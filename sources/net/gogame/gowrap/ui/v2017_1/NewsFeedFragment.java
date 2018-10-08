@@ -367,10 +367,10 @@ public class NewsFeedFragment extends Fragment {
     }
 
     private Feed readFeed(File file) throws IOException {
-        JsonReader jsonReader;
         InputStream fileInputStream = new FileInputStream(file);
         try {
             Reader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+            JsonReader jsonReader;
             try {
                 jsonReader = new JsonReader(inputStreamReader);
                 Feed feed = new Feed(jsonReader);

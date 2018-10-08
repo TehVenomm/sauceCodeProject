@@ -949,19 +949,18 @@ final class CustomConcurrentHashMap {
         }
 
         public boolean isEmpty() {
-            int i;
             Segment[] segmentArr = this.segments;
             int[] iArr = new int[segmentArr.length];
-            int i2 = 0;
-            for (i = 0; i < segmentArr.length; i++) {
-                if (segmentArr[i].count != 0) {
+            int i = 0;
+            for (int i2 = 0; i2 < segmentArr.length; i2++) {
+                if (segmentArr[i2].count != 0) {
                     return false;
                 }
-                int i3 = segmentArr[i].modCount;
-                iArr[i] = i3;
-                i2 += i3;
+                int i3 = segmentArr[i2].modCount;
+                iArr[i2] = i3;
+                i += i3;
             }
-            if (i2 != 0) {
+            if (i != 0) {
                 i = 0;
                 while (i < segmentArr.length) {
                     if (segmentArr[i].count != 0 || iArr[i] != segmentArr[i].modCount) {
@@ -1066,16 +1065,15 @@ final class CustomConcurrentHashMap {
             long j = 0;
             long j2 = 0;
             for (int i2 = 0; i2 < 2; i2++) {
-                int i3;
                 j = 0;
-                int i4 = 0;
-                for (i3 = 0; i3 < segmentArr.length; i3++) {
-                    j += (long) segmentArr[i3].count;
-                    int i5 = segmentArr[i3].modCount;
-                    iArr[i3] = i5;
-                    i4 += i5;
+                int i3 = 0;
+                for (int i4 = 0; i4 < segmentArr.length; i4++) {
+                    j += (long) segmentArr[i4].count;
+                    int i5 = segmentArr[i4].modCount;
+                    iArr[i4] = i5;
+                    i3 += i5;
                 }
-                if (i4 != 0) {
+                if (i3 != 0) {
                     j2 = 0;
                     for (i3 = 0; i3 < segmentArr.length; i3++) {
                         j2 += (long) segmentArr[i3].count;

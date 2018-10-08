@@ -19,8 +19,8 @@ public class SpringPosition
 
 	public OnFinished onFinished;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private GameObject eventReceiver;
 
 	[SerializeField]

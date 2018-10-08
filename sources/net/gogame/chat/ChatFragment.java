@@ -129,7 +129,6 @@ public class ChatFragment extends Fragment {
     }
 
     private void send(Uri uri) {
-        OutputStream fileOutputStream;
         try {
             String filename = ContentUtils.getFilename(getActivity(), uri);
             if (filename == null) {
@@ -137,6 +136,7 @@ public class ChatFragment extends Fragment {
             }
             File file = new File(getActivity().getCacheDir(), filename);
             InputStream openInputStream = getActivity().getContentResolver().openInputStream(uri);
+            OutputStream fileOutputStream;
             try {
                 fileOutputStream = new FileOutputStream(file);
                 IOUtils.copy(openInputStream, fileOutputStream);

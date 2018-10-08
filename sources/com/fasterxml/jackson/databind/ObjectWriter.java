@@ -543,22 +543,22 @@ public class ObjectWriter implements Versioned, Serializable {
     }
 
     public void writeValue(JsonGenerator jsonGenerator, Object obj) throws IOException, JsonGenerationException, JsonMappingException {
+        Closeable closeable;
         Throwable th;
         _configureGenerator(jsonGenerator);
         if (this._config.isEnabled(SerializationFeature.CLOSE_CLOSEABLE) && (obj instanceof Closeable)) {
-            Closeable closeable = (Closeable) obj;
-            Closeable closeable2;
+            Closeable closeable2 = (Closeable) obj;
             try {
                 this._prefetch.serialize(jsonGenerator, obj, _serializerProvider());
                 if (this._config.isEnabled(SerializationFeature.FLUSH_AFTER_WRITE_VALUE)) {
                     jsonGenerator.flush();
                 }
-                closeable2 = null;
+                closeable = null;
                 try {
-                    closeable.close();
-                    if (closeable2 != null) {
+                    closeable2.close();
+                    if (closeable != null) {
                         try {
-                            closeable2.close();
+                            closeable.close();
                             return;
                         } catch (IOException e) {
                             return;
@@ -567,9 +567,9 @@ public class ObjectWriter implements Versioned, Serializable {
                     return;
                 } catch (Throwable th2) {
                     th = th2;
-                    if (closeable2 != null) {
+                    if (closeable != null) {
                         try {
-                            closeable2.close();
+                            closeable.close();
                         } catch (IOException e2) {
                         }
                     }
@@ -577,10 +577,10 @@ public class ObjectWriter implements Versioned, Serializable {
                 }
             } catch (Throwable th3) {
                 Throwable th4 = th3;
-                closeable2 = closeable;
+                closeable = closeable2;
                 th = th4;
-                if (closeable2 != null) {
-                    closeable2.close();
+                if (closeable != null) {
+                    closeable.close();
                 }
                 throw th;
             }

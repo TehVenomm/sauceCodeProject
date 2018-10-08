@@ -787,13 +787,13 @@ public class SlidingPaneLayout extends ViewGroup {
                     i8 = i7;
                 }
                 if (isLayoutRtlSupport) {
-                    paddingRight += i5 - i8;
-                    i9 = paddingRight - measuredWidth;
+                    i9 = (i5 - i8) + paddingRight;
+                    paddingRight = i9 - measuredWidth;
                 } else {
-                    i9 = i8 - paddingRight;
-                    paddingRight = i9 + measuredWidth;
+                    paddingRight = i8 - paddingRight;
+                    i9 = paddingRight + measuredWidth;
                 }
-                childAt.layout(i9, paddingTop, paddingRight, childAt.getMeasuredHeight() + paddingTop);
+                childAt.layout(paddingRight, paddingTop, i9, childAt.getMeasuredHeight() + paddingTop);
                 paddingRight = childAt.getWidth() + i7;
             }
             i6++;

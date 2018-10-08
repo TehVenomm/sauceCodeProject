@@ -8,6 +8,7 @@ import im.getsocial.sdk.GetSocialException;
 import im.getsocial.sdk.internal.p089m.EmkjBpiUfq;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -61,11 +62,9 @@ public class jjbQypPegg implements upgqDBbsrL {
             public void run() {
                 Closeable inputStream;
                 Closeable byteArrayOutputStream;
-                Throwable th;
-                Closeable closeable;
-                Throwable th2;
-                OutOfMemoryError e;
-                Closeable closeable2 = null;
+                Throwable e;
+                OutOfMemoryError e2;
+                Closeable closeable = null;
                 try {
                     HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(str2).openConnection();
                     httpURLConnection.setDoInput(true);
@@ -74,40 +73,28 @@ public class jjbQypPegg implements upgqDBbsrL {
                     inputStream = httpURLConnection.getInputStream();
                     try {
                         byteArrayOutputStream = new ByteArrayOutputStream();
-                    } catch (Throwable e2) {
-                        th = e2;
-                        closeable = null;
-                        th2 = th;
-                        try {
-                            callback2.onFailure(im.getsocial.sdk.internal.p033c.p051c.jjbQypPegg.m1222a(th2));
-                            EmkjBpiUfq.m2100a(inputStream);
-                            EmkjBpiUfq.m2100a(closeable);
-                        } catch (Throwable th3) {
-                            th2 = th3;
-                            EmkjBpiUfq.m2100a(inputStream);
-                            EmkjBpiUfq.m2100a(closeable);
-                            throw th2;
-                        }
-                    } catch (OutOfMemoryError e3) {
+                    } catch (IOException e3) {
                         e = e3;
                         try {
-                            callback2.onFailure(new GetSocialException(103, e.getMessage()));
-                            EmkjBpiUfq.m2100a(inputStream);
-                            EmkjBpiUfq.m2100a(closeable2);
-                        } catch (Throwable e22) {
-                            th = e22;
-                            closeable = closeable2;
-                            th2 = th;
+                            callback2.onFailure(im.getsocial.sdk.internal.p033c.p051c.jjbQypPegg.m1222a(e));
                             EmkjBpiUfq.m2100a(inputStream);
                             EmkjBpiUfq.m2100a(closeable);
-                            throw th2;
+                        } catch (Throwable th) {
+                            e = th;
+                            EmkjBpiUfq.m2100a(inputStream);
+                            EmkjBpiUfq.m2100a(closeable);
+                            throw e;
                         }
-                    } catch (Throwable e222) {
-                        th2 = e222;
-                        closeable = null;
+                    } catch (OutOfMemoryError e4) {
+                        e2 = e4;
+                        callback2.onFailure(new GetSocialException(103, e2.getMessage()));
                         EmkjBpiUfq.m2100a(inputStream);
                         EmkjBpiUfq.m2100a(closeable);
-                        throw th2;
+                    } catch (Throwable th2) {
+                        e = th2;
+                        EmkjBpiUfq.m2100a(inputStream);
+                        EmkjBpiUfq.m2100a(closeable);
+                        throw e;
                     }
                     try {
                         jjbQypPegg.m1906a(inputStream, byteArrayOutputStream);
@@ -126,47 +113,43 @@ public class jjbQypPegg implements upgqDBbsrL {
                         }
                         EmkjBpiUfq.m2100a(inputStream);
                         EmkjBpiUfq.m2100a(byteArrayOutputStream);
-                    } catch (Throwable e2222) {
-                        th2 = e2222;
+                    } catch (IOException e5) {
+                        e = e5;
                         closeable = byteArrayOutputStream;
-                        callback2.onFailure(im.getsocial.sdk.internal.p033c.p051c.jjbQypPegg.m1222a(th2));
+                        callback2.onFailure(im.getsocial.sdk.internal.p033c.p051c.jjbQypPegg.m1222a(e));
                         EmkjBpiUfq.m2100a(inputStream);
                         EmkjBpiUfq.m2100a(closeable);
-                    } catch (OutOfMemoryError e4) {
-                        e = e4;
-                        closeable2 = byteArrayOutputStream;
-                        callback2.onFailure(new GetSocialException(103, e.getMessage()));
+                    } catch (OutOfMemoryError e6) {
+                        e2 = e6;
+                        closeable = byteArrayOutputStream;
+                        callback2.onFailure(new GetSocialException(103, e2.getMessage()));
                         EmkjBpiUfq.m2100a(inputStream);
-                        EmkjBpiUfq.m2100a(closeable2);
-                    } catch (Throwable th4) {
-                        th2 = th4;
+                        EmkjBpiUfq.m2100a(closeable);
+                    } catch (Throwable th3) {
+                        e = th3;
                         closeable = byteArrayOutputStream;
                         EmkjBpiUfq.m2100a(inputStream);
                         EmkjBpiUfq.m2100a(closeable);
-                        throw th2;
+                        throw e;
                     }
-                } catch (Throwable e22222) {
+                } catch (IOException e7) {
+                    e = e7;
                     inputStream = null;
-                    th = e22222;
-                    closeable = null;
-                    th2 = th;
-                    callback2.onFailure(im.getsocial.sdk.internal.p033c.p051c.jjbQypPegg.m1222a(th2));
+                    callback2.onFailure(im.getsocial.sdk.internal.p033c.p051c.jjbQypPegg.m1222a(e));
                     EmkjBpiUfq.m2100a(inputStream);
                     EmkjBpiUfq.m2100a(closeable);
-                } catch (OutOfMemoryError e5) {
-                    e = e5;
+                } catch (OutOfMemoryError e8) {
+                    e2 = e8;
                     inputStream = null;
-                    callback2.onFailure(new GetSocialException(103, e.getMessage()));
-                    EmkjBpiUfq.m2100a(inputStream);
-                    EmkjBpiUfq.m2100a(closeable2);
-                } catch (Throwable e222222) {
-                    inputStream = null;
-                    th = e222222;
-                    closeable = null;
-                    th2 = th;
+                    callback2.onFailure(new GetSocialException(103, e2.getMessage()));
                     EmkjBpiUfq.m2100a(inputStream);
                     EmkjBpiUfq.m2100a(closeable);
-                    throw th2;
+                } catch (Throwable th4) {
+                    e = th4;
+                    inputStream = null;
+                    EmkjBpiUfq.m2100a(inputStream);
+                    EmkjBpiUfq.m2100a(closeable);
+                    throw e;
                 }
             }
         });

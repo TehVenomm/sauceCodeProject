@@ -368,28 +368,28 @@ public final class C$Gson$Types {
             int i = resolve2 != componentType ? 1 : 0;
             r4 = parameterizedType.getActualTypeArguments();
             int length = r4.length;
-            Type[] typeArr = r4;
-            Type[] typeArr2 = typeArr;
-            for (int i2 = 0; i2 < length; i2++) {
-                Type resolve3 = C$Gson$Types.resolve(type, cls, typeArr2[i2]);
-                if (resolve3 != typeArr2[i2]) {
-                    if (i == 0) {
-                        typeArr2 = (Type[]) typeArr2.clone();
-                        i = 1;
+            int i2 = i;
+            r1 = r4;
+            for (int i3 = 0; i3 < length; i3++) {
+                Type resolve3 = C$Gson$Types.resolve(type, cls, r1[i3]);
+                if (resolve3 != r1[i3]) {
+                    if (i2 == 0) {
+                        r1 = (Type[]) r1.clone();
+                        i2 = 1;
                     }
-                    typeArr2[i2] = resolve3;
+                    r1[i3] = resolve3;
                 }
             }
-            return i != 0 ? C$Gson$Types.newParameterizedTypeWithOwner(resolve2, parameterizedType.getRawType(), typeArr2) : parameterizedType;
+            return i2 != 0 ? C$Gson$Types.newParameterizedTypeWithOwner(resolve2, parameterizedType.getRawType(), r1) : parameterizedType;
         } else if (!(type3 instanceof WildcardType)) {
             return type3;
         } else {
             WildcardType wildcardType = (WildcardType) type3;
-            Type[] lowerBounds = wildcardType.getLowerBounds();
+            r1 = wildcardType.getLowerBounds();
             r4 = wildcardType.getUpperBounds();
-            if (lowerBounds.length == 1) {
-                resolve = C$Gson$Types.resolve(type, cls, lowerBounds[0]);
-                return resolve != lowerBounds[0] ? C$Gson$Types.supertypeOf(resolve) : wildcardType;
+            if (r1.length == 1) {
+                resolve = C$Gson$Types.resolve(type, cls, r1[0]);
+                return resolve != r1[0] ? C$Gson$Types.supertypeOf(resolve) : wildcardType;
             } else if (r4.length != 1) {
                 return wildcardType;
             } else {

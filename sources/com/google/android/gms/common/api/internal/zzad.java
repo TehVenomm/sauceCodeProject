@@ -76,8 +76,8 @@ public final class zzad implements zzcd {
             zzw zzw = (zzw) obj;
             hashMap2.put(zzw.zzfda, zzw);
         }
-        Object obj2 = 1;
-        Object obj3 = null;
+        Object obj2 = null;
+        Object obj3 = 1;
         Object obj4 = null;
         for (Entry entry : map.entrySet()) {
             Object obj5;
@@ -86,28 +86,28 @@ public final class zzad implements zzcd {
             Api api2 = (Api) hashMap.get(entry.getKey());
             Api.zze zze2 = (Api.zze) entry.getValue();
             if (!zze2.zzafe()) {
-                obj5 = obj4;
-                obj6 = obj3;
-                obj7 = null;
+                obj5 = obj2;
+                obj6 = null;
+                obj7 = obj4;
             } else if (((Boolean) this.zzfkg.get(api2)).booleanValue()) {
                 int i2 = 1;
                 obj6 = obj3;
-                obj7 = obj2;
+                obj7 = obj4;
             } else {
                 obj5 = 1;
-                obj6 = 1;
-                obj7 = obj2;
+                obj6 = obj3;
+                obj7 = 1;
             }
             zzac zzac = new zzac(context, api2, looper, zze2, (zzw) hashMap2.get(api2), zzq, zza);
             this.zzfke.put((zzc) entry.getKey(), zzac);
             if (zze2.zzaaa()) {
                 this.zzfkf.put((zzc) entry.getKey(), zzac);
             }
-            obj4 = obj5;
-            obj2 = obj7;
+            obj2 = obj5;
             obj3 = obj6;
+            obj4 = obj7;
         }
-        boolean z2 = obj4 != null && obj2 == null && obj3 == null;
+        boolean z2 = obj2 != null && obj3 == null && obj4 == null;
         this.zzfkl = z2;
         this.zzfgp = zzbp.zzahn();
     }

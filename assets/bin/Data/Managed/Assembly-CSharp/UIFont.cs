@@ -30,12 +30,12 @@ public class UIFont
 	[HideInInspector]
 	private List<BMSymbol> mSymbols = new List<BMSymbol>();
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Font mDynamicFont;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private int mDynamicFontSize = 16;
 
 	[SerializeField]

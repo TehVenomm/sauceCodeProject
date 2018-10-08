@@ -161,11 +161,11 @@ public class EmkjBpiUfq {
 
     /* renamed from: b */
     private static boolean m2105b(Context context, Bitmap bitmap) {
-        Closeable fileOutputStream;
         IOException e;
         Throwable th;
         File file = new File(context.getCacheDir(), "getsocial-smartinvite-tempimage.jpg");
         if (!file.exists() || file.delete()) {
+            Closeable fileOutputStream;
             try {
                 if (file.createNewFile()) {
                     fileOutputStream = new FileOutputStream(file);
@@ -213,15 +213,16 @@ public class EmkjBpiUfq {
     /* renamed from: b */
     private static boolean m2106b(File file, String str) {
         IOException e;
+        Closeable closeable;
         Throwable th;
-        Closeable closeable = null;
-        Closeable inputStream;
+        Closeable closeable2;
+        Closeable closeable3 = null;
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(str).openConnection();
             httpURLConnection.setDoInput(true);
             httpURLConnection.setUseCaches(true);
             httpURLConnection.connect();
-            inputStream = httpURLConnection.getInputStream();
+            Closeable inputStream = httpURLConnection.getInputStream();
             try {
                 if (file.createNewFile()) {
                     Closeable fileOutputStream = new FileOutputStream(file);
@@ -240,23 +241,26 @@ public class EmkjBpiUfq {
                         }
                     } catch (IOException e2) {
                         e = e2;
-                        closeable = fileOutputStream;
+                        closeable = inputStream;
+                        closeable3 = fileOutputStream;
                         try {
                             f2208a.mo4393c("Could not save url content to the cache directory, returning null. error: " + e.getMessage());
+                            EmkjBpiUfq.m2100a(closeable3);
                             EmkjBpiUfq.m2100a(closeable);
-                            EmkjBpiUfq.m2100a(inputStream);
                             return false;
                         } catch (Throwable th2) {
                             th = th2;
-                            EmkjBpiUfq.m2100a(closeable);
-                            EmkjBpiUfq.m2100a(inputStream);
+                            closeable2 = closeable;
+                            EmkjBpiUfq.m2100a(closeable3);
+                            EmkjBpiUfq.m2100a(closeable2);
                             throw th;
                         }
                     } catch (Throwable th3) {
                         th = th3;
-                        closeable = fileOutputStream;
-                        EmkjBpiUfq.m2100a(closeable);
-                        EmkjBpiUfq.m2100a(inputStream);
+                        closeable2 = inputStream;
+                        closeable3 = fileOutputStream;
+                        EmkjBpiUfq.m2100a(closeable3);
+                        EmkjBpiUfq.m2100a(closeable2);
                         throw th;
                     }
                 }
@@ -266,28 +270,30 @@ public class EmkjBpiUfq {
                 return false;
             } catch (IOException e3) {
                 e = e3;
+                closeable = inputStream;
                 f2208a.mo4393c("Could not save url content to the cache directory, returning null. error: " + e.getMessage());
+                EmkjBpiUfq.m2100a(closeable3);
                 EmkjBpiUfq.m2100a(closeable);
-                EmkjBpiUfq.m2100a(inputStream);
                 return false;
             } catch (Throwable th4) {
                 th = th4;
-                EmkjBpiUfq.m2100a(closeable);
-                EmkjBpiUfq.m2100a(inputStream);
+                closeable2 = inputStream;
+                EmkjBpiUfq.m2100a(closeable3);
+                EmkjBpiUfq.m2100a(closeable2);
                 throw th;
             }
         } catch (IOException e4) {
             e = e4;
-            inputStream = null;
+            closeable = null;
             f2208a.mo4393c("Could not save url content to the cache directory, returning null. error: " + e.getMessage());
+            EmkjBpiUfq.m2100a(closeable3);
             EmkjBpiUfq.m2100a(closeable);
-            EmkjBpiUfq.m2100a(inputStream);
             return false;
         } catch (Throwable th5) {
             th = th5;
-            inputStream = null;
-            EmkjBpiUfq.m2100a(closeable);
-            EmkjBpiUfq.m2100a(inputStream);
+            closeable2 = null;
+            EmkjBpiUfq.m2100a(closeable3);
+            EmkjBpiUfq.m2100a(closeable2);
             throw th;
         }
     }

@@ -73,9 +73,9 @@ public class zoToeBNOjF implements Serializable, Comparable<zoToeBNOjF> {
             byte b = bArr[i];
             int i3 = i2 + 1;
             cArr[i2] = (char) f1028a[(b >> 4) & 15];
-            i2 = i3 + 1;
             cArr[i3] = (char) f1028a[b & 15];
             i++;
+            i2 = i3 + 1;
         }
         return new String(cArr);
     }

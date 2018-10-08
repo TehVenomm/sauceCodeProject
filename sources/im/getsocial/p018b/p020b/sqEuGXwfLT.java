@@ -107,12 +107,12 @@ final class sqEuGXwfLT extends zoToeBNOjF {
         Object obj = new byte[this.f1034g[this.f1033f.length - 1]];
         int length = this.f1033f.length;
         int i2 = 0;
-        while (i2 < length) {
-            int i3 = this.f1034g[length + i2];
-            int i4 = this.f1034g[i2];
-            System.arraycopy(this.f1033f[i2], i3, obj, i, i4 - i);
-            i2++;
-            i = i4;
+        while (i < length) {
+            int i3 = this.f1034g[length + i];
+            int i4 = this.f1034g[i];
+            System.arraycopy(this.f1033f[i], i3, obj, i2, i4 - i2);
+            i++;
+            i2 = i4;
         }
         return obj;
     }
@@ -128,21 +128,21 @@ final class sqEuGXwfLT extends zoToeBNOjF {
             if (mo4311c() - c < 0) {
                 i = 0;
             } else {
-                int i2 = 0;
-                int b = m796b(0);
-                int i3 = c;
-                c = 0;
-                while (i3 > 0) {
-                    i = b == 0 ? 0 : this.f1034g[b - 1];
-                    int min = Math.min(i3, ((this.f1034g[b] - i) + i) - i2);
-                    if (!zotoebnojf.mo4309a(c, this.f1033f[b], (i2 - i) + this.f1034g[this.f1033f.length + b], min)) {
+                int i2 = c;
+                int i3 = 0;
+                int i4 = 0;
+                c = m796b(0);
+                while (i2 > 0) {
+                    i = c == 0 ? 0 : this.f1034g[c - 1];
+                    int min = Math.min(i2, ((this.f1034g[c] - i) + i) - i4);
+                    if (!zotoebnojf.mo4309a(i3, this.f1033f[c], (i4 - i) + this.f1034g[this.f1033f.length + c], min)) {
                         i = 0;
                         break;
                     }
-                    i2 += min;
-                    i3 -= min;
-                    b++;
-                    c += min;
+                    i4 += min;
+                    i3 += min;
+                    i2 -= min;
+                    c++;
                 }
                 i = 1;
             }

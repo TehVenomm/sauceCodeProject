@@ -16,16 +16,16 @@ public class UISlider : UIProgressBar
 	[HideInInspector]
 	private Transform foreground;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private float rawValue = 1f;
 
 	[HideInInspector]
 	[SerializeField]
 	private Direction direction = Direction.Upgraded;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected bool mInverted;
 
 	public bool isColliderEnabled

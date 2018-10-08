@@ -44,7 +44,6 @@ final class C0815s implements HttpRequest {
 
     /* renamed from: b */
     private void m623b(@NonNull File file, @NonNull URL url) {
-        PrintWriter printWriter;
         InputStream bufferedInputStream;
         OutputStream outputStream;
         Throwable th;
@@ -53,6 +52,7 @@ final class C0815s implements HttpRequest {
         HttpsURLConnection httpsURLConnection;
         HttpsURLConnection httpsURLConnection2 = null;
         OutputStream outputStream2;
+        PrintWriter printWriter;
         try {
             long length;
             HttpsURLConnection httpsURLConnection3 = (HttpsURLConnection) url.openConnection();

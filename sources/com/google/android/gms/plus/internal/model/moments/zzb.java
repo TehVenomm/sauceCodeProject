@@ -45,8 +45,8 @@ public class zzb implements Creator<MomentEntity> {
         Set hashSet = new HashSet();
         int i = 0;
         String str = null;
-        ItemScopeEntity itemScopeEntity2 = null;
         String str2 = null;
+        ItemScopeEntity itemScopeEntity2 = null;
         String str3 = null;
         while (parcel.dataPosition() < zzL) {
             int zzK = zza.zzK(parcel);

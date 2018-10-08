@@ -19,8 +19,8 @@ public class zzee implements IInterface {
     }
 
     protected final Parcel zza(int i, Parcel parcel) throws RemoteException {
-        IBinder iBinder;
         Parcel obtain = Parcel.obtain();
+        IBinder iBinder;
         try {
             iBinder = this.zzakc;
             iBinder.transact(i, parcel, obtain, 0);
@@ -56,7 +56,7 @@ jadx.core.utils.exceptions.CodegenException: Error generate insn: 0x0017: INVOKE
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1758893871.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
 Caused by: jadx.core.utils.exceptions.CodegenException: Error generate insn: ?: MERGE  (r5_1 android.os.Parcel) = (r5_0 'parcel' android.os.Parcel), (r1_0 'obtain' android.os.Parcel) in method: com.google.android.gms.internal.zzee.zza(int, android.os.Parcel):android.os.Parcel, dex: classes.dex
 	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:226)
 	at jadx.core.codegen.InsnGen.addArg(InsnGen.java:101)

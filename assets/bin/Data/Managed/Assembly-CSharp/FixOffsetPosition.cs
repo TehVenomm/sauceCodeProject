@@ -7,11 +7,14 @@ public class FixOffsetPosition
 
 	public float OffsetHeigh;
 
+	public float OffsetWidt;
+
 	public bool IsOnlyInphoneX;
 
 	public FixOffsetPosition(string _path)
 	{
 		Path = _path;
 		OffsetHeigh = 0f;
+		OffsetWidt = 0f;
 	}
 }

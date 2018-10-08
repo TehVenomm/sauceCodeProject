@@ -988,8 +988,8 @@ public final class Utility {
 
     public static String readStreamToString(InputStream inputStream) throws IOException {
         Closeable bufferedInputStream;
-        Throwable th;
         Closeable inputStreamReader;
+        Throwable th;
         try {
             bufferedInputStream = new BufferedInputStream(inputStream);
             try {

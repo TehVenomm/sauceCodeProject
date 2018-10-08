@@ -32,8 +32,8 @@ public class UIPlayTween
 	[HideInInspector]
 	private GameObject eventReceiver;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private string callWhenFinished;
 
 	private UITweener[] mTweens;

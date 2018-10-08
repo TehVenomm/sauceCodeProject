@@ -1249,45 +1249,45 @@ public class UTF8StreamJsonParser extends ParserBase {
     }
 
     private final JsonToken _parseNumber2(char[] cArr, int i, boolean z, int i2) throws IOException {
-        int i3 = i2;
-        int i4 = i;
+        int i3;
+        int i4 = i2;
+        int i5 = i;
         char[] cArr2 = cArr;
         while (true) {
-            int i5;
             if (this._inputPtr < this._inputEnd || loadMore()) {
                 byte[] bArr = this._inputBuffer;
-                i5 = this._inputPtr;
-                this._inputPtr = i5 + 1;
-                i5 = bArr[i5] & 255;
-                if (i5 <= 57 && i5 >= 48) {
+                i3 = this._inputPtr;
+                this._inputPtr = i3 + 1;
+                i3 = bArr[i3] & 255;
+                if (i3 <= 57 && i3 >= 48) {
                     int i6;
-                    if (i4 >= cArr2.length) {
+                    if (i5 >= cArr2.length) {
                         cArr2 = this._textBuffer.finishCurrentSegment();
                         i6 = 0;
                     } else {
-                        i6 = i4;
+                        i6 = i5;
                     }
-                    i4 = i6 + 1;
-                    cArr2[i6] = (char) i5;
-                    i3++;
+                    i5 = i6 + 1;
+                    cArr2[i6] = (char) i3;
+                    i4++;
                 }
             } else {
-                this._textBuffer.setCurrentLength(i4);
-                return resetInt(z, i3);
+                this._textBuffer.setCurrentLength(i5);
+                return resetInt(z, i4);
             }
         }
-        if (i5 == 46 || i5 == 101 || i5 == 69) {
-            return _parseFloat(cArr2, i4, i5, z, i3);
+        if (i3 == 46 || i3 == 101 || i3 == 69) {
+            return _parseFloat(cArr2, i5, i3, z, i4);
         }
         this._inputPtr--;
-        this._textBuffer.setCurrentLength(i4);
+        this._textBuffer.setCurrentLength(i5);
         if (this._parsingContext.inRoot()) {
             bArr = this._inputBuffer;
             int i7 = this._inputPtr;
             this._inputPtr = i7 + 1;
             _verifyRootSpace(bArr[i7] & 255);
         }
-        return resetInt(z, i3);
+        return resetInt(z, i4);
     }
 
     private final int _verifyNoLeadingZeroes() throws IOException {

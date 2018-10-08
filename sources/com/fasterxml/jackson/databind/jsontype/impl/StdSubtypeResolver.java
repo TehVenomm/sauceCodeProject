@@ -84,6 +84,7 @@ public class StdSubtypeResolver extends SubtypeResolver implements Serializable 
 
     public Collection<NamedType> collectAndResolveSubtypesByTypeId(MapperConfig<?> mapperConfig, AnnotatedMember annotatedMember, JavaType javaType) {
         Iterator it;
+        NamedType namedType;
         AnnotationIntrospector annotationIntrospector = mapperConfig.getAnnotationIntrospector();
         Class rawType = javaType == null ? annotatedMember.getRawType() : javaType.getRawClass();
         Set hashSet = new HashSet();
@@ -91,8 +92,7 @@ public class StdSubtypeResolver extends SubtypeResolver implements Serializable 
         _collectAndResolveByTypeId(AnnotatedClass.constructWithoutSuperTypes(rawType, mapperConfig), new NamedType(rawType, null), mapperConfig, hashSet, linkedHashMap);
         Collection<NamedType> findSubtypes = annotationIntrospector.findSubtypes(annotatedMember);
         if (findSubtypes != null) {
-            for (NamedType namedType : findSubtypes) {
-                NamedType namedType2;
+            for (NamedType namedType2 : findSubtypes) {
                 _collectAndResolveByTypeId(AnnotatedClass.constructWithoutSuperTypes(namedType2.getType(), mapperConfig), namedType2, mapperConfig, hashSet, linkedHashMap);
             }
         }

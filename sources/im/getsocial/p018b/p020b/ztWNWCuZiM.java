@@ -51,8 +51,8 @@ public final class ztWNWCuZiM implements rFvvVpjzZH {
     }
 
     public final void close() {
+        Throwable th;
         if (!this.f1039c) {
-            Throwable th;
             Throwable th2 = null;
             try {
                 this.f1038b.finish();

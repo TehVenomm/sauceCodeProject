@@ -33,8 +33,8 @@ public class UIAtlas
 		TexCoords
 	}
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Material material;
 
 	[SerializeField]

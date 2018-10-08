@@ -8,5 +8,7 @@ public class FixOffsetHeigh
 
 	public float OffsetHeigh;
 
+	public float OffsetWidt;
+
 	public bool IsOnlyInphoneX;
 }

@@ -182,12 +182,12 @@ class AppEventStore {
     }
 
     private static void saveEventsToDisk(PersistedEvents persistedEvents) {
+        Closeable objectOutputStream;
         Throwable th;
         Throwable e;
         Throwable th2;
         Closeable closeable = null;
         Context applicationContext = FacebookSdk.getApplicationContext();
-        Closeable objectOutputStream;
         try {
             objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(applicationContext.openFileOutput(PERSISTED_EVENTS_FILENAME, 0)));
             try {

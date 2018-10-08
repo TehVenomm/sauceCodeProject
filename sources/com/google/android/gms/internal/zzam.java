@@ -37,8 +37,8 @@ public final class zzam {
         str = (String) map.get(HttpRequest.HEADER_CACHE_CONTROL);
         if (str != null) {
             String[] split = str.split(",");
-            Object obj3 = null;
             j = 0;
+            Object obj3 = null;
             long j5 = 0;
             for (String trim : split) {
                 String trim2 = trim2.trim();
@@ -64,10 +64,10 @@ public final class zzam {
             obj = 1;
             obj2 = obj3;
         } else {
-            j2 = 0;
             j3 = 0;
             obj = null;
             obj2 = null;
+            j2 = 0;
         }
         str = (String) map.get(HttpRequest.HEADER_EXPIRES);
         j = str != null ? zzf(str) : 0;

@@ -37,12 +37,12 @@ public final class jjbQypPegg {
         List arrayList;
         String str2 = null;
         if (xdbacJlTDQ.f1647b.f1671c != null) {
-            str2 = xdbacJlTDQ.f1647b.f1671c.f1834b;
-            str = xdbacJlTDQ.f1647b.f1671c.f1833a;
+            str = xdbacJlTDQ.f1647b.f1671c.f1834b;
+            str2 = xdbacJlTDQ.f1647b.f1671c.f1833a;
         } else {
             str = null;
         }
-        Builder content = ActivityPost.builder().id(xdbacJlTDQ.f1646a).commentsCount(qdyNCsqjKt.m2121a(xdbacJlTDQ.f1652g)).likesCount(qdyNCsqjKt.m2121a(xdbacJlTDQ.f1653h)).likedByMe(qdyNCsqjKt.m2122a(xdbacJlTDQ.f1654i)).createdAt(qdyNCsqjKt.m2123b(xdbacJlTDQ.f1649d)).stickyStart(qdyNCsqjKt.m2123b(xdbacJlTDQ.f1650e)).stickyEnd(qdyNCsqjKt.m2123b(xdbacJlTDQ.f1651f)).author(jjbQypPegg.m977a(xdbacJlTDQ.f1648c)).content(xdbacJlTDQ.f1647b.f1669a, xdbacJlTDQ.f1647b.f1670b, xdbacJlTDQ.f1647b.f1672d, str2, str);
+        Builder content = ActivityPost.builder().id(xdbacJlTDQ.f1646a).commentsCount(qdyNCsqjKt.m2121a(xdbacJlTDQ.f1652g)).likesCount(qdyNCsqjKt.m2121a(xdbacJlTDQ.f1653h)).likedByMe(qdyNCsqjKt.m2122a(xdbacJlTDQ.f1654i)).createdAt(qdyNCsqjKt.m2123b(xdbacJlTDQ.f1649d)).stickyStart(qdyNCsqjKt.m2123b(xdbacJlTDQ.f1650e)).stickyEnd(qdyNCsqjKt.m2123b(xdbacJlTDQ.f1651f)).author(jjbQypPegg.m977a(xdbacJlTDQ.f1648c)).content(xdbacJlTDQ.f1647b.f1669a, xdbacJlTDQ.f1647b.f1670b, xdbacJlTDQ.f1647b.f1672d, str, str2);
         String str3 = xdbacJlTDQ.f1655j;
         if (!ztWNWCuZiM.m1521a(str3)) {
             if (ActivitiesQuery.GLOBAL_FEED.equals(str3)) {

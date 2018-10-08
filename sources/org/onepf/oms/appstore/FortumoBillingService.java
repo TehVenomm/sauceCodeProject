@@ -500,23 +500,23 @@ public class FortumoBillingService implements AppstoreInAppBillingService {
     }
 
     public Inventory queryInventory(boolean z, @Nullable List<String> list, List<String> list2) throws IabException {
-        String str;
+        PaymentResponse paymentResponse;
         Inventory inventory = new Inventory();
         SharedPreferences sharedPreferences = this.context.getSharedPreferences(SHARED_PREFS_FORTUMO, 0);
         Map all = sharedPreferences.getAll();
         if (all != null) {
             Editor edit = sharedPreferences.edit();
-            for (String str2 : all.keySet()) {
-                str = (String) all.get(str2);
-                if (str != null) {
-                    PaymentResponse paymentResponse = MpUtils.getPaymentResponse(this.context, Long.valueOf(str).longValue());
+            for (String str : all.keySet()) {
+                String str2 = (String) all.get(str);
+                if (str2 != null) {
+                    paymentResponse = MpUtils.getPaymentResponse(this.context, Long.valueOf(str2).longValue());
                     if (paymentResponse.getBillingStatus() == 2) {
                         inventory.addPurchase(purchaseFromPaymentResponse(this.context, paymentResponse));
                     } else if (paymentResponse.getBillingStatus() == 3) {
-                        edit.remove(str2);
+                        edit.remove(str);
                     }
                 } else {
-                    all.remove(str2);
+                    all.remove(str);
                 }
             }
             edit.commit();

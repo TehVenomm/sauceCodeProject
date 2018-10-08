@@ -9,16 +9,16 @@ public class UI2DSprite : UIBasicSprite
 	[SerializeField]
 	private Sprite mSprite;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Material mMat;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Shader mShader;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Vector4 mBorder = Vector4.get_zero();
 
 	[HideInInspector]

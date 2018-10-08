@@ -193,9 +193,9 @@ class MetaDataStore {
     }
 
     public void writeUserData(String str, UserMetaData userMetaData) {
-        Closeable bufferedWriter;
         Throwable e;
         File userDataFileForSession = getUserDataFileForSession(str);
+        Closeable bufferedWriter;
         try {
             String userDataToJson = userDataToJson(userMetaData);
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(userDataFileForSession), UTF_8));

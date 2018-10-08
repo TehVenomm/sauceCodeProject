@@ -186,23 +186,33 @@ public class ProfilePictureView extends FrameLayout {
         if (width >= 1 && height >= 1) {
             int presetSizeInPixels = getPresetSizeInPixels(false);
             if (presetSizeInPixels != 0) {
-                width = presetSizeInPixels;
+                height = presetSizeInPixels;
             } else {
-                presetSizeInPixels = width;
-                width = height;
+                presetSizeInPixels = height;
+                height = width;
             }
-            if (presetSizeInPixels <= width) {
-                width = isCropped() ? presetSizeInPixels : 0;
+            if (height > presetSizeInPixels) {
+                if (isCropped()) {
+                    height = presetSizeInPixels;
+                } else {
+                    boolean z2 = false;
+                }
+                int i = presetSizeInPixels;
+                presetSizeInPixels = height;
+                height = i;
+            } else if (isCropped()) {
+                presetSizeInPixels = height;
             } else {
-                presetSizeInPixels = isCropped() ? width : 0;
+                presetSizeInPixels = height;
+                height = 0;
             }
             if (presetSizeInPixels != this.queryWidth) {
                 z = true;
-            } else if (width != this.queryHeight) {
+            } else if (height != this.queryHeight) {
                 z = true;
             }
             this.queryWidth = presetSizeInPixels;
-            this.queryHeight = width;
+            this.queryHeight = height;
         }
         return z;
     }

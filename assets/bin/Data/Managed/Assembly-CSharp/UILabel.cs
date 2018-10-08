@@ -41,8 +41,8 @@ public class UILabel : UIWidget
 	[SerializeField]
 	private UIFont mFont;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	[Multiline(6)]
 	private string mText = string.Empty;
 
@@ -62,12 +62,12 @@ public class UILabel : UIWidget
 	[HideInInspector]
 	private bool mEncoding = true;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private int mMaxLineCount;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Effect mEffectStyle;
 
 	[SerializeField]
@@ -86,20 +86,20 @@ public class UILabel : UIWidget
 	[HideInInspector]
 	private Overflow mOverflow;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Material mMaterial;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private bool mApplyGradient;
 
 	[SerializeField]
 	[HideInInspector]
 	private Color mGradientTop = Color.get_white();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Color mGradientBottom = new Color(0.7f, 0.7f, 0.7f);
 
 	[HideInInspector]
@@ -114,24 +114,24 @@ public class UILabel : UIWidget
 	[SerializeField]
 	private bool mUseFloatSpacing;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private float mFloatSpacingX;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private float mFloatSpacingY;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool mShrinkToFit;
 
 	[SerializeField]
 	[HideInInspector]
 	private int mMaxLineWidth;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private int mMaxLineHeight;
 
 	[HideInInspector]

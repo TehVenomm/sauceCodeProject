@@ -1460,28 +1460,28 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     private final void _writeCloseableValue(JsonGenerator jsonGenerator, Object obj, SerializationConfig serializationConfig) throws IOException {
+        Closeable closeable;
         Throwable th;
-        Closeable closeable = (Closeable) obj;
-        Closeable closeable2;
+        Closeable closeable2 = (Closeable) obj;
         try {
             _serializerProvider(serializationConfig).serializeValue(jsonGenerator, obj);
             if (serializationConfig.isEnabled(SerializationFeature.FLUSH_AFTER_WRITE_VALUE)) {
                 jsonGenerator.flush();
             }
-            closeable2 = null;
+            closeable = null;
             try {
-                closeable.close();
-                if (closeable2 != null) {
+                closeable2.close();
+                if (closeable != null) {
                     try {
-                        closeable2.close();
+                        closeable.close();
                     } catch (IOException e) {
                     }
                 }
             } catch (Throwable th2) {
                 th = th2;
-                if (closeable2 != null) {
+                if (closeable != null) {
                     try {
-                        closeable2.close();
+                        closeable.close();
                     } catch (IOException e2) {
                     }
                 }
@@ -1489,10 +1489,10 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
             }
         } catch (Throwable th3) {
             Throwable th4 = th3;
-            closeable2 = closeable;
+            closeable = closeable2;
             th = th4;
-            if (closeable2 != null) {
-                closeable2.close();
+            if (closeable != null) {
+                closeable.close();
             }
             throw th;
         }

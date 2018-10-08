@@ -643,13 +643,12 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
     }
 
     private int postponePostponableTransactions(ArrayList<BackStackRecord> arrayList, ArrayList<Boolean> arrayList2, int i, int i2, ArraySet<Fragment> arraySet) {
-        int i3 = i2 - 1;
-        int i4 = i2;
-        while (i3 >= i) {
+        int i3 = i2;
+        for (int i4 = i2 - 1; i4 >= i; i4--) {
             int i5;
-            BackStackRecord backStackRecord = (BackStackRecord) arrayList.get(i3);
-            boolean booleanValue = ((Boolean) arrayList2.get(i3)).booleanValue();
-            Object obj = (!backStackRecord.isPostponed() || backStackRecord.interactsWith(arrayList, i3 + 1, i2)) ? null : 1;
+            BackStackRecord backStackRecord = (BackStackRecord) arrayList.get(i4);
+            boolean booleanValue = ((Boolean) arrayList2.get(i4)).booleanValue();
+            Object obj = (!backStackRecord.isPostponed() || backStackRecord.interactsWith(arrayList, i4 + 1, i2)) ? null : 1;
             if (obj != null) {
                 if (this.mPostponedTransactions == null) {
                     this.mPostponedTransactions = new ArrayList();
@@ -662,20 +661,19 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
                 } else {
                     backStackRecord.executePopOps();
                 }
-                int i6 = i4 - 1;
-                if (i3 != i6) {
-                    arrayList.remove(i3);
+                int i6 = i3 - 1;
+                if (i4 != i6) {
+                    arrayList.remove(i4);
                     arrayList.add(i6, backStackRecord);
                 }
                 addAddedFragments(arraySet);
                 i5 = i6;
             } else {
-                i5 = i4;
+                i5 = i3;
             }
-            i3--;
-            i4 = i5;
+            i3 = i5;
         }
-        return i4;
+        return i3;
     }
 
     public static int reverseTransit(int i) {
@@ -1328,11 +1326,12 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
     void doPendingDeferredStart() {
         if (this.mHavePendingDeferredStart) {
             int i = 0;
-            for (int i2 = 0; i2 < this.mActive.size(); i2++) {
+            int i2 = 0;
+            while (i2 < this.mActive.size()) {
                 Fragment fragment = (Fragment) this.mActive.get(i2);
-                if (!(fragment == null || fragment.mLoaderManager == null)) {
-                    i |= fragment.mLoaderManager.hasRunningLoaders();
-                }
+                int hasRunningLoaders = (fragment == null || fragment.mLoaderManager == null) ? i : i | fragment.mLoaderManager.hasRunningLoaders();
+                i2++;
+                i = hasRunningLoaders;
             }
             if (i == 0) {
                 this.mHavePendingDeferredStart = false;
@@ -2816,13 +2815,13 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
                 Fragment fragment = (Fragment) this.mActive.get(i);
                 List list3;
                 if (fragment != null) {
-                    ArrayList arrayList3;
                     boolean z;
+                    ArrayList arrayList3;
                     if (fragment.mRetainInstance) {
                         if (list == null) {
-                            arrayList3 = new ArrayList();
+                            arrayList = new ArrayList();
                         }
-                        arrayList3.add(fragment);
+                        arrayList.add(fragment);
                         fragment.mRetaining = true;
                         fragment.mTargetIndex = fragment.mTarget != null ? fragment.mTarget.mIndex : -1;
                         if (DEBUG) {
@@ -2832,20 +2831,25 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
                     if (fragment.mChildFragmentManager != null) {
                         FragmentManagerNonConfig retainNonConfig = fragment.mChildFragmentManager.retainNonConfig();
                         if (retainNonConfig != null) {
+                            ArrayList arrayList4;
                             if (list2 == null) {
-                                arrayList = new ArrayList();
+                                arrayList4 = new ArrayList();
                                 for (int i2 = 0; i2 < i; i2++) {
-                                    arrayList.add(null);
+                                    arrayList4.add(null);
                                 }
                             }
-                            arrayList.add(retainNonConfig);
-                            arrayList2 = arrayList;
+                            arrayList4.add(retainNonConfig);
+                            arrayList2 = arrayList4;
                             z = true;
-                            if (arrayList2 != null || r1) {
-                                arrayList = arrayList3;
+                            if (arrayList2 != null || r2) {
+                                arrayList3 = arrayList;
+                                arrayList = arrayList2;
+                                arrayList2 = arrayList3;
                             } else {
                                 arrayList2.add(null);
-                                arrayList = arrayList3;
+                                arrayList3 = arrayList;
+                                arrayList = arrayList2;
+                                arrayList2 = arrayList3;
                             }
                         }
                     }
@@ -2853,10 +2857,12 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
                     z = false;
                     if (arrayList2 != null) {
                     }
-                    arrayList = arrayList3;
+                    arrayList3 = arrayList;
+                    arrayList = arrayList2;
+                    arrayList2 = arrayList3;
                 } else {
-                    list3 = list2;
-                    list2 = list;
+                    list3 = list;
+                    list = list2;
                 }
                 i++;
                 Object obj = arrayList;

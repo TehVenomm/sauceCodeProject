@@ -471,13 +471,13 @@ public final class C1390c extends AdapterView {
                 }
                 if (childCount > 0) {
                     this.f3595g = i5 + this.f3595g;
-                    i5 = this.f3595g;
-                    for (i6 = 0; i6 < childCount; i6++) {
-                        View childAt = getChildAt(i6);
-                        int paddingLeft = getPaddingLeft() + i5;
+                    i6 = this.f3595g;
+                    for (i5 = 0; i5 < childCount; i5++) {
+                        View childAt = getChildAt(i5);
+                        int paddingLeft = getPaddingLeft() + i6;
                         int paddingTop = getPaddingTop();
                         childAt.layout(paddingLeft, paddingTop, childAt.getMeasuredWidth() + paddingLeft, childAt.getMeasuredHeight() + paddingTop);
-                        i5 += childAt.getMeasuredWidth() + this.f3600l;
+                        i6 += childAt.getMeasuredWidth() + this.f3600l;
                     }
                 }
                 this.f3591c = this.f3592d;

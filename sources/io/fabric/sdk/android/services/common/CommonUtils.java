@@ -239,11 +239,11 @@ public class CommonUtils {
     }
 
     public static String extractFieldFromSystemFile(File file, String str) {
+        Closeable bufferedReader;
         Throwable e;
         Throwable th;
         String str2 = null;
         if (file.exists()) {
-            Closeable bufferedReader;
             try {
                 String[] split;
                 bufferedReader = new BufferedReader(new FileReader(file), 1024);
@@ -317,10 +317,10 @@ public class CommonUtils {
     }
 
     public static String getAppIconHashOrNull(Context context) {
-        Closeable openRawResource;
         Throwable e;
         Throwable th;
         String str = null;
+        Closeable openRawResource;
         try {
             openRawResource = context.getResources().openRawResource(getAppIconResourceId(context));
             try {
@@ -443,8 +443,8 @@ public class CommonUtils {
 
     public static long getTotalRamInBytes() {
         long j;
-        String toUpperCase;
         synchronized (CommonUtils.class) {
+            String toUpperCase;
             try {
                 if (totalRamInBytes == -1) {
                     Object extractFieldFromSystemFile = extractFieldFromSystemFile(new File("/proc/meminfo"), "MemTotal");

@@ -103,13 +103,13 @@ public class CursorLoader extends AsyncTaskLoader<Cursor> {
     }
 
     public Cursor loadInBackground() {
-        Cursor query;
         synchronized (this) {
             if (isLoadInBackgroundCanceled()) {
                 throw new OperationCanceledException();
             }
             this.mCancellationSignal = new CancellationSignal();
         }
+        Cursor query;
         try {
             query = ContentResolverCompat.query(getContext().getContentResolver(), this.mUri, this.mProjection, this.mSelection, this.mSelectionArgs, this.mSortOrder, this.mCancellationSignal);
             if (query != null) {

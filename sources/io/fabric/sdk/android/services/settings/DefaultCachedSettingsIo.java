@@ -71,13 +71,13 @@ class DefaultCachedSettingsIo implements CachedSettingsIo {
     }
 
     public void writeCachedSettings(long j, JSONObject jSONObject) {
+        Closeable fileWriter;
         Throwable th;
         Throwable e;
         Throwable th2;
         Closeable closeable = null;
         Fabric.getLogger().mo4753d("Fabric", "Writing settings to cache file...");
         if (jSONObject != null) {
-            Closeable fileWriter;
             try {
                 jSONObject.put(SettingsJsonConstants.EXPIRES_AT_KEY, j);
                 fileWriter = new FileWriter(new File(new FileStoreImpl(this.kit).getFilesDir(), Settings.SETTINGS_CACHE_FILENAME));

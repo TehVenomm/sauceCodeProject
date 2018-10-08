@@ -69,10 +69,10 @@ final class C0288p {
 
     /* renamed from: ˏ */
     private static String m336(File file) {
-        RandomAccessFile randomAccessFile;
         byte[] bArr;
         Throwable e;
         Throwable th;
+        RandomAccessFile randomAccessFile;
         try {
             randomAccessFile = new RandomAccessFile(file, "r");
             try {

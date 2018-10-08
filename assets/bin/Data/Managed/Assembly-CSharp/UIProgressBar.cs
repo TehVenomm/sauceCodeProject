@@ -21,20 +21,20 @@ public class UIProgressBar : UIWidgetContainer
 
 	public Transform thumb;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected UIWidget mBG;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected UIWidget mFG;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected float mValue = 1f;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected FillDirection mFill;
 
 	protected Transform mTrans;

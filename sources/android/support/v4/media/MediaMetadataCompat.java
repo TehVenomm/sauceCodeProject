@@ -265,13 +265,13 @@ public final class MediaMetadataCompat implements Parcelable {
         if (TextUtils.isEmpty(text)) {
             int i2 = 0;
             i = 0;
-            while (i < charSequenceArr.length && i2 < PREFERRED_DESCRIPTION_ORDER.length) {
-                CharSequence text2 = getText(PREFERRED_DESCRIPTION_ORDER[i2]);
+            while (i2 < charSequenceArr.length && i < PREFERRED_DESCRIPTION_ORDER.length) {
+                CharSequence text2 = getText(PREFERRED_DESCRIPTION_ORDER[i]);
                 if (!TextUtils.isEmpty(text2)) {
-                    charSequenceArr[i] = text2;
-                    i++;
+                    charSequenceArr[i2] = text2;
+                    i2++;
                 }
-                i2++;
+                i++;
             }
         } else {
             charSequenceArr[0] = text;

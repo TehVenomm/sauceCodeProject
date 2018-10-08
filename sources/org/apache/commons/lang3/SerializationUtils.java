@@ -116,11 +116,11 @@ public class SerializationUtils {
     }
 
     public static void serialize(Serializable serializable, OutputStream outputStream) {
-        ObjectOutputStream objectOutputStream;
         Throwable e;
         if (outputStream == null) {
             throw new IllegalArgumentException("The OutputStream must not be null");
         }
+        ObjectOutputStream objectOutputStream;
         try {
             objectOutputStream = new ObjectOutputStream(outputStream);
             try {

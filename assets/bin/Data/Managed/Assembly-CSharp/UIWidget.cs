@@ -36,20 +36,20 @@ public class UIWidget : UIRect
 	[SerializeField]
 	protected Color mColor = Color.get_white();
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected Pivot mPivot = Pivot.Center;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected int mWidth = 100;
 
 	[SerializeField]
 	[HideInInspector]
 	protected int mHeight = 100;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected int mDepth;
 
 	public OnDimensionsChanged onChange;

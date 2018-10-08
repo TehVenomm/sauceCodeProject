@@ -92,20 +92,21 @@ public final class DeserializerCache implements Serializable {
             _findCachedDeserializer = _findCachedDeserializer(javaType);
             if (_findCachedDeserializer != null) {
             } else {
-                int size = this._incompleteDeserializers.size();
-                if (size > 0) {
+                r2 = this._incompleteDeserializers.size();
+                if (r2 > 0) {
                     _findCachedDeserializer = (JsonDeserializer) this._incompleteDeserializers.get(javaType);
                     if (_findCachedDeserializer != null) {
                     }
                 }
                 try {
                     _findCachedDeserializer = _createAndCache2(deserializationContext, deserializerFactory, javaType);
-                    if (size == 0) {
+                    if (r2 == 0) {
                         if (this._incompleteDeserializers.size() > 0) {
                             this._incompleteDeserializers.clear();
                         }
                     }
                 } catch (Throwable th) {
+                    int size;
                     if (size == 0 && this._incompleteDeserializers.size() > 0) {
                         this._incompleteDeserializers.clear();
                     }

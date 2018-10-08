@@ -408,6 +408,10 @@ public class FixedPanelNGUI
 		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
 		if (m_fixOffsetPosition != null)
 		{
 			FixOffsetHeigh[] fixOffsetPosition = m_fixOffsetPosition;
@@ -418,6 +422,8 @@ public class FixedPanelNGUI
 					Transform objectMove = fixOffsetHeigh.ObjectMove;
 					objectMove.set_localPosition(objectMove.get_localPosition() + fixOffsetHeigh.OffsetHeigh * Vector3.get_up());
 				}
+				Transform objectMove2 = fixOffsetHeigh.ObjectMove;
+				objectMove2.set_localPosition(objectMove2.get_localPosition() + fixOffsetHeigh.OffsetWidt * Vector3.get_right());
 			}
 		}
 	}

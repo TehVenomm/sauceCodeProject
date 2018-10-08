@@ -5,16 +5,16 @@ using UnityEngine;
 [AddComponentMenu("NGUI/UI/NGUI Texture")]
 public class UITexture : UIBasicSprite
 {
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Rect mRect = new Rect(0f, 0f, 1f, 1f);
 
 	[HideInInspector]
 	[SerializeField]
 	private Texture mTexture;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Material mMat;
 
 	[HideInInspector]
