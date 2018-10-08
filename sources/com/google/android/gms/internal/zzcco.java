@@ -2327,11 +2327,11 @@ public class zzcco {
 
     @WorkerThread
     public final void zzazf() {
-        String zzawt;
+        String zzaxh;
         zzauj().zzug();
         zzwh();
         this.zzits = true;
-        String zzaxh;
+        String zzawt;
         try {
             zzcap.zzawj();
             Boolean zzayn = zzaul().zzayn();
@@ -2897,6 +2897,8 @@ public class zzcco {
 
     @WorkerThread
     public final void zze(zzcak zzcak) {
+        zzcdl zzaue;
+        String appId;
         zzauj().zzug();
         zzwh();
         zzbp.zzu(zzcak);
@@ -2923,8 +2925,6 @@ public class zzcco {
                     i = 0;
                 }
                 zzaue().beginTransaction();
-                zzcdl zzaue;
-                String appId;
                 try {
                     zziw = zzaue().zziw(zzcak.packageName);
                     if (!(zziw == null || zziw.getGmpAppId() == null || zziw.getGmpAppId().equals(zzcak.zziln))) {

@@ -39,8 +39,8 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal unsafe static IntPtr ToIntPtr<T, P>(Action<T, P> callback, Func<IntPtr, P> conversionFunction) where P : BaseReferenceHolder
 		{
-			_003CToIntPtr_003Ec__AnonStorey83E<T, P> _003CToIntPtr_003Ec__AnonStorey83E;
-			Action<T, IntPtr> callback2 = new Action<_003F, IntPtr>((object)_003CToIntPtr_003Ec__AnonStorey83E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CToIntPtr_003Ec__AnonStorey83F<T, P> _003CToIntPtr_003Ec__AnonStorey83F;
+			Action<T, IntPtr> callback2 = new Action<_003F, IntPtr>((object)_003CToIntPtr_003Ec__AnonStorey83F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			return ToIntPtr((Delegate)callback2);
 		}
 
@@ -163,7 +163,7 @@ namespace GooglePlayGames.Native.PInvoke
 				//IL_002c: Expected O, but got Unknown
 				if (toInvokeOnGameThread != null)
 				{
-					_003CAsOnGameThreadCallback_003Ec__AnonStorey83F<T>._003CAsOnGameThreadCallback_003Ec__AnonStorey840 _003CAsOnGameThreadCallback_003Ec__AnonStorey;
+					_003CAsOnGameThreadCallback_003Ec__AnonStorey840<T>._003CAsOnGameThreadCallback_003Ec__AnonStorey841 _003CAsOnGameThreadCallback_003Ec__AnonStorey;
 					PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CAsOnGameThreadCallback_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 			};
@@ -171,7 +171,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal unsafe static Action<T1, T2> AsOnGameThreadCallback<T1, T2>(Action<T1, T2> toInvokeOnGameThread)
 		{
-			_003CAsOnGameThreadCallback_003Ec__AnonStorey841<T1, T2> _003CAsOnGameThreadCallback_003Ec__AnonStorey;
+			_003CAsOnGameThreadCallback_003Ec__AnonStorey842<T1, T2> _003CAsOnGameThreadCallback_003Ec__AnonStorey;
 			return new Action<_003F, _003F>((object)_003CAsOnGameThreadCallback_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 

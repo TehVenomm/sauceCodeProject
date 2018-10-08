@@ -166,8 +166,8 @@ public class DeviceShareDialogFragment extends DialogFragment {
     }
 
     private static ScheduledThreadPoolExecutor getBackgroundExecutor() {
-        Class cls;
         synchronized (DeviceShareDialogFragment.class) {
+            Class cls;
             try {
                 if (backgroundExecutor == null) {
                     cls = true;

@@ -33,17 +33,17 @@ public class UILabel : UIWidget
 
 	public Crispness keepCrispWhenShrunk = Crispness.OnDesktop;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Font mTrueTypeFont;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UIFont mFont;
 
-	[SerializeField]
-	[HideInInspector]
 	[Multiline(6)]
+	[HideInInspector]
+	[SerializeField]
 	private string mText = string.Empty;
 
 	[SerializeField]
@@ -58,8 +58,8 @@ public class UILabel : UIWidget
 	[HideInInspector]
 	private NGUIText.Alignment mAlignment;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool mEncoding = true;
 
 	[SerializeField]
@@ -74,28 +74,28 @@ public class UILabel : UIWidget
 	[HideInInspector]
 	private Color mEffectColor = Color.get_black();
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private NGUIText.SymbolStyle mSymbols = NGUIText.SymbolStyle.Normal;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Vector2 mEffectDistance = Vector2.get_one();
 
 	[SerializeField]
 	[HideInInspector]
 	private Overflow mOverflow;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Material mMaterial;
 
 	[HideInInspector]
 	[SerializeField]
 	private bool mApplyGradient;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Color mGradientTop = Color.get_white();
 
 	[HideInInspector]
@@ -106,28 +106,28 @@ public class UILabel : UIWidget
 	[HideInInspector]
 	private int mSpacingX;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private int mSpacingY;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool mUseFloatSpacing;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private float mFloatSpacingX;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private float mFloatSpacingY;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool mShrinkToFit;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private int mMaxLineWidth;
 
 	[SerializeField]

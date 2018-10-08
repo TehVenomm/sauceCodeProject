@@ -83,7 +83,7 @@ public class LoungeSearchList : GameSection
 
 	private unsafe void SendRequest(Action onFinish, Action<bool> cb)
 	{
-		_003CSendRequest_003Ec__AnonStorey3E2 _003CSendRequest_003Ec__AnonStorey3E;
+		_003CSendRequest_003Ec__AnonStorey3E3 _003CSendRequest_003Ec__AnonStorey3E;
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendSearch(new Action<bool, Error>((object)_003CSendRequest_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
 	}
 
@@ -105,7 +105,7 @@ public class LoungeSearchList : GameSection
 		SetLabelText(t, UI.LBL_LABEL, text);
 		SetStamp(t, lounge.stampId);
 		int num = lounge.num + 1;
-		_003CSetLoungeData_003Ec__AnonStorey3E3 _003CSetLoungeData_003Ec__AnonStorey3E;
+		_003CSetLoungeData_003Ec__AnonStorey3E4 _003CSetLoungeData_003Ec__AnonStorey3E;
 		int num2 = lounge.slotInfos.Count(new Func<LoungeModel.SlotInfo, bool>((object)_003CSetLoungeData_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		for (int j = 0; j < 7; j++)
 		{

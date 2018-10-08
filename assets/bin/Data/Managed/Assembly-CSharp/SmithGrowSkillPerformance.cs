@@ -68,7 +68,7 @@ public class SmithGrowSkillPerformance : GameSection
 		GameObject npcRoot = new GameObject("NPC");
 		npcData.LoadModel(npcRoot, false, true, delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator162)/*Error near IL_0224: stateMachine*/)._003Cwait_003E__1--;
+			((_003CDoInitialize_003Ec__Iterator163)/*Error near IL_0224: stateMachine*/)._003Cwait_003E__1--;
 		}, false);
 		CacheAudio(loadingQueue);
 		yield return (object)loadingQueue.Wait();

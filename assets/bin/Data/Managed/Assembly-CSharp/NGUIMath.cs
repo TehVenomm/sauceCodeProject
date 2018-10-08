@@ -3,22 +3,22 @@ using UnityEngine;
 
 public static class NGUIMath
 {
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static float Lerp(float from, float to, float factor)
 	{
 		return from * (1f - factor) + to * factor;
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static int ClampIndex(int val, int max)
 	{
 		return (val >= 0) ? ((val >= max) ? (max - 1) : val) : 0;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static int RepeatIndex(int val, int max)
 	{
 		if (max < 1)
@@ -58,8 +58,8 @@ public static class NGUIMath
 		return val - (float)Mathf.FloorToInt(val);
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static int HexToDecimal(char ch)
 	{
 		switch (ch)
@@ -107,8 +107,8 @@ public static class NGUIMath
 		}
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static char DecimalToHexChar(int num)
 	{
 		if (num > 15)
@@ -138,15 +138,15 @@ public static class NGUIMath
 		return num.ToString("X6");
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static string DecimalToHex32(int num)
 	{
 		return num.ToString("X8");
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static int ColorToInt(Color c)
 	{
 		int num = 0;
@@ -172,8 +172,8 @@ public static class NGUIMath
 		return black;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static string IntToBinary(int val, int bits)
 	{
 		string text = string.Empty;

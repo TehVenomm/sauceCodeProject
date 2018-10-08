@@ -175,7 +175,7 @@ public class GachaResultQuest : GachaResultBase
 		yield return (object)LoadGachaButton(buttonName: CreateButtonName(), loadQueue: loadQueue, parent: FindCtrl(footerRoot, UI.BTN_GACHA));
 		yield return (object)LoadGachaGuaranteeCounter(loadQueue, nextGuachaGuarantee, delegate(LoadObject lo_guarantee)
 		{
-			((_003CLoadNormalUI_003Ec__Iterator58)/*Error near IL_00e8: stateMachine*/)._003C_003Ef__this.SetTexture(((_003CLoadNormalUI_003Ec__Iterator58)/*Error near IL_00e8: stateMachine*/)._003C_003Ef__this.footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN, lo_guarantee.loadedObject as Texture);
+			((_003CLoadNormalUI_003Ec__Iterator59)/*Error near IL_00e8: stateMachine*/)._003C_003Ef__this.SetTexture(((_003CLoadNormalUI_003Ec__Iterator59)/*Error near IL_00e8: stateMachine*/)._003C_003Ef__this.footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN, lo_guarantee.loadedObject as Texture);
 		});
 	}
 

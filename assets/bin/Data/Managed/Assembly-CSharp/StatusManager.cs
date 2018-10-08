@@ -561,15 +561,15 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		{
 			if (!is_success)
 			{
-				if (((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0034: stateMachine*/).callback != null)
+				if (((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0034: stateMachine*/).callback != null)
 				{
-					((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0034: stateMachine*/).callback(false);
+					((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0034: stateMachine*/).callback(false);
 				}
-				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0034: stateMachine*/)._003Crecv_break_003E__0 = true;
+				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0034: stateMachine*/)._003Crecv_break_003E__0 = true;
 			}
 			else
 			{
-				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0034: stateMachine*/)._003Cwait_visual_equip_003E__1 = false;
+				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0034: stateMachine*/)._003Cwait_visual_equip_003E__1 = false;
 			}
 		});
 		bool wait_equip = true;
@@ -577,13 +577,13 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		{
 			if (!is_success)
 			{
-				if (((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0057: stateMachine*/).callback != null)
+				if (((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0057: stateMachine*/).callback != null)
 				{
-					((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0057: stateMachine*/).callback(false);
+					((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0057: stateMachine*/).callback(false);
 				}
-				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0057: stateMachine*/)._003Crecv_break_003E__0 = true;
+				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0057: stateMachine*/)._003Crecv_break_003E__0 = true;
 			}
-			((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0057: stateMachine*/)._003Cwait_equip_003E__2 = false;
+			((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0057: stateMachine*/)._003Cwait_equip_003E__2 = false;
 		});
 		while (wait_equip || wait_visual_equip)
 		{
@@ -639,7 +639,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 	public unsafe void UpdateEquip(EquipItemInfo equip)
 	{
 		int i = 0;
-		_003CUpdateEquip_003Ec__AnonStorey6B4 _003CUpdateEquip_003Ec__AnonStorey6B;
+		_003CUpdateEquip_003Ec__AnonStorey6B5 _003CUpdateEquip_003Ec__AnonStorey6B;
 		for (int num = equipSet.Length; i < num; i++)
 		{
 			IsEquipping(i, equip, new Action<int, int>((object)_003CUpdateEquip_003Ec__AnonStorey6B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));

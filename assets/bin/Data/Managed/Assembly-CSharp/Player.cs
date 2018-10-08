@@ -1621,8 +1621,8 @@ public class Player : Character
 		{
 			return false;
 		}
-		_003CIsBoostByType_003Ec__AnonStorey519 _003CIsBoostByType_003Ec__AnonStorey;
-		if (boostPrayedInfoList.Count(new Func<BoostPrayInfo, bool>((object)_003CIsBoostByType_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)) > 0)
+		_003CIsBoostByType_003Ec__AnonStorey51A _003CIsBoostByType_003Ec__AnonStorey51A;
+		if (boostPrayedInfoList.Count(new Func<BoostPrayInfo, bool>((object)_003CIsBoostByType_003Ec__AnonStorey51A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)) > 0)
 		{
 			return true;
 		}
@@ -5627,8 +5627,8 @@ public class Player : Character
 	private unsafe void DetachRootEffectTemporary()
 	{
 		Transform attachTrans = (!MonoBehaviourSingleton<EffectManager>.IsValid()) ? MonoBehaviourSingleton<StageObjectManager>.I._transform : MonoBehaviourSingleton<EffectManager>.I._transform;
-		_003CDetachRootEffectTemporary_003Ec__AnonStorey51F _003CDetachRootEffectTemporary_003Ec__AnonStorey51F;
-		effectTransTable.ForEachKeyAndValue(new Action<string, Transform>((object)_003CDetachRootEffectTemporary_003Ec__AnonStorey51F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CDetachRootEffectTemporary_003Ec__AnonStorey520 _003CDetachRootEffectTemporary_003Ec__AnonStorey;
+		effectTransTable.ForEachKeyAndValue(new Action<string, Transform>((object)_003CDetachRootEffectTemporary_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void ReAttachRootEffect()
@@ -11986,7 +11986,7 @@ public class Player : Character
 					}
 				}
 			}
-			_003CShotSoulArrow_003Ec__AnonStorey521 _003CShotSoulArrow_003Ec__AnonStorey;
+			_003CShotSoulArrow_003Ec__AnonStorey522 _003CShotSoulArrow_003Ec__AnonStorey;
 			this.StartCoroutine(_ShotSoulArrow(shotPos, bowRot, list, arrowActionInfo.soulShotInterval, new Action((object)_003CShotSoulArrow_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 	}

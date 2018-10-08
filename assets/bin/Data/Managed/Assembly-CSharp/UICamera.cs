@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/NGUI Event System (UICamera)")]
 [RequireComponent(typeof(Camera))]
+[AddComponentMenu("NGUI/UI/NGUI Event System (UICamera)")]
 [ExecuteInEditMode]
 public class UICamera
 {

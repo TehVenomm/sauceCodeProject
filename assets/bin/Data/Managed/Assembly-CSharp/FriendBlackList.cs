@@ -19,7 +19,7 @@ public class FriendBlackList : FollowListBase
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey303 _003CSendGetList_003Ec__AnonStorey;
+		_003CSendGetList_003Ec__AnonStorey304 _003CSendGetList_003Ec__AnonStorey;
 		MonoBehaviourSingleton<BlackListManager>.I.SendList(page, new Action<bool, BlackListListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

@@ -660,8 +660,8 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 	{
 		if (guildData != null && guildData.clanId != -1)
 		{
-			_003CGetClanStat_003Ec__AnonStorey5EB _003CGetClanStat_003Ec__AnonStorey5EB;
-			SendRequestStatistic(guildData.clanId, new Action<bool, GuildStatisticInfo>((object)_003CGetClanStat_003Ec__AnonStorey5EB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CGetClanStat_003Ec__AnonStorey5EC _003CGetClanStat_003Ec__AnonStorey5EC;
+			SendRequestStatistic(guildData.clanId, new Action<bool, GuildStatisticInfo>((object)_003CGetClanStat_003Ec__AnonStorey5EC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -680,8 +680,8 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 
 	public unsafe void SetTalkUser(FriendCharaInfo message_user)
 	{
-		_003CSetTalkUser_003Ec__AnonStorey5ED _003CSetTalkUser_003Ec__AnonStorey5ED;
-		FriendCharaInfo friendCharaInfo = talkUsers.FirstOrDefault(new Func<FriendCharaInfo, bool>((object)_003CSetTalkUser_003Ec__AnonStorey5ED, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSetTalkUser_003Ec__AnonStorey5EE _003CSetTalkUser_003Ec__AnonStorey5EE;
+		FriendCharaInfo friendCharaInfo = talkUsers.FirstOrDefault(new Func<FriendCharaInfo, bool>((object)_003CSetTalkUser_003Ec__AnonStorey5EE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (friendCharaInfo == null)
 		{
 			talkUsers.Insert(0, message_user);
@@ -691,13 +691,13 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 
 	public unsafe bool AddTalkUser(int userId)
 	{
-		_003CAddTalkUser_003Ec__AnonStorey5EE _003CAddTalkUser_003Ec__AnonStorey5EE;
-		FriendCharaInfo friendCharaInfo = talkUsers.FirstOrDefault(new Func<FriendCharaInfo, bool>((object)_003CAddTalkUser_003Ec__AnonStorey5EE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CAddTalkUser_003Ec__AnonStorey5EF _003CAddTalkUser_003Ec__AnonStorey5EF;
+		FriendCharaInfo friendCharaInfo = talkUsers.FirstOrDefault(new Func<FriendCharaInfo, bool>((object)_003CAddTalkUser_003Ec__AnonStorey5EF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (friendCharaInfo != null)
 		{
 			return false;
 		}
-		friendCharaInfo = members.FirstOrDefault(new Func<FriendCharaInfo, bool>((object)_003CAddTalkUser_003Ec__AnonStorey5EE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		friendCharaInfo = members.FirstOrDefault(new Func<FriendCharaInfo, bool>((object)_003CAddTalkUser_003Ec__AnonStorey5EF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (friendCharaInfo != null)
 		{
 			talkUsers.Add(friendCharaInfo);
@@ -708,8 +708,8 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 
 	public unsafe void RemoveTalkUser(FriendCharaInfo message_user)
 	{
-		_003CRemoveTalkUser_003Ec__AnonStorey5EF _003CRemoveTalkUser_003Ec__AnonStorey5EF;
-		FriendCharaInfo friendCharaInfo = talkUsers.FirstOrDefault(new Func<FriendCharaInfo, bool>((object)_003CRemoveTalkUser_003Ec__AnonStorey5EF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CRemoveTalkUser_003Ec__AnonStorey5F0 _003CRemoveTalkUser_003Ec__AnonStorey5F;
+		FriendCharaInfo friendCharaInfo = talkUsers.FirstOrDefault(new Func<FriendCharaInfo, bool>((object)_003CRemoveTalkUser_003Ec__AnonStorey5F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (friendCharaInfo != null)
 		{
 			talkUsers.Remove(friendCharaInfo);

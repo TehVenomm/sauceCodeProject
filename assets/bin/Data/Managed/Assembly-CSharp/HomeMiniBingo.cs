@@ -116,16 +116,16 @@ public class HomeMiniBingo : HomeBingo
 		{
 			InitCardDataList(base.eventDataList);
 			List<Network.EventData> eventDataList = base.eventDataList;
-			if (_003CDoInitialize_003Ec__Iterator99._003C_003Ef__am_0024cache6 == null)
+			if (_003CDoInitialize_003Ec__Iterator9A._003C_003Ef__am_0024cache6 == null)
 			{
-				_003CDoInitialize_003Ec__Iterator99._003C_003Ef__am_0024cache6 = new Func<Network.EventData, int, _003C_003E__AnonType0<Network.EventData, int>>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				_003CDoInitialize_003Ec__Iterator9A._003C_003Ef__am_0024cache6 = new Func<Network.EventData, int, _003C_003E__AnonType0<Network.EventData, int>>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			}
-			var source = Enumerable.Select(eventDataList, _003CDoInitialize_003Ec__Iterator99._003C_003Ef__am_0024cache6).Where(new Func<_003C_003E__AnonType0<Network.EventData, int>, bool>((object)/*Error near IL_00c6: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-			if (_003CDoInitialize_003Ec__Iterator99._003C_003Ef__am_0024cache7 == null)
+			var source = Enumerable.Select(eventDataList, _003CDoInitialize_003Ec__Iterator9A._003C_003Ef__am_0024cache6).Where(new Func<_003C_003E__AnonType0<Network.EventData, int>, bool>((object)/*Error near IL_00c6: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			if (_003CDoInitialize_003Ec__Iterator9A._003C_003Ef__am_0024cache7 == null)
 			{
-				_003CDoInitialize_003Ec__Iterator99._003C_003Ef__am_0024cache7 = new Func<_003C_003E__AnonType0<Network.EventData, int>, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				_003CDoInitialize_003Ec__Iterator9A._003C_003Ef__am_0024cache7 = new Func<_003C_003E__AnonType0<Network.EventData, int>, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			}
-			int defaultIndex = Enumerable.Select(source, _003CDoInitialize_003Ec__Iterator99._003C_003Ef__am_0024cache7).FirstOrDefault();
+			int defaultIndex = Enumerable.Select(source, _003CDoInitialize_003Ec__Iterator9A._003C_003Ef__am_0024cache7).FirstOrDefault();
 			SetCurrentIndex(defaultIndex);
 			yield return (object)this.StartCoroutine(LoadBanner(GetEventDataFromList(GetCurrentIndex()), GetCurrentIndex(), null));
 			callback.Invoke();

@@ -179,7 +179,7 @@ public class TaskTop : GameSection
 		{
 			item_num = taskDataLists[(int)showType].Count - start;
 		}
-		_003CUpdateInventory_003Ec__AnonStorey482 _003CUpdateInventory_003Ec__AnonStorey;
+		_003CUpdateInventory_003Ec__AnonStorey483 _003CUpdateInventory_003Ec__AnonStorey;
 		SetDynamicList(gridTransform, LIST_ITEM_PREFAB_NAME, item_num, true, null, null, new Action<int, Transform, bool>((object)_003CUpdateInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

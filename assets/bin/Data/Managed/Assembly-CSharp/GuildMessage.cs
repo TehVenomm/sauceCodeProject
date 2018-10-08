@@ -501,7 +501,7 @@ public class GuildMessage : GameSection
 		bool finish_donate_list = false;
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateList(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator64)/*Error near IL_0101: stateMachine*/)._003Cfinish_donate_list_003E__7 = true;
+			((_003CDoInitialize_003Ec__Iterator65)/*Error near IL_0101: stateMachine*/)._003Cfinish_donate_list_003E__7 = true;
 		});
 		bool finish_log_member = true;
 		if (_chatType == CHAT_TYPE.MEMBER && MonoBehaviourSingleton<GuildManager>.I.talkUser != null)
@@ -1203,7 +1203,7 @@ public class GuildMessage : GameSection
 			if (!isRecycle)
 			{
 				ChatStampListItem chatStampListItem = item;
-				_003CInitStampItem_003Ec__AnonStorey336 _003CInitStampItem_003Ec__AnonStorey;
+				_003CInitStampItem_003Ec__AnonStorey337 _003CInitStampItem_003Ec__AnonStorey;
 				chatStampListItem.onButton = Delegate.Combine((Delegate)chatStampListItem.onButton, (Delegate)new Action((object)_003CInitStampItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
@@ -1465,8 +1465,8 @@ public class GuildMessage : GameSection
 			RefreshUI();
 		}));
 		List<DonateInfo> donate_list = MonoBehaviourSingleton<GuildManager>.I.donateList;
-		_003CUpdateDonate_003Ec__AnonStorey33A _003CUpdateDonate_003Ec__AnonStorey33A;
-		SetGrid(UI.GRD_DONATE, "GuildMessageDonateListItem", donate_list.Count, true, new Action<int, Transform, bool>((object)_003CUpdateDonate_003Ec__AnonStorey33A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateDonate_003Ec__AnonStorey33B _003CUpdateDonate_003Ec__AnonStorey33B;
+		SetGrid(UI.GRD_DONATE, "GuildMessageDonateListItem", donate_list.Count, true, new Action<int, Transform, bool>((object)_003CUpdateDonate_003Ec__AnonStorey33B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		SetActive((Enum)UI.LBL_NO_DONATE, donate_list.Count == 0);
 	}
 
@@ -1640,8 +1640,8 @@ public class GuildMessage : GameSection
 			stayEvent = true;
 			GameSceneEvent.Stay();
 		}
-		_003CRefreshClanPinData_003Ec__AnonStorey33C _003CRefreshClanPinData_003Ec__AnonStorey33C;
-		MonoBehaviourSingleton<GuildManager>.I.GetAllPinData(new Action<bool, GuildGetPinModel>((object)_003CRefreshClanPinData_003Ec__AnonStorey33C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CRefreshClanPinData_003Ec__AnonStorey33D _003CRefreshClanPinData_003Ec__AnonStorey33D;
+		MonoBehaviourSingleton<GuildManager>.I.GetAllPinData(new Action<bool, GuildGetPinModel>((object)_003CRefreshClanPinData_003Ec__AnonStorey33D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnReceiveClanChatUnPin()
@@ -1904,8 +1904,8 @@ public class GuildMessage : GameSection
 		if (info != null && !(info.expired <= 0.0))
 		{
 			GameSection.StayEvent();
-			_003CSendPinDonate_003Ec__AnonStorey33E _003CSendPinDonate_003Ec__AnonStorey33E;
-			MonoBehaviourSingleton<GuildManager>.I.SendClanChatPin(0, info.id, string.Empty, 2, string.Empty, new Action<bool, GuildChatPinModel>((object)_003CSendPinDonate_003Ec__AnonStorey33E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSendPinDonate_003Ec__AnonStorey33F _003CSendPinDonate_003Ec__AnonStorey33F;
+			MonoBehaviourSingleton<GuildManager>.I.SendClanChatPin(0, info.id, string.Empty, 2, string.Empty, new Action<bool, GuildChatPinModel>((object)_003CSendPinDonate_003Ec__AnonStorey33F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -1933,10 +1933,10 @@ public class GuildMessage : GameSection
 			{
 				//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 				GuildChatAdvisoryItem.SetReadNew();
-				if (((_003CAddAdvisary_003Ec__Iterator69)/*Error near IL_0120: stateMachine*/)._003C_003Ef__this.chatAdvisoryItem != null)
+				if (((_003CAddAdvisary_003Ec__Iterator6A)/*Error near IL_0120: stateMachine*/)._003C_003Ef__this.chatAdvisoryItem != null)
 				{
-					Object.DestroyImmediate(((_003CAddAdvisary_003Ec__Iterator69)/*Error near IL_0120: stateMachine*/)._003C_003Ef__this.chatAdvisoryItem.get_gameObject());
-					((_003CAddAdvisary_003Ec__Iterator69)/*Error near IL_0120: stateMachine*/)._003C_003Ef__this.chatAdvisoryItem = null;
+					Object.DestroyImmediate(((_003CAddAdvisary_003Ec__Iterator6A)/*Error near IL_0120: stateMachine*/)._003C_003Ef__this.chatAdvisoryItem.get_gameObject());
+					((_003CAddAdvisary_003Ec__Iterator6A)/*Error near IL_0120: stateMachine*/)._003C_003Ef__this.chatAdvisoryItem = null;
 				}
 			}));
 		}

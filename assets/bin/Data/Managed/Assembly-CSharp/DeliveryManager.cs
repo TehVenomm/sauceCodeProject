@@ -122,11 +122,11 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 		{
 			yield return (object)null;
 		}
-		if (_003CCheckUpdateDeliveryItem_003Ec__Iterator22A._003C_003Ef__am_0024cache4 == null)
+		if (_003CCheckUpdateDeliveryItem_003Ec__Iterator22B._003C_003Ef__am_0024cache4 == null)
 		{
-			_003CCheckUpdateDeliveryItem_003Ec__Iterator22A._003C_003Ef__am_0024cache4 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CCheckUpdateDeliveryItem_003Ec__Iterator22B._003C_003Ef__am_0024cache4 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		Protocol.Force(_003CCheckUpdateDeliveryItem_003Ec__Iterator22A._003C_003Ef__am_0024cache4);
+		Protocol.Force(_003CCheckUpdateDeliveryItem_003Ec__Iterator22B._003C_003Ef__am_0024cache4);
 	}
 
 	public bool IsExistDelivery(DELIVERY_TYPE[] typeList)
@@ -382,13 +382,13 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 
 	public unsafe int GetCompletableEventDeliveryNum(int event_id)
 	{
-		_003CGetCompletableEventDeliveryNum_003Ec__AnonStorey572 _003CGetCompletableEventDeliveryNum_003Ec__AnonStorey;
+		_003CGetCompletableEventDeliveryNum_003Ec__AnonStorey573 _003CGetCompletableEventDeliveryNum_003Ec__AnonStorey;
 		return CountCompletableDeliveryNum(new Func<ClearStatusDelivery, DeliveryTable.DeliveryData, bool>((object)_003CGetCompletableEventDeliveryNum_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
 	}
 
 	public unsafe int GetCompletableRegionDeliveryNum(int regionId, int groupId)
 	{
-		_003CGetCompletableRegionDeliveryNum_003Ec__AnonStorey573 _003CGetCompletableRegionDeliveryNum_003Ec__AnonStorey;
+		_003CGetCompletableRegionDeliveryNum_003Ec__AnonStorey574 _003CGetCompletableRegionDeliveryNum_003Ec__AnonStorey;
 		return CountCompletableDeliveryNum(new Func<ClearStatusDelivery, DeliveryTable.DeliveryData, bool>((object)_003CGetCompletableRegionDeliveryNum_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new DELIVERY_TYPE[2]
 		{
 			DELIVERY_TYPE.STORY,

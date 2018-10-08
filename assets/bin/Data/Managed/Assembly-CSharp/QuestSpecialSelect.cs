@@ -319,7 +319,7 @@ public class QuestSpecialSelect : GameSection
 			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_questselect_complete");
 			MonoBehaviourSingleton<QuestManager>.I.SendGetDeliveryList(delegate
 			{
-				((_003CDoInitialize_003Ec__IteratorCC)/*Error near IL_007e: stateMachine*/)._003Cis_recv_delivery_003E__1 = true;
+				((_003CDoInitialize_003Ec__IteratorCD)/*Error near IL_007e: stateMachine*/)._003Cis_recv_delivery_003E__1 = true;
 			});
 			while (!is_recv_delivery2)
 			{
@@ -336,7 +336,7 @@ public class QuestSpecialSelect : GameSection
 		bool is_recv_delivery = false;
 		MonoBehaviourSingleton<DeliveryManager>.I.SendEventNormalList(delegate
 		{
-			((_003CDoInitialize_003Ec__IteratorCC)/*Error near IL_0115: stateMachine*/)._003Cis_recv_delivery_003E__2 = true;
+			((_003CDoInitialize_003Ec__IteratorCD)/*Error near IL_0115: stateMachine*/)._003Cis_recv_delivery_003E__2 = true;
 		});
 		while (!is_recv_delivery)
 		{
@@ -611,7 +611,7 @@ public class QuestSpecialSelect : GameSection
 					areaInfos.Add(new AreaQuestInfo(data, areaBanners[i], cleared, flag));
 				}
 			}
-			_003CSetDeliveryList_003Ec__AnonStorey3A0 _003CSetDeliveryList_003Ec__AnonStorey3A;
+			_003CSetDeliveryList_003Ec__AnonStorey3A1 _003CSetDeliveryList_003Ec__AnonStorey3A;
 			SetDynamicList((Enum)UI.GRD_AREA, "QuestAreaListItem", areaInfos.Count, true, null, null, new Action<int, Transform, bool>((object)_003CSetDeliveryList_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			isDeliveryGridReset = false;
 			RepositionAreaGrid();
@@ -623,7 +623,7 @@ public class QuestSpecialSelect : GameSection
 			SetActive((Enum)UI.GRD_DELIVERY, list.Length > 0);
 			SetActive((Enum)UI.LBL_DELIVERY_NON_LIST, list.Length == 0);
 			SetActive((Enum)UI.OBJ_DELIVERY_BAR, true);
-			_003CSetDeliveryList_003Ec__AnonStorey3A1 _003CSetDeliveryList_003Ec__AnonStorey3A2;
+			_003CSetDeliveryList_003Ec__AnonStorey3A2 _003CSetDeliveryList_003Ec__AnonStorey3A2;
 			SetDynamicList((Enum)UI.GRD_DELIVERY, "QuestRequestItem", list.Length, isDeliveryGridReset, null, null, new Action<int, Transform, bool>((object)_003CSetDeliveryList_003Ec__AnonStorey3A2, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			isDeliveryGridReset = false;
 			ShowNonDeliveryList();
@@ -977,7 +977,7 @@ public class QuestSpecialSelect : GameSection
 		changeToDeliveryClearEvent = true;
 		bool is_tutorial = !TutorialStep.HasFirstDeliveryCompleted();
 		bool enable_clear_event = table.clearEventID != 0;
-		_003CSendDeliveryComplete_003Ec__AnonStorey3A4 _003CSendDeliveryComplete_003Ec__AnonStorey3A;
+		_003CSendDeliveryComplete_003Ec__AnonStorey3A5 _003CSendDeliveryComplete_003Ec__AnonStorey3A;
 		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo[index].uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003CSendDeliveryComplete_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

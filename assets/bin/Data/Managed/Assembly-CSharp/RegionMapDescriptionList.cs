@@ -114,7 +114,7 @@ public class RegionMapDescriptionList : GameSection
 		ClearTable();
 		int num2 = count + count3 + count2 + num;
 		SetActive((Enum)UI.LBL_NON_LIST, num2 <= 0);
-		_003CUpdateTable_003Ec__AnonStorey495 _003CUpdateTable_003Ec__AnonStorey;
+		_003CUpdateTable_003Ec__AnonStorey496 _003CUpdateTable_003Ec__AnonStorey;
 		SetTable(UI.TBL_ALL, string.Empty, num2, true, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -158,7 +158,7 @@ public class RegionMapDescriptionList : GameSection
 			Delivery delivery = deliveryList[i];
 			int dId = delivery.dId;
 			DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)dId);
-			_003CCreateDeliveryList_003Ec__AnonStorey496 _003CCreateDeliveryList_003Ec__AnonStorey;
+			_003CCreateDeliveryList_003Ec__AnonStorey497 _003CCreateDeliveryList_003Ec__AnonStorey;
 			if (IsExistTargetEnemy(deliveryTableData, mapId) && (!deliveryTableData.IsEvent() || !MonoBehaviourSingleton<QuestManager>.I.bingoEventList.Any(new Func<Network.EventData, bool>((object)_003CCreateDeliveryList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/))))
 			{
 				list.Add(new DeliveryDataAndUId(deliveryTableData, delivery.uId));
@@ -304,7 +304,7 @@ public class RegionMapDescriptionList : GameSection
 		bool is_tutorial = !TutorialStep.HasFirstDeliveryCompleted();
 		int delivery_id = (int)deliveryData.id;
 		bool enable_clear_event = deliveryData.clearEventID != 0;
-		_003CSendDeliveryComplete_003Ec__AnonStorey498 _003CSendDeliveryComplete_003Ec__AnonStorey;
+		_003CSendDeliveryComplete_003Ec__AnonStorey499 _003CSendDeliveryComplete_003Ec__AnonStorey;
 		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryUniqueId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003CSendDeliveryComplete_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

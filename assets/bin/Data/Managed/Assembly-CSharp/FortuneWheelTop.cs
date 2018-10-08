@@ -118,12 +118,12 @@ public class FortuneWheelTop : GameSection
 		bool wait = true;
 		MonoBehaviourSingleton<FortuneWheelManager>.I.SendInfo(delegate(bool is_success)
 		{
-			((_003CDoInitialize_003Ec__Iterator3B)/*Error near IL_0117: stateMachine*/)._003Cwait_003E__2 = false;
+			((_003CDoInitialize_003Ec__Iterator3C)/*Error near IL_0117: stateMachine*/)._003Cwait_003E__2 = false;
 			if (is_success)
 			{
-				((_003CDoInitialize_003Ec__Iterator3B)/*Error near IL_0117: stateMachine*/)._003C_003Ef__this.serverLogList = new List<FortuneWheelServerLog>(MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.history.server);
-				((_003CDoInitialize_003Ec__Iterator3B)/*Error near IL_0117: stateMachine*/)._003C_003Ef__this.userLogList = new List<FortuneWheelUserLog>(MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.history.user);
-				((_003CDoInitialize_003Ec__Iterator3B)/*Error near IL_0117: stateMachine*/)._003C_003Ef__this.userLogList.Reverse();
+				((_003CDoInitialize_003Ec__Iterator3C)/*Error near IL_0117: stateMachine*/)._003C_003Ef__this.serverLogList = new List<FortuneWheelServerLog>(MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.history.server);
+				((_003CDoInitialize_003Ec__Iterator3C)/*Error near IL_0117: stateMachine*/)._003C_003Ef__this.userLogList = new List<FortuneWheelUserLog>(MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.history.user);
+				((_003CDoInitialize_003Ec__Iterator3C)/*Error near IL_0117: stateMachine*/)._003C_003Ef__this.userLogList.Reverse();
 			}
 		});
 		while (wait)
@@ -376,7 +376,7 @@ public class FortuneWheelTop : GameSection
 				int count = userLogList.Count - 30;
 				userLogList.RemoveRange(0, count);
 			}
-			_003CReloadUserRewardLog_003Ec__AnonStorey2F4 _003CReloadUserRewardLog_003Ec__AnonStorey2F;
+			_003CReloadUserRewardLog_003Ec__AnonStorey2F5 _003CReloadUserRewardLog_003Ec__AnonStorey2F;
 			SetGrid(UI.GRD_REWARD_LOG, "FortuneWheelRewardLogItem", userLogList.Count, true, new Action<int, Transform, bool>((object)_003CReloadUserRewardLog_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			UIScrollView component = GetCtrl(UI.SCR_USER_REWARD).GetComponent<UIScrollView>();
 			if (component.CurrentFit())
@@ -396,9 +396,9 @@ public class FortuneWheelTop : GameSection
 
 	private string GetServerLogString(FortuneWheelServerLog data)
 	{
-		DateTime dateTime = DateTime.Parse(data.createdDate);
+		DateTime dateTime = DateTime.Parse(data.createdDate).ToLocalTime();
 		string arg = $"{dateTime.Hour}:{dateTime.Minute}:{dateTime.Second}";
-		return $"{arg} {data.userName} has won {data.rewardString}";
+		return string.Format(StringTable.Get(STRING_CATEGORY.DRAGON_VAULT, 2u), arg, data.userName, data.rewardString);
 	}
 
 	private void OnQuery_SPIN()
@@ -448,7 +448,7 @@ public class FortuneWheelTop : GameSection
 			}
 			else
 			{
-				GameSection.ChangeEvent("SKIP_SPIN_X10", "Skip?");
+				GameSection.ChangeEvent("SKIP_SPIN_X10", StringTable.Get(STRING_CATEGORY.DRAGON_VAULT, 5u));
 			}
 		}
 	}
@@ -592,9 +592,13 @@ public class FortuneWheelTop : GameSection
 	private void Spin10EndAction(bool b)
 	{
 		isSpinning = b;
-		if (!isSpinning)
+		if (!isSpinning && !isUserSkip)
 		{
 			countX10++;
+		}
+		else if (isUserSkip)
+		{
+			countX10 = 0;
 		}
 	}
 
@@ -671,5 +675,6 @@ public class FortuneWheelTop : GameSection
 			MonoBehaviourSingleton<FortuneWheelManager>.I.OnJackpotWin -= OnJackpotWinHandler;
 			MonoBehaviourSingleton<FortuneWheelManager>.I.OnRequestUpdateUI -= new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
+		SoundManager.RequestBGM(2, true);
 	}
 }

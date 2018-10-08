@@ -111,7 +111,7 @@ public class ItemSellConfirm : GameSection
 	{
 		SortCompareData[] sell_data_ary = sellData.ToArray();
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		_003CDrawIcon_003Ec__AnonStorey3D2 _003CDrawIcon_003Ec__AnonStorey3D;
+		_003CDrawIcon_003Ec__AnonStorey3D3 _003CDrawIcon_003Ec__AnonStorey3D;
 		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

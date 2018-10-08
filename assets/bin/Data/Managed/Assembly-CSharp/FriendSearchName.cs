@@ -33,7 +33,7 @@ public class FriendSearchName : ConfigName
 		GameSection.SetEventData(null);
 		string input_text = GetInputValue((Enum)UI.IPT_TEXT);
 		GameSection.StayEvent();
-		_003COnQuery_OK_003Ec__AnonStorey312 _003COnQuery_OK_003Ec__AnonStorey;
+		_003COnQuery_OK_003Ec__AnonStorey313 _003COnQuery_OK_003Ec__AnonStorey;
 		MonoBehaviourSingleton<FriendManager>.I.SendSearchName(input_text, page, new Action<bool, FriendSearchResult>((object)_003COnQuery_OK_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 }

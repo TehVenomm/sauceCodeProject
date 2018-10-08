@@ -38,7 +38,7 @@ public class CoopClientPacketSender
 		model.id = 1003;
 		model.status = (int)coopClient.status;
 		model.joinType = (int)coopClient.joinType;
-		_003CSendClientStatus_003Ec__AnonStorey4C6 _003CSendClientStatus_003Ec__AnonStorey4C;
+		_003CSendClientStatus_003Ec__AnonStorey4C7 _003CSendClientStatus_003Ec__AnonStorey4C;
 		Send(model, true, to_client_id, null, new Func<Coop_Model_Base, bool>((object)_003CSendClientStatus_003Ec__AnonStorey4C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

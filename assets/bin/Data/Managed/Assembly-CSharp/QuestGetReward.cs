@@ -176,7 +176,7 @@ public class QuestGetReward : GameSection
 					data[i].getType = data2.getType;
 				}
 			}
-			_003CUpdateUI_003Ec__AnonStorey401 _003CUpdateUI_003Ec__AnonStorey;
+			_003CUpdateUI_003Ec__AnonStorey402 _003CUpdateUI_003Ec__AnonStorey;
 			SetGrid(UI.GRD_ICON, string.Empty, num2, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

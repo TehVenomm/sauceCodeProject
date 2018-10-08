@@ -146,8 +146,8 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 		//IL_005f: Expected O, but got Unknown
 		if (channel > 0 && (currentChannel == null || currentChannel.channel != channel || !homeChat.HasConnect))
 		{
-			_003CSelectChannel_003Ec__AnonStorey53D _003CSelectChannel_003Ec__AnonStorey53D;
-			Protocol.Force(new Action((object)_003CSelectChannel_003Ec__AnonStorey53D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSelectChannel_003Ec__AnonStorey53E _003CSelectChannel_003Ec__AnonStorey53E;
+			Protocol.Force(new Action((object)_003CSelectChannel_003Ec__AnonStorey53E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -227,8 +227,8 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 		if (roomChat != null)
 		{
 			IChatConnection conn = roomChat.connection;
-			_003CSwitchRoomChatConnection_003Ec__AnonStorey53F _003CSwitchRoomChatConnection_003Ec__AnonStorey53F;
-			roomChat.Disconnect(new Action((object)_003CSwitchRoomChatConnection_003Ec__AnonStorey53F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSwitchRoomChatConnection_003Ec__AnonStorey540 _003CSwitchRoomChatConnection_003Ec__AnonStorey;
+			roomChat.Disconnect(new Action((object)_003CSwitchRoomChatConnection_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -258,7 +258,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 		if (roomChat != null)
 		{
 			IChatConnection conn = roomChat.connection;
-			_003CDestroyRoomChat_003Ec__AnonStorey540 _003CDestroyRoomChat_003Ec__AnonStorey;
+			_003CDestroyRoomChat_003Ec__AnonStorey541 _003CDestroyRoomChat_003Ec__AnonStorey;
 			roomChat.Disconnect(new Action((object)_003CDestroyRoomChat_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			if (this.OnDestroyRoomChat != null)
 			{
@@ -333,7 +333,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 		else
 		{
 			clanChat = new ClanChatRoom();
-			_003CCreateClanChat_003Ec__AnonStorey541 _003CCreateClanChat_003Ec__AnonStorey;
+			_003CCreateClanChat_003Ec__AnonStorey542 _003CCreateClanChat_003Ec__AnonStorey;
 			Protocol.Force(new Action((object)_003CCreateClanChat_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

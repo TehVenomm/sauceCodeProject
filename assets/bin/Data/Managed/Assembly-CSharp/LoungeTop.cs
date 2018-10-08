@@ -662,18 +662,18 @@ public class LoungeTop : HomeBase
 			if (ret.Error == Error.None)
 			{
 				bool flag = PlayerPrefs.GetInt("Pike_Shop_Event", 0) == 1;
-				LoungeTop _003C_003Ef__this = ((_003CWaitForCheckpikeShop_003Ec__IteratorF2)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this;
+				LoungeTop _003C_003Ef__this = ((_003CWaitForCheckpikeShop_003Ec__IteratorF3)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this;
 				List<PointShop> result = ret.result;
-				if (_003CWaitForCheckpikeShop_003Ec__IteratorF2._003C_003Ef__am_0024cache4 == null)
+				if (_003CWaitForCheckpikeShop_003Ec__IteratorF3._003C_003Ef__am_0024cache4 == null)
 				{
-					_003CWaitForCheckpikeShop_003Ec__IteratorF2._003C_003Ef__am_0024cache4 = new Func<PointShop, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					_003CWaitForCheckpikeShop_003Ec__IteratorF3._003C_003Ef__am_0024cache4 = new Func<PointShop, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 				}
-				_003C_003Ef__this.isHighlightPikeShop = result.Any(_003CWaitForCheckpikeShop_003Ec__IteratorF2._003C_003Ef__am_0024cache4);
-				if (((_003CWaitForCheckpikeShop_003Ec__IteratorF2)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop)
+				_003C_003Ef__this.isHighlightPikeShop = result.Any(_003CWaitForCheckpikeShop_003Ec__IteratorF3._003C_003Ef__am_0024cache4);
+				if (((_003CWaitForCheckpikeShop_003Ec__IteratorF3)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop)
 				{
 					if (flag)
 					{
-						((_003CWaitForCheckpikeShop_003Ec__IteratorF2)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop = false;
+						((_003CWaitForCheckpikeShop_003Ec__IteratorF3)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop = false;
 					}
 				}
 				else
@@ -681,7 +681,7 @@ public class LoungeTop : HomeBase
 					PlayerPrefs.SetInt("Pike_Shop_Event", 0);
 				}
 			}
-			((_003CWaitForCheckpikeShop_003Ec__IteratorF2)/*Error near IL_003a: stateMachine*/)._003CisWait_003E__0 = false;
+			((_003CWaitForCheckpikeShop_003Ec__IteratorF3)/*Error near IL_003a: stateMachine*/)._003CisWait_003E__0 = false;
 		}, string.Empty);
 		while (isWait)
 		{

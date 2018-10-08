@@ -251,7 +251,7 @@ public class HomePeople
 		bool wait = true;
 		MonoBehaviourSingleton<FriendManager>.I.SendHomeCharaList(delegate
 		{
-			((_003CGetHomePlayerCharacterList_003Ec__IteratorBB)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CGetHomePlayerCharacterList_003Ec__IteratorBC)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
 		});
 		while (wait)
 		{
@@ -295,11 +295,11 @@ public class HomePeople
 		{
 			if (o.get_name().StartsWith("LEAF"))
 			{
-				((_003CLoadPeopleWayPoint_003Ec__IteratorBD)/*Error near IL_00ba: stateMachine*/)._003C_003Ef__this.leafPoints.Add(o.GetComponent<WayPoint>());
+				((_003CLoadPeopleWayPoint_003Ec__IteratorBE)/*Error near IL_00ba: stateMachine*/)._003C_003Ef__this.leafPoints.Add(o.GetComponent<WayPoint>());
 			}
 			else if (o.get_name() == "CENTER")
 			{
-				((_003CLoadPeopleWayPoint_003Ec__IteratorBD)/*Error near IL_00ba: stateMachine*/)._003C_003Ef__this.centerPoint = o.GetComponent<WayPoint>();
+				((_003CLoadPeopleWayPoint_003Ec__IteratorBE)/*Error near IL_00ba: stateMachine*/)._003C_003Ef__this.centerPoint = o.GetComponent<WayPoint>();
 			}
 			return false;
 		});
@@ -321,7 +321,7 @@ public class HomePeople
 		{
 			if (o.get_name() == "CENTER")
 			{
-				((_003CLoadLoungeWayPoint_003Ec__IteratorBE)/*Error near IL_00af: stateMachine*/)._003C_003Ef__this.centerPoint = o.GetComponent<WayPoint>();
+				((_003CLoadLoungeWayPoint_003Ec__IteratorBF)/*Error near IL_00af: stateMachine*/)._003C_003Ef__this.centerPoint = o.GetComponent<WayPoint>();
 			}
 			return false;
 		});

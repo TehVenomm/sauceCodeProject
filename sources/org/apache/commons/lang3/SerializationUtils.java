@@ -53,11 +53,11 @@ public class SerializationUtils {
     }
 
     public static <T extends Serializable> T clone(T t) {
+        ClassLoaderAwareObjectInputStream classLoaderAwareObjectInputStream;
         Throwable e;
         Throwable th;
         T t2 = null;
         if (t != null) {
-            ClassLoaderAwareObjectInputStream classLoaderAwareObjectInputStream;
             try {
                 classLoaderAwareObjectInputStream = new ClassLoaderAwareObjectInputStream(new ByteArrayInputStream(serialize(t)), t.getClass().getClassLoader());
                 try {
@@ -116,11 +116,11 @@ public class SerializationUtils {
     }
 
     public static void serialize(Serializable serializable, OutputStream outputStream) {
-        ObjectOutputStream objectOutputStream;
         Throwable e;
         if (outputStream == null) {
             throw new IllegalArgumentException("The OutputStream must not be null");
         }
+        ObjectOutputStream objectOutputStream;
         try {
             objectOutputStream = new ObjectOutputStream(outputStream);
             try {
@@ -167,19 +167,19 @@ public class SerializationUtils {
     }
 
     public static <T> T deserialize(InputStream inputStream) {
-        ObjectInputStream objectInputStream;
         Throwable e;
         if (inputStream == null) {
             throw new IllegalArgumentException("The InputStream must not be null");
         }
-        ObjectInputStream objectInputStream2 = null;
+        ObjectInputStream objectInputStream = null;
+        ObjectInputStream objectInputStream2;
         try {
-            objectInputStream = new ObjectInputStream(inputStream);
+            objectInputStream2 = new ObjectInputStream(inputStream);
             try {
-                T readObject = objectInputStream.readObject();
-                if (objectInputStream != null) {
+                T readObject = objectInputStream2.readObject();
+                if (objectInputStream2 != null) {
                     try {
-                        objectInputStream.close();
+                        objectInputStream2.close();
                     } catch (IOException e2) {
                     }
                 }
@@ -190,10 +190,10 @@ public class SerializationUtils {
                     throw new SerializationException(e);
                 } catch (Throwable th) {
                     e = th;
-                    objectInputStream2 = objectInputStream;
-                    if (objectInputStream2 != null) {
+                    objectInputStream = objectInputStream2;
+                    if (objectInputStream != null) {
                         try {
-                            objectInputStream2.close();
+                            objectInputStream.close();
                         } catch (IOException e4) {
                         }
                     }
@@ -201,16 +201,16 @@ public class SerializationUtils {
                 }
             } catch (ClassNotFoundException e5) {
                 e = e5;
-                objectInputStream2 = objectInputStream;
+                objectInputStream = objectInputStream2;
                 throw new SerializationException(e);
             } catch (IOException e6) {
                 e = e6;
-                objectInputStream2 = objectInputStream;
+                objectInputStream = objectInputStream2;
                 throw new SerializationException(e);
             }
         } catch (ClassCastException e7) {
             e = e7;
-            objectInputStream = null;
+            objectInputStream2 = null;
             throw new SerializationException(e);
         } catch (ClassNotFoundException e8) {
             e = e8;
@@ -220,8 +220,8 @@ public class SerializationUtils {
             throw new SerializationException(e);
         } catch (Throwable th2) {
             e = th2;
-            if (objectInputStream2 != null) {
-                objectInputStream2.close();
+            if (objectInputStream != null) {
+                objectInputStream.close();
             }
             throw e;
         }

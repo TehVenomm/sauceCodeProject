@@ -416,12 +416,12 @@ public class IabHelper implements AppstoreInAppBillingService {
     }
 
     public void processPurchaseSuccess(@NotNull Intent intent, @Nullable String str, @Nullable String str2) {
+        IabResult iabResult;
         Logger.m1000d("Successful resultcode from purchase activity.");
         Logger.m1001d("Purchase data: ", str);
         Logger.m1001d("Data signature: ", str2);
         Logger.m1001d("Extras: ", intent.getExtras());
         Logger.m1001d("Expected item type: ", this.mPurchasingItemType);
-        IabResult iabResult;
         if (str == null || str2 == null) {
             Logger.m1002e("In-app billing error: BUG: either purchaseData or dataSignature is null.");
             Logger.m1001d("Extras: ", intent.getExtras());

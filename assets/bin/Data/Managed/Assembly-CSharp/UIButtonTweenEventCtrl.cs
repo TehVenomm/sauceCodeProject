@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(UIGameSceneEventSender))]
 [AddComponentMenu("ProjectUI/UIButtonTweenEventCtrl")]
+[RequireComponent(typeof(UIGameSceneEventSender))]
 public class UIButtonTweenEventCtrl : UITweenCtrl
 {
 	public UITweener[] pushTweens;

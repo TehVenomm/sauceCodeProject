@@ -41,9 +41,9 @@ final class zzcbw implements Runnable {
         int i;
         OutputStream outputStream2;
         Throwable th2;
+        Map map2;
         int i2 = 0;
         this.zziqb.zzatv();
-        Map map2;
         try {
             URLConnection openConnection = this.zzbvm.openConnection();
             if (openConnection instanceof HttpURLConnection) {

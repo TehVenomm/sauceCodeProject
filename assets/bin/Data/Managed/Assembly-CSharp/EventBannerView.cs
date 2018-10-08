@@ -110,7 +110,7 @@ public class EventBannerView : UIBehaviour
 				loadingRoutines.Clear();
 				UIWidget refWidget = base._transform.GetComponentInChildren<UIWidget>();
 				bannerNum1 = ((MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count > 1) ? 1 : MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count);
-				_003CUpdateEventBannerAll_003Ec__AnonStorey2D6 _003CUpdateEventBannerAll_003Ec__AnonStorey2D;
+				_003CUpdateEventBannerAll_003Ec__AnonStorey2D7 _003CUpdateEventBannerAll_003Ec__AnonStorey2D;
 				SetWrapContent(UI.WRP_EVENT_BANNER1, "EventBanner", bannerNum1, true, new Action<int, Transform, bool>((object)_003CUpdateEventBannerAll_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				bannerNum2 = MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count - bannerNum1;
 				if (bannerNum2 > 5)

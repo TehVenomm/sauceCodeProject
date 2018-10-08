@@ -150,8 +150,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		bool waitGetData5 = true;
 		MonoBehaviourSingleton<PartyManager>.I.SendInvitedParty(delegate(bool partySuccess)
 		{
-			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_0060: stateMachine*/)._003CpartySuccess__003E__0 = partySuccess;
-			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_0060: stateMachine*/)._003CwaitGetData_003E__5 = false;
+			((_003CGetInvitedList_003Ec__IteratorD0)/*Error near IL_0060: stateMachine*/)._003CpartySuccess__003E__0 = partySuccess;
+			((_003CGetInvitedList_003Ec__IteratorD0)/*Error near IL_0060: stateMachine*/)._003CwaitGetData_003E__5 = false;
 		}, false);
 		while (waitGetData5)
 		{
@@ -160,8 +160,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		waitGetData5 = true;
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInvitedLounge(delegate(bool loungeSuccess)
 		{
-			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_00a1: stateMachine*/)._003CloungeSuccess__003E__1 = loungeSuccess;
-			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_00a1: stateMachine*/)._003CwaitGetData_003E__5 = false;
+			((_003CGetInvitedList_003Ec__IteratorD0)/*Error near IL_00a1: stateMachine*/)._003CloungeSuccess__003E__1 = loungeSuccess;
+			((_003CGetInvitedList_003Ec__IteratorD0)/*Error near IL_00a1: stateMachine*/)._003CwaitGetData_003E__5 = false;
 		});
 		while (waitGetData5)
 		{
@@ -170,8 +170,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		waitGetData5 = true;
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.GetRallyList(delegate(bool rallySuccess)
 		{
-			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_00e1: stateMachine*/)._003CrallySuccess__003E__2 = rallySuccess;
-			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_00e1: stateMachine*/)._003CwaitGetData_003E__5 = false;
+			((_003CGetInvitedList_003Ec__IteratorD0)/*Error near IL_00e1: stateMachine*/)._003CrallySuccess__003E__2 = rallySuccess;
+			((_003CGetInvitedList_003Ec__IteratorD0)/*Error near IL_00e1: stateMachine*/)._003CwaitGetData_003E__5 = false;
 		});
 		while (waitGetData5)
 		{
@@ -180,8 +180,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		waitGetData5 = true;
 		MonoBehaviourSingleton<GuildManager>.I.SendInvitedGuild(delegate(bool guildSuccess)
 		{
-			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_0121: stateMachine*/)._003CguildInviteSuccess__003E__3 = guildSuccess;
-			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_0121: stateMachine*/)._003CwaitGetData_003E__5 = false;
+			((_003CGetInvitedList_003Ec__IteratorD0)/*Error near IL_0121: stateMachine*/)._003CguildInviteSuccess__003E__3 = guildSuccess;
+			((_003CGetInvitedList_003Ec__IteratorD0)/*Error near IL_0121: stateMachine*/)._003CwaitGetData_003E__5 = false;
 		}, false);
 		while (waitGetData5)
 		{
@@ -190,8 +190,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		waitGetData5 = true;
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateInvitationList(delegate(bool guildDonateInviteSuccess)
 		{
-			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_0162: stateMachine*/)._003CguildDonateInviteSuccess__003E__4 = guildDonateInviteSuccess;
-			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_0162: stateMachine*/)._003CwaitGetData_003E__5 = false;
+			((_003CGetInvitedList_003Ec__IteratorD0)/*Error near IL_0162: stateMachine*/)._003CguildDonateInviteSuccess__003E__4 = guildDonateInviteSuccess;
+			((_003CGetInvitedList_003Ec__IteratorD0)/*Error near IL_0162: stateMachine*/)._003CwaitGetData_003E__5 = false;
 		}, false);
 		while (waitGetData5)
 		{
@@ -255,8 +255,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 				Object.Destroy(val.get_gameObject());
 			}
 		}
-		_003CUpdateTable_003Ec__AnonStorey3AF _003CUpdateTable_003Ec__AnonStorey3AF;
-		SetTable(UI.TBL_QUEST, string.Empty, item_num, true, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey3AF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey3AF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateTable_003Ec__AnonStorey3B0 _003CUpdateTable_003Ec__AnonStorey3B;
+		SetTable(UI.TBL_QUEST, string.Empty, item_num, true, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_QUEST);
 		component.set_enabled(true);
 		RepositionTable();
@@ -282,7 +282,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		SetLabelText(t, UI.LBL_LABEL, text);
 		SetStamp(t, lounge.stampId);
 		int num = lounge.num + 1;
-		_003CInitLounge_003Ec__AnonStorey3B0 _003CInitLounge_003Ec__AnonStorey3B;
+		_003CInitLounge_003Ec__AnonStorey3B1 _003CInitLounge_003Ec__AnonStorey3B;
 		int num2 = lounge.slotInfos.Count(new Func<LoungeModel.SlotInfo, bool>((object)_003CInitLounge_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		for (int j = 0; j < 7; j++)
 		{

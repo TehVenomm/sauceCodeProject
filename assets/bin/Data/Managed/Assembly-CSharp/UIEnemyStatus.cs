@@ -462,7 +462,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 			yield return (object)new WaitForSeconds(downEffectTime / speed);
 			effects.ForEach(delegate(GameObject obj)
 			{
-				((_003C_DirectionDownParticle_003Ec__Iterator1FC)/*Error near IL_0233: stateMachine*/)._003C_003Ef__this.playEffects.Remove(obj);
+				((_003C_DirectionDownParticle_003Ec__Iterator1FD)/*Error near IL_0233: stateMachine*/)._003C_003Ef__this.playEffects.Remove(obj);
 				EffectManager.ReleaseEffect(obj, true, false);
 			});
 		}
@@ -699,7 +699,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 			yield return (object)new WaitForSeconds(downEffectTime);
 			effects.ForEach(delegate(GameObject obj)
 			{
-				((_003C_DirectionShadowSealingGauge_003Ec__Iterator1FE)/*Error near IL_025b: stateMachine*/)._003C_003Ef__this.playShadowSealingEffects.Remove(obj);
+				((_003C_DirectionShadowSealingGauge_003Ec__Iterator1FF)/*Error near IL_025b: stateMachine*/)._003C_003Ef__this.playShadowSealingEffects.Remove(obj);
 				EffectManager.ReleaseEffect(obj, true, false);
 			});
 		}

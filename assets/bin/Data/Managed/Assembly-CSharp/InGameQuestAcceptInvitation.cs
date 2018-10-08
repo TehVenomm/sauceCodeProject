@@ -197,7 +197,7 @@ public class InGameQuestAcceptInvitation : QuestAcceptInvitation
 				{
 					component.ResetPosition();
 					AppMain i = MonoBehaviourSingleton<AppMain>.I;
-					_003CReposition_003Ec__AnonStorey3B2 _003CReposition_003Ec__AnonStorey3B;
+					_003CReposition_003Ec__AnonStorey3B3 _003CReposition_003Ec__AnonStorey3B;
 					i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003CReposition_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 			}

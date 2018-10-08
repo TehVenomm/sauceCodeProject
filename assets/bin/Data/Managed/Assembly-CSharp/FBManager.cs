@@ -268,7 +268,7 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 	{
 		if (CheckAndSetActionExecuting())
 		{
-			_003CAppRequest_003Ec__AnonStorey7C8 _003CAppRequest_003Ec__AnonStorey7C;
+			_003CAppRequest_003Ec__AnonStorey7C9 _003CAppRequest_003Ec__AnonStorey7C;
 			OnActionCallback = new Action<bool, string>((object)_003CAppRequest_003Ec__AnonStorey7C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			FB.AppRequest(message, (IEnumerable<string>)to, (IEnumerable<object>)null, (IEnumerable<string>)null, (int?)null, data, title, new FacebookDelegate<IAppRequestResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
@@ -278,8 +278,8 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 	{
 		if (CheckAndSetActionExecuting())
 		{
-			_003CGetInvitableFriends_003Ec__AnonStorey7C9 _003CGetInvitableFriends_003Ec__AnonStorey7C;
-			OnActionCallback = new Action<bool, string>((object)_003CGetInvitableFriends_003Ec__AnonStorey7C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CGetInvitableFriends_003Ec__AnonStorey7CA _003CGetInvitableFriends_003Ec__AnonStorey7CA;
+			OnActionCallback = new Action<bool, string>((object)_003CGetInvitableFriends_003Ec__AnonStorey7CA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			FB.API("/me/invitable_friends?fields=id,name,picture&pretty=0&limit=5000", 0, new FacebookDelegate<IGraphResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), (IDictionary<string, string>)null);
 		}
 	}
@@ -288,8 +288,8 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 	{
 		if (CheckAndSetActionExecuting())
 		{
-			_003CGetFriends_003Ec__AnonStorey7CA _003CGetFriends_003Ec__AnonStorey7CA;
-			OnActionCallback = new Action<bool, string>((object)_003CGetFriends_003Ec__AnonStorey7CA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CGetFriends_003Ec__AnonStorey7CB _003CGetFriends_003Ec__AnonStorey7CB;
+			OnActionCallback = new Action<bool, string>((object)_003CGetFriends_003Ec__AnonStorey7CB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			FB.API("/me/friends?fields=id,name,picture&pretty=0&limit=5000", 0, new FacebookDelegate<IGraphResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), (IDictionary<string, string>)null);
 		}
 	}

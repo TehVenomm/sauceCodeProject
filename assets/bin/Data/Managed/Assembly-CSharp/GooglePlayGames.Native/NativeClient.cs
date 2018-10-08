@@ -155,7 +155,7 @@ namespace GooglePlayGames.Native
 			//IL_0033: Expected O, but got Unknown
 			if (callback != null)
 			{
-				_003CInvokeCallbackOnGameThread_003Ec__AnonStorey7E2<T, S> _003CInvokeCallbackOnGameThread_003Ec__AnonStorey7E;
+				_003CInvokeCallbackOnGameThread_003Ec__AnonStorey7E3<T, S> _003CInvokeCallbackOnGameThread_003Ec__AnonStorey7E;
 				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CInvokeCallbackOnGameThread_003Ec__AnonStorey7E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
@@ -166,7 +166,7 @@ namespace GooglePlayGames.Native
 			//IL_002c: Expected O, but got Unknown
 			if (callback != null)
 			{
-				_003CInvokeCallbackOnGameThread_003Ec__AnonStorey7E3<T> _003CInvokeCallbackOnGameThread_003Ec__AnonStorey7E;
+				_003CInvokeCallbackOnGameThread_003Ec__AnonStorey7E4<T> _003CInvokeCallbackOnGameThread_003Ec__AnonStorey7E;
 				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CInvokeCallbackOnGameThread_003Ec__AnonStorey7E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
@@ -251,7 +251,7 @@ namespace GooglePlayGames.Native
 			{
 				bool shouldAutolaunch = eventType == Types.MultiplayerEvent.UPDATED_FROM_APP_LAUNCH;
 				Invitation invite = invitation.AsInvitation();
-				_003CHandleInvitation_003Ec__AnonStorey7E4 _003CHandleInvitation_003Ec__AnonStorey7E;
+				_003CHandleInvitation_003Ec__AnonStorey7E5 _003CHandleInvitation_003Ec__AnonStorey7E;
 				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CHandleInvitation_003Ec__AnonStorey7E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
@@ -303,7 +303,7 @@ namespace GooglePlayGames.Native
 			//IL_0035: Expected O, but got Unknown
 			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0054: Expected O, but got Unknown
-			_003CLoadFriends_003Ec__AnonStorey7E5 _003CLoadFriends_003Ec__AnonStorey7E;
+			_003CLoadFriends_003Ec__AnonStorey7E6 _003CLoadFriends_003Ec__AnonStorey7E;
 			if (!IsAuthenticated())
 			{
 				Logger.d("Cannot loadFriends when not authenticated");
@@ -547,7 +547,7 @@ namespace GooglePlayGames.Native
 		{
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0020: Expected O, but got Unknown
-			_003CGetPlayerStats_003Ec__AnonStorey7E7 _003CGetPlayerStats_003Ec__AnonStorey7E;
+			_003CGetPlayerStats_003Ec__AnonStorey7E8 _003CGetPlayerStats_003Ec__AnonStorey7E;
 			PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CGetPlayerStats_003Ec__AnonStorey7E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
@@ -562,8 +562,8 @@ namespace GooglePlayGames.Native
 				{
 					users[i] = nativeUsers[i].AsPlayer();
 				}
-				_003CLoadUsers_003Ec__AnonStorey7E8._003CLoadUsers_003Ec__AnonStorey7E9 _003CLoadUsers_003Ec__AnonStorey7E;
-				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CLoadUsers_003Ec__AnonStorey7E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CLoadUsers_003Ec__AnonStorey7E9._003CLoadUsers_003Ec__AnonStorey7EA _003CLoadUsers_003Ec__AnonStorey7EA;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CLoadUsers_003Ec__AnonStorey7EA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			});
 		}
 
@@ -582,8 +582,8 @@ namespace GooglePlayGames.Native
 			//IL_004a: Expected O, but got Unknown
 			GooglePlayGames.BasicApi.Achievement[] data = new GooglePlayGames.BasicApi.Achievement[mAchievements.Count];
 			mAchievements.Values.CopyTo(data, 0);
-			_003CLoadAchievements_003Ec__AnonStorey7EA _003CLoadAchievements_003Ec__AnonStorey7EA;
-			PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CLoadAchievements_003Ec__AnonStorey7EA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CLoadAchievements_003Ec__AnonStorey7EB _003CLoadAchievements_003Ec__AnonStorey7EB;
+			PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CLoadAchievements_003Ec__AnonStorey7EB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
 		public void UnlockAchievement(string achId, Action<bool> callback)
@@ -891,7 +891,7 @@ namespace GooglePlayGames.Native
 			}
 			else
 			{
-				_003CRegisterInvitationDelegate_003Ec__AnonStorey7F2 _003CRegisterInvitationDelegate_003Ec__AnonStorey7F;
+				_003CRegisterInvitationDelegate_003Ec__AnonStorey7F3 _003CRegisterInvitationDelegate_003Ec__AnonStorey7F;
 				mInvitationDelegate = Callbacks.AsOnGameThreadCallback<Invitation, bool>(new Action<Invitation, bool>((object)_003CRegisterInvitationDelegate_003Ec__AnonStorey7F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}

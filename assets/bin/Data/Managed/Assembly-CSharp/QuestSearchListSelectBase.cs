@@ -169,8 +169,8 @@ public abstract class QuestSearchListSelectBase : GameSection
 
 	protected unsafe void SendGetChallengeInfo(Action onFinish, Action<bool> cb)
 	{
-		_003CSendGetChallengeInfo_003Ec__AnonStorey3AB _003CSendGetChallengeInfo_003Ec__AnonStorey3AB;
-		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(new Action<bool, Error>((object)_003CSendGetChallengeInfo_003Ec__AnonStorey3AB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendGetChallengeInfo_003Ec__AnonStorey3AC _003CSendGetChallengeInfo_003Ec__AnonStorey3AC;
+		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(new Action<bool, Error>((object)_003CSendGetChallengeInfo_003Ec__AnonStorey3AC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected void SetMemberIcon(Transform t, QuestTable.QuestTableData table)

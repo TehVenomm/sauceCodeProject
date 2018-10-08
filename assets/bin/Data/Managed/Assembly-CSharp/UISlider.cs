@@ -12,16 +12,16 @@ public class UISlider : UIProgressBar
 		Upgraded
 	}
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Transform foreground;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private float rawValue = 1f;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Direction direction = Direction.Upgraded;
 
 	[SerializeField]

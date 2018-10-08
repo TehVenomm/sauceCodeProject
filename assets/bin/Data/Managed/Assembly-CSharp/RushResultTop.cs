@@ -424,8 +424,8 @@ public class RushResultTop : QuestResultTop
 			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)MonoBehaviourSingleton<InGameManager>.I.GetRushQuestId(wave));
 			string text2 = "Lv" + questData.GetMainEnemyLv().ToString() + Singleton<EnemyTable>.I.GetEnemyName((uint)questData.GetMainEnemyID());
 			SetLabelText(t_grid, UI.LBL_BOSS_NAME, text2);
-			_003CSetDropItemIcon_003Ec__AnonStorey43D _003CSetDropItemIcon_003Ec__AnonStorey43D;
-			SetGrid(t_grid, UI.GRD_DROP_ITEM, null, dropItemList.Length, true, new Action<int, Transform, bool>((object)_003CSetDropItemIcon_003Ec__AnonStorey43D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSetDropItemIcon_003Ec__AnonStorey43E _003CSetDropItemIcon_003Ec__AnonStorey43E;
+			SetGrid(t_grid, UI.GRD_DROP_ITEM, null, dropItemList.Length, true, new Action<int, Transform, bool>((object)_003CSetDropItemIcon_003Ec__AnonStorey43E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -440,7 +440,7 @@ public class RushResultTop : QuestResultTop
 		PlayAudio(AUDIO.ADVENT);
 		PlayTween((Enum)UI.OBJ_TITLE, true, (EventDelegate.Callback)delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator14C)/*Error near IL_0073: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			((_003CPlayAnimation_003Ec__Iterator14D)/*Error near IL_0073: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 		}, false, 0);
 		while (animState != 0 && !is_skip)
 		{
@@ -450,7 +450,7 @@ public class RushResultTop : QuestResultTop
 		PlayAudio(AUDIO.ACHIEVEMENT);
 		PlayTween((Enum)UI.OBJ_WAVE, true, (EventDelegate.Callback)delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator14C)/*Error near IL_00e8: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			((_003CPlayAnimation_003Ec__Iterator14D)/*Error near IL_00e8: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 		}, false, 0);
 		while (animState != 0 && !is_skip)
 		{
@@ -460,7 +460,7 @@ public class RushResultTop : QuestResultTop
 		PlayAudio(AUDIO.ACHIEVEMENT);
 		PlayTween((Enum)UI.OBJ_TIME, true, (EventDelegate.Callback)delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator14C)/*Error near IL_015d: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			((_003CPlayAnimation_003Ec__Iterator14D)/*Error near IL_015d: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 		}, false, 0);
 		while (animState != 0 && !is_skip)
 		{
@@ -475,11 +475,11 @@ public class RushResultTop : QuestResultTop
 			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, (EventDelegate.Callback)null, false, 1);
 			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, (EventDelegate.Callback)delegate
 			{
-				((_003CPlayAnimation_003Ec__Iterator14C)/*Error near IL_0221: stateMachine*/)._003C_003Ef__this.PlayAudio(AUDIO.ARRIVAL_WAVE);
+				((_003CPlayAnimation_003Ec__Iterator14D)/*Error near IL_0221: stateMachine*/)._003C_003Ef__this.PlayAudio(AUDIO.ARRIVAL_WAVE);
 			}, false, 2);
 			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, (EventDelegate.Callback)delegate
 			{
-				((_003CPlayAnimation_003Ec__Iterator14C)/*Error near IL_0242: stateMachine*/)._003C_003Ef__this.PlayAudio(AUDIO.ARRIVAL_WAVE);
+				((_003CPlayAnimation_003Ec__Iterator14D)/*Error near IL_0242: stateMachine*/)._003C_003Ef__this.PlayAudio(AUDIO.ARRIVAL_WAVE);
 			}, false, 3);
 			PlayTween((Enum)UI.OBJ_ARRIVAL_BONUS, true, (EventDelegate.Callback)null, false, 0);
 			SetActive((Enum)UI.BTN_NEXT, true);
@@ -491,7 +491,7 @@ public class RushResultTop : QuestResultTop
 			animState = RESULT_ANIM_STATE.ARRIVAL_NEXT;
 			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, (EventDelegate.Callback)delegate
 			{
-				((_003CPlayAnimation_003Ec__Iterator14C)/*Error near IL_02cc: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+				((_003CPlayAnimation_003Ec__Iterator14D)/*Error near IL_02cc: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 			}, false, 4);
 			while (animState != 0 && !is_skip)
 			{
@@ -514,7 +514,7 @@ public class RushResultTop : QuestResultTop
 		PlayTween((Enum)UI.OBJ_MONEY, true, (EventDelegate.Callback)null, true, 0);
 		PlayTween((Enum)UI.OBJ_TREASURE_ROOT, true, (EventDelegate.Callback)delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator14C)/*Error near IL_041c: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			((_003CPlayAnimation_003Ec__Iterator14D)/*Error near IL_041c: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 		}, false, 0);
 		while (animState != 0 && !is_skip)
 		{
@@ -857,8 +857,8 @@ public class RushResultTop : QuestResultTop
 				followBonusCallback = end_callback;
 				if (!QuestResultTop.IsExecuteNowSceneEvent(GetSceneName()))
 				{
-					_003COpenMutualFollowBonusDialog_003Ec__AnonStorey43E _003COpenMutualFollowBonusDialog_003Ec__AnonStorey43E;
-					this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenMutualFollowBonusDialog_003Ec__AnonStorey43E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+					_003COpenMutualFollowBonusDialog_003Ec__AnonStorey43F _003COpenMutualFollowBonusDialog_003Ec__AnonStorey43F;
+					this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenMutualFollowBonusDialog_003Ec__AnonStorey43F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 				}
 				else
 				{

@@ -41,8 +41,8 @@ public class UIAtlas
 	[SerializeField]
 	private List<UISpriteData> mSprites = new List<UISpriteData>();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private float mPixelSize = 1f;
 
 	[HideInInspector]
@@ -53,8 +53,8 @@ public class UIAtlas
 	[SerializeField]
 	private Coordinates mCoordinates;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private List<Sprite> sprites = new List<Sprite>();
 
 	private int mPMA = -1;

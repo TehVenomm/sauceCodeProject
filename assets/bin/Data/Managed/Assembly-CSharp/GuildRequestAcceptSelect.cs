@@ -49,14 +49,14 @@ public class GuildRequestAcceptSelect : QuestAcceptSelect
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0022: Expected O, but got Unknown
 			GuildRequestAcceptSelect guildRequestAcceptSelect = this;
-			_003COnQuery_GuildRequestSortieMessage_YES_003Ec__AnonStorey353 _003COnQuery_GuildRequestSortieMessage_YES_003Ec__AnonStorey;
+			_003COnQuery_GuildRequestSortieMessage_YES_003Ec__AnonStorey354 _003COnQuery_GuildRequestSortieMessage_YES_003Ec__AnonStorey;
 			SendGetChallengeInfo(new Action((object)_003COnQuery_GuildRequestSortieMessage_YES_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
 		});
 	}
 
 	private unsafe void SendGetChallengeInfo(Action onFinish, Action<bool> cb)
 	{
-		_003CSendGetChallengeInfo_003Ec__AnonStorey354 _003CSendGetChallengeInfo_003Ec__AnonStorey;
+		_003CSendGetChallengeInfo_003Ec__AnonStorey355 _003CSendGetChallengeInfo_003Ec__AnonStorey;
 		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(new Action<bool, Error>((object)_003CSendGetChallengeInfo_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 }

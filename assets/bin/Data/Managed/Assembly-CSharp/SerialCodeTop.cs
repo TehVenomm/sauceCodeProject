@@ -58,7 +58,7 @@ public class SerialCodeTop : GameSection
 		bool wait = true;
 		SendGetSerialCodeList(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator14E)/*Error near IL_002e: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CDoInitialize_003Ec__Iterator14F)/*Error near IL_002e: stateMachine*/)._003Cwait_003E__0 = false;
 		});
 		while (wait)
 		{
@@ -88,7 +88,7 @@ public class SerialCodeTop : GameSection
 		else
 		{
 			GameSection.StayEvent();
-			_003COnQuery_SEND_003Ec__AnonStorey441 _003COnQuery_SEND_003Ec__AnonStorey;
+			_003COnQuery_SEND_003Ec__AnonStorey442 _003COnQuery_SEND_003Ec__AnonStorey;
 			SendInputSerialCode(serialList.serials[index].serialId, inputValue, new Action<bool, string>((object)_003COnQuery_SEND_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

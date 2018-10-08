@@ -1005,11 +1005,11 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	private unsafe IEnumerator CRChangeScene(string scene, string section, Action callback)
 	{
-		if (_003CCRChangeScene_003Ec__Iterator253._003C_003Ef__am_0024cache8 == null)
+		if (_003CCRChangeScene_003Ec__Iterator254._003C_003Ef__am_0024cache8 == null)
 		{
-			_003CCRChangeScene_003Ec__Iterator253._003C_003Ef__am_0024cache8 = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CCRChangeScene_003Ec__Iterator254._003C_003Ef__am_0024cache8 = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		yield return (object)new WaitUntil(_003CCRChangeScene_003Ec__Iterator253._003C_003Ef__am_0024cache8);
+		yield return (object)new WaitUntil(_003CCRChangeScene_003Ec__Iterator254._003C_003Ef__am_0024cache8);
 		if (callback != null)
 		{
 			callback.Invoke();

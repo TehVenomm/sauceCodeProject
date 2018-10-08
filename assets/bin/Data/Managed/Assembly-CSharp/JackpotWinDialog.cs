@@ -17,7 +17,8 @@ public class JackpotWinDialog : GameSection
 		LBL_HUNTER_WIN,
 		JACKPOT_NUMBER,
 		SPR_INFO,
-		SPR_INFO_GRAND
+		SPR_INFO_GRAND,
+		BTN_SHARESCREENSHOT
 	}
 
 	private enum PamelaVoice
@@ -118,14 +119,17 @@ public class JackpotWinDialog : GameSection
 	private IEnumerator DoInitialize()
 	{
 		data = (GameSection.GetEventData() as FortuneWheelManager.JackpotWinData);
-		isOurs = IsOurWin(int.Parse(data.userId));
-		SoundManager.RequestBGM((!isOurs) ? 10 : 191, false);
-		pamelaActiveList = ((!isOurs) ? pamelaTheirsAnimList : pamelaOursAnimList);
-		dragonActiveList = ((!isOurs) ? dragonTheirsAnimList : dragonOursAnimList);
-		jackportNumber = GetCtrl(UI.JACKPOT_NUMBER).GetComponent<JackportNumber>();
-		UpdateNPC();
-		yield return (object)null;
-		base.Initialize();
+		if (data != null)
+		{
+			isOurs = IsOurWin(int.Parse(data.userId));
+			SoundManager.RequestBGM((!isOurs) ? 10 : 191, false);
+			pamelaActiveList = ((!isOurs) ? pamelaTheirsAnimList : pamelaOursAnimList);
+			dragonActiveList = ((!isOurs) ? dragonTheirsAnimList : dragonOursAnimList);
+			jackportNumber = GetCtrl(UI.JACKPOT_NUMBER).GetComponent<JackportNumber>();
+			UpdateNPC();
+			yield return (object)null;
+			base.Initialize();
+		}
 	}
 
 	private void OnDisable()
@@ -146,15 +150,16 @@ public class JackpotWinDialog : GameSection
 		//IL_0027: Expected O, but got Unknown
 		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003d: Expected O, but got Unknown
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Expected O, but got Unknown
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0079: Expected O, but got Unknown
 		jackportNumber.ShowNumber(jackpot);
 		Transform ctrl = GetCtrl(UI.OBJ_JACKPOT_GROUP);
 		SetActive(ctrl.get_transform(), UI.OBJ_OURS, isOurs);
 		SetActive(ctrl.get_transform(), UI.OBJ_THEIRS, !isOurs);
+		SetActive((Enum)UI.BTN_SHARESCREENSHOT, isOurs);
 		if (!isOurs)
 		{
-			SetLabelText(GetCtrl(UI.OBJ_THEIRS).get_transform(), UI.LBL_HUNTER_WIN, $"{hunterWinName} hit the Jackpot!)");
+			SetLabelText(GetCtrl(UI.OBJ_THEIRS).get_transform(), UI.LBL_HUNTER_WIN, $"{hunterWinName} hit the Jackpot!");
 		}
 		else
 		{

@@ -122,7 +122,7 @@ public class SmithExceedDialog : GameSection
 		UpdateBonusDetail(true);
 		bool is_only_lapis = true;
 		int item_num = exceedData.exceed.Length;
-		_003CUpdateUI_003Ec__AnonStorey3D0 _003CUpdateUI_003Ec__AnonStorey3D;
+		_003CUpdateUI_003Ec__AnonStorey3D1 _003CUpdateUI_003Ec__AnonStorey3D;
 		SetGrid(UI.GRD_LAPIS, "SmithExceedItem", item_num, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		bool flag = exceedCount < 4;
 		SetActive((Enum)UI.OBJ_VALID_EXCEED_ROOT, flag);
@@ -257,7 +257,7 @@ public class SmithExceedDialog : GameSection
 				{
 					uint itemId = equipItemExceedDataIncludeLimited.exceed[selectIndex].itemId;
 					GameSection.StayEvent();
-					_003COnQuery_SmithExceedConfirm_YES_003Ec__AnonStorey3D1 _003COnQuery_SmithExceedConfirm_YES_003Ec__AnonStorey3D;
+					_003COnQuery_SmithExceedConfirm_YES_003Ec__AnonStorey3D2 _003COnQuery_SmithExceedConfirm_YES_003Ec__AnonStorey3D;
 					MonoBehaviourSingleton<SmithManager>.I.SendExceedEquipItem(selectEquipData.uniqueID, itemId, new Action<Error, EquipItemInfo>((object)_003COnQuery_SmithExceedConfirm_YES_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 			}

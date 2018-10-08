@@ -98,8 +98,8 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 			{
 				currentList[i] = inviteUsers[nowPage * 10 + i];
 			}
-			_003CUpdateListUI_003Ec__AnonStorey32B _003CUpdateListUI_003Ec__AnonStorey32B;
-			SetDynamicList((Enum)UI.GRD_LIST, "QuestInviteeSelectListItem", currentPageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateListUI_003Ec__AnonStorey32B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateListUI_003Ec__AnonStorey32C _003CUpdateListUI_003Ec__AnonStorey32C;
+			SetDynamicList((Enum)UI.GRD_LIST, "QuestInviteeSelectListItem", currentPageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateListUI_003Ec__AnonStorey32C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -146,8 +146,8 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey32C _003CSendGetList_003Ec__AnonStorey32C;
-		MonoBehaviourSingleton<PartyManager>.I.SendInviteList(new Action<bool, PartyInviteCharaInfo[]>((object)_003CSendGetList_003Ec__AnonStorey32C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendGetList_003Ec__AnonStorey32D _003CSendGetList_003Ec__AnonStorey32D;
+		MonoBehaviourSingleton<PartyManager>.I.SendInviteList(new Action<bool, PartyInviteCharaInfo[]>((object)_003CSendGetList_003Ec__AnonStorey32D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public override void OnQuery_FOLLOW_INFO()

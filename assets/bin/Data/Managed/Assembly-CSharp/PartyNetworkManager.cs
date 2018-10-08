@@ -190,8 +190,8 @@ public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 		party_Model_Register.signature = conn_data.signature;
 		Logd("Regist. roomId={0}", conn_data.roomId);
 		registerAck = null;
-		_003CRegist_003Ec__AnonStorey54E _003CRegist_003Ec__AnonStorey54E;
-		SendServer(party_Model_Register, true, new Func<Coop_Model_ACK, bool>((object)_003CRegist_003Ec__AnonStorey54E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
+		_003CRegist_003Ec__AnonStorey54F _003CRegist_003Ec__AnonStorey54F;
+		SendServer(party_Model_Register, true, new Func<Coop_Model_ACK, bool>((object)_003CRegist_003Ec__AnonStorey54F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
 	}
 
 	public void ConnectAndRegist(ConnectData conn_data, Action<bool, bool> call_back)

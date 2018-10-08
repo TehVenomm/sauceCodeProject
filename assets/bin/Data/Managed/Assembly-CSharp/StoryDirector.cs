@@ -182,8 +182,8 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 		string text = null;
 		MonoBehaviourSingleton<DataTableManager>.I.LoadStory(scriptName, delegate(string x)
 		{
-			((_003CParseScript_003Ec__IteratorDA)/*Error near IL_0057: stateMachine*/)._003Ctext_003E__2 = x;
-			((_003CParseScript_003Ec__IteratorDA)/*Error near IL_0057: stateMachine*/)._003Cloading_003E__1 = false;
+			((_003CParseScript_003Ec__IteratorDB)/*Error near IL_0057: stateMachine*/)._003Ctext_003E__2 = x;
+			((_003CParseScript_003Ec__IteratorDB)/*Error near IL_0057: stateMachine*/)._003Cloading_003E__1 = false;
 		});
 		while (loading)
 		{
@@ -264,7 +264,7 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 				int id = -1;
 				for (int i = 0; (float)i < 4f; i++)
 				{
-					if (charas.Find((StoryCharacter o) => o.id == ((_003CLoadScriptResources_003Ec__IteratorDB)/*Error near IL_02fd: stateMachine*/)._003Ci_003E__11) == null)
+					if (charas.Find((StoryCharacter o) => o.id == ((_003CLoadScriptResources_003Ec__IteratorDC)/*Error near IL_02fd: stateMachine*/)._003Ci_003E__11) == null)
 					{
 						id = i;
 						break;

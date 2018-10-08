@@ -30,7 +30,7 @@ public class FriendSearchID : ConfigName
 		GameSection.SetEventData(null);
 		string input_text = GetInputValue((Enum)UI.IPT_TEXT);
 		GameSection.StayEvent();
-		_003COnQuery_OK_003Ec__AnonStorey311 _003COnQuery_OK_003Ec__AnonStorey;
+		_003COnQuery_OK_003Ec__AnonStorey312 _003COnQuery_OK_003Ec__AnonStorey;
 		MonoBehaviourSingleton<FriendManager>.I.SendSearchID(input_text, new Action<bool, FriendSearchResult>((object)_003COnQuery_OK_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 }

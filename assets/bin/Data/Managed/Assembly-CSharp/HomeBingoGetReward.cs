@@ -69,7 +69,7 @@ public class HomeBingoGetReward : GameSection
 		if (rewards != null && rewards.Length > 0)
 		{
 			int exp = 0;
-			_003CUpdateRewardIcon_003Ec__AnonStorey376 _003CUpdateRewardIcon_003Ec__AnonStorey;
+			_003CUpdateRewardIcon_003Ec__AnonStorey377 _003CUpdateRewardIcon_003Ec__AnonStorey;
 			SetGrid(UI.GRD_REWARD, string.Empty, rewards.Length, false, new Action<int, Transform, bool>((object)_003CUpdateRewardIcon_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

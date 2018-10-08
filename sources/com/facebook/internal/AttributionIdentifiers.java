@@ -166,11 +166,11 @@ public class AttributionIdentifiers {
     }
 
     private static AttributionIdentifiers getAndroidIdViaService(Context context) {
+        AttributionIdentifiers attributionIdentifiers;
         ServiceConnection googleAdServiceConnection = new GoogleAdServiceConnection();
         Intent intent = new Intent(AdvertisingInfoServiceStrategy.GOOGLE_PLAY_SERVICES_INTENT);
         intent.setPackage("com.google.android.gms");
         if (context.bindService(intent, googleAdServiceConnection, 1)) {
-            AttributionIdentifiers attributionIdentifiers;
             try {
                 GoogleAdInfo googleAdInfo = new GoogleAdInfo(googleAdServiceConnection.getBinder());
                 attributionIdentifiers = new AttributionIdentifiers();

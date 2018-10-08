@@ -109,7 +109,7 @@ public class GuildSearchList : GameSection
 
 	private unsafe void SendRequest(Action onFinish, Action<bool> cb)
 	{
-		_003CSendRequest_003Ec__AnonStorey340 _003CSendRequest_003Ec__AnonStorey;
+		_003CSendRequest_003Ec__AnonStorey341 _003CSendRequest_003Ec__AnonStorey;
 		MonoBehaviourSingleton<GuildManager>.I.SendSearch(new Action<bool, Error>((object)_003CSendRequest_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
 	}
 }

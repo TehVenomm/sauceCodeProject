@@ -773,13 +773,13 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
     }
 
     private void writeSessionApp(String str) throws Exception {
+        OutputStream clsFileOutputStream;
         Throwable e;
         Flushable flushable;
         Throwable th;
         Closeable closeable;
         Object obj;
         Flushable flushable2 = null;
-        OutputStream clsFileOutputStream;
         try {
             clsFileOutputStream = new ClsFileOutputStream(this.filesDir, str + SESSION_APP_TAG);
             try {
@@ -936,12 +936,12 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
     }
 
     private void writeSessionOS(String str) throws Exception {
+        Closeable clsFileOutputStream;
+        Flushable newInstance;
         Throwable th;
         Throwable e;
         Throwable th2;
         Flushable flushable = null;
-        Closeable clsFileOutputStream;
-        Flushable newInstance;
         try {
             clsFileOutputStream = new ClsFileOutputStream(this.filesDir, str + SESSION_OS_TAG);
             try {
@@ -1000,6 +1000,7 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
     }
 
     private void writeSessionPartsToSessionFile(File file, String str, int i) {
+        OutputStream clsFileOutputStream;
         Throwable e;
         Flushable flushable;
         Throwable th;
@@ -1014,7 +1015,6 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
         boolean z2 = listFilesMatching2 != null && listFilesMatching2.length > 0;
         Fabric.getLogger().mo4289d("Fabric", String.format(Locale.US, "Session %s has non-fatal exceptions: %s", new Object[]{str, Boolean.valueOf(z2)}));
         if (z || z2) {
-            OutputStream clsFileOutputStream;
             try {
                 clsFileOutputStream = new ClsFileOutputStream(this.filesDir, str);
                 try {

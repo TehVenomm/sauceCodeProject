@@ -709,7 +709,7 @@ public class WorldMapOpenNewField : GameSection
 				endTime = 0.4f;
 			}
 			SoundManager.PlayOneShotUISE(40000032);
-			_003COpenNewLocation_003Ec__AnonStorey4A1 _003COpenNewLocation_003Ec__AnonStorey4A;
+			_003COpenNewLocation_003Ec__AnonStorey4A2 _003COpenNewLocation_003Ec__AnonStorey4A;
 			portal.Open(effect.get_transform(), regionMapRoot.animator, reverse, endTime, new Action((object)_003COpenNewLocation_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

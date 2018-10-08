@@ -374,7 +374,7 @@ public class WorldMapOpenNewRegion : GameSection
 		{
 			to = data[toRegionID].iconPos;
 		}
-		_003COnOpen_003Ec__AnonStorey4A3 _003COnOpen_003Ec__AnonStorey4A;
+		_003COnOpen_003Ec__AnonStorey4A4 _003COnOpen_003Ec__AnonStorey4A;
 		FadeInMap(new Action((object)_003COnOpen_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		base.collectUI = base._transform;
 		base.OnOpen();
@@ -449,7 +449,7 @@ public class WorldMapOpenNewRegion : GameSection
 		{
 			uiMapSprite.get_gameObject().SetActive(true);
 		}
-		_003CFadeInMap_003Ec__AnonStorey4A4 _003CFadeInMap_003Ec__AnonStorey4A;
+		_003CFadeInMap_003Ec__AnonStorey4A5 _003CFadeInMap_003Ec__AnonStorey4A;
 		this.StartCoroutine(DoFadeMap(0f, 1f, 0.4f, new Action((object)_003CFadeInMap_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 
@@ -559,7 +559,7 @@ public class WorldMapOpenNewRegion : GameSection
 		tweenCtrl.Reset();
 		tweenCtrl.Play(true, delegate
 		{
-			((_003CDoGlowRegion_003Ec__Iterator1A0)/*Error near IL_04df: stateMachine*/)._003CisTweenEnd_003E__7 = true;
+			((_003CDoGlowRegion_003Ec__Iterator1A1)/*Error near IL_04df: stateMachine*/)._003CisTweenEnd_003E__7 = true;
 		});
 		SoundManager.PlayOneShotUISE(SE_ID_LOGO);
 		while (!isTweenEnd)

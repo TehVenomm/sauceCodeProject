@@ -202,8 +202,8 @@ namespace GooglePlayGames.Native
 				//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0048: Expected O, but got Unknown
 				Logger.d("Invoking conflict callback");
-				_003CToOnGameThread_003Ec__AnonStorey81B._003CToOnGameThread_003Ec__AnonStorey81C _003CToOnGameThread_003Ec__AnonStorey81C;
-				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CToOnGameThread_003Ec__AnonStorey81C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CToOnGameThread_003Ec__AnonStorey81C._003CToOnGameThread_003Ec__AnonStorey81D _003CToOnGameThread_003Ec__AnonStorey81D;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CToOnGameThread_003Ec__AnonStorey81D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			};
 		}
 
@@ -243,15 +243,15 @@ namespace GooglePlayGames.Native
 				{
 					NativeSnapshotMetadata original = response.ConflictOriginal();
 					NativeSnapshotMetadata unmerged = response.ConflictUnmerged();
-					_003CInternalManualOpen_003Ec__AnonStorey81D._003CInternalManualOpen_003Ec__AnonStorey81E _003CInternalManualOpen_003Ec__AnonStorey81E;
-					NativeConflictResolver resolver = new NativeConflictResolver(mSnapshotManager, response.ConflictId(), original, unmerged, completedCallback, new Action((object)_003CInternalManualOpen_003Ec__AnonStorey81E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					_003CInternalManualOpen_003Ec__AnonStorey81E._003CInternalManualOpen_003Ec__AnonStorey81F _003CInternalManualOpen_003Ec__AnonStorey81F;
+					NativeConflictResolver resolver = new NativeConflictResolver(mSnapshotManager, response.ConflictId(), original, unmerged, completedCallback, new Action((object)_003CInternalManualOpen_003Ec__AnonStorey81F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					if (!prefetchDataOnConflict)
 					{
 						conflictCallback(resolver, original, null, unmerged, null);
 					}
 					else
 					{
-						Prefetcher @object = new Prefetcher(new Action<byte[], byte[]>((object)_003CInternalManualOpen_003Ec__AnonStorey81E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), completedCallback);
+						Prefetcher @object = new Prefetcher(new Action<byte[], byte[]>((object)_003CInternalManualOpen_003Ec__AnonStorey81F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), completedCallback);
 						mSnapshotManager.Read(original, @object.OnOriginalDataRead);
 						mSnapshotManager.Read(unmerged, @object.OnUnmergedDataRead);
 					}
@@ -487,7 +487,7 @@ namespace GooglePlayGames.Native
 
 		private unsafe static Action<T1, T2> ToOnGameThread<T1, T2>(Action<T1, T2> toConvert)
 		{
-			_003CToOnGameThread_003Ec__AnonStorey823<T1, T2> _003CToOnGameThread_003Ec__AnonStorey;
+			_003CToOnGameThread_003Ec__AnonStorey824<T1, T2> _003CToOnGameThread_003Ec__AnonStorey;
 			return new Action<_003F, _003F>((object)_003CToOnGameThread_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 	}

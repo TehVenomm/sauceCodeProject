@@ -430,8 +430,8 @@ public class ItemDetailTop : GameSection
 		int num2 = 0;
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
-			_003CGetQuestNum_003Ec__AnonStorey349 _003CGetQuestNum_003Ec__AnonStorey;
-			num2 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CGetQuestNum_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
+			_003CGetQuestNum_003Ec__AnonStorey34A _003CGetQuestNum_003Ec__AnonStorey34A;
+			num2 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CGetQuestNum_003Ec__AnonStorey34A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 		}
 		int num3 = num - num2;
 		return Mathf.Max(num3, 0);
@@ -1269,18 +1269,18 @@ public class ItemDetailTop : GameSection
 
 	private unsafe IEnumerator CRSendDonateRequest(int itemID, string itemName, string request, int numRequest)
 	{
-		if (_003CCRSendDonateRequest_003Ec__Iterator71._003C_003Ef__am_0024cacheB == null)
+		if (_003CCRSendDonateRequest_003Ec__Iterator72._003C_003Ef__am_0024cacheB == null)
 		{
-			_003CCRSendDonateRequest_003Ec__Iterator71._003C_003Ef__am_0024cacheB = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CCRSendDonateRequest_003Ec__Iterator72._003C_003Ef__am_0024cacheB = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		yield return (object)new WaitUntil(_003CCRSendDonateRequest_003Ec__Iterator71._003C_003Ef__am_0024cacheB);
+		yield return (object)new WaitUntil(_003CCRSendDonateRequest_003Ec__Iterator72._003C_003Ef__am_0024cacheB);
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest(itemID, itemName, request, numRequest, delegate(bool success)
 		{
 			GameSection.ResumeEvent(success, null);
 			if (success)
 			{
-				((_003CCRSendDonateRequest_003Ec__Iterator71)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;
+				((_003CCRSendDonateRequest_003Ec__Iterator72)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;
 			}
 		});
 	}

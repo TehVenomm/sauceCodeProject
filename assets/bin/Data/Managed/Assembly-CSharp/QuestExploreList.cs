@@ -46,7 +46,7 @@ public class QuestExploreList : GameSection
 		bool is_recv_delivery = false;
 		MonoBehaviourSingleton<QuestManager>.I.SendGetExploreList(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator11A)/*Error near IL_0031: stateMachine*/)._003Cis_recv_delivery_003E__0 = true;
+			((_003CDoInitialize_003Ec__Iterator11B)/*Error near IL_0031: stateMachine*/)._003Cis_recv_delivery_003E__0 = true;
 		});
 		while (!is_recv_delivery)
 		{
@@ -161,8 +161,8 @@ public class QuestExploreList : GameSection
 					if (!ev.readPrologueStory)
 					{
 						GameSection.StayEvent();
-						_003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey3FA _003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey3FA;
-						MonoBehaviourSingleton<QuestManager>.I.SendQuestReadEventStory(ev.eventId, new Action<bool, Error>((object)_003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey3FA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+						_003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey3FB _003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey3FB;
+						MonoBehaviourSingleton<QuestManager>.I.SendQuestReadEventStory(ev.eventId, new Action<bool, Error>((object)_003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey3FB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					}
 					if (ev.eventType == 12)
 					{

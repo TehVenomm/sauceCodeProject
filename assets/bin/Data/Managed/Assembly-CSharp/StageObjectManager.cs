@@ -1689,8 +1689,8 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 			enemy.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.DEFAULT);
 		}
 		enemy.PlayMotion(124, -1f);
-		_003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey4FB _003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey4FB;
-		this.StartCoroutine(SimpleMoveCharacterY(enemy, (float)num, to, 1f, new Action((object)_003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey4FB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+		_003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey4FC _003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey4FC;
+		this.StartCoroutine(SimpleMoveCharacterY(enemy, (float)num, to, 1f, new Action((object)_003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey4FC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 
 	public IEnumerator SimpleMoveCharacterY(Character character, float from, float to, float time, Action OnEndAction)

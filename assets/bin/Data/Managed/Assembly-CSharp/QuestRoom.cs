@@ -566,9 +566,9 @@ public class QuestRoom : GameSection
 		bool wait = true;
 		MonoBehaviourSingleton<PartyManager>.I.SendRepeat(MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest, delegate
 		{
-			((_003CSetDeaultRepeat_003Ec__Iterator11F)/*Error near IL_004b: stateMachine*/)._003C_003Ef__this.SetActive((Enum)UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-			((_003CSetDeaultRepeat_003Ec__Iterator11F)/*Error near IL_004b: stateMachine*/)._003C_003Ef__this.SetActive((Enum)UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-			((_003CSetDeaultRepeat_003Ec__Iterator11F)/*Error near IL_004b: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CSetDeaultRepeat_003Ec__Iterator120)/*Error near IL_004b: stateMachine*/)._003C_003Ef__this.SetActive((Enum)UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			((_003CSetDeaultRepeat_003Ec__Iterator120)/*Error near IL_004b: stateMachine*/)._003C_003Ef__this.SetActive((Enum)UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			((_003CSetDeaultRepeat_003Ec__Iterator120)/*Error near IL_004b: stateMachine*/)._003Cwait_003E__0 = false;
 		});
 		while (wait)
 		{
@@ -598,7 +598,7 @@ public class QuestRoom : GameSection
 			bool wait = true;
 			MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate
 			{
-				((_003CDoExit_003Ec__Iterator120)/*Error near IL_0037: stateMachine*/)._003Cwait_003E__0 = false;
+				((_003CDoExit_003Ec__Iterator121)/*Error near IL_0037: stateMachine*/)._003Cwait_003E__0 = false;
 			});
 			while (wait)
 			{

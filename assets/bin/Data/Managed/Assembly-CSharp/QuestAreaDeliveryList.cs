@@ -161,7 +161,7 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 			Object.Destroy(val.get_gameObject());
 		}
 		bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-		_003CUpdateTable_003Ec__AnonStorey3B8 _003CUpdateTable_003Ec__AnonStorey3B;
+		_003CUpdateTable_003Ec__AnonStorey3B9 _003CUpdateTable_003Ec__AnonStorey3B;
 		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, isResetUI, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
 		component.set_enabled(true);

@@ -65,7 +65,7 @@ public class Reel : GameSection
 			digits += ((data <= 0) ? 1 : data);
 		});
 		int reel_list_width_base = width / digits;
-		_003CUpdateUI_003Ec__AnonStorey7B0 _003CUpdateUI_003Ec__AnonStorey7B;
+		_003CUpdateUI_003Ec__AnonStorey7B1 _003CUpdateUI_003Ec__AnonStorey7B;
 		SetTable(UI.TBL_REEL, "ReelList", initData.digit.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey7B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

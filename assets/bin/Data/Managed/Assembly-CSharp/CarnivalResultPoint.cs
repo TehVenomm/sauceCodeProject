@@ -371,8 +371,8 @@ public class CarnivalResultPoint : GameSection
 		SetActive((Enum)UI.BTN_OK, false);
 		InitTween((Enum)UI.OBJ_GET_REWARD_ROOT);
 		PointEventCurrentData.PointResultData data = currentData.pointRankingData;
-		_003CSetRewardUI_003Ec__AnonStorey41F _003CSetRewardUI_003Ec__AnonStorey41F;
-		SetGrid(UI.GRD_POINT_DETAIL, "CarnivalResultPointDetailItem", data.bonusPoint.Count, true, new Action<int, Transform, bool>((object)_003CSetRewardUI_003Ec__AnonStorey41F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSetRewardUI_003Ec__AnonStorey420 _003CSetRewardUI_003Ec__AnonStorey;
+		SetGrid(UI.GRD_POINT_DETAIL, "CarnivalResultPointDetailItem", data.bonusPoint.Count, true, new Action<int, Transform, bool>((object)_003CSetRewardUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		MonoBehaviourSingleton<GuildRequestManager>.I.isCompleteMulti = false;
 		SetLabelText((Enum)UI.LBL_GET_POINT, data.getPoint.ToString("N0"));
 		SetLabelText((Enum)UI.LBL_TOTAL_POINT, (data.userPoint + data.getPoint).ToString("N0"));
@@ -407,7 +407,7 @@ public class CarnivalResultPoint : GameSection
 		SetLabelText((Enum)UI.LBL_GET_POINT, "0");
 		PlayTween((Enum)UI.OBJ_CARNIVAL_POINT, true, (EventDelegate.Callback)delegate
 		{
-			((_003CGetPointAnimation_003Ec__Iterator135)/*Error near IL_00b8: stateMachine*/)._003Cwait_003E__3 = false;
+			((_003CGetPointAnimation_003Ec__Iterator136)/*Error near IL_00b8: stateMachine*/)._003Cwait_003E__3 = false;
 		}, true, 0);
 		while (wait2)
 		{
@@ -426,7 +426,7 @@ public class CarnivalResultPoint : GameSection
 			wait2 = true;
 			PlayTween((Enum)UI.OBJ_GET_REWARD_ROOT, true, (EventDelegate.Callback)delegate
 			{
-				((_003CGetPointAnimation_003Ec__Iterator135)/*Error near IL_01d8: stateMachine*/)._003Cwait_003E__3 = false;
+				((_003CGetPointAnimation_003Ec__Iterator136)/*Error near IL_01d8: stateMachine*/)._003Cwait_003E__3 = false;
 			}, true, 0);
 			while (wait2)
 			{
@@ -444,7 +444,7 @@ public class CarnivalResultPoint : GameSection
 
 	private unsafe void SetNextItemIcon(List<PointEventCurrentData.Reward> reward)
 	{
-		_003CSetNextItemIcon_003Ec__AnonStorey420 _003CSetNextItemIcon_003Ec__AnonStorey;
+		_003CSetNextItemIcon_003Ec__AnonStorey421 _003CSetNextItemIcon_003Ec__AnonStorey;
 		SetDynamicList((Enum)UI.OBJ_NEXT_REWARD_ITEM_ICON_ROOT, "ItemIcon", reward.Count, true, null, null, new Action<int, Transform, bool>((object)_003CSetNextItemIcon_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -492,7 +492,7 @@ public class CarnivalResultPoint : GameSection
 
 	private unsafe void SetAllRewardItem(UI targetGrid, List<PointEventCurrentData.Reward> rewardList)
 	{
-		_003CSetAllRewardItem_003Ec__AnonStorey421 _003CSetAllRewardItem_003Ec__AnonStorey;
+		_003CSetAllRewardItem_003Ec__AnonStorey422 _003CSetAllRewardItem_003Ec__AnonStorey;
 		SetGrid(targetGrid, "ItemIconReward", rewardList.Count, true, new Action<int, Transform, bool>((object)_003CSetAllRewardItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -568,7 +568,7 @@ public class CarnivalResultPoint : GameSection
 		bool wait2 = true;
 		PlayTween((Enum)UI.OBJ_RANKING_ANIM_ROOT, true, (EventDelegate.Callback)delegate
 		{
-			((_003CStartRankingAnimation_003Ec__Iterator139)/*Error near IL_0056: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CStartRankingAnimation_003Ec__Iterator13A)/*Error near IL_0056: stateMachine*/)._003Cwait_003E__0 = false;
 		}, true, 0);
 		while (wait2)
 		{
@@ -614,7 +614,7 @@ public class CarnivalResultPoint : GameSection
 			wait2 = true;
 			PlayTween((Enum)UI.OBJ_PASS_ANIM_ROOT, true, (EventDelegate.Callback)delegate
 			{
-				((_003CStartRankingAnimation_003Ec__Iterator139)/*Error near IL_039b: stateMachine*/)._003Cwait_003E__0 = false;
+				((_003CStartRankingAnimation_003Ec__Iterator13A)/*Error near IL_039b: stateMachine*/)._003Cwait_003E__0 = false;
 			}, true, 0);
 			while (wait2)
 			{

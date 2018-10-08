@@ -109,11 +109,11 @@ public class TheaterMode : GameSection
 		Dictionary<uint, List<int>> deliveryList = new Dictionary<uint, List<int>>();
 		MonoBehaviourSingleton<TheaterModeTable>.I.AllTheaterData(delegate(TheaterModeTable.TheaterModeData data)
 		{
-			if (!((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_00d8: stateMachine*/)._003CcheckList_003E__0.ContainsKey(data.script_id) && !((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_00d8: stateMachine*/)._003CidList_003E__1.ContainsKey(data.script_id))
+			if (!((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_00d8: stateMachine*/)._003CcheckList_003E__0.ContainsKey(data.script_id) && !((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_00d8: stateMachine*/)._003CidList_003E__1.ContainsKey(data.script_id))
 			{
-				((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_00d8: stateMachine*/)._003CcheckList_003E__0.Add(data.script_id, 0);
-				((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_00d8: stateMachine*/)._003CidList_003E__1.Add(data.script_id, data.story_id);
-				((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_00d8: stateMachine*/)._003CrevIdList_003E__2.Add(data.story_id, data.script_id);
+				((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_00d8: stateMachine*/)._003CcheckList_003E__0.Add(data.script_id, 0);
+				((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_00d8: stateMachine*/)._003CidList_003E__1.Add(data.script_id, data.story_id);
+				((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_00d8: stateMachine*/)._003CrevIdList_003E__2.Add(data.story_id, data.script_id);
 			}
 		});
 		if (checkList.ContainsKey(11000001))
@@ -128,17 +128,17 @@ public class TheaterMode : GameSection
 		{
 			Singleton<QuestTable>.I.AllQuestData(delegate(QuestTable.QuestTableData data)
 			{
-				if (data.storyId != 0 && ((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0.ContainsKey(data.storyId))
+				if (data.storyId != 0 && ((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0.ContainsKey(data.storyId))
 				{
-					if (((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0[data.storyId] == 0)
+					if (((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0[data.storyId] == 0)
 					{
-						((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0[data.storyId] = -1;
+						((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0[data.storyId] = -1;
 					}
-					((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_014e: stateMachine*/)._003CquestList_003E__3.Add(data.questID, data.storyId);
+					((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_014e: stateMachine*/)._003CquestList_003E__3.Add(data.questID, data.storyId);
 					ClearStatusQuest clearStatusQuestData = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(data.questID);
 					if (clearStatusQuestData != null && (clearStatusQuestData.questStatus == 3 || clearStatusQuestData.questStatus == 4))
 					{
-						((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0[data.storyId] = 1;
+						((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0[data.storyId] = 1;
 					}
 				}
 			});
@@ -148,34 +148,34 @@ public class TheaterMode : GameSection
 			if (data.clearEventID != 0)
 			{
 				int clearEventID = (int)data.clearEventID;
-				if (((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0.ContainsKey(clearEventID))
+				if (((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0.ContainsKey(clearEventID))
 				{
-					if (((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[clearEventID] == 0)
+					if (((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[clearEventID] == 0)
 					{
-						((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[clearEventID] = -1;
+						((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[clearEventID] = -1;
 					}
-					((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003C_003Ef__this.AddDeliveryList(((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CdeliveryList_003E__4, data.id, clearEventID);
+					((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_0164: stateMachine*/)._003C_003Ef__this.AddDeliveryList(((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_0164: stateMachine*/)._003CdeliveryList_003E__4, data.id, clearEventID);
 					CLEAR_STATUS clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.GetClearStatusDelivery(data.id);
 					if (clearStatusDelivery == CLEAR_STATUS.CLEAR || clearStatusDelivery == CLEAR_STATUS.ALL_CLEAR)
 					{
-						((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[clearEventID] = 1;
+						((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[clearEventID] = 1;
 					}
 				}
 			}
 			if (data.readScriptId != 0)
 			{
 				int readScriptId = (int)data.readScriptId;
-				if (((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0.ContainsKey(readScriptId))
+				if (((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0.ContainsKey(readScriptId))
 				{
-					if (((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[readScriptId] == 0)
+					if (((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[readScriptId] == 0)
 					{
-						((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[readScriptId] = -1;
+						((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[readScriptId] = -1;
 					}
-					((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003C_003Ef__this.AddDeliveryList(((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CdeliveryList_003E__4, data.id, readScriptId);
+					((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_0164: stateMachine*/)._003C_003Ef__this.AddDeliveryList(((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_0164: stateMachine*/)._003CdeliveryList_003E__4, data.id, readScriptId);
 					CLEAR_STATUS clearStatusDelivery2 = MonoBehaviourSingleton<DeliveryManager>.I.GetClearStatusDelivery(data.id);
 					if (clearStatusDelivery2 == CLEAR_STATUS.CLEAR || clearStatusDelivery2 == CLEAR_STATUS.ALL_CLEAR)
 					{
-						((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[readScriptId] = 1;
+						((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[readScriptId] = 1;
 					}
 				}
 			}
@@ -218,7 +218,7 @@ public class TheaterMode : GameSection
 					}
 					s_connectCache = ret.result;
 				}
-				((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0362: stateMachine*/)._003CisEndConnection_003E__15 = true;
+				((_003CDoInitialize_003Ec__Iterator105)/*Error near IL_0362: stateMachine*/)._003CisEndConnection_003E__15 = true;
 			}, string.Empty);
 			while (!isEndConnection)
 			{
@@ -338,7 +338,7 @@ public class TheaterMode : GameSection
 		}
 		SetLabelText((Enum)UI.LBL_MAX, m_pageMax.ToString());
 		SetLabelText((Enum)UI.LBL_NOW, m_nowPage.ToString());
-		_003CUpdateUI_003Ec__AnonStorey3E5 _003CUpdateUI_003Ec__AnonStorey3E;
+		_003CUpdateUI_003Ec__AnonStorey3E6 _003CUpdateUI_003Ec__AnonStorey3E;
 		SetDynamicList((Enum)UI.GRD_EVENT_QUEST, "TheaterModeListItem", dispList.Count, true, null, null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -511,12 +511,12 @@ public class TheaterMode : GameSection
 		Dictionary<int, int> stateList = new Dictionary<int, int>();
 		MonoBehaviourSingleton<TheaterModeTable>.I.AllTheaterDataDesc(delegate(TheaterModeTable.TheaterModeData data)
 		{
-			if (!((_003CInitTables_003Ec__Iterator106)/*Error near IL_00df: stateMachine*/)._003CcheckList_003E__0.ContainsKey(data.script_id) && !((_003CInitTables_003Ec__Iterator106)/*Error near IL_00df: stateMachine*/)._003CidList_003E__1.ContainsKey(data.script_id))
+			if (!((_003CInitTables_003Ec__Iterator107)/*Error near IL_00df: stateMachine*/)._003CcheckList_003E__0.ContainsKey(data.script_id) && !((_003CInitTables_003Ec__Iterator107)/*Error near IL_00df: stateMachine*/)._003CidList_003E__1.ContainsKey(data.script_id))
 			{
-				((_003CInitTables_003Ec__Iterator106)/*Error near IL_00df: stateMachine*/)._003CcheckList_003E__0.Add(data.script_id, 0);
-				((_003CInitTables_003Ec__Iterator106)/*Error near IL_00df: stateMachine*/)._003CstateList_003E__5.Add(data.script_id, data.state_id);
-				((_003CInitTables_003Ec__Iterator106)/*Error near IL_00df: stateMachine*/)._003CidList_003E__1.Add(data.script_id, data.story_id);
-				((_003CInitTables_003Ec__Iterator106)/*Error near IL_00df: stateMachine*/)._003CrevIdList_003E__2.Add(data.story_id, data.script_id);
+				((_003CInitTables_003Ec__Iterator107)/*Error near IL_00df: stateMachine*/)._003CcheckList_003E__0.Add(data.script_id, 0);
+				((_003CInitTables_003Ec__Iterator107)/*Error near IL_00df: stateMachine*/)._003CstateList_003E__5.Add(data.script_id, data.state_id);
+				((_003CInitTables_003Ec__Iterator107)/*Error near IL_00df: stateMachine*/)._003CidList_003E__1.Add(data.script_id, data.story_id);
+				((_003CInitTables_003Ec__Iterator107)/*Error near IL_00df: stateMachine*/)._003CrevIdList_003E__2.Add(data.story_id, data.script_id);
 			}
 		});
 		SetTutorialStoryForceEnableView(checkList);
@@ -741,7 +741,7 @@ public class TheaterMode : GameSection
 					}
 					s_connectCache = ret.result;
 				}
-				((_003CRequestPrologueStoryStatusAPI_003Ec__Iterator107)/*Error near IL_0212: stateMachine*/)._003CisEndConnection_003E__10 = true;
+				((_003CRequestPrologueStoryStatusAPI_003Ec__Iterator108)/*Error near IL_0212: stateMachine*/)._003CisEndConnection_003E__10 = true;
 			}, string.Empty);
 			while (!isEndConnection)
 			{

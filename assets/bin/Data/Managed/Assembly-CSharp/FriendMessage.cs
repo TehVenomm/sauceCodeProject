@@ -809,8 +809,8 @@ public class FriendMessage : GameSection
 			ChatStampListItem item = iTransform.GetComponent<ChatStampListItem>();
 			item.Init(stampId);
 			ChatStampListItem chatStampListItem = item;
-			_003CInitStampItem_003Ec__AnonStorey30A _003CInitStampItem_003Ec__AnonStorey30A;
-			chatStampListItem.onButton = Delegate.Combine((Delegate)chatStampListItem.onButton, (Delegate)new Action((object)_003CInitStampItem_003Ec__AnonStorey30A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CInitStampItem_003Ec__AnonStorey30B _003CInitStampItem_003Ec__AnonStorey30B;
+			chatStampListItem.onButton = Delegate.Combine((Delegate)chatStampListItem.onButton, (Delegate)new Action((object)_003CInitStampItem_003Ec__AnonStorey30B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 

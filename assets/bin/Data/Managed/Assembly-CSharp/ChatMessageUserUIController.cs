@@ -118,7 +118,7 @@ public class ChatMessageUserUIController
 		int len = (recv_data != null) ? recv_data.Count : 0;
 		m_currentItemList = GetItemObjects(len, m_itemListParent);
 		int loadCompleteCount = 0;
-		_003CGenerateMessageUserList_003Ec__AnonStorey2CA _003CGenerateMessageUserList_003Ec__AnonStorey2CA;
+		_003CGenerateMessageUserList_003Ec__AnonStorey2CB _003CGenerateMessageUserList_003Ec__AnonStorey2CB;
 		for (int i = 0; i < len; i++)
 		{
 			HomeMutualFollowerListItem homeMutualFollowerListItem = m_currentItemList[i];
@@ -133,7 +133,7 @@ public class ChatMessageUserUIController
 			initParam.IsPermittedMessage = recv_data[i].isPermitted;
 			initParam.IsUseRenderTextureCharaModel = (!FieldManager.IsValidInField() && !FieldManager.IsValidInGame() && !FieldManager.IsValidInTutorial());
 			initParam.OnClickItem = OnClickItem;
-			initParam.OnCompleteLoading = new Action((object)_003CGenerateMessageUserList_003Ec__AnonStorey2CA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			initParam.OnCompleteLoading = new Action((object)_003CGenerateMessageUserList_003Ec__AnonStorey2CB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			homeMutualFollowerListItem.Initialize(initParam);
 		}
 	}

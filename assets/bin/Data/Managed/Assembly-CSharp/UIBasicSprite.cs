@@ -36,25 +36,25 @@ public abstract class UIBasicSprite : UIWidget
 		Both
 	}
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected Type mType;
 
 	[HideInInspector]
 	[SerializeField]
 	protected FillDirection mFillDirection = FillDirection.Radial360;
 
-	[SerializeField]
 	[Range(0f, 1f)]
 	[HideInInspector]
+	[SerializeField]
 	protected float mFillAmount = 1f;
 
 	[SerializeField]
 	[HideInInspector]
 	protected bool mInvert;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected Flip mFlip;
 
 	[NonSerialized]

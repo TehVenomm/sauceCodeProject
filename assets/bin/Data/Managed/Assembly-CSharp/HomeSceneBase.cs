@@ -14,7 +14,7 @@ public class HomeSceneBase : GameSection
 		bool wait = true;
 		MonoBehaviourSingleton<OnceManager>.I.SendGetOnce(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator6A)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CDoInitialize_003Ec__Iterator6B)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
 		});
 		while (wait)
 		{

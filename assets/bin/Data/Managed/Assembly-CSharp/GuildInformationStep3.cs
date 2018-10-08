@@ -68,7 +68,7 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 				item_num = info.Length;
 			}
 		}
-		_003CUpdateDynamicList_003Ec__AnonStorey327 _003CUpdateDynamicList_003Ec__AnonStorey;
+		_003CUpdateDynamicList_003Ec__AnonStorey328 _003CUpdateDynamicList_003Ec__AnonStorey;
 		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -207,8 +207,8 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey329 _003CSendGetList_003Ec__AnonStorey;
-		MonoBehaviourSingleton<FriendManager>.I.SendGetFollowList(page, new Action<bool, FriendFollowListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendGetList_003Ec__AnonStorey32A _003CSendGetList_003Ec__AnonStorey32A;
+		MonoBehaviourSingleton<FriendManager>.I.SendGetFollowList(page, new Action<bool, FriendFollowListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey32A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void PostSendGetListByReopen(int page)

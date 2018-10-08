@@ -150,18 +150,18 @@ public class GuildDonateMaterialSelectDialog : GameSection
 
 	private unsafe IEnumerator CRSendDonateRequest(int itemID, string itemName, string request, int numRequest)
 	{
-		if (_003CCRSendDonateRequest_003Ec__Iterator5C._003C_003Ef__am_0024cacheB == null)
+		if (_003CCRSendDonateRequest_003Ec__Iterator5D._003C_003Ef__am_0024cacheB == null)
 		{
-			_003CCRSendDonateRequest_003Ec__Iterator5C._003C_003Ef__am_0024cacheB = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CCRSendDonateRequest_003Ec__Iterator5D._003C_003Ef__am_0024cacheB = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		yield return (object)new WaitUntil(_003CCRSendDonateRequest_003Ec__Iterator5C._003C_003Ef__am_0024cacheB);
+		yield return (object)new WaitUntil(_003CCRSendDonateRequest_003Ec__Iterator5D._003C_003Ef__am_0024cacheB);
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest(itemID, itemName, request, numRequest, delegate(bool success)
 		{
 			GameSection.ResumeEvent(success, null);
 			if (success)
 			{
-				((_003CCRSendDonateRequest_003Ec__Iterator5C)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;
+				((_003CCRSendDonateRequest_003Ec__Iterator5D)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;
 			}
 		});
 	}

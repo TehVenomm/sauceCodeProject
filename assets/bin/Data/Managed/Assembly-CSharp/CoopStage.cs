@@ -1778,7 +1778,7 @@ public class CoopStage
 		{
 			time = MonoBehaviourSingleton<InGameSettingsManager>.I.fishingParam.hitEnemyMoveSec;
 		}
-		_003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4D5 _003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4D;
+		_003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4D6 _003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4D;
 		this.StartCoroutine(SimpleMoveCharacterY(enemy, -10f, StageManager.GetHeight(enemy._transform.get_position()), time, new Action((object)_003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 
@@ -1797,7 +1797,7 @@ public class CoopStage
 		enemy.ActIdle(false, -1f);
 		Enemy enemy2 = enemy;
 		Vector3 position = enemy._transform.get_position();
-		_003CGoDownCharacterToUnderGround_003Ec__AnonStorey4D6 _003CGoDownCharacterToUnderGround_003Ec__AnonStorey4D;
+		_003CGoDownCharacterToUnderGround_003Ec__AnonStorey4D7 _003CGoDownCharacterToUnderGround_003Ec__AnonStorey4D;
 		this.StartCoroutine(SimpleMoveCharacterY(enemy2, position.y, -10f, 3f, new Action((object)_003CGoDownCharacterToUnderGround_003Ec__AnonStorey4D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 

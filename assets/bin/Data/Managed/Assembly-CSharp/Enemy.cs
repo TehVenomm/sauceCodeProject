@@ -4089,7 +4089,7 @@ public class Enemy : Character
 						{
 							if (delay > 0f)
 							{
-								_003COnPlayAttackedHitEffect_003Ec__AnonStorey508 _003COnPlayAttackedHitEffect_003Ec__AnonStorey;
+								_003COnPlayAttackedHitEffect_003Ec__AnonStorey509 _003COnPlayAttackedHitEffect_003Ec__AnonStorey;
 								AppMain.Delay(delay, new Action((object)_003COnPlayAttackedHitEffect_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 							}
 							else
@@ -9871,7 +9871,7 @@ public class Enemy : Character
 				{
 					if (material.HasProperty("_MatCapPow"))
 					{
-						material.SetFloat("_MatCapPow", ((_003CSetShieldShaderParam_003Ec__Iterator1E2)/*Error near IL_009b: stateMachine*/)._003CmatCapPow_003E__1);
+						material.SetFloat("_MatCapPow", ((_003CSetShieldShaderParam_003Ec__Iterator1E3)/*Error near IL_009b: stateMachine*/)._003CmatCapPow_003E__1);
 					}
 				});
 				yield return (object)null;

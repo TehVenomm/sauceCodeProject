@@ -603,8 +603,8 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 			[Tooltip("[Burst] 兜割り(単発射撃へ接続可能)")]
 			public int BurstAvoidAttackID = 79;
 
-			[SerializeField]
 			[Tooltip("[Burst] 距離減衰の最小減衰距離")]
+			[SerializeField]
 			private float MinAttenuationDistance = 10f;
 
 			[SerializeField]
@@ -635,8 +635,8 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			public float FullBurstBaseDmgRate = 2f;
 
-			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			[SerializeField]
+			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			public float FullBurstElementDmgRate = 4f;
 
 			[Tooltip("単発ショットのヒットエフェクト(属性差分あり")]

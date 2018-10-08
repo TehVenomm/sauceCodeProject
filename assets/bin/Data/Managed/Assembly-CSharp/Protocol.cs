@@ -80,7 +80,7 @@ public class Protocol
 	{
 		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002f: Expected O, but got Unknown
-		_003CSend_003Ec__AnonStorey6E7<T> _003CSend_003Ec__AnonStorey6E;
+		_003CSend_003Ec__AnonStorey6E8<T> _003CSend_003Ec__AnonStorey6E;
 		Action send = new Action((object)_003CSend_003Ec__AnonStorey6E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		if (Begin(url, send))
 		{
@@ -104,7 +104,7 @@ public class Protocol
 	{
 		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0037: Expected O, but got Unknown
-		_003CSend_003Ec__AnonStorey6E8<T1, T2> _003CSend_003Ec__AnonStorey6E;
+		_003CSend_003Ec__AnonStorey6E9<T1, T2> _003CSend_003Ec__AnonStorey6E;
 		Action send = new Action((object)_003CSend_003Ec__AnonStorey6E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		if (Begin(url, send))
 		{
@@ -128,8 +128,8 @@ public class Protocol
 	{
 		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0037: Expected O, but got Unknown
-		_003CSend_003Ec__AnonStorey6E9<T> _003CSend_003Ec__AnonStorey6E;
-		Action send = new Action((object)_003CSend_003Ec__AnonStorey6E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		_003CSend_003Ec__AnonStorey6EA<T> _003CSend_003Ec__AnonStorey6EA;
+		Action send = new Action((object)_003CSend_003Ec__AnonStorey6EA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		if (Begin(url, send))
 		{
 			MonoBehaviourSingleton<NetworkManager>.I.RequestForm(CheckURL(url), form, delegate(T ret)
@@ -291,11 +291,11 @@ public class Protocol
 						Debug.Log((object)"kciked");
 						AppMain i = MonoBehaviourSingleton<AppMain>.I;
 						string empty = string.Empty;
-						if (_003CEnd_003Ec__AnonStorey6EA<T>._003C_003Ef__am_0024cache4 == null)
+						if (_003CEnd_003Ec__AnonStorey6EB<T>._003C_003Ef__am_0024cache4 == null)
 						{
-							_003CEnd_003Ec__AnonStorey6EA<T>._003C_003Ef__am_0024cache4 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+							_003CEnd_003Ec__AnonStorey6EB<T>._003C_003Ef__am_0024cache4 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 						}
-						i.ChangeScene(empty, "HomeTop", _003CEnd_003Ec__AnonStorey6EA<T>._003C_003Ef__am_0024cache4);
+						i.ChangeScene(empty, "HomeTop", _003CEnd_003Ec__AnonStorey6EB<T>._003C_003Ef__am_0024cache4);
 					}
 				}, true, code);
 			}

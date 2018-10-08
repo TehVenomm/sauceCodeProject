@@ -65,9 +65,9 @@ public class FortuneWheelManager : MonoBehaviourSingleton<FortuneWheelManager>
 		{
 			this.OnJackpotWin(data);
 		}
-		if ((MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "HomeScene" || MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "LoungeScene" || MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameMain") && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "FortuneWheelTop")
+		if ((MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "HomeScene" || MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "LoungeScene" || MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene") && !MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName().Contains("FortuneWheel") && !MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName().Contains("Jackpot"))
 		{
-			MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce($"{data.userName} just woon {data.jackpot} from Dragon's Vault jackpot", string.Empty);
+			MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce($"{data.userName} just won {data.jackpot} from Dragon's Vault", string.Empty);
 		}
 	}
 

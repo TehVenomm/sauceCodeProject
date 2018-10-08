@@ -178,8 +178,8 @@ namespace GooglePlayGames
 
 		public unsafe void Authenticate(Action<bool> callback, bool silent)
 		{
-			_003CAuthenticate_003Ec__AnonStorey7CD _003CAuthenticate_003Ec__AnonStorey7CD;
-			Authenticate(new Action<bool, string>((object)_003CAuthenticate_003Ec__AnonStorey7CD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), silent);
+			_003CAuthenticate_003Ec__AnonStorey7CE _003CAuthenticate_003Ec__AnonStorey7CE;
+			Authenticate(new Action<bool, string>((object)_003CAuthenticate_003Ec__AnonStorey7CE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), silent);
 		}
 
 		public void Authenticate(Action<bool, string> callback, bool silent)

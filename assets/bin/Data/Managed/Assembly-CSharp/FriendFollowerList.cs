@@ -56,7 +56,7 @@ public class FriendFollowerList : FollowListBase
 				component.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 			}
 			CleanItemList();
-			_003CUpdateDynamicList_003Ec__AnonStorey306 _003CUpdateDynamicList_003Ec__AnonStorey;
+			_003CUpdateDynamicList_003Ec__AnonStorey307 _003CUpdateDynamicList_003Ec__AnonStorey;
 			SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, currentPageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
@@ -86,7 +86,7 @@ public class FriendFollowerList : FollowListBase
 		{
 			int chunkIndex = GetChunkIndex(page);
 			IsConnect = true;
-			_003CSendGetList_003Ec__AnonStorey307 _003CSendGetList_003Ec__AnonStorey;
+			_003CSendGetList_003Ec__AnonStorey308 _003CSendGetList_003Ec__AnonStorey;
 			MonoBehaviourSingleton<FriendManager>.I.SendGetFollowerList(chunkIndex, (int)m_currentSortType, new Action<bool, FriendFollowerListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

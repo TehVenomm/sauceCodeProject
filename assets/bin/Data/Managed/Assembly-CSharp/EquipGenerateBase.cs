@@ -194,8 +194,8 @@ public abstract class EquipGenerateBase : EquipMaterialBase
 					string allAbilityName = string.Empty;
 					string allAp = string.Empty;
 					string allAbilityDesc = string.Empty;
-					_003CEquipTableParam_003Ec__AnonStorey459 _003CEquipTableParam_003Ec__AnonStorey;
-					SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", table_data.fixedAbility.Length, false, new Action<int, Transform, bool>((object)_003CEquipTableParam_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					_003CEquipTableParam_003Ec__AnonStorey45A _003CEquipTableParam_003Ec__AnonStorey45A;
+					SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", table_data.fixedAbility.Length, false, new Action<int, Transform, bool>((object)_003CEquipTableParam_003Ec__AnonStorey45A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					SetActive((Enum)UI.STR_NON_ABILITY, false);
 					PreCacheAbilityDetail(allAbilityName, allAp, allAbilityDesc);
 				}
@@ -238,8 +238,8 @@ public abstract class EquipGenerateBase : EquipMaterialBase
 		SmithManager.ResultData result_data = new SmithManager.ResultData();
 		GameSection.SetEventData(result_data);
 		GameSection.StayEvent();
-		_003CSend_003Ec__AnonStorey45A _003CSend_003Ec__AnonStorey45A;
-		MonoBehaviourSingleton<SmithManager>.I.SendCreateEquipItem(GetCreateEquiptableID(), new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey45A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSend_003Ec__AnonStorey45B _003CSend_003Ec__AnonStorey45B;
+		MonoBehaviourSingleton<SmithManager>.I.SendCreateEquipItem(GetCreateEquiptableID(), new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey45B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public void OnQuery_SmithCreateOverEquipItem_GO_ITEM_STORAGE()

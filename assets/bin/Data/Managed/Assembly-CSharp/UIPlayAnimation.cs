@@ -2,8 +2,8 @@ using AnimationOrTween;
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Play Animation")]
+[ExecuteInEditMode]
 public class UIPlayAnimation
 {
 	public static UIPlayAnimation current;
@@ -28,8 +28,8 @@ public class UIPlayAnimation
 
 	public List<EventDelegate> onFinished = new List<EventDelegate>();
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private GameObject eventReceiver;
 
 	[SerializeField]

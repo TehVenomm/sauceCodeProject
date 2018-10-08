@@ -31,8 +31,8 @@ public class LoungeMemberesStatus
 
 	public unsafe LoungeMemberStatus GetMemberData(int userId)
 	{
-		_003CGetMemberData_003Ec__AnonStorey64D _003CGetMemberData_003Ec__AnonStorey64D;
-		LoungeMemberStatus loungeMemberStatus = memberes.FirstOrDefault(new Func<LoungeMemberStatus, bool>((object)_003CGetMemberData_003Ec__AnonStorey64D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CGetMemberData_003Ec__AnonStorey64E _003CGetMemberData_003Ec__AnonStorey64E;
+		LoungeMemberStatus loungeMemberStatus = memberes.FirstOrDefault(new Func<LoungeMemberStatus, bool>((object)_003CGetMemberData_003Ec__AnonStorey64E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (object.ReferenceEquals(null, loungeMemberStatus))
 		{
 			loungeMemberStatus = new LoungeMemberStatus(userId);
@@ -84,14 +84,14 @@ public class LoungeMemberesStatus
 	{
 		List<int> list = new List<int>();
 		List<int> list2 = new List<int>();
-		_003CSyncLoungeMember_003Ec__AnonStorey64F _003CSyncLoungeMember_003Ec__AnonStorey64F;
-		IEnumerable<LoungeModel.SlotInfo> source = lounge.slotInfos.Where(new Func<LoungeModel.SlotInfo, bool>((object)_003CSyncLoungeMember_003Ec__AnonStorey64F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSyncLoungeMember_003Ec__AnonStorey650 _003CSyncLoungeMember_003Ec__AnonStorey;
+		IEnumerable<LoungeModel.SlotInfo> source = lounge.slotInfos.Where(new Func<LoungeModel.SlotInfo, bool>((object)_003CSyncLoungeMember_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (_003C_003Ef__am_0024cache3 == null)
 		{
 			_003C_003Ef__am_0024cache3 = new Func<LoungeModel.SlotInfo, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 		list = source.Select<LoungeModel.SlotInfo, int>(_003C_003Ef__am_0024cache3).ToList();
-		IEnumerable<LoungeMemberStatus> source2 = memberes.Where(new Func<LoungeMemberStatus, bool>((object)_003CSyncLoungeMember_003Ec__AnonStorey64F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		IEnumerable<LoungeMemberStatus> source2 = memberes.Where(new Func<LoungeMemberStatus, bool>((object)_003CSyncLoungeMember_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (_003C_003Ef__am_0024cache4 == null)
 		{
 			_003C_003Ef__am_0024cache4 = new Func<LoungeMemberStatus, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);

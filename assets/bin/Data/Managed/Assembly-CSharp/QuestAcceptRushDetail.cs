@@ -332,7 +332,7 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 		GameSection.StayEvent();
 		int retryCount = 0;
 		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 0);
-		_003COnQuery_AUTO_MATCHING_003Ec__AnonStorey412 _003COnQuery_AUTO_MATCHING_003Ec__AnonStorey;
+		_003COnQuery_AUTO_MATCHING_003Ec__AnonStorey413 _003COnQuery_AUTO_MATCHING_003Ec__AnonStorey;
 		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.GetQuestData().questID, retryCount, false, new Action<bool, int, bool, float>((object)_003COnQuery_AUTO_MATCHING_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

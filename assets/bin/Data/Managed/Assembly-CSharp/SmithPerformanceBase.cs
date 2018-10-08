@@ -35,7 +35,7 @@ public class SmithPerformanceBase : GameSection
 		GameObject npcRoot4 = new GameObject("NPC");
 		npcData4.LoadModel(npcRoot4, false, true, delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator160)/*Error near IL_0093: stateMachine*/)._003Cwait_003E__2--;
+			((_003CDoInitialize_003Ec__Iterator161)/*Error near IL_0093: stateMachine*/)._003Cwait_003E__2--;
 		}, false);
 		GameObject npcRoot3 = null;
 		if (this is SmithAbilityChangePerformance || this is SmithAbilityItemPerformance)
@@ -45,7 +45,7 @@ public class SmithPerformanceBase : GameSection
 			npcRoot3 = new GameObject("NPC003");
 			npcData3.LoadModel(npcRoot3, false, true, delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator160)/*Error near IL_011c: stateMachine*/)._003Cwait_003E__2--;
+				((_003CDoInitialize_003Ec__Iterator161)/*Error near IL_011c: stateMachine*/)._003Cwait_003E__2--;
 			}, false);
 		}
 		int[] seIds2 = (int[])Enum.GetValues(typeof(SmithEquipDirector.AUDIO));

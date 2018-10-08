@@ -15,12 +15,12 @@ public class UIChatGimmickGizmo : UIStatusGizmoBase
 	[SerializeField]
 	protected float screenSideOffset = 36f;
 
-	[SerializeField]
 	[Tooltip("スクリ\u30fcン下オフセット")]
+	[SerializeField]
 	protected float screenBottomOffset = 107f;
 
-	[SerializeField]
 	[Tooltip("スクリ\u30fcン下オフセット、フィ\u30fcルド時")]
+	[SerializeField]
 	protected float screenBottomFieldOffset = 107f;
 
 	[Tooltip("チャット横オフセット")]

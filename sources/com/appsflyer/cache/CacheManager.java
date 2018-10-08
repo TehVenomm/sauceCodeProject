@@ -128,9 +128,9 @@ public class CacheManager {
 
     /* renamed from: ˎ */
     private static RequestCacheData m285(File file) {
+        Reader fileReader;
         Reader reader;
         Throwable th;
-        Reader fileReader;
         try {
             fileReader = new FileReader(file);
             try {

@@ -159,7 +159,7 @@ public class UIInGamePopupDialog : MonoBehaviourSingleton<UIInGamePopupDialog>
 		bool play_tween = true;
 		tweenCtrl.Play(true, delegate
 		{
-			((_003CDoShowDialog_003Ec__Iterator204)/*Error near IL_0201: stateMachine*/)._003Cplay_tween_003E__4 = false;
+			((_003CDoShowDialog_003Ec__Iterator205)/*Error near IL_0201: stateMachine*/)._003Cplay_tween_003E__4 = false;
 		});
 		yield return (object)new WaitForSeconds(desc.showTime);
 		while (play_tween)

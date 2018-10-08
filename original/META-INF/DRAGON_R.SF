@@ -1,10 +1,10 @@
 Signature-Version: 1.0
-Created-By: 0.0.0 (Android apksigner)
-SHA1-Digest-Manifest: k8a1/GNYU9u1iCU9/pPmLJM3QfA=
+Created-By: 1.0 (Android)
+SHA1-Digest-Manifest: 2wohLJCo3InIJXNdrmQhvnxs/nM=
 X-Android-APK-Signed: 2
 
 Name: AndroidManifest.xml
-SHA1-Digest: 86KIPzGJckrNDRU3KwXufIedA/w=
+SHA1-Digest: DFAY56a37mACMx3IOFXBCoaYY3s=
 
 Name: assets/META-INF/LICENSE
 SHA1-Digest: mTapDj9n1PcNwXlN5zAUB2Hg/Jw=
@@ -72,7 +72,7 @@ Name: assets/bin/Data/000d37809a59d42e0a670334ca13dd17
 SHA1-Digest: cWvF9Q13QsIWlxYdfm0lRnEiXiQ=
 
 Name: assets/bin/Data/004cab964205cbd4695f62ca753cd91c
-SHA1-Digest: OLftDDtC150xUAy+6XbKhqyo5po=
+SHA1-Digest: mkNnUfJKIVWyf6Nrrr7WsB55+TA=
 
 Name: assets/bin/Data/005511004a6fe40479bfa674d4e95601
 SHA1-Digest: SkdKu4tpx0Rohq1o1MMS6PS7yY4=
@@ -2340,7 +2340,7 @@ Name: assets/bin/Data/636bb5e3fdc634b4491437cf3b0e4077
 SHA1-Digest: 1nHRorR9PvIeDIXHNxBZYfZYfXI=
 
 Name: assets/bin/Data/636bb5e3fdc634b4491437cf3b0e4077.resource
-SHA1-Digest: WQ5R2/eZnV7FaegbvIIEkawb+7c=
+SHA1-Digest: pK7Yvvn9/lmfmik01pZkxribB58=
 
 Name: assets/bin/Data/63a6e6cb110574805b079586841f9cdc
 SHA1-Digest: p1xuEMluX1EAH+yPZArMGl8n83A=
@@ -3605,6 +3605,9 @@ SHA1-Digest: kTvgfuHtuL+UQ3dHSbtwLiGK+E8=
 Name: assets/bin/Data/9b8317f43fe114da4ac5187ad88fce5b
 SHA1-Digest: kDjLYZj+amnRVT19vtRcqktPLb4=
 
+Name: assets/bin/Data/9ba1e70702126cf4c96d5774bc308f9f
+SHA1-Digest: 3UO+tDCfbfDYUOnkeYZn0//vuhw=
+
 Name: assets/bin/Data/9bd4557abfb3743659bb70a667a2f8bc
 SHA1-Digest: vF0d1Q73XqeEN795qF77Rr+Sdbo=
 
@@ -3702,10 +3705,10 @@ Name: assets/bin/Data/9fdff69bd1fba45aca0bef192255553e
 SHA1-Digest: RanVgJJ0Cd1hYHD/+rAkCVySq50=
 
 Name: assets/bin/Data/Managed/Assembly-CSharp-firstpass.dll
-SHA1-Digest: RA80pBi17K7+Jg77y/EUis7/x1g=
+SHA1-Digest: 7nSe2nSP2snJgY87MIa+vZH2JdU=
 
 Name: assets/bin/Data/Managed/Assembly-CSharp.dll
-SHA1-Digest: W9ZLtcR3ympOHlKhVffuXvpI/9Q=
+SHA1-Digest: J6zSvMsqX2e+J7ee8wepM6W8Wtg=
 
 Name: assets/bin/Data/Managed/Facebook.Unity.Android.dll
 SHA1-Digest: XjnbSp9qFbsbcxcbnwxTfNSNEUo=
@@ -3903,7 +3906,7 @@ Name: assets/bin/Data/a643662667eea4a6ba41c0f1c451b2e8
 SHA1-Digest: /sOK3YVy/76W63SKnixUqPoc3QQ=
 
 Name: assets/bin/Data/a6474a64033bc40c88db73b7b90728dd
-SHA1-Digest: Niav9GzVSfQhKLqD8bgg+SCrMZ0=
+SHA1-Digest: vK+cA0duE2OaJd2GdBLSLRFSwuk=
 
 Name: assets/bin/Data/a65b61601323e41059b565e2957609e5
 SHA1-Digest: grud+K8a7wGJedzngaGqP3Y+8sg=
@@ -4173,7 +4176,7 @@ Name: assets/bin/Data/b3c89ab55d6ef45c5b9234c61ee7dd00
 SHA1-Digest: OPBJ7ryZPyO4MJmpRSRS8WANWjo=
 
 Name: assets/bin/Data/b3da59ad23f3a4b4b99d8621c4a5da1e
-SHA1-Digest: yRz+PKVRysE//JAKaGOwOxXFMEo=
+SHA1-Digest: 4G9ZK5vw+rLXuwvXtttFnzVhxqE=
 
 Name: assets/bin/Data/b3f9e5ad8b4ef4fc184b7b1efda1c47c
 SHA1-Digest: RjbFMGH39tOu3nAz8wRbujI+ViM=
@@ -6033,7 +6036,7 @@ Name: assets/bin/Data/ffca94dd2dbf54e8cb2c086c5eeb46c0
 SHA1-Digest: SVyzjM7ISHnVc7brWyR25AijTYQ=
 
 Name: assets/bin/Data/globalgamemanagers
-SHA1-Digest: voXK04NHd8IYH6Hm4ZkfqKJU23M=
+SHA1-Digest: LdZCERTwbmENRqz4k7VRpWvHHbY=
 
 Name: assets/bin/Data/globalgamemanagers.assets
 SHA1-Digest: xQ1AbzGgsQl+pLVjZPTmsYhP2lA=
@@ -7464,5 +7467,5 @@ Name: res/layout/purchased_history_row.xml
 SHA1-Digest: SmmbHQWjm4hZ0PGG0L8ZKppU5ns=
 
 Name: resources.arsc
-SHA1-Digest: dML5qhJjxZgB6bqbHzWLnAG263o=
+SHA1-Digest: gUoNMm3csbL6i4pn+tj3eHFaklw=
 

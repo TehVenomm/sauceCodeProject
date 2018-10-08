@@ -17,12 +17,12 @@ public class ShieldEffectCtrl
 
 	private Transform _transform;
 
-	[SerializeField]
 	[Tooltip("LOOPを指定")]
+	[SerializeField]
 	private Transform targetRotateRoot;
 
-	[SerializeField]
 	[Tooltip("HITを指定")]
+	[SerializeField]
 	private Transform hitEffectRoot;
 
 	[SerializeField]
@@ -37,8 +37,8 @@ public class ShieldEffectCtrl
 	[Tooltip("シ\u30fcルドHPが0の時のScale")]
 	private Vector3 afterScale;
 
-	[SerializeField]
 	[Tooltip("Element0(HP MAX),Element1,...,ElementN(HP 0)の順でシ\u30fcルドHPに合わせて変化する")]
+	[SerializeField]
 	private ColorSet[] colorVariation;
 
 	private Transform[] targetObject;

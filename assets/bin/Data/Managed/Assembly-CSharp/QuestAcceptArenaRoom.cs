@@ -98,7 +98,7 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 		if (arenaData != null)
 		{
 			List<QuestTable.QuestTableData> questDataArray = arenaData.GetQuestDataArray();
-			_003CUpdateEnemyList_003Ec__AnonStorey416 _003CUpdateEnemyList_003Ec__AnonStorey;
+			_003CUpdateEnemyList_003Ec__AnonStorey417 _003CUpdateEnemyList_003Ec__AnonStorey;
 			SetTable(UI.TBL_LIST, "QuestArenaRoomEnemyListItem", questDataArray.Count, false, new Action<int, Transform, bool>((object)_003CUpdateEnemyList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

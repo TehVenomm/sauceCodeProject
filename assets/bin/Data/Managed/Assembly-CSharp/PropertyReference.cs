@@ -171,8 +171,8 @@ public class PropertyReference
 		return null;
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public bool Set(object value)
 	{
 		if (mProperty == null && mField == null && isValid)

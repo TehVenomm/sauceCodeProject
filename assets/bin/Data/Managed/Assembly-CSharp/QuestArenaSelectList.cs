@@ -88,7 +88,7 @@ public class QuestArenaSelectList : QuestEventSelectList
 			bool is_recv_delivery = false;
 			MonoBehaviourSingleton<QuestManager>.I.SendGetEventList(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator115)/*Error near IL_003b: stateMachine*/)._003Cis_recv_delivery_003E__0 = true;
+				((_003CDoInitialize_003Ec__Iterator116)/*Error near IL_003b: stateMachine*/)._003Cis_recv_delivery_003E__0 = true;
 			});
 			while (!is_recv_delivery)
 			{
@@ -283,7 +283,7 @@ public class QuestArenaSelectList : QuestEventSelectList
 				}
 			}
 			bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-			_003CUpdateTable_003Ec__AnonStorey3F0 _003CUpdateTable_003Ec__AnonStorey3F;
+			_003CUpdateTable_003Ec__AnonStorey3F1 _003CUpdateTable_003Ec__AnonStorey3F;
 			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey3F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey3F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
 			component.set_enabled(true);
@@ -468,7 +468,7 @@ public class QuestArenaSelectList : QuestEventSelectList
 			bool enable_clear_event = dd.clearEventID != 0;
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-			_003COnQuery_SELECT_RUSH_003Ec__AnonStorey3F2 _003COnQuery_SELECT_RUSH_003Ec__AnonStorey3F;
+			_003COnQuery_SELECT_RUSH_003Ec__AnonStorey3F3 _003COnQuery_SELECT_RUSH_003Ec__AnonStorey3F;
 			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(notClearDelivery.uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003COnQuery_SELECT_RUSH_003Ec__AnonStorey3F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		else if (dd.GetConditionType(0u) == DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)

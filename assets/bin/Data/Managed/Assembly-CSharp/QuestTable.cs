@@ -464,7 +464,7 @@ public class QuestTable : Singleton<QuestTable>
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
 			uint questId = quest_item.infoData.questData.tableData.questID;
-			_003CGetQuestNum_003Ec__AnonStorey787 _003CGetQuestNum_003Ec__AnonStorey;
+			_003CGetQuestNum_003Ec__AnonStorey788 _003CGetQuestNum_003Ec__AnonStorey;
 			num2 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CGetQuestNum_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 		}
 		int num3 = num - num2;
@@ -554,9 +554,9 @@ public class QuestTable : Singleton<QuestTable>
 		List<QuestTableData> enemyTable = new List<QuestTableData>();
 		questTable.ForEach(delegate(QuestTableData table)
 		{
-			if (table.enemyID != null && Array.IndexOf(table.enemyID, (int)((_003CGetEnemyAppearQuestData_003Ec__Iterator289)/*Error near IL_0039: stateMachine*/).enemy_id) >= 0)
+			if (table.enemyID != null && Array.IndexOf(table.enemyID, (int)((_003CGetEnemyAppearQuestData_003Ec__Iterator28A)/*Error near IL_0039: stateMachine*/).enemy_id) >= 0)
 			{
-				((_003CGetEnemyAppearQuestData_003Ec__Iterator289)/*Error near IL_0039: stateMachine*/)._003CenemyTable_003E__0.Add(table);
+				((_003CGetEnemyAppearQuestData_003Ec__Iterator28A)/*Error near IL_0039: stateMachine*/)._003CenemyTable_003E__0.Add(table);
 			}
 		});
 		foreach (QuestTableData item in enemyTable)

@@ -364,7 +364,7 @@ public class CharaMake : GameSection
 			bool hasSentTutorialStep = false;
 			MonoBehaviourSingleton<UserInfoManager>.I.SendTutorialStep(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator174)/*Error near IL_0728: stateMachine*/)._003ChasSentTutorialStep_003E__19 = true;
+				((_003CDoInitialize_003Ec__Iterator175)/*Error near IL_0728: stateMachine*/)._003ChasSentTutorialStep_003E__19 = true;
 			});
 			while (!hasSentTutorialStep)
 			{
@@ -599,7 +599,7 @@ public class CharaMake : GameSection
 		Transform val2 = SetPrefab((Enum)ui, "CharaMakeList");
 		SetEvent(val2, UI.BTN_LIST_PREV, "LIST_PREV", (int)ui);
 		SetEvent(val2, UI.BTN_LIST_NEXT, "LIST_NEXT", (int)ui);
-		_003CSetList_003Ec__AnonStorey484 _003CSetList_003Ec__AnonStorey;
+		_003CSetList_003Ec__AnonStorey485 _003CSetList_003Ec__AnonStorey;
 		SetGrid(val2, UI.GRD_LIST, "CharaMakeListItem", item_num, false, new Action<int, Transform, bool>((object)_003CSetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		SetCenterOnChildFunc(val2, UI.GRD_LIST, OnCenterListItem);
 		SetCenter(val2, UI.GRD_LIST, listInfo.index, false);
@@ -611,7 +611,7 @@ public class CharaMake : GameSection
 	{
 		GlobalSettingsManager.HasVisuals hasVisuals = MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals;
 		int item_num = (!IsWoman()) ? hasVisuals.hasManFaceIndexes.Length : hasVisuals.hasWomanFaceIndexes.Length;
-		_003CUpdateLists_003Ec__AnonStorey485 _003CUpdateLists_003Ec__AnonStorey;
+		_003CUpdateLists_003Ec__AnonStorey486 _003CUpdateLists_003Ec__AnonStorey;
 		SetList(LIST.FACETYPE, UI.OBJ_LIST_FACETYPE, item_num, new Action<int, Transform>((object)_003CUpdateLists_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		int item_num2 = (!IsWoman()) ? hasVisuals.hasManHeadIndexes.Length : hasVisuals.hasWomanHeadIndexes.Length;
 		SetList(LIST.HAIRSTYLE, UI.OBJ_LIST_HAIRSTYLE, item_num2, new Action<int, Transform>((object)_003CUpdateLists_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));

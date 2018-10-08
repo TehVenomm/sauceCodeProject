@@ -120,8 +120,8 @@ namespace GooglePlayGames.Android
 		{
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0020: Expected O, but got Unknown
-			_003CFetchTokens_003Ec__AnonStorey7D9 _003CFetchTokens_003Ec__AnonStorey7D;
-			PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CFetchTokens_003Ec__AnonStorey7D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CFetchTokens_003Ec__AnonStorey7DA _003CFetchTokens_003Ec__AnonStorey7DA;
+			PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CFetchTokens_003Ec__AnonStorey7DA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
 		internal unsafe void DoFetchToken(Action callback)
@@ -150,8 +150,8 @@ namespace GooglePlayGames.Android
 						array2[8].l = AndroidJNI.NewStringUTF(accountName);
 						IntPtr ptr = AndroidJNI.CallStaticObjectMethod(val.GetRawClass(), staticMethodID, array2);
 						PendingResult<TokenResult> pendingResult = new PendingResult<TokenResult>(ptr);
-						_003CDoFetchToken_003Ec__AnonStorey7DA _003CDoFetchToken_003Ec__AnonStorey7DA;
-						pendingResult.setResultCallback(new TokenResultCallback(new Action<int, string, string, string>((object)_003CDoFetchToken_003Ec__AnonStorey7DA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+						_003CDoFetchToken_003Ec__AnonStorey7DB _003CDoFetchToken_003Ec__AnonStorey7DB;
+						pendingResult.setResultCallback(new TokenResultCallback(new Action<int, string, string, string>((object)_003CDoFetchToken_003Ec__AnonStorey7DB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 					}
 					finally
 					{

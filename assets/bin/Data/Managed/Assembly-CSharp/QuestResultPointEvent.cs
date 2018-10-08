@@ -395,7 +395,7 @@ public class QuestResultPointEvent : GameSection
 		SetLabelText((Enum)UI.LBL_GET_POINT, "0");
 		PlayTween((Enum)UI.OBJ_GET_EXP_ROOT, true, (EventDelegate.Callback)delegate
 		{
-			((_003CGetPointAnimation_003Ec__Iterator140)/*Error near IL_00db: stateMachine*/)._003Cwait_003E__3 = false;
+			((_003CGetPointAnimation_003Ec__Iterator141)/*Error near IL_00db: stateMachine*/)._003Cwait_003E__3 = false;
 		}, true, 0);
 		while (wait6)
 		{
@@ -413,7 +413,7 @@ public class QuestResultPointEvent : GameSection
 			wait6 = true;
 			PlayTween((Enum)UI.OBJ_BONUS_TIME_ROOT, true, (EventDelegate.Callback)delegate
 			{
-				((_003CGetPointAnimation_003Ec__Iterator140)/*Error near IL_01d2: stateMachine*/)._003Cwait_003E__3 = false;
+				((_003CGetPointAnimation_003Ec__Iterator141)/*Error near IL_01d2: stateMachine*/)._003Cwait_003E__3 = false;
 			}, true, 0);
 			while (wait6)
 			{
@@ -440,7 +440,7 @@ public class QuestResultPointEvent : GameSection
 		SetLabelText((Enum)UI.LBL_TOTAL_POINT, userPoint.ToString("N0"));
 		PlayTween((Enum)UI.OBJ_TOTAL_EXP_ROOT, true, (EventDelegate.Callback)delegate
 		{
-			((_003CGetPointAnimation_003Ec__Iterator140)/*Error near IL_0324: stateMachine*/)._003Cwait_003E__3 = false;
+			((_003CGetPointAnimation_003Ec__Iterator141)/*Error near IL_0324: stateMachine*/)._003Cwait_003E__3 = false;
 		}, true, 0);
 		while (wait6)
 		{
@@ -481,7 +481,7 @@ public class QuestResultPointEvent : GameSection
 				SetLabelText((Enum)UI.LBL_NEXT_POINT, currentPoint.ToString("N0"));
 				PlayTween((Enum)UI.OBJ_NEXT_REWARD_ROOT, true, (EventDelegate.Callback)delegate
 				{
-					((_003CGetPointAnimation_003Ec__Iterator140)/*Error near IL_05ca: stateMachine*/)._003Cwait_003E__3 = false;
+					((_003CGetPointAnimation_003Ec__Iterator141)/*Error near IL_05ca: stateMachine*/)._003Cwait_003E__3 = false;
 				}, true, 0);
 				if (!skipRequest)
 				{
@@ -513,7 +513,7 @@ public class QuestResultPointEvent : GameSection
 			SetLabelText((Enum)UI.LBL_NEXT_POINT, currentPoint2.ToString("N0"));
 			PlayTween((Enum)UI.OBJ_NEXT_REWARD_ROOT, true, (EventDelegate.Callback)delegate
 			{
-				((_003CGetPointAnimation_003Ec__Iterator140)/*Error near IL_07b0: stateMachine*/)._003Cwait_003E__3 = false;
+				((_003CGetPointAnimation_003Ec__Iterator141)/*Error near IL_07b0: stateMachine*/)._003Cwait_003E__3 = false;
 			}, true, 0);
 			PlayAudio(AUDIO.CATEGORY);
 			while (wait6)
@@ -537,7 +537,7 @@ public class QuestResultPointEvent : GameSection
 			ResetTween((Enum)UI.OBJ_GET_REWARD_ROOT, 0);
 			PlayTween((Enum)UI.OBJ_GET_REWARD_ROOT, true, (EventDelegate.Callback)delegate
 			{
-				((_003CGetPointAnimation_003Ec__Iterator140)/*Error near IL_08d7: stateMachine*/)._003Cwait_003E__3 = false;
+				((_003CGetPointAnimation_003Ec__Iterator141)/*Error near IL_08d7: stateMachine*/)._003Cwait_003E__3 = false;
 			}, true, 0);
 			PlayAudio(AUDIO.POINTREWARD);
 			while (wait6)
@@ -566,7 +566,7 @@ public class QuestResultPointEvent : GameSection
 
 	private unsafe void SetNextItemIcon(List<PointEventCurrentData.Reward> reward)
 	{
-		_003CSetNextItemIcon_003Ec__AnonStorey427 _003CSetNextItemIcon_003Ec__AnonStorey;
+		_003CSetNextItemIcon_003Ec__AnonStorey428 _003CSetNextItemIcon_003Ec__AnonStorey;
 		SetDynamicList((Enum)UI.OBJ_NEXT_REWARD_ITEM_ICON_ROOT, "ItemIcon", reward.Count, true, null, null, new Action<int, Transform, bool>((object)_003CSetNextItemIcon_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -604,7 +604,7 @@ public class QuestResultPointEvent : GameSection
 				rewardObjects.Add(val2);
 			}
 		}
-		_003CSetAllRewardItem_003Ec__AnonStorey428 _003CSetAllRewardItem_003Ec__AnonStorey;
+		_003CSetAllRewardItem_003Ec__AnonStorey429 _003CSetAllRewardItem_003Ec__AnonStorey;
 		SetDynamicList((Enum)UI.GRD_ANIM_ITEM_ROOT, "ItemIcon", rewardList.Count, true, null, null, new Action<int, Transform, bool>((object)_003CSetAllRewardItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -727,7 +727,7 @@ public class QuestResultPointEvent : GameSection
 		bool wait2 = true;
 		PlayTween((Enum)UI.OBJ_RANKING_ANIM_ROOT, true, (EventDelegate.Callback)delegate
 		{
-			((_003CStartRankingAnimation_003Ec__Iterator144)/*Error near IL_0056: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CStartRankingAnimation_003Ec__Iterator145)/*Error near IL_0056: stateMachine*/)._003Cwait_003E__0 = false;
 		}, true, 0);
 		while (wait2)
 		{
@@ -773,7 +773,7 @@ public class QuestResultPointEvent : GameSection
 			wait2 = true;
 			PlayTween((Enum)UI.OBJ_PASS_ANIM_ROOT, true, (EventDelegate.Callback)delegate
 			{
-				((_003CStartRankingAnimation_003Ec__Iterator144)/*Error near IL_039b: stateMachine*/)._003Cwait_003E__0 = false;
+				((_003CStartRankingAnimation_003Ec__Iterator145)/*Error near IL_039b: stateMachine*/)._003Cwait_003E__0 = false;
 			}, true, 0);
 			while (wait2)
 			{

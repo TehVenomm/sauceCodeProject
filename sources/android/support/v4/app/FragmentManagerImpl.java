@@ -1342,7 +1342,6 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
     public void dump(String str, FileDescriptor fileDescriptor, PrintWriter printWriter, String[] strArr) {
         int size;
         int i;
-        Fragment fragment;
         int i2 = 0;
         String str2 = str + "    ";
         if (this.mActive != null) {
@@ -1353,6 +1352,7 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
                 printWriter.print(Integer.toHexString(System.identityHashCode(this)));
                 printWriter.println(":");
                 for (i = 0; i < size; i++) {
+                    Fragment fragment;
                     fragment = (Fragment) this.mActive.get(i);
                     printWriter.print(str);
                     printWriter.print("  #");

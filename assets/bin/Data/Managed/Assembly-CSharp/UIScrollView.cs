@@ -68,8 +68,8 @@ public class UIScrollView
 
 	public OnDragNotification onStoppedMoving;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Vector3 scale = new Vector3(1f, 0f, 0f);
 
 	[HideInInspector]

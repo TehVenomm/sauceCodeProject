@@ -232,8 +232,8 @@ public class EquipSetDetailStatusAndAbilityTable : GameSection
 		string allAbilityName = string.Empty;
 		string allAp = string.Empty;
 		string allAbilityDesc = string.Empty;
-		_003CUpdateAbilityTable_003Ec__AnonStorey2ED _003CUpdateAbilityTable_003Ec__AnonStorey2ED;
-		SetGrid(UI.GRD_ABILITY, "EquipSetDetailAbilityTableItem", item_num, true, new Action<int, Transform, bool>((object)_003CUpdateAbilityTable_003Ec__AnonStorey2ED, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateAbilityTable_003Ec__AnonStorey2EE _003CUpdateAbilityTable_003Ec__AnonStorey2EE;
+		SetGrid(UI.GRD_ABILITY, "EquipSetDetailAbilityTableItem", item_num, true, new Action<int, Transform, bool>((object)_003CUpdateAbilityTable_003Ec__AnonStorey2EE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		PreCacheAbilityDetail(allAbilityName, allAp, allAbilityDesc);
 		base.GetComponent<UIScrollView>((Enum)UI.SCR_ABILITY).set_enabled(is_scroll);
 	}

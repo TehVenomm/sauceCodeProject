@@ -195,8 +195,8 @@ public class QuestExploreSelectList : QuestEventSelectList
 				}
 			}
 			bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-			_003CUpdateTable_003Ec__AnonStorey3FE _003CUpdateTable_003Ec__AnonStorey3FE;
-			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey3FE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey3FE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateTable_003Ec__AnonStorey3FF _003CUpdateTable_003Ec__AnonStorey3FF;
+			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey3FF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey3FF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
 			component.set_enabled(true);
 			RepositionTable();
@@ -264,7 +264,7 @@ public class QuestExploreSelectList : QuestEventSelectList
 			bool enable_clear_event = table.clearEventID != 0;
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-			_003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey400 _003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey;
+			_003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey401 _003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey;
 			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo[num].uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		else
@@ -376,8 +376,8 @@ public class QuestExploreSelectList : QuestEventSelectList
 			eid = eventData.eventId
 		}, url: QuestExplorePointModel.URL, call_back: (Action<QuestExplorePointModel>)delegate(QuestExplorePointModel result)
 		{
-			((_003CGetCurrentStatus_003Ec__Iterator11C)/*Error near IL_0059: stateMachine*/)._003CisRequest_003E__0 = false;
-			((_003CGetCurrentStatus_003Ec__Iterator11C)/*Error near IL_0059: stateMachine*/)._003C_003Ef__this.currentData = result.result;
+			((_003CGetCurrentStatus_003Ec__Iterator11D)/*Error near IL_0059: stateMachine*/)._003CisRequest_003E__0 = false;
+			((_003CGetCurrentStatus_003Ec__Iterator11D)/*Error near IL_0059: stateMachine*/)._003C_003Ef__this.currentData = result.result;
 		}, get_param: string.Empty);
 		while (isRequest)
 		{

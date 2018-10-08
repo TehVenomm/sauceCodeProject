@@ -124,7 +124,7 @@ public class PresentManager : MonoBehaviourSingleton<PresentManager>
 		requestSendForm.id = 0;
 		requestSendForm.p0 = 0;
 		requestSendForm.p1 = 0;
-		_003CSendDebugAddCrystal_003Ec__AnonStorey675 _003CSendDebugAddCrystal_003Ec__AnonStorey;
+		_003CSendDebugAddCrystal_003Ec__AnonStorey676 _003CSendDebugAddCrystal_003Ec__AnonStorey;
 		Protocol.Send(DebugAddPresentModel.URL, requestSendForm, delegate(DebugAddPresentModel ret)
 		{
 			List<string> list = new List<string>();

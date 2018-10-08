@@ -164,7 +164,7 @@ namespace BestHTTP.Extensions
 
 		internal unsafe static string Read(this string str, ref int pos, char block, bool needResult = true)
 		{
-			_003CRead_003Ec__AnonStorey7C6 _003CRead_003Ec__AnonStorey7C;
+			_003CRead_003Ec__AnonStorey7C7 _003CRead_003Ec__AnonStorey7C;
 			return str.Read(ref pos, new Func<char, bool>((object)_003CRead_003Ec__AnonStorey7C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), needResult);
 		}
 

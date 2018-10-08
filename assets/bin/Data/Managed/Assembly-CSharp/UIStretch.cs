@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/Stretch")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/Stretch")]
 public class UIStretch
 {
 	public enum Style
@@ -30,8 +30,8 @@ public class UIStretch
 
 	public Vector2 borderPadding = Vector2.get_zero();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UIWidget widgetContainer;
 
 	private Transform mTrans;

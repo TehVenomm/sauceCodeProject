@@ -2,8 +2,8 @@ using AnimationOrTween;
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Play Tween")]
+[ExecuteInEditMode]
 public class UIPlayTween
 {
 	public static UIPlayTween current;
@@ -32,8 +32,8 @@ public class UIPlayTween
 	[SerializeField]
 	private GameObject eventReceiver;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private string callWhenFinished;
 
 	private UITweener[] mTweens;

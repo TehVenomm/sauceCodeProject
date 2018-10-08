@@ -114,7 +114,7 @@ public class TheaterStory : GameSection
 			}
 			dispList = list;
 		}
-		_003CUpdateUI_003Ec__AnonStorey3E8 _003CUpdateUI_003Ec__AnonStorey3E;
+		_003CUpdateUI_003Ec__AnonStorey3E9 _003CUpdateUI_003Ec__AnonStorey3E;
 		SetDynamicList((Enum)UI.GRD_LIST, "TheaterStoryListItem", dispList.Count, true, null, null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

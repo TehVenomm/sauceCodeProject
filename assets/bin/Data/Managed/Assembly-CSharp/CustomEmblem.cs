@@ -36,12 +36,12 @@ public class CustomEmblem : GameSection
 	public unsafe void UpdateList()
 	{
 		GuildItemInfoModel.EmblemInfo[] infos = GuildItemManager.I.GetEmblemLayer1Infos();
-		_003CUpdateList_003Ec__AnonStorey319 _003CUpdateList_003Ec__AnonStorey;
-		SetDynamicList((Enum)UI.GRD_LIST_1, "EmblemLayer1Item", infos.Length, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateList_003Ec__AnonStorey31A _003CUpdateList_003Ec__AnonStorey31A;
+		SetDynamicList((Enum)UI.GRD_LIST_1, "EmblemLayer1Item", infos.Length, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateList_003Ec__AnonStorey31A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		infos = GuildItemManager.I.GetEmblemLayer2Infos();
-		SetDynamicList((Enum)UI.GRD_LIST_2, "EmblemLayer2Item", infos.Length, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetDynamicList((Enum)UI.GRD_LIST_2, "EmblemLayer2Item", infos.Length, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateList_003Ec__AnonStorey31A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		infos = GuildItemManager.I.GetEmblemLayer3Infos();
-		SetDynamicList((Enum)UI.GRD_LIST_3, "EmblemLayer3Item", infos.Length, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetDynamicList((Enum)UI.GRD_LIST_3, "EmblemLayer3Item", infos.Length, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateList_003Ec__AnonStorey31A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected void SetListItem(int i, Transform t, bool is_recycle, GuildItemInfoModel.EmblemInfo data)

@@ -1090,54 +1090,54 @@ public class ReaderBasedJsonParser extends ParserBase {
     private final JsonToken _parseFloat(int i, int i2, int i3, boolean z, int i4) throws IOException {
         int i5;
         int i6;
-        int i7;
-        int i8 = 0;
-        int i9 = this._inputEnd;
+        int i7 = 0;
+        int i8 = this._inputEnd;
+        int i9;
         if (i == 46) {
             i5 = 0;
-            i6 = i3;
-            while (i6 < i9) {
-                i3 = i6 + 1;
-                i6 = this._inputBuffer[i6];
-                if (i6 < 48 || i6 > 57) {
+            i9 = i3;
+            while (i9 < i8) {
+                i3 = i9 + 1;
+                i9 = this._inputBuffer[i9];
+                if (i9 < 48 || i9 > 57) {
                     if (i5 == 0) {
-                        reportUnexpectedNumberChar(i6, "Decimal point not followed by a digit");
+                        reportUnexpectedNumberChar(i9, "Decimal point not followed by a digit");
                     }
-                    i7 = i5;
+                    i6 = i5;
                     i5 = i3;
                 } else {
                     i5++;
-                    i6 = i3;
+                    i9 = i3;
                 }
             }
             return _parseNumber2(z, i2);
         }
-        i7 = 0;
+        i6 = 0;
         i5 = i3;
-        i6 = i;
-        if (i6 == Quests.SELECT_COMPLETED_UNCLAIMED || i6 == 69) {
-            if (i5 >= i9) {
+        i9 = i;
+        if (i9 == Quests.SELECT_COMPLETED_UNCLAIMED || i9 == 69) {
+            if (i5 >= i8) {
                 this._inputPtr = i2;
                 return _parseNumber2(z, i2);
             }
             int i10;
             char c;
-            i6 = i5 + 1;
+            i9 = i5 + 1;
             char c2 = this._inputBuffer[i5];
             if (c2 != '-' && c2 != '+') {
-                i10 = i6;
+                i10 = i9;
                 c = c2;
                 i5 = i10;
-            } else if (i6 >= i9) {
+            } else if (i9 >= i8) {
                 this._inputPtr = i2;
                 return _parseNumber2(z, i2);
             } else {
-                i5 = i6 + 1;
-                i6 = this._inputBuffer[i6];
+                i5 = i9 + 1;
+                i9 = this._inputBuffer[i9];
             }
-            while (i6 <= 57 && i6 >= 48) {
-                i8++;
-                if (i5 >= i9) {
+            while (i9 <= 57 && i9 >= 48) {
+                i7++;
+                if (i5 >= i8) {
                     this._inputPtr = i2;
                     return _parseNumber2(z, i2);
                 }
@@ -1145,17 +1145,17 @@ public class ReaderBasedJsonParser extends ParserBase {
                 c = this._inputBuffer[i5];
                 i5 = i10;
             }
-            if (i8 == 0) {
-                reportUnexpectedNumberChar(i6, "Exponent indicator not followed by a digit");
+            if (i7 == 0) {
+                reportUnexpectedNumberChar(i9, "Exponent indicator not followed by a digit");
             }
         }
         i5--;
         this._inputPtr = i5;
         if (this._parsingContext.inRoot()) {
-            _verifyRootSpace(i6);
+            _verifyRootSpace(i9);
         }
         this._textBuffer.resetWithShared(this._inputBuffer, i2, i5 - i2);
-        return resetFloat(z, i4, i7, i8);
+        return resetFloat(z, i4, i6, i7);
     }
 
     protected final JsonToken _parseNegNumber() throws IOException {

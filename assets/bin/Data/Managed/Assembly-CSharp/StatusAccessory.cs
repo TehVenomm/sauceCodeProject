@@ -216,8 +216,8 @@ public class StatusAccessory : SkillInfoBase
 				num++;
 			}
 			SetActive((Enum)UI.LBL_NON_LIST, num <= 0);
-			_003CUpdateUI_003Ec__AnonStorey47A _003CUpdateUI_003Ec__AnonStorey47A;
-			SetDynamicList((Enum)UI.GRD_INVENTORY, (string)null, num, false, new Func<int, bool>((object)_003CUpdateUI_003Ec__AnonStorey47A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey47A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateUI_003Ec__AnonStorey47B _003CUpdateUI_003Ec__AnonStorey47B;
+			SetDynamicList((Enum)UI.GRD_INVENTORY, (string)null, num, false, new Func<int, bool>((object)_003CUpdateUI_003Ec__AnonStorey47B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey47B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			base.UpdateUI();
 			SetActive((Enum)UI.LIST_ROOT, true);
 			SetActive((Enum)UI.ACCESSORY_ROOT, false);

@@ -102,7 +102,7 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 		base.DrawIcon();
 		NeedMaterial[] reward_ary = CreateNeedMaterialAry();
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		_003CDrawIcon_003Ec__AnonStorey3D3 _003CDrawIcon_003Ec__AnonStorey3D;
+		_003CDrawIcon_003Ec__AnonStorey3D4 _003CDrawIcon_003Ec__AnonStorey3D;
 		SetGrid(UI.GRD_REWARD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		SetActive((Enum)UI.STR_NON_REWARD, reward_ary.Length == 0);
 	}

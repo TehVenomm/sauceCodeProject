@@ -75,11 +75,11 @@ public class InGameInterval : GameSection
 		{
 			if (!is_connect)
 			{
-				((_003CDoInitialize_003Ec__IteratorC8)/*Error near IL_0206: stateMachine*/)._003C_003Ef__this.coopServerInvalidFlag = true;
+				((_003CDoInitialize_003Ec__IteratorC9)/*Error near IL_0206: stateMachine*/)._003C_003Ef__this.coopServerInvalidFlag = true;
 			}
 			else
 			{
-				((_003CDoInitialize_003Ec__IteratorC8)/*Error near IL_0206: stateMachine*/)._003Cmatching_flag_003E__5 = true;
+				((_003CDoInitialize_003Ec__IteratorC9)/*Error near IL_0206: stateMachine*/)._003Cmatching_flag_003E__5 = true;
 			}
 		};
 		if (MonoBehaviourSingleton<InGameManager>.I.isTransitionFieldToQuest)
@@ -114,7 +114,7 @@ public class InGameInterval : GameSection
 				}
 				CoopApp.EnterQuestOnly(delegate
 				{
-					((_003CDoInitialize_003Ec__IteratorC8)/*Error near IL_0333: stateMachine*/)._003Cmatching_end_action_003E__6(CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected());
+					((_003CDoInitialize_003Ec__IteratorC9)/*Error near IL_0333: stateMachine*/)._003Cmatching_end_action_003E__6(CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected());
 				});
 				if (MonoBehaviourSingleton<CoopManager>.IsValid())
 				{

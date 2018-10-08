@@ -326,7 +326,7 @@ public class ItemDetailEquip : SkillInfoBase
 				string allAbilityName = string.Empty;
 				string allAp = string.Empty;
 				string allAbilityDesc = string.Empty;
-				_003CUpdateUI_003Ec__AnonStorey3C4 _003CUpdateUI_003Ec__AnonStorey3C;
+				_003CUpdateUI_003Ec__AnonStorey3C5 _003CUpdateUI_003Ec__AnonStorey3C;
 				SetTable(detailBase, UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", equip.ability.Length + (flag ? 1 : 0), false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				PreCacheAbilityDetail(allAbilityName, allAp, allAbilityDesc);
 				if (empty_ability)
@@ -379,7 +379,7 @@ public class ItemDetailEquip : SkillInfoBase
 				string allAbilityName2 = string.Empty;
 				string allAp2 = string.Empty;
 				string allAbilityDesc2 = string.Empty;
-				_003CUpdateUI_003Ec__AnonStorey3C7 _003CUpdateUI_003Ec__AnonStorey3C2;
+				_003CUpdateUI_003Ec__AnonStorey3C8 _003CUpdateUI_003Ec__AnonStorey3C2;
 				SetTable(detailBase, UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", table.fixedAbility.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3C2, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				PreCacheAbilityDetail(allAbilityName2, allAp2, allAbilityDesc2);
 				SetActive(detailBase, UI.STR_NON_ABILITY, false);
@@ -498,7 +498,7 @@ public class ItemDetailEquip : SkillInfoBase
 		if (select_item != null)
 		{
 			GameSection.StayEvent();
-			_003COnQueryFavorite_003Ec__AnonStorey3C8 _003COnQueryFavorite_003Ec__AnonStorey3C;
+			_003COnQueryFavorite_003Ec__AnonStorey3C9 _003COnQueryFavorite_003Ec__AnonStorey3C;
 			MonoBehaviourSingleton<StatusManager>.I.SendInventoryEquipLock(select_item.uniqueID, new Action<bool, EquipItemInfo>((object)_003COnQueryFavorite_003Ec__AnonStorey3C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

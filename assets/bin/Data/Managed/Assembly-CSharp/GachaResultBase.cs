@@ -117,7 +117,7 @@ public abstract class GachaResultBase : GameSection
 		SetEvent(FindCtrl(footerRoot, UI.BTN_NEXT).GetChild(0), "NEXT_PERFORMANCE", -1);
 		yield return (object)LoadGachaGuaranteeCounter(loadQueue, nextGuachaGuarantee, delegate(LoadObject lo_guarantee)
 		{
-			((_003CLoadMultiResultUI_003Ec__Iterator4D)/*Error near IL_011e: stateMachine*/)._003C_003Ef__this.SetTexture(((_003CLoadMultiResultUI_003Ec__Iterator4D)/*Error near IL_011e: stateMachine*/)._003C_003Ef__this.footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN, lo_guarantee.loadedObject as Texture);
+			((_003CLoadMultiResultUI_003Ec__Iterator4E)/*Error near IL_011e: stateMachine*/)._003C_003Ef__this.SetTexture(((_003CLoadMultiResultUI_003Ec__Iterator4E)/*Error near IL_011e: stateMachine*/)._003C_003Ef__this.footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN, lo_guarantee.loadedObject as Texture);
 		});
 	}
 

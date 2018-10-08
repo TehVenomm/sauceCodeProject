@@ -146,7 +146,7 @@ public class InGameLoungeMemberList : GameSection
 		ScrollViewResetPosition((Enum)UI.SCR_LIST);
 		UpdateAnchors();
 		AppMain i = MonoBehaviourSingleton<AppMain>.I;
-		_003COnScreenRotate_003Ec__AnonStorey396 _003COnScreenRotate_003Ec__AnonStorey;
+		_003COnScreenRotate_003Ec__AnonStorey397 _003COnScreenRotate_003Ec__AnonStorey;
 		i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003COnScreenRotate_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

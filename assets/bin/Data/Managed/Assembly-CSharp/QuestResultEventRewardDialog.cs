@@ -58,7 +58,7 @@ public class QuestResultEventRewardDialog : ItemSellConfirm
 		}
 		bool shouldAddGold = totalGold > 0;
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		_003CDrawIcon_003Ec__AnonStorey422 _003CDrawIcon_003Ec__AnonStorey;
+		_003CDrawIcon_003Ec__AnonStorey423 _003CDrawIcon_003Ec__AnonStorey;
 		SetGrid(UI.GRD_EVENT_REWARD, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

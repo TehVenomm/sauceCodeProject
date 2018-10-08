@@ -17,6 +17,7 @@ public class DefaultArmoryService implements ArmoryService {
     public static final DefaultArmoryService INSTANCE = new DefaultArmoryService();
 
     public ArmoryResponse getArmory(String str) throws IOException, HttpException {
+        JsonReader jsonReader;
         HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(String.format(Locale.ENGLISH, "%s/hunters/%s/armory", new Object[]{ServiceConstants.BASE_URL, str})).openConnection();
         try {
             httpURLConnection.setRequestMethod(HttpRequest.METHOD_GET);
@@ -24,7 +25,6 @@ public class DefaultArmoryService implements ArmoryService {
             httpURLConnection.setReadTimeout(30000);
             if (HttpUtils.isSuccessful(httpURLConnection.getResponseCode())) {
                 InputStream inputStream = httpURLConnection.getInputStream();
-                JsonReader jsonReader;
                 try {
                     jsonReader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
                     ArmoryResponse armoryResponse = new ArmoryResponse(jsonReader);

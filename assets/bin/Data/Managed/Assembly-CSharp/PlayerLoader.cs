@@ -719,7 +719,7 @@ public class PlayerLoader : ModelLoaderBase
 				{
 					animObjectTable.ForEach(delegate(LoadObject load_object)
 					{
-						((_003CDoLoad_003Ec__Iterator273)/*Error near IL_0ec2: stateMachine*/)._003Cload_queue_003E__21.CacheAnimDataUseResource(load_object.loadedObjects[1].obj as AnimEventData, delegate(string effect_name)
+						((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003Cload_queue_003E__21.CacheAnimDataUseResource(load_object.loadedObjects[1].obj as AnimEventData, delegate(string effect_name)
 						{
 							if (effect_name[0] == '@')
 							{
@@ -727,7 +727,7 @@ public class PlayerLoader : ModelLoaderBase
 							}
 							return effect_name;
 						}, null);
-						((_003CDoLoad_003Ec__Iterator273)/*Error near IL_0ec2: stateMachine*/)._003Cload_queue_003E__21.CacheAnimDataUseResourceDependPlayer(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_0ec2: stateMachine*/)._003Cplayer_003E__0, load_object.loadedObjects[1].obj as AnimEventData);
+						((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003Cload_queue_003E__21.CacheAnimDataUseResourceDependPlayer(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003Cplayer_003E__0, load_object.loadedObjects[1].obj as AnimEventData);
 						AnimEventData animEventData = load_object.loadedObjects[1].obj as AnimEventData;
 						if (animEventData != null && !animEventData.animations.IsNullOrEmpty())
 						{
@@ -754,10 +754,10 @@ public class PlayerLoader : ModelLoaderBase
 													string text2 = array[num8];
 													if (!string.IsNullOrEmpty(text2))
 													{
-														LoadObject loadObject2 = ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_0ec2: stateMachine*/)._003Cload_queue_003E__21.Load(RESOURCE_CATEGORY.INGAME_BULLET, text2, false);
-														if (loadObject2 != null && ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_0ec2: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Get(text2) == null)
+														LoadObject loadObject2 = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003Cload_queue_003E__21.Load(RESOURCE_CATEGORY.INGAME_BULLET, text2, false);
+														if (loadObject2 != null && ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Get(text2) == null)
 														{
-															((_003CDoLoad_003Ec__Iterator273)/*Error near IL_0ec2: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Add(text2, loadObject2);
+															((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Add(text2, loadObject2);
 														}
 													}
 												}
@@ -773,10 +773,10 @@ public class PlayerLoader : ModelLoaderBase
 											string text = eventData.stringArgs[num5];
 											if (!string.IsNullOrEmpty(text))
 											{
-												LoadObject loadObject = ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_0ec2: stateMachine*/)._003Cload_queue_003E__21.Load(RESOURCE_CATEGORY.INGAME_BULLET, text, false);
-												if (loadObject != null && ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_0ec2: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Get(text) == null)
+												LoadObject loadObject = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003Cload_queue_003E__21.Load(RESOURCE_CATEGORY.INGAME_BULLET, text, false);
+												if (loadObject != null && ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Get(text) == null)
 												{
-													((_003CDoLoad_003Ec__Iterator273)/*Error near IL_0ec2: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Add(text, loadObject);
+													((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Add(text, loadObject);
 												}
 											}
 										}
@@ -809,7 +809,7 @@ public class PlayerLoader : ModelLoaderBase
 											{
 												if (text3.StartsWith(namesNeededLoadAtkInfoFromAnimEvent[num10]))
 												{
-													((_003CDoLoad_003Ec__Iterator273)/*Error near IL_0ec2: stateMachine*/)._003CneedAtkInfoNames_003E__59.Add(text3);
+													((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003CneedAtkInfoNames_003E__59.Add(text3);
 													break;
 												}
 											}
@@ -1257,12 +1257,12 @@ public class PlayerLoader : ModelLoaderBase
 					//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 					//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 					//IL_0016: Expected O, but got Unknown
-					((_003CDoLoad_003Ec__Iterator273)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.body = data.instantiatedObject.get_transform();
-					((_003CDoLoad_003Ec__Iterator273)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.body.SetParent(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_25c8: stateMachine*/)._003C_this_003E__20, false);
-					((_003CDoLoad_003Ec__Iterator273)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.renderersBody = ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.body.GetComponentsInChildren<Renderer>();
-					((_003CDoLoad_003Ec__Iterator273)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.SetDynamicBones_Body(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.body, ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_25c8: stateMachine*/)._003CenableBone_003E__1);
-					SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.renderersBody, false);
-					((_003CDoLoad_003Ec__Iterator273)/*Error near IL_25c8: stateMachine*/)._003Cwait_003E__108 = false;
+					((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.body = data.instantiatedObject.get_transform();
+					((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.body.SetParent(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_this_003E__20, false);
+					((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.renderersBody = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.body.GetComponentsInChildren<Renderer>();
+					((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.SetDynamicBones_Body(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.body, ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003CenableBone_003E__1);
+					SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.renderersBody, false);
+					((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003Cwait_003E__108 = false;
 				}, false);
 				while (wait8)
 				{
@@ -1341,11 +1341,11 @@ public class PlayerLoader : ModelLoaderBase
 								//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 								//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 								//IL_0016: Expected O, but got Unknown
-								((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.face = data.instantiatedObject.get_transform();
-								((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.face.SetParent(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.socketHead, false);
-								((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.renderersFace = ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.face.GetComponentsInChildren<Renderer>();
-								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.renderersFace, false);
-								((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2a74: stateMachine*/)._003Cwait_003E__108 = false;
+								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.face = data.instantiatedObject.get_transform();
+								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.face.SetParent(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.socketHead, false);
+								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.renderersFace = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.face.GetComponentsInChildren<Renderer>();
+								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.renderersFace, false);
+								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2a74: stateMachine*/)._003Cwait_003E__108 = false;
 							}, false);
 							while (wait8)
 							{
@@ -1377,12 +1377,12 @@ public class PlayerLoader : ModelLoaderBase
 								//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 								//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 								//IL_0016: Expected O, but got Unknown
-								((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.hair = data.instantiatedObject.get_transform();
-								((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.hair.SetParent(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.socketHead, false);
-								((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.renderersHair = ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.hair.GetComponentsInChildren<Renderer>();
-								((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.SetDynamicBones(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.body, ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.hair, ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2bde: stateMachine*/)._003CenableBone_003E__1);
-								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.renderersHair, false);
-								((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2bde: stateMachine*/)._003Cwait_003E__108 = false;
+								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.hair = data.instantiatedObject.get_transform();
+								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.hair.SetParent(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.socketHead, false);
+								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.renderersHair = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.hair.GetComponentsInChildren<Renderer>();
+								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.SetDynamicBones(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.body, ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.hair, ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003CenableBone_003E__1);
+								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.renderersHair, false);
+								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003Cwait_003E__108 = false;
 							}, false);
 							while (wait8)
 							{
@@ -1418,11 +1418,11 @@ public class PlayerLoader : ModelLoaderBase
 								//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 								//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 								//IL_0016: Expected O, but got Unknown
-								((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.head = data.instantiatedObject.get_transform();
-								((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.head.SetParent(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.socketHead, false);
-								((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.renderersHead = ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.head.GetComponentsInChildren<Renderer>();
-								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.renderersHead, false);
-								((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2d07: stateMachine*/)._003Cwait_003E__108 = false;
+								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.head = data.instantiatedObject.get_transform();
+								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.head.SetParent(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.socketHead, false);
+								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.renderersHead = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.head.GetComponentsInChildren<Renderer>();
+								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.renderersHead, false);
+								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2d07: stateMachine*/)._003Cwait_003E__108 = false;
 							}, false);
 							while (wait8)
 							{
@@ -1461,11 +1461,11 @@ public class PlayerLoader : ModelLoaderBase
 									//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 									//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 									//IL_0016: Expected O, but got Unknown
-									((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.arm = data.instantiatedObject.get_transform();
-									((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.arm = ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.AddSkin(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.arm);
-									((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.renderersArm = ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.arm.GetComponentsInChildren<Renderer>();
-									SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.renderersArm, false);
-									((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2e79: stateMachine*/)._003Cwait_003E__108 = false;
+									((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.arm = data.instantiatedObject.get_transform();
+									((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.arm = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.AddSkin(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.arm);
+									((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.renderersArm = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.arm.GetComponentsInChildren<Renderer>();
+									SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.renderersArm, false);
+									((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003Cwait_003E__108 = false;
 								}, false);
 								while (wait8)
 								{
@@ -1504,11 +1504,11 @@ public class PlayerLoader : ModelLoaderBase
 										//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 										//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 										//IL_0016: Expected O, but got Unknown
-										((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.leg = data.instantiatedObject.get_transform();
-										((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.leg = ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.AddSkin(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.leg);
-										((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.renderersLeg = ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.leg.GetComponentsInChildren<Renderer>();
-										SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.renderersLeg, false);
-										((_003CDoLoad_003Ec__Iterator273)/*Error near IL_2fd8: stateMachine*/)._003Cwait_003E__108 = false;
+										((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.leg = data.instantiatedObject.get_transform();
+										((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.leg = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.AddSkin(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.leg);
+										((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.renderersLeg = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.leg.GetComponentsInChildren<Renderer>();
+										SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.renderersLeg, false);
+										((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003Cwait_003E__108 = false;
 									}, false);
 									while (wait8)
 									{
@@ -1550,10 +1550,10 @@ public class PlayerLoader : ModelLoaderBase
 										//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 										//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 										//IL_0011: Expected O, but got Unknown
-										((_003CDoLoad_003Ec__Iterator273)/*Error near IL_313f: stateMachine*/)._003Cweapon_003E__118 = data.instantiatedObject.get_transform();
-										((_003CDoLoad_003Ec__Iterator273)/*Error near IL_313f: stateMachine*/)._003C_003Ef__this.renderersWep = ((_003CDoLoad_003Ec__Iterator273)/*Error near IL_313f: stateMachine*/)._003Cweapon_003E__118.GetComponentsInChildren<Renderer>();
-										SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator273)/*Error near IL_313f: stateMachine*/)._003C_003Ef__this.renderersWep, false);
-										((_003CDoLoad_003Ec__Iterator273)/*Error near IL_313f: stateMachine*/)._003Cwait_003E__108 = false;
+										((_003CDoLoad_003Ec__Iterator274)/*Error near IL_313f: stateMachine*/)._003Cweapon_003E__118 = data.instantiatedObject.get_transform();
+										((_003CDoLoad_003Ec__Iterator274)/*Error near IL_313f: stateMachine*/)._003C_003Ef__this.renderersWep = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_313f: stateMachine*/)._003Cweapon_003E__118.GetComponentsInChildren<Renderer>();
+										SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_313f: stateMachine*/)._003C_003Ef__this.renderersWep, false);
+										((_003CDoLoad_003Ec__Iterator274)/*Error near IL_313f: stateMachine*/)._003Cwait_003E__108 = false;
 									}, false);
 									while (wait8)
 									{
@@ -1682,8 +1682,8 @@ public class PlayerLoader : ModelLoaderBase
 											//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 											//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 											//IL_0011: Expected O, but got Unknown
-											((_003CDoLoad_003Ec__Iterator273)/*Error near IL_36ea: stateMachine*/)._003CaccTrans_003E__133 = data.instantiatedObject.get_transform();
-											((_003CDoLoad_003Ec__Iterator273)/*Error near IL_36ea: stateMachine*/)._003Cwait_003E__108 = false;
+											((_003CDoLoad_003Ec__Iterator274)/*Error near IL_36ea: stateMachine*/)._003CaccTrans_003E__133 = data.instantiatedObject.get_transform();
+											((_003CDoLoad_003Ec__Iterator274)/*Error near IL_36ea: stateMachine*/)._003Cwait_003E__108 = false;
 										}, false);
 										while (wait8)
 										{

@@ -191,7 +191,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		party_Model_Register.signature = conn_data.signature;
 		Logd("Regist. roomId={0}", conn_data.roomId);
 		registerAck = null;
-		_003CRegist_003Ec__AnonStorey548 _003CRegist_003Ec__AnonStorey;
+		_003CRegist_003Ec__AnonStorey549 _003CRegist_003Ec__AnonStorey;
 		SendServer(party_Model_Register, true, new Func<Coop_Model_ACK, bool>((object)_003CRegist_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
 	}
 

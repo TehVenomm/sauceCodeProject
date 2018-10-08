@@ -311,9 +311,9 @@ public final class Gson {
 
     public <T> TypeAdapter<T> getAdapter(TypeToken<T> typeToken) {
         Object obj;
-        Map map;
         TypeAdapter<T> typeAdapter = (TypeAdapter) this.typeTokenCache.get(typeToken);
         if (typeAdapter == null) {
+            Map map;
             Map map2 = (Map) this.calls.get();
             if (map2 == null) {
                 HashMap hashMap = new HashMap();

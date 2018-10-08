@@ -307,7 +307,7 @@ public class GuildSmithGrow : EquipMaterialBase
 				GameSection.SetEventData(result_data);
 				isNotifySelfUpdate = true;
 				GameSection.StayEvent();
-				_003CSend_003Ec__AnonStorey344 _003CSend_003Ec__AnonStorey;
+				_003CSend_003Ec__AnonStorey345 _003CSend_003Ec__AnonStorey;
 				MonoBehaviourSingleton<SmithManager>.I.SendGrowEquipItem(selectEquipData.uniqueID, aimLv, new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
@@ -425,18 +425,18 @@ public class GuildSmithGrow : EquipMaterialBase
 
 	private unsafe IEnumerator CRSendDonateRequest(int itemID, string itemName, string request, int numRequest)
 	{
-		if (_003CCRSendDonateRequest_003Ec__Iterator6D._003C_003Ef__am_0024cacheB == null)
+		if (_003CCRSendDonateRequest_003Ec__Iterator6E._003C_003Ef__am_0024cacheB == null)
 		{
-			_003CCRSendDonateRequest_003Ec__Iterator6D._003C_003Ef__am_0024cacheB = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CCRSendDonateRequest_003Ec__Iterator6E._003C_003Ef__am_0024cacheB = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		yield return (object)new WaitUntil(_003CCRSendDonateRequest_003Ec__Iterator6D._003C_003Ef__am_0024cacheB);
+		yield return (object)new WaitUntil(_003CCRSendDonateRequest_003Ec__Iterator6E._003C_003Ef__am_0024cacheB);
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest(itemID, itemName, request, numRequest, delegate(bool success)
 		{
 			GameSection.ResumeEvent(success, null);
 			if (success)
 			{
-				((_003CCRSendDonateRequest_003Ec__Iterator6D)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;
+				((_003CCRSendDonateRequest_003Ec__Iterator6E)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;
 			}
 		});
 	}

@@ -382,7 +382,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 				}
 			}
 			bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-			_003CUpdateTable_003Ec__AnonStorey3B5 _003CUpdateTable_003Ec__AnonStorey3B;
+			_003CUpdateTable_003Ec__AnonStorey3B6 _003CUpdateTable_003Ec__AnonStorey3B;
 			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, isResetUI, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
 			component.set_enabled(true);
@@ -429,7 +429,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 		{
 			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, false);
 			SetActive((Enum)UI.GRD_DELIVERY_QUEST, true);
-			_003CUpdateGrid_003Ec__AnonStorey3B6 _003CUpdateGrid_003Ec__AnonStorey3B;
+			_003CUpdateGrid_003Ec__AnonStorey3B7 _003CUpdateGrid_003Ec__AnonStorey3B;
 			SetDynamicList((Enum)UI.GRD_DELIVERY_QUEST, "QuestRequestItem", showList.Length, isResetUI, null, null, new Action<int, Transform, bool>((object)_003CUpdateGrid_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

@@ -45,7 +45,7 @@ public class ShopGachaEquipListTop : GameSection
 		object[] array = (object[])GameSection.GetEventData();
 		uint materialID = (uint)array[0];
 		CreateEquipItemTable.CreateEquipItemData[] equipItems = Singleton<CreateEquipItemTable>.I.GetSortedCreateEquipItemsByPart(materialID);
-		_003CUpdateUI_003Ec__AnonStorey443 _003CUpdateUI_003Ec__AnonStorey;
+		_003CUpdateUI_003Ec__AnonStorey444 _003CUpdateUI_003Ec__AnonStorey;
 		SetTable(UI.TBL_LIST, "GachaEquipItem", equipItems.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

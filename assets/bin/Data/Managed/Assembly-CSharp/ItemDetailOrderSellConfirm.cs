@@ -42,7 +42,7 @@ public class ItemDetailOrderSellConfirm : GameSection
 		int num = 0;
 		int num2 = 0;
 		QuestItemInfo item_info = itemData.GetItemData() as QuestItemInfo;
-		_003CUpdateUI_003Ec__AnonStorey3D6 _003CUpdateUI_003Ec__AnonStorey3D;
+		_003CUpdateUI_003Ec__AnonStorey3D7 _003CUpdateUI_003Ec__AnonStorey3D;
 		SetGrid(UI.GRD_ICON, string.Empty, 1, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		SetLabelText((Enum)UI.LBL_GOLD, num.ToString());
 		SetLabelText((Enum)UI.LBL_EXP, num2.ToString());

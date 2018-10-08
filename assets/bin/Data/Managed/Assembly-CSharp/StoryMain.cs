@@ -30,7 +30,7 @@ public class StoryMain : GameSection, StoryDirector.IStoryEventReceiver
 	}
 
 	[CompilerGenerated]
-	private sealed class AddMessage_003Ec__AnonStorey3C2
+	private sealed class AddMessage_003Ec__AnonStorey3C3
 	{
 		internal string name;
 
@@ -132,7 +132,7 @@ public class StoryMain : GameSection, StoryDirector.IStoryEventReceiver
 	{
 		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004c: Expected O, but got Unknown
-		AddMessage_003Ec__AnonStorey3C2 addMessage_003Ec__AnonStorey3C = new AddMessage_003Ec__AnonStorey3C2();
+		AddMessage_003Ec__AnonStorey3C3 addMessage_003Ec__AnonStorey3C = new AddMessage_003Ec__AnonStorey3C3();
 		addMessage_003Ec__AnonStorey3C.name = name;
 		addMessage_003Ec__AnonStorey3C.msg = msg;
 		addMessage_003Ec__AnonStorey3C.tail_dir = tail_dir;

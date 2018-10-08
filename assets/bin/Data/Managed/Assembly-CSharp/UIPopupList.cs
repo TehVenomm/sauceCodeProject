@@ -74,24 +74,24 @@ public class UIPopupList : UIWidgetContainer
 	[SerializeField]
 	private string mSelectedItem;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private UIPanel mPanel;
 
 	[HideInInspector]
 	[SerializeField]
 	private UISprite mBackground;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private UISprite mHighlight;
 
 	[HideInInspector]
 	[SerializeField]
 	private UILabel mHighlightedLabel;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private List<UILabel> mLabelList = new List<UILabel>();
 
 	[SerializeField]
@@ -116,8 +116,8 @@ public class UIPopupList : UIWidgetContainer
 	[HideInInspector]
 	private float textScale;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UIFont font;
 
 	[SerializeField]

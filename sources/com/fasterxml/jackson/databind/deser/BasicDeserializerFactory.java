@@ -408,10 +408,10 @@ public abstract class BasicDeserializerFactory extends DeserializerFactory imple
     }
 
     protected void _checkImplicitlyNamedConstructors(DeserializationContext deserializationContext, BeanDescription beanDescription, VisibilityChecker<?> visibilityChecker, AnnotationIntrospector annotationIntrospector, CreatorCollector creatorCollector, List<AnnotatedConstructor> list) throws JsonMappingException {
-        PropertyName _findParamName;
         SettableBeanProperty[] settableBeanPropertyArr = null;
         AnnotatedWithParams annotatedWithParams = null;
         for (AnnotatedMember annotatedMember : list) {
+            PropertyName _findParamName;
             if (visibilityChecker.isCreatorVisible(annotatedMember)) {
                 int parameterCount = annotatedMember.getParameterCount();
                 SettableBeanProperty[] settableBeanPropertyArr2 = new SettableBeanProperty[parameterCount];

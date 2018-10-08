@@ -132,7 +132,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 	{
 		CheckRegisterModel.RequestSendForm requestSendForm = new CheckRegisterModel.RequestSendForm();
 		requestSendForm.data = ntc_data;
-		_003CSendCheckRegister_003Ec__AnonStorey552 _003CSendCheckRegister_003Ec__AnonStorey;
+		_003CSendCheckRegister_003Ec__AnonStorey553 _003CSendCheckRegister_003Ec__AnonStorey;
 		Protocol.Send(CheckRegisterModel.URL, requestSendForm, delegate(CheckRegisterModel ret)
 		{
 			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)

@@ -999,7 +999,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 					load_objects[i2] = object_cache_category.Get(res_name);
 					if (load_objects[i2] == null)
 					{
-						load_objects[i2] = cache.systemCaches.Find((ResourceObject o) => o.obj.get_name() == ((_003CDoLoad_003Ec__Iterator280)/*Error near IL_04da: stateMachine*/)._003Cres_name_003E__19);
+						load_objects[i2] = cache.systemCaches.Find((ResourceObject o) => o.obj.get_name() == ((_003CDoLoad_003Ec__Iterator281)/*Error near IL_04da: stateMachine*/)._003Cres_name_003E__19);
 					}
 					if (load_objects[i2] != null)
 					{
@@ -1420,7 +1420,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 							{
 								if (o != null)
 								{
-									((_003CDoLoad_003Ec__Iterator280)/*Error near IL_17c8: stateMachine*/)._003Cload_objects_003E__9[((_003CDoLoad_003Ec__Iterator280)/*Error near IL_17c8: stateMachine*/)._003Ci_003E__45] = ResourceObject.Get(((_003CDoLoad_003Ec__Iterator280)/*Error near IL_17c8: stateMachine*/).request.category, ((_003CDoLoad_003Ec__Iterator280)/*Error near IL_17c8: stateMachine*/).request.resourceNames[((_003CDoLoad_003Ec__Iterator280)/*Error near IL_17c8: stateMachine*/)._003Ci_003E__45], o);
+									((_003CDoLoad_003Ec__Iterator281)/*Error near IL_17c8: stateMachine*/)._003Cload_objects_003E__9[((_003CDoLoad_003Ec__Iterator281)/*Error near IL_17c8: stateMachine*/)._003Ci_003E__45] = ResourceObject.Get(((_003CDoLoad_003Ec__Iterator281)/*Error near IL_17c8: stateMachine*/).request.category, ((_003CDoLoad_003Ec__Iterator281)/*Error near IL_17c8: stateMachine*/).request.resourceNames[((_003CDoLoad_003Ec__Iterator281)/*Error near IL_17c8: stateMachine*/)._003Ci_003E__45], o);
 								}
 							}));
 							enableLoadDirect = save_enableLoadDirect;
@@ -1901,11 +1901,11 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 				{
 					yield return (object)ExternalResources.LoadAsync<Object>(path2, (Action<ResourceRequest>)delegate(ResourceRequest progress)
 					{
-						((_003CLoadDirect_003Ec__Iterator282)/*Error near IL_01c2: stateMachine*/).request.progressObject = progress;
+						((_003CLoadDirect_003Ec__Iterator283)/*Error near IL_01c2: stateMachine*/).request.progressObject = progress;
 					}, (Action<Object>)delegate(Object asset)
 					{
-						((_003CLoadDirect_003Ec__Iterator282)/*Error near IL_01ce: stateMachine*/).request.progressObject = PROGRESS_COMPLATE;
-						((_003CLoadDirect_003Ec__Iterator282)/*Error near IL_01ce: stateMachine*/)._003Cload_object_003E__1 = asset;
+						((_003CLoadDirect_003Ec__Iterator283)/*Error near IL_01ce: stateMachine*/).request.progressObject = PROGRESS_COMPLATE;
+						((_003CLoadDirect_003Ec__Iterator283)/*Error near IL_01ce: stateMachine*/)._003Cload_object_003E__1 = asset;
 					});
 				}
 				else

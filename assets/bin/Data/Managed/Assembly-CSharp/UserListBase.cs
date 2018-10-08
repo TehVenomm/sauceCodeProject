@@ -33,7 +33,7 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 		bool is_recv = false;
 		this.SendGetList(this.nowPage, (Action<bool>)delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator44)/*Error near IL_0039: stateMachine*/)._003Cis_recv_003E__0 = true;
+			((_003CDoInitialize_003Ec__Iterator45)/*Error near IL_0039: stateMachine*/)._003Cis_recv_003E__0 = true;
 		});
 		while (!is_recv)
 		{
@@ -65,8 +65,8 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 		bool is_recv = false;
 		this.SendGetList(this.nowPage, (Action<bool>)delegate
 		{
-			((_003CDoInitializeReopen_003Ec__Iterator45)/*Error near IL_0039: stateMachine*/)._003C_003Ef__this.PostSendGetListByReopen(((_003CDoInitializeReopen_003Ec__Iterator45)/*Error near IL_0039: stateMachine*/)._003C_003Ef__this.nowPage);
-			((_003CDoInitializeReopen_003Ec__Iterator45)/*Error near IL_0039: stateMachine*/)._003Cis_recv_003E__0 = true;
+			((_003CDoInitializeReopen_003Ec__Iterator46)/*Error near IL_0039: stateMachine*/)._003C_003Ef__this.PostSendGetListByReopen(((_003CDoInitializeReopen_003Ec__Iterator46)/*Error near IL_0039: stateMachine*/)._003C_003Ef__this.nowPage);
+			((_003CDoInitializeReopen_003Ec__Iterator46)/*Error near IL_0039: stateMachine*/)._003Cis_recv_003E__0 = true;
 		});
 		while (!is_recv)
 		{
@@ -91,8 +91,8 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 		int send_page = (this.nowPage <= 0) ? (this.pageNumMax - 1) : (this.nowPage - 1);
 		this.SendGetList(send_page, (Action<bool>)delegate(bool b)
 		{
-			((_003CGetPrevPage_003Ec__Iterator46)/*Error near IL_0071: stateMachine*/)._003Cwait_003E__0 = false;
-			((_003CGetPrevPage_003Ec__Iterator46)/*Error near IL_0071: stateMachine*/)._003Cis_success_003E__1 = b;
+			((_003CGetPrevPage_003Ec__Iterator47)/*Error near IL_0071: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CGetPrevPage_003Ec__Iterator47)/*Error near IL_0071: stateMachine*/)._003Cis_success_003E__1 = b;
 		});
 		while (wait)
 		{
@@ -108,8 +108,8 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 		int send_page = (this.nowPage < this.pageNumMax - 1) ? (this.nowPage + 1) : 0;
 		this.SendGetList(send_page, (Action<bool>)delegate(bool b)
 		{
-			((_003CGetNextPage_003Ec__Iterator47)/*Error near IL_0071: stateMachine*/)._003Cwait_003E__0 = false;
-			((_003CGetNextPage_003Ec__Iterator47)/*Error near IL_0071: stateMachine*/)._003Cis_success_003E__1 = b;
+			((_003CGetNextPage_003Ec__Iterator48)/*Error near IL_0071: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CGetNextPage_003Ec__Iterator48)/*Error near IL_0071: stateMachine*/)._003Cis_success_003E__1 = b;
 		});
 		while (wait)
 		{

@@ -234,7 +234,7 @@ public class InGameMain : GameSection
 					cutScenePlayer = questControllerObj.AddComponent<CutScenePlayer>();
 					cutScenePlayer.Init(path, delegate
 					{
-						((_003CDoInitialize_003Ec__IteratorCA)/*Error near IL_04e0: stateMachine*/)._003Cwait_003E__12 = false;
+						((_003CDoInitialize_003Ec__IteratorCB)/*Error near IL_04e0: stateMachine*/)._003Cwait_003E__12 = false;
 					});
 					while (wait)
 					{
@@ -669,7 +669,7 @@ public class InGameMain : GameSection
 		{
 			MonoBehaviourSingleton<UIPlayerStatus>.I.autoBattleButton.GetAutoPlayTime(delegate
 			{
-				((_003CDoInitialize_003Ec__IteratorCA)/*Error near IL_18ec: stateMachine*/)._003CwaitGetAutoTime_003E__70 = false;
+				((_003CDoInitialize_003Ec__IteratorCB)/*Error near IL_18ec: stateMachine*/)._003CwaitGetAutoTime_003E__70 = false;
 			});
 		}
 		while (waitGetAutoTime)
@@ -919,7 +919,7 @@ public class InGameMain : GameSection
 					Network.EventData firstEvent = validBingoDataListInSection[0];
 					List<DeliveryTable.DeliveryData> deliveryTableDataList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryTableDataList(false);
 					List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
-					_003COnQuery_BINGO_003Ec__AnonStorey397 _003COnQuery_BINGO_003Ec__AnonStorey;
+					_003COnQuery_BINGO_003Ec__AnonStorey398 _003COnQuery_BINGO_003Ec__AnonStorey;
 					int num = deliveryTableDataList.Where(new Func<DeliveryTable.DeliveryData, bool>((object)_003COnQuery_BINGO_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 					int num2 = 0;
 					for (int i = 0; i < clearStatusDelivery.Count; i++)
@@ -1374,7 +1374,7 @@ public class InGameMain : GameSection
 				component.bottomAnchor.Set(0f, num);
 				component.UpdateAnchors();
 				AppMain i = MonoBehaviourSingleton<AppMain>.I;
-				_003COnScreenRotate_003Ec__AnonStorey398 _003COnScreenRotate_003Ec__AnonStorey;
+				_003COnScreenRotate_003Ec__AnonStorey399 _003COnScreenRotate_003Ec__AnonStorey;
 				i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003COnScreenRotate_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}

@@ -47,7 +47,7 @@ public class TitleTop : GameSection
 			bool wait = true;
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator178)/*Error near IL_004b: stateMachine*/)._003Cwait_003E__0 = false;
+				((_003CDoInitialize_003Ec__Iterator179)/*Error near IL_004b: stateMachine*/)._003Cwait_003E__0 = false;
 			}, false);
 			while (wait)
 			{

@@ -108,8 +108,8 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 	[SerializeField]
 	protected float chatTopOffset = 120f;
 
-	[SerializeField]
 	[Tooltip("チャットスタンプ横オフセット")]
+	[SerializeField]
 	protected float chatStampSideOffset = 60f;
 
 	[SerializeField]

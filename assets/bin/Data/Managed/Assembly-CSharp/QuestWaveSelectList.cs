@@ -74,8 +74,8 @@ public class QuestWaveSelectList : QuestEventSelectList
 			eid = eventData.eventId
 		}, url: QuestPointRewardModel.URL, call_back: (Action<QuestPointRewardModel>)delegate(QuestPointRewardModel result)
 		{
-			((_003CGetCurrentStatus_003Ec__Iterator126)/*Error near IL_0059: stateMachine*/)._003CisRequest_003E__0 = false;
-			((_003CGetCurrentStatus_003Ec__Iterator126)/*Error near IL_0059: stateMachine*/)._003C_003Ef__this.currentData = result.result;
+			((_003CGetCurrentStatus_003Ec__Iterator127)/*Error near IL_0059: stateMachine*/)._003CisRequest_003E__0 = false;
+			((_003CGetCurrentStatus_003Ec__Iterator127)/*Error near IL_0059: stateMachine*/)._003C_003Ef__this.currentData = result.result;
 		}, get_param: string.Empty);
 		while (isRequest)
 		{
@@ -151,8 +151,8 @@ public class QuestWaveSelectList : QuestEventSelectList
 				}
 			}
 			bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-			_003CUpdateTable_003Ec__AnonStorey40C _003CUpdateTable_003Ec__AnonStorey40C;
-			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey40C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey40C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateTable_003Ec__AnonStorey40D _003CUpdateTable_003Ec__AnonStorey40D;
+			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey40D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey40D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
 			component.set_enabled(true);
 			RepositionTable();
@@ -214,8 +214,8 @@ public class QuestWaveSelectList : QuestEventSelectList
 			bool enable_clear_event = table.clearEventID != 0;
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-			_003COnQuery_SELECT_WAVE_003Ec__AnonStorey40E _003COnQuery_SELECT_WAVE_003Ec__AnonStorey40E;
-			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo[num].uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003COnQuery_SELECT_WAVE_003Ec__AnonStorey40E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003COnQuery_SELECT_WAVE_003Ec__AnonStorey40F _003COnQuery_SELECT_WAVE_003Ec__AnonStorey40F;
+			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo[num].uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003COnQuery_SELECT_WAVE_003Ec__AnonStorey40F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		else
 		{

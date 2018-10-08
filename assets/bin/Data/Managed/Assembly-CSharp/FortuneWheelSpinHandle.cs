@@ -242,7 +242,7 @@ public class FortuneWheelSpinHandle
 	private unsafe int GetReplaceIndex(int index)
 	{
 		index = ((index < DEFAULT_WHEEL_ITEMS_LENGTH) ? index : (index % DEFAULT_WHEEL_ITEMS_LENGTH));
-		_003CGetReplaceIndex_003Ec__AnonStorey2F2 _003CGetReplaceIndex_003Ec__AnonStorey2F;
+		_003CGetReplaceIndex_003Ec__AnonStorey2F3 _003CGetReplaceIndex_003Ec__AnonStorey2F;
 		FortuneWheelSpinItem fortuneWheelSpinItem = pinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)_003CGetReplaceIndex_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
 		if (fortuneWheelSpinItem.type == REWARD_TYPE.JACKPOT)
 		{
@@ -274,7 +274,7 @@ public class FortuneWheelSpinHandle
 		if (currentReward != null)
 		{
 			FortuneWheelSpinItem fortuneWheelSpinItem = null;
-			_003CReplaceRewardIcon_003Ec__AnonStorey2F3 _003CReplaceRewardIcon_003Ec__AnonStorey2F;
+			_003CReplaceRewardIcon_003Ec__AnonStorey2F4 _003CReplaceRewardIcon_003Ec__AnonStorey2F;
 			IEnumerable<FortuneWheelSpinItem> enumerable = initialSpinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)_003CReplaceRewardIcon_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			if (enumerable != null && enumerable.Count() > 0 && hiddenSpinItemList.IndexOf(enumerable.First()) > -1)
 			{

@@ -111,7 +111,7 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 				item_num = info.Length;
 			}
 		}
-		_003CUpdateDynamicList_003Ec__AnonStorey301 _003CUpdateDynamicList_003Ec__AnonStorey;
+		_003CUpdateDynamicList_003Ec__AnonStorey302 _003CUpdateDynamicList_003Ec__AnonStorey;
 		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -122,7 +122,7 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey302 _003CSendGetList_003Ec__AnonStorey;
+		_003CSendGetList_003Ec__AnonStorey303 _003CSendGetList_003Ec__AnonStorey;
 		MonoBehaviourSingleton<FriendManager>.I.SendGetLegendRanking(new Action<bool, List<ArenaLegendRankingModel.Param>>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

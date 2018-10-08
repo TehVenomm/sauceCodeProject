@@ -2,8 +2,8 @@ using System;
 using UnityEngine;
 
 [Serializable]
-[ExecuteInEditMode]
 [AddComponentMenu("Primitives/Plane")]
+[ExecuteInEditMode]
 public class ParametricPlane : ParametricPrimitive
 {
 	public float _height = 1f;

@@ -114,7 +114,7 @@ public class GuildRequestCounter : GameSection
 		bool wait2 = true;
 		MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestList(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator85)/*Error near IL_0031: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CDoInitialize_003Ec__Iterator86)/*Error near IL_0031: stateMachine*/)._003Cwait_003E__0 = false;
 		});
 		while (wait2)
 		{
@@ -191,8 +191,8 @@ public class GuildRequestCounter : GameSection
 		ShowNonRequestList(count > 0);
 		prefabCache.Clear();
 		bool isExistEmployButton = false;
-		_003CUpdateUI_003Ec__AnonStorey359 _003CUpdateUI_003Ec__AnonStorey;
-		SetGrid(UI.GRD_REQUEST_HOUND, "GuildRequestItem", count, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateUI_003Ec__AnonStorey35A _003CUpdateUI_003Ec__AnonStorey35A;
+		SetGrid(UI.GRD_REQUEST_HOUND, "GuildRequestItem", count, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey35A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		InitCompleteAllButton(MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList);
 		base.UpdateUI();
 	}
@@ -487,8 +487,8 @@ public class GuildRequestCounter : GameSection
 
 	protected unsafe void SendGetChallengeInfo(Action onFinish, Action<bool> cb)
 	{
-		_003CSendGetChallengeInfo_003Ec__AnonStorey35A _003CSendGetChallengeInfo_003Ec__AnonStorey35A;
-		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(new Action<bool, Error>((object)_003CSendGetChallengeInfo_003Ec__AnonStorey35A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendGetChallengeInfo_003Ec__AnonStorey35B _003CSendGetChallengeInfo_003Ec__AnonStorey35B;
+		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(new Action<bool, Error>((object)_003CSendGetChallengeInfo_003Ec__AnonStorey35B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnQuery_SELECT()
@@ -540,8 +540,8 @@ public class GuildRequestCounter : GameSection
 		{
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0027: Expected O, but got Unknown
-			_003COnQuery_GuildRequestCancel_YES_003Ec__AnonStorey35B._003COnQuery_GuildRequestCancel_YES_003Ec__AnonStorey35C _003COnQuery_GuildRequestCancel_YES_003Ec__AnonStorey35C;
-			SendGetChallengeInfo(new Action((object)_003COnQuery_GuildRequestCancel_YES_003Ec__AnonStorey35C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
+			_003COnQuery_GuildRequestCancel_YES_003Ec__AnonStorey35C._003COnQuery_GuildRequestCancel_YES_003Ec__AnonStorey35D _003COnQuery_GuildRequestCancel_YES_003Ec__AnonStorey35D;
+			SendGetChallengeInfo(new Action((object)_003COnQuery_GuildRequestCancel_YES_003Ec__AnonStorey35D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
 		});
 	}
 
@@ -645,8 +645,8 @@ public class GuildRequestCounter : GameSection
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0022: Expected O, but got Unknown
 			GuildRequestCounter guildRequestCounter = this;
-			_003COnQuery_GuildRequestCounterSortieMessage_YES_003Ec__AnonStorey35F _003COnQuery_GuildRequestCounterSortieMessage_YES_003Ec__AnonStorey35F;
-			SendGetChallengeInfo(new Action((object)_003COnQuery_GuildRequestCounterSortieMessage_YES_003Ec__AnonStorey35F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
+			_003COnQuery_GuildRequestCounterSortieMessage_YES_003Ec__AnonStorey360 _003COnQuery_GuildRequestCounterSortieMessage_YES_003Ec__AnonStorey;
+			SendGetChallengeInfo(new Action((object)_003COnQuery_GuildRequestCounterSortieMessage_YES_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
 		});
 	}
 

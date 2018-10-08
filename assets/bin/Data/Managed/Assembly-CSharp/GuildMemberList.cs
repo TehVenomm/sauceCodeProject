@@ -92,8 +92,8 @@ public class GuildMemberList : GameSection
 		else
 		{
 			int online_count = 0;
-			_003CUpdateUI_003Ec__AnonStorey31D _003CUpdateUI_003Ec__AnonStorey31D;
-			SetDynamicList((Enum)UI.GRD_LIST, "GuildMemberListItem", allMember.Count, true, null, null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey31D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateUI_003Ec__AnonStorey31E _003CUpdateUI_003Ec__AnonStorey31E;
+			SetDynamicList((Enum)UI.GRD_LIST, "GuildMemberListItem", allMember.Count, true, null, null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey31E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			SetLabelText((Enum)UI.LBL_GUILD_NUMBER_NOW, online_count.ToString());
 			SetActive((Enum)UI.STR_NON_LIST, false);
 			SetActive((Enum)UI.GRD_LIST, true);
@@ -102,8 +102,8 @@ public class GuildMemberList : GameSection
 
 	protected unsafe virtual void GetListItem(Action<bool, object> callback)
 	{
-		_003CGetListItem_003Ec__AnonStorey31E _003CGetListItem_003Ec__AnonStorey31E;
-		MonoBehaviourSingleton<GuildManager>.I.SendMemberList(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId, new Action<bool, GuildMemberListModel>((object)_003CGetListItem_003Ec__AnonStorey31E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CGetListItem_003Ec__AnonStorey31F _003CGetListItem_003Ec__AnonStorey31F;
+		MonoBehaviourSingleton<GuildManager>.I.SendMemberList(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId, new Action<bool, GuildMemberListModel>((object)_003CGetListItem_003Ec__AnonStorey31F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected virtual void SetListItem(int i, Transform t, string event_name, FriendCharaInfo member)

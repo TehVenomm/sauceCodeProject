@@ -633,7 +633,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		//IL_0026: Expected O, but got Unknown
 		if (force)
 		{
-			_003CSendInfo_003Ec__AnonStorey640 _003CSendInfo_003Ec__AnonStorey;
+			_003CSendInfo_003Ec__AnonStorey641 _003CSendInfo_003Ec__AnonStorey;
 			Protocol.Force(new Action((object)_003CSendInfo_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		else
@@ -748,11 +748,11 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			};
 			LoungeNetworkManager i = MonoBehaviourSingleton<LoungeNetworkManager>.I;
 			Lounge_Model_RoomLeaved model = packet;
-			if (_003CDoLeave_003Ec__Iterator248._003C_003Ef__am_0024cacheA == null)
+			if (_003CDoLeave_003Ec__Iterator249._003C_003Ef__am_0024cacheA == null)
 			{
-				_003CDoLeave_003Ec__Iterator248._003C_003Ef__am_0024cacheA = new Func<Coop_Model_ACK, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				_003CDoLeave_003Ec__Iterator249._003C_003Ef__am_0024cacheA = new Func<Coop_Model_ACK, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			}
-			i.SendBroadcast(model, false, _003CDoLeave_003Ec__Iterator248._003C_003Ef__am_0024cacheA, null);
+			i.SendBroadcast(model, false, _003CDoLeave_003Ec__Iterator249._003C_003Ef__am_0024cacheA, null);
 			MonoBehaviourSingleton<ChatManager>.I.DestroyLoungeChat();
 			StopAFKCheck();
 			ClearLounge();
@@ -1206,28 +1206,28 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			if (!allMember.IsNullOrEmpty())
 			{
 				List<LoungeMemberStatus> source = allMember;
-				if (_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache7 == null)
+				if (_003CDoAFKCheck_003Ec__Iterator24A._003C_003Ef__am_0024cache7 == null)
 				{
-					_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache7 = new Func<LoungeMemberStatus, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					_003CDoAFKCheck_003Ec__Iterator24A._003C_003Ef__am_0024cache7 = new Func<LoungeMemberStatus, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 				}
-				if (source.Where(_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache7).Any())
+				if (source.Where(_003CDoAFKCheck_003Ec__Iterator24A._003C_003Ef__am_0024cache7).Any())
 				{
 					List<LoungeMemberStatus> source2 = allMember;
-					if (_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache8 == null)
+					if (_003CDoAFKCheck_003Ec__Iterator24A._003C_003Ef__am_0024cache8 == null)
 					{
-						_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache8 = new Func<LoungeMemberStatus, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+						_003CDoAFKCheck_003Ec__Iterator24A._003C_003Ef__am_0024cache8 = new Func<LoungeMemberStatus, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 					}
-					IEnumerable<LoungeMemberStatus> source3 = source2.Where(_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache8);
-					if (_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache9 == null)
+					IEnumerable<LoungeMemberStatus> source3 = source2.Where(_003CDoAFKCheck_003Ec__Iterator24A._003C_003Ef__am_0024cache8);
+					if (_003CDoAFKCheck_003Ec__Iterator24A._003C_003Ef__am_0024cache9 == null)
 					{
-						_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache9 = new Func<LoungeMemberStatus, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+						_003CDoAFKCheck_003Ec__Iterator24A._003C_003Ef__am_0024cache9 = new Func<LoungeMemberStatus, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 					}
-					IEnumerable<LoungeMemberStatus> source4 = source3.Where(_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache9);
-					if (_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cacheA == null)
+					IEnumerable<LoungeMemberStatus> source4 = source3.Where(_003CDoAFKCheck_003Ec__Iterator24A._003C_003Ef__am_0024cache9);
+					if (_003CDoAFKCheck_003Ec__Iterator24A._003C_003Ef__am_0024cacheA == null)
 					{
-						_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cacheA = new Func<LoungeMemberStatus, DateTime>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+						_003CDoAFKCheck_003Ec__Iterator24A._003C_003Ef__am_0024cacheA = new Func<LoungeMemberStatus, DateTime>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 					}
-					LoungeMemberStatus fastest = source4.OrderBy<LoungeMemberStatus, DateTime>(_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cacheA).FirstOrDefault();
+					LoungeMemberStatus fastest = source4.OrderBy<LoungeMemberStatus, DateTime>(_003CDoAFKCheck_003Ec__Iterator24A._003C_003Ef__am_0024cacheA).FirstOrDefault();
 					if (fastest != null)
 					{
 						double waitTime = (AFK_KICK_TIME - (TimeManager.GetNow().ToUniversalTime() - fastest.lastExecTime)).TotalSeconds;

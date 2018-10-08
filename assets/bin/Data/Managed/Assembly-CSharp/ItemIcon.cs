@@ -374,8 +374,8 @@ public class ItemIcon
 			item_icon.bgID = iconBGID;
 			item_icon.bg.mainTexture = null;
 			item_icon.frameTexture = null;
-			_003C_Create_003Ec__AnonStorey7AB _003C_Create_003Ec__AnonStorey7AB;
-			ResourceLoad.ItemIconLoadIconBGTexture(item_icon, iconBGID, new Action<ItemIcon, Texture, int>((object)_003C_Create_003Ec__AnonStorey7AB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003C_Create_003Ec__AnonStorey7AC _003C_Create_003Ec__AnonStorey7AC;
+			ResourceLoad.ItemIconLoadIconBGTexture(item_icon, iconBGID, new Action<ItemIcon, Texture, int>((object)_003C_Create_003Ec__AnonStorey7AC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			item_icon.VisibleIcon(item_icon.isVisible, !string.IsNullOrEmpty(event_name));
 			item_icon.bg.set_enabled(iconBGID >= 0);
 			SetupElementIcon(item_icon, icon_type, element);

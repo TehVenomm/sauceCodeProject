@@ -178,7 +178,7 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 		coop_Model_Register.token = conn_data.token;
 		Logd("Regist. roomId={0}, token={1}", conn_data.roomId, conn_data.token);
 		registerAck = null;
-		_003CRegist_003Ec__AnonStorey4C7 _003CRegist_003Ec__AnonStorey4C;
+		_003CRegist_003Ec__AnonStorey4C8 _003CRegist_003Ec__AnonStorey4C;
 		SendServer(coop_Model_Register, true, new Func<Coop_Model_ACK, bool>((object)_003CRegist_003Ec__AnonStorey4C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
 	}
 

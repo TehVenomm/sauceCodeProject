@@ -2747,7 +2747,7 @@ public class MainChat : UIBehaviour
 			if (!isRecycle && !flag)
 			{
 				ChatStampListItem chatStampListItem = item;
-				_003CInitStampItem_003Ec__AnonStorey2D2 _003CInitStampItem_003Ec__AnonStorey2D;
+				_003CInitStampItem_003Ec__AnonStorey2D3 _003CInitStampItem_003Ec__AnonStorey2D;
 				chatStampListItem.onButton = Delegate.Combine((Delegate)chatStampListItem.onButton, (Delegate)new Action((object)_003CInitStampItem_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}

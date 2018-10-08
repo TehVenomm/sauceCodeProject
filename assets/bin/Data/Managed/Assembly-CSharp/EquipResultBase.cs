@@ -242,8 +242,8 @@ public abstract class EquipResultBase : SmithEquipBase
 				string allAbilityName = string.Empty;
 				string allAp = string.Empty;
 				string allAbilityDesc = string.Empty;
-				_003CResultEquipInfo_003Ec__AnonStorey45C _003CResultEquipInfo_003Ec__AnonStorey45C;
-				SetTable(detailBase, UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", item.ability.Length + (flag2 ? 1 : 0), false, new Action<int, Transform, bool>((object)_003CResultEquipInfo_003Ec__AnonStorey45C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CResultEquipInfo_003Ec__AnonStorey45D _003CResultEquipInfo_003Ec__AnonStorey45D;
+				SetTable(detailBase, UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", item.ability.Length + (flag2 ? 1 : 0), false, new Action<int, Transform, bool>((object)_003CResultEquipInfo_003Ec__AnonStorey45D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				PreCacheAbilityDetail(allAbilityName, allAp, allAbilityDesc);
 				if (empty_ability)
 				{

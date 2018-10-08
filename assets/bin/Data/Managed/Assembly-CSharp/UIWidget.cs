@@ -2,8 +2,8 @@ using System;
 using System.Diagnostics;
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/NGUI Widget")]
+[ExecuteInEditMode]
 public class UIWidget : UIRect
 {
 	public enum Pivot
@@ -32,8 +32,8 @@ public class UIWidget : UIRect
 
 	public delegate bool HitCheck(Vector3 worldPos);
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected Color mColor = Color.get_white();
 
 	[SerializeField]
@@ -48,8 +48,8 @@ public class UIWidget : UIRect
 	[SerializeField]
 	protected int mHeight = 100;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected int mDepth;
 
 	public OnDimensionsChanged onChange;

@@ -478,7 +478,7 @@ public abstract class HomeBase : GameSection
 			bool wait = true;
 			fieldRewardPool.SendFieldDrop(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator73)/*Error near IL_0112: stateMachine*/)._003Cwait_003E__1 = false;
+				((_003CDoInitialize_003Ec__Iterator74)/*Error near IL_0112: stateMachine*/)._003Cwait_003E__1 = false;
 			});
 			while (wait)
 			{
@@ -504,7 +504,7 @@ public abstract class HomeBase : GameSection
 		bool wait_info = true;
 		MonoBehaviourSingleton<GuildManager>.I.SendClanInfo(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator73)/*Error near IL_0231: stateMachine*/)._003Cwait_info_003E__3 = false;
+			((_003CDoInitialize_003Ec__Iterator74)/*Error near IL_0231: stateMachine*/)._003Cwait_info_003E__3 = false;
 		});
 		while (wait_guild || wait_info)
 		{
@@ -524,7 +524,7 @@ public abstract class HomeBase : GameSection
 			bool wait_clan_invite = true;
 			MonoBehaviourSingleton<GuildManager>.I.SendInvitedGuild(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator73)/*Error near IL_02dc: stateMachine*/)._003Cwait_clan_invite_003E__4 = false;
+				((_003CDoInitialize_003Ec__Iterator74)/*Error near IL_02dc: stateMachine*/)._003Cwait_clan_invite_003E__4 = false;
 			}, true);
 			while (wait_clan_invite)
 			{
@@ -536,7 +536,7 @@ public abstract class HomeBase : GameSection
 			bool wait_clan_donate_invite = true;
 			MonoBehaviourSingleton<GuildManager>.I.SendDonateInvitationList(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator73)/*Error near IL_032d: stateMachine*/)._003Cwait_clan_donate_invite_003E__5 = false;
+				((_003CDoInitialize_003Ec__Iterator74)/*Error near IL_032d: stateMachine*/)._003Cwait_clan_donate_invite_003E__5 = false;
 			}, true);
 			while (wait_clan_donate_invite)
 			{
@@ -2076,8 +2076,8 @@ public abstract class HomeBase : GameSection
 					Network.EventData firstEvent = validBingoDataListInSection[0];
 					List<DeliveryTable.DeliveryData> deliveryTableDataList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryTableDataList(false);
 					List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
-					_003COnQuery_BINGO_003Ec__AnonStorey34F _003COnQuery_BINGO_003Ec__AnonStorey34F;
-					int num = deliveryTableDataList.Where(new Func<DeliveryTable.DeliveryData, bool>((object)_003COnQuery_BINGO_003Ec__AnonStorey34F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
+					_003COnQuery_BINGO_003Ec__AnonStorey350 _003COnQuery_BINGO_003Ec__AnonStorey;
+					int num = deliveryTableDataList.Where(new Func<DeliveryTable.DeliveryData, bool>((object)_003COnQuery_BINGO_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 					int num2 = 0;
 					for (int i = 0; i < clearStatusDelivery.Count; i++)
 					{

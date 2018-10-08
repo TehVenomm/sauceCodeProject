@@ -301,9 +301,9 @@ public class SkubitIabHelper implements AppstoreInAppBillingService {
     }
 
     public void launchPurchaseFlow(@NotNull Activity activity, String str, @NotNull String str2, int i, @Nullable OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str3) {
+        IabResult iabResult;
         checkSetupDone("launchPurchaseFlow");
         flagStartAsync("launchPurchaseFlow");
-        IabResult iabResult;
         if (!str2.equals("subs") || this.mSubscriptionsSupported) {
             try {
                 Logger.m1001d("Constructing buy intent for ", str, ", item type: ", str2);
@@ -374,12 +374,12 @@ public class SkubitIabHelper implements AppstoreInAppBillingService {
     }
 
     public void processPurchaseSuccess(@NotNull Intent intent, @Nullable String str, @Nullable String str2) {
+        IabResult iabResult;
         Logger.m1000d("Successful resultcode from purchase activity.");
         Logger.m1001d("Purchase data: ", str);
         Logger.m1001d("Data signature: ", str2);
         Logger.m1001d("Extras: ", intent.getExtras());
         Logger.m1001d("Expected item type: ", this.mPurchasingItemType);
-        IabResult iabResult;
         if (str == null || str2 == null) {
             Logger.m1002e("In-app billing error: BUG: either purchaseData or dataSignature is null.");
             Logger.m1001d("Extras: ", intent.getExtras());

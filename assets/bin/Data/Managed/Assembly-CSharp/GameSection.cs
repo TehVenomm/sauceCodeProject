@@ -418,7 +418,7 @@ public class GameSection : UIBehaviour
 			}
 			MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(table.questID, is_free_join);
 			StayEvent();
-			_003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2B2 _003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2B;
+			_003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2B3 _003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2B;
 			CoopApp.EnterPartyQuest(new Action<bool, bool, bool, bool>((object)_003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
@@ -779,11 +779,11 @@ public class GameSection : UIBehaviour
 			{
 				LoungeMatchingManager i2 = MonoBehaviourSingleton<LoungeMatchingManager>.I;
 				string loungeNumber2 = roomPass;
-				if (_003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2B3._003C_003Ef__am_0024cache1 == null)
+				if (_003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2B4._003C_003Ef__am_0024cache1 == null)
 				{
-					_003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2B3._003C_003Ef__am_0024cache1 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					_003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2B4._003C_003Ef__am_0024cache1 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 				}
-				i2.SendApply(loungeNumber2, _003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2B3._003C_003Ef__am_0024cache1);
+				i2.SendApply(loungeNumber2, _003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2B4._003C_003Ef__am_0024cache1);
 			});
 		}
 		else

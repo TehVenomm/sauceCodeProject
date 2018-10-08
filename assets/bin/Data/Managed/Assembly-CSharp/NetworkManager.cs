@@ -108,11 +108,11 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 
 	public unsafe IEnumerator RequestFormCoroutine<T>(string path, WWWForm form, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		if (_003CRequestFormCoroutine_003Ec__Iterator223<T>._003C_003Ef__am_0024cacheD == null)
+		if (_003CRequestFormCoroutine_003Ec__Iterator224<T>._003C_003Ef__am_0024cacheD == null)
 		{
-			_003CRequestFormCoroutine_003Ec__Iterator223<T>._003C_003Ef__am_0024cacheD = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CRequestFormCoroutine_003Ec__Iterator224<T>._003C_003Ef__am_0024cacheD = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		yield return (object)this.StartCoroutine(this.Request_Impl<T>(path, form, call_back, _003CRequestFormCoroutine_003Ec__Iterator223<T>._003C_003Ef__am_0024cacheD, get_param, token));
+		yield return (object)this.StartCoroutine(this.Request_Impl<T>(path, form, call_back, _003CRequestFormCoroutine_003Ec__Iterator224<T>._003C_003Ef__am_0024cacheD, get_param, token));
 	}
 
 	private string GetUrl(string path, string get_param)
@@ -364,7 +364,7 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 				}
 				finally
 				{
-					((_003CRequest_Impl_003Ec__Iterator224<T>)/*Error near IL_0853: stateMachine*/)._003C_003E__Finally0();
+					((_003CRequest_Impl_003Ec__Iterator225<T>)/*Error near IL_0853: stateMachine*/)._003C_003E__Finally0();
 				}
 			}
 		}

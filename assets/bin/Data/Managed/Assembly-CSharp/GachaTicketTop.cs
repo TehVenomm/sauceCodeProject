@@ -73,7 +73,7 @@ public class GachaTicketTop : GameSection
 			ExpiredItem[] array = new ExpiredItem[num2];
 			Array.Copy(showList, num, array, 0, num2);
 			showList = array;
-			_003CUpdateUI_003Ec__AnonStorey442 _003CUpdateUI_003Ec__AnonStorey;
+			_003CUpdateUI_003Ec__AnonStorey443 _003CUpdateUI_003Ec__AnonStorey;
 			SetGrid(UI.GRD_LIST, "GachaTicketListItem", showList.Length, true, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

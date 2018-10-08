@@ -50,7 +50,6 @@ public final class SupportManager {
     }
 
     public static Long send(Context context, SupportRequest supportRequest) throws SupportServiceException {
-        OutputStream byteArrayOutputStream;
         Long l = null;
         try {
             String string;
@@ -95,6 +94,7 @@ public final class SupportManager {
             multipartUtility.addFormField("extraData", getExtraData(context, supportRequest.getName(), supportRequest.getCategory()));
             if (supportRequest.getAttachment() != null) {
                 InputStream openInputStream = context.getContentResolver().openInputStream(supportRequest.getAttachment());
+                OutputStream byteArrayOutputStream;
                 try {
                     byteArrayOutputStream = new ByteArrayOutputStream();
                     IOUtils.copy(openInputStream, byteArrayOutputStream);

@@ -239,11 +239,11 @@ public class CommonUtils {
     }
 
     public static String extractFieldFromSystemFile(File file, String str) {
+        Closeable bufferedReader;
         Throwable e;
         Throwable th;
         String str2 = null;
         if (file.exists()) {
-            Closeable bufferedReader;
             try {
                 String[] split;
                 bufferedReader = new BufferedReader(new FileReader(file), 1024);
