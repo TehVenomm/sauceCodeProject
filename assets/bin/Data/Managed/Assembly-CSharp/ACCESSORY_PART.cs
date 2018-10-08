@@ -1,0 +1,14 @@
+public enum ACCESSORY_PART
+{
+	NONE = -1,
+	HEAD,
+	FACE,
+	R_SHOULDER,
+	L_SHOULDER,
+	R_ARM,
+	L_ARM,
+	CHEST,
+	WAIST,
+	R_LEG,
+	L_LEG
+}

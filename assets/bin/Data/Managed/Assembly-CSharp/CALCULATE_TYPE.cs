@@ -1,0 +1,6 @@
+public enum CALCULATE_TYPE
+{
+	NONE,
+	RATE,
+	CONSTANT
+}

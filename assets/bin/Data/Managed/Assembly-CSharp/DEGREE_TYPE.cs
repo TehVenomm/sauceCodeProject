@@ -1,0 +1,9 @@
+public enum DEGREE_TYPE
+{
+	NONE = 0,
+	FRAME = 1,
+	SPECIAL_FRAME = 2,
+	NOUN = 3,
+	CONJUNCTION = 4,
+	CLAN = 55
+}

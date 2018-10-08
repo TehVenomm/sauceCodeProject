@@ -1,0 +1,6 @@
+public enum EVENT_DISPLAY_LOCATION_TYPE
+{
+	ALL,
+	FIELD,
+	HOME
+}

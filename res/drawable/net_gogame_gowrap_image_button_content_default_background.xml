@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape android:shape="rectangle"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:bottomLeftRadius="@dimen/net_gogame_gowrap_image_button_border_radius" android:bottomRightRadius="@dimen/net_gogame_gowrap_image_button_border_radius" />
+    <solid android:color="#c0000000" />
+    <stroke android:width="3.5dip" android:color="@android:color/transparent" />
+</shape>

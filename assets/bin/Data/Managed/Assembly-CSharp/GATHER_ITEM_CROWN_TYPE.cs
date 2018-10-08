@@ -1,0 +1,6 @@
+public enum GATHER_ITEM_CROWN_TYPE
+{
+	NONE,
+	SILVER,
+	GOLD
+}

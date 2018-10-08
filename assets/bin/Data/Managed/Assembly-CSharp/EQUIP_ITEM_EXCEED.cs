@@ -1,0 +1,9 @@
+public enum EQUIP_ITEM_EXCEED
+{
+	NONE = 0,
+	MAX = 4,
+	SKILL_SLOT_1 = 101,
+	SKILL_SLOT_2 = 102,
+	SKILL_SLOT_3 = 103,
+	SKILL_SLOT_4 = 104
+}

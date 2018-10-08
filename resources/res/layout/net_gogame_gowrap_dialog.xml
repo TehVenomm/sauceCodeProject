@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:colopl="http://schemas.android.com/apk/res/REMOVED_APPID" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:card_view="http://schemas.android.com/apk/res-auto" xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads" android:layout_width="match_parent" android:layout_height="match_parent" style="@style/net_gogame_gowrap_custom_dialog_blocker">
+    <LinearLayout android:layout_gravity="center" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/net_gogame_gowrap_custom_dialog">
+        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/net_gogame_gowrap_custom_dialog_title_container">
+            <TextView android:layout_gravity="center" android:id="@+id/net_gogame_gowrap_dialog_title" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/net_gogame_gowrap_custom_dialog_title_appearance"/>
+            <Button android:layout_gravity="right|center_vertical|center_horizontal|center" android:id="@+id/net_gogame_gowrap_dialog_close_button" style="@style/net_gogame_gowrap_custom_dialog_close_button"/>
+        </FrameLayout>
+        <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" style="@style/net_gogame_gowrap_custom_dialog_body_container">
+            <LinearLayout android:layout_gravity="center" android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/net_gogame_gowrap_custom_dialog_body_inner_container">
+                <FrameLayout android:id="@+id/net_gogame_gowrap_dialog_icon_container" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/net_gogame_gowrap_custom_dialog_icon_container">
+                    <ProgressBar android:layout_gravity="top|center_vertical|center_horizontal|center" android:id="@+id/net_gogame_gowrap_progress_indicator" android:padding="16dp" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" style="?android:attr/progressBarStyle"/>
+                    <ImageView android:layout_gravity="top|center_vertical|center_horizontal|center" android:id="@+id/net_gogame_gowrap_dialog_icon_alert" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/net_gogame_gowrap_custom_dialog_icon_alert"/>
+                    <ImageView android:layout_gravity="top|center_vertical|center_horizontal|center" android:id="@+id/net_gogame_gowrap_dialog_icon_info" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/net_gogame_gowrap_custom_dialog_icon_info"/>
+                </FrameLayout>
+                <TextView android:layout_gravity="center" android:id="@+id/net_gogame_gowrap_dialog_message" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" style="@style/net_gogame_gowrap_custom_dialog_message_appearance"/>
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+</FrameLayout>

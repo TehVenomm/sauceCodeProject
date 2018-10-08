@@ -1,0 +1,6 @@
+public enum DELIVERY_DROP_DIFFICULTY
+{
+	NORMAL,
+	RARE,
+	SUPER_RARE
+}

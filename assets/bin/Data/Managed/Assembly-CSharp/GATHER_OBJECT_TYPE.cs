@@ -1,0 +1,6 @@
+public enum GATHER_OBJECT_TYPE
+{
+	NORMAL,
+	COUNTER,
+	ATTACK
+}

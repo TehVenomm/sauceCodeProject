@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:colopl="http://schemas.android.com/apk/res/REMOVED_APPID" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:card_view="http://schemas.android.com/apk/res-auto" xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads" android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:paddingBottom="120dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/net_gogame_gowrap_margin_left" android:layout_marginTop="@dimen/net_gogame_gowrap_margin_bottom" android:layout_marginRight="@dimen/net_gogame_gowrap_margin_right" android:layout_marginBottom="@dimen/net_gogame_gowrap_margin_top">
+        <include android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="8dp" layout="@layout/net_gogame_gowrap_include_tips1"/>
+        <include layout="@layout/net_gogame_gowrap_include_tips_divider"/>
+        <include android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="8dp" layout="@layout/net_gogame_gowrap_include_tips2"/>
+        <include layout="@layout/net_gogame_gowrap_include_tips_divider"/>
+        <include android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="8dp" layout="@layout/net_gogame_gowrap_include_tips3"/>
+        <include layout="@layout/net_gogame_gowrap_include_tips_divider"/>
+        <net.gogame.gowrap.ui.view.AutoStateButton android:textSize="18sp" android:textStyle="bold" android:textColor="@android:color/white" android:ellipsize="end" android:gravity="center" android:id="@+id/net_gogame_gowrap_more_tips_button" android:background="@drawable/net_gogame_gowrap_default_button_background" android:layout_height="50dp" android:layout_margin="8dp" android:text="@string/net_gogame_gowrap_tips_more_tips_button_caption" android:maxLines="2" android:shadowColor="@android:color/black" android:shadowDx="1.5" android:shadowDy="1.3" android:shadowRadius="1.6" style="@style/net_gogame_gowrap_tips_button"/>
+    </LinearLayout>
+</ScrollView>

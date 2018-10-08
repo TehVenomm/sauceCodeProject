@@ -1,0 +1,4 @@
+public enum COOP_ERROR_TYPE
+{
+	CONNECT_FAILED
+}

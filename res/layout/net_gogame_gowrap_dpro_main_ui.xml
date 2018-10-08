@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="#cc000000" android:padding="4.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <net.gogame.gowrap.ui.dpro.view.CustomTabbelPanel android:id="@id/net_gogame_gowrap_main_tabbed_panel" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_weight="1.0" app:closeButton="@drawable/net_gogame_gowrap_icon_close" app:tabFillColor="#e0000000" app:fillColor="#80001323" app:selectedTextColor="#ffb4c12c">
+        <FrameLayout android:id="@id/net_gogame_gowrap_main_fragment_container" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+    </net.gogame.gowrap.ui.dpro.view.CustomTabbelPanel>
+    <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="60.0dip">
+        <ImageView android:background="@drawable/net_gogame_gowrap_sns_decor" android:layout_width="wrap_content" android:layout_height="wrap_content" android:adjustViewBounds="true" />
+        <net.gogame.gowrap.ui.view.AutoStateButton android:textSize="12.0sp" android:textColor="@android:color/black" android:ellipsize="end" android:gravity="center" android:id="@id/net_gogame_gowrap_main_sns_button" android:background="@drawable/net_gogame_gowrap_sns_button_background" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginTop="2.0dip" android:text="@string/net_gogame_gowrap_sns_blurb" android:maxLines="2" android:drawableRight="@drawable/net_gogame_gowrap_icon_facebook" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,8 @@
+public enum DISTANCE
+{
+	SHORT_SHORT,
+	SHORT,
+	MIDDLE,
+	LONG,
+	MAX
+}

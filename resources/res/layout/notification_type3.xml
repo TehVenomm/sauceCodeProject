@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:colopl="http://schemas.android.com/apk/res/REMOVED_APPID" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:card_view="http://schemas.android.com/apk/res-auto" xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads" android:orientation="vertical" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="9">
+        <ImageView android:id="@+id/img" android:layout_width="0dp" android:layout_height="match_parent" android:scaleType="fitStart" android:layout_weight="1"/>
+        <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:ellipsize="marquee" android:gravity="center" android:id="@+id/title" android:layout_width="0dp" android:layout_height="match_parent" android:layout_marginLeft="5dp" android:layout_marginRight="5dp" android:singleLine="true" android:layout_weight="1"/>
+    </LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4">
+        <TextView android:textAppearance="?android:attr/textAppearanceSmall" android:ellipsize="marquee" android:gravity="left|center_vertical|center_horizontal|center" android:id="@+id/message" android:layout_width="0dp" android:layout_height="match_parent" android:layout_marginLeft="5dp" android:singleLine="true" android:layout_weight="4"/>
+        <TextView android:textAppearance="?android:attr/textAppearanceSmall" android:gravity="right|center_vertical|center_horizontal|center" android:id="@+id/time" android:layout_width="0dp" android:layout_height="match_parent" android:layout_marginRight="5dp" android:layout_weight="1"/>
+    </LinearLayout>
+</LinearLayout>

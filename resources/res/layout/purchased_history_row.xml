@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:colopl="http://schemas.android.com/apk/res/REMOVED_APPID" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:card_view="http://schemas.android.com/apk/res-auto" xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads" android:orientation="vertical" android:id="@+id/notification_row" android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:orientation="vertical" android:paddingLeft="10dp" android:paddingTop="10dp" android:layout_width="match_parent" android:layout_height="match_parent">
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="match_parent">
+            <TextView android:textColor="#ff000000" android:id="@+id/purchased_order_id" android:paddingLeft="10dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <TextView android:textColor="#ff000000" android:id="@+id/purchased_state" android:paddingLeft="10dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="match_parent">
+            <TextView android:textColor="#ff000000" android:id="@+id/purchased_time" android:paddingLeft="10dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <TextView android:textColor="#ff000000" android:id="@+id/purchased_item_name" android:paddingLeft="10dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,6 @@
+public enum STAMP_TYPE
+{
+	NONE,
+	COMMON,
+	DISTRIBUTION
+}

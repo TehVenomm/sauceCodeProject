@@ -1,0 +1,12 @@
+public enum MAIN_SCENE
+{
+	HOME,
+	LOUNGE,
+	QUEST,
+	STUDIO,
+	GATHER,
+	SHOP,
+	FRIEND,
+	GUILD,
+	MAX
+}

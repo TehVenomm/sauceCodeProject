@@ -1,0 +1,5 @@
+public enum PURCHASE_ITEM_TYPE
+{
+	NORMAL,
+	FIRST_TIME
+}

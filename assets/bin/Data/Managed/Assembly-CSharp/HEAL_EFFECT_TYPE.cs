@@ -1,0 +1,7 @@
+public enum HEAL_EFFECT_TYPE
+{
+	NONE,
+	BASIS,
+	ABSORB,
+	HIT_ABSORB
+}
