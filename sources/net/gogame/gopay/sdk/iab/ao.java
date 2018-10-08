@@ -2,19 +2,19 @@ package net.gogame.gopay.sdk.iab;
 
 final class ao implements Runnable {
     /* renamed from: a */
-    final /* synthetic */ an f1068a;
+    final /* synthetic */ an f3456a;
 
     ao(an anVar) {
-        this.f1068a = anVar;
+        this.f3456a = anVar;
     }
 
     public final void run() {
-        if (!this.f1068a.f1067a.f1012H.canRetry() || this.f1068a.f1067a.f1046y == null) {
-            this.f1068a.f1067a.f1024c = true;
-            this.f1068a.f1067a.f1030i = null;
-            this.f1068a.f1067a.onBackPressed();
+        if (!this.f3456a.f3455a.f3400H.canRetry() || this.f3456a.f3455a.f3434y == null) {
+            this.f3456a.f3455a.f3412c = true;
+            this.f3456a.f3455a.f3418i = null;
+            this.f3456a.f3455a.onBackPressed();
             return;
         }
-        this.f1068a.f1067a.f1046y.loadUrl(this.f1068a.f1067a.f1012H.getFailedUrl());
+        this.f3456a.f3455a.f3434y.loadUrl(this.f3456a.f3455a.f3400H.getFailedUrl());
     }
 }

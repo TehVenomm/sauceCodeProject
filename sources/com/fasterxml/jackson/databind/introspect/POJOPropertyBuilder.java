@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.PropertyMetadata;
 import com.fasterxml.jackson.databind.PropertyName;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.util.ClassUtil;
+import im.getsocial.sdk.consts.LanguageCodes;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -526,7 +527,7 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
         if (name.startsWith("get") && name.length() > 3) {
             return 1;
         }
-        if (!name.startsWith("is") || name.length() <= 2) {
+        if (!name.startsWith(LanguageCodes.ICELANDIC) || name.length() <= 2) {
             return 3;
         }
         return 2;

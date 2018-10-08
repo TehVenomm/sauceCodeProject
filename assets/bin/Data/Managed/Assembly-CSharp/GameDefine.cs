@@ -4,9 +4,11 @@ using UnityEngine;
 
 public static class GameDefine
 {
-	public const int NAME_MAX_LENGTH = 12;
+	public const int NAME_MAX_LENGTH = 14;
 
 	public const string SYSTEM_INIT_NAME = "/colopl_rob";
+
+	public const string GG_SYSTEM_INIT_NAME = "DPRO Hunter ";
 
 	public const int COMMENT_MAX_LENGTH = 30;
 
@@ -237,6 +239,22 @@ public static class GameDefine
 	public const float PERCENT = 0.01f;
 
 	public const int DEFAULT_EXCEEDABLE_NUM = 4;
+
+	public const string TUTORIAL_WEAPON_PREF_ARMOR = "Tut_Armor";
+
+	public const string TUTORIAL_WEAPON_PREF_ARM = "Tut_Arm";
+
+	public const string TUTORIAL_WEAPON_PREF_HEAD = "Tut_Head";
+
+	public const string TUTORIAL_WEAPON_PREF_LEG = "Tut_Leg";
+
+	public const string TUTORIAL_WEAPON_PREF_WEAPON = "Tut_Weapon";
+
+	public const string TUTORIAL_WEAPON_PREF_SEX = "Tut_Sex";
+
+	public const string TUTORIAL_WEAPON_PREF_WEAPON_TYPE = "Tut_Weapon_Type";
+
+	public const string TUTORIAL_PLAYER_NAME = "Tut_Name";
 
 	public static readonly int[] NOTIFY_QUEST_REMAIN_DAY = new int[3]
 	{

@@ -144,7 +144,7 @@ final class ReflectionHelper {
                     if (charAt == '[') {
                         return Array.newInstance(m400a(str, iArr), 0).getClass();
                     }
-                    C0768m.Log(5, "! parseType; " + charAt + " is not known!");
+                    C0767m.Log(5, "! parseType; " + charAt + " is not known!");
                 }
                 return null;
             }

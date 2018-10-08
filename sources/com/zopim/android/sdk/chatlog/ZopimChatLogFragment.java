@@ -31,14 +31,14 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import com.zopim.android.sdk.api.Chat;
 import com.zopim.android.sdk.api.ChatSession;
 import com.zopim.android.sdk.api.Logger;
 import com.zopim.android.sdk.api.ZopimChat;
 import com.zopim.android.sdk.attachment.ImagePicker;
 import com.zopim.android.sdk.chatlog.ConnectionFragment.ConnectionListener;
-import com.zopim.android.sdk.chatlog.ConnectionToastFragment.C0832a;
+import com.zopim.android.sdk.chatlog.ConnectionToastFragment.C0831a;
 import com.zopim.android.sdk.data.observers.AgentsObserver;
 import com.zopim.android.sdk.data.observers.ChatLogObserver;
 import com.zopim.android.sdk.model.Profile;
@@ -49,7 +49,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ZopimChatLogFragment extends Fragment implements ConnectionListener, C0832a {
+public class ZopimChatLogFragment extends Fragment implements ConnectionListener, C0831a {
     private static final String LOG_TAG = ZopimChatLogFragment.class.getSimpleName();
     private static final String STATE_ATTACH_BUTTON_ENABLED = "ATTACH_BUTTON_ENABLED";
     private static final String STATE_INPUT_FIELD_ENABLED = "INPUT_FILED_ENABLED";
@@ -65,7 +65,7 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
     private Chat mChat;
     private AlertDialog mChatEndConfirmDialog;
     private ChatListener mChatListener;
-    C0842i mChatLogAdapter;
+    C0841i mChatLogAdapter;
     ChatLogObserver mChatLogObserver = new am(this);
     private final ChatTimeoutReceiver mChatTimeoutReceiver = new ChatTimeoutReceiver();
     private AlertDialog mEmailTranscriptDialog;
@@ -116,16 +116,16 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
     }
 
     private void showConfirmDialog() {
-        this.mChatEndConfirmDialog = new Builder(getActivity()).setTitle(C0785R.string.chat_end_dialog_title).setMessage(C0785R.string.chat_end_dialog_message).setPositiveButton(C0785R.string.chat_end_dialog_confirm_button, new av(this)).setNegativeButton(C0785R.string.chat_end_dialog_cancel_button, new au(this)).show();
+        this.mChatEndConfirmDialog = new Builder(getActivity()).setTitle(C0784R.string.chat_end_dialog_title).setMessage(C0784R.string.chat_end_dialog_message).setPositiveButton(C0784R.string.chat_end_dialog_confirm_button, new av(this)).setNegativeButton(C0784R.string.chat_end_dialog_cancel_button, new au(this)).show();
     }
 
     private void showEmailTranscriptDialog() {
         Profile profile = ZopimChat.getDataSource().getProfile();
         boolean z = (profile == null || profile.getEmail() == null || profile.getEmail().isEmpty()) ? false : true;
-        EditText editText = (EditText) getActivity().getLayoutInflater().inflate(C0785R.layout.email_transcript_input_view, null);
-        Builder negativeButton = new Builder(getActivity()).setPositiveButton(17039370, null).setTitle(C0785R.string.email_transcript_title).setMessage(C0785R.string.email_transcript_message).setPositiveButton(C0785R.string.email_transcript_confirm_button, new ax(this)).setNegativeButton(C0785R.string.email_transcript_cancel_button, new aw(this));
+        EditText editText = (EditText) getActivity().getLayoutInflater().inflate(C0784R.layout.email_transcript_input_view, null);
+        Builder negativeButton = new Builder(getActivity()).setPositiveButton(17039370, null).setTitle(C0784R.string.email_transcript_title).setMessage(C0784R.string.email_transcript_message).setPositiveButton(C0784R.string.email_transcript_confirm_button, new ax(this)).setNegativeButton(C0784R.string.email_transcript_cancel_button, new aw(this));
         if (z) {
-            negativeButton.setPositiveButton(C0785R.string.email_transcript_confirm_button, new ay(this, profile));
+            negativeButton.setPositiveButton(C0784R.string.email_transcript_confirm_button, new ay(this, profile));
             this.mEmailTranscriptDialog = negativeButton.show();
             return;
         }
@@ -162,7 +162,7 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
         r3 = 1;
         r4 = 0;
         r0 = r12.getListAdapter();
-        r0 = r0 instanceof com.zopim.android.sdk.chatlog.C0842i;
+        r0 = r0 instanceof com.zopim.android.sdk.chatlog.C0841i;
         if (r0 != 0) goto L_0x0026;
     L_0x000b:
         r0 = LOG_TAG;
@@ -170,7 +170,7 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
         r1.<init>();
         r2 = "Aborting update. Adapter must be of type ";
         r1 = r1.append(r2);
-        r2 = com.zopim.android.sdk.chatlog.C0842i.class;
+        r2 = com.zopim.android.sdk.chatlog.C0841i.class;
         r1 = r1.append(r2);
         r1 = r1.toString();
         android.util.Log.w(r0, r1);
@@ -326,10 +326,10 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
         r1 = r1 + 1;
         goto L_0x0114;
     L_0x014a:
-        r1 = com.zopim.android.sdk.chatlog.aa.C0834a.CHAT_EVENT;
+        r1 = com.zopim.android.sdk.chatlog.aa.C0833a.CHAT_EVENT;
         r8.f744h = r1;
         r1 = r12.getResources();
-        r9 = com.zopim.android.sdk.C0785R.string.chat_visitor_queue_message;
+        r9 = com.zopim.android.sdk.C0784R.string.chat_visitor_queue_message;
         r1 = r1.getString(r9);
         r9 = new java.lang.Object[r3];
         r0 = r0.getVisitorQueue();
@@ -341,7 +341,7 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
         r0 = r2;
         goto L_0x0097;
     L_0x016e:
-        r0 = com.zopim.android.sdk.chatlog.aa.C0834a.CHAT_EVENT;
+        r0 = com.zopim.android.sdk.chatlog.aa.C0833a.CHAT_EVENT;
         r8.f744h = r0;
         r0 = r8.f743g;
         r7.put(r0, r8);
@@ -367,10 +367,10 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
         r2 = r4;
         goto L_0x018a;
     L_0x01a2:
-        r1 = com.zopim.android.sdk.chatlog.aa.C0834a.MEMBER_EVENT;
+        r1 = com.zopim.android.sdk.chatlog.aa.C0833a.MEMBER_EVENT;
         r8.f744h = r1;
         r1 = r12.getResources();
-        r9 = com.zopim.android.sdk.C0785R.string.chat_agent_joined_message;
+        r9 = com.zopim.android.sdk.C0784R.string.chat_agent_joined_message;
         r1 = r1.getString(r9);
         r9 = new java.lang.Object[r3];
         r0 = r0.getDisplayName();
@@ -397,10 +397,10 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
         r1 = r1.equals(r10);
         if (r1 == 0) goto L_0x01d6;
     L_0x01ea:
-        r1 = com.zopim.android.sdk.chatlog.aa.C0834a.MEMBER_EVENT;
+        r1 = com.zopim.android.sdk.chatlog.aa.C0833a.MEMBER_EVENT;
         r8.f744h = r1;
         r1 = r12.getResources();
-        r9 = com.zopim.android.sdk.C0785R.string.chat_agent_left_message;
+        r9 = com.zopim.android.sdk.C0784R.string.chat_agent_left_message;
         r1 = r1.getString(r9);
         r9 = new java.lang.Object[r3];
         r0 = r0.getDisplayName();
@@ -449,7 +449,7 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
         if (r1 != 0) goto L_0x021d;
     L_0x0256:
         r1 = r12.getActivity();
-        r9 = com.zopim.android.sdk.C0785R.string.attachment_upload_size_limit_error_message;
+        r9 = com.zopim.android.sdk.C0784R.string.attachment_upload_size_limit_error_message;
         r1 = android.widget.Toast.makeText(r1, r9, r3);
         r1.show();
         r1 = r12.mAttachmentErrorItems;
@@ -463,7 +463,7 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
         if (r1 != 0) goto L_0x021d;
     L_0x0279:
         r1 = r12.getActivity();
-        r9 = com.zopim.android.sdk.C0785R.string.attachment_upload_type_error_message;
+        r9 = com.zopim.android.sdk.C0784R.string.attachment_upload_type_error_message;
         r1 = android.widget.Toast.makeText(r1, r9, r3);
         r1.show();
         r1 = r12.mAttachmentErrorItems;
@@ -483,7 +483,7 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
         goto L_0x0097;
     L_0x02a9:
         r0 = r12.getListAdapter();
-        r0 = (com.zopim.android.sdk.chatlog.C0842i) r0;
+        r0 = (com.zopim.android.sdk.chatlog.C0841i) r0;
         r6 = r4;
     L_0x02b0:
         r1 = r0.getItemCount();
@@ -543,16 +543,16 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
         com.zopim.android.sdk.api.Logger.m564v(r3, r1);
         r0.notifyItemChanged(r6);
     L_0x0321:
-        r1 = r2 instanceof com.zopim.android.sdk.chatlog.C0833a;
+        r1 = r2 instanceof com.zopim.android.sdk.chatlog.C0832a;
         if (r1 == 0) goto L_0x0353;
     L_0x0325:
-        r1 = r4 instanceof com.zopim.android.sdk.chatlog.C0833a;
+        r1 = r4 instanceof com.zopim.android.sdk.chatlog.C0832a;
         if (r1 == 0) goto L_0x0353;
     L_0x0329:
         r1 = r2;
-        r1 = (com.zopim.android.sdk.chatlog.C0833a) r1;
+        r1 = (com.zopim.android.sdk.chatlog.C0832a) r1;
         r3 = r4;
-        r3 = (com.zopim.android.sdk.chatlog.C0833a) r3;
+        r3 = (com.zopim.android.sdk.chatlog.C0832a) r3;
         r8 = r1.equals(r3);
         if (r8 != 0) goto L_0x0353;
     L_0x0335:
@@ -567,15 +567,15 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
         com.zopim.android.sdk.api.Logger.m564v(r3, r1);
         r0.notifyItemChanged(r6);
     L_0x0353:
-        r1 = r2 instanceof com.zopim.android.sdk.chatlog.C0853t;
+        r1 = r2 instanceof com.zopim.android.sdk.chatlog.C0852t;
         if (r1 == 0) goto L_0x0384;
     L_0x0357:
-        r1 = r4 instanceof com.zopim.android.sdk.chatlog.C0853t;
+        r1 = r4 instanceof com.zopim.android.sdk.chatlog.C0852t;
         if (r1 == 0) goto L_0x0384;
     L_0x035b:
-        r2 = (com.zopim.android.sdk.chatlog.C0853t) r2;
+        r2 = (com.zopim.android.sdk.chatlog.C0852t) r2;
         r1 = r4;
-        r1 = (com.zopim.android.sdk.chatlog.C0853t) r1;
+        r1 = (com.zopim.android.sdk.chatlog.C0852t) r1;
         r3 = r2.equals(r1);
         if (r3 != 0) goto L_0x0384;
     L_0x0366:
@@ -660,7 +660,7 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
             Fragment connectionToastFragment = new ConnectionToastFragment();
             Fragment connectionFragment = new ConnectionFragment();
             FragmentTransaction beginTransaction = getChildFragmentManager().beginTransaction();
-            beginTransaction.add(C0785R.id.toast_fragment_container, connectionToastFragment, ConnectionToastFragment.class.getName());
+            beginTransaction.add(C0784R.id.toast_fragment_container, connectionToastFragment, ConnectionToastFragment.class.getName());
             beginTransaction.add(connectionFragment, ConnectionFragment.class.getName());
             beginTransaction.commit();
         }
@@ -669,14 +669,14 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         super.onCreateOptionsMenu(menu, menuInflater);
-        menuInflater.inflate(C0785R.menu.chat_log_menu, menu);
+        menuInflater.inflate(C0784R.menu.chat_log_menu, menu);
     }
 
     public View onCreateView(LayoutInflater layoutInflater, @Nullable ViewGroup viewGroup, @Nullable Bundle bundle) {
-        View inflate = layoutInflater.inflate(C0785R.layout.zopim_chat_log_fragment, viewGroup, false);
-        this.mRecyclerView = (RecyclerView) inflate.findViewById(C0785R.id.recycler_view);
+        View inflate = layoutInflater.inflate(C0784R.layout.zopim_chat_log_fragment, viewGroup, false);
+        this.mRecyclerView = (RecyclerView) inflate.findViewById(C0784R.id.recycler_view);
         this.mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), 1, false));
-        this.mChatLogAdapter = new C0842i(getActivity(), new ArrayList());
+        this.mChatLogAdapter = new C0841i(getActivity(), new ArrayList());
         this.mChatLogAdapter.m690a(this.mChat);
         this.mRecyclerView.setAdapter(this.mChatLogAdapter);
         return inflate;
@@ -701,7 +701,7 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
         if (16908332 == itemId && this.mChat.hasEnded()) {
             close();
             return super.onOptionsItemSelected(menuItem);
-        } else if (C0785R.id.end_chat != itemId) {
+        } else if (C0784R.id.end_chat != itemId) {
             return super.onOptionsItemSelected(menuItem);
         } else {
             if (this.mChat.hasEnded()) {
@@ -795,9 +795,9 @@ public class ZopimChatLogFragment extends Fragment implements ConnectionListener
 
     public void onViewCreated(View view, Bundle bundle) {
         super.onViewCreated(view, bundle);
-        this.mInputField = (EditText) view.findViewById(C0785R.id.input_field);
-        this.mSendButton = (ImageButton) view.findViewById(C0785R.id.send_button);
-        this.mAttachButton = (ImageButton) view.findViewById(C0785R.id.attach_button);
+        this.mInputField = (EditText) view.findViewById(C0784R.id.input_field);
+        this.mSendButton = (ImageButton) view.findViewById(C0784R.id.send_button);
+        this.mAttachButton = (ImageButton) view.findViewById(C0784R.id.attach_button);
         this.mInputField.addTextChangedListener(new ag(this));
         this.mSendButton.setOnClickListener(new ar(this));
         this.mAttachButton.setOnClickListener(new as(this));

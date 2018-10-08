@@ -25,13 +25,13 @@ public class IconRequest {
         }
         try {
             int appIconResourceId = CommonUtils.getAppIconResourceId(context);
-            Fabric.getLogger().mo4289d("Fabric", "App icon resource ID is " + appIconResourceId);
+            Fabric.getLogger().mo4753d("Fabric", "App icon resource ID is " + appIconResourceId);
             Options options = new Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeResource(context.getResources(), appIconResourceId, options);
             return new IconRequest(str, appIconResourceId, options.outWidth, options.outHeight);
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Failed to load icon", e);
+            Fabric.getLogger().mo4756e("Fabric", "Failed to load icon", e);
             return null;
         }
     }

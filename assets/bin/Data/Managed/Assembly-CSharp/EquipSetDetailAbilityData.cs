@@ -79,8 +79,8 @@ public class EquipSetDetailAbilityData : GameSection
 		SetActive((Enum)UI.GRD_DATA_LIST, data != null);
 		if (data != null)
 		{
-			_003CUpdateUI_003Ec__AnonStorey2F4 _003CUpdateUI_003Ec__AnonStorey2F;
-			SetGrid(UI.GRD_DATA_LIST, "EquipSetDetailAbilityDataItem", data.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateUI_003Ec__AnonStorey303 _003CUpdateUI_003Ec__AnonStorey;
+			SetGrid(UI.GRD_DATA_LIST, "EquipSetDetailAbilityDataItem", data.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DATA_LIST);
 			if (component != null && component.get_enabled())
 			{

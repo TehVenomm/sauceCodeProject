@@ -93,8 +93,8 @@ public class InGamePlayerList : GameSection
 		ScrollViewResetPosition((Enum)UI.SCR_LIST);
 		UpdateAnchors();
 		AppMain i = MonoBehaviourSingleton<AppMain>.I;
-		_003COnScreenRotate_003Ec__AnonStorey3A2 _003COnScreenRotate_003Ec__AnonStorey3A;
-		i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003COnScreenRotate_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003COnScreenRotate_003Ec__AnonStorey3B2 _003COnScreenRotate_003Ec__AnonStorey3B;
+		i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003COnScreenRotate_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public unsafe override void UpdateUI()
@@ -136,8 +136,8 @@ public class InGamePlayerList : GameSection
 		List<int> list = new List<int>();
 		list.Add(infoList[index].userId);
 		GameSection.StayEvent();
-		_003COnQuery_FOLLOW_003Ec__AnonStorey3A3 _003COnQuery_FOLLOW_003Ec__AnonStorey3A;
-		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(list, new Action<Error, List<int>>((object)_003COnQuery_FOLLOW_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003COnQuery_FOLLOW_003Ec__AnonStorey3B3 _003COnQuery_FOLLOW_003Ec__AnonStorey3B;
+		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(list, new Action<Error, List<int>>((object)_003COnQuery_FOLLOW_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnQuery_UN_FOLLOW()

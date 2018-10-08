@@ -1,3 +1,6 @@
+using Facebook.Unity;
+using GetSocialSdk.Core;
+using GetSocialSdk.Ui;
 using Network;
 using System;
 using System.Collections;
@@ -13,7 +16,8 @@ public class MutualFollowDialog : GameSection
 		LBL_REMAIN_NUM,
 		LBL_MESSAGE,
 		LBL_LOUNGE_REMAIN_NUM,
-		OBJ_FIRST_MET_LOUNGE
+		OBJ_FIRST_MET_LOUNGE,
+		BTN_INVITE
 	}
 
 	private const string MUTUAL_FOLLOW_BANNER_NAME = "IMG_00000001";
@@ -26,7 +30,8 @@ public class MutualFollowDialog : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019d: Unknown result type (might be due to invalid IL or missing references)
 		followLinkResult = MonoBehaviourSingleton<FriendManager>.I.followLinkResult;
 		SetLabelText((Enum)UI.LBL_FOLLOWER_NUM, followLinkResult.followCnt.ToString() + "/" + followLinkResult.followMaxCnt.ToString());
 		string text = base.sectionData.GetText("REMAIN");
@@ -35,9 +40,19 @@ public class MutualFollowDialog : GameSection
 		string empty = string.Empty;
 		SetLabelText(text: (followLinkResult.remainedLoungeFirstMetNum >= 0) ? (text + " " + followLinkResult.remainedLoungeFirstMetNum.ToString() + " " + text2) : base.sectionData.GetText("NON_CAMPAIN"), label_enum: UI.LBL_LOUNGE_REMAIN_NUM);
 		string message = followLinkResult.message;
-		linkMessage = string.Format(message, followLinkResult.link);
+		linkMessage = followLinkResult.link;
 		linkMessage = linkMessage.Replace("<BR>", "\n");
+		if (!FB.get_IsInitialized())
+		{
+			FB.Init(null, null, (string)null);
+		}
+		if (!GetSocial.IsInitialized)
+		{
+			GetSocial.Init();
+		}
+		GetSocial.RegisterInviteChannelPlugin("facebook", new FacebookSharePlugin());
 		this.StartCoroutine(LoadTopBanner());
+		GetCtrl(UI.BTN_INVITE).get_gameObject().GetComponent<UIButton>().isEnabled = false;
 		base.Initialize();
 	}
 
@@ -95,5 +110,20 @@ public class MutualFollowDialog : GameSection
 	private void OnQuery_DETAIL()
 	{
 		GameSection.SetEventData(followLinkResult.linkUrl);
+	}
+
+	private void OnQuery_INVITE()
+	{
+		InviteContent.Builder builder = InviteContent.CreateBuilder();
+		builder.WithSubject(StringTable.Get(STRING_CATEGORY.GET_SOCIAL, 0u));
+		string text = string.Format(StringTable.Get(STRING_CATEGORY.GET_SOCIAL, 1u), linkMessage);
+		WWW.UnEscapeURL(text);
+		builder.WithText(text);
+		InvitesViewBuilder invitesViewBuilder = GetSocialUi.CreateInvitesView();
+		invitesViewBuilder.SetCustomInviteContent(builder.Build());
+		if (!invitesViewBuilder.Show())
+		{
+			Debug.Log((object)"Fail to show invite builder");
+		}
 	}
 }

@@ -56,8 +56,8 @@ public class FriendFollowerList : FollowListBase
 				component.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 			}
 			CleanItemList();
-			_003CUpdateDynamicList_003Ec__AnonStorey30F _003CUpdateDynamicList_003Ec__AnonStorey30F;
-			SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, currentPageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey30F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateDynamicList_003Ec__AnonStorey31E _003CUpdateDynamicList_003Ec__AnonStorey31E;
+			SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, currentPageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey31E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -86,8 +86,8 @@ public class FriendFollowerList : FollowListBase
 		{
 			int chunkIndex = GetChunkIndex(page);
 			IsConnect = true;
-			_003CSendGetList_003Ec__AnonStorey310 _003CSendGetList_003Ec__AnonStorey;
-			MonoBehaviourSingleton<FriendManager>.I.SendGetFollowerList(chunkIndex, (int)m_currentSortType, new Action<bool, FriendFollowerListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSendGetList_003Ec__AnonStorey31F _003CSendGetList_003Ec__AnonStorey31F;
+			MonoBehaviourSingleton<FriendManager>.I.SendGetFollowerList(chunkIndex, (int)m_currentSortType, new Action<bool, FriendFollowerListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey31F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -192,22 +192,31 @@ public class FriendFollowerList : FollowListBase
 
 	protected override void OnQuery_SORT()
 	{
-		if (!IsConnect)
+		if (m_currentFollowerCount > 0)
 		{
-			UpdateSortType();
-			GameSaveData.instance.SetFollowerListSortType((int)m_currentSortType);
-			if (!HasNullOrEmptyData(nowPage))
+			if (!IsConnect)
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GetUpdateUINotifyFlags());
-			}
-			else
-			{
-				GameSection.StayEvent();
-				SendGetList(nowPage, delegate(bool ret)
+				UpdateSortType();
+				GameSaveData.instance.SetFollowerListSortType((int)m_currentSortType);
+				if (!HasNullOrEmptyData(nowPage))
 				{
-					GameSection.ResumeEvent(ret, null);
-				});
+					MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GetUpdateUINotifyFlags());
+				}
+				else
+				{
+					GameSection.StayEvent();
+					SendGetList(nowPage, delegate(bool ret)
+					{
+						GameSection.ResumeEvent(ret, null);
+					});
+				}
 			}
+		}
+		else
+		{
+			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "You have no Follower Hunters", StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u), null, null, null), delegate
+			{
+			}, false, 0);
 		}
 	}
 }

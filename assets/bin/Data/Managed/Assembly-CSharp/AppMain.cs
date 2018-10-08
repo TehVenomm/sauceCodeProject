@@ -300,7 +300,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		Utility.CreateGameObjectAndComponent("NativeReceiver", base._transform, -1);
 		Utility.CreateGameObjectAndComponent("ShopReceiver", base._transform, -1);
 		Utility.CreateGameObjectAndComponent("ChatManager", base._transform, -1);
-		Utility.CreateGameObjectAndComponent("NativeShare", base._transform, -1);
+		Utility.CreateGameObjectAndComponent("GGNativeShare", base._transform, -1);
 		yield return (object)null;
 		go.AddComponent<CoopApp>();
 		go.AddComponent<BootProcess>();
@@ -1021,11 +1021,11 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	private unsafe IEnumerator CRChangeScene(string scene, string section, Action callback)
 	{
-		if (_003CCRChangeScene_003Ec__Iterator255._003C_003Ef__am_0024cache8 == null)
+		if (_003CCRChangeScene_003Ec__Iterator264._003C_003Ef__am_0024cache8 == null)
 		{
-			_003CCRChangeScene_003Ec__Iterator255._003C_003Ef__am_0024cache8 = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CCRChangeScene_003Ec__Iterator264._003C_003Ef__am_0024cache8 = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		yield return (object)new WaitUntil(_003CCRChangeScene_003Ec__Iterator255._003C_003Ef__am_0024cache8);
+		yield return (object)new WaitUntil(_003CCRChangeScene_003Ec__Iterator264._003C_003Ef__am_0024cache8);
 		if (callback != null)
 		{
 			callback.Invoke();

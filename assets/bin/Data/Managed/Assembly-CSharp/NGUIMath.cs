@@ -10,8 +10,8 @@ public static class NGUIMath
 		return from * (1f - factor) + to * factor;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static int ClampIndex(int val, int max)
 	{
 		return (val >= 0) ? ((val >= max) ? (max - 1) : val) : 0;
@@ -36,8 +36,8 @@ public static class NGUIMath
 		return val;
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static float WrapAngle(float angle)
 	{
 		while (angle > 180f)
@@ -58,8 +58,8 @@ public static class NGUIMath
 		return val - (float)Mathf.FloorToInt(val);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static int HexToDecimal(char ch)
 	{
 		switch (ch)
@@ -122,16 +122,16 @@ public static class NGUIMath
 		return (char)(65 + num - 10);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static string DecimalToHex8(int num)
 	{
 		num &= 0xFF;
 		return num.ToString("X2");
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static string DecimalToHex24(int num)
 	{
 		num &= 0xFFFFFF;
@@ -156,8 +156,8 @@ public static class NGUIMath
 		return num | Mathf.RoundToInt(c.a * 255f);
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static Color IntToColor(int val)
 	{
 		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
@@ -189,8 +189,8 @@ public static class NGUIMath
 		return text;
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static Color HexToColor(uint val)
 	{
 		//IL_0001: Unknown result type (might be due to invalid IL or missing references)

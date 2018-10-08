@@ -6,16 +6,16 @@ import android.view.View.OnTouchListener;
 
 final class ar implements OnTouchListener {
     /* renamed from: a */
-    final /* synthetic */ PurchaseActivity f1071a;
+    final /* synthetic */ PurchaseActivity f3459a;
 
     ar(PurchaseActivity purchaseActivity) {
-        this.f1071a = purchaseActivity;
+        this.f3459a = purchaseActivity;
     }
 
     public final boolean onTouch(View view, MotionEvent motionEvent) {
-        if (!((this.f1071a.f1014J && this.f1071a.f1025d) || this.f1071a.f1030i == null)) {
-            this.f1071a.f1016L = true;
-            this.f1071a.f1043v.postDelayed(this.f1071a.f1045x, (long) this.f1071a.f1019O);
+        if (!((this.f3459a.f3402J && this.f3459a.f3413d) || this.f3459a.f3418i == null)) {
+            this.f3459a.f3404L = true;
+            this.f3459a.f3431v.postDelayed(this.f3459a.f3433x, (long) this.f3459a.f3407O);
         }
         return false;
     }

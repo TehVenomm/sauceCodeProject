@@ -25,7 +25,7 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.google.android.gms.drive.DriveFile;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import com.zopim.android.sdk.anim.AnimatorPack;
 import com.zopim.android.sdk.api.Logger;
 import com.zopim.android.sdk.api.ZopimChat;
@@ -47,10 +47,10 @@ public class ChatWidgetService extends Service {
     private static final int DEFAULT_WIDGET_WIDTH_DP = 50;
     private static final String LOG_TAG = ChatWidgetService.class.getSimpleName();
     private static final int WIDGET_INIT_DELAY = 150;
-    AgentsObserver mAgentsObserver = new C0905c(this);
+    AgentsObserver mAgentsObserver = new C0904c(this);
     private Handler mAnimationHandler = new Handler(Looper.getMainLooper());
     private final IBinder mBinder = new LocalBinder();
-    ChatLogObserver mChannelLogObserver = new C0908f(this);
+    ChatLogObserver mChannelLogObserver = new C0907f(this);
     private AnimatorSet mCrossfadeAnimator;
     private int mHorizontalMargin;
     private int mInitialAgentMessageCount;
@@ -62,7 +62,7 @@ public class ChatWidgetService extends Service {
     private int mUnreadCount;
     private TextView mUnreadNotificationView;
     private int mVerticalMargin;
-    private C0901a mWidgetAnimatorTask;
+    private C0900a mWidgetAnimatorTask;
     private ImageView mWidgetBackground;
     private WidgetView mWidgetView;
     private WindowManager mWindowManager;
@@ -74,7 +74,7 @@ public class ChatWidgetService extends Service {
     }
 
     /* renamed from: com.zopim.android.sdk.widget.ChatWidgetService$a */
-    private class C0901a extends TimerTask {
+    private class C0900a extends TimerTask {
         /* renamed from: a */
         int f917a;
         /* renamed from: b */
@@ -86,7 +86,7 @@ public class ChatWidgetService extends Service {
         /* renamed from: e */
         final /* synthetic */ ChatWidgetService f921e;
 
-        public C0901a(ChatWidgetService chatWidgetService, int i, int i2) {
+        public C0900a(ChatWidgetService chatWidgetService, int i, int i2) {
             int i3 = 0;
             this.f921e = chatWidgetService;
             this.f917a = i < 0 ? 0 : i;
@@ -147,12 +147,12 @@ public class ChatWidgetService extends Service {
         }
 
         public void run() {
-            this.f921e.mAnimationHandler.post(new C0911i(this));
+            this.f921e.mAnimationHandler.post(new C0910i(this));
         }
     }
 
     /* renamed from: com.zopim.android.sdk.widget.ChatWidgetService$b */
-    private class C0902b implements OnTouchListener {
+    private class C0901b implements OnTouchListener {
         /* renamed from: a */
         long f922a;
         /* renamed from: b */
@@ -168,7 +168,7 @@ public class ChatWidgetService extends Service {
         /* renamed from: g */
         private float f928g;
 
-        private C0902b(ChatWidgetService chatWidgetService) {
+        private C0901b(ChatWidgetService chatWidgetService) {
             this.f923b = chatWidgetService;
             this.f924c = ViewConfiguration.get(this.f923b.getApplicationContext()).getScaledTouchSlop();
         }
@@ -213,7 +213,7 @@ public class ChatWidgetService extends Service {
                             return false;
                         }
                     }
-                    this.f923b.mWidgetAnimatorTask = new C0901a(this.f923b, this.f923b.mHorizontalMargin, this.f923b.mVerticalMargin);
+                    this.f923b.mWidgetAnimatorTask = new C0900a(this.f923b, this.f923b.mHorizontalMargin, this.f923b.mVerticalMargin);
                     this.f923b.mTimer = new Timer();
                     this.f923b.mTimer.schedule(this.f923b.mWidgetAnimatorTask, 0, 30);
                     return true;
@@ -259,7 +259,7 @@ public class ChatWidgetService extends Service {
         int i2 = getApplicationContext().getResources().getDisplayMetrics().heightPixels;
         this.mRootLayoutParams.x = (int) ((this.mOffsetX / 100.0d) * ((double) i));
         this.mRootLayoutParams.y = (int) ((this.mOffsetY / 100.0d) * ((double) i2));
-        this.mWidgetAnimatorTask = new C0901a(this, this.mHorizontalMargin, this.mVerticalMargin);
+        this.mWidgetAnimatorTask = new C0900a(this, this.mHorizontalMargin, this.mVerticalMargin);
         this.mTimer = new Timer();
         this.mTimer.schedule(this.mWidgetAnimatorTask, 0, 30);
     }
@@ -270,42 +270,42 @@ public class ChatWidgetService extends Service {
             int i = getApplicationContext().getResources().getDisplayMetrics().heightPixels;
             int i2 = getApplicationContext().getResources().getDisplayMetrics().widthPixels;
             try {
-                this.mHorizontalMargin = getResources().getDimensionPixelSize(C0785R.dimen.widget_horizontal_margin);
-                this.mVerticalMargin = getResources().getDimensionPixelSize(C0785R.dimen.widget_vertical_margin);
+                this.mHorizontalMargin = getResources().getDimensionPixelSize(C0784R.dimen.widget_horizontal_margin);
+                this.mVerticalMargin = getResources().getDimensionPixelSize(C0784R.dimen.widget_vertical_margin);
             } catch (Throwable e) {
                 Log.w(LOG_TAG, "Could not find margin resources. Will use zero margin", e);
                 this.mHorizontalMargin = 0;
                 this.mVerticalMargin = 0;
             }
             this.mWindowManager = (WindowManager) getSystemService("window");
-            this.mWidgetView = (WidgetView) LayoutInflater.from(this).inflate(C0785R.layout.chat_widget, null);
-            this.mTypingIndicatorView = (TypingIndicatorView) this.mWidgetView.findViewById(C0785R.id.typing_indicator);
-            this.mUnreadNotificationView = (TextView) this.mWidgetView.findViewById(C0785R.id.unread_notification);
-            this.mWidgetBackground = (ImageView) this.mWidgetView.findViewById(C0785R.id.background);
+            this.mWidgetView = (WidgetView) LayoutInflater.from(this).inflate(C0784R.layout.chat_widget, null);
+            this.mTypingIndicatorView = (TypingIndicatorView) this.mWidgetView.findViewById(C0784R.id.typing_indicator);
+            this.mUnreadNotificationView = (TextView) this.mWidgetView.findViewById(C0784R.id.unread_notification);
+            this.mWidgetBackground = (ImageView) this.mWidgetView.findViewById(C0784R.id.background);
             if (VERSION.SDK_INT >= 11) {
                 Animator crossfade = AnimatorPack.crossfade(this.mWidgetBackground, this.mWidgetBackground);
                 Animator crossfade2 = AnimatorPack.crossfade(this.mTypingIndicatorView, this.mUnreadNotificationView);
                 this.mCrossfadeAnimator = new AnimatorSet();
                 this.mCrossfadeAnimator.play(crossfade).with(crossfade2);
-                this.mCrossfadeAnimator.addListener(new C0903a(this));
-                long integer = (long) getResources().getInteger(C0785R.integer.crossfade_duration);
+                this.mCrossfadeAnimator.addListener(new C0902a(this));
+                long integer = (long) getResources().getInteger(C0784R.integer.crossfade_duration);
                 if (integer > 0) {
                     this.mCrossfadeAnimator.setDuration(integer);
                 }
             }
-            this.mWidgetView.setOnTouchListener(new C0902b());
+            this.mWidgetView.setOnTouchListener(new C0901b());
             int convertDpToPixel = Dimensions.convertDpToPixel(this, 50.0f);
             int convertDpToPixel2 = Dimensions.convertDpToPixel(this, 50.0f);
             try {
-                convertDpToPixel = getResources().getDimensionPixelSize(C0785R.dimen.widget_width);
-                convertDpToPixel2 = getResources().getDimensionPixelSize(C0785R.dimen.widget_height);
+                convertDpToPixel = getResources().getDimensionPixelSize(C0784R.dimen.widget_width);
+                convertDpToPixel2 = getResources().getDimensionPixelSize(C0784R.dimen.widget_height);
             } catch (Throwable e2) {
                 Log.w(LOG_TAG, "Could not find widget size resources. Will use default size.", e2);
             }
             this.mRootLayoutParams = new LayoutParams(convertDpToPixel, convertDpToPixel2, 2002, 520, -3);
             this.mRootLayoutParams.gravity = 51;
             this.mWindowManager.addView(this.mWidgetView, this.mRootLayoutParams);
-            this.mWidgetView.postDelayed(new C0904b(this, i2, i), 150);
+            this.mWidgetView.postDelayed(new C0903b(this, i2, i), 150);
             return;
         }
         Log.i(LOG_TAG, "Not presenting chat widget. Missing permission SYSTEM_ALERT_WINDOW");

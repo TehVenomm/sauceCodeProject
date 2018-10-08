@@ -14,6 +14,6 @@
             </LinearLayout>
             <ImageView android:layout_gravity="center_vertical" android:id="@+id/net_gogame_gowrap_close_button" android:padding="@dimen/net_gogame_gowrap_navbar_button_padding" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/net_gogame_gowrap_icon_close" android:contentDescription="@string/net_gogame_gowrap_close_button_content_description"/>
         </LinearLayout>
-        <FrameLayout android:id="@+id/net_gogame_gowrap_main_fragment_container" android:background="#2f6476" android:layout_width="match_parent" android:layout_height="match_parent"/>
+        <FrameLayout android:id="@+id/net_gogame_gowrap_main_fragment_container" android:background="#ff2f6476" android:layout_width="match_parent" android:layout_height="match_parent"/>
     </LinearLayout>
 </FrameLayout>

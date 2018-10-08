@@ -41,7 +41,7 @@ public class FieldUtils {
             Field field;
             try {
                 field = cls22.getField(str);
-                Validate.isTrue(declaredField == null, "Reference to field %s is ambiguous relative to %s; a matching field exists on two or more implemented interfaces.", str, cls);
+                Validate.isTrue(declaredField == null, "Reference to field %s is ambiguous relative to %s; a matching field exists on two or more implemented interfaces.", new Object[]{str, cls});
             } catch (NoSuchFieldException e2) {
                 field = declaredField;
             }
@@ -122,7 +122,7 @@ public class FieldUtils {
             z2 = false;
         }
         Validate.isTrue(z2, "The field must not be null", new Object[0]);
-        Validate.isTrue(Modifier.isStatic(field.getModifiers()), "The field '%s' is not static", field.getName());
+        Validate.isTrue(Modifier.isStatic(field.getModifiers()), "The field '%s' is not static", new Object[]{field.getName()});
         return readField(field, null, z);
     }
 
@@ -138,7 +138,7 @@ public class FieldUtils {
         } else {
             z2 = false;
         }
-        Validate.isTrue(z2, "Cannot locate field '%s' on %s", str, cls);
+        Validate.isTrue(z2, "Cannot locate field '%s' on %s", new Object[]{str, cls});
         return readStaticField(field, false);
     }
 
@@ -154,7 +154,7 @@ public class FieldUtils {
         } else {
             z2 = false;
         }
-        Validate.isTrue(z2, "Cannot locate declared field %s.%s", cls.getName(), str);
+        Validate.isTrue(z2, "Cannot locate declared field %s.%s", new Object[]{cls.getName(), str});
         return readStaticField(declaredField, false);
     }
 
@@ -185,7 +185,7 @@ public class FieldUtils {
         } else {
             z2 = false;
         }
-        Validate.isTrue(z2, "Cannot locate field %s on %s", str, r3);
+        Validate.isTrue(z2, "Cannot locate field %s on %s", new Object[]{str, r3});
         return readField(field, obj, false);
     }
 
@@ -202,7 +202,7 @@ public class FieldUtils {
         } else {
             z2 = false;
         }
-        Validate.isTrue(z2, "Cannot locate declared field %s.%s", r3, str);
+        Validate.isTrue(z2, "Cannot locate declared field %s.%s", new Object[]{r3, str});
         return readField(declaredField, obj, false);
     }
 
@@ -218,7 +218,7 @@ public class FieldUtils {
             z2 = false;
         }
         Validate.isTrue(z2, "The field must not be null", new Object[0]);
-        Validate.isTrue(Modifier.isStatic(field.getModifiers()), "The field %s.%s is not static", field.getDeclaringClass().getName(), field.getName());
+        Validate.isTrue(Modifier.isStatic(field.getModifiers()), "The field %s.%s is not static", new Object[]{field.getDeclaringClass().getName(), field.getName()});
         writeField(field, null, obj, z);
     }
 
@@ -234,7 +234,7 @@ public class FieldUtils {
         } else {
             z2 = false;
         }
-        Validate.isTrue(z2, "Cannot locate field %s on %s", str, cls);
+        Validate.isTrue(z2, "Cannot locate field %s on %s", new Object[]{str, cls});
         writeStaticField(field, obj, false);
     }
 
@@ -250,7 +250,7 @@ public class FieldUtils {
         } else {
             z2 = false;
         }
-        Validate.isTrue(z2, "Cannot locate declared field %s.%s", cls.getName(), str);
+        Validate.isTrue(z2, "Cannot locate declared field %s.%s", new Object[]{cls.getName(), str});
         writeField(declaredField, null, obj, false);
     }
 
@@ -312,7 +312,7 @@ public class FieldUtils {
         } else {
             z2 = false;
         }
-        Validate.isTrue(z2, "Cannot locate declared field %s.%s", r3.getName(), str);
+        Validate.isTrue(z2, "Cannot locate declared field %s.%s", new Object[]{r3.getName(), str});
         writeField(field, obj, obj2, false);
     }
 
@@ -329,7 +329,7 @@ public class FieldUtils {
         } else {
             z2 = false;
         }
-        Validate.isTrue(z2, "Cannot locate declared field %s.%s", r3.getName(), str);
+        Validate.isTrue(z2, "Cannot locate declared field %s.%s", new Object[]{r3.getName(), str});
         writeField(declaredField, obj, obj2, false);
     }
 }

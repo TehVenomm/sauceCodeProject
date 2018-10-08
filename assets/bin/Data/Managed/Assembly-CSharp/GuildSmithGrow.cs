@@ -307,8 +307,8 @@ public class GuildSmithGrow : EquipMaterialBase
 				GameSection.SetEventData(result_data);
 				isNotifySelfUpdate = true;
 				GameSection.StayEvent();
-				_003CSend_003Ec__AnonStorey34D _003CSend_003Ec__AnonStorey34D;
-				MonoBehaviourSingleton<SmithManager>.I.SendGrowEquipItem(selectEquipData.uniqueID, aimLv, new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey34D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CSend_003Ec__AnonStorey35C _003CSend_003Ec__AnonStorey35C;
+				MonoBehaviourSingleton<SmithManager>.I.SendGrowEquipItem(selectEquipData.uniqueID, aimLv, new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey35C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}

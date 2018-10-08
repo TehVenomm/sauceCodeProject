@@ -8,11 +8,11 @@ import io.fabric.sdk.android.services.cache.ValueLoader;
 public class InstallerPackageNameProvider {
     private static final String NO_INSTALLER_PACKAGE_NAME = "";
     private final MemoryValueCache<String> installerPackageNameCache = new MemoryValueCache();
-    private final ValueLoader<String> installerPackageNameLoader = new C09221();
+    private final ValueLoader<String> installerPackageNameLoader = new C12381();
 
     /* renamed from: io.fabric.sdk.android.services.common.InstallerPackageNameProvider$1 */
-    class C09221 implements ValueLoader<String> {
-        C09221() {
+    class C12381 implements ValueLoader<String> {
+        C12381() {
         }
 
         public String load(Context context) throws Exception {
@@ -26,7 +26,7 @@ public class InstallerPackageNameProvider {
             String str = (String) this.installerPackageNameCache.get(context, this.installerPackageNameLoader);
             return "".equals(str) ? null : str;
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Failed to determine installer package name", e);
+            Fabric.getLogger().mo4756e("Fabric", "Failed to determine installer package name", e);
             return null;
         }
     }

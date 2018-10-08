@@ -1,8 +1,8 @@
 package com.amazon.device.iap.internal;
 
 import android.util.Log;
-import com.amazon.device.iap.internal.p000a.C0192d;
-import com.amazon.device.iap.internal.p001b.C0227g;
+import com.amazon.device.iap.internal.p004a.C0192d;
+import com.amazon.device.iap.internal.p005b.C0227g;
 
 /* renamed from: com.amazon.device.iap.internal.e */
 public final class C0237e {

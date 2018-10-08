@@ -827,7 +827,7 @@ public final class ItemScopeEntity extends FastSafeParcelableJsonResponse implem
                 return this.zzaAj;
             case MotionEventCompat.AXIS_GENERIC_10 /*41*/:
                 return this.zzaAk;
-            case MotionEventCompat.AXIS_GENERIC_11 /*42*/:
+            case 42:
                 return this.zzaAl;
             case MotionEventCompat.AXIS_GENERIC_12 /*43*/:
                 return this.zzaAm;

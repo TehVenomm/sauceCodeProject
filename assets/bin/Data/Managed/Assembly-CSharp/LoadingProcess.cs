@@ -128,7 +128,6 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 			_003CStart_003Ec__Iterator1A._003C_003Ef__am_0024cache15 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 		i2.LoadAllTable(_003CStart_003Ec__Iterator1A._003C_003Ef__am_0024cache15, false);
-		MonoBehaviourSingleton<GameSceneManager>.I.Initialize();
 		while (!MonoBehaviourSingleton<GameSceneManager>.I.isInitialized)
 		{
 			yield return (object)null;
@@ -136,7 +135,7 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 		MonoBehaviourSingleton<GlobalSettingsManager>.I.InitAvatarData();
 		if (is_tutorial)
 		{
-			MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapPortalID(10000100u, 0f, 0f, 180f);
+			MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapPortalID(10000101u, 0f, 0f, 180f);
 			MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible = false;
 		}
 		while ((MonoBehaviourSingleton<SoundManager>.IsValid() && MonoBehaviourSingleton<SoundManager>.I.IsLoadingAudioClip()) || !isLinkResourceLoaded)
@@ -148,7 +147,7 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 			bool wait = true;
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
 			{
-				((_003CStart_003Ec__Iterator1A)/*Error near IL_0727: stateMachine*/)._003Cwait_003E__14 = false;
+				((_003CStart_003Ec__Iterator1A)/*Error near IL_071d: stateMachine*/)._003Cwait_003E__14 = false;
 			}, false);
 			while (wait)
 			{

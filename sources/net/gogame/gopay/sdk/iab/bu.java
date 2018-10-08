@@ -2,15 +2,15 @@ package net.gogame.gopay.sdk.iab;
 
 public final class bu {
     /* renamed from: a */
-    final float f1123a;
+    final float f3511a;
     /* renamed from: b */
-    final String f1124b;
+    final String f3512b;
     /* renamed from: c */
-    final boolean f1125c;
+    final boolean f3513c;
 
     public bu(float f, String str, boolean z) {
-        this.f1123a = f;
-        this.f1124b = str;
-        this.f1125c = z;
+        this.f3511a = f;
+        this.f3512b = str;
+        this.f3513c = z;
     }
 }

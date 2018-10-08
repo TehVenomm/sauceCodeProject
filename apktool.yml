@@ -1,21 +1,15 @@
 !!brut.androlib.meta.MetaInfo
-apkFileName: DragonProject_v1.3.5_apkpure.com.apk
+apkFileName: DragonProject_v1.3.6_apkpure.com.apk
 compressionType: false
 doNotCompress:
 - arsc
-- MF
-- assets/META-INF/maven/com.squareup.picasso/picasso/pom.properties
-- assets/META-INF/maven/org.apache.commons/commons-lang3/pom.properties
-- assets/META-INF/services/com.fasterxml.jackson.core.JsonFactory
-- assets/META-INF/services/com.fasterxml.jackson.core.ObjectCodec
-- resource
 - png
-- res/drawable-hdpi-v4/com_facebook_tooltip_black_background.9.png
-- res/drawable-hdpi-v4/com_facebook_tooltip_blue_background.9.png
 - res/drawable-hdpi-v4/common_google_signin_btn_icon_dark_normal_background.9.png
 - res/drawable-hdpi-v4/common_google_signin_btn_icon_light_normal_background.9.png
 - res/drawable-hdpi-v4/common_google_signin_btn_text_dark_normal_background.9.png
 - res/drawable-hdpi-v4/common_google_signin_btn_text_light_normal_background.9.png
+- res/drawable-hdpi-v4/com_facebook_tooltip_black_background.9.png
+- res/drawable-hdpi-v4/com_facebook_tooltip_blue_background.9.png
 - res/drawable-hdpi-v4/net_gogame_gowrap_button_background_facebook.9.png
 - res/drawable-hdpi-v4/net_gogame_gowrap_button_background_forum.9.png
 - res/drawable-hdpi-v4/net_gogame_gowrap_button_background_instagram.9.png
@@ -49,18 +43,18 @@ doNotCompress:
 - res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_summon_top.9.png
 - res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_tips_bottom.9.png
 - res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_tips_top.9.png
-- res/drawable-mdpi-v4/com_facebook_tooltip_black_background.9.png
-- res/drawable-mdpi-v4/com_facebook_tooltip_blue_background.9.png
 - res/drawable-mdpi-v4/common_google_signin_btn_icon_dark_normal_background.9.png
 - res/drawable-mdpi-v4/common_google_signin_btn_icon_light_normal_background.9.png
 - res/drawable-mdpi-v4/common_google_signin_btn_text_dark_normal_background.9.png
 - res/drawable-mdpi-v4/common_google_signin_btn_text_light_normal_background.9.png
-- res/drawable-xhdpi-v4/com_facebook_tooltip_black_background.9.png
-- res/drawable-xhdpi-v4/com_facebook_tooltip_blue_background.9.png
+- res/drawable-mdpi-v4/com_facebook_tooltip_black_background.9.png
+- res/drawable-mdpi-v4/com_facebook_tooltip_blue_background.9.png
 - res/drawable-xhdpi-v4/common_google_signin_btn_icon_dark_normal_background.9.png
 - res/drawable-xhdpi-v4/common_google_signin_btn_icon_light_normal_background.9.png
 - res/drawable-xhdpi-v4/common_google_signin_btn_text_dark_normal_background.9.png
 - res/drawable-xhdpi-v4/common_google_signin_btn_text_light_normal_background.9.png
+- res/drawable-xhdpi-v4/com_facebook_tooltip_black_background.9.png
+- res/drawable-xhdpi-v4/com_facebook_tooltip_blue_background.9.png
 - res/drawable-xhdpi-v4/net_gogame_gowrap_dialog_background_bottom.9.png
 - res/drawable-xhdpi-v4/net_gogame_gowrap_dialog_background_top.9.png
 - res/drawable-xhdpi-v4/net_gogame_gowrap_dpro_equip_item_frame.9.png
@@ -80,13 +74,49 @@ doNotCompress:
 - res/drawable-xxhdpi-v4/net_gogame_gowrap_panel_background_top.9.png
 - res/drawable-xxhdpi-v4/net_gogame_gowrap_panel_foreground.9.png
 - res/drawable-xxhdpi-v4/net_gogame_gowrap_search_background.9.png
+- resource
+- assets/getsocial-ui-internal/activity-action-button.bg-image-normal.png
+- assets/getsocial-ui-internal/activity-action-button.bg-image-pressed.png
+- assets/getsocial-ui-internal/activity-image.default-image.png
+- assets/getsocial-ui-internal/activity-image.video-play-image.png
+- assets/getsocial-ui-internal/activity-not-found.bg-image.png
+- assets/getsocial-ui-internal/avatar.default-image.png
+- assets/getsocial-ui-internal/back-button.bg-image-normal.png
+- assets/getsocial-ui-internal/back-button.bg-image-pressed.png
+- assets/getsocial-ui-internal/badge.bg-image.png
+- assets/getsocial-ui-internal/close-button.bg-image-normal.png
+- assets/getsocial-ui-internal/close-button.bg-image-pressed.png
+- assets/getsocial-ui-internal/invite-friends-button.bg-image-normal.png
+- assets/getsocial-ui-internal/invite-friends-button.bg-image-pressed.png
+- assets/getsocial-ui-internal/invite-provider-placeholder.bg-image.png
+- assets/getsocial-ui-internal/like-button.bg-image-normal.png
+- assets/getsocial-ui-internal/like-button.bg-image-selected.png
+- assets/getsocial-ui-internal/load-more-button.bg-image-normal.png
+- assets/getsocial-ui-internal/load-more-button.bg-image-pressed.png
+- assets/getsocial-ui-internal/loading-indicator.bg-image.png
+- assets/getsocial-ui-internal/more-button.bg-image-normal.png
+- assets/getsocial-ui-internal/more-button.bg-image-pressed.png
+- assets/getsocial-ui-internal/no-activity-placeholder.bg-image.png
+- assets/getsocial-ui-internal/no-friends-placeholder.bg-image.png
+- assets/getsocial-ui-internal/no-network-placeholder.bg-image.png
+- assets/getsocial-ui-internal/no-search-results-placeholder.bg-image.png
+- assets/getsocial-ui-internal/notification-icon-comment.bg-image.png
+- assets/getsocial-ui-internal/notification-icon-like.bg-image.png
+- assets/getsocial-ui-internal/post-button.bg-image-normal.png
+- assets/getsocial-ui-internal/post-button.bg-image-pressed.png
+- assets/getsocial-ui-internal/verified-account-badge.bg-image.png
+- MF
+- assets/META-INF/maven/com.squareup.picasso/picasso/pom.properties
+- assets/META-INF/maven/org.apache.commons/commons-lang3/pom.properties
+- assets/META-INF/services/com.fasterxml.jackson.core.JsonFactory
+- assets/META-INF/services/com.fasterxml.jackson.core.ObjectCodec
 isFrameworkApk: false
 packageInfo:
   forcedPackageId: '127'
   renameManifestPackage: null
 sdkInfo:
   minSdkVersion: '16'
-  targetSdkVersion: '25'
+  targetSdkVersion: '27'
 sharedLibrary: false
 sparseResources: false
 unknownFiles: {}
@@ -96,5 +126,5 @@ usesFramework:
   tag: null
 version: 2.3.3
 versionInfo:
-  versionCode: '2018073002'
-  versionName: 1.3.5
+  versionCode: '2018082302'
+  versionName: 1.3.6

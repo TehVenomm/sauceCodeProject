@@ -111,7 +111,7 @@ public final class zzcfs extends zzegi<zzcfs> {
                 case MotionEventCompat.AXIS_GENERIC_3 /*34*/:
                     this.zzixv = zzegf.readString();
                     continue;
-                case MotionEventCompat.AXIS_GENERIC_11 /*42*/:
+                case 42:
                     this.zzixw = zzegf.readString();
                     continue;
                 default:

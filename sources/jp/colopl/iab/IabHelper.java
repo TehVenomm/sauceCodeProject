@@ -266,13 +266,13 @@ public class IabHelper {
     }
 
     public boolean handleActivityResult(int i, int i2, Intent intent) {
-        IabResult iabResult;
         JSONException e;
         if (i != this.mRequestCode) {
             return false;
         }
         checkSetupDone("handleActivityResult");
         flagEndAsync();
+        IabResult iabResult;
         if (intent == null) {
             logError("Null data in IAB activity result.");
             iabResult = new IabResult(-1002, "Null data in IAB result");
@@ -366,9 +366,9 @@ public class IabHelper {
     }
 
     public void launchPurchaseFlow(Activity activity, String str, String str2, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str3, String str4) {
-        IabResult iabResult;
         checkSetupDone("launchPurchaseFlow");
         flagStartAsync("launchPurchaseFlow");
+        IabResult iabResult;
         if (!str2.equals("subs") || this.mSubscriptionsSupported) {
             try {
                 Bundle buyIntentExtraParams;
@@ -525,7 +525,7 @@ public class IabHelper {
     int queryPurchases(jp.colopl.iab.Inventory r13, java.lang.String r14) throws org.json.JSONException, android.os.RemoteException {
         /*
         r12 = this;
-        r5 = 0;
+        r4 = 0;
         r0 = new java.lang.StringBuilder;
         r0.<init>();
         r1 = "Querying owned items, item type: ";
@@ -551,7 +551,7 @@ public class IabHelper {
         return r0;
     L_0x003b:
         r1 = r0;
-        r0 = r3;
+        r0 = r5;
     L_0x003d:
         r2 = new java.lang.StringBuilder;
         r2.<init>();
@@ -562,9 +562,9 @@ public class IabHelper {
         r12.logDebug(r2);
         r2 = r12.mService;
         r3 = 3;
-        r4 = r12.mContext;
-        r4 = r4.getPackageName();
-        r6 = r2.getPurchases(r3, r4, r14, r1);
+        r5 = r12.mContext;
+        r5 = r5.getPackageName();
+        r6 = r2.getPurchases(r3, r5, r14, r1);
         r1 = r12.getResponseCodeFromBundle(r6);
         r2 = new java.lang.StringBuilder;
         r2.<init>();
@@ -610,17 +610,17 @@ public class IabHelper {
         r8 = r6.getStringArrayList(r1);
         r1 = "INAPP_DATA_SIGNATURE_LIST";
         r9 = r6.getStringArrayList(r1);
-        r3 = r0;
-        r4 = r5;
+        r3 = r4;
+        r5 = r0;
     L_0x00d1:
         r0 = r8.size();
-        if (r4 >= r0) goto L_0x016d;
+        if (r3 >= r0) goto L_0x016d;
     L_0x00d7:
-        r0 = r8.get(r4);
+        r0 = r8.get(r3);
         r0 = (java.lang.String) r0;
-        r1 = r9.get(r4);
+        r1 = r9.get(r3);
         r1 = (java.lang.String) r1;
-        r2 = r7.get(r4);
+        r2 = r7.get(r3);
         r2 = (java.lang.String) r2;
         r10 = r12.mSignatureBase64;
         r10 = jp.colopl.iab.Security.verifyPurchase(r10, r0, r1);
@@ -650,19 +650,19 @@ public class IabHelper {
         r12.logDebug(r0);
     L_0x0131:
         r13.addPurchase(r2);
-        r0 = r3;
+        r1 = r5;
     L_0x0135:
-        r1 = r4 + 1;
+        r0 = r3 + 1;
         r3 = r0;
-        r4 = r1;
+        r5 = r1;
         goto L_0x00d1;
     L_0x013a:
         r2 = "Purchase signature verification **FAILED**. Not adding item.";
         r12.logWarn(r2);
         r2 = new java.lang.StringBuilder;
         r2.<init>();
-        r3 = "   Purchase data: ";
-        r2 = r2.append(r3);
+        r5 = "   Purchase data: ";
+        r2 = r2.append(r5);
         r0 = r2.append(r0);
         r0 = r0.toString();
         r12.logDebug(r0);
@@ -673,7 +673,7 @@ public class IabHelper {
         r0 = r0.append(r1);
         r0 = r0.toString();
         r12.logDebug(r0);
-        r0 = 1;
+        r1 = 1;
         goto L_0x0135;
     L_0x016d:
         r0 = "INAPP_CONTINUATION_TOKEN";
@@ -688,16 +688,16 @@ public class IabHelper {
         r1 = android.text.TextUtils.isEmpty(r0);
         if (r1 == 0) goto L_0x003b;
     L_0x018f:
-        if (r3 == 0) goto L_0x0195;
+        if (r5 == 0) goto L_0x0195;
     L_0x0191:
         r0 = -1003; // 0xfffffffffffffc15 float:NaN double:NaN;
         goto L_0x003a;
     L_0x0195:
-        r0 = r5;
+        r0 = r4;
         goto L_0x003a;
     L_0x0198:
         r1 = r0;
-        r0 = r5;
+        r0 = r4;
         goto L_0x003d;
         */
         throw new UnsupportedOperationException("Method not decompiled: jp.colopl.iab.IabHelper.queryPurchases(jp.colopl.iab.Inventory, java.lang.String):int");

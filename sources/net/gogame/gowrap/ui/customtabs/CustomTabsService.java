@@ -24,12 +24,12 @@ public abstract class CustomTabsService extends Service {
     public static final int RESULT_FAILURE_MESSAGING_ERROR = -3;
     public static final int RESULT_FAILURE_REMOTE_ERROR = -2;
     public static final int RESULT_SUCCESS = 0;
-    private Stub mBinder = new C11471();
+    private Stub mBinder = new C14631();
     private final Map<IBinder, DeathRecipient> mDeathRecipientMap = new HashMap();
 
     /* renamed from: net.gogame.gowrap.ui.customtabs.CustomTabsService$1 */
-    class C11471 extends Stub {
-        C11471() {
+    class C14631 extends Stub {
+        C14631() {
         }
 
         public boolean warmup(long j) {
@@ -40,14 +40,14 @@ public abstract class CustomTabsService extends Service {
             boolean z = false;
             final CustomTabsSessionToken customTabsSessionToken = new CustomTabsSessionToken(iCustomTabsCallback);
             try {
-                DeathRecipient c11461 = new DeathRecipient() {
+                DeathRecipient c14621 = new DeathRecipient() {
                     public void binderDied() {
                         CustomTabsService.this.cleanUpSession(customTabsSessionToken);
                     }
                 };
                 synchronized (CustomTabsService.this.mDeathRecipientMap) {
-                    iCustomTabsCallback.asBinder().linkToDeath(c11461, 0);
-                    CustomTabsService.this.mDeathRecipientMap.put(iCustomTabsCallback.asBinder(), c11461);
+                    iCustomTabsCallback.asBinder().linkToDeath(c14621, 0);
+                    CustomTabsService.this.mDeathRecipientMap.put(iCustomTabsCallback.asBinder(), c14621);
                 }
                 z = CustomTabsService.this.newSession(customTabsSessionToken);
             } catch (RemoteException e) {

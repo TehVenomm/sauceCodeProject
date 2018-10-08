@@ -115,7 +115,7 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 		}
 		else if (ResourceManager.isDownloadAssets)
 		{
-			load_queue.Load(RESOURCE_CATEGORY.STAGE_SCENE, load_scene_name, true);
+			load_queue.Load(RESOURCE_CATEGORY.STAGE_SCENE, load_scene_name, null, true);
 			yield return (object)load_queue.Wait();
 		}
 		AsyncOperation ao = SceneManager.LoadSceneAsync(load_scene_name);
@@ -148,6 +148,15 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 			if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
 			{
 				stageObject = MonoBehaviourSingleton<SceneSettingsManager>.I.get_transform();
+			}
+		}
+		if (!MonoBehaviourSingleton<GlobalSettingsManager>.I.stageCache.Contains(data.scene))
+		{
+			PackageObject package = MonoBehaviourSingleton<ResourceManager>.I.cache.PopCachedPackage(RESOURCE_CATEGORY.STAGE_SCENE.ToAssetBundleName(load_scene_name));
+			AssetBundle asset_bundle = (package == null) ? null : (package.obj as AssetBundle);
+			if (asset_bundle != null)
+			{
+				asset_bundle.Unload(false);
 			}
 		}
 		bool is_field_stage = id.StartsWith("FI");
@@ -365,7 +374,7 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 		UnloadStage();
 		LoadingQueue load_queue = new LoadingQueue(this);
 		ResourceManager.enableCache = false;
-		LoadObject lo_bg = load_queue.Load(RESOURCE_CATEGORY.STAGE_IMAGE, "BackgroundImage", false);
+		LoadObject lo_bg = load_queue.Load(RESOURCE_CATEGORY.STAGE_IMAGE, (!MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName().Contains("TutorialWeaponSelectTop")) ? "BackgroundImage" : "BackgroundTutImage", false);
 		LoadObject lo_tex = load_queue.Load(RESOURCE_CATEGORY.STAGE_IMAGE, ResourceName.GetBackgroundImage(image_id), false);
 		ResourceManager.enableCache = true;
 		if (load_queue.IsLoading())

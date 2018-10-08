@@ -652,8 +652,8 @@ public class BlackMarketTop : GameSection
 	{
 		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001a: Expected O, but got Unknown
-		_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2D0 _003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2D;
-		SendRequestCurrentCrystal(new Action((object)_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2DF _003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2DF;
+		SendRequestCurrentCrystal(new Action((object)_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2DF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void CheckCrystalNum(OnceStatusInfoModel ret, Action onFinish)

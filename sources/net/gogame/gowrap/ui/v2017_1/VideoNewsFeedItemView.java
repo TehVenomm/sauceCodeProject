@@ -8,7 +8,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.MediaController;
 import android.widget.VideoView;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.support.DownloadManager.DownloadResult;
 import net.gogame.gowrap.support.DownloadManager.Target;
@@ -39,26 +39,26 @@ public class VideoNewsFeedItemView extends AbstractNewsFeedItemView implements T
     }
 
     protected void customInit(Context context) {
-        this.videoView = (VideoView) findViewById(C1110R.id.net_gogame_gowrap_newsfeed_item_video);
+        this.videoView = (VideoView) findViewById(C1426R.id.net_gogame_gowrap_newsfeed_item_video);
         MediaController mediaController = new MediaController(context);
         mediaController.setAnchorView(this);
         this.videoView.setMediaController(mediaController);
     }
 
     protected int getViewResourceId() {
-        return C1110R.layout.net_gogame_gowrap_newsfeed_video_item;
+        return C1426R.layout.net_gogame_gowrap_newsfeed_video_item;
     }
 
     protected Integer getResizingViewResourceId() {
-        return Integer.valueOf(C1110R.id.net_gogame_gowrap_newsfeed_item_video);
+        return Integer.valueOf(C1426R.id.net_gogame_gowrap_newsfeed_item_video);
     }
 
     protected int[] getClickResourceIds() {
-        return new int[]{C1110R.id.net_gogame_gowrap_newsfeed_item_content};
+        return new int[]{C1426R.id.net_gogame_gowrap_newsfeed_item_content};
     }
 
     protected int[] getButtonClickResourceIds() {
-        return new int[]{C1110R.id.net_gogame_gowrap_newsfeed_item_button};
+        return new int[]{C1426R.id.net_gogame_gowrap_newsfeed_item_button};
     }
 
     protected void onLayoutCompleted() {

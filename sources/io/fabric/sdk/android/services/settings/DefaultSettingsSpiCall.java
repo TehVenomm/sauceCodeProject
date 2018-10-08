@@ -1,5 +1,6 @@
 package io.fabric.sdk.android.services.settings;
 
+import im.getsocial.sdk.ErrorCode;
 import io.fabric.sdk.android.Fabric;
 import io.fabric.sdk.android.Kit;
 import io.fabric.sdk.android.services.common.AbstractSpiCall;
@@ -34,8 +35,8 @@ class DefaultSettingsSpiCall extends AbstractSpiCall implements SettingsSpiCall 
         try {
             return new JSONObject(str);
         } catch (Throwable e) {
-            Fabric.getLogger().mo4290d("Fabric", "Failed to parse settings JSON from " + getUrl(), e);
-            Fabric.getLogger().mo4289d("Fabric", "Settings response " + str);
+            Fabric.getLogger().mo4754d("Fabric", "Failed to parse settings JSON from " + getUrl(), e);
+            Fabric.getLogger().mo4753d("Fabric", "Settings response " + str);
             return null;
         }
     }
@@ -57,11 +58,11 @@ class DefaultSettingsSpiCall extends AbstractSpiCall implements SettingsSpiCall 
 
     JSONObject handleResponse(HttpRequest httpRequest) {
         int code = httpRequest.code();
-        Fabric.getLogger().mo4289d("Fabric", "Settings result was: " + code);
+        Fabric.getLogger().mo4753d("Fabric", "Settings result was: " + code);
         if (requestWasSuccessful(code)) {
             return getJsonObjectFrom(httpRequest.body());
         }
-        Fabric.getLogger().mo4291e("Fabric", "Failed to retrieve settings from " + getUrl());
+        Fabric.getLogger().mo4755e("Fabric", "Failed to retrieve settings from " + getUrl());
         return null;
     }
 
@@ -70,18 +71,18 @@ class DefaultSettingsSpiCall extends AbstractSpiCall implements SettingsSpiCall 
         try {
             Map queryParamsFor = getQueryParamsFor(settingsRequest);
             httpRequest = applyHeadersTo(getHttpRequest(queryParamsFor), settingsRequest);
-            Fabric.getLogger().mo4289d("Fabric", "Requesting settings from " + getUrl());
-            Fabric.getLogger().mo4289d("Fabric", "Settings query params were: " + queryParamsFor);
+            Fabric.getLogger().mo4753d("Fabric", "Requesting settings from " + getUrl());
+            Fabric.getLogger().mo4753d("Fabric", "Settings query params were: " + queryParamsFor);
             JSONObject handleResponse = handleResponse(httpRequest);
             return handleResponse;
         } finally {
             if (httpRequest != null) {
-                Fabric.getLogger().mo4289d("Fabric", "Settings request ID: " + httpRequest.header(AbstractSpiCall.HEADER_REQUEST_ID));
+                Fabric.getLogger().mo4753d("Fabric", "Settings request ID: " + httpRequest.header(AbstractSpiCall.HEADER_REQUEST_ID));
             }
         }
     }
 
     boolean requestWasSuccessful(int i) {
-        return i == 200 || i == 201 || i == 202 || i == 203;
+        return i == 200 || i == ErrorCode.ACTION_DENIED || i == ErrorCode.SDK_NOT_INITIALIZED || i == ErrorCode.SDK_INITIALIZATION_FAILED;
     }
 }

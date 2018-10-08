@@ -2345,7 +2345,8 @@ public class Enemy : Character
 
 	public override void ActDead(bool force_sync = false, bool recieve_direct = false)
 	{
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		Debug.Log((object)"ACtdead");
 		ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
 		base.badStatusTotal.Reset();
 		badStatusMax.Copy(badStatusBase);
@@ -4089,7 +4090,7 @@ public class Enemy : Character
 						{
 							if (delay > 0f)
 							{
-								_003COnPlayAttackedHitEffect_003Ec__AnonStorey512 _003COnPlayAttackedHitEffect_003Ec__AnonStorey;
+								_003COnPlayAttackedHitEffect_003Ec__AnonStorey525 _003COnPlayAttackedHitEffect_003Ec__AnonStorey;
 								AppMain.Delay(delay, new Action((object)_003COnPlayAttackedHitEffect_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 							}
 							else
@@ -6872,7 +6873,7 @@ public class Enemy : Character
 
 	private void EventRadialBlurStart(AnimEventData.EventData data)
 	{
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
 		float time = data.floatArgs[0];
 		float strength = data.floatArgs[1];
 		string text = data.stringArgs[0];
@@ -6886,6 +6887,10 @@ public class Enemy : Character
 		{
 			if (flag)
 			{
+				if (MonoBehaviourSingleton<GlobalSettingsManager>.I.noBlurEffectBossId.Contains(enemyID) && MonoBehaviourSingleton<GlobalSettingsManager>.I.noBlurEffectEventId.Contains(Utility.GetCurrentEventID()))
+				{
+					return;
+				}
 				MonoBehaviourSingleton<InGameCameraManager>.I.StartRadialBlurFilter(time, strength, val);
 			}
 			else
@@ -9871,7 +9876,7 @@ public class Enemy : Character
 				{
 					if (material.HasProperty("_MatCapPow"))
 					{
-						material.SetFloat("_MatCapPow", ((_003CSetShieldShaderParam_003Ec__Iterator1E3)/*Error near IL_009b: stateMachine*/)._003CmatCapPow_003E__1);
+						material.SetFloat("_MatCapPow", ((_003CSetShieldShaderParam_003Ec__Iterator1EE)/*Error near IL_009b: stateMachine*/)._003CmatCapPow_003E__1);
 					}
 				});
 				yield return (object)null;

@@ -33,12 +33,12 @@ public class UIAtlas
 		TexCoords
 	}
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Material material;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private List<UISpriteData> mSprites = new List<UISpriteData>();
 
 	[HideInInspector]
@@ -49,12 +49,12 @@ public class UIAtlas
 	[SerializeField]
 	private UIAtlas mReplacement;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Coordinates mCoordinates;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private List<Sprite> sprites = new List<Sprite>();
 
 	private int mPMA = -1;

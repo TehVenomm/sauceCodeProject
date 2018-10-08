@@ -21,35 +21,35 @@ class ao extends AgentsObserver {
             return;
         }
         Logger.m564v(ZopimChatLogFragment.LOG_TAG, "Agent " + agent.getDisplayName() + " typing " + agent.isTyping());
-        aa c0840g = new C0840g();
-        c0840g.f811b = agent.isTyping().booleanValue();
-        c0840g.f810a = agent.getAvatarUri();
-        c0840g.l = Long.valueOf(System.currentTimeMillis());
-        c0840g.k = str;
-        C0842i c0842i = (C0842i) this.f788a.getListAdapter();
-        aa b = c0842i.m692b(c0842i.getItemCount() - 1);
-        if (b instanceof C0840g) {
-            ((C0840g) b).f811b = agent.isTyping().booleanValue();
+        aa c0839g = new C0839g();
+        c0839g.f811b = agent.isTyping().booleanValue();
+        c0839g.f810a = agent.getAvatarUri();
+        c0839g.l = Long.valueOf(System.currentTimeMillis());
+        c0839g.k = str;
+        C0841i c0841i = (C0841i) this.f788a.getListAdapter();
+        aa b = c0841i.m692b(c0841i.getItemCount() - 1);
+        if (b instanceof C0839g) {
+            ((C0839g) b).f811b = agent.isTyping().booleanValue();
         } else {
-            c0842i.m691a(c0840g);
+            c0841i.m691a(c0839g);
         }
-        c0842i.notifyItemChanged(c0842i.getItemCount() - 1);
-        this.f788a.mRecyclerView.getLayoutManager().scrollToPosition(c0842i.getItemCount() - 1);
+        c0841i.notifyItemChanged(c0841i.getItemCount() - 1);
+        this.f788a.mRecyclerView.getLayoutManager().scrollToPosition(c0841i.getItemCount() - 1);
     }
 
     /* renamed from: b */
     private void m678b(String str, Agent agent) {
-        C0842i c0842i = (C0842i) this.f788a.getListAdapter();
-        for (int i = 0; i < c0842i.getItemCount(); i++) {
-            if (c0842i.m692b(i) instanceof C0833a) {
-                C0833a c0833a = (C0833a) c0842i.m692b(i);
-                if (!str.equals(c0833a.k)) {
+        C0841i c0841i = (C0841i) this.f788a.getListAdapter();
+        for (int i = 0; i < c0841i.getItemCount(); i++) {
+            if (c0841i.m692b(i) instanceof C0832a) {
+                C0832a c0832a = (C0832a) c0841i.m692b(i);
+                if (!str.equals(c0832a.k)) {
                     continue;
                 } else if (agent.getAvatarUri() == null) {
                     return;
                 } else {
-                    if (!agent.getAvatarUri().equals(c0833a.f753e)) {
-                        c0833a.f753e = agent.getAvatarUri();
+                    if (!agent.getAvatarUri().equals(c0832a.f753e)) {
+                        c0832a.f753e = agent.getAvatarUri();
                     }
                 }
             }

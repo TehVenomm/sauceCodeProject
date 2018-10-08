@@ -33,7 +33,7 @@ public abstract class AsyncTask<Params, Progress, Result> {
     private static volatile Executor defaultExecutor = SERIAL_EXECUTOR;
     private static final InternalHandler handler = new InternalHandler();
     private static final BlockingQueue<Runnable> poolWorkQueue = new LinkedBlockingQueue(128);
-    private static final ThreadFactory threadFactory = new C09251();
+    private static final ThreadFactory threadFactory = new C12411();
     private final AtomicBoolean cancelled = new AtomicBoolean();
     private final FutureTask<Result> future = new FutureTask<Result>(this.worker) {
         protected void done() {
@@ -50,13 +50,13 @@ public abstract class AsyncTask<Params, Progress, Result> {
     };
     private volatile Status status = Status.PENDING;
     private final AtomicBoolean taskInvoked = new AtomicBoolean();
-    private final WorkerRunnable<Params, Result> worker = new C09262();
+    private final WorkerRunnable<Params, Result> worker = new C12422();
 
     /* renamed from: io.fabric.sdk.android.services.concurrency.AsyncTask$1 */
-    static final class C09251 implements ThreadFactory {
+    static final class C12411 implements ThreadFactory {
         private final AtomicInteger count = new AtomicInteger(1);
 
-        C09251() {
+        C12411() {
         }
 
         public Thread newThread(Runnable runnable) {
@@ -72,8 +72,8 @@ public abstract class AsyncTask<Params, Progress, Result> {
     }
 
     /* renamed from: io.fabric.sdk.android.services.concurrency.AsyncTask$2 */
-    class C09262 extends WorkerRunnable<Params, Result> {
-        C09262() {
+    class C12422 extends WorkerRunnable<Params, Result> {
+        C12422() {
             super();
         }
 

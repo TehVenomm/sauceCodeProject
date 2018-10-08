@@ -328,8 +328,8 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[2];
-		_003CContent_003Ec__AnonStorey856 _003CContent_003Ec__AnonStorey;
-		List(tag, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CContent_003Ec__AnonStorey87C _003CContent_003Ec__AnonStorey87C;
+		List(tag, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey87C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1]);
 		return this;
 	}
@@ -349,8 +349,8 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[2];
-		_003CContentOptional_003Ec__AnonStorey857 _003CContentOptional_003Ec__AnonStorey;
-		List(tag, new Action<int, JSONInStream>((object)_003CContentOptional_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CContentOptional_003Ec__AnonStorey87D _003CContentOptional_003Ec__AnonStorey87D;
+		List(tag, new Action<int, JSONInStream>((object)_003CContentOptional_003Ec__AnonStorey87D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1]);
 		return this;
 	}
@@ -371,8 +371,8 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[2];
-		_003CContent_003Ec__AnonStorey858 _003CContent_003Ec__AnonStorey;
-		List(idx, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CContent_003Ec__AnonStorey87E _003CContent_003Ec__AnonStorey87E;
+		List(idx, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey87E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1]);
 		return this;
 	}
@@ -388,8 +388,8 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[3];
-		_003CContent_003Ec__AnonStorey859 _003CContent_003Ec__AnonStorey;
-		List(tag, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CContent_003Ec__AnonStorey87F _003CContent_003Ec__AnonStorey87F;
+		List(tag, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey87F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2]);
 		return this;
 	}
@@ -409,8 +409,8 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[3];
-		_003CContentOptional_003Ec__AnonStorey85A _003CContentOptional_003Ec__AnonStorey85A;
-		List(tag, new Action<int, JSONInStream>((object)_003CContentOptional_003Ec__AnonStorey85A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CContentOptional_003Ec__AnonStorey880 _003CContentOptional_003Ec__AnonStorey;
+		List(tag, new Action<int, JSONInStream>((object)_003CContentOptional_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2]);
 		return this;
 	}
@@ -431,8 +431,8 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[3];
-		_003CContent_003Ec__AnonStorey85B _003CContent_003Ec__AnonStorey85B;
-		List(idx, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey85B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CContent_003Ec__AnonStorey881 _003CContent_003Ec__AnonStorey;
+		List(idx, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2]);
 		return this;
 	}
@@ -448,8 +448,8 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[4];
-		_003CContent_003Ec__AnonStorey85C _003CContent_003Ec__AnonStorey85C;
-		List(tag, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey85C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CContent_003Ec__AnonStorey882 _003CContent_003Ec__AnonStorey;
+		List(tag, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
@@ -469,8 +469,8 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[4];
-		_003CContentOptional_003Ec__AnonStorey85D _003CContentOptional_003Ec__AnonStorey85D;
-		List(tag, new Action<int, JSONInStream>((object)_003CContentOptional_003Ec__AnonStorey85D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CContentOptional_003Ec__AnonStorey883 _003CContentOptional_003Ec__AnonStorey;
+		List(tag, new Action<int, JSONInStream>((object)_003CContentOptional_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
@@ -491,8 +491,8 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[4];
-		_003CContent_003Ec__AnonStorey85E _003CContent_003Ec__AnonStorey85E;
-		List(idx, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey85E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CContent_003Ec__AnonStorey884 _003CContent_003Ec__AnonStorey;
+		List(idx, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
@@ -508,8 +508,8 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[4];
-		_003CContent_003Ec__AnonStorey85F _003CContent_003Ec__AnonStorey85F;
-		List(tag, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey85F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CContent_003Ec__AnonStorey885 _003CContent_003Ec__AnonStorey;
+		List(tag, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
@@ -529,7 +529,7 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[4];
-		_003CContentOptional_003Ec__AnonStorey860 _003CContentOptional_003Ec__AnonStorey;
+		_003CContentOptional_003Ec__AnonStorey886 _003CContentOptional_003Ec__AnonStorey;
 		List(tag, new Action<int, JSONInStream>((object)_003CContentOptional_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
 		return this;
@@ -551,7 +551,7 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[4];
-		_003CContent_003Ec__AnonStorey861 _003CContent_003Ec__AnonStorey;
+		_003CContent_003Ec__AnonStorey887 _003CContent_003Ec__AnonStorey;
 		List(idx, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
 		return this;
@@ -568,7 +568,7 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[4];
-		_003CContent_003Ec__AnonStorey862 _003CContent_003Ec__AnonStorey;
+		_003CContent_003Ec__AnonStorey888 _003CContent_003Ec__AnonStorey;
 		List(tag, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
 		return this;
@@ -589,7 +589,7 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[4];
-		_003CContentOptional_003Ec__AnonStorey863 _003CContentOptional_003Ec__AnonStorey;
+		_003CContentOptional_003Ec__AnonStorey889 _003CContentOptional_003Ec__AnonStorey;
 		List(tag, new Action<int, JSONInStream>((object)_003CContentOptional_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
 		return this;
@@ -611,8 +611,8 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[4];
-		_003CContent_003Ec__AnonStorey864 _003CContent_003Ec__AnonStorey;
-		List(idx, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CContent_003Ec__AnonStorey88A _003CContent_003Ec__AnonStorey88A;
+		List(idx, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey88A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
@@ -627,8 +627,8 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[4];
-		_003CContent_003Ec__AnonStorey865 _003CContent_003Ec__AnonStorey;
-		List(tag, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CContent_003Ec__AnonStorey88B _003CContent_003Ec__AnonStorey88B;
+		List(tag, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey88B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
@@ -647,8 +647,8 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[4];
-		_003CContentOptional_003Ec__AnonStorey866 _003CContentOptional_003Ec__AnonStorey;
-		List(tag, new Action<int, JSONInStream>((object)_003CContentOptional_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CContentOptional_003Ec__AnonStorey88C _003CContentOptional_003Ec__AnonStorey88C;
+		List(tag, new Action<int, JSONInStream>((object)_003CContentOptional_003Ec__AnonStorey88C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
@@ -668,8 +668,8 @@ public class JSONInStream
 			return this;
 		}
 		float[] fs = new float[4];
-		_003CContent_003Ec__AnonStorey867 _003CContent_003Ec__AnonStorey;
-		List(idx, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CContent_003Ec__AnonStorey88D _003CContent_003Ec__AnonStorey88D;
+		List(idx, new Action<int, JSONInStream>((object)_003CContent_003Ec__AnonStorey88D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}

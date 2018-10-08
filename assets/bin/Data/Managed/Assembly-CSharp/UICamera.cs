@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/NGUI Event System (UICamera)")]
-[ExecuteInEditMode]
 [RequireComponent(typeof(Camera))]
+[ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/NGUI Event System (UICamera)")]
 public class UICamera
 {
 	public enum ControlScheme

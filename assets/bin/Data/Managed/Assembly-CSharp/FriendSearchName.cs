@@ -25,7 +25,7 @@ public class FriendSearchName : ConfigName
 	protected override void SetBeforeText()
 	{
 		before_text = string.Empty;
-		inputMaxLength = 12;
+		inputMaxLength = 14;
 	}
 
 	private unsafe void OnQuery_OK()
@@ -33,7 +33,7 @@ public class FriendSearchName : ConfigName
 		GameSection.SetEventData(null);
 		string input_text = GetInputValue((Enum)UI.IPT_TEXT);
 		GameSection.StayEvent();
-		_003COnQuery_OK_003Ec__AnonStorey31B _003COnQuery_OK_003Ec__AnonStorey31B;
-		MonoBehaviourSingleton<FriendManager>.I.SendSearchName(input_text, page, new Action<bool, FriendSearchResult>((object)_003COnQuery_OK_003Ec__AnonStorey31B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003COnQuery_OK_003Ec__AnonStorey32A _003COnQuery_OK_003Ec__AnonStorey32A;
+		MonoBehaviourSingleton<FriendManager>.I.SendSearchName(input_text, page, new Action<bool, FriendSearchResult>((object)_003COnQuery_OK_003Ec__AnonStorey32A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 }

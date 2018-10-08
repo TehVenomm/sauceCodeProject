@@ -1,19 +1,19 @@
 package net.gogame.gopay.sdk.iab;
 
-import net.gogame.gopay.sdk.C1066n;
+import net.gogame.gopay.sdk.C1382n;
 
 final class av implements Runnable {
     /* renamed from: a */
-    final /* synthetic */ C1066n f1077a;
+    final /* synthetic */ C1382n f3465a;
     /* renamed from: b */
-    final /* synthetic */ at f1078b;
+    final /* synthetic */ at f3466b;
 
-    av(at atVar, C1066n c1066n) {
-        this.f1078b = atVar;
-        this.f1077a = c1066n;
+    av(at atVar, C1382n c1382n) {
+        this.f3466b = atVar;
+        this.f3465a = c1382n;
     }
 
     public final void run() {
-        PurchaseActivity.m794a(this.f1078b.f1074b, this.f1077a);
+        PurchaseActivity.m3819a(this.f3466b.f3462b, this.f3465a);
     }
 }

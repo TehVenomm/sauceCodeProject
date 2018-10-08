@@ -14,24 +14,24 @@ public class DefaultLogger implements Logger {
     }
 
     /* renamed from: d */
-    public void mo4289d(String str, String str2) {
-        mo4290d(str, str2, null);
+    public void mo4753d(String str, String str2) {
+        mo4754d(str, str2, null);
     }
 
     /* renamed from: d */
-    public void mo4290d(String str, String str2, Throwable th) {
+    public void mo4754d(String str, String str2, Throwable th) {
         if (isLoggable(str, 3)) {
             Log.d(str, str2, th);
         }
     }
 
     /* renamed from: e */
-    public void mo4291e(String str, String str2) {
-        mo4292e(str, str2, null);
+    public void mo4755e(String str, String str2) {
+        mo4756e(str, str2, null);
     }
 
     /* renamed from: e */
-    public void mo4292e(String str, String str2, Throwable th) {
+    public void mo4756e(String str, String str2, Throwable th) {
         if (isLoggable(str, 6)) {
             Log.e(str, str2, th);
         }
@@ -42,12 +42,12 @@ public class DefaultLogger implements Logger {
     }
 
     /* renamed from: i */
-    public void mo4294i(String str, String str2) {
-        mo4295i(str, str2, null);
+    public void mo4758i(String str, String str2) {
+        mo4759i(str, str2, null);
     }
 
     /* renamed from: i */
-    public void mo4295i(String str, String str2, Throwable th) {
+    public void mo4759i(String str, String str2, Throwable th) {
         if (isLoggable(str, 4)) {
             Log.i(str, str2, th);
         }
@@ -72,24 +72,24 @@ public class DefaultLogger implements Logger {
     }
 
     /* renamed from: v */
-    public void mo4300v(String str, String str2) {
-        mo4301v(str, str2, null);
+    public void mo4764v(String str, String str2) {
+        mo4765v(str, str2, null);
     }
 
     /* renamed from: v */
-    public void mo4301v(String str, String str2, Throwable th) {
+    public void mo4765v(String str, String str2, Throwable th) {
         if (isLoggable(str, 2)) {
             Log.v(str, str2, th);
         }
     }
 
     /* renamed from: w */
-    public void mo4302w(String str, String str2) {
-        mo4303w(str, str2, null);
+    public void mo4766w(String str, String str2) {
+        mo4767w(str, str2, null);
     }
 
     /* renamed from: w */
-    public void mo4303w(String str, String str2, Throwable th) {
+    public void mo4767w(String str, String str2, Throwable th) {
         if (isLoggable(str, 5)) {
             Log.w(str, str2, th);
         }

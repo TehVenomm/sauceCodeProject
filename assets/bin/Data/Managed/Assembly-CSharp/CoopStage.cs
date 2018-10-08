@@ -1077,7 +1077,7 @@ public class CoopStage
 	{
 		//IL_0327: Unknown result type (might be due to invalid IL or missing references)
 		//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0477: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0478: Unknown result type (might be due to invalid IL or missing references)
 		if (!isActivateStart)
 		{
 			return false;
@@ -1156,7 +1156,7 @@ public class CoopStage
 				createPlayerInfo.charaInfo = model.charaInfo;
 				Logd("CreatePlayer. sid={0},userId={1}", model.sid, createPlayerInfo.charaInfo.userId);
 				createPlayerInfo.extentionInfo = model.extentionInfo;
-				player = MonoBehaviourSingleton<StageObjectManager>.I.CreatePlayer(model.sid, createPlayerInfo, false, Vector3.get_zero(), 0f, model.transferInfo, callback);
+				player = MonoBehaviourSingleton<StageObjectManager>.I.CreatePlayer(model.sid, createPlayerInfo, false, Vector3.get_zero(), 0f, model.transferInfo, callback, false);
 				if (QuestManager.IsValidInGame())
 				{
 					MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.AddPlayer(createPlayerInfo.charaInfo);
@@ -1233,9 +1233,9 @@ public class CoopStage
 	private bool PopEnemy(Coop_Model_EnemyPop model, out Enemy outEnmey)
 	{
 		//IL_0262: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_042a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_042b: Unknown result type (might be due to invalid IL or missing references)
 		outEnmey = null;
 		if (!isActivateStart)
 		{
@@ -1300,7 +1300,7 @@ public class CoopStage
 						{
 							MonoBehaviourSingleton<InGameRecorder>.I.RecordEnemyHP(target.id, target.hpMax);
 						}
-					}) : MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyForDefenseBattle(model.sid, num, num2));
+					}, false) : MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyForDefenseBattle(model.sid, num, num2));
 				}
 				if (model.popIndex >= 0 && MonoBehaviourSingleton<CoopOfflineManager>.IsValid())
 				{
@@ -1351,7 +1351,7 @@ public class CoopStage
 				enemy = MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(model.sid, Vector3.get_zero(), 0f, num, num2, enemyPopData.bossFlag, enemyPopData.bigMonsterFlag, false, false, delegate(Enemy target)
 				{
 					OnPopEnemyLoadComplete(target, model.ownerClientId, true);
-				});
+				}, false);
 				enemy.SetCoopMode(StageObject.COOP_MODE_TYPE.MIRROR, model.ownerClientId);
 				enemy.enemyPopIndex = model.popIndex;
 				if (model.popIndex >= 0 && MonoBehaviourSingleton<CoopOfflineManager>.IsValid())
@@ -1778,8 +1778,8 @@ public class CoopStage
 		{
 			time = MonoBehaviourSingleton<InGameSettingsManager>.I.fishingParam.hitEnemyMoveSec;
 		}
-		_003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4DF _003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4DF;
-		this.StartCoroutine(SimpleMoveCharacterY(enemy, -10f, StageManager.GetHeight(enemy._transform.get_position()), time, new Action((object)_003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4DF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+		_003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4F1 _003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4F;
+		this.StartCoroutine(SimpleMoveCharacterY(enemy, -10f, StageManager.GetHeight(enemy._transform.get_position()), time, new Action((object)_003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 
 	public unsafe void GoDownCharacterToUnderGround(Enemy enemy, Action OnEndAction)
@@ -1797,8 +1797,8 @@ public class CoopStage
 		enemy.ActIdle(false, -1f);
 		Enemy enemy2 = enemy;
 		Vector3 position = enemy._transform.get_position();
-		_003CGoDownCharacterToUnderGround_003Ec__AnonStorey4E0 _003CGoDownCharacterToUnderGround_003Ec__AnonStorey4E;
-		this.StartCoroutine(SimpleMoveCharacterY(enemy2, position.y, -10f, 3f, new Action((object)_003CGoDownCharacterToUnderGround_003Ec__AnonStorey4E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+		_003CGoDownCharacterToUnderGround_003Ec__AnonStorey4F2 _003CGoDownCharacterToUnderGround_003Ec__AnonStorey4F;
+		this.StartCoroutine(SimpleMoveCharacterY(enemy2, position.y, -10f, 3f, new Action((object)_003CGoDownCharacterToUnderGround_003Ec__AnonStorey4F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 
 	public IEnumerator SimpleMoveCharacterY(Character enemy, float from, float to, float time, Action OnEndAction)

@@ -61,16 +61,16 @@ public class HttpMultipartRequest {
     }
 
     private byte[] getImageBytes(File file) {
+        FileInputStream fileInputStream;
         FileNotFoundException e;
         IOException e2;
         Throwable th;
-        FileInputStream fileInputStream = null;
+        FileInputStream fileInputStream2 = null;
         byte[] bArr = new byte[10];
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        FileInputStream fileInputStream2;
         try {
-            fileInputStream2 = new FileInputStream(file);
-            while (fileInputStream2.read(bArr) > 0) {
+            fileInputStream = new FileInputStream(file);
+            while (fileInputStream.read(bArr) > 0) {
                 try {
                     byteArrayOutputStream.write(bArr);
                 } catch (FileNotFoundException e3) {
@@ -85,39 +85,39 @@ public class HttpMultipartRequest {
                 byteArrayOutputStream.close();
             } catch (IOException e5) {
             }
-            if (fileInputStream2 != null) {
+            if (fileInputStream != null) {
                 try {
-                    fileInputStream2.close();
+                    fileInputStream.close();
                 } catch (IOException e6) {
                 }
             }
         } catch (FileNotFoundException e7) {
             e = e7;
-            fileInputStream2 = null;
+            fileInputStream = null;
             try {
                 e.printStackTrace();
                 try {
                     byteArrayOutputStream.close();
                 } catch (IOException e8) {
                 }
-                if (fileInputStream2 != null) {
+                if (fileInputStream != null) {
                     try {
-                        fileInputStream2.close();
+                        fileInputStream.close();
                     } catch (IOException e9) {
                     }
                 }
                 return byteArrayOutputStream.toByteArray();
             } catch (Throwable th3) {
                 th = th3;
-                fileInputStream = fileInputStream2;
                 fileInputStream2 = fileInputStream;
+                fileInputStream = fileInputStream2;
                 try {
                     byteArrayOutputStream.close();
                 } catch (IOException e10) {
                 }
-                if (fileInputStream2 != null) {
+                if (fileInputStream != null) {
                     try {
-                        fileInputStream2.close();
+                        fileInputStream.close();
                     } catch (IOException e11) {
                     }
                 }
@@ -125,25 +125,25 @@ public class HttpMultipartRequest {
             }
         } catch (IOException e12) {
             e2 = e12;
-            fileInputStream2 = null;
+            fileInputStream = null;
             e2.printStackTrace();
             try {
                 byteArrayOutputStream.close();
             } catch (IOException e13) {
             }
-            if (fileInputStream2 != null) {
+            if (fileInputStream != null) {
                 try {
-                    fileInputStream2.close();
+                    fileInputStream.close();
                 } catch (IOException e14) {
                 }
             }
             return byteArrayOutputStream.toByteArray();
         } catch (Throwable th4) {
             th = th4;
-            fileInputStream2 = fileInputStream;
+            fileInputStream = fileInputStream2;
             byteArrayOutputStream.close();
-            if (fileInputStream2 != null) {
-                fileInputStream2.close();
+            if (fileInputStream != null) {
+                fileInputStream.close();
             }
             throw th;
         }

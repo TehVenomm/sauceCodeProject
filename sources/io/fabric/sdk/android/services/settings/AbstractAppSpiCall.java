@@ -52,7 +52,7 @@ abstract class AbstractAppSpiCall extends AbstractSpiCall implements AppSpiCall 
                 closeable = this.kit.getContext().getResources().openRawResource(appRequestData.icon.iconResourceId);
                 part.part(APP_ICON_HASH_PARAM, appRequestData.icon.hash).part(APP_ICON_DATA_PARAM, ICON_FILE_NAME, ICON_CONTENT_TYPE, (InputStream) closeable).part(APP_ICON_WIDTH_PARAM, Integer.valueOf(appRequestData.icon.width)).part(APP_ICON_HEIGHT_PARAM, Integer.valueOf(appRequestData.icon.height));
             } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "Failed to find app icon with resource ID: " + appRequestData.icon.iconResourceId, e);
+                Fabric.getLogger().mo4756e("Fabric", "Failed to find app icon with resource ID: " + appRequestData.icon.iconResourceId, e);
             } finally {
                 part = "Failed to close app icon InputStream.";
                 CommonUtils.closeOrLog(closeable, part);
@@ -77,14 +77,14 @@ abstract class AbstractAppSpiCall extends AbstractSpiCall implements AppSpiCall 
 
     public boolean invoke(AppRequestData appRequestData) {
         HttpRequest applyMultipartDataTo = applyMultipartDataTo(applyHeadersTo(getHttpRequest(), appRequestData), appRequestData);
-        Fabric.getLogger().mo4289d("Fabric", "Sending app info to " + getUrl());
+        Fabric.getLogger().mo4753d("Fabric", "Sending app info to " + getUrl());
         if (appRequestData.icon != null) {
-            Fabric.getLogger().mo4289d("Fabric", "App icon hash is " + appRequestData.icon.hash);
-            Fabric.getLogger().mo4289d("Fabric", "App icon size is " + appRequestData.icon.width + "x" + appRequestData.icon.height);
+            Fabric.getLogger().mo4753d("Fabric", "App icon hash is " + appRequestData.icon.hash);
+            Fabric.getLogger().mo4753d("Fabric", "App icon size is " + appRequestData.icon.width + "x" + appRequestData.icon.height);
         }
         int code = applyMultipartDataTo.code();
-        Fabric.getLogger().mo4289d("Fabric", (HttpRequest.METHOD_POST.equals(applyMultipartDataTo.method()) ? "Create" : "Update") + " app request ID: " + applyMultipartDataTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
-        Fabric.getLogger().mo4289d("Fabric", "Result was " + code);
+        Fabric.getLogger().mo4753d("Fabric", (HttpRequest.METHOD_POST.equals(applyMultipartDataTo.method()) ? "Create" : "Update") + " app request ID: " + applyMultipartDataTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
+        Fabric.getLogger().mo4753d("Fabric", "Result was " + code);
         return ResponseParser.parse(code) == 0;
     }
 }

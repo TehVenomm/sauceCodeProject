@@ -36,19 +36,18 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import com.google.android.gms.measurement.AppMeasurement.Param;
-import io.fabric.sdk.android.services.settings.SettingsJsonConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import net.gogame.gopay.sdk.C1026a;
-import net.gogame.gopay.sdk.C1029d;
-import net.gogame.gopay.sdk.C1032f;
-import net.gogame.gopay.sdk.C1033g;
-import net.gogame.gopay.sdk.C1062j;
-import net.gogame.gopay.sdk.C1066n;
+import net.gogame.gopay.sdk.C1342a;
+import net.gogame.gopay.sdk.C1345d;
+import net.gogame.gopay.sdk.C1348f;
+import net.gogame.gopay.sdk.C1349g;
+import net.gogame.gopay.sdk.C1378j;
+import net.gogame.gopay.sdk.C1382n;
 import net.gogame.gopay.sdk.Country;
-import net.gogame.gopay.sdk.support.C1074c;
-import net.gogame.gopay.sdk.support.C1084m;
+import net.gogame.gopay.sdk.support.C1390c;
+import net.gogame.gopay.sdk.support.C1400m;
 import net.gogame.gopay.sdk.support.DisplayUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,94 +55,94 @@ import org.onepf.oms.appstore.googleUtils.SkuDetails;
 
 public class PurchaseActivity extends Activity {
     /* renamed from: A */
-    private C1029d f1005A;
+    private C1345d f3393A;
     /* renamed from: B */
-    private C1037b f1006B;
+    private C1353b f3394B;
     /* renamed from: C */
-    private C1045i f1007C;
+    private C1361i f3395C;
     /* renamed from: D */
-    private bs f1008D;
+    private bs f3396D;
     /* renamed from: E */
-    private C1025a f1009E = null;
+    private C1341a f3397E = null;
     /* renamed from: F */
-    private Spinner f1010F;
+    private Spinner f3398F;
     /* renamed from: G */
-    private Spinner f1011G;
+    private Spinner f3399G;
     /* renamed from: H */
-    private C1044g f1012H = new C1044g();
+    private C1360g f3400H = new C1360g();
     /* renamed from: I */
-    private boolean f1013I = false;
+    private boolean f3401I = false;
     /* renamed from: J */
-    private boolean f1014J;
+    private boolean f3402J;
     /* renamed from: K */
-    private boolean f1015K = false;
+    private boolean f3403K = false;
     /* renamed from: L */
-    private boolean f1016L = false;
+    private boolean f3404L = false;
     /* renamed from: M */
-    private int f1017M = 0;
+    private int f3405M = 0;
     /* renamed from: N */
-    private int f1018N = 3;
+    private int f3406N = 3;
     /* renamed from: O */
-    private int f1019O;
+    private int f3407O;
     /* renamed from: P */
-    private int f1020P;
+    private int f3408P;
     /* renamed from: Q */
-    private int f1021Q;
+    private int f3409Q;
     /* renamed from: a */
-    RelativeLayout f1022a;
+    RelativeLayout f3410a;
     /* renamed from: b */
-    C1074c f1023b;
+    C1390c f3411b;
     /* renamed from: c */
-    private boolean f1024c = false;
+    private boolean f3412c = false;
     /* renamed from: d */
-    private boolean f1025d = false;
+    private boolean f3413d = false;
     /* renamed from: e */
-    private String f1026e;
+    private String f3414e;
     /* renamed from: f */
-    private String f1027f;
+    private String f3415f;
     /* renamed from: g */
-    private String f1028g;
+    private String f3416g;
     /* renamed from: h */
-    private String f1029h;
+    private String f3417h;
     /* renamed from: i */
-    private br f1030i;
+    private br f3418i;
     /* renamed from: j */
-    private String f1031j;
+    private String f3419j;
     /* renamed from: k */
-    private String f1032k;
+    private String f3420k;
     /* renamed from: l */
-    private String f1033l;
+    private String f3421l;
     /* renamed from: m */
-    private String f1034m;
+    private String f3422m;
     /* renamed from: n */
-    private String f1035n;
+    private String f3423n;
     /* renamed from: o */
-    private String f1036o;
+    private String f3424o;
     /* renamed from: p */
-    private Map f1037p;
+    private Map f3425p;
     /* renamed from: q */
-    private SkuDetails f1038q;
+    private SkuDetails f3426q;
     /* renamed from: r */
-    private SkuDetails f1039r;
+    private SkuDetails f3427r;
     /* renamed from: s */
-    private ProgressBar f1040s;
+    private ProgressBar f3428s;
     /* renamed from: t */
-    private SharedPreferences f1041t;
+    private SharedPreferences f3429t;
     /* renamed from: u */
-    private AsyncTask f1042u;
+    private AsyncTask f3430u;
     /* renamed from: v */
-    private Handler f1043v;
+    private Handler f3431v;
     /* renamed from: w */
-    private Runnable f1044w;
+    private Runnable f3432w;
     /* renamed from: x */
-    private Runnable f1045x = new C1048l(this);
+    private Runnable f3433x = new C1364l(this);
     /* renamed from: y */
-    private WebView f1046y;
+    private WebView f3434y;
     /* renamed from: z */
-    private Button f1047z;
+    private Button f3435z;
 
     /* renamed from: a */
-    static /* synthetic */ Dialog m779a(PurchaseActivity purchaseActivity, String str, C1026a c1026a, OnClickListener onClickListener) {
+    static /* synthetic */ Dialog m3804a(PurchaseActivity purchaseActivity, String str, C1342a c1342a, OnClickListener onClickListener) {
         Dialog dialog = new Dialog(purchaseActivity);
         dialog.setOnCancelListener(new bf(purchaseActivity));
         dialog.getWindow().requestFeature(1);
@@ -153,7 +152,7 @@ public class PurchaseActivity extends Activity {
         imageButton.setBackgroundColor(0);
         imageButton.setPadding(0, 0, 0, 0);
         imageButton.setOnClickListener(new bg(purchaseActivity, dialog));
-        imageButton.setImageDrawable(purchaseActivity.m781a(C1084m.m936g()));
+        imageButton.setImageDrawable(purchaseActivity.m3806a(C1400m.m3961g()));
         LayoutParams layoutParams = new RelativeLayout.LayoutParams(-2, -2);
         layoutParams.setMargins(0, 0, DisplayUtils.pxFromDp(purchaseActivity, 7.0f), 0);
         layoutParams.addRule(11);
@@ -183,8 +182,8 @@ public class PurchaseActivity extends Activity {
         relativeLayout.addView(imageButton, layoutParams);
         imageButton = new ListView(purchaseActivity);
         imageButton.setBackgroundColor(0);
-        imageButton.setAdapter(c1026a);
-        imageButton.setSelection(purchaseActivity.f1007C.f1144e);
+        imageButton.setAdapter(c1342a);
+        imageButton.setSelection(purchaseActivity.f3395C.f3532e);
         imageButton.setOnItemClickListener(new bh(purchaseActivity, onClickListener, dialog));
         View linearLayout = new LinearLayout(purchaseActivity);
         linearLayout.setOrientation(1);
@@ -204,19 +203,19 @@ public class PurchaseActivity extends Activity {
         dialog.getWindow().setBackgroundDrawable(gradientDrawable2);
         WindowManager.LayoutParams attributes = dialog.getWindow().getAttributes();
         int i = (int) (((double) DisplayUtils.getScreenSize(purchaseActivity).y) / 1.5d);
-        if (DisplayUtils.pxFromDp(purchaseActivity, 60.0f) * c1026a.getCount() >= i) {
+        if (DisplayUtils.pxFromDp(purchaseActivity, 60.0f) * c1342a.getCount() >= i) {
             attributes.height = i;
         }
         return dialog;
     }
 
     /* renamed from: a */
-    private static Intent m780a(int i, br brVar, String str) {
+    private static Intent m3805a(int i, br brVar, String str) {
         Intent intent = new Intent();
         intent.putExtra("RESPONSE_CODE", i);
         if (brVar != null) {
             intent.putExtra("INAPP_PURCHASE_DATA", brVar.toString());
-            intent.putExtra("INAPP_DATA_SIGNATURE", brVar.f1114b);
+            intent.putExtra("INAPP_DATA_SIGNATURE", brVar.f3502b);
         }
         if (str != null) {
             intent.putExtra("MESSAGE", str);
@@ -225,76 +224,76 @@ public class PurchaseActivity extends Activity {
     }
 
     /* renamed from: a */
-    private BitmapDrawable m781a(Bitmap bitmap) {
+    private BitmapDrawable m3806a(Bitmap bitmap) {
         return bitmap == null ? null : new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, DisplayUtils.pxFromDp(this, ((float) bitmap.getWidth()) * 0.5f), DisplayUtils.pxFromDp(this, ((float) bitmap.getHeight()) * 0.5f), false));
     }
 
     /* renamed from: a */
-    private String m782a(String str) {
-        return this.f1037p.containsKey(str) ? (String) this.f1037p.get(str) : null;
+    private String m3807a(String str) {
+        return this.f3425p.containsKey(str) ? (String) this.f3425p.get(str) : null;
     }
 
     /* renamed from: a */
-    private void m784a() {
-        if (this.f1040s == null || this.f1040s.isShown()) {
-            m806c();
-            Handler handler = this.f1043v;
+    private void m3809a() {
+        if (this.f3428s == null || this.f3428s.isShown()) {
+            m3831c();
+            Handler handler = this.f3431v;
             Runnable axVar = new ax(this);
-            this.f1044w = axVar;
+            this.f3432w = axVar;
             handler.postDelayed(axVar, 10000);
             return;
         }
-        this.f1043v.post(new bm(this));
+        this.f3431v.post(new bm(this));
     }
 
     /* renamed from: a */
-    private void m785a(int i, String str) {
-        this.f1024c = true;
-        m802b();
-        this.f1043v.post(new ay(this, i, str));
+    private void m3810a(int i, String str) {
+        this.f3412c = true;
+        m3827b();
+        this.f3431v.post(new ay(this, i, str));
     }
 
     /* renamed from: a */
-    static /* synthetic */ void m787a(PurchaseActivity purchaseActivity, int i) {
-        purchaseActivity.f1020P = i;
-        purchaseActivity.f1013I = false;
-        purchaseActivity.f1010F.setEnabled(false);
-        purchaseActivity.f1011G.setEnabled(false);
-        if (purchaseActivity.f1047z != null) {
-            purchaseActivity.f1047z.setEnabled(false);
+    static /* synthetic */ void m3812a(PurchaseActivity purchaseActivity, int i) {
+        purchaseActivity.f3408P = i;
+        purchaseActivity.f3401I = false;
+        purchaseActivity.f3398F.setEnabled(false);
+        purchaseActivity.f3399G.setEnabled(false);
+        if (purchaseActivity.f3435z != null) {
+            purchaseActivity.f3435z.setEnabled(false);
         }
-        purchaseActivity.m784a();
-        C1062j.m868a(((Country) purchaseActivity.f1005A.getItem(i)).getCode());
-        purchaseActivity.m796a(new as(purchaseActivity), true);
+        purchaseActivity.m3809a();
+        C1378j.m3893a(((Country) purchaseActivity.f3393A.getItem(i)).getCode());
+        purchaseActivity.m3821a(new as(purchaseActivity), true);
     }
 
     /* renamed from: a */
-    static /* synthetic */ void m790a(PurchaseActivity purchaseActivity, String str, List list) {
-        if (!purchaseActivity.f1013I) {
-            purchaseActivity.f1013I = true;
-            purchaseActivity.f1007C.m757a(str, list);
-            purchaseActivity.f1007C.f1145f = null;
-            if (purchaseActivity.f1008D != null) {
+    static /* synthetic */ void m3815a(PurchaseActivity purchaseActivity, String str, List list) {
+        if (!purchaseActivity.f3401I) {
+            purchaseActivity.f3401I = true;
+            purchaseActivity.f3395C.m3782a(str, list);
+            purchaseActivity.f3395C.f3533f = null;
+            if (purchaseActivity.f3396D != null) {
                 Point screenSize = DisplayUtils.getScreenSize(purchaseActivity);
-                int count = purchaseActivity.f1007C.getCount();
+                int count = purchaseActivity.f3395C.getCount();
                 int pxFromDp = screenSize.x / DisplayUtils.pxFromDp(purchaseActivity, 80.0f);
                 if (count != 0) {
                     LinearLayout.LayoutParams layoutParams;
                     if ((count - pxFromDp) + 1 > 0) {
-                        purchaseActivity.f1047z.setVisibility(0);
-                        count = (int) Math.floor((double) (((float) purchaseActivity.f1047z.getLeft()) / ((float) DisplayUtils.pxFromDp(purchaseActivity, 80.0f))));
-                        layoutParams = (LinearLayout.LayoutParams) purchaseActivity.f1023b.getLayoutParams();
-                        layoutParams.width = purchaseActivity.f1047z.getLeft();
-                        purchaseActivity.f1023b.setLayoutParams(layoutParams);
+                        purchaseActivity.f3435z.setVisibility(0);
+                        count = (int) Math.floor((double) (((float) purchaseActivity.f3435z.getLeft()) / ((float) DisplayUtils.pxFromDp(purchaseActivity, 80.0f))));
+                        layoutParams = (LinearLayout.LayoutParams) purchaseActivity.f3411b.getLayoutParams();
+                        layoutParams.width = purchaseActivity.f3435z.getLeft();
+                        purchaseActivity.f3411b.setLayoutParams(layoutParams);
                         pxFromDp = count - 1;
                     } else {
-                        purchaseActivity.f1047z.setVisibility(8);
-                        layoutParams = (LinearLayout.LayoutParams) purchaseActivity.f1023b.getLayoutParams();
+                        purchaseActivity.f3435z.setVisibility(8);
+                        layoutParams = (LinearLayout.LayoutParams) purchaseActivity.f3411b.getLayoutParams();
                         layoutParams.width = -1;
-                        purchaseActivity.f1023b.setLayoutParams(layoutParams);
+                        purchaseActivity.f3411b.setLayoutParams(layoutParams);
                         pxFromDp = count;
                     }
-                    List list2 = purchaseActivity.f1008D.c;
+                    List list2 = purchaseActivity.f3396D.c;
                     if (list2 == null) {
                         list2 = new ArrayList();
                     }
@@ -302,45 +301,45 @@ public class PurchaseActivity extends Activity {
                     for (int i = 0; i < pxFromDp; i++) {
                         list2.add(new Integer(i));
                     }
-                    bs bsVar = purchaseActivity.f1008D;
-                    bsVar.f1117e = 0;
-                    bsVar.f1118f = null;
-                    if (!purchaseActivity.f1014J || purchaseActivity.f1009E == null) {
-                        purchaseActivity.f1008D.m849a((C1025a) purchaseActivity.f1007C.getItem(0));
+                    bs bsVar = purchaseActivity.f3396D;
+                    bsVar.f3505e = 0;
+                    bsVar.f3506f = null;
+                    if (!purchaseActivity.f3402J || purchaseActivity.f3397E == null) {
+                        purchaseActivity.f3396D.m3874a((C1341a) purchaseActivity.f3395C.getItem(0));
                     } else {
-                        purchaseActivity.f1008D.m849a(purchaseActivity.f1009E);
+                        purchaseActivity.f3396D.m3874a(purchaseActivity.f3397E);
                     }
-                    purchaseActivity.f1008D.m757a(purchaseActivity.f1007C.m756a(), list2);
+                    purchaseActivity.f3396D.m3782a(purchaseActivity.f3395C.m3781a(), list2);
                 }
             }
-            if (purchaseActivity.f1014J) {
-                String a = purchaseActivity.m782a("welcomePage");
-                String url = purchaseActivity.f1046y.getUrl();
+            if (purchaseActivity.f3402J) {
+                String a = purchaseActivity.m3807a("welcomePage");
+                String url = purchaseActivity.f3434y.getUrl();
                 if (url == null || !url.equals(a)) {
-                    purchaseActivity.f1046y.stopLoading();
-                    purchaseActivity.f1046y.clearCache(true);
-                    purchaseActivity.f1046y.loadUrl(a);
+                    purchaseActivity.f3434y.stopLoading();
+                    purchaseActivity.f3434y.clearCache(true);
+                    purchaseActivity.f3434y.loadUrl(a);
                     return;
                 }
-                purchaseActivity.m802b();
-                purchaseActivity.f1024c = true;
-                purchaseActivity.f1013I = false;
+                purchaseActivity.m3827b();
+                purchaseActivity.f3412c = true;
+                purchaseActivity.f3401I = false;
                 return;
             }
-            purchaseActivity.f1007C.f1144e = 0;
-            purchaseActivity.m795a(purchaseActivity.f1008D != null ? purchaseActivity.f1008D.f1118f : (C1025a) purchaseActivity.f1007C.getItem(0));
+            purchaseActivity.f3395C.f3532e = 0;
+            purchaseActivity.m3820a(purchaseActivity.f3396D != null ? purchaseActivity.f3396D.f3506f : (C1341a) purchaseActivity.f3395C.getItem(0));
         }
     }
 
     /* renamed from: a */
-    static /* synthetic */ void m791a(PurchaseActivity purchaseActivity, C1033g c1033g, boolean z) {
+    static /* synthetic */ void m3816a(PurchaseActivity purchaseActivity, C1349g c1349g, boolean z) {
         LinearLayout linearLayout;
-        purchaseActivity.f1037p = c1033g.f977d;
-        if (purchaseActivity.m782a("infoPage") != null) {
-            purchaseActivity.f1009E = new C1043f("Info", purchaseActivity.m782a("infoPage"));
+        purchaseActivity.f3425p = c1349g.f3365d;
+        if (purchaseActivity.m3807a("infoPage") != null) {
+            purchaseActivity.f3397E = new C1359f("Info", purchaseActivity.m3807a("infoPage"));
         }
-        purchaseActivity.f1038q = c1033g.f975b;
-        Object obj = (purchaseActivity.f1009E == null || !((C1043f) purchaseActivity.f1009E).f1138b) ? null : 1;
+        purchaseActivity.f3426q = c1349g.f3363b;
+        Object obj = (purchaseActivity.f3397E == null || !((C1359f) purchaseActivity.f3397E).f3526b) ? null : 1;
         int pxFromDp = DisplayUtils.pxFromDp(purchaseActivity, z ? 40.0f : 120.0f);
         int pxFromDp2 = obj != null ? DisplayUtils.pxFromDp(purchaseActivity, 40.0f) : 0;
         int i = DisplayUtils.getScreenSize(purchaseActivity).x;
@@ -349,7 +348,7 @@ public class PurchaseActivity extends Activity {
         linearLayout2.setOrientation(1);
         LayoutParams layoutParams = new RelativeLayout.LayoutParams(-1, -1);
         layoutParams.addRule(13);
-        purchaseActivity.f1022a.addView(linearLayout2, layoutParams);
+        purchaseActivity.f3410a.addView(linearLayout2, layoutParams);
         View linearLayout3 = new LinearLayout(purchaseActivity);
         linearLayout3.setBackgroundColor(-1);
         linearLayout3.setOrientation(0);
@@ -373,16 +372,16 @@ public class PurchaseActivity extends Activity {
         imageButton.setBackgroundColor(Color.rgb(92, 176, 59));
         imageButton.setPadding(0, 0, 0, 0);
         imageButton.setOnClickListener(new bo(purchaseActivity));
-        imageButton.setImageDrawable(purchaseActivity.m781a(C1084m.m936g()));
+        imageButton.setImageDrawable(purchaseActivity.m3806a(C1400m.m3961g()));
         linearLayout3.addView(imageButton, new LinearLayout.LayoutParams(pxFromDp, -1));
         View linearLayout4 = new LinearLayout(purchaseActivity);
         linearLayout4.setWeightSum(4.0f);
         linearLayout3.addView(linearLayout4, new LinearLayout.LayoutParams((i - pxFromDp) - pxFromDp2, -1));
-        purchaseActivity.f1005A = new C1029d(purchaseActivity);
-        purchaseActivity.f1005A.m757a(purchaseActivity.m782a("country"), c1033g.f978e);
+        purchaseActivity.f3393A = new C1345d(purchaseActivity);
+        purchaseActivity.f3393A.m3782a(purchaseActivity.m3807a("country"), c1349g.f3366e);
         int i2 = 0;
-        while (i2 < purchaseActivity.f1005A.getCount()) {
-            if (((Country) purchaseActivity.f1005A.getItem(i2)).getCode().equals(C1062j.m858a())) {
+        while (i2 < purchaseActivity.f3393A.getCount()) {
+            if (((Country) purchaseActivity.f3393A.getItem(i2)).getCode().equals(C1378j.m3883a())) {
                 break;
             }
             i2++;
@@ -391,21 +390,21 @@ public class PurchaseActivity extends Activity {
         LayoutParams layoutParams2 = new LinearLayout.LayoutParams(0, -1);
         layoutParams2.weight = 2.0f;
         layoutParams2.setMargins(DisplayUtils.pxFromDp(purchaseActivity, 5.0f), DisplayUtils.pxFromDp(purchaseActivity, 0.0f), DisplayUtils.pxFromDp(purchaseActivity, 0.0f), DisplayUtils.pxFromDp(purchaseActivity, 0.0f));
-        purchaseActivity.f1010F = new Spinner(purchaseActivity, 1);
-        purchaseActivity.f1010F.setBackgroundColor(0);
-        purchaseActivity.f1010F.setAdapter(purchaseActivity.f1005A);
-        purchaseActivity.f1010F.setSelection(i2);
-        purchaseActivity.f1010F.setPadding(0, 0, 0, 0);
-        purchaseActivity.f1010F.setEnabled(purchaseActivity.f1005A.getCount() > 1);
-        purchaseActivity.f1010F.setOnTouchListener(new bp(purchaseActivity));
-        purchaseActivity.f1020P = i2;
+        purchaseActivity.f3398F = new Spinner(purchaseActivity, 1);
+        purchaseActivity.f3398F.setBackgroundColor(0);
+        purchaseActivity.f3398F.setAdapter(purchaseActivity.f3393A);
+        purchaseActivity.f3398F.setSelection(i2);
+        purchaseActivity.f3398F.setPadding(0, 0, 0, 0);
+        purchaseActivity.f3398F.setEnabled(purchaseActivity.f3393A.getCount() > 1);
+        purchaseActivity.f3398F.setOnTouchListener(new bp(purchaseActivity));
+        purchaseActivity.f3408P = i2;
         int i3 = VERSION.SDK_INT;
-        purchaseActivity.f1010F.setOnItemSelectedListener(new C1049m(purchaseActivity));
-        linearLayout4.addView(purchaseActivity.f1010F, layoutParams2);
-        purchaseActivity.f1006B = new C1037b(purchaseActivity);
-        purchaseActivity.f1006B.m757a(purchaseActivity.m782a("paymentType"), c1033g.f976c);
+        purchaseActivity.f3398F.setOnItemSelectedListener(new C1365m(purchaseActivity));
+        linearLayout4.addView(purchaseActivity.f3398F, layoutParams2);
+        purchaseActivity.f3394B = new C1353b(purchaseActivity);
+        purchaseActivity.f3394B.m3782a(purchaseActivity.m3807a("paymentType"), c1349g.f3364c);
         imageButton = new ImageView(purchaseActivity);
-        imageButton.setImageBitmap(C1084m.m935f());
+        imageButton.setImageBitmap(C1400m.m3960f());
         imageButton.setPadding(0, 0, 0, 0);
         LayoutParams layoutParams3 = new LinearLayout.LayoutParams(DisplayUtils.pxFromDp(purchaseActivity, 9.0f), -1);
         layoutParams3.weight = 0.0f;
@@ -413,28 +412,28 @@ public class PurchaseActivity extends Activity {
         layoutParams3 = new LinearLayout.LayoutParams(0, -1);
         layoutParams3.weight = 2.0f;
         layoutParams3.setMargins(DisplayUtils.pxFromDp(purchaseActivity, 0.0f), DisplayUtils.pxFromDp(purchaseActivity, 0.0f), DisplayUtils.pxFromDp(purchaseActivity, 0.0f), DisplayUtils.pxFromDp(purchaseActivity, 0.0f));
-        purchaseActivity.f1021Q = 0;
-        purchaseActivity.f1011G = new Spinner(purchaseActivity, 1);
-        purchaseActivity.f1011G.setBackgroundColor(0);
-        purchaseActivity.f1011G.setAdapter(purchaseActivity.f1006B);
-        purchaseActivity.f1011G.setSelection(0);
-        purchaseActivity.f1011G.setPadding(0, 0, 0, 0);
-        purchaseActivity.f1011G.setEnabled(purchaseActivity.f1006B.getCount() > 1);
+        purchaseActivity.f3409Q = 0;
+        purchaseActivity.f3399G = new Spinner(purchaseActivity, 1);
+        purchaseActivity.f3399G.setBackgroundColor(0);
+        purchaseActivity.f3399G.setAdapter(purchaseActivity.f3394B);
+        purchaseActivity.f3399G.setSelection(0);
+        purchaseActivity.f3399G.setPadding(0, 0, 0, 0);
+        purchaseActivity.f3399G.setEnabled(purchaseActivity.f3394B.getCount() > 1);
         i3 = VERSION.SDK_INT;
-        purchaseActivity.f1011G.setOnTouchListener(new C1052p(purchaseActivity));
-        purchaseActivity.f1011G.setOnItemSelectedListener(new C1053q(purchaseActivity));
-        linearLayout4.addView(purchaseActivity.f1011G, layoutParams3);
+        purchaseActivity.f3399G.setOnTouchListener(new C1368p(purchaseActivity));
+        purchaseActivity.f3399G.setOnItemSelectedListener(new C1369q(purchaseActivity));
+        linearLayout4.addView(purchaseActivity.f3399G, layoutParams3);
         if (obj != null) {
             imageButton = new ImageButton(purchaseActivity);
             imageButton.setMinimumWidth(0);
             imageButton.setMinimumHeight(0);
             imageButton.setBackgroundColor(Color.rgb(92, 176, 59));
             imageButton.setPadding(0, 0, 0, 0);
-            imageButton.setImageDrawable(purchaseActivity.m781a(C1084m.m937h()));
-            imageButton.setOnClickListener(new C1056u(purchaseActivity));
+            imageButton.setImageDrawable(purchaseActivity.m3806a(C1400m.m3962h()));
+            imageButton.setOnClickListener(new C1372u(purchaseActivity));
             linearLayout3.addView(imageButton, new LinearLayout.LayoutParams(pxFromDp2, -1));
         }
-        purchaseActivity.f1007C = new C1045i(purchaseActivity);
+        purchaseActivity.f3395C = new C1361i(purchaseActivity);
         View relativeLayout;
         if (z) {
             relativeLayout = new RelativeLayout(purchaseActivity);
@@ -455,24 +454,24 @@ public class PurchaseActivity extends Activity {
             layoutParams = new RelativeLayout.LayoutParams(DisplayUtils.pxFromDp(purchaseActivity, 70.0f), DisplayUtils.pxFromDp(purchaseActivity, 40.0f));
             layoutParams.addRule(11);
             layoutParams.addRule(15);
-            purchaseActivity.f1047z = new Button(purchaseActivity);
-            purchaseActivity.f1047z.setText("MORE");
-            purchaseActivity.f1047z.setTextSize(16.0f);
-            purchaseActivity.f1047z.setMinimumWidth(0);
-            purchaseActivity.f1047z.setMinWidth(0);
-            purchaseActivity.f1047z.setMaxWidth(DisplayUtils.pxFromDp(purchaseActivity, 70.0f));
-            purchaseActivity.f1047z.setTypeface(Typeface.DEFAULT_BOLD);
-            purchaseActivity.f1047z.setTextColor(Color.rgb(92, 176, 59));
-            Bitmap d = C1084m.m933d();
+            purchaseActivity.f3435z = new Button(purchaseActivity);
+            purchaseActivity.f3435z.setText("MORE");
+            purchaseActivity.f3435z.setTextSize(16.0f);
+            purchaseActivity.f3435z.setMinimumWidth(0);
+            purchaseActivity.f3435z.setMinWidth(0);
+            purchaseActivity.f3435z.setMaxWidth(DisplayUtils.pxFromDp(purchaseActivity, 70.0f));
+            purchaseActivity.f3435z.setTypeface(Typeface.DEFAULT_BOLD);
+            purchaseActivity.f3435z.setTextColor(Color.rgb(92, 176, 59));
+            Bitmap d = C1400m.m3958d();
             if (d != null) {
-                purchaseActivity.f1047z.setCompoundDrawablesWithIntrinsicBounds(null, null, purchaseActivity.m781a(d), null);
+                purchaseActivity.f3435z.setCompoundDrawablesWithIntrinsicBounds(null, null, purchaseActivity.m3806a(d), null);
             }
-            purchaseActivity.f1047z.setCompoundDrawablePadding(DisplayUtils.pxFromDp(purchaseActivity, 4.0f));
-            purchaseActivity.f1047z.setBackgroundColor(0);
-            purchaseActivity.f1047z.setPadding(0, 0, DisplayUtils.pxFromDp(purchaseActivity, 4.0f), 0);
-            purchaseActivity.f1047z.setOnTouchListener(new C1059x(purchaseActivity));
-            purchaseActivity.f1047z.setOnClickListener(new C1060y(purchaseActivity));
-            relativeLayout.addView(purchaseActivity.f1047z, layoutParams);
+            purchaseActivity.f3435z.setCompoundDrawablePadding(DisplayUtils.pxFromDp(purchaseActivity, 4.0f));
+            purchaseActivity.f3435z.setBackgroundColor(0);
+            purchaseActivity.f3435z.setPadding(0, 0, DisplayUtils.pxFromDp(purchaseActivity, 4.0f), 0);
+            purchaseActivity.f3435z.setOnTouchListener(new C1375x(purchaseActivity));
+            purchaseActivity.f3435z.setOnClickListener(new C1376y(purchaseActivity));
+            relativeLayout.addView(purchaseActivity.f3435z, layoutParams);
             imageButton = new LinearLayout(purchaseActivity);
             imageButton.setBackgroundColor(0);
             imageButton.setOrientation(0);
@@ -480,22 +479,22 @@ public class PurchaseActivity extends Activity {
             layoutParams3.addRule(9);
             layoutParams3.addRule(15);
             relativeLayout.addView(imageButton, layoutParams3);
-            purchaseActivity.f1023b = new C1074c(purchaseActivity);
-            purchaseActivity.f1023b.setBackgroundColor(0);
-            purchaseActivity.f1023b.setScrollingEnabled(false);
-            purchaseActivity.f1023b.setHorizontalFadingEdgeEnabled(false);
-            C1074c c1074c = purchaseActivity.f1023b;
-            ListAdapter bsVar = new bs(purchaseActivity, purchaseActivity.f1007C);
-            purchaseActivity.f1008D = bsVar;
-            c1074c.setAdapter(bsVar);
-            purchaseActivity.f1023b.setOnItemClickListener(new ac(purchaseActivity));
-            imageButton.addView(purchaseActivity.f1023b, new LinearLayout.LayoutParams(-1, DisplayUtils.pxFromDp(purchaseActivity, 60.0f)));
+            purchaseActivity.f3411b = new C1390c(purchaseActivity);
+            purchaseActivity.f3411b.setBackgroundColor(0);
+            purchaseActivity.f3411b.setScrollingEnabled(false);
+            purchaseActivity.f3411b.setHorizontalFadingEdgeEnabled(false);
+            C1390c c1390c = purchaseActivity.f3411b;
+            ListAdapter bsVar = new bs(purchaseActivity, purchaseActivity.f3395C);
+            purchaseActivity.f3396D = bsVar;
+            c1390c.setAdapter(bsVar);
+            purchaseActivity.f3411b.setOnItemClickListener(new ac(purchaseActivity));
+            imageButton.addView(purchaseActivity.f3411b, new LinearLayout.LayoutParams(-1, DisplayUtils.pxFromDp(purchaseActivity, 60.0f)));
             linearLayout = new LinearLayout(purchaseActivity);
             linearLayout.setBackgroundColor(Color.rgb(100, 100, 100));
             linearLayout.setOrientation(1);
             linearLayout2.addView(linearLayout, new LinearLayout.LayoutParams(-1, -1));
         } else {
-            purchaseActivity.f1007C.f1143d = 2;
+            purchaseActivity.f3395C.f3531d = 2;
             relativeLayout = new LinearLayout(purchaseActivity);
             relativeLayout.setBackgroundColor(0);
             relativeLayout.setOrientation(0);
@@ -512,204 +511,204 @@ public class PurchaseActivity extends Activity {
             } else {
                 listView.setBackgroundDrawable(layerDrawable);
             }
-            listView.setAdapter(purchaseActivity.f1007C);
+            listView.setAdapter(purchaseActivity.f3395C);
             listView.setOnTouchListener(new af(purchaseActivity));
             listView.setOnItemClickListener(new ag(purchaseActivity));
             listView.setOnItemLongClickListener(new aj(purchaseActivity));
             relativeLayout.addView(listView, new LinearLayout.LayoutParams(DisplayUtils.pxFromDp(purchaseActivity, 120.0f), -1));
             imageButton = relativeLayout;
         }
-        purchaseActivity.f1012H.setCallback(new an(purchaseActivity));
-        purchaseActivity.f1046y = new WebView(purchaseActivity);
-        purchaseActivity.f1046y.addJavascriptInterface(purchaseActivity.f1012H, SettingsJsonConstants.APP_KEY);
-        purchaseActivity.f1046y.setHorizontalScrollBarEnabled(true);
-        purchaseActivity.f1046y.setVerticalScrollBarEnabled(true);
-        purchaseActivity.f1046y.setHapticFeedbackEnabled(false);
-        purchaseActivity.f1046y.setOnLongClickListener(new ap(purchaseActivity));
-        purchaseActivity.f1046y.setLongClickable(false);
-        purchaseActivity.f1046y.getSettings().setAllowContentAccess(true);
-        purchaseActivity.f1046y.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-        purchaseActivity.f1046y.getSettings().setJavaScriptEnabled(true);
-        purchaseActivity.f1046y.getSettings().setSupportZoom(true);
-        purchaseActivity.f1046y.getSettings().setDomStorageEnabled(true);
-        purchaseActivity.f1046y.getSettings().setUseWideViewPort(true);
-        purchaseActivity.f1046y.getSettings().setLoadWithOverviewMode(true);
-        purchaseActivity.f1046y.getSettings().setAppCacheEnabled(false);
-        purchaseActivity.f1046y.getSettings().setCacheMode(2);
-        purchaseActivity.f1046y.setWebChromeClient(new WebChromeClient());
-        purchaseActivity.f1046y.setWebViewClient(new aq(purchaseActivity));
-        purchaseActivity.f1046y.setOnTouchListener(new ar(purchaseActivity));
-        linearLayout.addView(purchaseActivity.f1046y, new LinearLayout.LayoutParams(-1, -1));
-        if (purchaseActivity.f1040s != null) {
-            purchaseActivity.f1040s.bringToFront();
+        purchaseActivity.f3400H.setCallback(new an(purchaseActivity));
+        purchaseActivity.f3434y = new WebView(purchaseActivity);
+        purchaseActivity.f3434y.addJavascriptInterface(purchaseActivity.f3400H, "app");
+        purchaseActivity.f3434y.setHorizontalScrollBarEnabled(true);
+        purchaseActivity.f3434y.setVerticalScrollBarEnabled(true);
+        purchaseActivity.f3434y.setHapticFeedbackEnabled(false);
+        purchaseActivity.f3434y.setOnLongClickListener(new ap(purchaseActivity));
+        purchaseActivity.f3434y.setLongClickable(false);
+        purchaseActivity.f3434y.getSettings().setAllowContentAccess(true);
+        purchaseActivity.f3434y.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        purchaseActivity.f3434y.getSettings().setJavaScriptEnabled(true);
+        purchaseActivity.f3434y.getSettings().setSupportZoom(true);
+        purchaseActivity.f3434y.getSettings().setDomStorageEnabled(true);
+        purchaseActivity.f3434y.getSettings().setUseWideViewPort(true);
+        purchaseActivity.f3434y.getSettings().setLoadWithOverviewMode(true);
+        purchaseActivity.f3434y.getSettings().setAppCacheEnabled(false);
+        purchaseActivity.f3434y.getSettings().setCacheMode(2);
+        purchaseActivity.f3434y.setWebChromeClient(new WebChromeClient());
+        purchaseActivity.f3434y.setWebViewClient(new aq(purchaseActivity));
+        purchaseActivity.f3434y.setOnTouchListener(new ar(purchaseActivity));
+        linearLayout.addView(purchaseActivity.f3434y, new LinearLayout.LayoutParams(-1, -1));
+        if (purchaseActivity.f3428s != null) {
+            purchaseActivity.f3428s.bringToFront();
         }
-        purchaseActivity.f1014J = true;
+        purchaseActivity.f3402J = true;
     }
 
     /* renamed from: a */
-    static /* synthetic */ void m794a(PurchaseActivity purchaseActivity, C1066n c1066n) {
-        if (!purchaseActivity.f1014J && !purchaseActivity.f1025d) {
-            if (c1066n == null || !purchaseActivity.m797a(c1066n.f1186c)) {
-                JSONObject jSONObject = c1066n.f1185b;
+    static /* synthetic */ void m3819a(PurchaseActivity purchaseActivity, C1382n c1382n) {
+        if (!purchaseActivity.f3402J && !purchaseActivity.f3413d) {
+            if (c1382n == null || !purchaseActivity.m3822a(c1382n.f3574c)) {
+                JSONObject jSONObject = c1382n.f3573b;
                 try {
-                    purchaseActivity.f1030i = new br(purchaseActivity.f1026e, purchaseActivity.getPackageName(), jSONObject.has("order_id") ? jSONObject.getString("order_id") : "xxx", jSONObject.has("order_id") ? jSONObject.getString("order_id") : "xxx", jSONObject.has(Param.TIMESTAMP) ? jSONObject.getLong(Param.TIMESTAMP) : 0, jSONObject.has("payload") ? jSONObject.getString("payload") : purchaseActivity.f1029h, jSONObject.has("gp_status") ? jSONObject.getInt("gp_status") : 1);
-                    purchaseActivity.f1019O = (jSONObject.has("timer") ? jSONObject.getInt("timer") : 5) * 1000;
-                    purchaseActivity.f1036o = jSONObject.has("header_text") ? jSONObject.getString("header_text") : "Confirmation";
-                    purchaseActivity.f1035n = jSONObject.has("info_text") ? jSONObject.getString("info_text") : "Cancel current Purchase?";
-                    purchaseActivity.f1033l = jSONObject.has("yes_btn_text") ? jSONObject.getString("yes_btn_text") : "Yes";
-                    purchaseActivity.f1034m = jSONObject.has("no_btn_text") ? jSONObject.getString("no_btn_text") : "No";
+                    purchaseActivity.f3418i = new br(purchaseActivity.f3414e, purchaseActivity.getPackageName(), jSONObject.has("order_id") ? jSONObject.getString("order_id") : "xxx", jSONObject.has("order_id") ? jSONObject.getString("order_id") : "xxx", jSONObject.has(Param.TIMESTAMP) ? jSONObject.getLong(Param.TIMESTAMP) : 0, jSONObject.has("payload") ? jSONObject.getString("payload") : purchaseActivity.f3417h, jSONObject.has("gp_status") ? jSONObject.getInt("gp_status") : 1);
+                    purchaseActivity.f3407O = (jSONObject.has("timer") ? jSONObject.getInt("timer") : 5) * 1000;
+                    purchaseActivity.f3424o = jSONObject.has("header_text") ? jSONObject.getString("header_text") : "Confirmation";
+                    purchaseActivity.f3423n = jSONObject.has("info_text") ? jSONObject.getString("info_text") : "Cancel current Purchase?";
+                    purchaseActivity.f3421l = jSONObject.has("yes_btn_text") ? jSONObject.getString("yes_btn_text") : "Yes";
+                    purchaseActivity.f3422m = jSONObject.has("no_btn_text") ? jSONObject.getString("no_btn_text") : "No";
                 } catch (JSONException e) {
                 }
-                purchaseActivity.f1015K = false;
-                purchaseActivity.f1016L = false;
-                purchaseActivity.f1046y.stopLoading();
-                purchaseActivity.f1046y.clearCache(true);
-                purchaseActivity.f1046y.loadUrl(c1066n.f1184a);
+                purchaseActivity.f3403K = false;
+                purchaseActivity.f3404L = false;
+                purchaseActivity.f3434y.stopLoading();
+                purchaseActivity.f3434y.clearCache(true);
+                purchaseActivity.f3434y.loadUrl(c1382n.f3572a);
             }
         }
     }
 
     /* renamed from: a */
-    private void m795a(C1025a c1025a) {
-        if (c1025a != null) {
-            if (this.f1042u != null) {
-                this.f1042u.cancel(true);
-                this.f1042u = null;
+    private void m3820a(C1341a c1341a) {
+        if (c1341a != null) {
+            if (this.f3430u != null) {
+                this.f3430u.cancel(true);
+                this.f3430u = null;
             }
-            m784a();
-            this.f1046y.stopLoading();
-            if (c1025a instanceof C1043f) {
-                this.f1007C.f1144e = -1;
-                if (this.f1007C.f1145f != null) {
-                    this.f1007C.f1145f.setBackgroundColor(Color.rgb(241, 241, 241));
+            m3809a();
+            this.f3434y.stopLoading();
+            if (c1341a instanceof C1359f) {
+                this.f3395C.f3532e = -1;
+                if (this.f3395C.f3533f != null) {
+                    this.f3395C.f3533f.setBackgroundColor(Color.rgb(241, 241, 241));
                 }
-                this.f1007C.f1145f = null;
-                this.f1046y.loadUrl(((C1043f) c1025a).f1137a);
+                this.f3395C.f3533f = null;
+                this.f3434y.loadUrl(((C1359f) c1341a).f3525a);
                 return;
             }
-            this.f1042u = new at(this, c1025a).execute(new Void[0]);
+            this.f3430u = new at(this, c1341a).execute(new Void[0]);
         }
     }
 
     /* renamed from: a */
-    private void m796a(bq bqVar, boolean z) {
+    private void m3821a(bq bqVar, boolean z) {
         new bk(this, z, bqVar).execute(new Void[0]);
     }
 
     /* renamed from: a */
-    private boolean m797a(C1032f c1032f) {
-        if (c1032f == null || c1032f.f972b) {
+    private boolean m3822a(C1348f c1348f) {
+        if (c1348f == null || c1348f.f3360b) {
             return false;
         }
-        m802b();
-        new Builder(this).setTitle("Error(" + String.valueOf(c1032f.f971a) + ")").setMessage(c1032f.f973c).setNegativeButton("Dismiss", new bc(this, c1032f)).setOnCancelListener(new bb(this, c1032f)).show();
+        m3827b();
+        new Builder(this).setTitle("Error(" + String.valueOf(c1348f.f3359a) + ")").setMessage(c1348f.f3361c).setNegativeButton("Dismiss", new bc(this, c1348f)).setOnCancelListener(new bb(this, c1348f)).show();
         return true;
     }
 
     /* renamed from: b */
-    private void m802b() {
-        m806c();
-        if (this.f1040s != null && this.f1040s.isShown()) {
-            this.f1043v.post(new bn(this));
+    private void m3827b() {
+        m3831c();
+        if (this.f3428s != null && this.f3428s.isShown()) {
+            this.f3431v.post(new bn(this));
         }
     }
 
     /* renamed from: b */
-    static /* synthetic */ void m803b(PurchaseActivity purchaseActivity, int i, String str) {
-        purchaseActivity.setResult(-1, m780a(i, null, str));
+    static /* synthetic */ void m3828b(PurchaseActivity purchaseActivity, int i, String str) {
+        purchaseActivity.setResult(-1, m3805a(i, null, str));
         purchaseActivity.finish();
     }
 
     /* renamed from: b */
-    static /* synthetic */ void m804b(PurchaseActivity purchaseActivity, String str) {
+    static /* synthetic */ void m3829b(PurchaseActivity purchaseActivity, String str) {
         int i = 1;
         try {
-            br brVar = new br(purchaseActivity.f1026e, str.substring(9), purchaseActivity.getPackageName());
-            if ((brVar.f1113a == 0 ? 1 : 0) != 0) {
+            br brVar = new br(purchaseActivity.f3414e, str.substring(9), purchaseActivity.getPackageName());
+            if ((brVar.f3501a == 0 ? 1 : 0) != 0) {
                 i = -1;
             }
-            purchaseActivity.setResult(i, m780a(brVar.f1113a, brVar, null));
+            purchaseActivity.setResult(i, m3805a(brVar.f3501a, brVar, null));
             purchaseActivity.finish();
         } catch (Exception e) {
-            purchaseActivity.m785a(-1002, "Something went wrong!\nException: " + e.getLocalizedMessage());
+            purchaseActivity.m3810a(-1002, "Something went wrong!\nException: " + e.getLocalizedMessage());
         }
     }
 
     /* renamed from: b */
-    static /* synthetic */ void m805b(PurchaseActivity purchaseActivity, boolean z) {
-        purchaseActivity.f1025d = z;
+    static /* synthetic */ void m3830b(PurchaseActivity purchaseActivity, boolean z) {
+        purchaseActivity.f3413d = z;
         if (z) {
-            if (purchaseActivity.f1010F != null) {
-                purchaseActivity.f1010F.setAlpha(0.4f);
+            if (purchaseActivity.f3398F != null) {
+                purchaseActivity.f3398F.setAlpha(0.4f);
             }
-            if (purchaseActivity.f1011G != null) {
-                purchaseActivity.f1011G.setAlpha(0.4f);
+            if (purchaseActivity.f3399G != null) {
+                purchaseActivity.f3399G.setAlpha(0.4f);
             }
-            if (purchaseActivity.f1047z != null) {
-                purchaseActivity.f1047z.setAlpha(0.4f);
+            if (purchaseActivity.f3435z != null) {
+                purchaseActivity.f3435z.setAlpha(0.4f);
             }
-            if (purchaseActivity.f1008D != null) {
-                purchaseActivity.f1008D.m849a(purchaseActivity.f1009E);
+            if (purchaseActivity.f3396D != null) {
+                purchaseActivity.f3396D.m3874a(purchaseActivity.f3397E);
             }
-            purchaseActivity.m795a(purchaseActivity.f1009E);
+            purchaseActivity.m3820a(purchaseActivity.f3397E);
             return;
         }
-        if (purchaseActivity.f1014J) {
-            String a = purchaseActivity.m782a("welcomePage");
-            String url = purchaseActivity.f1046y.getUrl();
+        if (purchaseActivity.f3402J) {
+            String a = purchaseActivity.m3807a("welcomePage");
+            String url = purchaseActivity.f3434y.getUrl();
             if (url == null || !url.equals(a)) {
-                purchaseActivity.f1046y.stopLoading();
-                purchaseActivity.f1046y.clearCache(true);
-                purchaseActivity.f1046y.loadUrl(a);
+                purchaseActivity.f3434y.stopLoading();
+                purchaseActivity.f3434y.clearCache(true);
+                purchaseActivity.f3434y.loadUrl(a);
             } else {
-                purchaseActivity.m802b();
-                purchaseActivity.f1024c = true;
-                purchaseActivity.f1013I = false;
+                purchaseActivity.m3827b();
+                purchaseActivity.f3412c = true;
+                purchaseActivity.f3401I = false;
             }
         }
-        if (purchaseActivity.f1010F != null) {
-            purchaseActivity.f1010F.setAlpha(1.0f);
+        if (purchaseActivity.f3398F != null) {
+            purchaseActivity.f3398F.setAlpha(1.0f);
         }
-        if (purchaseActivity.f1011G != null) {
-            purchaseActivity.f1011G.setAlpha(1.0f);
+        if (purchaseActivity.f3399G != null) {
+            purchaseActivity.f3399G.setAlpha(1.0f);
         }
-        if (purchaseActivity.f1047z != null) {
-            purchaseActivity.f1047z.setAlpha(1.0f);
+        if (purchaseActivity.f3435z != null) {
+            purchaseActivity.f3435z.setAlpha(1.0f);
         }
     }
 
     /* renamed from: c */
-    private void m806c() {
-        this.f1043v.removeCallbacks(this.f1044w);
-        this.f1044w = null;
+    private void m3831c() {
+        this.f3431v.removeCallbacks(this.f3432w);
+        this.f3432w = null;
     }
 
     /* renamed from: c */
-    static /* synthetic */ void m808c(PurchaseActivity purchaseActivity, int i) {
-        purchaseActivity.f1008D.m849a((C1025a) purchaseActivity.f1007C.getItem(i));
-        purchaseActivity.f1007C.f1144e = i;
-        purchaseActivity.m795a((C1025a) purchaseActivity.f1007C.getItem(i));
+    static /* synthetic */ void m3833c(PurchaseActivity purchaseActivity, int i) {
+        purchaseActivity.f3396D.m3874a((C1341a) purchaseActivity.f3395C.getItem(i));
+        purchaseActivity.f3395C.f3532e = i;
+        purchaseActivity.m3820a((C1341a) purchaseActivity.f3395C.getItem(i));
     }
 
     /* renamed from: m */
-    static /* synthetic */ void m821m(PurchaseActivity purchaseActivity) {
-        if (((purchaseActivity.f1014J || purchaseActivity.f1025d) && purchaseActivity.f1030i == null) || purchaseActivity.f1030i == null || !purchaseActivity.f1015K) {
-            purchaseActivity.setResult(0, m780a(-1005, null, "User cancelled"));
+    static /* synthetic */ void m3846m(PurchaseActivity purchaseActivity) {
+        if (((purchaseActivity.f3402J || purchaseActivity.f3413d) && purchaseActivity.f3418i == null) || purchaseActivity.f3418i == null || !purchaseActivity.f3403K) {
+            purchaseActivity.setResult(0, m3805a(-1005, null, "User cancelled"));
         } else {
             try {
-                purchaseActivity.setResult(-1, m780a(purchaseActivity.f1030i.f1113a, purchaseActivity.f1030i, null));
+                purchaseActivity.setResult(-1, m3805a(purchaseActivity.f3418i.f3501a, purchaseActivity.f3418i, null));
             } catch (Exception e) {
-                purchaseActivity.setResult(0, m780a(-1005, null, "User cancelled"));
+                purchaseActivity.setResult(0, m3805a(-1005, null, "User cancelled"));
             }
         }
         purchaseActivity.finish();
     }
 
     public void finish() {
-        m802b();
-        this.f1043v.removeCallbacksAndMessages(null);
-        if (this.f1042u != null) {
-            this.f1042u.cancel(true);
+        m3827b();
+        this.f3431v.removeCallbacksAndMessages(null);
+        if (this.f3430u != null) {
+            this.f3430u.cancel(true);
         }
         super.finish();
     }
@@ -719,20 +718,20 @@ public class PurchaseActivity extends Activity {
     }
 
     public void onBackPressed() {
-        if (this.f1024c) {
-            if (((this.f1014J || this.f1025d) && this.f1030i == null) || this.f1030i == null || !this.f1015K) {
-                setResult(0, m780a(-1005, null, "User cancelled"));
+        if (this.f3412c) {
+            if (((this.f3402J || this.f3413d) && this.f3418i == null) || this.f3418i == null || !this.f3403K) {
+                setResult(0, m3805a(-1005, null, "User cancelled"));
             } else {
                 try {
-                    setResult(-1, m780a(this.f1030i.f1113a, this.f1030i, null));
+                    setResult(-1, m3805a(this.f3418i.f3501a, this.f3418i, null));
                 } catch (Exception e) {
-                    setResult(0, m780a(-1005, null, "User cancelled"));
+                    setResult(0, m3805a(-1005, null, "User cancelled"));
                 }
             }
-            this.f1043v.removeCallbacksAndMessages(null);
-            if (this.f1042u != null) {
-                this.f1042u.cancel(true);
-                this.f1042u = null;
+            this.f3431v.removeCallbacksAndMessages(null);
+            if (this.f3430u != null) {
+                this.f3430u.cancel(true);
+                this.f3430u = null;
             }
             super.onBackPressed();
         }
@@ -741,37 +740,37 @@ public class PurchaseActivity extends Activity {
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         requestWindowFeature(1);
-        C1084m.m923a(getFilesDir().getPath());
-        this.f1041t = getSharedPreferences("_config_", 0);
-        this.f1043v = new Handler();
-        this.f1028g = getIntent().getExtras().getString("gid");
-        this.f1027f = getIntent().getExtras().getString("guid");
-        this.f1026e = getIntent().getExtras().getString("sku");
-        this.f1029h = getIntent().getExtras().getString("payload");
+        C1400m.m3948a(getFilesDir().getPath());
+        this.f3429t = getSharedPreferences("_config_", 0);
+        this.f3431v = new Handler();
+        this.f3416g = getIntent().getExtras().getString("gid");
+        this.f3415f = getIntent().getExtras().getString("guid");
+        this.f3414e = getIntent().getExtras().getString("sku");
+        this.f3417h = getIntent().getExtras().getString("payload");
         String string = getIntent().getExtras().getString("json");
         if (string != null) {
             try {
-                this.f1039r = new SkuDetails(string);
+                this.f3427r = new SkuDetails(string);
                 JSONObject jSONObject = new JSONObject(string);
-                this.f1031j = jSONObject.getString("price_amount_micros");
-                this.f1032k = jSONObject.getString("price_currency_code");
+                this.f3419j = jSONObject.getString("price_amount_micros");
+                this.f3420k = jSONObject.getString("price_currency_code");
             } catch (JSONException e) {
             }
         }
         View frameLayout = new FrameLayout(this);
         frameLayout.setBackgroundColor(0);
         setContentView(frameLayout, new LayoutParams(-1, -1));
-        this.f1022a = new RelativeLayout(this);
-        this.f1022a.setBackgroundColor(0);
-        frameLayout.addView(this.f1022a, new FrameLayout.LayoutParams(-1, -1));
-        this.f1040s = new ProgressBar(this);
-        this.f1040s.setIndeterminate(true);
-        this.f1040s.setVisibility(4);
+        this.f3410a = new RelativeLayout(this);
+        this.f3410a.setBackgroundColor(0);
+        frameLayout.addView(this.f3410a, new FrameLayout.LayoutParams(-1, -1));
+        this.f3428s = new ProgressBar(this);
+        this.f3428s.setIndeterminate(true);
+        this.f3428s.setVisibility(4);
         LayoutParams layoutParams = new RelativeLayout.LayoutParams(-2, -2);
         layoutParams.addRule(13);
-        this.f1022a.addView(this.f1040s, layoutParams);
-        m784a();
-        this.f1043v.post(new am(this));
+        this.f3410a.addView(this.f3428s, layoutParams);
+        m3809a();
+        this.f3431v.post(new am(this));
     }
 
     protected void onResume() {

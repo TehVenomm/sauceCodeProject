@@ -82,7 +82,7 @@ public class LivechatAgentsPath extends Path<LinkedHashMap<String, Agent>> {
         if (isClearRequired(str)) {
             clear();
         } else if (!str.isEmpty()) {
-            updateInternal((LinkedHashMap) this.PARSER.parse(str, new C0865c(this)));
+            updateInternal((LinkedHashMap) this.PARSER.parse(str, new C0864c(this)));
         }
     }
 }

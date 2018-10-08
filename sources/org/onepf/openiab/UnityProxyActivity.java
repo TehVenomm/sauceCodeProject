@@ -14,8 +14,8 @@ public class UnityProxyActivity extends Activity {
     private BroadcastReceiver broadcastReceiver;
 
     /* renamed from: org.onepf.openiab.UnityProxyActivity$1 */
-    class C13481 extends BroadcastReceiver {
-        C13481() {
+    class C15981 extends BroadcastReceiver {
+        C15981() {
         }
 
         public void onReceive(Context context, Intent intent) {
@@ -37,7 +37,7 @@ public class UnityProxyActivity extends Activity {
 
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        this.broadcastReceiver = new C13481();
+        this.broadcastReceiver = new C15981();
         registerReceiver(this.broadcastReceiver, new IntentFilter(ACTION_FINISH));
         if (UnityPlugin.sendRequest) {
             UnityPlugin.sendRequest = false;

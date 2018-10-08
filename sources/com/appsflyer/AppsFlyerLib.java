@@ -38,6 +38,7 @@ import com.facebook.internal.NativeProtocol;
 import com.facebook.internal.ServerProtocol;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.analytics.FirebaseAnalytics.Param;
+import im.getsocial.sdk.usermanagement.AuthIdentityProviderIds;
 import io.fabric.sdk.android.services.common.IdManager;
 import io.fabric.sdk.android.services.network.HttpRequest;
 import java.io.BufferedReader;
@@ -96,7 +97,7 @@ public class AppsFlyerLib implements C0259b {
     /* renamed from: ˊॱ */
     private static final List<String> f157 = Arrays.asList(new String[]{"is_cache"});
     /* renamed from: ˋॱ */
-    private static final List<String> f158 = Arrays.asList(new String[]{"googleplay", "playstore", "googleplaystore"});
+    private static final List<String> f158 = Arrays.asList(new String[]{AuthIdentityProviderIds.GOOGLE_PLAY, "playstore", "googleplaystore"});
     /* renamed from: ˎ */
     static final String f159 = new StringBuilder("https://register.%s/api/v").append(f155).toString();
     /* renamed from: ˏ */
@@ -3641,7 +3642,6 @@ public class AppsFlyerLib implements C0259b {
     /* renamed from: ˊ */
     private void m218(URL url, String str, String str2, WeakReference<Context> weakReference, String str3, boolean z) throws IOException {
         Object obj;
-        HttpURLConnection httpURLConnection;
         Throwable th;
         Writer writer;
         Context context = (Context) weakReference.get();
@@ -3650,6 +3650,7 @@ public class AppsFlyerLib implements C0259b {
         } else {
             obj = 1;
         }
+        HttpURLConnection httpURLConnection;
         try {
             C0300y.m378().m391(url.toString(), str);
             httpURLConnection = (HttpURLConnection) url.openConnection();

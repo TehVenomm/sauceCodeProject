@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/Root")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/Root")]
 public class UIRoot
 {
 	public enum Scaling

@@ -1,8 +1,8 @@
 using UnityEngine;
 
-[RequireComponent(typeof(UIWidget))]
-[AddComponentMenu("NGUI/UI/Localize")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/Localize")]
+[RequireComponent(typeof(UIWidget))]
 public class UILocalize
 {
 	public string key;

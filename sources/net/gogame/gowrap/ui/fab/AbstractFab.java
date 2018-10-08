@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.ui.fab.Fab.ClickListener;
 import net.gogame.gowrap.ui.utils.DisplayUtils;
 
@@ -29,7 +29,7 @@ public abstract class AbstractFab implements Fab {
         imageView.setImageDrawable(context.getResources().getDrawable(i));
         relativeLayout.addView(imageView);
         imageView = new ImageView(context);
-        imageView.setImageResource(C1110R.drawable.net_gogame_gowrap_server_down_fab_icon);
+        imageView.setImageResource(C1426R.drawable.net_gogame_gowrap_server_down_fab_icon);
         ViewGroup.LayoutParams layoutParams = new LayoutParams(-2, -2);
         layoutParams.setMargins(DisplayUtils.pxFromDp(context, 20.0f), DisplayUtils.pxFromDp(context, 5.0f), 0, 0);
         imageView.setLayoutParams(layoutParams);

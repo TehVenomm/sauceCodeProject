@@ -24,6 +24,7 @@ import com.google.android.gms.measurement.AppMeasurement;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.analytics.FirebaseAnalytics.Event;
 import com.google.firebase.analytics.FirebaseAnalytics.Param;
+import im.getsocial.sdk.ErrorCode;
 import io.fabric.sdk.android.services.common.AbstractSpiCall;
 import io.fabric.sdk.android.services.network.HttpRequest;
 import java.io.File;
@@ -559,7 +560,7 @@ public class zzcco {
     private final void zzb(zzcaj zzcaj) {
         zzauj().zzug();
         if (TextUtils.isEmpty(zzcaj.getGmpAppId())) {
-            zzb(zzcaj.getAppId(), 204, null, null, null);
+            zzb(zzcaj.getAppId(), ErrorCode.ILLEGAL_ARGUMENT, null, null, null);
             return;
         }
         String gmpAppId = zzcaj.getGmpAppId();
@@ -597,7 +598,6 @@ public class zzcco {
 
     @WorkerThread
     private final void zzc(zzcbc zzcbc, zzcak zzcak) {
-        zzcdl zzaue;
         zzbp.zzu(zzcak);
         zzbp.zzgf(zzcak.packageName);
         long nanoTime = System.nanoTime();
@@ -631,6 +631,7 @@ public class zzcco {
                 zzauk().zzayi().zzj("Logging event", zzauf().zzb(zzcbc));
             }
             zzaue().beginTransaction();
+            zzcdl zzaue;
             try {
                 zzaxy = zzcbc.zzinj.zzaxy();
                 zzf(zzcak);
@@ -2000,6 +2001,7 @@ public class zzcco {
 
     @WorkerThread
     protected final void zza(int i, Throwable th, byte[] bArr) {
+        zzcdl zzaue;
         zzauj().zzug();
         zzwh();
         if (bArr == null) {
@@ -2012,14 +2014,13 @@ public class zzcco {
         }
         List<Long> list = this.zzitk;
         this.zzitk = null;
-        if ((i == 200 || i == 204) && th == null) {
+        if ((i == 200 || i == ErrorCode.ILLEGAL_ARGUMENT) && th == null) {
             try {
                 zzaul().zziqg.set(this.zzasl.currentTimeMillis());
                 zzaul().zziqh.set(0);
                 zzazh();
                 zzauk().zzayi().zze("Successful upload. Got network response. code, size", Integer.valueOf(i), Integer.valueOf(bArr.length));
                 zzaue().beginTransaction();
-                zzcdl zzaue;
                 try {
                     for (Long l : list) {
                         zzaue = zzaue();
@@ -2158,11 +2159,11 @@ public class zzcco {
                 zzcgc.zzizt = zza(zziw.getAppId(), zzcgc.zzizb, zzcgc.zziza);
                 zzcgc.zzizd = zzcfz.zziyt;
                 zzcgc.zzize = zzcfz.zziyt;
-                long zzaur = zziw.zzaur();
-                zzcgc.zzizg = zzaur != 0 ? Long.valueOf(zzaur) : null;
-                zzaus = zziw.zzauq();
-                if (zzaus == 0) {
-                    zzaus = zzaur;
+                zzaus = zziw.zzaur();
+                zzcgc.zzizg = zzaus != 0 ? Long.valueOf(zzaus) : null;
+                long zzauq = zziw.zzauq();
+                if (zzauq != 0) {
+                    zzaus = zzauq;
                 }
                 zzcgc.zzizf = zzaus != 0 ? Long.valueOf(zzaus) : null;
                 zziw.zzava();
@@ -2327,11 +2328,11 @@ public class zzcco {
 
     @WorkerThread
     public final void zzazf() {
+        String zzawt;
         zzauj().zzug();
         zzwh();
         this.zzits = true;
         String zzaxh;
-        String zzawt;
         try {
             zzcap.zzawj();
             Boolean zzayn = zzaul().zzayn();
@@ -2763,7 +2764,7 @@ public class zzcco {
         zzauk().zzayi().zzj("onConfigFetched. Response size", Integer.valueOf(bArr.length));
         zzaue().beginTransaction();
         zzcaj zziw = zzaue().zziw(str);
-        boolean z2 = (i == 200 || i == 204 || i == 304) && th == null;
+        boolean z2 = (i == 200 || i == ErrorCode.ILLEGAL_ARGUMENT || i == 304) && th == null;
         if (zziw == null) {
             zzauk().zzaye().zzj("App does not exist in onConfigFetched. appId", zzcbo.zzjf(str));
         } else if (z2 || i == 404) {
@@ -2897,8 +2898,6 @@ public class zzcco {
 
     @WorkerThread
     public final void zze(zzcak zzcak) {
-        zzcdl zzaue;
-        String appId;
         zzauj().zzug();
         zzwh();
         zzbp.zzu(zzcak);
@@ -2925,6 +2924,8 @@ public class zzcco {
                     i = 0;
                 }
                 zzaue().beginTransaction();
+                zzcdl zzaue;
+                String appId;
                 try {
                     zziw = zzaue().zziw(zzcak.packageName);
                     if (!(zziw == null || zziw.getGmpAppId() == null || zziw.getGmpAppId().equals(zzcak.zziln))) {

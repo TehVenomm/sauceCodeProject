@@ -8,7 +8,7 @@
     <item android:top="1dp">
         <shape android:shape="rectangle">
             <corners android:radius="@dimen/net_gogame_gowrap_border_radius"/>
-            <solid android:color="#7d7d7d"/>
+            <solid android:color="#ff7d7d7d"/>
         </shape>
     </item>
     <item android:bottom="1dp">

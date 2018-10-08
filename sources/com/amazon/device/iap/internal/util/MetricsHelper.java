@@ -1,7 +1,7 @@
 package com.amazon.device.iap.internal.util;
 
-import com.amazon.device.iap.internal.p001b.C0197e;
-import com.amazon.device.iap.internal.p001b.p009h.C0228a;
+import com.amazon.device.iap.internal.p005b.C0197e;
+import com.amazon.device.iap.internal.p005b.p013h.C0228a;
 import com.amazon.device.iap.model.RequestId;
 import org.json.JSONObject;
 

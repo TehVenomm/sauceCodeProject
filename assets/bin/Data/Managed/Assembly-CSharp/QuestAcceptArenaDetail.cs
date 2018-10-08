@@ -223,15 +223,15 @@ public class QuestAcceptArenaDetail : QuestDeliveryDetail
 		{
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002a: Expected O, but got Unknown
-			if (((_003CPlayRankUpEffect_003Ec__Iterator12A)/*Error near IL_00a8: stateMachine*/).is_unlock_portal)
+			if (((_003CPlayRankUpEffect_003Ec__Iterator12E)/*Error near IL_00a8: stateMachine*/).is_unlock_portal)
 			{
-				QuestAcceptArenaDetail _003C_003Ef__this = ((_003CPlayRankUpEffect_003Ec__Iterator12A)/*Error near IL_00a8: stateMachine*/)._003C_003Ef__this;
-				string effectName2 = ((_003CPlayRankUpEffect_003Ec__Iterator12A)/*Error near IL_00a8: stateMachine*/).effectName;
-				if (_003CPlayRankUpEffect_003Ec__Iterator12A._003C_003Ef__am_0024cache8 == null)
+				QuestAcceptArenaDetail _003C_003Ef__this = ((_003CPlayRankUpEffect_003Ec__Iterator12E)/*Error near IL_00a8: stateMachine*/)._003C_003Ef__this;
+				string effectName2 = ((_003CPlayRankUpEffect_003Ec__Iterator12E)/*Error near IL_00a8: stateMachine*/).effectName;
+				if (_003CPlayRankUpEffect_003Ec__Iterator12E._003C_003Ef__am_0024cache8 == null)
 				{
-					_003CPlayRankUpEffect_003Ec__Iterator12A._003C_003Ef__am_0024cache8 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					_003CPlayRankUpEffect_003Ec__Iterator12E._003C_003Ef__am_0024cache8 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 				}
-				_003C_003Ef__this.PlayUnlockPortalTween(effectName2, _003CPlayRankUpEffect_003Ec__Iterator12A._003C_003Ef__am_0024cache8);
+				_003C_003Ef__this.PlayUnlockPortalTween(effectName2, _003CPlayRankUpEffect_003Ec__Iterator12E._003C_003Ef__am_0024cache8);
 			}
 		}, false, 0);
 	}

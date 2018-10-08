@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:colopl="http://schemas.android.com/apk/res/REMOVED_APPID" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:card_view="http://schemas.android.com/apk/res-auto" xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads" android:orientation="vertical" android:background="#cc000000" android:padding="4dp" android:layout_width="match_parent" android:layout_height="match_parent">
-    <net.gogame.gowrap.ui.dpro.view.CustomTabbelPanel android:id="@+id/net_gogame_gowrap_main_tabbed_panel" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" card_view:closeButton="@drawable/net_gogame_gowrap_icon_close" card_view:tabFillColor="#e0000000" card_view:fillColor="#80001323" card_view:selectedTextColor="#b4c12c">
+    <net.gogame.gowrap.ui.dpro.view.CustomTabbelPanel android:id="@+id/net_gogame_gowrap_main_tabbed_panel" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" card_view:closeButton="@drawable/net_gogame_gowrap_icon_close" card_view:tabFillColor="#e0000000" card_view:fillColor="#80001323" card_view:selectedTextColor="#ffb4c12c">
         <FrameLayout android:id="@+id/net_gogame_gowrap_main_fragment_container" android:layout_width="match_parent" android:layout_height="match_parent"/>
     </net.gogame.gowrap.ui.dpro.view.CustomTabbelPanel>
     <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="60dp">

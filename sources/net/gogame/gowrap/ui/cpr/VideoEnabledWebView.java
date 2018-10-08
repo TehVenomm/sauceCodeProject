@@ -30,8 +30,8 @@ public class VideoEnabledWebView extends WebView {
     public class JavascriptInterface {
 
         /* renamed from: net.gogame.gowrap.ui.cpr.VideoEnabledWebView$JavascriptInterface$1 */
-        class C11371 implements Runnable {
-            C11371() {
+        class C14531 implements Runnable {
+            C14531() {
             }
 
             public void run() {
@@ -44,7 +44,7 @@ public class VideoEnabledWebView extends WebView {
         @android.webkit.JavascriptInterface
         public void notifyVideoEnd() {
             Log.d("___", "GOT IT");
-            new Handler(Looper.getMainLooper()).post(new C11371());
+            new Handler(Looper.getMainLooper()).post(new C14531());
         }
     }
 

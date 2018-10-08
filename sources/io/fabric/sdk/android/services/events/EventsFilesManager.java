@@ -26,8 +26,8 @@ public abstract class EventsFilesManager<T> {
     protected final EventTransform<T> transform;
 
     /* renamed from: io.fabric.sdk.android.services.events.EventsFilesManager$1 */
-    class C09311 implements Comparator<FileWithTimestamp> {
-        C09311() {
+    class C12471 implements Comparator<FileWithTimestamp> {
+        C12471() {
         }
 
         public int compare(FileWithTimestamp fileWithTimestamp, FileWithTimestamp fileWithTimestamp2) {
@@ -82,7 +82,7 @@ public abstract class EventsFilesManager<T> {
         if (allFilesInRollOverDirectory.size() > maxFilesToKeep) {
             int size = allFilesInRollOverDirectory.size() - maxFilesToKeep;
             CommonUtils.logControlled(this.context, String.format(Locale.US, "Found %d files in  roll over directory, this is greater than %d, deleting %d oldest files", new Object[]{Integer.valueOf(allFilesInRollOverDirectory.size()), Integer.valueOf(maxFilesToKeep), Integer.valueOf(size)}));
-            TreeSet treeSet = new TreeSet(new C09311());
+            TreeSet treeSet = new TreeSet(new C12471());
             for (File file : allFilesInRollOverDirectory) {
                 treeSet.add(new FileWithTimestamp(file, parseCreationTimestampFromFileName(file.getName())));
             }

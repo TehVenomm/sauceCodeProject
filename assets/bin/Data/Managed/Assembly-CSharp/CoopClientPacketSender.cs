@@ -38,8 +38,8 @@ public class CoopClientPacketSender
 		model.id = 1003;
 		model.status = (int)coopClient.status;
 		model.joinType = (int)coopClient.joinType;
-		_003CSendClientStatus_003Ec__AnonStorey4D0 _003CSendClientStatus_003Ec__AnonStorey4D;
-		Send(model, true, to_client_id, null, new Func<Coop_Model_Base, bool>((object)_003CSendClientStatus_003Ec__AnonStorey4D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendClientStatus_003Ec__AnonStorey4E2 _003CSendClientStatus_003Ec__AnonStorey4E;
+		Send(model, true, to_client_id, null, new Func<Coop_Model_Base, bool>((object)_003CSendClientStatus_003Ec__AnonStorey4E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public void SendClientBecameHost(int to_client_id = 0)

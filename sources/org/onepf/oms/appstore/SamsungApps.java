@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.onepf.oms.AppstoreInAppBillingService;
 import org.onepf.oms.DefaultAppstore;
 import org.onepf.oms.OpenIabHelper;
-import org.onepf.oms.OpenIabHelper.Options;
+import org.onepf.oms.OpenIabHelper$Options;
 import org.onepf.oms.appstore.googleUtils.IabHelper.OnIabSetupFinishedListener;
 import org.onepf.oms.appstore.googleUtils.IabResult;
 import org.onepf.oms.util.Logger;
@@ -23,11 +23,11 @@ public class SamsungApps extends DefaultAppstore {
     private Activity activity;
     private AppstoreInAppBillingService billingService;
     private Boolean isBillingAvailable;
-    private Options options;
+    private OpenIabHelper$Options options;
 
-    public SamsungApps(Activity activity, Options options) {
+    public SamsungApps(Activity activity, OpenIabHelper$Options openIabHelper$Options) {
         this.activity = activity;
-        this.options = options;
+        this.options = openIabHelper$Options;
     }
 
     public static void checkSku(@NotNull String str) {
@@ -71,14 +71,14 @@ public class SamsungApps extends DefaultAppstore {
             this.activity.getPackageManager().getApplicationInfo(IAP_PACKAGE_NAME, 128);
             z = this.activity.getPackageManager().getPackageInfo(IAP_PACKAGE_NAME, 64).signatures[0].hashCode() == IAP_SIGNATURE_HASHCODE;
         } catch (Exception e) {
-            Logger.m1000d("isBillingAvailable() Samsung IAP Service is not installed");
+            Logger.m4025d("isBillingAvailable() Samsung IAP Service is not installed");
             z = false;
         }
         if (!z) {
             return false;
         }
         if (isSamsungTestMode) {
-            Logger.m1000d("isBillingAvailable() billing is supported in test mode.");
+            Logger.m4025d("isBillingAvailable() billing is supported in test mode.");
             this.isBillingAvailable = Boolean.valueOf(true);
             return true;
         }
@@ -87,8 +87,8 @@ public class SamsungApps extends DefaultAppstore {
         getInAppBillingService().startSetup(new OnIabSetupFinishedListener() {
 
             /* renamed from: org.onepf.oms.appstore.SamsungApps$1$1 */
-            class C13201 implements Runnable {
-                C13201() {
+            class C16281 implements Runnable {
+                C16281() {
                 }
 
                 /* JADX WARNING: inconsistent code. */
@@ -96,7 +96,7 @@ public class SamsungApps extends DefaultAppstore {
                 public void run() {
                     /*
                     r4 = this;
-                    r0 = org.onepf.oms.appstore.SamsungApps.C13211.this;	 Catch:{ IabException -> 0x0043 }
+                    r0 = org.onepf.oms.appstore.SamsungApps.C16291.this;	 Catch:{ IabException -> 0x0043 }
                     r0 = org.onepf.oms.appstore.SamsungApps.this;	 Catch:{ IabException -> 0x0043 }
                     r0 = r0.getInAppBillingService();	 Catch:{ IabException -> 0x0043 }
                     r1 = 1;
@@ -111,17 +111,17 @@ public class SamsungApps extends DefaultAppstore {
                     r0 = org.onepf.oms.util.CollectionUtils.isEmpty(r0);	 Catch:{ IabException -> 0x0043 }
                     if (r0 != 0) goto L_0x0030;
                 L_0x0024:
-                    r0 = org.onepf.oms.appstore.SamsungApps.C13211.this;	 Catch:{ IabException -> 0x0043 }
+                    r0 = org.onepf.oms.appstore.SamsungApps.C16291.this;	 Catch:{ IabException -> 0x0043 }
                     r0 = org.onepf.oms.appstore.SamsungApps.this;	 Catch:{ IabException -> 0x0043 }
                     r1 = 1;
                     r1 = java.lang.Boolean.valueOf(r1);	 Catch:{ IabException -> 0x0043 }
                     r0.isBillingAvailable = r1;	 Catch:{ IabException -> 0x0043 }
                 L_0x0030:
-                    r0 = org.onepf.oms.appstore.SamsungApps.C13211.this;
+                    r0 = org.onepf.oms.appstore.SamsungApps.C16291.this;
                     r0 = org.onepf.oms.appstore.SamsungApps.this;
                     r0 = r0.getInAppBillingService();
                     r0.dispose();
-                    r0 = org.onepf.oms.appstore.SamsungApps.C13211.this;
+                    r0 = org.onepf.oms.appstore.SamsungApps.C16291.this;
                     r0 = r1;
                     r0.countDown();
                 L_0x0042:
@@ -129,22 +129,22 @@ public class SamsungApps extends DefaultAppstore {
                 L_0x0043:
                     r0 = move-exception;
                     r1 = "isBillingAvailable() failed";
-                    org.onepf.oms.util.Logger.m1003e(r1, r0);	 Catch:{ all -> 0x005c }
-                    r0 = org.onepf.oms.appstore.SamsungApps.C13211.this;
+                    org.onepf.oms.util.Logger.m4028e(r1, r0);	 Catch:{ all -> 0x005c }
+                    r0 = org.onepf.oms.appstore.SamsungApps.C16291.this;
                     r0 = org.onepf.oms.appstore.SamsungApps.this;
                     r0 = r0.getInAppBillingService();
                     r0.dispose();
-                    r0 = org.onepf.oms.appstore.SamsungApps.C13211.this;
+                    r0 = org.onepf.oms.appstore.SamsungApps.C16291.this;
                     r0 = r1;
                     r0.countDown();
                     goto L_0x0042;
                 L_0x005c:
                     r0 = move-exception;
-                    r1 = org.onepf.oms.appstore.SamsungApps.C13211.this;
+                    r1 = org.onepf.oms.appstore.SamsungApps.C16291.this;
                     r1 = org.onepf.oms.appstore.SamsungApps.this;
                     r1 = r1.getInAppBillingService();
                     r1.dispose();
-                    r1 = org.onepf.oms.appstore.SamsungApps.C13211.this;
+                    r1 = org.onepf.oms.appstore.SamsungApps.C16291.this;
                     r1 = r1;
                     r1.countDown();
                     throw r0;
@@ -155,7 +155,7 @@ public class SamsungApps extends DefaultAppstore {
 
             public void onIabSetupFinished(@NotNull IabResult iabResult) {
                 if (iabResult.isSuccess()) {
-                    new Thread(new C13201()).start();
+                    new Thread(new C16281()).start();
                     return;
                 }
                 SamsungApps.this.getInAppBillingService().dispose();
@@ -165,7 +165,7 @@ public class SamsungApps extends DefaultAppstore {
         try {
             countDownLatch.await();
         } catch (Throwable e2) {
-            Logger.m1003e("isBillingAvailable() interrupted", e2);
+            Logger.m4028e("isBillingAvailable() interrupted", e2);
         }
         return this.isBillingAvailable.booleanValue();
     }

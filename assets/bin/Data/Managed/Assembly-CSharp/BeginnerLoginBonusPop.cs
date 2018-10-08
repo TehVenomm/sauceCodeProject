@@ -103,7 +103,7 @@ public class BeginnerLoginBonusPop : GameSection
 		PlayAudio(AUDIO.START, 1.3f, false);
 		PlayTween((Enum)UI.OBJ_IMG_ROOT, true, (EventDelegate.Callback)delegate
 		{
-			((_003CStartAnimation_003Ec__Iterator8B)/*Error near IL_0062: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CStartAnimation_003Ec__Iterator8C)/*Error near IL_0062: stateMachine*/)._003Cwait_003E__0 = false;
 		}, true, 0);
 		while (wait)
 		{
@@ -137,7 +137,7 @@ public class BeginnerLoginBonusPop : GameSection
 		bool wait = true;
 		PlayTween((Enum)UI.OBJ_IMG_ROOT, false, (EventDelegate.Callback)delegate
 		{
-			((_003CEndAnimation_003Ec__Iterator8D)/*Error near IL_0035: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CEndAnimation_003Ec__Iterator8E)/*Error near IL_0035: stateMachine*/)._003Cwait_003E__0 = false;
 		}, true, 0);
 		while (wait)
 		{

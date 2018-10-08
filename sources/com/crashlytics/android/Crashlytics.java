@@ -182,7 +182,7 @@ public class Crashlytics extends Kit<Void> implements KitGroup {
 
     @Deprecated
     public static void setPinningInfoProvider(PinningInfoProvider pinningInfoProvider) {
-        Fabric.getLogger().mo4302w(TAG, "Use of Crashlytics.setPinningInfoProvider is deprecated");
+        Fabric.getLogger().mo4766w(TAG, "Use of Crashlytics.setPinningInfoProvider is deprecated");
     }
 
     public static void setString(String str, String str2) {
@@ -215,7 +215,7 @@ public class Crashlytics extends Kit<Void> implements KitGroup {
 
     @Deprecated
     public boolean getDebugMode() {
-        Fabric.getLogger().mo4302w(TAG, "Use of Crashlytics.getDebugMode is deprecated.");
+        Fabric.getLogger().mo4766w(TAG, "Use of Crashlytics.getDebugMode is deprecated.");
         getFabric();
         return Fabric.isDebuggable();
     }
@@ -234,7 +234,7 @@ public class Crashlytics extends Kit<Void> implements KitGroup {
 
     @Deprecated
     public void setDebugMode(boolean z) {
-        Fabric.getLogger().mo4302w(TAG, "Use of Crashlytics.setDebugMode is deprecated.");
+        Fabric.getLogger().mo4766w(TAG, "Use of Crashlytics.setDebugMode is deprecated.");
     }
 
     @Deprecated

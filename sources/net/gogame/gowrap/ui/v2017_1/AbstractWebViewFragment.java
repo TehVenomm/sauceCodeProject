@@ -27,7 +27,7 @@ import android.widget.ProgressBar;
 import com.facebook.share.internal.ShareConstants;
 import java.io.IOException;
 import java.util.Locale;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.GoWrapImpl;
 import net.gogame.gowrap.InternalConstants;
@@ -63,8 +63,8 @@ public abstract class AbstractWebViewFragment extends Fragment implements BackPr
     private boolean webViewIsAvailable;
 
     /* renamed from: net.gogame.gowrap.ui.v2017_1.AbstractWebViewFragment$2 */
-    class C11882 implements ToggledFullscreenCallback {
-        C11882() {
+    class C15042 implements ToggledFullscreenCallback {
+        C15042() {
         }
 
         public void toggledFullscreen(boolean z) {
@@ -80,10 +80,10 @@ public abstract class AbstractWebViewFragment extends Fragment implements BackPr
     }
 
     /* renamed from: net.gogame.gowrap.ui.v2017_1.AbstractWebViewFragment$3 */
-    class C11893 extends WebViewClient {
+    class C15053 extends WebViewClient {
         private String currentUrl = null;
 
-        C11893() {
+        C15053() {
         }
 
         private boolean handleUri(Uri uri) {
@@ -99,7 +99,7 @@ public abstract class AbstractWebViewFragment extends Fragment implements BackPr
                     intent.setAction("android.intent.action.SEND");
                     intent.putExtra("android.intent.extra.TEXT", r1);
                     intent.setType("text/plain");
-                    AbstractWebViewFragment.this.context.startActivity(Intent.createChooser(intent, AbstractWebViewFragment.this.getString(C1110R.string.net_gogame_gowrap_share_prompt)));
+                    AbstractWebViewFragment.this.context.startActivity(Intent.createChooser(intent, AbstractWebViewFragment.this.getString(C1426R.string.net_gogame_gowrap_share_prompt)));
                     return true;
                 }
             } else if (StringUtils.isEquals(uri.getScheme(), AbstractWebViewFragment.COMMUNITY_SCHEME)) {
@@ -111,11 +111,11 @@ public abstract class AbstractWebViewFragment extends Fragment implements BackPr
                 r1 = null;
                 if (StringUtils.isEquals(schemeSpecificPart, InternalConstants.COMMUNITY_HOME)) {
                     r1 = localeConfiguration.getWhatsNewUrl();
-                } else if (StringUtils.isEquals(schemeSpecificPart, InternalConstants.COMMUNITY_FACEBOOK)) {
+                } else if (StringUtils.isEquals(schemeSpecificPart, "facebook")) {
                     r1 = localeConfiguration.getFacebookUrl();
-                } else if (StringUtils.isEquals(schemeSpecificPart, InternalConstants.COMMUNITY_TWITTER)) {
+                } else if (StringUtils.isEquals(schemeSpecificPart, "twitter")) {
                     r1 = localeConfiguration.getTwitterUrl();
-                } else if (StringUtils.isEquals(schemeSpecificPart, InternalConstants.COMMUNITY_INSTAGRAM)) {
+                } else if (StringUtils.isEquals(schemeSpecificPart, "instagram")) {
                     r1 = localeConfiguration.getInstagramUrl();
                 } else if (StringUtils.isEquals(schemeSpecificPart, InternalConstants.COMMUNITY_YOUTUBE)) {
                     r1 = localeConfiguration.getYoutubeUrl();
@@ -193,7 +193,7 @@ public abstract class AbstractWebViewFragment extends Fragment implements BackPr
             }
             webView.stopLoading();
             if (AbstractWebViewFragment.this.context != null) {
-                AbstractWebViewFragment.this.doLoadHtml(AbstractWebViewFragment.this.composeHtml(AbstractWebViewFragment.this.context, webView.getContext().getResources().getString(C1110R.string.net_gogame_gowrap_network_no_connection_message), ""), str);
+                AbstractWebViewFragment.this.doLoadHtml(AbstractWebViewFragment.this.composeHtml(AbstractWebViewFragment.this.context, webView.getContext().getResources().getString(C1426R.string.net_gogame_gowrap_network_no_connection_message), ""), str);
             }
         }
 
@@ -215,7 +215,7 @@ public abstract class AbstractWebViewFragment extends Fragment implements BackPr
         }
 
         public void onReceivedSslError(WebView webView, SslErrorHandler sslErrorHandler, SslError sslError) {
-            handleError(webView, sslError.getUrl(), webView.getContext().getResources().getString(C1110R.string.net_gogame_gowrap_network_ssl_error_message));
+            handleError(webView, sslError.getUrl(), webView.getContext().getResources().getString(C1426R.string.net_gogame_gowrap_network_ssl_error_message));
             super.onReceivedSslError(webView, sslErrorHandler, sslError);
         }
     }
@@ -273,14 +273,14 @@ public abstract class AbstractWebViewFragment extends Fragment implements BackPr
 
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
         View inflate = layoutInflater.inflate(this.layoutResourceId, viewGroup, false);
-        this.progressBar = (ProgressBar) inflate.findViewById(C1110R.id.net_gogame_gowrap_progressBar);
-        this.progressBar2 = (ProgressBar) inflate.findViewById(C1110R.id.net_gogame_gowrap_progressBar2);
-        this.webView = (VideoEnabledWebView) inflate.findViewById(C1110R.id.net_gogame_gowrap_main_webview);
+        this.progressBar = (ProgressBar) inflate.findViewById(C1426R.id.net_gogame_gowrap_progressBar);
+        this.progressBar2 = (ProgressBar) inflate.findViewById(C1426R.id.net_gogame_gowrap_progressBar2);
+        this.webView = (VideoEnabledWebView) inflate.findViewById(C1426R.id.net_gogame_gowrap_main_webview);
         this.webViewIsAvailable = true;
         this.webView.setBackgroundColor(0);
-        View findViewById = inflate.findViewById(C1110R.id.net_gogame_gowrap_webview_non_video_layout);
-        ViewGroup viewGroup2 = (ViewGroup) inflate.findViewById(C1110R.id.net_gogame_gowrap_webview_video_layout);
-        View inflate2 = layoutInflater.inflate(C1110R.layout.net_gogame_gowrap_view_loading_video, viewGroup, false);
+        View findViewById = inflate.findViewById(C1426R.id.net_gogame_gowrap_webview_non_video_layout);
+        ViewGroup viewGroup2 = (ViewGroup) inflate.findViewById(C1426R.id.net_gogame_gowrap_webview_video_layout);
+        View inflate2 = layoutInflater.inflate(C1426R.layout.net_gogame_gowrap_view_loading_video, viewGroup, false);
         WebSettings settings = this.webView.getSettings();
         settings.setDefaultTextEncodingName("utf-8");
         settings.setJavaScriptEnabled(true);
@@ -313,9 +313,9 @@ public abstract class AbstractWebViewFragment extends Fragment implements BackPr
                 }
             }
         };
-        this.webChromeClient.setOnToggledFullscreen(new C11882());
+        this.webChromeClient.setOnToggledFullscreen(new C15042());
         this.webView.setWebChromeClient(this.webChromeClient);
-        this.webView.setWebViewClient(new C11893());
+        this.webView.setWebViewClient(new C15053());
         if (this.savedInstanceState != null) {
             this.webView.restoreState(this.savedInstanceState);
         } else {

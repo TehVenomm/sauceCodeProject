@@ -74,8 +74,8 @@ public final class FileUtils {
     }
 
     public static void copyFromAsset(Context context, String str, File file) throws IOException {
-        Throwable th;
         OutputStream fileOutputStream;
+        Throwable th;
         try {
             fileOutputStream = new FileOutputStream(file);
             try {
@@ -95,8 +95,8 @@ public final class FileUtils {
     }
 
     public static String toString(File file, String str) throws IOException {
-        InputStream fileInputStream;
         Throwable th;
+        InputStream fileInputStream;
         try {
             fileInputStream = new FileInputStream(file);
             try {
@@ -117,9 +117,9 @@ public final class FileUtils {
     }
 
     public static void gzipCopyFromAsset(Context context, String str, File file) throws IOException {
-        InputStream open;
         Throwable th;
         Throwable th2;
+        InputStream open;
         try {
             InputStream gZIPInputStream;
             OutputStream fileOutputStream;

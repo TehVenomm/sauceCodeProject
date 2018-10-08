@@ -12,7 +12,7 @@ import org.json.JSONObject;
 
 public class CustomTaskQueue extends TapeTaskQueue<BaseEvent> {
     /* renamed from: a */
-    private final ConnectivityManager f1266a;
+    private final ConnectivityManager f3654a;
 
     public static class CustomConverter implements Converter<BaseEvent> {
         public BaseEvent from(byte[] bArr) throws IOException {
@@ -56,14 +56,14 @@ public class CustomTaskQueue extends TapeTaskQueue<BaseEvent> {
 
     public CustomTaskQueue(Context context, File file, Listener listener) throws IOException {
         super(file, new CustomConverter(), listener);
-        this.f1266a = (ConnectivityManager) context.getSystemService("connectivity");
+        this.f3654a = (ConnectivityManager) context.getSystemService("connectivity");
     }
 
     protected boolean shouldProcess() {
-        if (this.f1266a == null) {
+        if (this.f3654a == null) {
             return false;
         }
-        NetworkInfo activeNetworkInfo = this.f1266a.getActiveNetworkInfo();
+        NetworkInfo activeNetworkInfo = this.f3654a.getActiveNetworkInfo();
         if (activeNetworkInfo == null || !activeNetworkInfo.isConnectedOrConnecting()) {
             return false;
         }

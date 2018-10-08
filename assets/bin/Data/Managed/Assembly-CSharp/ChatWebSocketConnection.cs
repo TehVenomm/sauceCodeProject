@@ -97,17 +97,17 @@ public class ChatWebSocketConnection : IChatConnection
 		}
 		TryConnect(delegate(bool success)
 		{
-			((_003CTryReconnect_003Ec__Iterator214)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.reconnecting = false;
+			((_003CTryReconnect_003Ec__Iterator223)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.reconnecting = false;
 			if (!success)
 			{
-				if (((_003CTryReconnect_003Ec__Iterator214)/*Error near IL_0088: stateMachine*/).count > 0)
+				if (((_003CTryReconnect_003Ec__Iterator223)/*Error near IL_0088: stateMachine*/).count > 0)
 				{
-					((_003CTryReconnect_003Ec__Iterator214)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.Reconnect(((_003CTryReconnect_003Ec__Iterator214)/*Error near IL_0088: stateMachine*/).count - 1);
+					((_003CTryReconnect_003Ec__Iterator223)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.Reconnect(((_003CTryReconnect_003Ec__Iterator223)/*Error near IL_0088: stateMachine*/).count - 1);
 				}
 			}
 			else
 			{
-				((_003CTryReconnect_003Ec__Iterator214)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.Join(((_003CTryReconnect_003Ec__Iterator214)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.roomId, ((_003CTryReconnect_003Ec__Iterator214)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.userName);
+				((_003CTryReconnect_003Ec__Iterator223)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.Join(((_003CTryReconnect_003Ec__Iterator223)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.roomId, ((_003CTryReconnect_003Ec__Iterator223)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.userName);
 			}
 		});
 	}

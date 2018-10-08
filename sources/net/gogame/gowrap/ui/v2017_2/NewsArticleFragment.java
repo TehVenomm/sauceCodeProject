@@ -20,7 +20,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import jp.colopl.drapro.LocalNotificationAlarmReceiver;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.GoWrapImpl;
 import net.gogame.gowrap.model.news.Article;
@@ -39,13 +39,13 @@ public class NewsArticleFragment extends Fragment {
     private Article article;
     private LinearLayout articleContainer;
     private TextView dateTimeTextView;
-    private Listener downloadManagerListener = new C12271();
+    private Listener downloadManagerListener = new C15431();
     private ProgressBar progressBar;
     private UIContext uiContext;
 
     /* renamed from: net.gogame.gowrap.ui.v2017_2.NewsArticleFragment$1 */
-    class C12271 implements Listener {
-        C12271() {
+    class C15431 implements Listener {
+        C15431() {
         }
 
         public void onDownloadsStarted() {
@@ -88,11 +88,11 @@ public class NewsArticleFragment extends Fragment {
         if (getArguments() != null) {
             this.article = (Article) getArguments().getSerializable(KEY_ARTICLE);
         }
-        View inflate = layoutInflater.inflate(C1110R.layout.net_gogame_gowrap_v2017_2_fragment_news_article, viewGroup, false);
-        this.articleContainer = (LinearLayout) inflate.findViewById(C1110R.id.net_gogame_gowrap_news_article_container);
-        this.dateTimeTextView = (TextView) inflate.findViewById(C1110R.id.net_gogame_gowrap_news_article_timestamp);
+        View inflate = layoutInflater.inflate(C1426R.layout.net_gogame_gowrap_v2017_2_fragment_news_article, viewGroup, false);
+        this.articleContainer = (LinearLayout) inflate.findViewById(C1426R.id.net_gogame_gowrap_news_article_container);
+        this.dateTimeTextView = (TextView) inflate.findViewById(C1426R.id.net_gogame_gowrap_news_article_timestamp);
         populate();
-        this.progressBar = (ProgressBar) inflate.findViewById(C1110R.id.net_gogame_gowrap_progress_indicator);
+        this.progressBar = (ProgressBar) inflate.findViewById(C1426R.id.net_gogame_gowrap_progress_indicator);
         return inflate;
     }
 
@@ -139,7 +139,7 @@ public class NewsArticleFragment extends Fragment {
     }
 
     private void populateParagraph(MarkupElement markupElement) {
-        TextView textView = (TextView) getLayoutInflater().inflate(C1110R.layout.net_gogame_gowrap_v2017_2_fragment_news_article_paragraph, this.articleContainer, false);
+        TextView textView = (TextView) getLayoutInflater().inflate(C1426R.layout.net_gogame_gowrap_v2017_2_fragment_news_article_paragraph, this.articleContainer, false);
         textView.setMovementMethod(LinkMovementMethod.getInstance());
         this.articleContainer.addView(textView);
         StringBuffer stringBuffer = new StringBuffer();
@@ -216,7 +216,7 @@ public class NewsArticleFragment extends Fragment {
 
     private void populateImage(MarkupElement markupElement) {
         if (markupElement.getSrc() != null) {
-            ImageView imageView = (ImageView) getLayoutInflater().inflate(C1110R.layout.net_gogame_gowrap_v2017_2_fragment_news_article_image, this.articleContainer, false);
+            ImageView imageView = (ImageView) getLayoutInflater().inflate(C1426R.layout.net_gogame_gowrap_v2017_2_fragment_news_article_image, this.articleContainer, false);
             this.articleContainer.addView(imageView);
             if (this.uiContext != null) {
                 this.uiContext.getDownloadManager().download(Builder.newBuilder(markupElement.getSrc()).into(new ImageViewTarget(imageView)));
@@ -225,13 +225,13 @@ public class NewsArticleFragment extends Fragment {
     }
 
     private void populateButton(MarkupElement markupElement) {
-        Button button = (Button) getLayoutInflater().inflate(C1110R.layout.net_gogame_gowrap_v2017_2_fragment_news_article_button, this.articleContainer, false);
+        Button button = (Button) getLayoutInflater().inflate(C1426R.layout.net_gogame_gowrap_v2017_2_fragment_news_article_button, this.articleContainer, false);
         this.articleContainer.addView(button);
         if (markupElement.getStyle() != null) {
             try {
                 int parseInt = Integer.parseInt(markupElement.getStyle());
                 DisplayUtils.setLevel(button.getBackground(), parseInt);
-                Drawable drawable = getActivity().getResources().getDrawable(C1110R.drawable.net_gogame_gowrap_news_article_button_icon);
+                Drawable drawable = getActivity().getResources().getDrawable(C1426R.drawable.net_gogame_gowrap_news_article_button_icon);
                 DisplayUtils.setLevel(drawable, parseInt);
                 button.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
                 button.setCompoundDrawablePadding(DisplayUtils.pxFromDp(getActivity(), 8.0f));

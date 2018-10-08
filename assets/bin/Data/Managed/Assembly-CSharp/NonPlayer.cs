@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class NonPlayer : Player
 {
 	public enum eNpcAllayState
@@ -39,11 +41,18 @@ public class NonPlayer : Player
 		base.Awake();
 	}
 
-	public override void OnSetPlayerStatus(int _level, int _atk, int _def, int _hp, bool send_packet = true, StageObjectManager.PlayerTransferInfo transfer_info = null)
+	public override void OnSetPlayerStatus(int _level, int _atk, int _def, int _hp, bool send_packet = true, StageObjectManager.PlayerTransferInfo transfer_info = null, bool usingRealAtk = false)
 	{
-		base.OnSetPlayerStatus(_level, _atk, _def, _hp, send_packet, transfer_info);
-		npcAtk = (float)_atk;
-		base.playerAtk = 0f;
+		base.OnSetPlayerStatus(_level, _atk, _def, _hp, send_packet, transfer_info, false);
+		if (!usingRealAtk)
+		{
+			npcAtk = (float)_atk;
+			base.playerAtk = 0f;
+		}
+		else
+		{
+			float num2 = npcAtk = (base.playerAtk = (float)_atk);
+		}
 	}
 
 	public override void InitParameter()
@@ -107,5 +116,36 @@ public class NonPlayer : Player
 			return eNpcAllayState.ANOTHER;
 		}
 		return eNpcAllayState.CAN;
+	}
+
+	public bool NPCSkillAction(int skill_index, bool isGuestUsingSecondGrade = false)
+	{
+		bool flag = ActSkillAction(skill_index, false);
+		SkillInfo.SkillParam actSkillParam = base.skillInfo.actSkillParam;
+		if (actSkillParam == null)
+		{
+			return false;
+		}
+		if (flag)
+		{
+			SKILL_SLOT_TYPE type = actSkillParam.tableData.type;
+			if (type == SKILL_SLOT_TYPE.ATTACK)
+			{
+				MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(true, 0f);
+			}
+			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
+			{
+				Debug.Log((object)"NPCSkillAction OnUses");
+				MonoBehaviourSingleton<InGameProgress>.I.OnSkillUse(base.skillInfo.actSkillParam);
+			}
+		}
+		return flag;
+	}
+
+	public void ActPose(bool force_sync = false, bool recieve = false)
+	{
+		EndAction();
+		base.actionID = (ACTION_ID)40;
+		PlayMotion(40, -1f);
 	}
 }

@@ -200,18 +200,18 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 				{
 					purchaseItemList = ret.result;
 					List<ProductData> shopList = purchaseItemList.shopList;
-					if (_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey6AB._003C_003Ef__am_0024cache2 == null)
+					if (_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey6BD._003C_003Ef__am_0024cache2 == null)
 					{
-						_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey6AB._003C_003Ef__am_0024cache2 = new Func<ProductData, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+						_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey6BD._003C_003Ef__am_0024cache2 = new Func<ProductData, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 					}
-					string productNameData = string.Join("----", shopList.Select<ProductData, string>(_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey6AB._003C_003Ef__am_0024cache2).ToArray());
+					string productNameData = string.Join("----", shopList.Select<ProductData, string>(_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey6BD._003C_003Ef__am_0024cache2).ToArray());
 					Native.SetProductNameData(productNameData);
 					List<ProductData> shopList2 = purchaseItemList.shopList;
-					if (_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey6AB._003C_003Ef__am_0024cache3 == null)
+					if (_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey6BD._003C_003Ef__am_0024cache3 == null)
 					{
-						_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey6AB._003C_003Ef__am_0024cache3 = new Func<ProductData, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+						_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey6BD._003C_003Ef__am_0024cache3 = new Func<ProductData, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 					}
-					productNameData = string.Join("----", shopList2.Select<ProductData, string>(_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey6AB._003C_003Ef__am_0024cache3).ToArray());
+					productNameData = string.Join("----", shopList2.Select<ProductData, string>(_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey6BD._003C_003Ef__am_0024cache3).ToArray());
 					Native.SetProductIdData(productNameData);
 					obj = true;
 					MonoBehaviourSingleton<AppMain>.I.UpdatePurchaseItemListRequestTime();

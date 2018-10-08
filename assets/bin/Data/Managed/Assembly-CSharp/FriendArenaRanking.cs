@@ -165,7 +165,7 @@ public class FriendArenaRanking : FriendArenaRankingBase
 	private unsafe void SendGetNormalRanking(int sendGroup, Action<bool> callback)
 	{
 		int isContaionSelf = isOwn ? 1 : 0;
-		_003CSendGetNormalRanking_003Ec__AnonStorey303 _003CSendGetNormalRanking_003Ec__AnonStorey;
+		_003CSendGetNormalRanking_003Ec__AnonStorey312 _003CSendGetNormalRanking_003Ec__AnonStorey;
 		MonoBehaviourSingleton<FriendManager>.I.SendGetArenaRanking(sendGroup, isContaionSelf, new Action<bool, List<ArenaRankingData>>((object)_003CSendGetNormalRanking_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

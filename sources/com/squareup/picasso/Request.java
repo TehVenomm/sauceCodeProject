@@ -3,6 +3,7 @@ package com.squareup.picasso;
 import android.graphics.Bitmap.Config;
 import android.net.Uri;
 import com.squareup.picasso.Picasso.Priority;
+import im.getsocial.sdk.consts.LanguageCodes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -319,7 +320,7 @@ public final class Request {
         if (nanoTime > TOO_LONG_LOG) {
             return plainId() + '+' + TimeUnit.NANOSECONDS.toSeconds(nanoTime) + 's';
         }
-        return plainId() + '+' + TimeUnit.NANOSECONDS.toMillis(nanoTime) + "ms";
+        return plainId() + '+' + TimeUnit.NANOSECONDS.toMillis(nanoTime) + LanguageCodes.MALAY;
     }
 
     String plainId() {

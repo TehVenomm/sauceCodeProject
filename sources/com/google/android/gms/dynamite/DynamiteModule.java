@@ -381,9 +381,9 @@ public final class DynamiteModule {
     }
 
     private static int zzd(Context context, String str, boolean z) throws zzc {
+        Cursor query;
         Throwable e;
         String str2 = z ? "api_force_staging" : "api";
-        Cursor query;
         try {
             query = context.getContentResolver().query(Uri.parse(new StringBuilder(((String.valueOf("content://com.google.android.gms.chimera/").length() + 1) + String.valueOf(str2).length()) + String.valueOf(str).length()).append("content://com.google.android.gms.chimera/").append(str2).append(Constants.URL_PATH_DELIMITER).append(str).toString()), null, null, null, null);
             if (query != null) {

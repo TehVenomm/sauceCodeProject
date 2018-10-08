@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?><manifest xmlns:android="http://schemas.android.com/apk/res/android" android:installLocation="preferExternal" package="net.gogame.dragon" platformBuildVersionCode="23" platformBuildVersionName="6.0-2438415">
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="com.android.vending.BILLING"/>
     <uses-permission android:name="com.android.vending.CHECK_LICENSE"/>
     <uses-permission android:name="org.onepf.openiab.permission.BILLING"/>
@@ -14,6 +14,37 @@
     <uses-permission android:name="net.gogame.dragon.permission.C2D_MESSAGE"/>
     <supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true" android:smallScreens="true" android:xlargeScreens="true"/>
     <application android:debuggable="false" android:icon="@drawable/app_icon" android:isGame="true" android:label="@string/app_name" android:launchMode="singleTask" android:name="jp.colopl.drapro.ColoplApplication">
+        <receiver android:name="im.getsocial.sdk.invites.MultipleInstallReferrerReceiver">
+            <intent-filter android:autoVerify="false">
+                <action android:name="com.android.vending.INSTALL_REFERRER"/>
+            </intent-filter>
+        </receiver>
+        <activity android:name="im.getsocial.sdk.internal.unity.GetSocialDeepLinkingActivity">
+            <intent-filter android:autoVerify="true">
+                <data android:host="dragonproject-gsalt.gsc.im" android:scheme="https"/>
+                <data android:host="dragonproject.gsc.im" android:scheme="https"/>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <data android:host="LH8Uv8906P6j" android:scheme="getsocial"/>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+            </intent-filter>
+        </activity>
+        <provider android:authorities="net.gogame.dragon.smartinvite.images.provider" android:enabled="true" android:exported="true" android:name="im.getsocial.sdk.invites.ImageContentProvider"/>
+        <provider android:authorities="net.gogame.dragon.AutoInitSdkContentProvider" android:enabled="true" android:exported="false" android:name="im.getsocial.sdk.AutoInitSdkContentProvider"/>
+        <meta-data android:name="im.getsocial.sdk.UiConfigurationFile" android:value=""/>
+        <meta-data android:name="im.getsocial.sdk.AutoInitSdk" android:value="true"/>
+        <meta-data android:name="im.getsocial.sdk.ShowNotificationInForeground" android:value="false"/>
+        <meta-data android:name="im.getsocial.sdk.AutoRegisterForPush" android:value="true"/>
+        <meta-data android:name="im.getsocial.sdk.WrapperVersion" android:value="6.19.2"/>
+        <meta-data android:name="im.getsocial.sdk.RuntimeVersion" android:value="5.3.3f1"/>
+        <meta-data android:name="im.getsocial.sdk.Runtime" android:value="UNITY"/>
+        <meta-data android:name="im.getsocial.sdk.AppId" android:value="LH8Uv8906P6j"/>
+        <provider android:authorities="net.gogame.dragon" android:exported="false" android:grantUriPermissions="true" android:name="com.yasirkula.unity.UnitySSContentProvider"/>
         <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/push_icon"/>
         <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@drawable/app_icon"/>
         <activity android:configChanges="fontScale|keyboard|keyboardHidden|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode" android:label="@string/app_name" android:launchMode="singleTask" android:name="jp.colopl.drapro.StartActivity" android:screenOrientation="portrait" android:theme="@style/AppTheme">
@@ -113,11 +144,22 @@
             </intent-filter>
         </service>
         <service android:exported="false" android:name="com.google.firebase.messaging.cpp.RegistrationIntentService"/>
+        <receiver android:name="im.getsocial.sdk.PushNotificationsReceiver" android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION"/>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <category android:name=".gcm"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="im.getsocial.sdk.intent.RECEIVE"/>
+                <data android:scheme="getSocialNotificationId"/>
+            </intent-filter>
+        </receiver>
         <activity android:excludeFromRecents="true" android:exported="false" android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
         <service android:exported="true" android:name="com.google.android.gms.auth.api.signin.RevocationBoundService" android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"/>
         <activity android:exported="false" android:name="com.google.android.gms.common.api.GoogleApiActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
-        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="net.gogame.gowrap.ui.MainActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
-        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="net.gogame.gowrap.ui.dpro.ui.MainActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="net.gogame.gowrap.ui.MainActivity" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="net.gogame.gowrap.ui.dpro.ui.MainActivity" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
         <service android:exported="false" android:name="com.zopim.android.sdk.api.ChatService"/>
         <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="net.gogame.zopim.client.base.ZopimMainActivity" android:theme="@style/net.gogame.zopim.ZopimChatTheme" android:windowSoftInputMode="adjustResize"/>
         <receiver android:name="com.zopim.android.sdk.api.ZopimChat$ChatTimeoutReceiver">

@@ -71,7 +71,9 @@ public class EquipSetDetailAbilityTable : EquipSetDetailStatusAndAbilityTable
 		SPR_TYPE_ICON_BG,
 		SPR_TYPE_ICON_RARITY,
 		OBJ_CAPTION_3,
-		LBL_CAPTION
+		LBL_CAPTION,
+		OBJ_EMPTY,
+		LBL_NO_ITEM
 	}
 
 	private AbilityDetailPopUp abilityDetailPopUp;

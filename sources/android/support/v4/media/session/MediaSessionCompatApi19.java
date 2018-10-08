@@ -6,7 +6,6 @@ import android.media.RemoteControlClient;
 import android.media.RemoteControlClient.MetadataEditor;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
-import com.google.android.gms.games.quest.Quests;
 
 @TargetApi(19)
 @RequiresApi(19)
@@ -43,7 +42,7 @@ class MediaSessionCompatApi19 {
                 metadataEditor.putLong(8, bundle.getLong("android.media.metadata.YEAR"));
             }
             if (bundle.containsKey("android.media.metadata.RATING")) {
-                metadataEditor.putObject(Quests.SELECT_COMPLETED_UNCLAIMED, bundle.getParcelable("android.media.metadata.RATING"));
+                metadataEditor.putObject(101, bundle.getParcelable("android.media.metadata.RATING"));
             }
             if (bundle.containsKey("android.media.metadata.USER_RATING")) {
                 metadataEditor.putObject(268435457, bundle.getParcelable("android.media.metadata.USER_RATING"));

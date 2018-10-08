@@ -33,16 +33,16 @@ public class Beta extends Kit<Boolean> implements DeviceIdentifierProvider {
 
     private String getBetaDeviceToken(Context context, String str) {
         if (isAppPossiblyInstalledByBeta(str, VERSION.SDK_INT)) {
-            Fabric.getLogger().mo4289d(TAG, "App was possibly installed by Beta. Getting device token");
+            Fabric.getLogger().mo4753d(TAG, "App was possibly installed by Beta. Getting device token");
             try {
                 String str2 = (String) this.deviceTokenCache.get(context, this.deviceTokenLoader);
                 return "".equals(str2) ? null : str2;
             } catch (Throwable e) {
-                Fabric.getLogger().mo4292e(TAG, "Failed to load the Beta device token", e);
+                Fabric.getLogger().mo4756e(TAG, "Failed to load the Beta device token", e);
                 return null;
             }
         }
-        Fabric.getLogger().mo4289d(TAG, "App was not installed by Beta. Skipping device token");
+        Fabric.getLogger().mo4753d(TAG, "App was not installed by Beta. Skipping device token");
         return null;
     }
 
@@ -88,7 +88,7 @@ public class Beta extends Kit<Boolean> implements DeviceIdentifierProvider {
         r5 = r2.buildId;	 Catch:{ Exception -> 0x00a8, all -> 0x009d }
         r3 = r3.append(r5);	 Catch:{ Exception -> 0x00a8, all -> 0x009d }
         r3 = r3.toString();	 Catch:{ Exception -> 0x00a8, all -> 0x009d }
-        r0.mo4289d(r4, r3);	 Catch:{ Exception -> 0x00a8, all -> 0x009d }
+        r0.mo4753d(r4, r3);	 Catch:{ Exception -> 0x00a8, all -> 0x009d }
         r0 = r2;
     L_0x0054:
         if (r1 == 0) goto L_0x0059;
@@ -101,7 +101,7 @@ public class Beta extends Kit<Boolean> implements DeviceIdentifierProvider {
         r2 = io.fabric.sdk.android.Fabric.getLogger();
         r3 = "Beta";
         r4 = "Error closing Beta build properties asset";
-        r2.mo4292e(r3, r4, r1);
+        r2.mo4756e(r3, r4, r1);
         goto L_0x0059;
     L_0x0067:
         r0 = move-exception;
@@ -111,7 +111,7 @@ public class Beta extends Kit<Boolean> implements DeviceIdentifierProvider {
         r3 = io.fabric.sdk.android.Fabric.getLogger();	 Catch:{ all -> 0x009f }
         r4 = "Beta";
         r5 = "Error reading Beta build properties";
-        r3.mo4292e(r4, r5, r1);	 Catch:{ all -> 0x009f }
+        r3.mo4756e(r4, r5, r1);	 Catch:{ all -> 0x009f }
         if (r2 == 0) goto L_0x0059;
     L_0x0077:
         r2.close();	 Catch:{ IOException -> 0x007b }
@@ -121,7 +121,7 @@ public class Beta extends Kit<Boolean> implements DeviceIdentifierProvider {
         r2 = io.fabric.sdk.android.Fabric.getLogger();
         r3 = "Beta";
         r4 = "Error closing Beta build properties asset";
-        r2.mo4292e(r3, r4, r1);
+        r2.mo4756e(r3, r4, r1);
         goto L_0x0059;
     L_0x0088:
         r0 = move-exception;
@@ -137,7 +137,7 @@ public class Beta extends Kit<Boolean> implements DeviceIdentifierProvider {
         r2 = io.fabric.sdk.android.Fabric.getLogger();
         r3 = "Beta";
         r4 = "Error closing Beta build properties asset";
-        r2.mo4292e(r3, r4, r1);
+        r2.mo4756e(r3, r4, r1);
         goto L_0x008f;
     L_0x009d:
         r0 = move-exception;
@@ -177,14 +177,14 @@ public class Beta extends Kit<Boolean> implements DeviceIdentifierProvider {
     }
 
     protected Boolean doInBackground() {
-        Fabric.getLogger().mo4289d(TAG, "Beta kit initializing...");
+        Fabric.getLogger().mo4753d(TAG, "Beta kit initializing...");
         Context context = getContext();
         IdManager idManager = getIdManager();
         if (TextUtils.isEmpty(getBetaDeviceToken(context, idManager.getInstallerPackageName()))) {
-            Fabric.getLogger().mo4289d(TAG, "A Beta device token was not found for this app");
+            Fabric.getLogger().mo4753d(TAG, "A Beta device token was not found for this app");
             return Boolean.valueOf(false);
         }
-        Fabric.getLogger().mo4289d(TAG, "Beta device token is present, checking for app updates.");
+        Fabric.getLogger().mo4753d(TAG, "Beta device token is present, checking for app updates.");
         BetaSettingsData betaSettingsData = getBetaSettingsData();
         BuildProperties loadBuildProperties = loadBuildProperties(context);
         if (canCheckForUpdates(betaSettingsData, loadBuildProperties)) {

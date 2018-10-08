@@ -39,14 +39,14 @@ public abstract class AbstractMainActivity extends Activity implements UIContext
     private static DiskLruCache diskLruCache;
     private static DownloadManager downloadManager;
     private boolean fullscreen = false;
-    private final Listener listener = new C11251();
+    private final Listener listener = new C14411();
     protected LocaleConfiguration localeConfiguration;
     protected LocaleManager localeManager = null;
     private Integer preFullscreenOrientation = null;
 
     /* renamed from: net.gogame.gowrap.ui.AbstractMainActivity$1 */
-    class C11251 implements Listener {
-        C11251() {
+    class C14411 implements Listener {
+        C14411() {
         }
 
         public void onVipStatusUpdated(VipStatus vipStatus) {

@@ -11,7 +11,6 @@ import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
 import com.google.firebase.messaging.MessageForwardingService;
-import io.fabric.sdk.android.services.settings.SettingsJsonConstants;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -233,7 +232,7 @@ public class GoogleCloudMessaging {
                 intent2.setPackage("com.google.example.invalidpackage");
                 this.zzaoS = PendingIntent.getBroadcast(this.zzmH, 0, intent2, 0);
             }
-            intent.putExtra(SettingsJsonConstants.APP_KEY, this.zzaoS);
+            intent.putExtra("app", this.zzaoS);
         }
     }
 

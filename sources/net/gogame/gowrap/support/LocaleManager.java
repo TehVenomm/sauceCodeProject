@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.InternalConstants;
 import net.gogame.gowrap.integrations.core.Wrapper;
@@ -22,8 +22,8 @@ public class LocaleManager {
 
     public LocaleManager(Context context) {
         this.context = context;
-        String[] stringArray = context.getResources().getStringArray(C1110R.array.language_values);
-        String[] stringArray2 = context.getResources().getStringArray(C1110R.array.languages);
+        String[] stringArray = context.getResources().getStringArray(C1426R.array.language_values);
+        String[] stringArray2 = context.getResources().getStringArray(C1426R.array.languages);
         Map linkedHashMap = new LinkedHashMap();
         for (int i = 0; i < stringArray.length; i++) {
             String str = stringArray[i];

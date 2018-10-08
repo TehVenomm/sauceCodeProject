@@ -173,7 +173,7 @@ public class TypeUtils {
                 return true;
             }
             if (type instanceof Class) {
-                return ClassUtils.isAssignable((Class) type, (Class) cls);
+                return ClassUtils.isAssignable((Class) type, cls);
             }
             if (type instanceof ParameterizedType) {
                 return isAssignable(getRawType((ParameterizedType) type), (Class) cls);
@@ -699,7 +699,7 @@ public class TypeUtils {
         while (i < typeArr.length) {
             Type unrollVariables = unrollVariables(map, typeArr[i]);
             if (unrollVariables == null) {
-                typeArr = (Type[]) ArrayUtils.remove((Object[]) typeArr, i);
+                typeArr = (Type[]) ArrayUtils.remove(typeArr, i);
                 i--;
             } else {
                 typeArr[i] = unrollVariables;
@@ -751,20 +751,20 @@ public class TypeUtils {
         boolean z;
         Validate.notNull(cls, "raw class is null", new Object[0]);
         if (cls.getEnclosingClass() == null) {
-            Validate.isTrue(type == null, "no owner allowed for top-level %s", cls);
+            Validate.isTrue(type == null, "no owner allowed for top-level %s", new Object[]{cls});
             type = null;
         } else if (type == null) {
             type = cls.getEnclosingClass();
         } else {
-            Validate.isTrue(isAssignable(type, cls.getEnclosingClass()), "%s is invalid owner type for parameterized %s", type, cls);
+            Validate.isTrue(isAssignable(type, cls.getEnclosingClass()), "%s is invalid owner type for parameterized %s", new Object[]{type, cls});
         }
-        Validate.noNullElements((Object[]) typeArr, "null type argument at index %s", new Object[0]);
+        Validate.noNullElements(typeArr, "null type argument at index %s", new Object[0]);
         if (cls.getTypeParameters().length == typeArr.length) {
             z = true;
         } else {
             z = false;
         }
-        Validate.isTrue(z, "invalid number of type parameters specified: expected %s, got %s", Integer.valueOf(cls.getTypeParameters().length), Integer.valueOf(typeArr.length));
+        Validate.isTrue(z, "invalid number of type parameters specified: expected %s, got %s", new Object[]{Integer.valueOf(cls.getTypeParameters().length), Integer.valueOf(typeArr.length)});
         return new ParameterizedTypeImpl(cls, type, typeArr);
     }
 
@@ -781,7 +781,7 @@ public class TypeUtils {
         int i2 = 0;
         while (i < length) {
             Type type = typeVariableArr[i];
-            Validate.isTrue(map.containsKey(type), "missing argument mapping for %s", toString(type));
+            Validate.isTrue(map.containsKey(type), "missing argument mapping for %s", new Object[]{toString(type)});
             int i3 = i2 + 1;
             typeArr[i2] = (Type) map.get(type);
             i++;
@@ -963,7 +963,7 @@ public class TypeUtils {
     }
 
     private static StringBuilder appendAllTo(StringBuilder stringBuilder, String str, Type... typeArr) {
-        Validate.notEmpty(Validate.noNullElements((Object[]) typeArr));
+        Validate.notEmpty(Validate.noNullElements(typeArr));
         if (typeArr.length > 0) {
             stringBuilder.append(toString(typeArr[0]));
             for (int i = 1; i < typeArr.length; i++) {

@@ -2,14 +2,14 @@ package net.gogame.gopay.sdk.iab;
 
 final class bm implements Runnable {
     /* renamed from: a */
-    final /* synthetic */ PurchaseActivity f1109a;
+    final /* synthetic */ PurchaseActivity f3497a;
 
     bm(PurchaseActivity purchaseActivity) {
-        this.f1109a = purchaseActivity;
+        this.f3497a = purchaseActivity;
     }
 
     public final void run() {
-        this.f1109a.f1040s.setVisibility(0);
-        this.f1109a.f1040s.bringToFront();
+        this.f3497a.f3428s.setVisibility(0);
+        this.f3497a.f3428s.bringToFront();
     }
 }

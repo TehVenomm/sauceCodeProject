@@ -243,8 +243,8 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		int reqCount = list.Count;
 		foreach (DataLoadRequest item2 in list)
 		{
-			_003CLoadInitialTable_003Ec__AnonStorey70C _003CLoadInitialTable_003Ec__AnonStorey70C;
-			item2.onComplete += new Action((object)_003CLoadInitialTable_003Ec__AnonStorey70C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CLoadInitialTable_003Ec__AnonStorey71E _003CLoadInitialTable_003Ec__AnonStorey71E;
+			item2.onComplete += new Action((object)_003CLoadInitialTable_003Ec__AnonStorey71E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 		Request(list);
 		return list;
@@ -252,9 +252,9 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 
 	public unsafe List<DataLoadRequest> LoadAllTable(Action onComplete, bool downloadOnly = false)
 	{
-		//IL_0368: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036d: Expected O, but got Unknown
-		RequestParam[] array = new RequestParam[48]
+		//IL_0377: Unknown result type (might be due to invalid IL or missing references)
+		//IL_037c: Expected O, but got Unknown
+		RequestParam[] array = new RequestParam[49]
 		{
 			new RequestParam("AbilityDataTable", null),
 			new RequestParam("AbilityTable", null),
@@ -266,6 +266,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 			new RequestParam("EvolveEquipItemTable", null),
 			new RequestParam("GrowEnemyTable", null),
 			new RequestParam("ItemTable", null),
+			new RequestParam("TutorialGearSetTable", null),
 			new RequestParam("SETable", null),
 			new RequestParam("StringTable", null),
 			new RequestParam("TaskTable", null),
@@ -317,8 +318,8 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		int reqCount = list.Count;
 		foreach (DataLoadRequest item2 in list)
 		{
-			_003CLoadAllTable_003Ec__AnonStorey70D _003CLoadAllTable_003Ec__AnonStorey70D;
-			item2.onComplete += new Action((object)_003CLoadAllTable_003Ec__AnonStorey70D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CLoadAllTable_003Ec__AnonStorey71F _003CLoadAllTable_003Ec__AnonStorey71F;
+			item2.onComplete += new Action((object)_003CLoadAllTable_003Ec__AnonStorey71F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 		Request(list);
 		return list;
@@ -420,7 +421,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0069: Expected O, but got Unknown
 		DataLoadRequest req = new DataLoadRequest(name, hash, directory, downloadOnly);
-		_003CCreateRequest_003Ec__AnonStorey710 _003CCreateRequest_003Ec__AnonStorey;
+		_003CCreateRequest_003Ec__AnonStorey722 _003CCreateRequest_003Ec__AnonStorey;
 		req.onVerifyError += new Func<string, bool>((object)_003CCreateRequest_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		req.onError += delegate(DataTableLoadError error)
 		{
@@ -512,6 +513,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		Singleton<GrowEquipItemTable>.Create();
 		Singleton<GrowSkillItemTable>.Create();
 		Singleton<ItemTable>.Create();
+		Singleton<TutorialGearSetTable>.Create();
 		Singleton<ItemToFieldTable>.Create();
 		Singleton<ItemToQuestTable>.Create();
 		Singleton<NPCMessageTable>.Create();
@@ -571,6 +573,8 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		GrowSkillItemTable i4 = Singleton<GrowSkillItemTable>.I;
 		RegisterTable("GrowSkillItemTable", new DataTableInterfaceProxy(i4.CreateTable), null);
 		RegisterTable("ItemTable", Singleton<ItemTable>.I, null);
+		TutorialGearSetTable i5 = Singleton<TutorialGearSetTable>.I;
+		RegisterTable("TutorialGearSetTable", new DataTableInterfaceProxy(i5.CreateTable), null);
 		RegisterTable("NPCMessageTable", Singleton<NPCMessageTable>.I, null);
 		RegisterTable("NPCTable", Singleton<NPCTable>.I, null);
 		RegisterTable("SETable", Singleton<SETable>.I, null);
@@ -692,6 +696,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		RegisterTable("EvolveEquipItemTable", table, null);
 		RegisterTable("GrowEnemyTable", table, null);
 		RegisterTable("ItemTable", table, null);
+		RegisterTable("TutorialGearSetTable", table, null);
 		RegisterTable("SETable", table, null);
 		RegisterTable("StringTable", table, null);
 		RegisterTable("TaskTable", table, null);

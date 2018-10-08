@@ -40,9 +40,9 @@ public class DefaultHttpRequestFactory implements HttpRequestFactory {
             this.attemptedSslInit = true;
             try {
                 sSLSocketFactory = NetworkUtils.getSSLSocketFactory(this.pinningInfo);
-                this.logger.mo4289d("Fabric", "Custom SSL pinning enabled");
+                this.logger.mo4753d("Fabric", "Custom SSL pinning enabled");
             } catch (Throwable e) {
-                this.logger.mo4292e("Fabric", "Exception while validating pinned certs", e);
+                this.logger.mo4756e("Fabric", "Exception while validating pinned certs", e);
                 sSLSocketFactory = null;
             }
         }

@@ -69,8 +69,8 @@ public class QuestSearchListSelect : QuestSearchListSelectBase
 
 	protected unsafe override void SendSearchRequest(Action onFinish, Action<bool> cb)
 	{
-		_003CSendSearchRequest_003Ec__AnonStorey3B5 _003CSendSearchRequest_003Ec__AnonStorey3B;
-		MonoBehaviourSingleton<PartyManager>.I.SendSearch(new Action<bool, Error>((object)_003CSendSearchRequest_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
+		_003CSendSearchRequest_003Ec__AnonStorey3C5 _003CSendSearchRequest_003Ec__AnonStorey3C;
+		MonoBehaviourSingleton<PartyManager>.I.SendSearch(new Action<bool, Error>((object)_003CSendSearchRequest_003Ec__AnonStorey3C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
 	}
 
 	protected override void ResetSearchRequest()
@@ -145,16 +145,16 @@ public class QuestSearchListSelect : QuestSearchListSelectBase
 			PartyModel.Party[] partys = MonoBehaviourSingleton<PartyManager>.I.partys.ToArray();
 			SetActive((Enum)UI.GRD_QUEST, true);
 			SetActive((Enum)UI.STR_NON_LIST, false);
-			_003CUpdateUI_003Ec__AnonStorey3B6 _003CUpdateUI_003Ec__AnonStorey3B;
-			SetGrid(UI.GRD_QUEST, "QuestSearchListSelectItem", partys.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateUI_003Ec__AnonStorey3C6 _003CUpdateUI_003Ec__AnonStorey3C;
+			SetGrid(UI.GRD_QUEST, "QuestSearchListSelectItem", partys.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			base.UpdateUI();
 		}
 	}
 
 	protected unsafe void SetGateData(PartyModel.Party party, Transform t, QUEST_TYPE type)
 	{
-		_003CSetGateData_003Ec__AnonStorey3B7 _003CSetGateData_003Ec__AnonStorey3B;
-		int num = party.slotInfos.Count(new Func<PartyModel.SlotInfo, bool>((object)_003CSetGateData_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSetGateData_003Ec__AnonStorey3C7 _003CSetGateData_003Ec__AnonStorey3C;
+		int num = party.slotInfos.Count(new Func<PartyModel.SlotInfo, bool>((object)_003CSetGateData_003Ec__AnonStorey3C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		for (int i = 0; i < 3; i++)
 		{
 			SetToggle(t, ui[i], i < num);

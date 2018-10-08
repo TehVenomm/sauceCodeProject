@@ -5,10 +5,10 @@ import android.content.DialogInterface.OnClickListener;
 
 final class ab implements OnClickListener {
     /* renamed from: a */
-    final /* synthetic */ C1061z f1050a;
+    final /* synthetic */ C1377z f3438a;
 
-    ab(C1061z c1061z) {
-        this.f1050a = c1061z;
+    ab(C1377z c1377z) {
+        this.f3438a = c1377z;
     }
 
     public final void onClick(DialogInterface dialogInterface, int i) {

@@ -298,8 +298,8 @@ public static class NGUIText
 		return Mathf.Clamp01((float)num / 255f);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static Color ParseColor(string text, int offset)
 	{
 		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
@@ -318,8 +318,8 @@ public static class NGUIText
 		return new Color(num4 * (float)num, num4 * (float)num2, num4 * (float)num3);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static Color ParseColor32(string text, int offset)
 	{
 		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
@@ -331,16 +331,16 @@ public static class NGUIText
 		return new Color(num5 * (float)num, num5 * (float)num2, num5 * (float)num3, num5 * (float)num4);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static string EncodeColor(Color c)
 	{
 		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 		return EncodeColor24(c);
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static string EncodeColor(string text, Color c)
 	{
 		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
@@ -364,8 +364,8 @@ public static class NGUIText
 		return NGUIMath.DecimalToHex24(num);
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static string EncodeColor32(Color c)
 	{
 		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
@@ -384,8 +384,8 @@ public static class NGUIText
 		return ParseSymbol(text, ref index, null, false, ref sub, ref bold, ref italic, ref underline, ref strike, ref ignoreColor);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static bool IsHex(char ch)
 	{
 		return (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F');
@@ -786,8 +786,8 @@ public static class NGUIText
 		return indices[i];
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	private static bool IsSpace(int ch)
 	{
 		return ch == 32 || ch == 8202 || ch == 8203 || ch == 8201;

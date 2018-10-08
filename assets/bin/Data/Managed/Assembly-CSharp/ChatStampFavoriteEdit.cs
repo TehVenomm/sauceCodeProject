@@ -139,8 +139,8 @@ public class ChatStampFavoriteEdit
 		{
 			int index = i;
 			Transform iTransform = favoriteIcons[i];
-			_003CInitFavoriteStampList_003Ec__AnonStorey2D5 _003CInitFavoriteStampList_003Ec__AnonStorey2D;
-			InitStampItem(MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[i], iTransform, new Action((object)_003CInitFavoriteStampList_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CInitFavoriteStampList_003Ec__AnonStorey2E4 _003CInitFavoriteStampList_003Ec__AnonStorey2E;
+			InitStampItem(MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[i], iTransform, new Action((object)_003CInitFavoriteStampList_003Ec__AnonStorey2E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -152,8 +152,8 @@ public class ChatStampFavoriteEdit
 		{
 			int i = (int)currentUnlockStamps[j].id;
 			Transform iTransform = unlockIcons[j];
-			_003CInitUnlockStampList_003Ec__AnonStorey2D6 _003CInitUnlockStampList_003Ec__AnonStorey2D;
-			InitStampItem((int)currentUnlockStamps[j].id, iTransform, new Action((object)_003CInitUnlockStampList_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CInitUnlockStampList_003Ec__AnonStorey2E5 _003CInitUnlockStampList_003Ec__AnonStorey2E;
+			InitStampItem((int)currentUnlockStamps[j].id, iTransform, new Action((object)_003CInitUnlockStampList_003Ec__AnonStorey2E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 

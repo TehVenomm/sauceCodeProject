@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace UnityStandardAssets.ImageEffects
 {
-	[ExecuteInEditMode]
 	[AddComponentMenu("Image Effects/Blur/Blur")]
+	[ExecuteInEditMode]
 	public class Blur
 	{
 		[Range(0f, 10f)]

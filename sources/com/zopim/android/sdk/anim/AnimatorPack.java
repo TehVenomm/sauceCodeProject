@@ -42,8 +42,8 @@ public class AnimatorPack {
         if (animatorListener2 != null) {
             ofFloat2.addListener(animatorListener2);
         }
-        ofFloat.addListener(new C0786a(view));
-        ofFloat2.addListener(new C0787b(view2));
+        ofFloat.addListener(new C0785a(view));
+        ofFloat2.addListener(new C0786b(view2));
         return animatorSet;
     }
 
@@ -56,7 +56,7 @@ public class AnimatorPack {
         Animator animatorSet = new AnimatorSet();
         animatorSet.setDuration(DURATION);
         animatorSet.play(ofFloat).with(scale);
-        animatorSet.addListener(new C0791f(view));
+        animatorSet.addListener(new C0790f(view));
         return animatorSet;
     }
 
@@ -69,7 +69,7 @@ public class AnimatorPack {
         Animator animatorSet = new AnimatorSet();
         animatorSet.setDuration(DURATION);
         animatorSet.play(ofFloat).with(scale);
-        animatorSet.addListener(new C0790e(view));
+        animatorSet.addListener(new C0789e(view));
         return animatorSet;
     }
 
@@ -120,7 +120,7 @@ public class AnimatorPack {
             return ofFloat;
         }
         ofFloat.setDuration(DURATION);
-        ofFloat.addListener(new C0789d(view));
+        ofFloat.addListener(new C0788d(view));
         return ofFloat;
     }
 
@@ -183,7 +183,7 @@ public class AnimatorPack {
                 break;
         }
         ofFloat.setDuration(DURATION);
-        ofFloat.addListener(new C0788c(view, translationX, translationY));
+        ofFloat.addListener(new C0787c(view, translationX, translationY));
         return ofFloat;
     }
 

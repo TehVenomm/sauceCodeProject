@@ -284,18 +284,18 @@ final class zzcam extends zzcdm {
         r0 = r2;
         goto L_0x0015;
     L_0x004e:
-        r3 = new java.math.BigDecimal;	 Catch:{ NumberFormatException -> 0x0064 }
-        r4 = r11.zzixv;	 Catch:{ NumberFormatException -> 0x0064 }
-        r3.<init>(r4);	 Catch:{ NumberFormatException -> 0x0064 }
         r4 = new java.math.BigDecimal;	 Catch:{ NumberFormatException -> 0x0064 }
+        r3 = r11.zzixv;	 Catch:{ NumberFormatException -> 0x0064 }
+        r4.<init>(r3);	 Catch:{ NumberFormatException -> 0x0064 }
+        r3 = new java.math.BigDecimal;	 Catch:{ NumberFormatException -> 0x0064 }
         r5 = r11.zzixw;	 Catch:{ NumberFormatException -> 0x0064 }
-        r4.<init>(r5);	 Catch:{ NumberFormatException -> 0x0064 }
+        r3.<init>(r5);	 Catch:{ NumberFormatException -> 0x0064 }
         r5 = r4;
         r4 = r2;
     L_0x005e:
         if (r6 != r8) goto L_0x007f;
     L_0x0060:
-        if (r3 != 0) goto L_0x0081;
+        if (r5 != 0) goto L_0x0081;
     L_0x0062:
         r0 = r2;
         goto L_0x0015;
@@ -392,10 +392,10 @@ final class zzcam extends zzcdm {
         r1 = r0;
         goto L_0x00e6;
     L_0x00ee:
-        r2 = r10.compareTo(r3);
+        r2 = r10.compareTo(r5);
         if (r2 == r7) goto L_0x0100;
     L_0x00f4:
-        r2 = r10.compareTo(r5);
+        r2 = r10.compareTo(r3);
         if (r2 == r1) goto L_0x0100;
     L_0x00fa:
         r0 = java.lang.Boolean.valueOf(r1);
@@ -480,16 +480,19 @@ final class zzcam extends zzcdm {
                     if (hashSet.contains(Integer.valueOf(intValue3))) {
                         zzauk().zzayi().zzj("Skipping failed audience ID", Integer.valueOf(intValue3));
                     } else {
-                        bitSet = (BitSet) arrayMap2.get(Integer.valueOf(intValue3));
-                        bitSet2 = (BitSet) arrayMap3.get(Integer.valueOf(intValue3));
+                        bitSet2 = (BitSet) arrayMap2.get(Integer.valueOf(intValue3));
+                        BitSet bitSet3 = (BitSet) arrayMap3.get(Integer.valueOf(intValue3));
                         if (((zzcfy) arrayMap.get(Integer.valueOf(intValue3))) == null) {
                             zzcfy zzcfy2 = new zzcfy();
                             arrayMap.put(Integer.valueOf(intValue3), zzcfy2);
                             zzcfy2.zziyq = Boolean.valueOf(true);
-                            bitSet = new BitSet();
-                            arrayMap2.put(Integer.valueOf(intValue3), bitSet);
                             bitSet2 = new BitSet();
-                            arrayMap3.put(Integer.valueOf(intValue3), bitSet2);
+                            arrayMap2.put(Integer.valueOf(intValue3), bitSet2);
+                            bitSet3 = new BitSet();
+                            arrayMap3.put(Integer.valueOf(intValue3), bitSet3);
+                            bitSet = bitSet3;
+                        } else {
+                            bitSet = bitSet3;
                         }
                         for (zzcfq zzcfq : (List) r9.get(Integer.valueOf(intValue3))) {
                             if (zzauk().zzad(2)) {
@@ -498,7 +501,7 @@ final class zzcam extends zzcdm {
                             }
                             if (zzcfq.zzixi == null || zzcfq.zzixi.intValue() > 256) {
                                 zzauk().zzaye().zze("Invalid event filter ID. appId, id", zzcbo.zzjf(str), String.valueOf(zzcfq.zzixi));
-                            } else if (bitSet.get(zzcfq.zzixi.intValue())) {
+                            } else if (bitSet2.get(zzcfq.zzixi.intValue())) {
                                 zzauk().zzayi().zze("Event filter already evaluated true. audience ID, filter ID", Integer.valueOf(intValue3), zzcfq.zzixi);
                             } else {
                                 Object obj;
@@ -513,9 +516,9 @@ final class zzcam extends zzcdm {
                                 if (zza == null) {
                                     hashSet.add(Integer.valueOf(intValue3));
                                 } else {
-                                    bitSet2.set(zzcfq.zzixi.intValue());
+                                    bitSet.set(zzcfq.zzixi.intValue());
                                     if (zza.booleanValue()) {
-                                        bitSet.set(zzcfq.zzixi.intValue());
+                                        bitSet2.set(zzcfq.zzixi.intValue());
                                     }
                                 }
                             }

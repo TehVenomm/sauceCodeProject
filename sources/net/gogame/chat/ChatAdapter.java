@@ -5,18 +5,18 @@ import android.database.DataSetObserver;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 
 public class ChatAdapter extends BaseAdapter {
     private final ChatContext chatContext;
     private final Context context;
-    private final DataSetObserver dataSetObserver = new C09991();
+    private final DataSetObserver dataSetObserver = new C13151();
     private final UIContext uiContext;
     private final ChatAdapterViewFactory viewFactory;
 
     /* renamed from: net.gogame.chat.ChatAdapter$1 */
-    class C09991 extends DataSetObserver {
-        C09991() {
+    class C13151 extends DataSetObserver {
+        C13151() {
         }
 
         public void onChanged() {
@@ -73,7 +73,7 @@ public class ChatAdapter extends BaseAdapter {
             }
             return view2;
         } else if (((AgentTypingEntry) item).isTyping()) {
-            return this.viewFactory.getNotificationView(view, viewGroup, this.context.getResources().getString(C0785R.string.net_gogame_chat_agent_typing_message));
+            return this.viewFactory.getNotificationView(view, viewGroup, this.context.getResources().getString(C0784R.string.net_gogame_chat_agent_typing_message));
         } else {
             return this.viewFactory.getNotificationView(view, viewGroup, null, true);
         }

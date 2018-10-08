@@ -106,7 +106,7 @@ public class RushResultPoint : GameSection
 		SetLabelText((Enum)UI.LBL_GET_POINT, "0pt");
 		SetFontStyle((Enum)UI.LBL_TOTAL_POINT, 2);
 		SetLabelText((Enum)UI.LBL_TOTAL_POINT, d.userPoint.ToString("N0") + "pt");
-		_003CUpdateUI_003Ec__AnonStorey443 _003CUpdateUI_003Ec__AnonStorey;
+		_003CUpdateUI_003Ec__AnonStorey453 _003CUpdateUI_003Ec__AnonStorey;
 		SetGrid(UI.GRD_POINT_DETAIL, "RushResultPointDetailItem", d.bonusPoint.Count, true, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (d.nextReward != null)
 		{
@@ -131,7 +131,7 @@ public class RushResultPoint : GameSection
 
 	private unsafe void SetAllRewardItem(UI targetGrid, List<PointEventCurrentData.Reward> rewardList)
 	{
-		_003CSetAllRewardItem_003Ec__AnonStorey444 _003CSetAllRewardItem_003Ec__AnonStorey;
+		_003CSetAllRewardItem_003Ec__AnonStorey454 _003CSetAllRewardItem_003Ec__AnonStorey;
 		SetGrid(targetGrid, "ItemIconReward", rewardList.Count, true, new Action<int, Transform, bool>((object)_003CSetAllRewardItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -177,7 +177,7 @@ public class RushResultPoint : GameSection
 		PlayTween((Enum)UI.OBJ_RUSH_POINT, true, (EventDelegate.Callback)delegate
 		{
 			SoundManager.PlayOneShotUISE(40000228);
-			((_003CPlayAnimation_003Ec__Iterator14A)/*Error near IL_0072: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			((_003CPlayAnimation_003Ec__Iterator14E)/*Error near IL_0072: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 		}, false, 0);
 		while (animState != 0 && !is_skip)
 		{
@@ -192,7 +192,7 @@ public class RushResultPoint : GameSection
 		animState = RESULT_ANIM_STATE.NEXT_REWARD;
 		PlayTween((Enum)UI.OBJ_NEXT_REWARD, true, (EventDelegate.Callback)delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator14A)/*Error near IL_013e: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			((_003CPlayAnimation_003Ec__Iterator14E)/*Error near IL_013e: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 		}, false, 0);
 		SoundManager.PlayOneShotUISE(40000228);
 		if (allPointEvents.pointRankingData.getReward.Count > 0)
@@ -200,7 +200,7 @@ public class RushResultPoint : GameSection
 			animState = RESULT_ANIM_STATE.REWARD;
 			PlayTween((Enum)UI.OBJ_GET_REWARD_ROOT, true, (EventDelegate.Callback)delegate
 			{
-				((_003CPlayAnimation_003Ec__Iterator14A)/*Error near IL_0195: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+				((_003CPlayAnimation_003Ec__Iterator14E)/*Error near IL_0195: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 			}, false, 0);
 		}
 		animState = RESULT_ANIM_STATE.END;

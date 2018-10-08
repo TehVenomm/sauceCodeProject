@@ -3,8 +3,8 @@ using UnityEngine;
 namespace UnityStandardAssets.ImageEffects
 {
 	[RequireComponent(typeof(Camera))]
-	[ExecuteInEditMode]
 	[AddComponentMenu("Image Effects/Color Adjustments/Contrast Enhance (Unsharp Mask)")]
+	[ExecuteInEditMode]
 	public class ContrastEnhance : PostEffectsBase
 	{
 		[Range(0f, 1f)]

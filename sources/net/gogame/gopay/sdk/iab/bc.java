@@ -2,20 +2,20 @@ package net.gogame.gopay.sdk.iab;
 
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import net.gogame.gopay.sdk.C1032f;
+import net.gogame.gopay.sdk.C1348f;
 
 final class bc implements OnClickListener {
     /* renamed from: a */
-    final /* synthetic */ C1032f f1089a;
+    final /* synthetic */ C1348f f3477a;
     /* renamed from: b */
-    final /* synthetic */ PurchaseActivity f1090b;
+    final /* synthetic */ PurchaseActivity f3478b;
 
-    bc(PurchaseActivity purchaseActivity, C1032f c1032f) {
-        this.f1090b = purchaseActivity;
-        this.f1089a = c1032f;
+    bc(PurchaseActivity purchaseActivity, C1348f c1348f) {
+        this.f3478b = purchaseActivity;
+        this.f3477a = c1348f;
     }
 
     public final void onClick(DialogInterface dialogInterface, int i) {
-        PurchaseActivity.m803b(this.f1090b, this.f1089a.f971a, this.f1089a.f973c);
+        PurchaseActivity.m3828b(this.f3478b, this.f3477a.f3359a, this.f3477a.f3361c);
     }
 }

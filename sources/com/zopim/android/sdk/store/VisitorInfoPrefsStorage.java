@@ -6,7 +6,7 @@ import android.util.Log;
 import com.zopim.android.sdk.model.VisitorInfo;
 import com.zopim.android.sdk.model.VisitorInfo.Builder;
 
-public final class VisitorInfoPrefsStorage extends C0898a implements VisitorInfoStorage {
+public final class VisitorInfoPrefsStorage extends C0897a implements VisitorInfoStorage {
     private static final String EMAIL_KEY = "email_key";
     private static final String LOG_TAG = VisitorInfoPrefsStorage.class.getSimpleName();
     private static final String NAME_KEY = "name_key";

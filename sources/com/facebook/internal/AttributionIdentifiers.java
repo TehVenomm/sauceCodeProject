@@ -166,11 +166,11 @@ public class AttributionIdentifiers {
     }
 
     private static AttributionIdentifiers getAndroidIdViaService(Context context) {
-        AttributionIdentifiers attributionIdentifiers;
         ServiceConnection googleAdServiceConnection = new GoogleAdServiceConnection();
         Intent intent = new Intent(AdvertisingInfoServiceStrategy.GOOGLE_PLAY_SERVICES_INTENT);
         intent.setPackage("com.google.android.gms");
         if (context.bindService(intent, googleAdServiceConnection, 1)) {
+            AttributionIdentifiers attributionIdentifiers;
             try {
                 GoogleAdInfo googleAdInfo = new GoogleAdInfo(googleAdServiceConnection.getBinder());
                 attributionIdentifiers = new AttributionIdentifiers();
@@ -188,13 +188,13 @@ public class AttributionIdentifiers {
     }
 
     public static AttributionIdentifiers getAttributionIdentifiers(Context context) {
-        Cursor query;
         Exception e;
         Throwable th;
         if (recentlyFetchedIdentifiers != null && System.currentTimeMillis() - recentlyFetchedIdentifiers.fetchTime < 3600000) {
             return recentlyFetchedIdentifiers;
         }
         AttributionIdentifiers androidId = getAndroidId(context);
+        Cursor query;
         try {
             Uri parse = context.getPackageManager().resolveContentProvider(ATTRIBUTION_ID_CONTENT_PROVIDER, 0) != null ? Uri.parse(AppsFlyerLib.ATTRIBUTION_ID_CONTENT_URI) : context.getPackageManager().resolveContentProvider(ATTRIBUTION_ID_CONTENT_PROVIDER_WAKIZASHI, 0) != null ? Uri.parse("content://com.facebook.wakizashi.provider.AttributionIdProvider") : null;
             String installerPackageName = getInstallerPackageName(context);

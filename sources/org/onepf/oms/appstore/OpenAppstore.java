@@ -89,7 +89,7 @@ public class OpenAppstore extends DefaultAppstore {
         try {
             return this.openAppstoreService.areOutsideLinksAllowed();
         } catch (Throwable e) {
-            Logger.m1010w("RemoteException", e);
+            Logger.m4035w("RemoteException", e);
             return false;
         }
     }
@@ -107,7 +107,7 @@ public class OpenAppstore extends DefaultAppstore {
         try {
             return this.openAppstoreService.getPackageVersion(str);
         } catch (Throwable e) {
-            Logger.m1004e(e, "getPackageVersion() packageName: ", str);
+            Logger.m4029e(e, "getPackageVersion() packageName: ", str);
             return -1;
         }
     }
@@ -117,7 +117,7 @@ public class OpenAppstore extends DefaultAppstore {
         try {
             return this.openAppstoreService.getProductPageIntent(str);
         } catch (Throwable e) {
-            Logger.m1010w("RemoteException: ", e);
+            Logger.m4035w("RemoteException: ", e);
             return null;
         }
     }
@@ -127,7 +127,7 @@ public class OpenAppstore extends DefaultAppstore {
         try {
             return this.openAppstoreService.getRateItPageIntent(str);
         } catch (Throwable e) {
-            Logger.m1010w("RemoteException", e);
+            Logger.m4035w("RemoteException", e);
             return null;
         }
     }
@@ -137,7 +137,7 @@ public class OpenAppstore extends DefaultAppstore {
         try {
             return this.openAppstoreService.getSameDeveloperPageIntent(str);
         } catch (Throwable e) {
-            Logger.m1010w("RemoteException", e);
+            Logger.m4035w("RemoteException", e);
             return null;
         }
     }
@@ -147,7 +147,7 @@ public class OpenAppstore extends DefaultAppstore {
         try {
             z = this.openAppstoreService.isBillingAvailable(str);
         } catch (Throwable e) {
-            Logger.m1004e(e, "isBillingAvailable() packageName: ", str);
+            Logger.m4029e(e, "isBillingAvailable() packageName: ", str);
         }
         return z;
     }
@@ -156,7 +156,7 @@ public class OpenAppstore extends DefaultAppstore {
         try {
             return this.openAppstoreService.isPackageInstaller(str);
         } catch (Throwable e) {
-            Logger.m1010w("RemoteException: ", e);
+            Logger.m4035w("RemoteException: ", e);
             return false;
         }
     }

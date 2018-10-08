@@ -51,11 +51,11 @@ public class NpcLevelTable : Singleton<NpcLevelTable>, IDataTable
 			return true;
 		}
 
-		public void CopyHomeCharaInfo(CharaInfo info, StageObjectManager.CreatePlayerInfo.ExtentionInfo extentionInfo)
+		public void CopyHomeCharaInfo(CharaInfo info, StageObjectManager.CreatePlayerInfo.ExtentionInfo extentionInfo, float atkRate = 1f)
 		{
 			info.level = (int)lv;
 			info.hp = hp;
-			info.atk = atk;
+			info.atk = (int)((float)atk * atkRate);
 			info.def = def;
 			int i = 0;
 			for (int num = equipItems.Length; i < num; i++)

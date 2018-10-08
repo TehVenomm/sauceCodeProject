@@ -683,8 +683,8 @@ public class ViewPager extends ViewGroup {
                 return itemInfo2;
             }
             int i3 = itemInfo2.position;
-            f2 = itemInfo2.widthFactor;
-            f3 = f4;
+            f2 = f4;
+            f3 = itemInfo2.widthFactor;
             obj = null;
             i2 = i + 1;
             i = i3;
@@ -1073,77 +1073,77 @@ public class ViewPager extends ViewGroup {
     }
 
     void dataSetChanged() {
-        int i;
         int count = this.mAdapter.getCount();
         this.mExpectedAdapterCount = count;
         boolean z = this.mItems.size() < (this.mOffscreenPageLimit * 2) + 1 && this.mItems.size() < count;
         boolean z2 = false;
-        int i2 = this.mCurItem;
+        int i = this.mCurItem;
         boolean z3 = z;
-        int i3 = 0;
-        while (i3 < this.mItems.size()) {
-            int i4;
+        int i2 = 0;
+        while (i2 < this.mItems.size()) {
+            int i3;
             boolean z4;
+            int i4;
             boolean z5;
-            ItemInfo itemInfo = (ItemInfo) this.mItems.get(i3);
+            ItemInfo itemInfo = (ItemInfo) this.mItems.get(i2);
             int itemPosition = this.mAdapter.getItemPosition(itemInfo.object);
             if (itemPosition == -1) {
-                i4 = i3;
+                i3 = i2;
                 z4 = z2;
-                i = i2;
+                i4 = i;
                 z5 = z3;
             } else if (itemPosition == -2) {
-                this.mItems.remove(i3);
-                i3--;
+                this.mItems.remove(i2);
+                i2--;
                 if (!z2) {
                     this.mAdapter.startUpdate((ViewGroup) this);
                     z2 = true;
                 }
                 this.mAdapter.destroyItem((ViewGroup) this, itemInfo.position, itemInfo.object);
                 if (this.mCurItem == itemInfo.position) {
-                    i4 = i3;
+                    i3 = i2;
                     z4 = z2;
-                    i = Math.max(0, Math.min(this.mCurItem, count - 1));
+                    i4 = Math.max(0, Math.min(this.mCurItem, count - 1));
                     z5 = true;
                 } else {
-                    i4 = i3;
+                    i3 = i2;
                     z4 = z2;
-                    i = i2;
+                    i4 = i;
                     z5 = true;
                 }
             } else if (itemInfo.position != itemPosition) {
                 if (itemInfo.position == this.mCurItem) {
-                    i2 = itemPosition;
+                    i = itemPosition;
                 }
                 itemInfo.position = itemPosition;
-                i4 = i3;
+                i3 = i2;
                 z4 = z2;
-                i = i2;
+                i4 = i;
                 z5 = true;
             } else {
-                i4 = i3;
+                i3 = i2;
                 z4 = z2;
-                i = i2;
+                i4 = i;
                 z5 = z3;
             }
             z3 = z5;
-            i2 = i;
+            i = i4;
             z2 = z4;
-            i3 = i4 + 1;
+            i2 = i3 + 1;
         }
         if (z2) {
             this.mAdapter.finishUpdate((ViewGroup) this);
         }
         Collections.sort(this.mItems, COMPARATOR);
         if (z3) {
-            i = getChildCount();
-            for (i3 = 0; i3 < i; i3++) {
-                LayoutParams layoutParams = (LayoutParams) getChildAt(i3).getLayoutParams();
+            i4 = getChildCount();
+            for (i2 = 0; i2 < i4; i2++) {
+                LayoutParams layoutParams = (LayoutParams) getChildAt(i2).getLayoutParams();
                 if (!layoutParams.isDecor) {
                     layoutParams.widthFactor = 0.0f;
                 }
             }
-            setCurrentItemInternal(i2, false, true);
+            setCurrentItemInternal(i, false, true);
             requestLayout();
         }
     }
@@ -1628,6 +1628,7 @@ public class ViewPager extends ViewGroup {
     }
 
     protected void onMeasure(int i, int i2) {
+        LayoutParams layoutParams;
         int i3;
         setMeasuredDimension(getDefaultSize(0, i), getDefaultSize(0, i2));
         int measuredWidth = getMeasuredWidth();
@@ -1636,7 +1637,6 @@ public class ViewPager extends ViewGroup {
         int measuredHeight = (getMeasuredHeight() - getPaddingTop()) - getPaddingBottom();
         int childCount = getChildCount();
         for (int i4 = 0; i4 < childCount; i4++) {
-            LayoutParams layoutParams;
             int i5;
             View childAt = getChildAt(i4);
             if (childAt.getVisibility() != 8) {
@@ -1654,48 +1654,29 @@ public class ViewPager extends ViewGroup {
                         i3 = 1073741824;
                     }
                     if (layoutParams.width != -2) {
-                        i5 = 1073741824;
-                        if (layoutParams.width != -1) {
-                            i7 = layoutParams.width;
-                            if (layoutParams.height != -2) {
-                                i3 = 1073741824;
-                                if (layoutParams.height != -1) {
-                                    measuredWidth = layoutParams.height;
-                                    childAt.measure(MeasureSpec.makeMeasureSpec(i7, i5), MeasureSpec.makeMeasureSpec(measuredWidth, i3));
-                                    if (obj == null) {
-                                        measuredHeight -= childAt.getMeasuredHeight();
-                                    } else if (obj2 == null) {
-                                        paddingLeft -= childAt.getMeasuredWidth();
-                                    }
-                                }
-                            }
-                            measuredWidth = measuredHeight;
-                            childAt.measure(MeasureSpec.makeMeasureSpec(i7, i5), MeasureSpec.makeMeasureSpec(measuredWidth, i3));
-                            if (obj == null) {
-                                measuredHeight -= childAt.getMeasuredHeight();
-                            } else if (obj2 == null) {
-                                paddingLeft -= childAt.getMeasuredWidth();
-                            }
-                        }
+                        i7 = 1073741824;
+                        i5 = layoutParams.width != -1 ? layoutParams.width : paddingLeft;
+                    } else {
+                        i7 = i5;
+                        i5 = paddingLeft;
                     }
-                    i7 = paddingLeft;
                     if (layoutParams.height != -2) {
                         i3 = 1073741824;
                         if (layoutParams.height != -1) {
                             measuredWidth = layoutParams.height;
-                            childAt.measure(MeasureSpec.makeMeasureSpec(i7, i5), MeasureSpec.makeMeasureSpec(measuredWidth, i3));
-                            if (obj == null) {
+                            childAt.measure(MeasureSpec.makeMeasureSpec(i5, i7), MeasureSpec.makeMeasureSpec(measuredWidth, i3));
+                            if (obj != null) {
                                 measuredHeight -= childAt.getMeasuredHeight();
-                            } else if (obj2 == null) {
+                            } else if (obj2 != null) {
                                 paddingLeft -= childAt.getMeasuredWidth();
                             }
                         }
                     }
                     measuredWidth = measuredHeight;
-                    childAt.measure(MeasureSpec.makeMeasureSpec(i7, i5), MeasureSpec.makeMeasureSpec(measuredWidth, i3));
-                    if (obj == null) {
+                    childAt.measure(MeasureSpec.makeMeasureSpec(i5, i7), MeasureSpec.makeMeasureSpec(measuredWidth, i3));
+                    if (obj != null) {
                         measuredHeight -= childAt.getMeasuredHeight();
-                    } else if (obj2 == null) {
+                    } else if (obj2 != null) {
                         paddingLeft -= childAt.getMeasuredWidth();
                     }
                 }

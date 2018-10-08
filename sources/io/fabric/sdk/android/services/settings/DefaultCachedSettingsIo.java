@@ -18,13 +18,13 @@ class DefaultCachedSettingsIo implements CachedSettingsIo {
     }
 
     public JSONObject readCachedSettings() {
+        Closeable fileInputStream;
         Throwable th;
         Closeable closeable;
         Throwable th2;
         Throwable th3;
         JSONObject jSONObject = null;
-        Fabric.getLogger().mo4289d("Fabric", "Reading cached settings...");
-        Closeable fileInputStream;
+        Fabric.getLogger().mo4753d("Fabric", "Reading cached settings...");
         try {
             File file = new File(new FileStoreImpl(this.kit).getFilesDir(), Settings.SETTINGS_CACHE_FILENAME);
             if (file.exists()) {
@@ -36,7 +36,7 @@ class DefaultCachedSettingsIo implements CachedSettingsIo {
                     closeable = fileInputStream;
                     th2 = th;
                     try {
-                        Fabric.getLogger().mo4292e("Fabric", "Failed to fetch cached settings", th2);
+                        Fabric.getLogger().mo4756e("Fabric", "Failed to fetch cached settings", th2);
                         CommonUtils.closeOrLog(closeable, "Error while closing settings cache file.");
                         return jSONObject;
                     } catch (Throwable th4) {
@@ -51,13 +51,13 @@ class DefaultCachedSettingsIo implements CachedSettingsIo {
                     throw th3;
                 }
             }
-            Fabric.getLogger().mo4289d("Fabric", "No cached settings found.");
+            Fabric.getLogger().mo4753d("Fabric", "No cached settings found.");
             fileInputStream = null;
             CommonUtils.closeOrLog(fileInputStream, "Error while closing settings cache file.");
         } catch (Exception e2) {
             th2 = e2;
             closeable = null;
-            Fabric.getLogger().mo4292e("Fabric", "Failed to fetch cached settings", th2);
+            Fabric.getLogger().mo4756e("Fabric", "Failed to fetch cached settings", th2);
             CommonUtils.closeOrLog(closeable, "Error while closing settings cache file.");
             return jSONObject;
         } catch (Throwable th22) {
@@ -76,7 +76,7 @@ class DefaultCachedSettingsIo implements CachedSettingsIo {
         Throwable e;
         Throwable th2;
         Closeable closeable = null;
-        Fabric.getLogger().mo4289d("Fabric", "Writing settings to cache file...");
+        Fabric.getLogger().mo4753d("Fabric", "Writing settings to cache file...");
         if (jSONObject != null) {
             try {
                 jSONObject.put(SettingsJsonConstants.EXPIRES_AT_KEY, j);
@@ -90,7 +90,7 @@ class DefaultCachedSettingsIo implements CachedSettingsIo {
                     closeable = fileWriter;
                     th2 = th;
                     try {
-                        Fabric.getLogger().mo4292e("Fabric", "Failed to cache settings", th2);
+                        Fabric.getLogger().mo4756e("Fabric", "Failed to cache settings", th2);
                         CommonUtils.closeOrLog(closeable, "Failed to close settings writer.");
                     } catch (Throwable th22) {
                         th = th22;
@@ -106,7 +106,7 @@ class DefaultCachedSettingsIo implements CachedSettingsIo {
                 }
             } catch (Exception e3) {
                 th22 = e3;
-                Fabric.getLogger().mo4292e("Fabric", "Failed to cache settings", th22);
+                Fabric.getLogger().mo4756e("Fabric", "Failed to cache settings", th22);
                 CommonUtils.closeOrLog(closeable, "Failed to close settings writer.");
             } catch (Throwable th222) {
                 th = th222;

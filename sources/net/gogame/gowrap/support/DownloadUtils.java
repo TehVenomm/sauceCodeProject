@@ -54,7 +54,6 @@ public final class DownloadUtils {
             Throwable th;
             HttpURLConnection httpURLConnection;
             Throwable th2;
-            OutputStream outputStream;
             try {
                 HttpURLConnection httpURLConnection2;
                 String str = "Etag/" + this.url.toString();
@@ -148,6 +147,7 @@ public final class DownloadUtils {
                             this.target.setEtag(str2);
                         }
                         InputStream inputStream = httpURLConnection2.getInputStream();
+                        OutputStream outputStream;
                         try {
                             outputStream = this.target.getOutputStream();
                             IOUtils.copy(inputStream, outputStream);

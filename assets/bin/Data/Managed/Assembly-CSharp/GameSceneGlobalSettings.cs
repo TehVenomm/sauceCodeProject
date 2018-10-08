@@ -203,6 +203,7 @@ public class GameSceneGlobalSettings
 		if (next_scene_name == "InGameScene")
 		{
 			MonoBehaviourSingleton<GameSceneManager>.I.ClearHistory();
+			MonoBehaviourSingleton<UIManager>.I.DeleteUI();
 		}
 		else
 		{
@@ -231,12 +232,12 @@ public class GameSceneGlobalSettings
 		return flag && AppMain.needClearMemory;
 	}
 
-	public void SceneInitialize(string prev_scene_name, string next_scene_name)
+	public void SceneInitialize(string prev_scene_name, string next_scene_name, bool skipChat = false)
 	{
 		if (next_scene_name != "InGameScene")
 		{
 			bool need_tutorial = UserInfoManager.IsNeedsTutorialMessage();
-			MonoBehaviourSingleton<UIManager>.I.LoadUI(true, true, need_tutorial);
+			MonoBehaviourSingleton<UIManager>.I.LoadUI(true, true, need_tutorial, skipChat);
 		}
 		if (next_scene_name != "GachaScene" && next_scene_name != "ShopScene" && MonoBehaviourSingleton<GachaManager>.IsValid())
 		{
@@ -382,6 +383,10 @@ public class GameSceneGlobalSettings
 					{
 						stageImageID = 10000000;
 					}
+					else if (scene_name.Contains("WeaponSelect"))
+					{
+						stageImageID = 99999999;
+					}
 					else
 					{
 						stageImageID = 10000001;
@@ -454,7 +459,7 @@ public class GameSceneGlobalSettings
 	{
 		if (section_name == "QuestResultFriend")
 		{
-			MonoBehaviourSingleton<UIManager>.I.LoadUI(true, false, false);
+			MonoBehaviourSingleton<UIManager>.I.LoadUI(true, false, false, false);
 		}
 	}
 
@@ -627,39 +632,39 @@ public class GameSceneGlobalSettings
 		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_018f: Expected O, but got Unknown
-		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e0: Expected O, but got Unknown
-		//IL_021e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0241: Expected O, but got Unknown
-		//IL_025c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027f: Expected O, but got Unknown
-		//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0304: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0313: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0318: Expected O, but got Unknown
-		//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0499: Unknown result type (might be due to invalid IL or missing references)
-		//IL_049e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0578: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ea: Expected O, but got Unknown
+		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0237: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0246: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024b: Expected O, but got Unknown
+		//IL_0266: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0275: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0284: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0289: Expected O, but got Unknown
+		//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_030e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_031d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0322: Expected O, but got Unknown
+		//IL_03bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0402: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0407: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04c4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04c9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04dc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04ee: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0582: Unknown result type (might be due to invalid IL or missing references)
 		Camera mainCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
 		if (!(mainCamera == null) && mainCamera.get_enabled() && MonoBehaviourSingleton<StageManager>.IsValid())
 		{
@@ -698,7 +703,7 @@ public class GameSceneGlobalSettings
 				{
 					mainCamera.get_transform().Set(MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.friendPos, MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.friendRot);
 				}
-				else if (MonoBehaviourSingleton<StageManager>.I.currentStageName == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage)
+				else if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid() && MonoBehaviourSingleton<StageManager>.I.currentStageName == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage)
 				{
 					mainCamera.get_transform().Set(MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createCameraPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createCameraRot);
 				}
@@ -1122,6 +1127,10 @@ public class GameSceneGlobalSettings
 			case "DebugScene":
 				return false;
 			default:
+				if (scene_name.Contains("TutorialWeaponSelect"))
+				{
+					return false;
+				}
 				if (scene_name == "HomeScene" || scene_name == "LoungeScene")
 				{
 					if (ExistSection("QuestAcceptRoom") || ExistSection("HomeLoginBonusTheater"))

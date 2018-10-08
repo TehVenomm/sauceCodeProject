@@ -1,8 +1,8 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/UI/Orthographic Camera")]
-[ExecuteInEditMode]
 [RequireComponent(typeof(Camera))]
+[ExecuteInEditMode]
 public class UIOrthoCamera
 {
 	private Camera mCam;

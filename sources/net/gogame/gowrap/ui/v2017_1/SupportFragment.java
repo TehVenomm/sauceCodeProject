@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.GoWrapImpl;
 import net.gogame.gowrap.integrations.core.Wrapper;
 import net.gogame.gowrap.io.utils.IOUtils;
@@ -62,8 +62,8 @@ public class SupportFragment extends Fragment implements VipListener {
     private boolean showButtons;
 
     /* renamed from: net.gogame.gowrap.ui.v2017_1.SupportFragment$2 */
-    class C12152 implements Runnable {
-        C12152() {
+    class C15312 implements Runnable {
+        C15312() {
         }
 
         public void run() {
@@ -73,8 +73,8 @@ public class SupportFragment extends Fragment implements VipListener {
     }
 
     /* renamed from: net.gogame.gowrap.ui.v2017_1.SupportFragment$5 */
-    class C12185 extends RightDrawableOnTouchListener {
-        C12185() {
+    class C15345 extends RightDrawableOnTouchListener {
+        C15345() {
         }
 
         public boolean onDrawableTouch(MotionEvent motionEvent) {
@@ -85,8 +85,8 @@ public class SupportFragment extends Fragment implements VipListener {
     }
 
     /* renamed from: net.gogame.gowrap.ui.v2017_1.SupportFragment$6 */
-    class C12196 implements OnEditorActionListener {
-        C12196() {
+    class C15356 implements OnEditorActionListener {
+        C15356() {
         }
 
         public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -97,8 +97,8 @@ public class SupportFragment extends Fragment implements VipListener {
     }
 
     /* renamed from: net.gogame.gowrap.ui.v2017_1.SupportFragment$7 */
-    class C12217 implements OnFocusChangeListener {
-        C12217() {
+    class C15377 implements OnFocusChangeListener {
+        C15377() {
         }
 
         public void onFocusChange(View view, boolean z) {
@@ -118,8 +118,8 @@ public class SupportFragment extends Fragment implements VipListener {
     }
 
     /* renamed from: net.gogame.gowrap.ui.v2017_1.SupportFragment$8 */
-    class C12228 implements OnGroupExpandListener {
-        C12228() {
+    class C15388 implements OnGroupExpandListener {
+        C15388() {
         }
 
         public void onGroupExpand(int i) {
@@ -178,7 +178,7 @@ public class SupportFragment extends Fragment implements VipListener {
         String assetToString;
         Bundle bundle3;
         Bundle bundle4 = null;
-        View inflate = layoutInflater.inflate(C1110R.layout.net_gogame_gowrap_fragment_support, viewGroup, false);
+        View inflate = layoutInflater.inflate(C1426R.layout.net_gogame_gowrap_fragment_support, viewGroup, false);
         if (getArguments() != null) {
             this.showButtons = getArguments().getBoolean(KEY_SHOW_BUTTONS, false);
         }
@@ -188,7 +188,7 @@ public class SupportFragment extends Fragment implements VipListener {
         } else {
             uIContext = null;
         }
-        inflate.findViewById(C1110R.id.net_gogame_gowrap_back_button).setOnClickListener(new OnClickListener() {
+        inflate.findViewById(C1426R.id.net_gogame_gowrap_back_button).setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
                 if (uIContext != null) {
                     uIContext.goBack();
@@ -196,10 +196,10 @@ public class SupportFragment extends Fragment implements VipListener {
             }
         });
         this.handler = new Handler();
-        this.autoSearchRunnable = new C12152();
-        this.expandableListView = (ExpandableListView) inflate.findViewById(C1110R.id.net_gogame_gowrap_faq_listview);
-        View inflate2 = layoutInflater.inflate(C1110R.layout.net_gogame_gowrap_include_faq_header, this.expandableListView, false);
-        View findViewById = inflate2.findViewById(C1110R.id.net_gogame_gowrap_support_form_button);
+        this.autoSearchRunnable = new C15312();
+        this.expandableListView = (ExpandableListView) inflate.findViewById(C1426R.id.net_gogame_gowrap_faq_listview);
+        View inflate2 = layoutInflater.inflate(C1426R.layout.net_gogame_gowrap_include_faq_header, this.expandableListView, false);
+        View findViewById = inflate2.findViewById(C1426R.id.net_gogame_gowrap_support_form_button);
         if (findViewById != null) {
             findViewById.setOnClickListener(new OnClickListener() {
                 public void onClick(View view) {
@@ -209,7 +209,7 @@ public class SupportFragment extends Fragment implements VipListener {
                 }
             });
         }
-        this.chatButton = (SupportCustomImageButton) inflate2.findViewById(C1110R.id.net_gogame_gowrap_support_chat_button);
+        this.chatButton = (SupportCustomImageButton) inflate2.findViewById(C1426R.id.net_gogame_gowrap_support_chat_button);
         if (this.chatButton != null) {
             updateChatButton(uIContext.isVipChatEnabled(), Wrapper.INSTANCE.isChatBotEnabled());
             this.chatButton.setOnClickListener(new OnClickListener() {
@@ -218,7 +218,7 @@ public class SupportFragment extends Fragment implements VipListener {
                     if (uIContext.isVipChatEnabled() || Wrapper.INSTANCE.isChatBotEnabled()) {
                         GoWrapImpl.INSTANCE.startChat();
                     } else {
-                        CustomDialog.newBuilder(context).withType(Type.ALERT).withTitle(C1110R.string.net_gogame_gowrap_support_title).withMessage(C1110R.string.net_gogame_gowrap_support_chat_vip_only_message).build().show();
+                        CustomDialog.newBuilder(context).withType(Type.ALERT).withTitle(C1426R.string.net_gogame_gowrap_support_title).withMessage(C1426R.string.net_gogame_gowrap_support_chat_vip_only_message).build().show();
                     }
                 }
             });
@@ -228,14 +228,14 @@ public class SupportFragment extends Fragment implements VipListener {
         } else {
             bundle2 = null;
         }
-        this.searchTextField = (EditText) inflate2.findViewById(C1110R.id.net_gogame_gowrap_support_search_textfield);
+        this.searchTextField = (EditText) inflate2.findViewById(C1426R.id.net_gogame_gowrap_support_search_textfield);
         if (bundle2 != null) {
             this.searchTextField.setText(bundle2.getString(SEARCH_TEXT_FIELD_BUNDLE_PROPERTY_NAME_TEXT));
         }
-        this.searchTextField.setOnTouchListener(new C12185());
-        UIUtils.setupRightDrawable(getActivity(), this.searchTextField, C1110R.array.net_gogame_gowrap_search_edittext_drawables);
-        this.searchTextField.setOnEditorActionListener(new C12196());
-        this.searchTextField.setOnFocusChangeListener(new C12217());
+        this.searchTextField.setOnTouchListener(new C15345());
+        UIUtils.setupRightDrawable(getActivity(), this.searchTextField, C1426R.array.net_gogame_gowrap_search_edittext_drawables);
+        this.searchTextField.setOnEditorActionListener(new C15356());
+        this.searchTextField.setOnFocusChangeListener(new C15377());
         this.expandableListView.addHeaderView(inflate2);
         try {
             assetToString = IOUtils.assetToString(context, "net/gogame/gowrap/faq-article-template.html", "UTF-8");
@@ -255,7 +255,7 @@ public class SupportFragment extends Fragment implements VipListener {
             bundle3 = null;
         }
         this.autoClosingExpandableListViewListener = new AutoClosingExpandableListViewListener(this.expandableListView, bundle3);
-        this.expandableListView.setOnGroupExpandListener(new C12228());
+        this.expandableListView.setOnGroupExpandListener(new C15388());
         this.expandableListView.setAdapter(this.listAdapter);
         this.expandableListView.setOnChildClickListener(new OnChildClickListener() {
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i2, long j) {
@@ -265,7 +265,7 @@ public class SupportFragment extends Fragment implements VipListener {
                 return true;
             }
         });
-        findViewById = inflate2.findViewById(C1110R.id.net_gogame_gowrap_back_support_buttons);
+        findViewById = inflate2.findViewById(C1426R.id.net_gogame_gowrap_back_support_buttons);
         if (this.showButtons) {
             findViewById.setVisibility(0);
         } else {

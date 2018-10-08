@@ -27,8 +27,8 @@ public class DeliveryBattleChecker : BattleCheckerBase
 		{
 			deliveryBattleInfo.totalSkillCountList = new List<DeliveryBattleInfo.SkillCount>();
 		}
-		_003CAddSkillCount_003Ec__AnonStorey4F3 _003CAddSkillCount_003Ec__AnonStorey4F;
-		DeliveryBattleInfo.SkillCount skillCount = deliveryBattleInfo.totalSkillCountList.FirstOrDefault(new Func<DeliveryBattleInfo.SkillCount, bool>((object)_003CAddSkillCount_003Ec__AnonStorey4F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CAddSkillCount_003Ec__AnonStorey505 _003CAddSkillCount_003Ec__AnonStorey;
+		DeliveryBattleInfo.SkillCount skillCount = deliveryBattleInfo.totalSkillCountList.FirstOrDefault(new Func<DeliveryBattleInfo.SkillCount, bool>((object)_003CAddSkillCount_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (skillCount == null || skillCount.skillId <= 0)
 		{
 			deliveryBattleInfo.totalSkillCountList.Add(new DeliveryBattleInfo.SkillCount(skillId, count));

@@ -124,14 +124,14 @@ public class PresentManager : MonoBehaviourSingleton<PresentManager>
 		requestSendForm.id = 0;
 		requestSendForm.p0 = 0;
 		requestSendForm.p1 = 0;
-		_003CSendDebugAddCrystal_003Ec__AnonStorey67F _003CSendDebugAddCrystal_003Ec__AnonStorey67F;
+		_003CSendDebugAddCrystal_003Ec__AnonStorey691 _003CSendDebugAddCrystal_003Ec__AnonStorey;
 		Protocol.Send(DebugAddPresentModel.URL, requestSendForm, delegate(DebugAddPresentModel ret)
 		{
 			List<string> list = new List<string>();
 			if (ret.Error == Error.None)
 			{
 				list.Add(ret.result.uniqId);
-				SendReceivePresent(list, new Action<bool, Error, int>((object)_003CSendDebugAddCrystal_003Ec__AnonStorey67F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				SendReceivePresent(list, new Action<bool, Error, int>((object)_003CSendDebugAddCrystal_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			else
 			{

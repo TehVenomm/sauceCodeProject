@@ -8,7 +8,7 @@ import net.gogame.gowrap.GoWrapImpl;
 import net.gogame.gowrap.integrations.core.Wrapper;
 import net.gogame.gowrap.model.configuration.Configuration.Integrations.Core.LocaleConfiguration;
 import net.gogame.gowrap.ui.AbstractMainActivity;
-import net.gogame.gowrap.ui.dpro.C1155R;
+import net.gogame.gowrap.ui.dpro.C1471R;
 import net.gogame.gowrap.ui.dpro.view.CustomTabbelPanel;
 import net.gogame.gowrap.ui.dpro.view.CustomTabbelPanel.Listener;
 import net.gogame.gowrap.ui.utils.ExternalAppLauncher;
@@ -21,10 +21,10 @@ public class MainActivity extends AbstractMainActivity {
     private ProgressBar progressIndicator;
 
     /* renamed from: net.gogame.gowrap.ui.dpro.ui.MainActivity$1 */
-    class C11601 implements Listener {
+    class C14761 implements Listener {
         private int currentTabIndex = 0;
 
-        C11601() {
+        C14761() {
         }
 
         public void onClose() {
@@ -61,8 +61,8 @@ public class MainActivity extends AbstractMainActivity {
     }
 
     /* renamed from: net.gogame.gowrap.ui.dpro.ui.MainActivity$2 */
-    class C11612 implements OnClickListener {
-        C11612() {
+    class C14772 implements OnClickListener {
+        C14772() {
         }
 
         public void onClick(View view) {
@@ -75,9 +75,9 @@ public class MainActivity extends AbstractMainActivity {
 
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        setContentView(C1155R.layout.net_gogame_gowrap_dpro_main_ui);
-        ((CustomTabbelPanel) findViewById(C1155R.id.net_gogame_gowrap_main_tabbed_panel)).setListener(new C11601());
-        findViewById(C1155R.id.net_gogame_gowrap_main_sns_button).setOnClickListener(new C11612());
+        setContentView(C1471R.layout.net_gogame_gowrap_dpro_main_ui);
+        ((CustomTabbelPanel) findViewById(C1471R.id.net_gogame_gowrap_main_tabbed_panel)).setListener(new C14761());
+        findViewById(C1471R.id.net_gogame_gowrap_main_sns_button).setOnClickListener(new C14772());
         showNews();
     }
 
@@ -90,7 +90,7 @@ public class MainActivity extends AbstractMainActivity {
     }
 
     protected int getFragmentContainerViewId() {
-        return C1155R.id.net_gogame_gowrap_main_fragment_container;
+        return C1471R.id.net_gogame_gowrap_main_fragment_container;
     }
 
     protected void onEnterFullscreen() {

@@ -23,8 +23,8 @@ public class SpringPosition
 	[SerializeField]
 	private GameObject eventReceiver;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	public string callWhenFinished;
 
 	private Transform mTrans;

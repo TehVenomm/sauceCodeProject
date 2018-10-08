@@ -2,6 +2,7 @@ package io.fabric.sdk.android.services.common;
 
 import android.os.SystemClock;
 import android.util.Log;
+import im.getsocial.sdk.consts.LanguageCodes;
 
 public class TimingMetric {
     private final boolean disabled;
@@ -17,7 +18,7 @@ public class TimingMetric {
     }
 
     private void reportToLog() {
-        Log.v(this.tag, this.eventName + ": " + this.duration + "ms");
+        Log.v(this.tag, this.eventName + ": " + this.duration + LanguageCodes.MALAY);
     }
 
     public long getDuration() {

@@ -16,7 +16,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 
 public abstract class AbstractNewsFeedItemView extends FrameLayout {
     public static final String DEFAULT_TIMESTAMP_DATE_FORMAT = "MMM d, yy h:mm a";
@@ -26,8 +26,8 @@ public abstract class AbstractNewsFeedItemView extends FrameLayout {
     private View resizingView;
 
     /* renamed from: net.gogame.gowrap.ui.v2017_1.AbstractNewsFeedItemView$1 */
-    class C11861 implements OnGlobalLayoutListener {
-        C11861() {
+    class C15021 implements OnGlobalLayoutListener {
+        C15021() {
         }
 
         public void onGlobalLayout() {
@@ -81,22 +81,22 @@ public abstract class AbstractNewsFeedItemView extends FrameLayout {
         if (inflate != null) {
             addView(inflate);
         }
-        this.contentBackgroundCount = getResources().getInteger(C1110R.integer.net_gogame_gowrap_newsfeed_item_content_backgrounds);
+        this.contentBackgroundCount = getResources().getInteger(C1426R.integer.net_gogame_gowrap_newsfeed_item_content_backgrounds);
         customInit(context);
         if (getResizingViewResourceId() != null) {
             this.resizingView = findViewById(getResizingViewResourceId().intValue());
             if (this.resizingView != null) {
-                this.resizingView.getViewTreeObserver().addOnGlobalLayoutListener(new C11861());
+                this.resizingView.getViewTreeObserver().addOnGlobalLayoutListener(new C15021());
             }
         }
     }
 
     public void setPosition(int i) {
-        ((ImageView) findViewById(C1110R.id.net_gogame_gowrap_newsfeed_item_content_background)).setImageLevel(i % this.contentBackgroundCount);
+        ((ImageView) findViewById(C1426R.id.net_gogame_gowrap_newsfeed_item_content_background)).setImageLevel(i % this.contentBackgroundCount);
     }
 
     public void setButtonImage(Drawable drawable) {
-        ((ImageView) findViewById(C1110R.id.net_gogame_gowrap_newsfeed_item_button)).setImageDrawable(drawable);
+        ((ImageView) findViewById(C1426R.id.net_gogame_gowrap_newsfeed_item_button)).setImageDrawable(drawable);
     }
 
     public void setTimestamp(Long l) {
@@ -116,7 +116,7 @@ public abstract class AbstractNewsFeedItemView extends FrameLayout {
     }
 
     public void setTimestamp(String str) {
-        TextView textView = (TextView) findViewById(C1110R.id.net_gogame_gowrap_newsfeed_item_timestamp);
+        TextView textView = (TextView) findViewById(C1426R.id.net_gogame_gowrap_newsfeed_item_timestamp);
         if (str != null) {
             textView.setText(str);
             textView.setVisibility(0);
@@ -126,7 +126,7 @@ public abstract class AbstractNewsFeedItemView extends FrameLayout {
     }
 
     public void setMessage(String str) {
-        TextView textView = (TextView) findViewById(C1110R.id.net_gogame_gowrap_newsfeed_item_message);
+        TextView textView = (TextView) findViewById(C1426R.id.net_gogame_gowrap_newsfeed_item_message);
         if (str != null) {
             textView.setText(str);
             textView.setVisibility(0);

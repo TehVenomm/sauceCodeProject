@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.integrations.core.Wrapper;
 import net.gogame.gowrap.model.configuration.Configuration.Integrations.Core.LocaleConfiguration;
 import net.gogame.gowrap.support.StringUtils;
@@ -15,16 +15,16 @@ import net.gogame.gowrap.ui.utils.ExternalAppLauncher;
 
 public class CommunityFragment extends Fragment {
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
-        View inflate = layoutInflater.inflate(C1110R.layout.net_gogame_gowrap_fragment_community, viewGroup, false);
+        View inflate = layoutInflater.inflate(C1426R.layout.net_gogame_gowrap_fragment_community, viewGroup, false);
         LocaleConfiguration localeConfiguration = Wrapper.INSTANCE.getLocaleConfiguration(getActivity());
         if (localeConfiguration != null) {
-            setup(inflate, C1110R.id.net_gogame_gowrap_community_header, localeConfiguration.getWhatsNewUrl(), false);
-            setup(inflate, C1110R.id.net_gogame_gowrap_facebook_button, localeConfiguration.getFacebookUrl());
-            setup(inflate, C1110R.id.net_gogame_gowrap_twitter_button, localeConfiguration.getTwitterUrl());
-            setup(inflate, C1110R.id.net_gogame_gowrap_instagram_button, localeConfiguration.getInstagramUrl());
-            setup(inflate, C1110R.id.net_gogame_gowrap_youtube_button, localeConfiguration.getYoutubeUrl());
-            setup(inflate, C1110R.id.net_gogame_gowrap_wiki_button, localeConfiguration.getWikiUrl());
-            setup(inflate, C1110R.id.net_gogame_gowrap_forum_button, localeConfiguration.getForumUrl());
+            setup(inflate, C1426R.id.net_gogame_gowrap_community_header, localeConfiguration.getWhatsNewUrl(), false);
+            setup(inflate, C1426R.id.net_gogame_gowrap_facebook_button, localeConfiguration.getFacebookUrl());
+            setup(inflate, C1426R.id.net_gogame_gowrap_twitter_button, localeConfiguration.getTwitterUrl());
+            setup(inflate, C1426R.id.net_gogame_gowrap_instagram_button, localeConfiguration.getInstagramUrl());
+            setup(inflate, C1426R.id.net_gogame_gowrap_youtube_button, localeConfiguration.getYoutubeUrl());
+            setup(inflate, C1426R.id.net_gogame_gowrap_wiki_button, localeConfiguration.getWikiUrl());
+            setup(inflate, C1426R.id.net_gogame_gowrap_forum_button, localeConfiguration.getForumUrl());
         }
         return inflate;
     }

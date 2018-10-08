@@ -2,7 +2,7 @@ package net.gogame.gowrap.ui.utils;
 
 import android.content.Context;
 import android.content.Intent;
-import net.gogame.gowrap.ui.common.C1135R;
+import net.gogame.gowrap.ui.common.C1451R;
 
 public class ShareHelper {
     public static void share(Context context, String str) {
@@ -10,6 +10,6 @@ public class ShareHelper {
         intent.setAction("android.intent.action.SEND");
         intent.putExtra("android.intent.extra.TEXT", str);
         intent.setType("text/plain");
-        context.startActivity(Intent.createChooser(intent, context.getResources().getString(C1135R.string.net_gogame_gowrap_share_prompt)));
+        context.startActivity(Intent.createChooser(intent, context.getResources().getString(C1451R.string.net_gogame_gowrap_share_prompt)));
     }
 }

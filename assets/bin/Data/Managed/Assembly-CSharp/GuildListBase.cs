@@ -88,7 +88,7 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 			UIGrid component = GetCtrl(UI.GRD_LIST).GetComponent<UIGrid>();
 			component.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 		}
-		_003CUpdateDynamicList_003Ec__AnonStorey339 _003CUpdateDynamicList_003Ec__AnonStorey;
+		_003CUpdateDynamicList_003Ec__AnonStorey348 _003CUpdateDynamicList_003Ec__AnonStorey;
 		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

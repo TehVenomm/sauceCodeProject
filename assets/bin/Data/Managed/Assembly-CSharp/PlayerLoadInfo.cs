@@ -236,10 +236,9 @@ public class PlayerLoadInfo
 		playerLoadInfo.equipType = equipType;
 		playerLoadInfo.weaponSpAttackType = weaponSpAttackType;
 		playerLoadInfo.actionVoiceBaseID = actionVoiceBaseID;
-		PlayerLoadInfo playerLoadInfo2 = playerLoadInfo;
-		playerLoadInfo2.accUIDs.Clear();
-		playerLoadInfo2.accUIDs.AddRange(accUIDs);
-		return playerLoadInfo2;
+		playerLoadInfo.accUIDs.Clear();
+		playerLoadInfo.accUIDs.AddRange(accUIDs);
+		return playerLoadInfo;
 	}
 
 	public void SetFace(int sex, int face_type_id, int skin_color_id)
@@ -451,7 +450,7 @@ public class PlayerLoadInfo
 		actionVoiceBaseID = (voice_type_id * 10 + sex) * 10000;
 	}
 
-	private void ApplyUserStatus(bool need_weapon, bool is_priority_visual_equip, int set_no = -1)
+	public void ApplyUserStatus(bool need_weapon, bool is_priority_visual_equip, int set_no = -1)
 	{
 		UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
 		uint num = MonoBehaviourSingleton<StatusManager>.I.GetEquippingItemTableID(0, set_no);
@@ -572,6 +571,20 @@ public class PlayerLoadInfo
 	{
 		PlayerLoadInfo playerLoadInfo = new PlayerLoadInfo();
 		playerLoadInfo.ApplyUserStatus(need_weapon, is_priority_visual_equip, set_no);
+		return playerLoadInfo;
+	}
+
+	public static PlayerLoadInfo GenerateForTutorial(int sex, uint weaponId, uint bodyId, uint headId, uint armId, uint legId)
+	{
+		PlayerLoadInfo playerLoadInfo = new PlayerLoadInfo();
+		playerLoadInfo.SetFace(sex, 0, 0);
+		playerLoadInfo.SetHair(sex, 0, 0);
+		playerLoadInfo.SetEquipWeapon(sex, weaponId);
+		playerLoadInfo.SetEquipBody(sex, bodyId);
+		playerLoadInfo.SetEquipHead(sex, headId);
+		playerLoadInfo.SetEquipArm(sex, armId);
+		playerLoadInfo.SetEquipLeg(sex, legId);
+		playerLoadInfo.SetActionVoiceBaseID(sex, 0);
 		return playerLoadInfo;
 	}
 

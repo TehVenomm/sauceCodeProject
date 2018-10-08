@@ -34,7 +34,7 @@ class QueueFileLogStore implements FileLogStore {
                     this.logFile.remove();
                 }
             } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "There was a problem writing to the Crashlytics log.", e);
+                Fabric.getLogger().mo4756e("Fabric", "There was a problem writing to the Crashlytics log.", e);
             }
         }
     }
@@ -44,7 +44,7 @@ class QueueFileLogStore implements FileLogStore {
             try {
                 this.logFile = new QueueFile(this.workingFile);
             } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "Could not open log file: " + this.workingFile, e);
+                Fabric.getLogger().mo4756e("Fabric", "Could not open log file: " + this.workingFile, e);
             }
         }
     }
@@ -82,7 +82,7 @@ class QueueFileLogStore implements FileLogStore {
                 }
             });
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "A problem occurred while reading the Crashlytics log file.", e);
+            Fabric.getLogger().mo4756e("Fabric", "A problem occurred while reading the Crashlytics log file.", e);
         }
         return ByteString.copyFrom(bArr, 0, iArr[0]);
     }

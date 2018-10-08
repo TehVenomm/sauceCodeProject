@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Scroll View")]
-[RequireComponent(typeof(UIPanel))]
 [ExecuteInEditMode]
+[RequireComponent(typeof(UIPanel))]
+[AddComponentMenu("NGUI/Interaction/Scroll View")]
 public class UIScrollView
 {
 	public enum Movement
@@ -68,12 +68,12 @@ public class UIScrollView
 
 	public OnDragNotification onStoppedMoving;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Vector3 scale = new Vector3(1f, 0f, 0f);
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Vector2 relativePositionOnReset = Vector2.get_zero();
 
 	protected Transform mTrans;

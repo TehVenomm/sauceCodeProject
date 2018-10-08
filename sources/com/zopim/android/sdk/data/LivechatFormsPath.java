@@ -33,7 +33,7 @@ public class LivechatFormsPath extends Path<Forms> {
         } else if (!str.isEmpty()) {
             synchronized (this.mLock) {
                 if (this.mData == null) {
-                    this.mData = this.PARSER.parse(str, new C0868f(this));
+                    this.mData = this.PARSER.parse(str, new C0867f(this));
                 } else {
                     try {
                         this.mData = (Forms) this.PARSER.getMapper().readerForUpdating(this.mData).readValue(str);

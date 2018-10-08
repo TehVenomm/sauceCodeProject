@@ -72,7 +72,9 @@ public class EquipSetDetailStatusAndAbilityTable : GameSection
 		SPR_TYPE_ICON_BG,
 		SPR_TYPE_ICON_RARITY,
 		OBJ_CAPTION_3,
-		LBL_CAPTION
+		LBL_CAPTION,
+		OBJ_EMPTY,
+		LBL_NO_ITEM
 	}
 
 	public class BaseStatus
@@ -232,8 +234,11 @@ public class EquipSetDetailStatusAndAbilityTable : GameSection
 		string allAbilityName = string.Empty;
 		string allAp = string.Empty;
 		string allAbilityDesc = string.Empty;
-		_003CUpdateAbilityTable_003Ec__AnonStorey2F5 _003CUpdateAbilityTable_003Ec__AnonStorey2F;
-		SetGrid(UI.GRD_ABILITY, "EquipSetDetailAbilityTableItem", item_num, true, new Action<int, Transform, bool>((object)_003CUpdateAbilityTable_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		bool isEmpty = true;
+		_003CUpdateAbilityTable_003Ec__AnonStorey304 _003CUpdateAbilityTable_003Ec__AnonStorey;
+		SetGrid(UI.GRD_ABILITY, "EquipSetDetailAbilityTableItem", item_num, true, new Action<int, Transform, bool>((object)_003CUpdateAbilityTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetActive(base._transform, UI.OBJ_EMPTY, isEmpty);
+		SetLabelText(GetCtrl(UI.OBJ_EMPTY), UI.LBL_NO_ITEM, StringTable.Get(STRING_CATEGORY.COMMON, 19800u));
 		PreCacheAbilityDetail(allAbilityName, allAp, allAbilityDesc);
 		base.GetComponent<UIScrollView>((Enum)UI.SCR_ABILITY).set_enabled(is_scroll);
 	}

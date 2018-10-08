@@ -350,7 +350,7 @@ public class FriendMessageUIController : UIBehaviour
 			ChatStampListItem item = iTransform.GetComponent<ChatStampListItem>();
 			item.Init(stampId);
 			ChatStampListItem chatStampListItem = item;
-			_003CInitStampItem_003Ec__AnonStorey316 _003CInitStampItem_003Ec__AnonStorey;
+			_003CInitStampItem_003Ec__AnonStorey325 _003CInitStampItem_003Ec__AnonStorey;
 			chatStampListItem.onButton = Delegate.Combine((Delegate)chatStampListItem.onButton, (Delegate)new Action((object)_003CInitStampItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

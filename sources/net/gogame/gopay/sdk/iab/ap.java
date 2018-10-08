@@ -5,10 +5,10 @@ import android.view.View.OnLongClickListener;
 
 final class ap implements OnLongClickListener {
     /* renamed from: a */
-    final /* synthetic */ PurchaseActivity f1069a;
+    final /* synthetic */ PurchaseActivity f3457a;
 
     ap(PurchaseActivity purchaseActivity) {
-        this.f1069a = purchaseActivity;
+        this.f3457a = purchaseActivity;
     }
 
     public final boolean onLongClick(View view) {

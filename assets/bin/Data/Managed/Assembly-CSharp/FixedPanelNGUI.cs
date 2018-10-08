@@ -49,7 +49,7 @@ public class FixedPanelNGUI
 
 	private float ratioHeight;
 
-	private Transform root;
+	public static Transform Root;
 
 	private float aspect;
 
@@ -81,9 +81,9 @@ public class FixedPanelNGUI
 		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Expected O, but got Unknown
+		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Expected O, but got Unknown
 		aspect = (float)Screen.get_width() / (float)Screen.get_height();
 		FixedNGUIThrowIphoneX component = this.GetComponent<FixedNGUIThrowIphoneX>();
 		resulotion = default(Vector2);
@@ -107,13 +107,13 @@ public class FixedPanelNGUI
 		ratio = aspect / BASERATIO;
 		if (aspect < BASERATIO)
 		{
-			if (root == null)
+			if (Root == null)
 			{
-				root = GameObject.Find("UI_Root").get_transform();
+				Root = GameObject.Find("UI_Root").get_transform();
 			}
-			if (root != null)
+			if (Root != null)
 			{
-				ChangeTarget(root);
+				ChangeTarget(Root);
 			}
 			saveBeginStaticUI();
 		}
@@ -123,14 +123,14 @@ public class FixedPanelNGUI
 	{
 		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0028: Expected O, but got Unknown
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Expected O, but got Unknown
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0044: Expected O, but got Unknown
+		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
 		if (aspect < BASERATIO)
 		{
 			if (m_mainChild == null)
@@ -154,7 +154,7 @@ public class FixedPanelNGUI
 		}
 	}
 
-	private bool checkCameraParent(GameObject obj)
+	public static bool checkCameraParent(GameObject obj)
 	{
 		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
@@ -185,10 +185,10 @@ public class FixedPanelNGUI
 		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 		Transform val = m_parent;
-		while (val.get_transform().get_parent() != null && val.get_transform().get_parent() != root && val.get_transform().get_parent().get_name() != "AppMain")
+		while (val.get_transform().get_parent() != null && val.get_transform().get_parent() != Root && val.get_transform().get_parent().get_name() != "AppMain")
 		{
 			val = val.get_transform().get_parent();
 			foreach (Transform item in val)
@@ -436,6 +436,28 @@ public class FixedPanelNGUI
 				}
 			}
 		}
+	}
+
+	public static bool CheckResolutionCanFix()
+	{
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		float num = (float)Screen.get_width() / (float)Screen.get_height();
+		Vector2 resolutionFixed = GetResolutionFixed(false);
+		float num2 = resolutionFixed.x / resolutionFixed.y;
+		float num3 = num2 / BASERATIO;
+		return num < BASERATIO;
+	}
+
+	public static float GetScaleResolution()
+	{
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		float num = (float)Screen.get_width() / (float)Screen.get_height();
+		Vector2 resolutionFixed = GetResolutionFixed(false);
+		float num2 = resolutionFixed.x / resolutionFixed.y;
+		float num3 = num2 / BASERATIO;
+		return num / BASERATIO;
 	}
 
 	public static Vector2 GetResolutionFixed(bool isThrowIphoneX = false)

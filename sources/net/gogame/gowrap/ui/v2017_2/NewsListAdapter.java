@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.inbox.DefaultMessageStateManager;
 import net.gogame.gowrap.inbox.MessageState;
 import net.gogame.gowrap.inbox.MessageStateManager;
@@ -142,12 +142,12 @@ public class NewsListAdapter extends BaseAdapter {
 
     public View getView(int i, Article article, View view, ViewGroup viewGroup) {
         if (view == null) {
-            view = ((LayoutInflater) this.context.getSystemService("layout_inflater")).inflate(C1110R.layout.net_gogame_gowrap_news_list_item, viewGroup, false);
+            view = ((LayoutInflater) this.context.getSystemService("layout_inflater")).inflate(C1426R.layout.net_gogame_gowrap_news_list_item, viewGroup, false);
         }
-        TextView textView = (TextView) view.findViewById(C1110R.id.net_gogame_gowrap_news_icon_top);
-        TextView textView2 = (TextView) view.findViewById(C1110R.id.net_gogame_gowrap_news_icon_bottom);
-        TextView textView3 = (TextView) view.findViewById(C1110R.id.net_gogame_gowrap_news_title);
-        ImageView imageView = (ImageView) view.findViewById(C1110R.id.net_gogame_gowrap_news_status);
+        TextView textView = (TextView) view.findViewById(C1426R.id.net_gogame_gowrap_news_icon_top);
+        TextView textView2 = (TextView) view.findViewById(C1426R.id.net_gogame_gowrap_news_icon_bottom);
+        TextView textView3 = (TextView) view.findViewById(C1426R.id.net_gogame_gowrap_news_title);
+        ImageView imageView = (ImageView) view.findViewById(C1426R.id.net_gogame_gowrap_news_status);
         if (VERSION.SDK_INT >= 17) {
             textView.setTextAlignment(4);
             textView2.setTextAlignment(4);

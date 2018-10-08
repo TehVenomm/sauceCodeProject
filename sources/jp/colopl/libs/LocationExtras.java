@@ -46,7 +46,7 @@ public class LocationExtras {
                         str2 = string;
                     }
                 }
-                LogUtil.m745v(TAG, "networkLocationSource = " + (str == null ? "" : str) + " networkLocationType = " + (str2 == null ? "" : str2));
+                LogUtil.m3770v(TAG, "networkLocationSource = " + (str == null ? "" : str) + " networkLocationType = " + (str2 == null ? "" : str2));
                 if (str2 == null && str != null && str.equals(NW_LOCATION_SOURCE_SERVER_STRING) && location.hasAccuracy() && location.getAccuracy() < 500.0f) {
                     str2 = NW_LOCATION_TYPE_WIFI_STRING;
                 }

@@ -229,22 +229,22 @@ public class StatusEnemyDetail : GameSection
 			if (popMapIds != null)
 			{
 				List<uint> source = popMapIds;
-				if (_003CDoInitialize_003Ec__Iterator170._003C_003Ef__am_0024cache18 == null)
+				if (_003CDoInitialize_003Ec__Iterator175._003C_003Ef__am_0024cache18 == null)
 				{
-					_003CDoInitialize_003Ec__Iterator170._003C_003Ef__am_0024cache18 = new Func<uint, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					_003CDoInitialize_003Ec__Iterator175._003C_003Ef__am_0024cache18 = new Func<uint, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 				}
-				popMapIds = source.Where(_003CDoInitialize_003Ec__Iterator170._003C_003Ef__am_0024cache18).ToList();
+				popMapIds = source.Where(_003CDoInitialize_003Ec__Iterator175._003C_003Ef__am_0024cache18).ToList();
 			}
 			if (string.IsNullOrEmpty(foundationName))
 			{
 				foundationName = base.sectionData.GetText("DEFAULT_STGE_NAME");
 			}
 			List<AchievementCounter> source2 = achievementCounter;
-			if (_003CDoInitialize_003Ec__Iterator170._003C_003Ef__am_0024cache19 == null)
+			if (_003CDoInitialize_003Ec__Iterator175._003C_003Ef__am_0024cache19 == null)
 			{
-				_003CDoInitialize_003Ec__Iterator170._003C_003Ef__am_0024cache19 = new Func<AchievementCounter, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				_003CDoInitialize_003Ec__Iterator175._003C_003Ef__am_0024cache19 = new Func<AchievementCounter, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			}
-			sameMonsterCounter = source2.Where(_003CDoInitialize_003Ec__Iterator170._003C_003Ef__am_0024cache19).Where(new Func<AchievementCounter, bool>((object)/*Error near IL_0597: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList();
+			sameMonsterCounter = source2.Where(_003CDoInitialize_003Ec__Iterator175._003C_003Ef__am_0024cache19).Where(new Func<AchievementCounter, bool>((object)/*Error near IL_0597: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList();
 			SetLabelText((Enum)UI.LBL_ENEMY_NAME, enemyData.name);
 			SetFrame(GetCtrl(UI.OBJ_FRAME), (int)enemyCollectionData.collectionType);
 			isUnknown = !sameMonsterCounter.Any(new Func<AchievementCounter, bool>((object)/*Error near IL_0612: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
@@ -298,11 +298,11 @@ public class StatusEnemyDetail : GameSection
 				SetLabelText((Enum)UI.LBL_FIELD_DEFEAT, sameMonsterCounter.First(new Func<AchievementCounter, bool>((object)/*Error near IL_0a9a: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).count);
 				object label_enum = UI.LBL_TOTAL_DEFEAT;
 				List<AchievementCounter> source3 = sameMonsterCounter;
-				if (_003CDoInitialize_003Ec__Iterator170._003C_003Ef__am_0024cache1A == null)
+				if (_003CDoInitialize_003Ec__Iterator175._003C_003Ef__am_0024cache1A == null)
 				{
-					_003CDoInitialize_003Ec__Iterator170._003C_003Ef__am_0024cache1A = new Func<AchievementCounter, long>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					_003CDoInitialize_003Ec__Iterator175._003C_003Ef__am_0024cache1A = new Func<AchievementCounter, long>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 				}
-				SetLabelText((Enum)label_enum, source3.Sum(_003CDoInitialize_003Ec__Iterator170._003C_003Ef__am_0024cache1A).ToString());
+				SetLabelText((Enum)label_enum, source3.Sum(_003CDoInitialize_003Ec__Iterator175._003C_003Ef__am_0024cache1A).ToString());
 			}
 			eventListener = base.GetComponent<UIEventListener>((Enum)UI.TEX_ENEMY_MODEL);
 			if (eventListener != null)

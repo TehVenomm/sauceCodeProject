@@ -30,7 +30,7 @@ public enum Storage {
             return new MachineIdPrefsStorage(INSTANCE.mAppContext);
         }
         Log.w(LOG_TAG, "Storage must be initialized first. Will return mocked storage implementation.");
-        return new C0899b();
+        return new C0898b();
     }
 
     public static VisitorInfoStorage visitorInfo() {
@@ -38,7 +38,7 @@ public enum Storage {
             return new VisitorInfoPrefsStorage(INSTANCE.mAppContext);
         }
         Log.w(LOG_TAG, "Storage must be initialized first. Will return dummy storage implementation.");
-        return new C0900c();
+        return new C0899c();
     }
 
     public void clearAll() {

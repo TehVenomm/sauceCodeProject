@@ -651,18 +651,18 @@ public class LoungeTop : HomeBase
 			if (ret.Error == Error.None)
 			{
 				bool flag = PlayerPrefs.GetInt("Pike_Shop_Event", 0) == 1;
-				LoungeTop _003C_003Ef__this = ((_003CWaitForCheckpikeShop_003Ec__IteratorF2)/*Error near IL_0024: stateMachine*/)._003C_003Ef__this;
+				LoungeTop _003C_003Ef__this = ((_003CWaitForCheckpikeShop_003Ec__IteratorF6)/*Error near IL_0024: stateMachine*/)._003C_003Ef__this;
 				List<PointShop> result = ret.result;
-				if (_003CWaitForCheckpikeShop_003Ec__IteratorF2._003C_003Ef__am_0024cache3 == null)
+				if (_003CWaitForCheckpikeShop_003Ec__IteratorF6._003C_003Ef__am_0024cache3 == null)
 				{
-					_003CWaitForCheckpikeShop_003Ec__IteratorF2._003C_003Ef__am_0024cache3 = new Func<PointShop, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					_003CWaitForCheckpikeShop_003Ec__IteratorF6._003C_003Ef__am_0024cache3 = new Func<PointShop, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 				}
-				_003C_003Ef__this.isHighlightPikeShop = result.Any(_003CWaitForCheckpikeShop_003Ec__IteratorF2._003C_003Ef__am_0024cache3);
-				if (((_003CWaitForCheckpikeShop_003Ec__IteratorF2)/*Error near IL_0024: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop)
+				_003C_003Ef__this.isHighlightPikeShop = result.Any(_003CWaitForCheckpikeShop_003Ec__IteratorF6._003C_003Ef__am_0024cache3);
+				if (((_003CWaitForCheckpikeShop_003Ec__IteratorF6)/*Error near IL_0024: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop)
 				{
 					if (flag)
 					{
-						((_003CWaitForCheckpikeShop_003Ec__IteratorF2)/*Error near IL_0024: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop = false;
+						((_003CWaitForCheckpikeShop_003Ec__IteratorF6)/*Error near IL_0024: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop = false;
 					}
 				}
 				else

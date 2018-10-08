@@ -8,7 +8,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.model.faq.Article;
 import net.gogame.gowrap.model.faq.Category;
 import net.gogame.gowrap.model.faq.Section;
@@ -22,7 +22,7 @@ public class FaqExpandableListAdapter extends BaseExpandableListAdapter {
     public FaqExpandableListAdapter(Context context, Category category) {
         this.context = context;
         this.category = category;
-        String string = context.getResources().getString(C1110R.string.net_gogame_gowrap_support_search_results_caption);
+        String string = context.getResources().getString(C1426R.string.net_gogame_gowrap_support_search_results_caption);
         this.searchResultsCategory = new Category(string, string, Arrays.asList(new Section[]{new Section(string, new ArrayList())}));
     }
 
@@ -103,11 +103,11 @@ public class FaqExpandableListAdapter extends BaseExpandableListAdapter {
         View inflate;
         Section section = (Section) getGroup(i);
         if (!z || getChildrenCount(i) <= 0) {
-            inflate = ((LayoutInflater) this.context.getSystemService("layout_inflater")).inflate(C1110R.layout.net_gogame_gowrap_fragment_faq_section_list_item, viewGroup, false);
+            inflate = ((LayoutInflater) this.context.getSystemService("layout_inflater")).inflate(C1426R.layout.net_gogame_gowrap_fragment_faq_section_list_item, viewGroup, false);
         } else {
-            inflate = ((LayoutInflater) this.context.getSystemService("layout_inflater")).inflate(C1110R.layout.net_gogame_gowrap_fragment_faq_section_expanded_list_item, viewGroup, false);
+            inflate = ((LayoutInflater) this.context.getSystemService("layout_inflater")).inflate(C1426R.layout.net_gogame_gowrap_fragment_faq_section_expanded_list_item, viewGroup, false);
         }
-        ((TextView) inflate.findViewById(C1110R.id.net_gogame_gowrap_faq_section_name)).setText(section.getName());
+        ((TextView) inflate.findViewById(C1426R.id.net_gogame_gowrap_faq_section_name)).setText(section.getName());
         return inflate;
     }
 
@@ -132,21 +132,21 @@ public class FaqExpandableListAdapter extends BaseExpandableListAdapter {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.getSystemService("layout_inflater");
             switch (childType) {
                 case 0:
-                    view = layoutInflater.inflate(C1110R.layout.net_gogame_gowrap_fragment_faq_article_list_item_header, viewGroup, false);
+                    view = layoutInflater.inflate(C1426R.layout.net_gogame_gowrap_fragment_faq_article_list_item_header, viewGroup, false);
                     break;
                 case 1:
-                    view = layoutInflater.inflate(C1110R.layout.net_gogame_gowrap_fragment_faq_article_list_item, viewGroup, false);
+                    view = layoutInflater.inflate(C1426R.layout.net_gogame_gowrap_fragment_faq_article_list_item, viewGroup, false);
                     break;
                 case 2:
-                    view = layoutInflater.inflate(C1110R.layout.net_gogame_gowrap_fragment_faq_article_list_item_footer, viewGroup, false);
+                    view = layoutInflater.inflate(C1426R.layout.net_gogame_gowrap_fragment_faq_article_list_item_footer, viewGroup, false);
                     break;
             }
         }
-        TextView textView = (TextView) view.findViewById(C1110R.id.net_gogame_gowrap_faq_article_title);
+        TextView textView = (TextView) view.findViewById(C1426R.id.net_gogame_gowrap_faq_article_title);
         if (article != null) {
             textView.setText(article.getTitle());
         } else {
-            textView.setText(C1110R.string.net_gogame_gowrap_faq_search_no_results_message);
+            textView.setText(C1426R.string.net_gogame_gowrap_faq_search_no_results_message);
         }
         return view;
     }

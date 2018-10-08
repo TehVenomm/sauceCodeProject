@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.integrations.core.Wrapper;
 import net.gogame.gowrap.ui.utils.DisplayUtils;
@@ -56,13 +56,13 @@ public class PopupWindowFab extends AbstractFab {
     private boolean slideOut = false;
     private Timer timer;
     private TimerTask timerTask;
-    private final Runnable updateFab = new C11721();
-    private final Runnable updatePopupWindowRunnable = new C11732();
+    private final Runnable updateFab = new C14881();
+    private final Runnable updatePopupWindowRunnable = new C14892();
     private View view = null;
 
     /* renamed from: net.gogame.gowrap.ui.fab.PopupWindowFab$1 */
-    class C11721 implements Runnable {
-        C11721() {
+    class C14881 implements Runnable {
+        C14881() {
         }
 
         public void run() {
@@ -86,8 +86,8 @@ public class PopupWindowFab extends AbstractFab {
     }
 
     /* renamed from: net.gogame.gowrap.ui.fab.PopupWindowFab$2 */
-    class C11732 implements Runnable {
-        C11732() {
+    class C14892 implements Runnable {
+        C14892() {
         }
 
         public void run() {
@@ -145,11 +145,11 @@ public class PopupWindowFab extends AbstractFab {
         this.timerTask = new TimerTask() {
 
             /* renamed from: net.gogame.gowrap.ui.fab.PopupWindowFab$3$1 */
-            class C11751 implements Runnable {
+            class C14911 implements Runnable {
 
                 /* renamed from: net.gogame.gowrap.ui.fab.PopupWindowFab$3$1$1 */
-                class C11741 implements Runnable {
-                    C11741() {
+                class C14901 implements Runnable {
+                    C14901() {
                     }
 
                     public void run() {
@@ -168,16 +168,16 @@ public class PopupWindowFab extends AbstractFab {
                     }
                 }
 
-                C11751() {
+                C14911() {
                 }
 
                 public void run() {
-                    PopupWindowFab.this.postDelayed(activity, new C11741(), 100);
+                    PopupWindowFab.this.postDelayed(activity, new C14901(), 100);
                 }
             }
 
             public void run() {
-                PopupWindowFab.this.post(activity, new C11751());
+                PopupWindowFab.this.post(activity, new C14911());
             }
         };
         this.timer.schedule(this.timerTask, 60000, 60000);
@@ -214,7 +214,7 @@ public class PopupWindowFab extends AbstractFab {
                 view = leafView;
             }
             this.retries = 0;
-            OnTouchListener c11795 = new OnTouchListener() {
+            OnTouchListener c14955 = new OnTouchListener() {
                 private float initialTouchX;
                 private float initialTouchY;
                 private int initialX;
@@ -222,8 +222,8 @@ public class PopupWindowFab extends AbstractFab {
                 private boolean isDrag;
 
                 /* renamed from: net.gogame.gowrap.ui.fab.PopupWindowFab$5$1 */
-                class C11781 implements Runnable {
-                    C11781() {
+                class C14941 implements Runnable {
+                    C14941() {
                     }
 
                     public void run() {
@@ -268,7 +268,7 @@ public class PopupWindowFab extends AbstractFab {
                             }
                             if (Wrapper.INSTANCE.isSlideOut() || Wrapper.INSTANCE.isSlideIn()) {
                                 PopupWindowFab.this.cancelAnimation(activity);
-                                PopupWindowFab.this.postDelayed(activity, new C11781(), 100);
+                                PopupWindowFab.this.postDelayed(activity, new C14941(), 100);
                             }
                             PopupWindowFab.this.updateFabLocation(activity);
                             if (!this.isDrag) {
@@ -297,9 +297,9 @@ public class PopupWindowFab extends AbstractFab {
                     return false;
                 }
             };
-            this.view = createImageView(activity, C1110R.drawable.net_gogame_gowrap_fab);
-            this.view.setOnTouchListener(c11795);
-            int intrinsicWidth = activity.getResources().getDrawable(C1110R.drawable.net_gogame_gowrap_fab).getIntrinsicWidth();
+            this.view = createImageView(activity, C1426R.drawable.net_gogame_gowrap_fab);
+            this.view.setOnTouchListener(c14955);
+            int intrinsicWidth = activity.getResources().getDrawable(C1426R.drawable.net_gogame_gowrap_fab).getIntrinsicWidth();
             if (Wrapper.INSTANCE.isSlideOut() || Wrapper.INSTANCE.isSlideIn()) {
                 this.fabStartPositionX = -((int) Math.round(((double) intrinsicWidth) * 0.65d));
                 this.fabEndPositionX = (int) Math.round(((double) intrinsicWidth) * 1.3d);
@@ -320,8 +320,8 @@ public class PopupWindowFab extends AbstractFab {
             rootView.post(new Runnable() {
 
                 /* renamed from: net.gogame.gowrap.ui.fab.PopupWindowFab$6$1 */
-                class C11801 implements Runnable {
-                    C11801() {
+                class C14961 implements Runnable {
+                    C14961() {
                     }
 
                     public void run() {
@@ -348,7 +348,7 @@ public class PopupWindowFab extends AbstractFab {
                             }
                             PopupWindowFab.this.popupWindow.showAtLocation(viewGroup, 0, PopupWindowFab.this.getX(), PopupWindowFab.this.getY());
                             if (Wrapper.INSTANCE.isSlideOut() || Wrapper.INSTANCE.isSlideIn()) {
-                                PopupWindowFab.this.postDelayed(activity, new C11801(), 100);
+                                PopupWindowFab.this.postDelayed(activity, new C14961(), 100);
                             }
                         }
                     } catch (Throwable e) {
@@ -356,7 +356,7 @@ public class PopupWindowFab extends AbstractFab {
                     }
                 }
             });
-            this.popupWindow.setTouchInterceptor(c11795);
+            this.popupWindow.setTouchInterceptor(c14955);
         }
     }
 
@@ -380,7 +380,7 @@ public class PopupWindowFab extends AbstractFab {
     @TargetApi(11)
     private AnimatorSet getAnimation(final Activity activity, final int i) {
         int i2;
-        AnimatorUpdateListener c11838 = new AnimatorUpdateListener() {
+        AnimatorUpdateListener c14998 = new AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 PopupWindowFab.this.offsetX = ((Integer) valueAnimator.getAnimatedValue()).intValue();
                 if (PopupWindowFab.this.view != null) {
@@ -399,13 +399,13 @@ public class PopupWindowFab extends AbstractFab {
             ValueAnimator valueAnimator = new ValueAnimator();
             valueAnimator.setDuration(500);
             valueAnimator.setIntValues(new int[]{i2, 0});
-            valueAnimator.addUpdateListener(c11838);
+            valueAnimator.addUpdateListener(c14998);
             arrayList.add(valueAnimator);
         }
         ValueAnimator valueAnimator2 = new ValueAnimator();
         valueAnimator2.setDuration(5000);
         valueAnimator2.setIntValues(new int[]{0, 0});
-        valueAnimator2.addUpdateListener(c11838);
+        valueAnimator2.addUpdateListener(c14998);
         arrayList.add(valueAnimator2);
         if (Wrapper.INSTANCE.isSlideIn()) {
             if (this.isFabLeft) {
@@ -416,7 +416,7 @@ public class PopupWindowFab extends AbstractFab {
             valueAnimator = new ValueAnimator();
             valueAnimator.setDuration(500);
             valueAnimator.setIntValues(new int[]{0, i2});
-            valueAnimator.addUpdateListener(c11838);
+            valueAnimator.addUpdateListener(c14998);
             valueAnimator.addListener(getAnimationListener(activity));
             arrayList.add(valueAnimator);
         }
@@ -442,7 +442,7 @@ public class PopupWindowFab extends AbstractFab {
 
     @TargetApi(11)
     private AnimatorSet getInsideAnimation(final Activity activity, int i) {
-        AnimatorUpdateListener c11849 = new AnimatorUpdateListener() {
+        AnimatorUpdateListener c15009 = new AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 PopupWindowFab.this.offsetX = ((Integer) valueAnimator.getAnimatedValue()).intValue();
                 PopupWindowFab.this.updateFabLocation(activity);
@@ -452,7 +452,7 @@ public class PopupWindowFab extends AbstractFab {
         ValueAnimator valueAnimator = new ValueAnimator();
         valueAnimator.setDuration(3000);
         valueAnimator.setIntValues(new int[]{0, 0});
-        valueAnimator.addUpdateListener(c11849);
+        valueAnimator.addUpdateListener(c15009);
         arrayList.add(valueAnimator);
         if (Wrapper.INSTANCE.isSlideIn()) {
             int i2;
@@ -464,7 +464,7 @@ public class PopupWindowFab extends AbstractFab {
             ValueAnimator valueAnimator2 = new ValueAnimator();
             valueAnimator2.setDuration(500);
             valueAnimator2.setIntValues(new int[]{0, i2});
-            valueAnimator2.addUpdateListener(c11849);
+            valueAnimator2.addUpdateListener(c15009);
             valueAnimator2.addListener(getAnimationListener(activity));
             arrayList.add(valueAnimator2);
         }

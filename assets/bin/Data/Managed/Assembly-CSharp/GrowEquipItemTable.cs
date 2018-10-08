@@ -298,6 +298,8 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 
 	private DoubleUIntKeyTable<GrowEquipItemNeedItemData> needUniqueTableData;
 
+	public DoubleUIntKeyTable<GrowEquipItemData> GrowTableData => growTableData;
+
 	public static DoubleUIntKeyTable<GrowEquipItemData> CreateGrowTableCSV(string csv_text)
 	{
 		return TableUtility.CreateDoubleUIntKeyTable<GrowEquipItemData>(csv_text, GrowEquipItemData.cb, "growId,level,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd", null, null, null, null);

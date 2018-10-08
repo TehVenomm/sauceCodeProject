@@ -17,6 +17,10 @@ public class EquipSetInfo
 
 	public AccessoryPlaceInfo acc = new AccessoryPlaceInfo();
 
+	public string tier;
+
+	public uint skillId;
+
 	public EquipSetInfo(EquipSet recv_data)
 	{
 		item[0] = (string.IsNullOrEmpty(recv_data.weapon_0.uniqId) ? null : new EquipItemInfo(recv_data.weapon_0));
@@ -45,6 +49,18 @@ public class EquipSetInfo
 		acc.Copy(recv_data.acc);
 	}
 
+	public EquipSetInfo(TutorialGearSetTable.ItemData data)
+	{
+		item[0] = new EquipItemInfo(data.weaponId);
+		item[3] = new EquipItemInfo(data.armorId);
+		item[4] = new EquipItemInfo(data.helmId);
+		item[5] = new EquipItemInfo(data.armId);
+		item[6] = new EquipItemInfo(data.legId);
+		name = data.name;
+		tier = data.difficulty;
+		skillId = data.skillItemId;
+	}
+
 	public EquipSetInfo(EquipItemInfo[] equip_item_info_ary, string equipName, int showHelm, AccessoryPlaceInfo _acc)
 	{
 		if (equip_item_info_ary == null || equip_item_info_ary.Length < 7)
@@ -59,8 +75,29 @@ public class EquipSetInfo
 				item[i] = equip_item_info_ary[i];
 			}
 			name = equipName;
+			tier = equipName;
 			this.showHelm = showHelm;
 			acc.Copy(_acc);
+		}
+	}
+
+	public EquipSetInfo(EquipItemInfo[] equip_item_info_ary, string equipName, string difficulty, uint skillId)
+	{
+		if (equip_item_info_ary == null || equip_item_info_ary.Length < 7)
+		{
+			Log.Warning("EquipSetInfo data is short or null");
+		}
+		else
+		{
+			int i = 0;
+			for (int num = 7; i < num; i++)
+			{
+				item[i] = equip_item_info_ary[i];
+			}
+			name = equipName;
+			tier = difficulty;
+			showHelm = 1;
+			this.skillId = skillId;
 		}
 	}
 

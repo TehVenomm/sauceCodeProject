@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace UnityStandardAssets.ImageEffects
 {
-	[AddComponentMenu("Image Effects/Color Adjustments/Color Correction (Curves, Saturation)")]
 	[ExecuteInEditMode]
+	[AddComponentMenu("Image Effects/Color Adjustments/Color Correction (Curves, Saturation)")]
 	public class ColorCorrectionCurves : PostEffectsBase
 	{
 		public enum ColorCorrectionMode

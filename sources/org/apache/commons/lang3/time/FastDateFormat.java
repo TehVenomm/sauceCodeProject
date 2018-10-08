@@ -14,14 +14,14 @@ public class FastDateFormat extends Format implements DateParser, DatePrinter {
     public static final int LONG = 1;
     public static final int MEDIUM = 2;
     public static final int SHORT = 3;
-    private static final FormatCache<FastDateFormat> cache = new C12861();
+    private static final FormatCache<FastDateFormat> cache = new C16031();
     private static final long serialVersionUID = 2;
     private final FastDateParser parser;
     private final FastDatePrinter printer;
 
     /* renamed from: org.apache.commons.lang3.time.FastDateFormat$1 */
-    static class C12861 extends FormatCache<FastDateFormat> {
-        C12861() {
+    static class C16031 extends FormatCache<FastDateFormat> {
+        C16031() {
         }
 
         protected FastDateFormat createInstance(String str, TimeZone timeZone, Locale locale) {

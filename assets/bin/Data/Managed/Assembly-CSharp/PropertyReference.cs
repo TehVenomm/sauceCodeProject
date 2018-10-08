@@ -149,8 +149,8 @@ public class PropertyReference
 		return null;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public object Get()
 	{
 		if (mProperty == null && mField == null && isValid)
@@ -171,8 +171,8 @@ public class PropertyReference
 		return null;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public bool Set(object value)
 	{
 		if (mProperty == null && mField == null && isValid)

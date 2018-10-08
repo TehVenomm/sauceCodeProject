@@ -74,8 +74,8 @@ public class QuestWaveSelectList : QuestEventSelectList
 			eid = eventData.eventId
 		}, url: QuestPointRewardModel.URL, callBack: (Action<QuestPointRewardModel>)delegate(QuestPointRewardModel result)
 		{
-			((_003CGetCurrentStatus_003Ec__Iterator127)/*Error near IL_0059: stateMachine*/)._003CisRequest_003E__0 = false;
-			((_003CGetCurrentStatus_003Ec__Iterator127)/*Error near IL_0059: stateMachine*/)._003C_003Ef__this.currentData = result.result;
+			((_003CGetCurrentStatus_003Ec__Iterator12B)/*Error near IL_0059: stateMachine*/)._003CisRequest_003E__0 = false;
+			((_003CGetCurrentStatus_003Ec__Iterator12B)/*Error near IL_0059: stateMachine*/)._003C_003Ef__this.currentData = result.result;
 		}, getParam: string.Empty);
 		while (isRequest)
 		{
@@ -151,7 +151,7 @@ public class QuestWaveSelectList : QuestEventSelectList
 				}
 			}
 			bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-			_003CUpdateTable_003Ec__AnonStorey415 _003CUpdateTable_003Ec__AnonStorey;
+			_003CUpdateTable_003Ec__AnonStorey425 _003CUpdateTable_003Ec__AnonStorey;
 			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
 			component.set_enabled(true);
@@ -214,7 +214,7 @@ public class QuestWaveSelectList : QuestEventSelectList
 			bool enable_clear_event = table.clearEventID != 0;
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-			_003COnQuery_SELECT_WAVE_003Ec__AnonStorey417 _003COnQuery_SELECT_WAVE_003Ec__AnonStorey;
+			_003COnQuery_SELECT_WAVE_003Ec__AnonStorey427 _003COnQuery_SELECT_WAVE_003Ec__AnonStorey;
 			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo[num].uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003COnQuery_SELECT_WAVE_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		else

@@ -314,7 +314,7 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
         Object obj;
         boolean z2 = true;
         boolean z3 = false;
-        LogUtil.m745v(TAG, "onLocationChanged = " + location.toString());
+        LogUtil.m3770v(TAG, "onLocationChanged = " + location.toString());
         String provider = location.getProvider();
         if (provider != null) {
             equals = provider.equals("gps");
@@ -331,46 +331,46 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
             if (this.firstNetworkLocation == null) {
                 if (locationExtras.getLocationSource() == 2 && locationExtras.getLocationType() == 2 && location.hasAccuracy() && location.getAccuracy() < 500.0f) {
                     location.setAccuracy(500.0f);
-                    LogUtil.m745v(TAG, "First Cached/Wifi Location. set Accuracyt to 500.0");
+                    LogUtil.m3770v(TAG, "First Cached/Wifi Location. set Accuracyt to 500.0");
                     z = true;
                 } else {
                     z = false;
                 }
-                LogUtil.m745v(TAG, "First Network Location");
+                LogUtil.m3770v(TAG, "First Network Location");
                 this.firstNetworkLocation = location;
                 if (isCellbasedLocation) {
-                    LogUtil.m745v(TAG, "Cell based location (*" + this.receiveCdmaCellLocationCount + ")");
+                    LogUtil.m3770v(TAG, "Cell based location (*" + this.receiveCdmaCellLocationCount + ")");
                     this.latestCellBasedLocation = location;
                     z2 = false;
                 } else if (equals) {
-                    LogUtil.m745v(TAG, "Force To Update");
-                    LogUtil.m745v(TAG, "Available Location");
+                    LogUtil.m3770v(TAG, "Force To Update");
+                    LogUtil.m3770v(TAG, "Available Location");
                 } else if (equals2) {
                     z2 = false;
                 } else if (this.previousNWLocation == null && LocationUtil.isSameLatLon(location, this.previousNWLocation, false)) {
                     this.sameLocationCount++;
                     if (this.sameLocationCount < 3 || this.latestCellBasedLocation == null) {
-                        LogUtil.m745v(TAG, "Same location count up (" + this.sameLocationCount + ")");
+                        LogUtil.m3770v(TAG, "Same location count up (" + this.sameLocationCount + ")");
                         return;
                     } else {
-                        LogUtil.m745v(TAG, "Same location. Use CellBasedLocation");
+                        LogUtil.m3770v(TAG, "Same location. Use CellBasedLocation");
                         obj = this.latestCellBasedLocation;
                     }
                 } else {
                     if (location == this.firstNetworkLocation) {
-                        LogUtil.m745v(TAG, "Through Update Check");
+                        LogUtil.m3770v(TAG, "Through Update Check");
                         isCellbasedLocation = true;
                     } else {
                         isCellbasedLocation = false;
                     }
                     this.sameLocationCount = 0;
                     this.previousNWLocation = location;
-                    LogUtil.m745v(TAG, "Available Location");
+                    LogUtil.m3770v(TAG, "Available Location");
                     z2 = false;
                     z3 = isCellbasedLocation;
                 }
                 if (updateLocation(obj, z2, z3)) {
-                    LogUtil.m745v(TAG, "Update Location");
+                    LogUtil.m3770v(TAG, "Update Location");
                     this.locations.put(provider, obj);
                     Intent intent = new Intent(ACTION_CHANGED_LOCATION);
                     intent.putExtra("location", obj);
@@ -384,12 +384,12 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
         }
         z = false;
         if (isCellbasedLocation) {
-            LogUtil.m745v(TAG, "Cell based location (*" + this.receiveCdmaCellLocationCount + ")");
+            LogUtil.m3770v(TAG, "Cell based location (*" + this.receiveCdmaCellLocationCount + ")");
             this.latestCellBasedLocation = location;
             z2 = false;
         } else if (equals) {
-            LogUtil.m745v(TAG, "Force To Update");
-            LogUtil.m745v(TAG, "Available Location");
+            LogUtil.m3770v(TAG, "Force To Update");
+            LogUtil.m3770v(TAG, "Available Location");
         } else if (equals2) {
             z2 = false;
         } else {
@@ -398,17 +398,17 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
             if (location == this.firstNetworkLocation) {
                 isCellbasedLocation = false;
             } else {
-                LogUtil.m745v(TAG, "Through Update Check");
+                LogUtil.m3770v(TAG, "Through Update Check");
                 isCellbasedLocation = true;
             }
             this.sameLocationCount = 0;
             this.previousNWLocation = location;
-            LogUtil.m745v(TAG, "Available Location");
+            LogUtil.m3770v(TAG, "Available Location");
             z2 = false;
             z3 = isCellbasedLocation;
         }
         if (updateLocation(obj, z2, z3)) {
-            LogUtil.m745v(TAG, "Update Location");
+            LogUtil.m3770v(TAG, "Update Location");
             this.locations.put(provider, obj);
             Intent intent2 = new Intent(ACTION_CHANGED_LOCATION);
             intent2.putExtra("location", obj);
@@ -529,7 +529,7 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
         this.receiveCdmaCellLocationCount = 0;
         ColoplCellLocationListener.startListenCellLocationChange(this, getColoplCellLocationListener());
         requestDoCoMoLocationInfo();
-        LogUtil.m745v(TAG, "----- startLocationMeasurement -----");
+        LogUtil.m3770v(TAG, "----- startLocationMeasurement -----");
         return z;
     }
 

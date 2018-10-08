@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace UnityStandardAssets.ImageEffects
 {
-	[RequireComponent(typeof(Camera))]
 	[ExecuteInEditMode]
+	[RequireComponent(typeof(Camera))]
 	[AddComponentMenu("Image Effects/Bloom and Glow/Bloom (Optimized)")]
 	public class BloomOptimized : PostEffectsBase
 	{

@@ -18,7 +18,7 @@ class ap implements Runnable {
     }
 
     public void run() {
-        if (this.f790b.f788a.getListAdapter() instanceof C0842i) {
+        if (this.f790b.f788a.getListAdapter() instanceof C0841i) {
             for (Entry entry : this.f789a.entrySet()) {
                 String str = (String) entry.getKey();
                 Agent agent = (Agent) entry.getValue();
@@ -28,6 +28,6 @@ class ap implements Runnable {
             Logger.m558d(ZopimChatLogFragment.LOG_TAG, "Agents updated");
             return;
         }
-        Log.w(ZopimChatLogFragment.LOG_TAG, "Aborting update. Adapter must be of type " + C0842i.class);
+        Log.w(ZopimChatLogFragment.LOG_TAG, "Aborting update. Adapter must be of type " + C0841i.class);
     }
 }

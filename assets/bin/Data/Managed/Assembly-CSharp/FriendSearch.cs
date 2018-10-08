@@ -90,7 +90,7 @@ public class FriendSearch : FollowListBase
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey319 _003CSendGetList_003Ec__AnonStorey;
+		_003CSendGetList_003Ec__AnonStorey328 _003CSendGetList_003Ec__AnonStorey;
 		switch (searchType)
 		{
 		case SEARCH_TYPE.NAME:

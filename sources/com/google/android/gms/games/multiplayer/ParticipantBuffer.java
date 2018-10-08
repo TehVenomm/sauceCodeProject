@@ -8,7 +8,7 @@ public final class ParticipantBuffer extends AbstractDataBuffer<Participant> {
     }
 
     /* renamed from: get */
-    public final /* synthetic */ Object m1012get(int i) {
+    public final /* synthetic */ Object m4037get(int i) {
         throw new NoSuchMethodError();
     }
 }

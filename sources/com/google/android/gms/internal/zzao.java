@@ -1,5 +1,6 @@
 package com.google.android.gms.internal;
 
+import im.getsocial.sdk.ErrorCode;
 import io.fabric.sdk.android.services.network.HttpRequest;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -86,8 +87,8 @@ public final class zzao implements zzan {
         httpURLConnection.setUseCaches(false);
         httpURLConnection.setDoInput(true);
         "https".equals(url2.getProtocol());
-        for (String str : hashMap.keySet()) {
-            httpURLConnection.addRequestProperty(str, (String) hashMap.get(str));
+        for (String url3 : hashMap.keySet()) {
+            httpURLConnection.addRequestProperty(url3, (String) hashMap.get(url3));
         }
         switch (zzp.getMethod()) {
             case -1:
@@ -130,7 +131,7 @@ public final class zzao implements zzan {
         HttpResponse basicHttpResponse = new BasicHttpResponse(basicStatusLine);
         int method = zzp.getMethod();
         zzi = basicStatusLine.getStatusCode();
-        boolean z = (method == 4 || ((100 <= zzi && zzi < 200) || zzi == 204 || zzi == 304)) ? false : true;
+        boolean z = (method == 4 || ((100 <= zzi && zzi < 200) || zzi == ErrorCode.ILLEGAL_ARGUMENT || zzi == 304)) ? false : true;
         if (z) {
             basicHttpResponse.setEntity(zza(httpURLConnection));
         }

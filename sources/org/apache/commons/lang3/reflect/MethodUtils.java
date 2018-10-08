@@ -29,7 +29,7 @@ public class MethodUtils {
     }
 
     public static Object invokeMethod(Object obj, String str, Object[] objArr, Class<?>[] clsArr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        Class[] nullToEmpty = ArrayUtils.nullToEmpty((Class[]) clsArr);
+        Class[] nullToEmpty = ArrayUtils.nullToEmpty(clsArr);
         Object[] nullToEmpty2 = ArrayUtils.nullToEmpty(objArr);
         Method matchingAccessibleMethod = getMatchingAccessibleMethod(obj.getClass(), str, nullToEmpty);
         if (matchingAccessibleMethod != null) {
@@ -49,7 +49,7 @@ public class MethodUtils {
 
     public static Object invokeExactMethod(Object obj, String str, Object[] objArr, Class<?>[] clsArr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Object[] nullToEmpty = ArrayUtils.nullToEmpty(objArr);
-        Method accessibleMethod = getAccessibleMethod(obj.getClass(), str, ArrayUtils.nullToEmpty((Class[]) clsArr));
+        Method accessibleMethod = getAccessibleMethod(obj.getClass(), str, ArrayUtils.nullToEmpty(clsArr));
         if (accessibleMethod != null) {
             return accessibleMethod.invoke(obj, nullToEmpty);
         }
@@ -58,7 +58,7 @@ public class MethodUtils {
 
     public static Object invokeExactStaticMethod(Class<?> cls, String str, Object[] objArr, Class<?>[] clsArr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Object[] nullToEmpty = ArrayUtils.nullToEmpty(objArr);
-        Method accessibleMethod = getAccessibleMethod(cls, str, ArrayUtils.nullToEmpty((Class[]) clsArr));
+        Method accessibleMethod = getAccessibleMethod(cls, str, ArrayUtils.nullToEmpty(clsArr));
         if (accessibleMethod != null) {
             return accessibleMethod.invoke(null, nullToEmpty);
         }
@@ -72,7 +72,7 @@ public class MethodUtils {
 
     public static Object invokeStaticMethod(Class<?> cls, String str, Object[] objArr, Class<?>[] clsArr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Object[] nullToEmpty = ArrayUtils.nullToEmpty(objArr);
-        Method matchingAccessibleMethod = getMatchingAccessibleMethod(cls, str, ArrayUtils.nullToEmpty((Class[]) clsArr));
+        Method matchingAccessibleMethod = getMatchingAccessibleMethod(cls, str, ArrayUtils.nullToEmpty(clsArr));
         if (matchingAccessibleMethod != null) {
             return matchingAccessibleMethod.invoke(null, nullToEmpty);
         }
@@ -155,7 +155,7 @@ public class MethodUtils {
             Method method2 = null;
             for (Method method3 : cls.getMethods()) {
                 Method method32;
-                if (method32.getName().equals(str) && ClassUtils.isAssignable((Class[]) clsArr, method32.getParameterTypes(), true)) {
+                if (method32.getName().equals(str) && ClassUtils.isAssignable(clsArr, method32.getParameterTypes(), true)) {
                     method32 = getAccessibleMethod(method32);
                     if (method32 != null && (method2 == null || MemberUtils.compareParameterTypes(method32.getParameterTypes(), method2.getParameterTypes(), clsArr) < 0)) {
                         method2 = method32;

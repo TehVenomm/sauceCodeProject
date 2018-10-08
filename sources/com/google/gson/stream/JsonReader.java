@@ -2,7 +2,6 @@ package com.google.gson.stream;
 
 import android.support.v4.view.MotionEventCompat;
 import com.facebook.internal.ServerProtocol;
-import com.google.android.gms.games.quest.Quests;
 import com.google.gson.internal.JsonReaderInternalAccess;
 import com.google.gson.internal.bind.JsonTreeReader;
 import java.io.Closeable;
@@ -362,7 +361,7 @@ public class JsonReader implements Closeable {
                 }
                 checkLenient();
                 switch (cArr[this.pos]) {
-                    case MotionEventCompat.AXIS_GENERIC_11 /*42*/:
+                    case '*':
                         this.pos++;
                         if (skipTo("*/")) {
                             i = this.pos + 2;
@@ -590,7 +589,7 @@ public class JsonReader implements Closeable {
                     obj2 = obj3;
                     continue;
                 case 'E':
-                case Quests.SELECT_COMPLETED_UNCLAIMED /*101*/:
+                case 'e':
                     if (i4 != 2 && i4 != 4) {
                         return 0;
                     }

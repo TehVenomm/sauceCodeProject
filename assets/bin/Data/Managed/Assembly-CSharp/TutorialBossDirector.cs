@@ -142,12 +142,8 @@ public class TutorialBossDirector
 		//IL_0029: Expected O, but got Unknown
 		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0091: Expected O, but got Unknown
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
 		boss = enemy;
 		bossShadow = boss.GetComponentInChildren<CircleShadow>();
 		bossShadowMaterial = bossShadow.GetComponent<MeshRenderer>().get_material();
@@ -160,11 +156,7 @@ public class TutorialBossDirector
 		player.animator.set_runtimeAnimatorController(playerAnimatorController);
 		player.animator.set_cullingMode(0);
 		player.animator.Rebind();
-		Character character2 = player;
-		Vector3 position = player._position;
-		float y = position.y;
-		Vector3 position2 = player._position;
-		character2._position = new Vector3(0f, y, position2.z);
+		player._position = new Vector3(0f, 0f, 26f);
 		player.PlayMotion(PLAYER_ANIM_ENTER_CUT_SCENE_START_NAME, -1f);
 		enemy.animator.set_cullingMode(0);
 		enemy.animator.Rebind();
@@ -217,7 +209,7 @@ public class TutorialBossDirector
 			new PlaySoundParam(11.3f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01, null),
 			new PlaySoundParam(11.93f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01, null),
 			new PlaySoundParam(13f, UITutorialOperationHelper.SE_ID_DRAGON_LANDING, null),
-			new PlaySoundParam(14.7f, UITutorialOperationHelper.SE_ID_DRAGON_CALL_01, () => ((_003CDoBattleStartDirection_003Ec__Iterator1EE)/*Error near IL_0169: stateMachine*/)._003C_003Ef__this.boss.head.get_position())
+			new PlaySoundParam(14.7f, UITutorialOperationHelper.SE_ID_DRAGON_CALL_01, () => ((_003CDoBattleStartDirection_003Ec__Iterator1FD)/*Error near IL_0169: stateMachine*/)._003C_003Ef__this.boss.head.get_position())
 		}));
 		this.StartCoroutine(WaitForTime(14.7f, new Action((object)/*Error near IL_01ad: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		while (cameraAnim.get_isPlaying())

@@ -38,8 +38,8 @@ namespace GooglePlayGames.OurUtils
 			//IL_0023: Expected O, but got Unknown
 			if (debugLogEnabled)
 			{
-				_003Cd_003Ec__AnonStorey7DE _003Cd_003Ec__AnonStorey7DE;
-				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003Cd_003Ec__AnonStorey7DE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003Cd_003Ec__AnonStorey804 _003Cd_003Ec__AnonStorey;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003Cd_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 
@@ -49,8 +49,8 @@ namespace GooglePlayGames.OurUtils
 			//IL_0023: Expected O, but got Unknown
 			if (warningLogEnabled)
 			{
-				_003Cw_003Ec__AnonStorey7DF _003Cw_003Ec__AnonStorey7DF;
-				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003Cw_003Ec__AnonStorey7DF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003Cw_003Ec__AnonStorey805 _003Cw_003Ec__AnonStorey;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003Cw_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 
@@ -60,8 +60,8 @@ namespace GooglePlayGames.OurUtils
 			//IL_0023: Expected O, but got Unknown
 			if (warningLogEnabled)
 			{
-				_003Ce_003Ec__AnonStorey7E0 _003Ce_003Ec__AnonStorey7E;
-				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003Ce_003Ec__AnonStorey7E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003Ce_003Ec__AnonStorey806 _003Ce_003Ec__AnonStorey;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003Ce_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 

@@ -80,7 +80,8 @@ public class StatusTop : SkillInfoBase
 		LBL_SET_NAME,
 		SCR_DRUM,
 		GRD_DRUM,
-		LBL_EQUIP_NO
+		LBL_EQUIP_NO,
+		ANCHOR_RIGHT_TOP
 	}
 
 	private enum EQUIP_SET_COPY_MODE
@@ -318,11 +319,12 @@ public class StatusTop : SkillInfoBase
 
 	public unsafe override void UpdateUI()
 	{
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0253: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0356: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0328: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05ad: Unknown result type (might be due to invalid IL or missing references)
 		int badgeTotalNum = MonoBehaviourSingleton<SmithManager>.I.GetBadgeTotalNum();
 		SetBadge((Enum)UI.BTN_STUDIO, badgeTotalNum, 1, 8, -8, true);
 		DrawEquipModeButton();
@@ -330,6 +332,14 @@ public class StatusTop : SkillInfoBase
 		if (showEquipMode)
 		{
 			EquipSetInfo equipSetInfo = localEquipSet[equipSetNo];
+			if (equipSetInfo != null && equipSetInfo.item[4] == null)
+			{
+				SetActive(GetCtrl(UI.ANCHOR_RIGHT_TOP), UI.TGL_VISIBLE_HELM_BUTTON, false);
+			}
+			else
+			{
+				SetActive(GetCtrl(UI.ANCHOR_RIGHT_TOP), UI.TGL_VISIBLE_HELM_BUTTON, true);
+			}
 			int i = 0;
 			for (int num = icons.Length; i < num; i++)
 			{
@@ -419,7 +429,7 @@ public class StatusTop : SkillInfoBase
 			}
 			visualEquip.isVisibleHelm = (localEquipSet[equipSetNo].showHelm == 1);
 		}
-		SetToggleButton((Enum)UI.TGL_VISIBLE_HELM_BUTTON, visualEquip.isVisibleHelm, (Action<bool>)delegate(bool is_active)
+		SetToggleButton(GetCtrl(UI.ANCHOR_RIGHT_TOP), UI.TGL_VISIBLE_HELM_BUTTON, visualEquip.isVisibleHelm, delegate(bool is_active)
 		{
 			visualEquip.isVisibleHelm = is_active;
 			localEquipSet[equipSetNo].showHelm = (visualEquip.isVisibleHelm ? 1 : 0);
@@ -437,6 +447,10 @@ public class StatusTop : SkillInfoBase
 		});
 		DrawEquipSetCopyModeButton();
 		SetDynamicList((Enum)UI.GRD_DRUM, "equipno", SET_NO_MAX, false, null, null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
+		{
+			GetCtrl(UI.SCR_DRUM).get_gameObject().GetComponent<UIScrollView>().set_enabled(false);
+		}
 		base.UpdateUI();
 	}
 

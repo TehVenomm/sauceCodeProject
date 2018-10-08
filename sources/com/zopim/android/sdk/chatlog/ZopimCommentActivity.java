@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import com.zopim.android.sdk.api.Logger;
 
 public class ZopimCommentActivity extends AppCompatActivity {
@@ -18,15 +18,15 @@ public class ZopimCommentActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        setContentView(C0785R.layout.zopim_comment_activity);
-        setSupportActionBar((Toolbar) findViewById(C0785R.id.toolbar));
+        setContentView(C0784R.layout.zopim_comment_activity);
+        setSupportActionBar((Toolbar) findViewById(C0784R.id.toolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         FragmentManager supportFragmentManager = getSupportFragmentManager();
         if (supportFragmentManager.findFragmentByTag(ZopimCommentFragment.class.getName()) == null) {
             String stringExtra = getIntent() != null ? getIntent().getStringExtra(EXTRA_COMMENT) : null;
             Fragment newInstance = stringExtra != null ? ZopimCommentFragment.newInstance(stringExtra) : new ZopimCommentFragment();
             FragmentTransaction beginTransaction = supportFragmentManager.beginTransaction();
-            beginTransaction.add(C0785R.id.comment_fragment_container, newInstance, ZopimCommentFragment.class.getName());
+            beginTransaction.add(C0784R.id.comment_fragment_container, newInstance, ZopimCommentFragment.class.getName());
             beginTransaction.commit();
         }
     }
@@ -40,7 +40,7 @@ public class ZopimCommentActivity extends AppCompatActivity {
         if (16908332 == menuItem.getItemId()) {
             finish();
             return super.onOptionsItemSelected(menuItem);
-        } else if (C0785R.id.send_comment != menuItem.getItemId()) {
+        } else if (C0784R.id.send_comment != menuItem.getItemId()) {
             return false;
         } else {
             finish();

@@ -12,52 +12,52 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import net.gogame.gopay.sdk.support.C1084m;
-import net.gogame.gopay.sdk.support.C1088s;
+import net.gogame.gopay.sdk.support.C1400m;
+import net.gogame.gopay.sdk.support.C1404s;
 import net.gogame.gopay.sdk.support.DisplayUtils;
 import org.onepf.oms.appstore.googleUtils.IabException;
 
 public class StoreActivity extends Activity {
     /* renamed from: a */
-    private Handler f957a;
+    private Handler f3345a;
     /* renamed from: b */
-    private ProgressDialog f958b;
+    private ProgressDialog f3346b;
     /* renamed from: c */
-    private C1065m f959c;
+    private C1381m f3347c;
     /* renamed from: d */
-    private C1029d f960d;
+    private C1345d f3348d;
     /* renamed from: e */
-    private C1094w f961e;
+    private C1410w f3349e;
 
     /* renamed from: a */
-    private void m749a() {
-        new C1070r(this).execute(new Void[0]);
+    private void m3774a() {
+        new C1386r(this).execute(new Void[0]);
     }
 
     /* renamed from: b */
-    private void m750b() {
-        this.f957a.post(new C1091t(this));
+    private void m3775b() {
+        this.f3345a.post(new C1407t(this));
     }
 
     /* renamed from: d */
-    static /* synthetic */ void m753d(StoreActivity storeActivity) {
-        storeActivity.f957a.post(new C1071s(storeActivity));
+    static /* synthetic */ void m3778d(StoreActivity storeActivity) {
+        storeActivity.f3345a.post(new C1387s(storeActivity));
         try {
-            C1034h a = C1062j.m865a(storeActivity.f959c.f1182a, storeActivity.f959c.f1183b, C1062j.m858a());
-            C1062j.m868a(a.f983a);
-            storeActivity.f957a.post(new C1069q(storeActivity, a));
+            C1350h a = C1378j.m3890a(storeActivity.f3347c.f3570a, storeActivity.f3347c.f3571b, C1378j.m3883a());
+            C1378j.m3893a(a.f3371a);
+            storeActivity.f3345a.post(new C1385q(storeActivity, a));
         } catch (IabException e) {
         } finally {
-            storeActivity.m750b();
+            storeActivity.m3775b();
         }
     }
 
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        C1084m.m923a(getFilesDir().getPath());
+        C1400m.m3948a(getFilesDir().getPath());
         requestWindowFeature(1);
-        setTitle(C1088s.m947a("store_title"));
-        this.f957a = new Handler();
+        setTitle(C1404s.m3972a("store_title"));
+        this.f3345a = new Handler();
         String str = null;
         String str2 = null;
         if (getIntent().getExtras().getString("appId") != null) {
@@ -66,7 +66,7 @@ public class StoreActivity extends Activity {
         if (getIntent().getExtras().getString("guid") != null) {
             str2 = getIntent().getExtras().getString("guid");
         }
-        this.f959c = new C1065m(str, str2);
+        this.f3347c = new C1381m(str, str2);
         View linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(1);
         View relativeLayout = new RelativeLayout(this);
@@ -81,34 +81,34 @@ public class StoreActivity extends Activity {
         LayoutParams layoutParams = new RelativeLayout.LayoutParams(-2, -2);
         layoutParams.addRule(15);
         textView.setLayoutParams(layoutParams);
-        textView.setText(C1088s.m947a("store_title"));
+        textView.setText(C1404s.m3972a("store_title"));
         relativeLayout.addView(textView);
-        this.f960d = new C1029d(this, true);
+        this.f3348d = new C1345d(this, true);
         textView = new Spinner(this);
         textView.setBackgroundColor(0);
-        textView.setAdapter(this.f960d);
+        textView.setAdapter(this.f3348d);
         textView.setPadding(0, 0, 0, 0);
-        textView.setOnItemSelectedListener(new C1067o(this));
+        textView.setOnItemSelectedListener(new C1383o(this));
         layoutParams = new RelativeLayout.LayoutParams(-2, -2);
         layoutParams.addRule(11);
         textView.setLayoutParams(layoutParams);
         relativeLayout.addView(textView);
-        if (C1035i.m761a()) {
+        if (C1351i.m3786a()) {
             linearLayout.setLongClickable(true);
-            linearLayout.setOnLongClickListener(new C1068p(this));
+            linearLayout.setOnLongClickListener(new C1384p(this));
         }
-        this.f961e = new C1094w(this, this.f959c);
-        linearLayout.addView(this.f961e);
+        this.f3349e = new C1410w(this, this.f3347c);
+        linearLayout.addView(this.f3349e);
         setContentView(linearLayout);
     }
 
     protected void onResume() {
         super.onResume();
-        m749a();
+        m3774a();
     }
 
     protected void onStop() {
         super.onStop();
-        this.f958b.dismiss();
+        this.f3346b.dismiss();
     }
 }

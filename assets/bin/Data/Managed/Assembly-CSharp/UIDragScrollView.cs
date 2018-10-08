@@ -5,8 +5,8 @@ public class UIDragScrollView
 {
 	public UIScrollView scrollView;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private UIScrollView draggablePanel;
 
 	private Transform mTrans;

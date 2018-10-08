@@ -82,7 +82,7 @@ public class LivechatDepartmentsPath extends Path<LinkedHashMap<String, Departme
         if (isClearRequired(str)) {
             clear();
         } else if (!str.isEmpty()) {
-            updateInternal((LinkedHashMap) this.PARSER.parse(str, new C0867e(this)));
+            updateInternal((LinkedHashMap) this.PARSER.parse(str, new C0866e(this)));
         }
     }
 }

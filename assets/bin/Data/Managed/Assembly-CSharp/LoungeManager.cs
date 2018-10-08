@@ -498,7 +498,7 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 		bool wait = true;
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
 		{
-			((_003CSendLoungeInfoForce_003Ec__IteratorFB)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CSendLoungeInfoForce_003Ec__IteratorFF)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
 		}, true);
 		while (wait)
 		{

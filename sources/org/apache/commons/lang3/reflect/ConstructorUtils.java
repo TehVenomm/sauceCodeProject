@@ -16,7 +16,7 @@ public class ConstructorUtils {
 
     public static <T> T invokeConstructor(Class<T> cls, Object[] objArr, Class<?>[] clsArr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Object[] nullToEmpty = ArrayUtils.nullToEmpty(objArr);
-        Constructor matchingAccessibleConstructor = getMatchingAccessibleConstructor(cls, ArrayUtils.nullToEmpty((Class[]) clsArr));
+        Constructor matchingAccessibleConstructor = getMatchingAccessibleConstructor(cls, ArrayUtils.nullToEmpty(clsArr));
         if (matchingAccessibleConstructor != null) {
             return matchingAccessibleConstructor.newInstance(nullToEmpty);
         }
@@ -30,7 +30,7 @@ public class ConstructorUtils {
 
     public static <T> T invokeExactConstructor(Class<T> cls, Object[] objArr, Class<?>[] clsArr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Object[] nullToEmpty = ArrayUtils.nullToEmpty(objArr);
-        Constructor accessibleConstructor = getAccessibleConstructor(cls, ArrayUtils.nullToEmpty((Class[]) clsArr));
+        Constructor accessibleConstructor = getAccessibleConstructor(cls, ArrayUtils.nullToEmpty(clsArr));
         if (accessibleConstructor != null) {
             return accessibleConstructor.newInstance(nullToEmpty);
         }
@@ -60,7 +60,7 @@ public class ConstructorUtils {
         } catch (NoSuchMethodException e) {
             Constructor<T> constructor2 = null;
             for (Constructor constructor3 : cls.getConstructors()) {
-                if (ClassUtils.isAssignable((Class[]) clsArr, constructor3.getParameterTypes(), true)) {
+                if (ClassUtils.isAssignable(clsArr, constructor3.getParameterTypes(), true)) {
                     AccessibleObject accessibleConstructor = getAccessibleConstructor(constructor3);
                     if (accessibleConstructor != null) {
                         MemberUtils.setAccessibleWorkaround(accessibleConstructor);

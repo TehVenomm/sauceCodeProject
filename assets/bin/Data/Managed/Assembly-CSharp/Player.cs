@@ -43,6 +43,7 @@ public class Player : Character
 		EVOLVE_SPECIAL,
 		READ_STORY,
 		FISHING,
+		POSE,
 		MAX
 	}
 
@@ -80,6 +81,7 @@ public class Player : Character
 		AVOID_ALTER,
 		WARP_ALTER,
 		FISHING,
+		POSE,
 		MAX
 	}
 
@@ -290,7 +292,7 @@ public class Player : Character
 
 	protected SoulEnergyController soulEnergyCtrl;
 
-	private BitArray disableActionFlag = new BitArray(40);
+	private BitArray disableActionFlag = new BitArray(41);
 
 	public static readonly string[] subMotionStateName;
 
@@ -631,6 +633,8 @@ public class Player : Character
 	public BarrierBulletObject activeBulletBarrierObject;
 
 	private IEnumerator cancelInvincible;
+
+	private CircleShadow shadow;
 
 	public override int id
 	{
@@ -1499,7 +1503,7 @@ public class Player : Character
 			"warp_alter",
 			"fishing"
 		};
-		subMotionHashCaches = new int[24];
+		subMotionHashCaches = new int[25];
 		guardAngleID = 0;
 		arrowAngleID = 0;
 		guardAngleID = Animator.StringToHash("guard_angle");
@@ -1629,7 +1633,7 @@ public class Player : Character
 		{
 			return false;
 		}
-		_003CIsBoostByType_003Ec__AnonStorey523 _003CIsBoostByType_003Ec__AnonStorey;
+		_003CIsBoostByType_003Ec__AnonStorey536 _003CIsBoostByType_003Ec__AnonStorey;
 		if (boostPrayedInfoList.Count(new Func<BoostPrayInfo, bool>((object)_003CIsBoostByType_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)) > 0)
 		{
 			return true;
@@ -5635,8 +5639,8 @@ public class Player : Character
 	private unsafe void DetachRootEffectTemporary()
 	{
 		Transform attachTrans = (!MonoBehaviourSingleton<EffectManager>.IsValid()) ? MonoBehaviourSingleton<StageObjectManager>.I._transform : MonoBehaviourSingleton<EffectManager>.I._transform;
-		_003CDetachRootEffectTemporary_003Ec__AnonStorey529 _003CDetachRootEffectTemporary_003Ec__AnonStorey;
-		effectTransTable.ForEachKeyAndValue(new Action<string, Transform>((object)_003CDetachRootEffectTemporary_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CDetachRootEffectTemporary_003Ec__AnonStorey53C _003CDetachRootEffectTemporary_003Ec__AnonStorey53C;
+		effectTransTable.ForEachKeyAndValue(new Action<string, Transform>((object)_003CDetachRootEffectTemporary_003Ec__AnonStorey53C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void ReAttachRootEffect()
@@ -7361,15 +7365,15 @@ public class Player : Character
 		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01e1: Expected O, but got Unknown
 		//IL_030b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0325: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0603: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0336: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0604: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0609: Unknown result type (might be due to invalid IL or missing references)
-		//IL_060e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_060f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0614: Unknown result type (might be due to invalid IL or missing references)
+		//IL_061a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_061f: Unknown result type (might be due to invalid IL or missing references)
 		if (base.isInitialized)
 		{
 			ACTION_ID actionID = base.actionID;
@@ -7463,7 +7467,7 @@ public class Player : Character
 			}
 			EndWaitingPacket(WAITING_PACKET.PLAYER_CHARGE_RELEASE);
 			EndWaitingPacket(WAITING_PACKET.PLAYER_APPLY_CHANGE_WEAPON);
-			if (loader.shadow != null && !loader.shadow.get_gameObject().get_activeSelf())
+			if (loader.shadow != null && !loader.shadow.get_gameObject().get_activeSelf() && shadow == null)
 			{
 				loader.shadow.get_gameObject().SetActive(true);
 			}
@@ -7636,7 +7640,7 @@ public class Player : Character
 
 	protected override int _GetCachedHash(int motion_id)
 	{
-		if (motion_id < 115 || motion_id >= 139)
+		if (motion_id < 115 || motion_id >= 140)
 		{
 			return base._GetCachedHash(motion_id);
 		}
@@ -7645,7 +7649,7 @@ public class Player : Character
 
 	protected override void _CacheHash(int motion_id, int hash)
 	{
-		if (motion_id < 115 || motion_id >= 139)
+		if (motion_id < 115 || motion_id >= 140)
 		{
 			base._CacheHash(motion_id, hash);
 		}
@@ -8491,7 +8495,7 @@ public class Player : Character
 		}
 	}
 
-	public virtual void OnSetPlayerStatus(int _level, int _atk, int _def, int _hp, bool send_packet = true, StageObjectManager.PlayerTransferInfo transfer_info = null)
+	public virtual void OnSetPlayerStatus(int _level, int _atk, int _def, int _hp, bool send_packet = true, StageObjectManager.PlayerTransferInfo transfer_info = null, bool usingRealAtk = false)
 	{
 		playerAtk = (float)_atk;
 		playerDef = (float)_def;
@@ -11859,11 +11863,11 @@ public class Player : Character
 			num = list.Count;
 		}
 		List<StageObject> range = list.GetRange(0, num);
-		if (_003C_003Ef__am_0024cacheE3 == null)
+		if (_003C_003Ef__am_0024cacheE4 == null)
 		{
-			_003C_003Ef__am_0024cacheE3 = new Func<StageObject, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003C_003Ef__am_0024cacheE4 = new Func<StageObject, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		return range.Select<StageObject, int>(_003C_003Ef__am_0024cacheE3).ToArray();
+		return range.Select<StageObject, int>(_003C_003Ef__am_0024cacheE4).ToArray();
 	}
 
 	private void EventHealHp()
@@ -11994,8 +11998,8 @@ public class Player : Character
 					}
 				}
 			}
-			_003CShotSoulArrow_003Ec__AnonStorey52B _003CShotSoulArrow_003Ec__AnonStorey52B;
-			this.StartCoroutine(_ShotSoulArrow(shotPos, bowRot, list, arrowActionInfo.soulShotInterval, new Action((object)_003CShotSoulArrow_003Ec__AnonStorey52B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			_003CShotSoulArrow_003Ec__AnonStorey53E _003CShotSoulArrow_003Ec__AnonStorey53E;
+			this.StartCoroutine(_ShotSoulArrow(shotPos, bowRot, list, arrowActionInfo.soulShotInterval, new Action((object)_003CShotSoulArrow_003Ec__AnonStorey53E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 	}
 
@@ -13247,11 +13251,11 @@ public class Player : Character
 	public unsafe bool IsInAliveBarrier()
 	{
 		List<BarrierBulletObject> source = bulletBarrierObjList;
-		if (_003C_003Ef__am_0024cacheE4 == null)
+		if (_003C_003Ef__am_0024cacheE5 == null)
 		{
-			_003C_003Ef__am_0024cacheE4 = new Func<BarrierBulletObject, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003C_003Ef__am_0024cacheE5 = new Func<BarrierBulletObject, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		return source.Any(_003C_003Ef__am_0024cacheE4);
+		return source.Any(_003C_003Ef__am_0024cacheE5);
 	}
 
 	private void ForceClearInBarrier()
@@ -13440,5 +13444,28 @@ public class Player : Character
 			return result;
 		}
 		return -1;
+	}
+
+	public void ActiveShadow(bool isActive)
+	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(IEActiveShadow(isActive));
+	}
+
+	private IEnumerator IEActiveShadow(bool isActive)
+	{
+		while (shadow == null && (loader == null || loader.isLoading))
+		{
+			yield return (object)null;
+		}
+		shadow = this.GetComponentInChildren<CircleShadow>(true);
+		if (shadow != null)
+		{
+			shadow.get_gameObject().SetActive(isActive);
+			if (isActive)
+			{
+				shadow = null;
+			}
+		}
 	}
 }

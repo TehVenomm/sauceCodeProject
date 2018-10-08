@@ -40,7 +40,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.GoWrapImpl;
 import net.gogame.gowrap.integrations.core.CoreSupport;
@@ -80,8 +80,8 @@ public class NewsFragment extends Fragment {
     private UIContext uiContext;
 
     /* renamed from: net.gogame.gowrap.ui.v2017_2.NewsFragment$1 */
-    class C12301 implements OnItemClickListener {
-        C12301() {
+    class C15461 implements OnItemClickListener {
+        C15461() {
         }
 
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long j) {
@@ -94,8 +94,8 @@ public class NewsFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.v2017_2.NewsFragment$3 */
-    class C12323 implements OnClickListener {
-        C12323() {
+    class C15483 implements OnClickListener {
+        C15483() {
         }
 
         public void onClick(View view) {
@@ -109,16 +109,16 @@ public class NewsFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.v2017_2.NewsFragment$4 */
-    class C12344 implements OnTouchListener {
-        private final GestureDetector gestureDetector = new GestureDetector(NewsFragment.this.getActivity(), new C12331());
+    class C15504 implements OnTouchListener {
+        private final GestureDetector gestureDetector = new GestureDetector(NewsFragment.this.getActivity(), new C15491());
 
         /* renamed from: net.gogame.gowrap.ui.v2017_2.NewsFragment$4$1 */
-        class C12331 extends SimpleOnGestureListener {
+        class C15491 extends SimpleOnGestureListener {
             private final int SWIPE_MAX_OFF_PATH = 100;
             private final int SWIPE_MIN_DISTANCE = 100;
             private final int SWIPE_THRESHOLD_VELOCITY = 200;
 
-            C12331() {
+            C15491() {
             }
 
             public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent2, float f, float f2) {
@@ -154,7 +154,7 @@ public class NewsFragment extends Fragment {
             }
         }
 
-        C12344() {
+        C15504() {
         }
 
         public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -163,8 +163,8 @@ public class NewsFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.v2017_2.NewsFragment$7 */
-    class C12417 implements Target {
-        C12417() {
+    class C15577 implements Target {
+        C15577() {
         }
 
         public void onDownloadStarted(Drawable drawable) {
@@ -202,17 +202,17 @@ public class NewsFragment extends Fragment {
         if (getActivity() instanceof UIContext) {
             this.uiContext = (UIContext) getActivity();
         }
-        View inflate = layoutInflater.inflate(C1110R.layout.net_gogame_gowrap_v2017_2_fragment_news, viewGroup, false);
-        this.progressBar = (ProgressBar) inflate.findViewById(C1110R.id.net_gogame_gowrap_progress_indicator);
+        View inflate = layoutInflater.inflate(C1426R.layout.net_gogame_gowrap_v2017_2_fragment_news, viewGroup, false);
+        this.progressBar = (ProgressBar) inflate.findViewById(C1426R.id.net_gogame_gowrap_progress_indicator);
         this.listAdapter = new NewsListAdapter(getActivity());
         this.listAdapter.onRestoreInstanceState(getParcelable(KEY_LIST_ADAPTER));
-        this.listView = (ListView) inflate.findViewById(C1110R.id.net_gogame_gowrap_news_listview);
+        this.listView = (ListView) inflate.findViewById(C1426R.id.net_gogame_gowrap_news_listview);
         this.listView.setAdapter(this.listAdapter);
-        this.listView.setOnItemClickListener(new C12301());
-        this.bannerView = (ImageSwitcher) inflate.findViewById(C1110R.id.net_gogame_gowrap_news_banners);
+        this.listView.setOnItemClickListener(new C15461());
+        this.bannerView = (ImageSwitcher) inflate.findViewById(C1426R.id.net_gogame_gowrap_news_banners);
         this.bannerView.setFactory(new ViewFactory() {
             public View makeView() {
-                ImageView imageView = (ImageView) layoutInflater.inflate(C1110R.layout.net_gogame_gowrap_v2017_2_fragment_news_banner, NewsFragment.this.bannerView, false);
+                ImageView imageView = (ImageView) layoutInflater.inflate(C1426R.layout.net_gogame_gowrap_v2017_2_fragment_news_banner, NewsFragment.this.bannerView, false);
                 if (VERSION.SDK_INT >= 21) {
                     imageView.setClipToOutline(true);
                 }
@@ -220,9 +220,9 @@ public class NewsFragment extends Fragment {
             }
         });
         this.bannerView.setAnimateFirstView(false);
-        this.bannerView.setOnClickListener(new C12323());
-        this.bannerView.setOnTouchListener(new C12344());
-        this.bannerPeriodTextView = (TextView) inflate.findViewById(C1110R.id.net_gogame_gowrap_news_banner_period);
+        this.bannerView.setOnClickListener(new C15483());
+        this.bannerView.setOnTouchListener(new C15504());
+        this.bannerPeriodTextView = (TextView) inflate.findViewById(C1426R.id.net_gogame_gowrap_news_banner_period);
         if (this.savedInstanceState != null) {
             if (getParcelable(KEY_LIST_VIEW) != null) {
                 this.listView.onRestoreInstanceState(getParcelable(KEY_LIST_VIEW));
@@ -242,33 +242,33 @@ public class NewsFragment extends Fragment {
                 DownloadUtils.download(getActivity(), url, new FileTarget(file), file.isFile(), new Callback() {
 
                     /* renamed from: net.gogame.gowrap.ui.v2017_2.NewsFragment$5$1 */
-                    class C12351 implements Runnable {
-                        C12351() {
+                    class C15511 implements Runnable {
+                        C15511() {
                         }
 
                         public void run() {
-                            C12395.this.hideProgressBar();
+                            C15555.this.hideProgressBar();
                         }
                     }
 
                     /* renamed from: net.gogame.gowrap.ui.v2017_2.NewsFragment$5$3 */
-                    class C12373 implements Runnable {
-                        C12373() {
+                    class C15533 implements Runnable {
+                        C15533() {
                         }
 
                         public void run() {
-                            C12395.this.hideProgressBar();
-                            C12395.this.showError();
+                            C15555.this.hideProgressBar();
+                            C15555.this.showError();
                         }
                     }
 
                     /* renamed from: net.gogame.gowrap.ui.v2017_2.NewsFragment$5$4 */
-                    class C12384 implements Runnable {
-                        C12384() {
+                    class C15544 implements Runnable {
+                        C15544() {
                         }
 
                         public void run() {
-                            NewsFragment.this.getView().findViewById(C1110R.id.net_gogame_gowrap_error_container).setVisibility(0);
+                            NewsFragment.this.getView().findViewById(C1426R.id.net_gogame_gowrap_error_container).setVisibility(0);
                         }
                     }
 
@@ -279,10 +279,10 @@ public class NewsFragment extends Fragment {
                     }
 
                     private NewsFeed readFeed(File file) throws IOException {
+                        JsonReader jsonReader;
                         InputStream fileInputStream = new FileInputStream(file);
                         try {
                             Reader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
-                            JsonReader jsonReader;
                             try {
                                 jsonReader = new JsonReader(inputStreamReader);
                                 NewsFeed newsFeed = new NewsFeed(jsonReader);
@@ -300,7 +300,7 @@ public class NewsFragment extends Fragment {
                     public void onDownloadSucceeded() {
                         if (NewsFragment.this.getActivity() != null) {
                             try {
-                                NewsFragment.this.getActivity().runOnUiThread(new C12351());
+                                NewsFragment.this.getActivity().runOnUiThread(new C15511());
                                 final NewsFeed readFeed = readFeed(file);
                                 NewsFragment.this.getActivity().runOnUiThread(new Runnable() {
                                     public void run() {
@@ -317,7 +317,7 @@ public class NewsFragment extends Fragment {
                     public void onDownloadFailed() {
                         if (NewsFragment.this.getActivity() != null) {
                             try {
-                                NewsFragment.this.getActivity().runOnUiThread(new C12373());
+                                NewsFragment.this.getActivity().runOnUiThread(new C15533());
                             } catch (Throwable e) {
                                 Log.e(Constants.TAG, "Exception", e);
                                 showError();
@@ -327,7 +327,7 @@ public class NewsFragment extends Fragment {
 
                     private void showError() {
                         if (NewsFragment.this.getView() != null) {
-                            NewsFragment.this.getActivity().runOnUiThread(new C12384());
+                            NewsFragment.this.getActivity().runOnUiThread(new C15544());
                         }
                     }
                 });
@@ -350,8 +350,8 @@ public class NewsFragment extends Fragment {
         if (this.banners != null && !this.banners.isEmpty()) {
             int size = (this.currentBannerIndex + 1) % this.banners.size();
             if (size != this.currentBannerIndex) {
-                Animation loadAnimation = AnimationUtils.loadAnimation(getActivity(), C1110R.anim.net_gogame_gowrap_slide_in_right);
-                Animation loadAnimation2 = AnimationUtils.loadAnimation(getActivity(), C1110R.anim.net_gogame_gowrap_slide_out_left);
+                Animation loadAnimation = AnimationUtils.loadAnimation(getActivity(), C1426R.anim.net_gogame_gowrap_slide_in_right);
+                Animation loadAnimation2 = AnimationUtils.loadAnimation(getActivity(), C1426R.anim.net_gogame_gowrap_slide_out_left);
                 this.bannerView.setInAnimation(loadAnimation);
                 this.bannerView.setOutAnimation(loadAnimation2);
                 showBanner(size);
@@ -363,8 +363,8 @@ public class NewsFragment extends Fragment {
         if (this.banners != null && !this.banners.isEmpty()) {
             int size = ((this.currentBannerIndex + this.banners.size()) - 1) % this.banners.size();
             if (size != this.currentBannerIndex) {
-                Animation loadAnimation = AnimationUtils.loadAnimation(getActivity(), C1110R.anim.net_gogame_gowrap_slide_in_left);
-                Animation loadAnimation2 = AnimationUtils.loadAnimation(getActivity(), C1110R.anim.net_gogame_gowrap_slide_out_right);
+                Animation loadAnimation = AnimationUtils.loadAnimation(getActivity(), C1426R.anim.net_gogame_gowrap_slide_in_left);
+                Animation loadAnimation2 = AnimationUtils.loadAnimation(getActivity(), C1426R.anim.net_gogame_gowrap_slide_out_right);
                 this.bannerView.setInAnimation(loadAnimation);
                 this.bannerView.setOutAnimation(loadAnimation2);
                 showBanner(size);
@@ -384,17 +384,17 @@ public class NewsFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 public void run() {
                     if (banner.getStartDateTime() != null && banner.getEndDateTime() != null) {
-                        NewsFragment.this.bannerPeriodTextView.setText(NewsFragment.this.getString(C1110R.string.net_gogame_gowrap_news_banner_time_period_format, new Object[]{NewsFragment.this.dateTimeFormat.format(new Date(banner.getStartDateTime().longValue())), NewsFragment.this.dateTimeFormat.format(new Date(banner.getEndDateTime().longValue()))}));
+                        NewsFragment.this.bannerPeriodTextView.setText(NewsFragment.this.getString(C1426R.string.net_gogame_gowrap_news_banner_time_period_format, new Object[]{NewsFragment.this.dateTimeFormat.format(new Date(banner.getStartDateTime().longValue())), NewsFragment.this.dateTimeFormat.format(new Date(banner.getEndDateTime().longValue()))}));
                     } else if (banner.getStartDateTime() != null && banner.getEndDateTime() == null) {
-                        NewsFragment.this.bannerPeriodTextView.setText(NewsFragment.this.getString(C1110R.string.net_gogame_gowrap_news_banner_time_period_from_format, new Object[]{NewsFragment.this.dateTimeFormat.format(new Date(banner.getStartDateTime().longValue()))}));
+                        NewsFragment.this.bannerPeriodTextView.setText(NewsFragment.this.getString(C1426R.string.net_gogame_gowrap_news_banner_time_period_from_format, new Object[]{NewsFragment.this.dateTimeFormat.format(new Date(banner.getStartDateTime().longValue()))}));
                     } else if (banner.getStartDateTime() != null || banner.getEndDateTime() == null) {
                         NewsFragment.this.bannerPeriodTextView.setText(null);
                     } else {
-                        NewsFragment.this.bannerPeriodTextView.setText(NewsFragment.this.getString(C1110R.string.net_gogame_gowrap_news_banner_time_period_until_format, new Object[]{NewsFragment.this.dateTimeFormat.format(new Date(banner.getEndDateTime().longValue()))}));
+                        NewsFragment.this.bannerPeriodTextView.setText(NewsFragment.this.getString(C1426R.string.net_gogame_gowrap_news_banner_time_period_until_format, new Object[]{NewsFragment.this.dateTimeFormat.format(new Date(banner.getEndDateTime().longValue()))}));
                     }
                 }
             });
-            this.uiContext.getDownloadManager().download(Builder.newBuilder(banner.getImageUrl()).into(new C12417()));
+            this.uiContext.getDownloadManager().download(Builder.newBuilder(banner.getImageUrl()).into(new C15577()));
         }
     }
 

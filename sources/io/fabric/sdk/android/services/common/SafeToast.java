@@ -10,8 +10,8 @@ import io.fabric.sdk.android.services.concurrency.PriorityRunnable;
 public class SafeToast extends Toast {
 
     /* renamed from: io.fabric.sdk.android.services.common.SafeToast$1 */
-    class C09241 extends PriorityRunnable {
-        C09241() {
+    class C12401 extends PriorityRunnable {
+        C12401() {
         }
 
         public void run() {
@@ -39,7 +39,7 @@ public class SafeToast extends Toast {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             super.show();
         } else {
-            new Handler(Looper.getMainLooper()).post(new C09241());
+            new Handler(Looper.getMainLooper()).post(new C12401());
         }
     }
 }

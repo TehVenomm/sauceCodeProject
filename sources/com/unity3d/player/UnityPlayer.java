@@ -32,7 +32,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ProgressBar;
-import com.unity3d.player.C0748a.C0744a;
+import com.unity3d.player.C0747a.C0743a;
 import io.fabric.sdk.android.services.common.CommonUtils;
 import java.io.File;
 import java.io.FileInputStream;
@@ -54,7 +54,7 @@ import net.gogame.gowrap.integrations.AbstractIntegrationSupport;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-public class UnityPlayer extends FrameLayout implements C0744a {
+public class UnityPlayer extends FrameLayout implements C0743a {
     /* renamed from: D */
     private static Lock f439D = new ReentrantLock();
     public static Activity currentActivity = null;
@@ -63,13 +63,13 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     /* renamed from: A */
     private ProgressBar f441A = null;
     /* renamed from: B */
-    private Runnable f442B = new C07342(this);
+    private Runnable f442B = new C07332(this);
     /* renamed from: C */
-    private Runnable f443C = new C07364(this);
+    private Runnable f443C = new C07354(this);
     /* renamed from: a */
-    C0743b f444a = new C0743b(this);
+    C0742b f444a = new C0742b(this);
     /* renamed from: b */
-    C0779s f445b = null;
+    C0778s f445b = null;
     /* renamed from: c */
     private boolean f446c = false;
     /* renamed from: d */
@@ -77,13 +77,13 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     /* renamed from: e */
     private boolean f448e = true;
     /* renamed from: f */
-    private final C0760j f449f;
+    private final C0759j f449f;
     /* renamed from: g */
-    private final C0780t f450g;
+    private final C0779t f450g;
     /* renamed from: h */
     private boolean f451h = false;
     /* renamed from: i */
-    private C0782v f452i = new C0782v();
+    private C0781v f452i = new C0781v();
     /* renamed from: j */
     private final ConcurrentLinkedQueue f453j = new ConcurrentLinkedQueue();
     /* renamed from: k */
@@ -105,7 +105,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     /* renamed from: t */
     private int f462t = 0;
     /* renamed from: u */
-    private final C0775r f463u;
+    private final C0774r f463u;
     /* renamed from: v */
     private String f464v = null;
     /* renamed from: w */
@@ -115,14 +115,14 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     /* renamed from: y */
     private List f467y = new ArrayList();
     /* renamed from: z */
-    private C0784w f468z;
+    private C0783w f468z;
 
     /* renamed from: com.unity3d.player.UnityPlayer$c */
-    private abstract class C0731c implements Runnable {
+    private abstract class C0730c implements Runnable {
         /* renamed from: f */
         final /* synthetic */ UnityPlayer f380f;
 
-        private C0731c(UnityPlayer unityPlayer) {
+        private C0730c(UnityPlayer unityPlayer) {
             this.f380f = unityPlayer;
         }
 
@@ -137,11 +137,11 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     }
 
     /* renamed from: com.unity3d.player.UnityPlayer$1 */
-    final class C07331 implements OnClickListener {
+    final class C07321 implements OnClickListener {
         /* renamed from: a */
         final /* synthetic */ UnityPlayer f408a;
 
-        C07331(UnityPlayer unityPlayer) {
+        C07321(UnityPlayer unityPlayer) {
             this.f408a = unityPlayer;
         }
 
@@ -151,11 +151,11 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     }
 
     /* renamed from: com.unity3d.player.UnityPlayer$2 */
-    final class C07342 implements Runnable {
+    final class C07332 implements Runnable {
         /* renamed from: a */
         final /* synthetic */ UnityPlayer f411a;
 
-        C07342(UnityPlayer unityPlayer) {
+        C07332(UnityPlayer unityPlayer) {
             this.f411a = unityPlayer;
         }
 
@@ -175,7 +175,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     }
 
     /* renamed from: com.unity3d.player.UnityPlayer$3 */
-    class C07353 extends BroadcastReceiver {
+    class C07343 extends BroadcastReceiver {
         /* renamed from: a */
         final /* synthetic */ UnityPlayer f412a;
 
@@ -185,11 +185,11 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     }
 
     /* renamed from: com.unity3d.player.UnityPlayer$4 */
-    final class C07364 implements Runnable {
+    final class C07354 implements Runnable {
         /* renamed from: a */
         final /* synthetic */ UnityPlayer f413a;
 
-        C07364(UnityPlayer unityPlayer) {
+        C07354(UnityPlayer unityPlayer) {
             this.f413a = unityPlayer;
         }
 
@@ -203,11 +203,11 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     }
 
     /* renamed from: com.unity3d.player.UnityPlayer$7 */
-    final class C07397 implements Runnable {
+    final class C07387 implements Runnable {
         /* renamed from: a */
         final /* synthetic */ UnityPlayer f425a;
 
-        C07397(UnityPlayer unityPlayer) {
+        C07387(UnityPlayer unityPlayer) {
             this.f425a = unityPlayer;
         }
 
@@ -220,7 +220,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     }
 
     /* renamed from: com.unity3d.player.UnityPlayer$a */
-    enum C0742a {
+    enum C0741a {
         PAUSE,
         RESUME,
         QUIT,
@@ -229,7 +229,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     }
 
     /* renamed from: com.unity3d.player.UnityPlayer$b */
-    private final class C0743b extends Thread {
+    private final class C0742b extends Thread {
         /* renamed from: a */
         ArrayBlockingQueue f436a = new ArrayBlockingQueue(32);
         /* renamed from: b */
@@ -237,14 +237,14 @@ public class UnityPlayer extends FrameLayout implements C0744a {
         /* renamed from: c */
         final /* synthetic */ UnityPlayer f438c;
 
-        C0743b(UnityPlayer unityPlayer) {
+        C0742b(UnityPlayer unityPlayer) {
             this.f438c = unityPlayer;
         }
 
         /* renamed from: a */
-        private void m410a(C0742a c0742a) {
+        private void m410a(C0741a c0741a) {
             try {
-                this.f436a.put(c0742a);
+                this.f436a.put(c0741a);
             } catch (InterruptedException e) {
                 interrupt();
             }
@@ -252,36 +252,36 @@ public class UnityPlayer extends FrameLayout implements C0744a {
 
         /* renamed from: a */
         public final void m411a() {
-            m410a(C0742a.QUIT);
+            m410a(C0741a.QUIT);
         }
 
         /* renamed from: a */
         public final void m412a(boolean z) {
-            m410a(z ? C0742a.FOCUS_GAINED : C0742a.FOCUS_LOST);
+            m410a(z ? C0741a.FOCUS_GAINED : C0741a.FOCUS_LOST);
         }
 
         /* renamed from: b */
         public final void m413b() {
-            m410a(C0742a.RESUME);
+            m410a(C0741a.RESUME);
         }
 
         /* renamed from: c */
         public final void m414c() {
-            m410a(C0742a.PAUSE);
+            m410a(C0741a.PAUSE);
         }
 
         public final void run() {
             setName("UnityMain");
             while (true) {
                 try {
-                    C0742a c0742a = (C0742a) this.f436a.take();
-                    if (c0742a != C0742a.QUIT) {
-                        if (c0742a == C0742a.RESUME) {
+                    C0741a c0741a = (C0741a) this.f436a.take();
+                    if (c0741a != C0741a.QUIT) {
+                        if (c0741a == C0741a.RESUME) {
                             this.f437b = true;
-                        } else if (c0742a == C0742a.PAUSE) {
+                        } else if (c0741a == C0741a.PAUSE) {
                             this.f437b = false;
                             this.f438c.executeGLThreadJobs();
-                        } else if (c0742a == C0742a.FOCUS_LOST && !this.f437b) {
+                        } else if (c0741a == C0741a.FOCUS_LOST && !this.f437b) {
                             this.f438c.executeGLThreadJobs();
                         }
                         if (this.f437b) {
@@ -292,7 +292,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
                                 } else if (!(this.f438c.isFinishing() || this.f438c.nativeRender())) {
                                     this.f438c.m429b();
                                 }
-                            } while (!C0743b.interrupted());
+                            } while (!C0742b.interrupted());
                         }
                     } else {
                         return;
@@ -305,7 +305,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     }
 
     static {
-        new C0781u().m542a();
+        new C0780u().m542a();
         f440p = false;
         f440p = loadLibraryStatic("main");
     }
@@ -315,17 +315,17 @@ public class UnityPlayer extends FrameLayout implements C0744a {
         if (contextWrapper instanceof Activity) {
             currentActivity = (Activity) contextWrapper;
         }
-        this.f450g = new C0780t(this);
+        this.f450g = new C0779t(this);
         this.f456m = contextWrapper;
-        this.f449f = contextWrapper instanceof Activity ? new C0773p(contextWrapper) : null;
-        this.f463u = new C0775r(contextWrapper, this);
+        this.f449f = contextWrapper instanceof Activity ? new C0772p(contextWrapper) : null;
+        this.f463u = new C0774r(contextWrapper, this);
         m418a();
-        if (C0774q.f535a) {
-            C0774q.f543i.mo4194a((View) this);
+        if (C0773q.f535a) {
+            C0773q.f543i.mo4194a((View) this);
         }
         setFullscreen(true);
         m420a(this.f456m.getApplicationInfo());
-        if (C0782v.m545c()) {
+        if (C0781v.m545c()) {
             nativeFile(this.f456m.getPackageCodePath());
             m447j();
             this.f457n = new SurfaceView(contextWrapper);
@@ -358,20 +358,20 @@ public class UnityPlayer extends FrameLayout implements C0744a {
             initJni(contextWrapper);
             nativeInitWWW(WWW.class);
             nativeInitWebRequest(UnityWebRequest.class);
-            if (C0774q.f539e) {
-                C0774q.f546l.mo4199a(this, this.f456m);
+            if (C0773q.f539e) {
+                C0773q.f546l.mo4199a(this, this.f456m);
             }
-            if (C0774q.f542h && currentActivity != null) {
-                C0774q.f547m.mo4203a(currentActivity, new Runnable(this) {
+            if (C0773q.f542h && currentActivity != null) {
+                C0773q.f547m.mo4203a(currentActivity, new Runnable(this) {
                     /* renamed from: a */
                     final /* synthetic */ UnityPlayer f401a;
 
                     /* renamed from: com.unity3d.player.UnityPlayer$15$1 */
-                    final class C07321 implements Runnable {
+                    final class C07311 implements Runnable {
                         /* renamed from: a */
                         final /* synthetic */ AnonymousClass15 f400a;
 
-                        C07321(AnonymousClass15 anonymousClass15) {
+                        C07311(AnonymousClass15 anonymousClass15) {
                             this.f400a = anonymousClass15;
                         }
 
@@ -386,19 +386,19 @@ public class UnityPlayer extends FrameLayout implements C0744a {
                     }
 
                     public final void run() {
-                        this.f401a.m457b(new C07321(this));
+                        this.f401a.m457b(new C07311(this));
                     }
                 });
             }
-            if (C0774q.f538d) {
-                C0774q.f545k.mo4202a(this);
+            if (C0773q.f538d) {
+                C0773q.f545k.mo4202a(this);
             }
             this.f458o = (WindowManager) this.f456m.getSystemService("window");
             m449k();
             this.f444a.start();
             return;
         }
-        AlertDialog create = new Builder(this.f456m).setTitle("Failure to initialize!").setPositiveButton("OK", new C07331(this)).setMessage("Your hardware does not support this application, sorry!").create();
+        AlertDialog create = new Builder(this.f456m).setTitle("Failure to initialize!").setPositiveButton("OK", new C07321(this)).setMessage("Your hardware does not support this application, sorry!").create();
         create.setCancelable(false);
         create.show();
     }
@@ -472,7 +472,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
                 }
             }
         } catch (Exception e) {
-            C0768m.Log(6, "Unable to locate player settings. " + e.getLocalizedMessage());
+            C0767m.Log(6, "Unable to locate player settings. " + e.getLocalizedMessage());
             m429b();
         }
     }
@@ -487,14 +487,14 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     /* renamed from: a */
     private static void m420a(ApplicationInfo applicationInfo) {
         if (f440p && NativeLoader.load(applicationInfo.nativeLibraryDir)) {
-            C0782v.m543a();
+            C0781v.m543a();
         }
     }
 
     /* renamed from: a */
-    private void m421a(C0731c c0731c) {
+    private void m421a(C0730c c0730c) {
         if (!isFinishing()) {
-            m434c((Runnable) c0731c);
+            m434c((Runnable) c0730c);
         }
     }
 
@@ -543,7 +543,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
 
     /* renamed from: b */
     private boolean m431b(int i, Surface surface) {
-        if (!C0782v.m545c()) {
+        if (!C0781v.m545c()) {
             return false;
         }
         nativeRecreateGfxState(i, surface);
@@ -552,9 +552,9 @@ public class UnityPlayer extends FrameLayout implements C0744a {
 
     /* renamed from: c */
     private void m433c() {
-        C0771o c0771o = new C0771o((Activity) this.f456m);
+        C0770o c0770o = new C0770o((Activity) this.f456m);
         if (this.f456m instanceof NativeActivity) {
-            boolean a = c0771o.m509a();
+            boolean a = c0770o.m509a();
             this.f455l = a;
             nativeForwardEventsToDalvik(a);
         }
@@ -562,7 +562,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
 
     /* renamed from: c */
     private void m434c(Runnable runnable) {
-        if (!C0782v.m545c()) {
+        if (!C0781v.m545c()) {
             return;
         }
         if (Thread.currentThread() == this.f444a) {
@@ -574,19 +574,19 @@ public class UnityPlayer extends FrameLayout implements C0744a {
 
     /* renamed from: d */
     private void m435d() {
-        for (C0748a c : this.f467y) {
+        for (C0747a c : this.f467y) {
             c.m474c();
         }
     }
 
     /* renamed from: e */
     private void m437e() {
-        for (C0748a c0748a : this.f467y) {
+        for (C0747a c0747a : this.f467y) {
             try {
-                c0748a.m471a((C0744a) this);
+                c0747a.m471a((C0743a) this);
             } catch (Exception e) {
-                C0768m.Log(6, "Unable to initialize camera: " + e.getMessage());
-                c0748a.m474c();
+                C0767m.Log(6, "Unable to initialize camera: " + e.getMessage());
+                c0747a.m474c();
             }
         }
     }
@@ -610,7 +610,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
         this.f463u.m526e();
         this.f464v = null;
         this.f465w = null;
-        if (C0782v.m545c()) {
+        if (C0781v.m545c()) {
             m447j();
         }
         m434c(new Runnable(this) {
@@ -630,10 +630,10 @@ public class UnityPlayer extends FrameLayout implements C0744a {
 
     /* renamed from: h */
     private static void m443h() {
-        if (C0782v.m545c()) {
+        if (C0781v.m545c()) {
             lockNativeAccess();
             if (NativeLoader.unload()) {
-                C0782v.m544b();
+                C0781v.m544b();
                 unlockNativeAccess();
                 return;
             }
@@ -672,10 +672,10 @@ public class UnityPlayer extends FrameLayout implements C0744a {
             System.loadLibrary(str);
             return true;
         } catch (UnsatisfiedLinkError e) {
-            C0768m.Log(6, "Unable to find " + str);
+            C0767m.Log(6, "Unable to find " + str);
             return false;
         } catch (Exception e2) {
-            C0768m.Log(6, "Unknown error " + e2);
+            C0767m.Log(6, "Unknown error " + e2);
             return false;
         }
     }
@@ -747,15 +747,15 @@ public class UnityPlayer extends FrameLayout implements C0744a {
         if (this.f456m instanceof Activity) {
             ((Activity) this.f456m).runOnUiThread(runnable);
         } else {
-            C0768m.Log(5, "Not running Unity from an Activity; ignored...");
+            C0767m.Log(5, "Not running Unity from an Activity; ignored...");
         }
     }
 
     protected void closeCamera(int i) {
-        for (C0748a c0748a : this.f467y) {
-            if (c0748a.m470a() == i) {
-                c0748a.m474c();
-                this.f467y.remove(c0748a);
+        for (C0747a c0747a : this.f467y) {
+            if (c0747a.m470a() == i) {
+                c0747a.m474c();
+                this.f467y.remove(c0747a);
                 return;
             }
         }
@@ -771,7 +771,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     }
 
     protected void disableLogger() {
-        C0768m.f525a = true;
+        C0767m.f525a = true;
     }
 
     public boolean displayChanged(int i, Surface surface) {
@@ -835,19 +835,19 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     }
 
     protected void hideSoftInput() {
-        final Runnable c07397 = new C07397(this);
-        if (C0774q.f541g) {
-            m421a(new C0731c(this) {
+        final Runnable c07387 = new C07387(this);
+        if (C0773q.f541g) {
+            m421a(new C0730c(this) {
                 /* renamed from: b */
                 final /* synthetic */ UnityPlayer f427b;
 
                 /* renamed from: a */
                 public final void mo4190a() {
-                    this.f427b.m457b(c07397);
+                    this.f427b.m457b(c07387);
                 }
             });
         } else {
-            m457b(c07397);
+            m457b(c07387);
         }
     }
 
@@ -875,15 +875,15 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     }
 
     protected int[] initCamera(int i, int i2, int i3, int i4) {
-        C0748a c0748a = new C0748a(i, i2, i3, i4);
+        C0747a c0747a = new C0747a(i, i2, i3, i4);
         try {
-            c0748a.m471a((C0744a) this);
-            this.f467y.add(c0748a);
-            Size b = c0748a.m473b();
+            c0747a.m471a((C0743a) this);
+            this.f467y.add(c0747a);
+            Size b = c0747a.m473b();
             return new int[]{b.width, b.height};
         } catch (Exception e) {
-            C0768m.Log(6, "Unable to initialize camera: " + e.getMessage());
-            c0748a.m474c();
+            C0767m.Log(6, "Unable to initialize camera: " + e.getMessage());
+            c0747a.m474c();
             return null;
         }
     }
@@ -893,7 +893,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     }
 
     protected boolean installPresentationDisplay(int i) {
-        return C0774q.f539e ? C0774q.f546l.mo4200a(this, this.f456m, i) : false;
+        return C0773q.f539e ? C0773q.f546l.mo4200a(this, this.f456m, i) : false;
     }
 
     protected boolean isCameraFrontFacing(int i) {
@@ -929,19 +929,19 @@ public class UnityPlayer extends FrameLayout implements C0744a {
 
     protected native void nativeSetLocationStatus(int i);
 
-    public void onCameraFrame(C0748a c0748a, byte[] bArr) {
-        final int a = c0748a.m470a();
-        final Size b = c0748a.m473b();
+    public void onCameraFrame(C0747a c0747a, byte[] bArr) {
+        final int a = c0747a.m470a();
+        final Size b = c0747a.m473b();
         final byte[] bArr2 = bArr;
-        final C0748a c0748a2 = c0748a;
-        m421a(new C0731c(this) {
+        final C0747a c0747a2 = c0747a;
+        m421a(new C0730c(this) {
             /* renamed from: e */
             final /* synthetic */ UnityPlayer f389e;
 
             /* renamed from: a */
             public final void mo4190a() {
                 this.f389e.nativeVideoFrameCallback(a, bArr2, b.width, b.height);
-                c0748a2.m472a(bArr2);
+                c0747a2.m472a(bArr2);
             }
         });
     }
@@ -973,7 +973,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
         }
         reportSoftInputStr(null, 1, true);
         if (this.f452i.m552g()) {
-            if (C0782v.m545c()) {
+            if (C0781v.m545c()) {
                 final Semaphore semaphore = new Semaphore(0);
                 if (isFinishing()) {
                     m434c(new Runnable(this) {
@@ -1003,10 +1003,10 @@ public class UnityPlayer extends FrameLayout implements C0744a {
                 }
                 try {
                     if (!semaphore.tryAcquire(4, TimeUnit.SECONDS)) {
-                        C0768m.Log(5, "Timeout while trying to pause the Unity Engine.");
+                        C0767m.Log(5, "Timeout while trying to pause the Unity Engine.");
                     }
                 } catch (InterruptedException e) {
-                    C0768m.Log(5, "UI thread got interrupted while trying to pause the Unity Engine.");
+                    C0767m.Log(5, "UI thread got interrupted while trying to pause the Unity Engine.");
                 }
                 if (semaphore.drainPermits() > 0) {
                     quit();
@@ -1035,14 +1035,14 @@ public class UnityPlayer extends FrameLayout implements C0744a {
             this.f456m.unregisterReceiver(this.f454k);
         }
         this.f454k = null;
-        if (C0782v.m545c()) {
+        if (C0781v.m545c()) {
             removeAllViews();
         }
-        if (C0774q.f539e) {
-            C0774q.f546l.mo4198a(this.f456m);
+        if (C0773q.f539e) {
+            C0773q.f546l.mo4198a(this.f456m);
         }
-        if (C0774q.f538d) {
-            C0774q.f545k.mo4201a();
+        if (C0773q.f538d) {
+            C0773q.f545k.mo4201a();
         }
         kill();
         m443h();
@@ -1052,7 +1052,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
         if (i == 1) {
             hideSoftInput();
         }
-        m421a(new C0731c(this) {
+        m421a(new C0730c(this) {
             /* renamed from: d */
             final /* synthetic */ UnityPlayer f384d;
 
@@ -1071,8 +1071,8 @@ public class UnityPlayer extends FrameLayout implements C0744a {
     }
 
     public void resume() {
-        if (C0774q.f535a) {
-            C0774q.f543i.mo4197b(this);
+        if (C0773q.f535a) {
+            C0773q.f543i.mo4197b(this);
         }
         this.f452i.m547b(false);
         m442g();
@@ -1080,13 +1080,13 @@ public class UnityPlayer extends FrameLayout implements C0744a {
 
     protected void setFullscreen(final boolean z) {
         this.f448e = z;
-        if (C0774q.f535a) {
+        if (C0773q.f535a) {
             m457b(new Runnable(this) {
                 /* renamed from: b */
                 final /* synthetic */ UnityPlayer f415b;
 
                 public final void run() {
-                    C0774q.f543i.mo4195a(this.f415b, z);
+                    C0773q.f543i.mo4195a(this.f415b, z);
                 }
             });
         }
@@ -1119,7 +1119,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
             final /* synthetic */ UnityPlayer f424i;
 
             public final void run() {
-                this.f424i.f445b = new C0779s(this.f424i.f456m, unityPlayer, str3, i2, z5, z6, z7, str4);
+                this.f424i.f445b = new C0778s(this.f424i.f456m, unityPlayer, str3, i2, z5, z6, z7, str4);
                 this.f424i.f445b.show();
             }
         });
@@ -1140,7 +1140,7 @@ public class UnityPlayer extends FrameLayout implements C0744a {
             public final void run() {
                 if (this.f397h.f468z == null) {
                     this.f397h.pause();
-                    this.f397h.f468z = new C0784w(this.f397h, this.f397h.f456m, str2, i6, i7, i8, z2, (long) i9, (long) i10);
+                    this.f397h.f468z = new C0783w(this.f397h, this.f397h.f456m, str2, i6, i7, i8, z2, (long) i9, (long) i10);
                     this.f397h.addView(this.f397h.f468z);
                     this.f397h.f468z.requestFocus();
                     this.f397h.f450g.m541d(this.f397h.f457n);
@@ -1162,8 +1162,8 @@ public class UnityPlayer extends FrameLayout implements C0744a {
         if (z && this.f445b != null) {
             reportSoftInputStr(null, 1, false);
         }
-        if (C0774q.f535a && z) {
-            C0774q.f543i.mo4197b(this);
+        if (C0773q.f535a && z) {
+            C0773q.f543i.mo4197b(this);
         }
         m434c(new Runnable(this) {
             /* renamed from: b */

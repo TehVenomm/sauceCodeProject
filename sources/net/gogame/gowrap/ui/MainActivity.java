@@ -11,7 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import java.util.List;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.GoWrapImpl;
 import net.gogame.gowrap.integrations.core.Wrapper;
@@ -27,10 +27,10 @@ public class MainActivity extends AbstractMainActivity {
     private ProgressBar progressIndicator;
 
     /* renamed from: net.gogame.gowrap.ui.MainActivity$1 */
-    class C11261 implements OnClickListener {
+    class C14421 implements OnClickListener {
         private int clicks = 0;
 
-        C11261() {
+        C14421() {
         }
 
         public void onClick(View view) {
@@ -42,8 +42,8 @@ public class MainActivity extends AbstractMainActivity {
     }
 
     /* renamed from: net.gogame.gowrap.ui.MainActivity$2 */
-    class C11272 implements OnClickListener {
-        C11272() {
+    class C14432 implements OnClickListener {
+        C14432() {
         }
 
         public void onClick(View view) {
@@ -52,8 +52,8 @@ public class MainActivity extends AbstractMainActivity {
     }
 
     /* renamed from: net.gogame.gowrap.ui.MainActivity$3 */
-    class C11283 implements OnClickListener {
-        C11283() {
+    class C14443 implements OnClickListener {
+        C14443() {
         }
 
         public void onClick(View view) {
@@ -62,8 +62,8 @@ public class MainActivity extends AbstractMainActivity {
     }
 
     /* renamed from: net.gogame.gowrap.ui.MainActivity$4 */
-    class C11294 implements OnClickListener {
-        C11294() {
+    class C14454 implements OnClickListener {
+        C14454() {
         }
 
         public void onClick(View view) {
@@ -72,8 +72,8 @@ public class MainActivity extends AbstractMainActivity {
     }
 
     /* renamed from: net.gogame.gowrap.ui.MainActivity$5 */
-    class C11305 implements OnClickListener {
-        C11305() {
+    class C14465 implements OnClickListener {
+        C14465() {
         }
 
         public void onClick(View view) {
@@ -84,8 +84,8 @@ public class MainActivity extends AbstractMainActivity {
     }
 
     /* renamed from: net.gogame.gowrap.ui.MainActivity$6 */
-    class C11316 implements OnClickListener {
-        C11316() {
+    class C14476 implements OnClickListener {
+        C14476() {
         }
 
         public void onClick(View view) {
@@ -96,8 +96,8 @@ public class MainActivity extends AbstractMainActivity {
     }
 
     /* renamed from: net.gogame.gowrap.ui.MainActivity$7 */
-    class C11327 implements OnClickListener {
-        C11327() {
+    class C14487 implements OnClickListener {
+        C14487() {
         }
 
         public void onClick(View view) {
@@ -108,8 +108,8 @@ public class MainActivity extends AbstractMainActivity {
     }
 
     /* renamed from: net.gogame.gowrap.ui.MainActivity$8 */
-    class C11338 implements OnClickListener {
-        C11338() {
+    class C14498 implements OnClickListener {
+        C14498() {
         }
 
         public void onClick(View view) {
@@ -120,8 +120,8 @@ public class MainActivity extends AbstractMainActivity {
     }
 
     /* renamed from: net.gogame.gowrap.ui.MainActivity$9 */
-    class C11349 implements OnClickListener {
-        C11349() {
+    class C14509 implements OnClickListener {
+        C14509() {
         }
 
         public void onClick(View view) {
@@ -131,28 +131,28 @@ public class MainActivity extends AbstractMainActivity {
 
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        setContentView(C1110R.layout.net_gogame_gowrap_main_ui);
-        this.navbar = findViewById(C1110R.id.net_gogame_gowrap_navbar);
-        this.navbar.setOnClickListener(new C11261());
-        findViewById(C1110R.id.net_gogame_gowrap_back_button).setOnClickListener(new C11272());
-        findViewById(C1110R.id.net_gogame_gowrap_info_button).setOnClickListener(new C11283());
-        View findViewById = findViewById(C1110R.id.net_gogame_gowrap_language_button);
-        findViewById.setOnClickListener(new C11294());
+        setContentView(C1426R.layout.net_gogame_gowrap_main_ui);
+        this.navbar = findViewById(C1426R.id.net_gogame_gowrap_navbar);
+        this.navbar.setOnClickListener(new C14421());
+        findViewById(C1426R.id.net_gogame_gowrap_back_button).setOnClickListener(new C14432());
+        findViewById(C1426R.id.net_gogame_gowrap_info_button).setOnClickListener(new C14443());
+        View findViewById = findViewById(C1426R.id.net_gogame_gowrap_language_button);
+        findViewById.setOnClickListener(new C14454());
         if (canShowLanguageMenu()) {
             findViewById.setVisibility(0);
         } else {
             findViewById.setVisibility(8);
         }
-        findViewById(C1110R.id.net_gogame_gowrap_community_button).setOnClickListener(new C11305());
-        findViewById(C1110R.id.net_gogame_gowrap_help_button).setOnClickListener(new C11316());
-        findViewById(C1110R.id.net_gogame_gowrap_contact_button).setOnClickListener(new C11327());
-        findViewById(C1110R.id.net_gogame_gowrap_offers_button).setOnClickListener(new C11338());
-        findViewById(C1110R.id.net_gogame_gowrap_close_button).setOnClickListener(new C11349());
+        findViewById(C1426R.id.net_gogame_gowrap_community_button).setOnClickListener(new C14465());
+        findViewById(C1426R.id.net_gogame_gowrap_help_button).setOnClickListener(new C14476());
+        findViewById(C1426R.id.net_gogame_gowrap_contact_button).setOnClickListener(new C14487());
+        findViewById(C1426R.id.net_gogame_gowrap_offers_button).setOnClickListener(new C14498());
+        findViewById(C1426R.id.net_gogame_gowrap_close_button).setOnClickListener(new C14509());
         showInitialFragment();
     }
 
     protected int getFragmentContainerViewId() {
-        return C1110R.id.net_gogame_gowrap_main_fragment_container;
+        return C1426R.id.net_gogame_gowrap_main_fragment_container;
     }
 
     protected void onEnterFullscreen() {
@@ -165,7 +165,7 @@ public class MainActivity extends AbstractMainActivity {
 
     protected void enableOffers() {
         Log.v(Constants.TAG, "Offers enabled");
-        findViewById(C1110R.id.net_gogame_gowrap_offers_button).setVisibility(0);
+        findViewById(C1426R.id.net_gogame_gowrap_offers_button).setVisibility(0);
     }
 
     public String getGuid() {
@@ -196,14 +196,14 @@ public class MainActivity extends AbstractMainActivity {
                 i++;
             }
             i = -1;
-            final Object arrayAdapter = new ArrayAdapter(this, C1110R.layout.net_gogame_gowrap_default_listview_item, C1110R.id.net_gogame_gowrap_text_view, this.localeManager.getSupportedLocaleDescriptors());
-            View inflate = getLayoutInflater().inflate(C1110R.layout.net_gogame_gowrap_default_listview, null, false);
-            ListView listView = (ListView) inflate.findViewById(C1110R.id.net_gogame_gowrap_list_view);
+            final Object arrayAdapter = new ArrayAdapter(this, C1426R.layout.net_gogame_gowrap_default_listview_item, C1426R.id.net_gogame_gowrap_text_view, this.localeManager.getSupportedLocaleDescriptors());
+            View inflate = getLayoutInflater().inflate(C1426R.layout.net_gogame_gowrap_default_listview, null, false);
+            ListView listView = (ListView) inflate.findViewById(C1426R.id.net_gogame_gowrap_list_view);
             listView.setAdapter(arrayAdapter);
             if (i >= 0) {
                 listView.setItemChecked(i, true);
             }
-            final Dialog dialog = new Dialog(this, C1110R.style.net_gogame_gowrap_dialog);
+            final Dialog dialog = new Dialog(this, C1426R.style.net_gogame_gowrap_dialog);
             dialog.setCanceledOnTouchOutside(true);
             dialog.setContentView(inflate);
             listView.setOnItemClickListener(new OnItemClickListener() {

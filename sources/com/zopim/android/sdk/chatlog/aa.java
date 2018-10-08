@@ -4,7 +4,7 @@ class aa<T extends aa> implements Comparable<aa> {
     /* renamed from: g */
     public String f743g;
     /* renamed from: h */
-    public C0834a f744h = C0834a.UNKNOWN;
+    public C0833a f744h = C0833a.UNKNOWN;
     /* renamed from: i */
     public String f745i;
     /* renamed from: j */
@@ -15,7 +15,7 @@ class aa<T extends aa> implements Comparable<aa> {
     public Long f748l;
 
     /* renamed from: com.zopim.android.sdk.chatlog.aa$a */
-    enum C0834a {
+    enum C0833a {
         UNKNOWN(-1),
         VISITOR(0),
         AGENT(1),
@@ -28,15 +28,15 @@ class aa<T extends aa> implements Comparable<aa> {
         /* renamed from: i */
         final int f764i;
 
-        private C0834a(int i) {
+        private C0833a(int i) {
             this.f764i = i;
         }
 
         /* renamed from: a */
-        static C0834a m671a(int i) {
-            for (C0834a c0834a : C0834a.values()) {
-                if (c0834a.m672a() == i) {
-                    return c0834a;
+        static C0833a m671a(int i) {
+            for (C0833a c0833a : C0833a.values()) {
+                if (c0833a.m672a() == i) {
+                    return c0833a;
                 }
             }
             return UNKNOWN;
@@ -61,7 +61,7 @@ class aa<T extends aa> implements Comparable<aa> {
     }
 
     /* renamed from: a */
-    public void mo4242a(T t) {
+    public void mo4244a(T t) {
         this.f743g = t.f743g;
         this.f744h = t.f744h;
         this.f745i = t.f745i;

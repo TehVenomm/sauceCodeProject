@@ -31,7 +31,7 @@ class AdvertisingInfoServiceStrategy implements AdvertisingInfoStrategy {
 
         public IBinder getBinder() {
             if (this.retrieved) {
-                Fabric.getLogger().mo4291e("Fabric", "getBinder already called");
+                Fabric.getLogger().mo4755e("Fabric", "getBinder already called");
             }
             this.retrieved = true;
             try {
@@ -78,7 +78,7 @@ class AdvertisingInfoServiceStrategy implements AdvertisingInfoStrategy {
                 obtain2.readException();
                 str = obtain2.readString();
             } catch (Exception e) {
-                Fabric.getLogger().mo4289d("Fabric", "Could not get parcel from Google Play Service to capture AdvertisingId");
+                Fabric.getLogger().mo4753d("Fabric", "Could not get parcel from Google Play Service to capture AdvertisingId");
             } finally {
                 obtain2.recycle();
                 obtain.recycle();
@@ -102,7 +102,7 @@ Error: java.lang.NullPointerException
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1731295355.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
 */
             /*
             r7 = this;
@@ -134,7 +134,7 @@ Error: java.lang.NullPointerException
             r0 = io.fabric.sdk.android.Fabric.getLogger();	 Catch:{ Exception -> 0x002c, all -> 0x0040 }
             r4 = "Fabric";	 Catch:{ Exception -> 0x002c, all -> 0x0040 }
             r5 = "Could not get parcel from Google Play Service to capture Advertising limitAdTracking";	 Catch:{ Exception -> 0x002c, all -> 0x0040 }
-            r0.mo4289d(r4, r5);	 Catch:{ Exception -> 0x002c, all -> 0x0040 }
+            r0.mo4753d(r4, r5);	 Catch:{ Exception -> 0x002c, all -> 0x0040 }
             r3.recycle();
             r2.recycle();
             r0 = r1;
@@ -155,7 +155,7 @@ Error: java.lang.NullPointerException
 
     public AdvertisingInfo getAdvertisingInfo() {
         if (Looper.myLooper() == Looper.getMainLooper()) {
-            Fabric.getLogger().mo4289d("Fabric", "AdvertisingInfoServiceStrategy cannot be called on the main thread");
+            Fabric.getLogger().mo4753d("Fabric", "AdvertisingInfoServiceStrategy cannot be called on the main thread");
             return null;
         }
         try {
@@ -170,18 +170,18 @@ Error: java.lang.NullPointerException
                     this.context.unbindService(advertisingConnection);
                     return advertisingInfo;
                 }
-                Fabric.getLogger().mo4289d("Fabric", "Could not bind to Google Play Service to capture AdvertisingId");
+                Fabric.getLogger().mo4753d("Fabric", "Could not bind to Google Play Service to capture AdvertisingId");
                 return null;
             } catch (Throwable e) {
-                Fabric.getLogger().mo4303w("Fabric", "Exception in binding to Google Play Service to capture AdvertisingId", e);
+                Fabric.getLogger().mo4767w("Fabric", "Exception in binding to Google Play Service to capture AdvertisingId", e);
                 this.context.unbindService(advertisingConnection);
                 return null;
             } catch (Throwable e2) {
-                Fabric.getLogger().mo4290d("Fabric", "Could not bind to Google Play Service to capture AdvertisingId", e2);
+                Fabric.getLogger().mo4754d("Fabric", "Could not bind to Google Play Service to capture AdvertisingId", e2);
                 return null;
             }
         } catch (Throwable e22) {
-            Fabric.getLogger().mo4290d("Fabric", "Unable to determine if Google Play Services is available", e22);
+            Fabric.getLogger().mo4754d("Fabric", "Unable to determine if Google Play Services is available", e22);
             return null;
         }
     }

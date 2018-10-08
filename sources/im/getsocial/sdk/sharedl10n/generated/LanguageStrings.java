@@ -1,0 +1,44 @@
+package im.getsocial.sdk.sharedl10n.generated;
+
+public class LanguageStrings {
+    public String ActivityAllNoActivitiesPlaceholderMessage = "";
+    public String ActivityAllNoActivitiesPlaceholderTitle = "";
+    public String ActivityNoSearchResultsPlaceholderTitle = "";
+    public String ActivityNotFound = "";
+    public String ActivityPostPlaceholder = "";
+    public String ActivityTitle = "";
+    public String CancelButton = "";
+    public String CommentsMoreCommentsButton = "";
+    public String CommentsPostPlaceholder = "";
+    public String CommentsTitle = "";
+    public String ConnectionLostMessage = "";
+    public String ConnectionLostTitle = "";
+    public String DeleteActivity = "";
+    public String DeleteComment = "";
+    public String ErrorAlertMessage = "";
+    public String ErrorAlertMessageTitle = "";
+    public String ErrorYoureBanned = "";
+    public String InviteFriends = "";
+    public String OkButton = "";
+    public String PullDownToRefresh = "";
+    public String PullUpToLoadMore = "";
+    public String ReleaseToLoadMore = "";
+    public String ReleaseToRefresh = "";
+    public String ReportAsInappropriate = "";
+    public String ReportAsSpam = "";
+    public String ReportNotificationText = "";
+    public String ReportNotificationTitle = "";
+    public String TimestampDays = "";
+    public String TimestampHours = "";
+    public String TimestampJustNow = "";
+    public String TimestampMinutes = "";
+    public String TimestampSeconds = "";
+    public String TimestampWeeks = "";
+    public String TimestampYesterday = "";
+    public String ViewCommentLink = "";
+    public String ViewComments2Link = "";
+    public String ViewCommentsLink = "";
+    public String ViewLikeLink = "";
+    public String ViewLikes2Link = "";
+    public String ViewLikesLink = "";
+}

@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import com.facebook.share.internal.ShareConstants;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import com.zopim.android.sdk.api.ZopimChat.SessionConfig;
 import net.gogame.chat.BaseActivity;
 import net.gogame.chat.ChatAdapter;
@@ -35,11 +35,11 @@ public class ZopimMainActivity extends BaseActivity {
     private static final String EXTRA_ZOPIM_SESSIONCONFIG = "zopim.sessionConfig";
     private ChatAdapter chatAdapter;
     private MultiChatContext multiChatContext;
-    private final UIContext uiContext = new C12511();
+    private final UIContext uiContext = new C15671();
 
     /* renamed from: net.gogame.zopim.client.base.ZopimMainActivity$1 */
-    class C12511 implements UIContext {
-        C12511() {
+    class C15671 implements UIContext {
+        C15671() {
         }
 
         public void showImage(String str) {
@@ -62,18 +62,18 @@ public class ZopimMainActivity extends BaseActivity {
     }
 
     /* renamed from: net.gogame.zopim.client.base.ZopimMainActivity$3 */
-    class C12533 implements OnClickListener {
-        C12533() {
+    class C15693 implements OnClickListener {
+        C15693() {
         }
 
         public void onClick(View view) {
-            new Builder(ZopimMainActivity.this).setTitle(C0785R.string.net_gogame_chat_title).setMessage(C0785R.string.net_gogame_chat_vip_only_message).show();
+            new Builder(ZopimMainActivity.this).setTitle(C0784R.string.net_gogame_chat_title).setMessage(C0784R.string.net_gogame_chat_vip_only_message).show();
         }
     }
 
     /* renamed from: net.gogame.zopim.client.base.ZopimMainActivity$5 */
-    class C12555 implements OnClickListener {
-        C12555() {
+    class C15715 implements OnClickListener {
+        C15715() {
         }
 
         public void onClick(View view) {
@@ -82,8 +82,8 @@ public class ZopimMainActivity extends BaseActivity {
     }
 
     /* renamed from: net.gogame.zopim.client.base.ZopimMainActivity$6 */
-    class C12566 implements OnClickListener {
-        C12566() {
+    class C15726 implements OnClickListener {
+        C15726() {
         }
 
         public void onClick(View view) {
@@ -92,8 +92,8 @@ public class ZopimMainActivity extends BaseActivity {
     }
 
     /* renamed from: net.gogame.zopim.client.base.ZopimMainActivity$7 */
-    class C12577 implements DialogInterface.OnClickListener {
-        C12577() {
+    class C15737 implements DialogInterface.OnClickListener {
+        C15737() {
         }
 
         public void onClick(DialogInterface dialogInterface, int i) {
@@ -102,8 +102,8 @@ public class ZopimMainActivity extends BaseActivity {
     }
 
     /* renamed from: net.gogame.zopim.client.base.ZopimMainActivity$8 */
-    class C12588 implements DialogInterface.OnClickListener {
-        C12588() {
+    class C15748 implements DialogInterface.OnClickListener {
+        C15748() {
         }
 
         public void onClick(DialogInterface dialogInterface, int i) {
@@ -132,14 +132,14 @@ public class ZopimMainActivity extends BaseActivity {
         requestWindowFeature(1);
         setFinishOnTouchOutside(false);
         setTitle(null);
-        setContentView(C0785R.layout.net_gogame_chat_activity_main);
+        setContentView(C0784R.layout.net_gogame_chat_activity_main);
         ChatBotConfig chatBotConfig = (ChatBotConfig) getIntent().getSerializableExtra(EXTRA_CHATBOT_CONFIG);
         final SessionConfig sessionConfig = (SessionConfig) getIntent().getSerializableExtra(EXTRA_ZOPIM_SESSIONCONFIG);
         final ChatAdapterViewFactory chatAdapterViewFactory = new ChatAdapterViewFactory(this, this.uiContext, true);
-        final Button button = (Button) findViewById(C0785R.id.switchButton);
+        final Button button = (Button) findViewById(C0784R.id.switchButton);
         if (sessionConfig != null) {
-            button.setBackgroundResource(C0785R.drawable.net_gogame_chat_outline_button);
-            button.setTextColor(getResources().getColor(C0785R.color.net_gogame_chat_outline_button));
+            button.setBackgroundResource(C0784R.drawable.net_gogame_chat_outline_button);
+            button.setTextColor(getResources().getColor(C0784R.color.net_gogame_chat_outline_button));
             button.setOnClickListener(new OnClickListener() {
                 public void onClick(View view) {
                     ChatContext zopimChatContext = new ZopimChatContext(ZopimMainActivity.this, sessionConfig, chatAdapterViewFactory, ZopimMainActivity.this.uiContext);
@@ -148,9 +148,9 @@ public class ZopimMainActivity extends BaseActivity {
                 }
             });
         } else {
-            button.setBackgroundResource(C0785R.drawable.net_gogame_chat_outline_button_disabled);
-            button.setTextColor(getResources().getColor(C0785R.color.net_gogame_chat_outline_button_disabled));
-            button.setOnClickListener(new C12533());
+            button.setBackgroundResource(C0784R.drawable.net_gogame_chat_outline_button_disabled);
+            button.setTextColor(getResources().getColor(C0784R.color.net_gogame_chat_outline_button_disabled));
+            button.setOnClickListener(new C15693());
         }
         this.multiChatContext = new MultiChatContext(new Listener() {
             public void onChatContextAdded(ChatContext chatContext) {
@@ -168,8 +168,8 @@ public class ZopimMainActivity extends BaseActivity {
             this.multiChatContext.addChatContext(new ZopimChatContext(this, sessionConfig, chatAdapterViewFactory, this.uiContext));
         }
         this.chatAdapter = new ChatAdapter(this, this.uiContext, chatAdapterViewFactory, this.multiChatContext);
-        findViewById(C0785R.id.closeButton).setOnClickListener(new C12555());
-        findViewById(C0785R.id.backButton).setOnClickListener(new C12566());
+        findViewById(C0784R.id.closeButton).setOnClickListener(new C15715());
+        findViewById(C0784R.id.backButton).setOnClickListener(new C15726());
         if (bundle == null) {
             addFragment(new ChatFragment(), Constants.FRAGMENT_CONTAINER, CHAT_FRAGMENT_TAG);
         }
@@ -182,10 +182,10 @@ public class ZopimMainActivity extends BaseActivity {
         } else {
             builder = new Builder(this);
         }
-        builder.setTitle(C0785R.string.net_gogame_chat_exit_alert_dialog_title);
-        builder.setMessage(C0785R.string.net_gogame_chat_exit_alert_dialog_message);
-        builder.setPositiveButton(C0785R.string.net_gogame_chat_end_button_caption, new C12577());
-        builder.setNegativeButton(C0785R.string.net_gogame_chat_cancel_button_caption, new C12588());
+        builder.setTitle(C0784R.string.net_gogame_chat_exit_alert_dialog_title);
+        builder.setMessage(C0784R.string.net_gogame_chat_exit_alert_dialog_message);
+        builder.setPositiveButton(C0784R.string.net_gogame_chat_end_button_caption, new C15737());
+        builder.setNegativeButton(C0784R.string.net_gogame_chat_cancel_button_caption, new C15748());
         builder.create().show();
     }
 

@@ -539,8 +539,8 @@ public final class zzcfo extends zzcdm {
     static long zzq(byte[] bArr) {
         zzbp.zzu(bArr);
         zzbp.zzbg(bArr.length > 0);
-        int length = bArr.length - 1;
         long j = 0;
+        int length = bArr.length - 1;
         long j2 = 0;
         while (length >= 0 && length >= bArr.length - 8) {
             j2 += (((long) bArr[length]) & 255) << j;
@@ -828,11 +828,11 @@ public final class zzcfo extends zzcdm {
     }
 
     final <T extends Parcelable> T zzb(byte[] bArr, Creator<T> creator) {
-        T t;
         if (bArr == null) {
             return null;
         }
         Parcel obtain = Parcel.obtain();
+        T t;
         try {
             obtain.unmarshall(bArr, 0, bArr.length);
             obtain.setDataPosition(0);
@@ -985,10 +985,10 @@ public final class zzcfo extends zzcdm {
                     queryParameter3 = uri.getQueryParameter("utm_medium");
                     queryParameter4 = uri.getQueryParameter("gclid");
                 } else {
-                    queryParameter2 = null;
-                    queryParameter = null;
-                    queryParameter3 = null;
                     queryParameter4 = null;
+                    queryParameter3 = null;
+                    queryParameter = null;
+                    queryParameter2 = null;
                 }
                 if (!(TextUtils.isEmpty(queryParameter) && TextUtils.isEmpty(queryParameter2) && TextUtils.isEmpty(queryParameter3) && TextUtils.isEmpty(queryParameter4))) {
                     bundle = new Bundle();
@@ -1004,25 +1004,25 @@ public final class zzcfo extends zzcdm {
                     if (!TextUtils.isEmpty(queryParameter4)) {
                         bundle.putString("gclid", queryParameter4);
                     }
-                    queryParameter2 = uri.getQueryParameter("utm_term");
-                    if (!TextUtils.isEmpty(queryParameter2)) {
-                        bundle.putString(Param.TERM, queryParameter2);
+                    queryParameter4 = uri.getQueryParameter("utm_term");
+                    if (!TextUtils.isEmpty(queryParameter4)) {
+                        bundle.putString(Param.TERM, queryParameter4);
                     }
-                    queryParameter2 = uri.getQueryParameter("utm_content");
-                    if (!TextUtils.isEmpty(queryParameter2)) {
-                        bundle.putString(Param.CONTENT, queryParameter2);
+                    queryParameter4 = uri.getQueryParameter("utm_content");
+                    if (!TextUtils.isEmpty(queryParameter4)) {
+                        bundle.putString(Param.CONTENT, queryParameter4);
                     }
-                    queryParameter2 = uri.getQueryParameter(Param.ACLID);
-                    if (!TextUtils.isEmpty(queryParameter2)) {
-                        bundle.putString(Param.ACLID, queryParameter2);
+                    queryParameter4 = uri.getQueryParameter(Param.ACLID);
+                    if (!TextUtils.isEmpty(queryParameter4)) {
+                        bundle.putString(Param.ACLID, queryParameter4);
                     }
-                    queryParameter2 = uri.getQueryParameter(Param.CP1);
-                    if (!TextUtils.isEmpty(queryParameter2)) {
-                        bundle.putString(Param.CP1, queryParameter2);
+                    queryParameter4 = uri.getQueryParameter(Param.CP1);
+                    if (!TextUtils.isEmpty(queryParameter4)) {
+                        bundle.putString(Param.CP1, queryParameter4);
                     }
-                    queryParameter2 = uri.getQueryParameter("anid");
-                    if (!TextUtils.isEmpty(queryParameter2)) {
-                        bundle.putString("anid", queryParameter2);
+                    queryParameter4 = uri.getQueryParameter("anid");
+                    if (!TextUtils.isEmpty(queryParameter4)) {
+                        bundle.putString("anid", queryParameter4);
                     }
                 }
             } catch (UnsupportedOperationException e) {

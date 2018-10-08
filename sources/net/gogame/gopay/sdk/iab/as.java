@@ -1,33 +1,33 @@
 package net.gogame.gopay.sdk.iab;
 
 import android.widget.Spinner;
-import net.gogame.gopay.sdk.C1033g;
-import net.gogame.gopay.sdk.C1063k;
+import net.gogame.gopay.sdk.C1349g;
+import net.gogame.gopay.sdk.C1379k;
 
 final class as implements bq {
     /* renamed from: a */
-    final /* synthetic */ PurchaseActivity f1072a;
+    final /* synthetic */ PurchaseActivity f3460a;
 
     as(PurchaseActivity purchaseActivity) {
-        this.f1072a = purchaseActivity;
+        this.f3460a = purchaseActivity;
     }
 
     /* renamed from: a */
-    public final void mo4423a(C1033g c1033g) {
+    public final void mo4871a(C1349g c1349g) {
         boolean z = false;
-        this.f1072a.f1006B.m757a(this.f1072a.m782a("paymentType"), c1033g.f976c);
-        this.f1072a.f1011G.setSelection(0);
-        this.f1072a.f1014J = true;
-        this.f1072a.f1021Q = 0;
-        PurchaseActivity.m790a(this.f1072a, this.f1072a.m782a("paymentMethod"), ((C1063k) this.f1072a.f1006B.getItem(0)).f1179a);
-        this.f1072a.f1010F.setEnabled(this.f1072a.f1005A.getCount() > 1);
-        Spinner p = this.f1072a.f1011G;
-        if (this.f1072a.f1006B.getCount() > 1) {
+        this.f3460a.f3394B.m3782a(this.f3460a.m3807a("paymentType"), c1349g.f3364c);
+        this.f3460a.f3399G.setSelection(0);
+        this.f3460a.f3402J = true;
+        this.f3460a.f3409Q = 0;
+        PurchaseActivity.m3815a(this.f3460a, this.f3460a.m3807a("paymentMethod"), ((C1379k) this.f3460a.f3394B.getItem(0)).f3567a);
+        this.f3460a.f3398F.setEnabled(this.f3460a.f3393A.getCount() > 1);
+        Spinner p = this.f3460a.f3399G;
+        if (this.f3460a.f3394B.getCount() > 1) {
             z = true;
         }
         p.setEnabled(z);
-        if (this.f1072a.f1047z != null) {
-            this.f1072a.f1047z.setEnabled(true);
+        if (this.f3460a.f3435z != null) {
+            this.f3460a.f3435z.setEnabled(true);
         }
     }
 }

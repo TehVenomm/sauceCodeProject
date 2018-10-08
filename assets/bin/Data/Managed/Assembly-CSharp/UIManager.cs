@@ -589,16 +589,17 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 		base.OnDisable();
 	}
 
-	public void LoadUI(bool need_common, bool need_outgame, bool need_tutorial)
+	public void LoadUI(bool need_common, bool need_outgame, bool need_tutorial, bool skipChat = false)
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		Debug.Log((object)"LoadUI");
 		if (!internalUI && !isLoading && (need_common || need_outgame || need_tutorial))
 		{
-			this.StartCoroutine(DoLoadUI(need_common, need_outgame, need_tutorial));
+			this.StartCoroutine(DoLoadUI(need_common, need_outgame, need_tutorial, skipChat));
 		}
 	}
 
-	private IEnumerator DoLoadUI(bool need_common, bool need_outgame, bool need_tutorial)
+	private IEnumerator DoLoadUI(bool need_common, bool need_outgame, bool need_tutorial, bool skipChat = false)
 	{
 		isLoading = true;
 		LoadingQueue load_queue = new LoadingQueue(this);
@@ -640,7 +641,7 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 		{
 			npcMessage = (CreatePrefabUI(lo_npc_msg.loadedObject, null, null, false, base._transform, 100, null) as NPCMessage);
 		}
-		if (lo_main_chat != null)
+		if (lo_main_chat != null && !skipChat)
 		{
 			mainChat = (CreatePrefabUI(lo_main_chat.loadedObject, null, null, false, base._transform, 6000, null) as MainChat);
 		}
@@ -683,27 +684,47 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 	{
 		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 		if (mainMenu != null)
 		{
 			Object.DestroyImmediate(mainMenu.get_gameObject());
 			mainMenu = null;
 		}
-		if (mainStatus != null)
-		{
-			Object.DestroyImmediate(mainStatus.get_gameObject());
-			mainStatus = null;
-		}
-		if (npcMessage != null)
-		{
-			Object.DestroyImmediate(npcMessage.get_gameObject());
-			npcMessage = null;
-		}
 		if (bannerView != null)
 		{
 			Object.DestroyImmediate(bannerView.get_gameObject());
 			bannerView = null;
+		}
+	}
+
+	public void ResetUI()
+	{
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		if (mainMenu != null)
+		{
+			mainMenu.get_gameObject().SetActive(false);
+			mainMenu.get_gameObject().SetActive(true);
+		}
+		if (mainStatus != null)
+		{
+			mainStatus.get_gameObject().SetActive(false);
+			mainStatus.get_gameObject().SetActive(true);
+		}
+		if (npcMessage != null)
+		{
+			npcMessage.get_gameObject().SetActive(false);
+			npcMessage.get_gameObject().SetActive(true);
+		}
+		if (bannerView != null)
+		{
+			bannerView.get_gameObject().SetActive(false);
+			bannerView.get_gameObject().SetActive(true);
 		}
 	}
 
@@ -945,15 +966,22 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 	{
 		if (Input.GetKeyUp(27))
 		{
-			if ((!string.IsNullOrEmpty(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialBit) && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP)) || !TutorialStep.HasAllTutorialCompleted())
+			if ((!string.IsNullOrEmpty(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialBit) && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP) && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM)) || !TutorialStep.HasAllTutorialCompleted())
 			{
 				if (MonoBehaviourSingleton<GameSceneManager>.IsValid())
 				{
 					string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-					if (!string.IsNullOrEmpty(currentSectionName) && MonoBehaviourSingleton<ToastManager>.IsValid() && !MonoBehaviourSingleton<ToastManager>.I.IsShowingDialog())
+					if (!string.IsNullOrEmpty(currentSectionName))
 					{
-						string text = (!(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "TitleScene")) ? StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 36u) : "You are unable to go back to Town Scene during this Tutorial Mission";
-						ToastManager.PushOpen(text, 1.8f);
+						if (currentSectionName == "Opening" || currentSectionName == "AccountTop" || currentSectionName == "AccountLoginMail" || currentSectionName == "TitleClearCacheConfirm" || currentSectionName == "AccountContact" || currentSectionName == "OpeningSkipConfirm")
+						{
+							ProcessBackKey();
+						}
+						else if (MonoBehaviourSingleton<ToastManager>.IsValid() && !MonoBehaviourSingleton<ToastManager>.I.IsShowingDialog())
+						{
+							string text = (!(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "TitleScene")) ? StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 36u) : "You are unable to go back to Town Scene during this Tutorial Mission";
+							ToastManager.PushOpen(text, 1.8f);
+						}
 					}
 				}
 			}
@@ -1173,41 +1201,40 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	private IEnumerator ShowGGTutorialMessage_()
 	{
-		showGGTutorialMessageTime = Time.get_time();
-		yield return (object)new WaitForSeconds(0.2f);
-		loading.ShowTutorialMsg(StringTable.Get(STRING_CATEGORY.TUTORIAL_LOADING_MSG, 0u), string.Empty);
-		yield return (object)new WaitForSeconds(1f);
-		loading.ShowTutorialMsg(StringTable.Get(STRING_CATEGORY.TUTORIAL_LOADING_MSG, 0u), string.Empty);
-		yield return (object)new WaitForSeconds(1f);
-		loading.ShowTutorialMsg(StringTable.Get(STRING_CATEGORY.TUTORIAL_LOADING_MSG, 1u), string.Empty);
-		yield return (object)new WaitForSeconds(1f);
-		loading.ShowTutorialMsg(StringTable.Get(STRING_CATEGORY.TUTORIAL_LOADING_MSG, 1u), string.Empty);
-		yield return (object)new WaitForSeconds(1f);
-		string text = StringTable.Get(STRING_CATEGORY.TUTORIAL_LOADING_MSG, 2u);
-		loading.ShowTutorialMsg(text, "[000000]...[-]");
-		int i = 0;
+		yield return (object)new WaitForSeconds(2f);
+		uint j = 0u;
+		uint i = 0u;
+		uint tutLen = (uint)StringTable.GetAllInCategory(STRING_CATEGORY.TUTORIAL_LOADING_MSG).Length;
 		while (true)
 		{
-			yield return (object)new WaitForSeconds(1f);
-			i++;
-			if (i > 3)
-			{
-				i = 0;
-			}
+			string text3 = StringTable.Get(STRING_CATEGORY.TUTORIAL_LOADING_MSG, j);
+			string text2;
 			switch (i)
 			{
-			case 0:
-				loading.ShowTutorialMsg(text, "[000000]...[-]");
+			case 0u:
+				text2 = "[000000]...[-]";
 				break;
-			case 1:
-				loading.ShowTutorialMsg(text, ".[000000]..[-]");
+			case 1u:
+				text2 = ".[000000]..[-]";
 				break;
-			case 2:
-				loading.ShowTutorialMsg(text, "..[000000].[-]");
+			case 2u:
+				text2 = "..[000000].[-]";
 				break;
 			default:
-				loading.ShowTutorialMsg(text, "...");
+				text2 = "...";
 				break;
+			}
+			loading.ShowTutorialMsg(text3, text2);
+			yield return (object)new WaitForSeconds(2.2f);
+			j++;
+			i++;
+			if (j >= tutLen - 1)
+			{
+				j = tutLen - 1;
+			}
+			if (i > 3)
+			{
+				i = 0u;
 			}
 		}
 	}

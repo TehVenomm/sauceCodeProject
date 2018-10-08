@@ -3,7 +3,7 @@ package net.gogame.gowrap.ui.v2017_1;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.support.StringUtils;
 import net.gogame.gowrap.ui.WebViewContext;
@@ -14,7 +14,7 @@ public class WebViewFragment extends AbstractWebViewFragment implements WebViewC
     private String currentRequestedUrl = null;
 
     public WebViewFragment() {
-        super(C1110R.layout.net_gogame_gowrap_fragment_webview);
+        super(C1426R.layout.net_gogame_gowrap_fragment_webview);
     }
 
     public static WebViewFragment newFragmentWithUrl(String str) {

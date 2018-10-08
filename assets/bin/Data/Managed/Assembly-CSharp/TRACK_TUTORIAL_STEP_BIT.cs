@@ -29,5 +29,11 @@ public enum TRACK_TUTORIAL_STEP_BIT
 	tutorial_magi_equip = 26,
 	tutorial_monster_gacha = 27,
 	tutorial_monster_gacha_fight = 28,
+	tutorial_1_login_screen = 29,
+	tutorial_2_name_creation = 30,
+	tutorial_3_battle_start = 0x1F,
+	tutorial_4_battle_NPC_appear = 0x20,
+	tutorial_5_battle_end = 33,
+	tutorial_6_pamela_greeting = 34,
 	MAX = 0x40
 }

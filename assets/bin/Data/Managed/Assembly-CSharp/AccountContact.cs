@@ -53,8 +53,8 @@ public class AccountContact : GameSection
 	{
 		SetInput((Enum)UI.IPT_ADDRESS, string.Empty, 255, (EventDelegate.Callback)InputCallback);
 		SetInput((Enum)UI.IPT_SECRET_ANSER, string.Empty, 45, (EventDelegate.Callback)InputCallback);
-		SetInput((Enum)UI.IPT_USER_NAME, string.Empty, 12, (EventDelegate.Callback)InputCallback);
-		SetInput((Enum)UI.IPT_USER_RANK, string.Empty, 12, (EventDelegate.Callback)InputCallback);
+		SetInput((Enum)UI.IPT_USER_NAME, string.Empty, 14, (EventDelegate.Callback)InputCallback);
+		SetInput((Enum)UI.IPT_USER_RANK, string.Empty, 14, (EventDelegate.Callback)InputCallback);
 		UpdateTargetAddressText();
 		SetActive((Enum)UI.OBJ_SECRET_QUESTION, true);
 		secretQuestionIndex = 0;
@@ -132,7 +132,7 @@ public class AccountContact : GameSection
 			});
 			return false;
 		}
-		if (text3.Length > 12)
+		if (text3.Length > 14)
 		{
 			CheckChangeEvent(is_send_event, "NAME_TOO_LONG", null);
 			return false;
@@ -153,7 +153,7 @@ public class AccountContact : GameSection
 			});
 			return false;
 		}
-		if (text4.Length > 12)
+		if (text4.Length > 14)
 		{
 			CheckChangeEvent(is_send_event, "RANK_TOO_LONG", null);
 			return false;

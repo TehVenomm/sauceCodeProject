@@ -3,7 +3,6 @@ package com.facebook.share.model;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.text.TextUtils;
-import net.gogame.gowrap.InternalConstants;
 
 public final class AppInviteContent implements ShareModel {
     public static final Creator<AppInviteContent> CREATOR = new C05091();
@@ -35,7 +34,7 @@ public final class AppInviteContent implements ShareModel {
         private String promoText;
 
         public enum Destination {
-            FACEBOOK(InternalConstants.COMMUNITY_FACEBOOK),
+            FACEBOOK("facebook"),
             MESSENGER("messenger");
             
             private final String name;

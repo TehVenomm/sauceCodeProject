@@ -33,7 +33,7 @@ public class LivechatAccountPath extends Path<Account> {
         } else if (!str.isEmpty()) {
             synchronized (this.mLock) {
                 if (this.mData == null) {
-                    this.mData = this.PARSER.parse(str, new C0864b(this));
+                    this.mData = this.PARSER.parse(str, new C0863b(this));
                 } else {
                     try {
                         this.mData = (Account) this.PARSER.getMapper().readerForUpdating(this.mData).readValue(str);

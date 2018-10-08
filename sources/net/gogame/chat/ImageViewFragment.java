@@ -13,16 +13,16 @@ import com.facebook.share.internal.ShareConstants;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Picasso.LoadedFrom;
 import com.squareup.picasso.Target;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 
 public class ImageViewFragment extends Fragment {
     private Target target;
 
     @Nullable
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
-        View inflate = layoutInflater.inflate(C0785R.layout.net_gogame_chat_fragment_image_view, viewGroup, false);
-        ZoomableImageView zoomableImageView = (ZoomableImageView) inflate.findViewById(C0785R.id.imageView);
-        final ProgressBar progressBar = (ProgressBar) inflate.findViewById(C0785R.id.progressBar);
+        View inflate = layoutInflater.inflate(C0784R.layout.net_gogame_chat_fragment_image_view, viewGroup, false);
+        ZoomableImageView zoomableImageView = (ZoomableImageView) inflate.findViewById(C0784R.id.imageView);
+        final ProgressBar progressBar = (ProgressBar) inflate.findViewById(C0784R.id.progressBar);
         DisplayUtils.hideKeyboard(getActivity(), zoomableImageView.getWindowToken());
         Uri uri = null;
         if (!(getArguments() == null || getArguments().getString(ShareConstants.MEDIA_URI) == null)) {

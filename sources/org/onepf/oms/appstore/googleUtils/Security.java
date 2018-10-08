@@ -21,10 +21,10 @@ public class Security {
         } catch (Throwable e) {
             throw new RuntimeException(e);
         } catch (Throwable e2) {
-            Logger.m1002e("Invalid key specification.");
+            Logger.m4027e("Invalid key specification.");
             throw new IllegalArgumentException(e2);
         } catch (Throwable e22) {
-            Logger.m1002e("Base64 decoding failed.");
+            Logger.m4027e("Base64 decoding failed.");
             throw new IllegalArgumentException(e22);
         }
     }
@@ -37,19 +37,19 @@ public class Security {
             if (instance.verify(Base64.decode(str2))) {
                 return true;
             }
-            Logger.m1002e("Signature verification failed.");
+            Logger.m4027e("Signature verification failed.");
             return false;
         } catch (NoSuchAlgorithmException e) {
-            Logger.m1002e("NoSuchAlgorithmException.");
+            Logger.m4027e("NoSuchAlgorithmException.");
             return false;
         } catch (InvalidKeyException e2) {
-            Logger.m1002e("Invalid key specification.");
+            Logger.m4027e("Invalid key specification.");
             return false;
         } catch (SignatureException e3) {
-            Logger.m1002e("Signature exception.");
+            Logger.m4027e("Signature exception.");
             return false;
         } catch (Base64DecoderException e4) {
-            Logger.m1002e("Base64 decoding failed.");
+            Logger.m4027e("Base64 decoding failed.");
             return false;
         }
     }
@@ -58,7 +58,7 @@ public class Security {
         if (!TextUtils.isEmpty(str2) && !TextUtils.isEmpty(str) && !TextUtils.isEmpty(str3)) {
             return verify(generatePublicKey(str), str2, str3);
         }
-        Logger.m1002e("Purchase verification failed: missing data.");
+        Logger.m4027e("Purchase verification failed: missing data.");
         return false;
     }
 }

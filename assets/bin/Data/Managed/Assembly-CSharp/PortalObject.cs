@@ -323,8 +323,8 @@ public class PortalObject
 		//IL_0356: Expected O, but got Unknown
 		//IL_0386: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0393: Expected O, but got Unknown
-		//IL_03f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0400: Expected O, but got Unknown
+		//IL_03e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03ef: Expected O, but got Unknown
 		if (collider.get_gameObject().GetComponent<Self>() == null)
 		{
 			return;
@@ -349,81 +349,85 @@ public class PortalObject
 		{
 			return;
 		}
-		if (isClearOrder && isUnlockedTime)
+		string text;
+		if (!isClearOrder || !isUnlockedTime)
 		{
-			if (!isFull)
+			text = portalData.notAppearText;
+			if (portalData.appearQuestId != 0 && string.IsNullOrEmpty(text) && !MonoBehaviourSingleton<QuestManager>.I.IsClearQuest(portalData.appearQuestId))
 			{
-				FieldMapPortalInfo portalPointToPortalInfo = MonoBehaviourSingleton<FieldManager>.I.GetPortalPointToPortalInfo();
-				if (portalPointToPortalInfo == portalInfo || portalInfo.IsFull())
+				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(portalData.appearQuestId);
+				text = StringTable.Format(STRING_CATEGORY.IN_GAME, 7000u, questData.questText);
+			}
+			if (portalData.appearDeliveryId != 0 && string.IsNullOrEmpty(text) && !MonoBehaviourSingleton<DeliveryManager>.I.IsClearDelivery(portalData.appearDeliveryId))
+			{
+				DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData(portalData.appearDeliveryId);
+				text = StringTable.Format(STRING_CATEGORY.IN_GAME, 7001u, deliveryTableData.name);
+			}
+			if (portalData.travelMapId != 0 && string.IsNullOrEmpty(text) && MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledMap((int)portalData.travelMapId))
+			{
+				goto IL_0198;
+			}
+			goto IL_0198;
+		}
+		if (!isFull)
+		{
+			FieldMapPortalInfo portalPointToPortalInfo = MonoBehaviourSingleton<FieldManager>.I.GetPortalPointToPortalInfo();
+			if (portalPointToPortalInfo == portalInfo || portalInfo.IsFull())
+			{
+				if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 				{
-					if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NOT_FULL", new object[2]
 					{
-						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NOT_FULL", new object[2]
-						{
-							nowPoint.ToString(),
-							maxPoint.ToString()
-						}, null, true);
-					}
-				}
-				else if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NOT_ACTIVE", null, null, true);
+						nowPoint.ToString(),
+						maxPoint.ToString()
+					}, null, true);
 				}
 			}
-			else
+			else if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 			{
-				MonoBehaviourSingleton<InGameProgress>.I.checkPortalObject = this;
-				if (isQuest)
-				{
-					if (isLock)
-					{
-						if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portalData, true, true))
-						{
-							MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_QUEST_LOCK", null, null, true);
-						}
-					}
-					else if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(portalData.dstQuestID, true))
-					{
-						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_QUEST", null, null, true);
-					}
-				}
-				else if (viewType == VIEW_TYPE.TO_HOME)
-				{
-					if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-					{
-						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_HOME", null, null, true);
-					}
-				}
-				else if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-				{
-					if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 0)
-					{
-						MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_guide_movement4, "Tutorial");
-					}
-					if (MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portalData, false, true))
-					{
-						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NEXT", null, null, true);
-					}
-				}
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NOT_ACTIVE", null, null, true);
 			}
 			return;
 		}
-		string text = portalData.notAppearText;
-		if (portalData.appearQuestId != 0 && string.IsNullOrEmpty(text) && !MonoBehaviourSingleton<QuestManager>.I.IsClearQuest(portalData.appearQuestId))
+		MonoBehaviourSingleton<InGameProgress>.I.checkPortalObject = this;
+		if (isQuest)
 		{
-			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(portalData.appearQuestId);
-			text = StringTable.Format(STRING_CATEGORY.IN_GAME, 7000u, questData.questText);
+			if (isLock)
+			{
+				if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portalData, true, true))
+				{
+					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_QUEST_LOCK", null, null, true);
+				}
+			}
+			else if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(portalData.dstQuestID, true))
+			{
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_QUEST", null, null, true);
+			}
+			return;
 		}
-		if (portalData.appearDeliveryId != 0 && string.IsNullOrEmpty(text) && !MonoBehaviourSingleton<DeliveryManager>.I.IsClearDelivery(portalData.appearDeliveryId))
+		if (viewType == VIEW_TYPE.TO_HOME)
 		{
-			DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData(portalData.appearDeliveryId);
-			text = StringTable.Format(STRING_CATEGORY.IN_GAME, 7001u, deliveryTableData.name);
+			if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+			{
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_HOME", null, null, true);
+			}
+			return;
 		}
-		if (portalData.travelMapId != 0 && string.IsNullOrEmpty(text) && MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledMap((int)portalData.travelMapId))
+		if (!MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 		{
-			goto IL_0198;
+			return;
 		}
-		goto IL_0198;
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep != 0)
+		{
+			goto IL_03c0;
+		}
+		goto IL_03c0;
+		IL_03c0:
+		if (MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portalData, false, true))
+		{
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NEXT", null, null, true);
+		}
+		return;
 		IL_0198:
 		if (!isUnlockedTime)
 		{

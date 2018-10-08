@@ -10,12 +10,12 @@ import net.gogame.gowrap.ui.customtabs.ICustomTabsCallback.Stub;
 
 public class CustomTabsSessionToken {
     private static final String TAG = "CustomTabsSessionToken";
-    private final CustomTabsCallback mCallback = new C11491();
+    private final CustomTabsCallback mCallback = new C14651();
     private final ICustomTabsCallback mCallbackBinder;
 
     /* renamed from: net.gogame.gowrap.ui.customtabs.CustomTabsSessionToken$1 */
-    class C11491 extends CustomTabsCallback {
-        C11491() {
+    class C14651 extends CustomTabsCallback {
+        C14651() {
         }
 
         public void onNavigationEvent(int i, Bundle bundle) {

@@ -29,7 +29,7 @@ public class ConfigName : GameSection
 	protected virtual void SetBeforeText()
 	{
 		before_text = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name;
-		inputMaxLength = 12;
+		inputMaxLength = 14;
 	}
 
 	public override void Initialize()

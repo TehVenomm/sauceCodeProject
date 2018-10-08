@@ -57,7 +57,7 @@ public class ActivityLifecycleManager {
             if (this.application == null) {
                 return false;
             }
-            ActivityLifecycleCallbacks c09121 = new ActivityLifecycleCallbacks() {
+            ActivityLifecycleCallbacks c12281 = new ActivityLifecycleCallbacks() {
                 public void onActivityCreated(Activity activity, Bundle bundle) {
                     callbacks.onActivityCreated(activity, bundle);
                 }
@@ -86,8 +86,8 @@ public class ActivityLifecycleManager {
                     callbacks.onActivityStopped(activity);
                 }
             };
-            this.application.registerActivityLifecycleCallbacks(c09121);
-            this.registeredCallbacks.add(c09121);
+            this.application.registerActivityLifecycleCallbacks(c12281);
+            this.registeredCallbacks.add(c12281);
             return true;
         }
     }

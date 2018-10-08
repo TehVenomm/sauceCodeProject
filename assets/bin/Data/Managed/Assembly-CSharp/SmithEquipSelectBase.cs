@@ -72,7 +72,8 @@ public abstract class SmithEquipSelectBase : EquipSelectBase
 		GRD_ARMOR,
 		OBJ_CAPTION_3,
 		LBL_CAPTION,
-		OBJ_ROOT
+		OBJ_ROOT,
+		LBL_NO_ITEM
 	}
 
 	protected UI[] uiTypeTab = new UI[11]
@@ -184,6 +185,10 @@ public abstract class SmithEquipSelectBase : EquipSelectBase
 			LocalInventory();
 			UpdateTabButton();
 		});
+	}
+
+	protected void ShowNoItemText()
+	{
 	}
 
 	protected override void EquipParam()

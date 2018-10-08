@@ -9,5 +9,5 @@ interface ErrorResponse {
     }
 
     /* renamed from: a */
-    String mo4229a();
+    String mo4231a();
 }

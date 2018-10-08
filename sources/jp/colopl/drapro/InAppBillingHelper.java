@@ -39,8 +39,8 @@ public class InAppBillingHelper {
     public static String userIdHash;
 
     /* renamed from: jp.colopl.drapro.InAppBillingHelper$1 */
-    static final class C09681 implements QueryInventoryFinishedListener {
-        C09681() {
+    static final class C12841 implements QueryInventoryFinishedListener {
+        C12841() {
         }
 
         public void onQueryInventoryFinished(IabResult iabResult, Inventory inventory) {
@@ -73,8 +73,8 @@ public class InAppBillingHelper {
     }
 
     /* renamed from: jp.colopl.drapro.InAppBillingHelper$5 */
-    static final class C09735 implements OnConsumeMultiFinishedListener {
-        C09735() {
+    static final class C12895 implements OnConsumeMultiFinishedListener {
+        C12895() {
         }
 
         public void onConsumeMultiFinished(List<Purchase> list, List<IabResult> list2) {
@@ -102,7 +102,7 @@ public class InAppBillingHelper {
             return;
         }
         if (consumeList.size() > 0) {
-            mHelper.consumeAsync(consumeList, new C09735());
+            mHelper.consumeAsync(consumeList, new C12895());
         } else {
             FinishCheckPromotion(false);
         }
@@ -232,7 +232,7 @@ public class InAppBillingHelper {
     }
 
     public static void getSkuDetails() throws IabException {
-        mHelper.queryInventoryAsync(true, Arrays.asList(AppConsts.itemCodeId), new C09681());
+        mHelper.queryInventoryAsync(true, Arrays.asList(AppConsts.itemCodeId), new C12841());
     }
 
     public static void init(IabHelper iabHelper, StartActivity startActivity) {

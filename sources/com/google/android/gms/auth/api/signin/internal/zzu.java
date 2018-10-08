@@ -6,7 +6,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.games.quest.Quests;
 import com.google.android.gms.internal.zzee;
 import com.google.android.gms.internal.zzeg;
 
@@ -19,7 +18,7 @@ public final class zzu extends zzee implements zzt {
         Parcel zzax = zzax();
         zzeg.zza(zzax, (IInterface) zzr);
         zzeg.zza(zzax, (Parcelable) googleSignInOptions);
-        zzb(Quests.SELECT_COMPLETED_UNCLAIMED, zzax);
+        zzb(101, zzax);
     }
 
     public final void zzb(zzr zzr, GoogleSignInOptions googleSignInOptions) throws RemoteException {
@@ -33,6 +32,6 @@ public final class zzu extends zzee implements zzt {
         Parcel zzax = zzax();
         zzeg.zza(zzax, (IInterface) zzr);
         zzeg.zza(zzax, (Parcelable) googleSignInOptions);
-        zzb(Quests.SELECT_RECENTLY_FAILED, zzax);
+        zzb(103, zzax);
     }
 }

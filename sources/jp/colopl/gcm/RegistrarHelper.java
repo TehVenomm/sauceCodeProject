@@ -24,8 +24,8 @@ public class RegistrarHelper {
     static GoogleCloudMessaging gcm;
 
     /* renamed from: jp.colopl.gcm.RegistrarHelper$1 */
-    static final class C09911 extends AsyncTask<Void, Void, String> {
-        C09911() {
+    static final class C13071 extends AsyncTask<Void, Void, String> {
+        C13071() {
         }
 
         protected String doInBackground(Void... voidArr) {
@@ -54,7 +54,7 @@ public class RegistrarHelper {
             String registrationId = getRegistrationId(context);
             if (registrationId.equals("")) {
                 gcm = GoogleCloudMessaging.getInstance(activity);
-                new C09911().execute(new Void[]{null, null, null});
+                new C13071().execute(new Void[]{null, null, null});
                 return;
             }
             UnityPlayer.UnitySendMessage("NativeReceiver", "GCMRegistered", registrationId);

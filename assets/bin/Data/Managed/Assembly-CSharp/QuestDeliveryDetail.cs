@@ -535,7 +535,7 @@ public class QuestDeliveryDetail : GameSection
 		int exp = 0;
 		if (rewardData != null)
 		{
-			_003CUpdateUI_003Ec__AnonStorey382 _003CUpdateUI_003Ec__AnonStorey;
+			_003CUpdateUI_003Ec__AnonStorey392 _003CUpdateUI_003Ec__AnonStorey;
 			SetGrid(baseRoot, UI.GRD_REWARD, string.Empty, rewardData.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		SetLabelText(baseRoot, UI.LBL_MONEY, money.ToString());
@@ -598,7 +598,7 @@ public class QuestDeliveryDetail : GameSection
 		}
 		PlayCompleteTween(delegate
 		{
-			((_003CStartTweenCoroutine_003Ec__Iterator9F)/*Error near IL_00c1: stateMachine*/)._003C_003Ef__this.OnEndCompletetween(((_003CStartTweenCoroutine_003Ec__Iterator9F)/*Error near IL_00c1: stateMachine*/).is_unlock_portal, ((_003CStartTweenCoroutine_003Ec__Iterator9F)/*Error near IL_00c1: stateMachine*/)._003CeffectName_003E__0);
+			((_003CStartTweenCoroutine_003Ec__IteratorA0)/*Error near IL_00c1: stateMachine*/)._003C_003Ef__this.OnEndCompletetween(((_003CStartTweenCoroutine_003Ec__IteratorA0)/*Error near IL_00c1: stateMachine*/).is_unlock_portal, ((_003CStartTweenCoroutine_003Ec__IteratorA0)/*Error near IL_00c1: stateMachine*/)._003CeffectName_003E__0);
 		});
 		CompleteTutorial();
 	}
@@ -658,7 +658,7 @@ public class QuestDeliveryDetail : GameSection
 			hasDispedMessage = true;
 			int releasedEventId = MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds[0];
 			MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds.RemoveAt(0);
-			_003CDispMessageEventOpen_003Ec__AnonStorey385 _003CDispMessageEventOpen_003Ec__AnonStorey;
+			_003CDispMessageEventOpen_003Ec__AnonStorey395 _003CDispMessageEventOpen_003Ec__AnonStorey;
 			Network.EventData eventData = MonoBehaviourSingleton<QuestManager>.I.eventList.Where(new Func<Network.EventData, bool>((object)_003CDispMessageEventOpen_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
 			if (eventData == null)
 			{
@@ -939,7 +939,7 @@ public class QuestDeliveryDetail : GameSection
 		GameSection.StayEvent();
 		int retryCount = 0;
 		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 0);
-		_003CWaveMatchAuto_003Ec__AnonStorey386 _003CWaveMatchAuto_003Ec__AnonStorey;
+		_003CWaveMatchAuto_003Ec__AnonStorey396 _003CWaveMatchAuto_003Ec__AnonStorey;
 		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.GetQuestData().questID, retryCount, false, new Action<bool, int, bool, float>((object)_003CWaveMatchAuto_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

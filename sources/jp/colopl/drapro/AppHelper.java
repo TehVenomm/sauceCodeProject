@@ -37,11 +37,11 @@ public class AppHelper {
     private static boolean shopMode = false;
 
     /* renamed from: jp.colopl.drapro.AppHelper$1 */
-    static final class C09601 implements Runnable {
+    static final class C12761 implements Runnable {
 
         /* renamed from: jp.colopl.drapro.AppHelper$1$1 */
-        class C09571 implements OnClickListener {
-            C09571() {
+        class C12731 implements OnClickListener {
+            C12731() {
             }
 
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -51,8 +51,8 @@ public class AppHelper {
         }
 
         /* renamed from: jp.colopl.drapro.AppHelper$1$2 */
-        class C09582 implements OnClickListener {
-            C09582() {
+        class C12742 implements OnClickListener {
+            C12742() {
             }
 
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -62,8 +62,8 @@ public class AppHelper {
         }
 
         /* renamed from: jp.colopl.drapro.AppHelper$1$3 */
-        class C09593 implements OnCancelListener {
-            C09593() {
+        class C12753 implements OnCancelListener {
+            C12753() {
             }
 
             public void onCancel(DialogInterface dialogInterface) {
@@ -72,7 +72,7 @@ public class AppHelper {
             }
         }
 
-        C09601() {
+        C12761() {
         }
 
         public void run() {
@@ -82,16 +82,16 @@ public class AppHelper {
             Builder builder = new Builder(AppHelper.activity);
             builder.setTitle(AppHelper.activity.getString(identifier));
             builder.setMessage(AppHelper.activity.getString(identifier2));
-            builder.setPositiveButton(AppHelper.activity.getString(identifier3), new C09571());
-            builder.setNegativeButton(AppHelper.activity.getString(AppHelper.activity.getResources().getIdentifier("dialog_button_cancel", "string", AppHelper.activity.getPackageName())), new C09582());
-            builder.setOnCancelListener(new C09593());
+            builder.setPositiveButton(AppHelper.activity.getString(identifier3), new C12731());
+            builder.setNegativeButton(AppHelper.activity.getString(AppHelper.activity.getResources().getIdentifier("dialog_button_cancel", "string", AppHelper.activity.getPackageName())), new C12742());
+            builder.setOnCancelListener(new C12753());
             builder.create().show();
         }
     }
 
     /* renamed from: jp.colopl.drapro.AppHelper$3 */
-    static final class C09653 implements Runnable {
-        C09653() {
+    static final class C12813 implements Runnable {
+        C12813() {
         }
 
         public void run() {
@@ -161,8 +161,8 @@ public class AppHelper {
             activity.runOnUiThread(new Runnable() {
 
                 /* renamed from: jp.colopl.drapro.AppHelper$2$1 */
-                class C09611 implements OnClickListener {
-                    C09611() {
+                class C12771 implements OnClickListener {
+                    C12771() {
                     }
 
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -171,8 +171,8 @@ public class AppHelper {
                 }
 
                 /* renamed from: jp.colopl.drapro.AppHelper$2$2 */
-                class C09622 implements OnClickListener {
-                    C09622() {
+                class C12782 implements OnClickListener {
+                    C12782() {
                     }
 
                     @SuppressLint({"NewApi"})
@@ -188,8 +188,8 @@ public class AppHelper {
                 }
 
                 /* renamed from: jp.colopl.drapro.AppHelper$2$3 */
-                class C09633 implements OnClickListener {
-                    C09633() {
+                class C12793 implements OnClickListener {
+                    C12793() {
                     }
 
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -213,9 +213,9 @@ public class AppHelper {
                     builder.setTitle(str);
                     builder.setMessage(str2);
                     builder.setView(editText);
-                    builder.setNegativeButton(AppHelper.activity.getResources().getIdentifier("dialog_button_cancel", "string", AppHelper.activity.getPackageName()), new C09611());
-                    builder.setNeutralButton(AppHelper.activity.getResources().getIdentifier("dialog_button_copy", "string", AppHelper.activity.getPackageName()), new C09622());
-                    builder.setPositiveButton(AppHelper.activity.getResources().getIdentifier("invite_mail_button", "string", AppHelper.activity.getPackageName()), new C09633());
+                    builder.setNegativeButton(AppHelper.activity.getResources().getIdentifier("dialog_button_cancel", "string", AppHelper.activity.getPackageName()), new C12771());
+                    builder.setNeutralButton(AppHelper.activity.getResources().getIdentifier("dialog_button_copy", "string", AppHelper.activity.getPackageName()), new C12782());
+                    builder.setPositiveButton(AppHelper.activity.getResources().getIdentifier("invite_mail_button", "string", AppHelper.activity.getPackageName()), new C12793());
                     AlertDialog create = builder.create();
                     create.setCanceledOnTouchOutside(false);
                     create.show();
@@ -262,7 +262,7 @@ public class AppHelper {
     public static void quit() {
         if (!isQuitDialogOpened) {
             isQuitDialogOpened = true;
-            activity.runOnUiThread(new C09601());
+            activity.runOnUiThread(new C12761());
         }
     }
 
@@ -300,7 +300,7 @@ public class AppHelper {
     }
 
     public static void testCrash() {
-        new Thread(new C09653()).start();
+        new Thread(new C12813()).start();
     }
 
     public static void trackUserRegEventAppsFlyer(String str) {

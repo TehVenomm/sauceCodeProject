@@ -1093,8 +1093,8 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 									//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 									o.get_gameObject().SetActive(false);
 									MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(o);
-									((_003CInitializeEnemyPop_003Ec__Iterator230)/*Error near IL_0232: stateMachine*/)._003Cload_count_003E__4++;
-								});
+									((_003CInitializeEnemyPop_003Ec__Iterator23F)/*Error near IL_0232: stateMachine*/)._003Cload_count_003E__4++;
+								}, false);
 							}
 						}
 					}
@@ -1123,8 +1123,8 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 					//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 					o.get_gameObject().SetActive(false);
 					MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(o);
-					((_003CInitializeEnemyPopForSeries_003Ec__Iterator231)/*Error near IL_00c4: stateMachine*/)._003CloadCount_003E__2++;
-				});
+					((_003CInitializeEnemyPopForSeries_003Ec__Iterator240)/*Error near IL_00c4: stateMachine*/)._003CloadCount_003E__2++;
+				}, false);
 			}
 		}
 		while (loadCount < count)

@@ -23,7 +23,7 @@ public class CrashTest {
     }
 
     public void indexOutOfBounds() {
-        Fabric.getLogger().mo4289d("Fabric", "Out of bounds value: " + new int[2][10]);
+        Fabric.getLogger().mo4753d("Fabric", "Out of bounds value: " + new int[2][10]);
     }
 
     public int stackOverflow() {

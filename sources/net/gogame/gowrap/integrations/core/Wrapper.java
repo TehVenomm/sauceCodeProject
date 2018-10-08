@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.InternalConstants;
 import net.gogame.gowrap.integrations.core.ServerStatus.LocalizedStatus;
@@ -192,7 +192,7 @@ public class Wrapper {
         try {
             this.configuration = new Configuration(readJson(context, InternalConstants.CONFIG_FILENAME));
             if (this.configuration != null && this.configuration.getIntegrations() != null && this.configuration.getIntegrations().getCore() != null && this.configuration.getIntegrations().getCore().getSupportedLocales() != null) {
-                List asList = Arrays.asList(context.getResources().getStringArray(C1110R.array.language_values));
+                List asList = Arrays.asList(context.getResources().getStringArray(C1426R.array.language_values));
                 List arrayList = new ArrayList();
                 arrayList.add(InternalConstants.DEFAULT_LOCALE);
                 for (String str : this.configuration.getIntegrations().getCore().getSupportedLocales()) {

@@ -56,7 +56,7 @@ class InitializationTask<Result> extends PriorityAsyncTask<Void, Void, Result> {
         } catch (UnmetDependencyException e) {
             throw e;
         } catch (Throwable e2) {
-            Fabric.getLogger().mo4292e("Fabric", "Failure onPreExecute()", e2);
+            Fabric.getLogger().mo4756e("Fabric", "Failure onPreExecute()", e2);
             createAndStartTimingMetric.stopMeasuring();
             cancel(true);
         } catch (Throwable th) {

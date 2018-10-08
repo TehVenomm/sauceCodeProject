@@ -47,7 +47,7 @@ class PinningTrustManager implements X509TrustManager {
             }
             throw new CertificateException("No valid pins found in chain!");
         }
-        Fabric.getLogger().mo4302w("Fabric", "Certificate pins are stale, (" + (System.currentTimeMillis() - this.pinCreationTimeMillis) + " millis vs " + PIN_FRESHNESS_DURATION_MILLIS + " millis) " + "falling back to system trust.");
+        Fabric.getLogger().mo4766w("Fabric", "Certificate pins are stale, (" + (System.currentTimeMillis() - this.pinCreationTimeMillis) + " millis vs " + PIN_FRESHNESS_DURATION_MILLIS + " millis) " + "falling back to system trust.");
     }
 
     private void checkSystemTrust(X509Certificate[] x509CertificateArr, String str) throws CertificateException {

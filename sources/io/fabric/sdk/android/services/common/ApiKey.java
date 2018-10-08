@@ -11,13 +11,13 @@ public class ApiKey {
 
     @Deprecated
     public static String getApiKey(Context context) {
-        Fabric.getLogger().mo4302w("Fabric", "getApiKey(context) is deprecated, please upgrade kit(s) to the latest version.");
+        Fabric.getLogger().mo4766w("Fabric", "getApiKey(context) is deprecated, please upgrade kit(s) to the latest version.");
         return new ApiKey().getValue(context);
     }
 
     @Deprecated
     public static String getApiKey(Context context, boolean z) {
-        Fabric.getLogger().mo4302w("Fabric", "getApiKey(context, debug) is deprecated, please upgrade kit(s) to the latest version.");
+        Fabric.getLogger().mo4766w("Fabric", "getApiKey(context, debug) is deprecated, please upgrade kit(s) to the latest version.");
         return new ApiKey().getValue(context);
     }
 
@@ -32,12 +32,12 @@ public class ApiKey {
             if (bundle != null) {
                 str = bundle.getString(FABRIC_API_KEY);
                 if (str == null) {
-                    Fabric.getLogger().mo4289d("Fabric", "Falling back to Crashlytics key lookup from Manifest");
+                    Fabric.getLogger().mo4753d("Fabric", "Falling back to Crashlytics key lookup from Manifest");
                     str = bundle.getString(CRASHLYTICS_API_KEY);
                 }
             }
         } catch (Exception e) {
-            Fabric.getLogger().mo4289d("Fabric", "Caught non-fatal exception while retrieving apiKey: " + e);
+            Fabric.getLogger().mo4753d("Fabric", "Caught non-fatal exception while retrieving apiKey: " + e);
         }
         return str;
     }
@@ -45,7 +45,7 @@ public class ApiKey {
     protected String getApiKeyFromStrings(Context context) {
         int resourcesIdentifier = CommonUtils.getResourcesIdentifier(context, FABRIC_API_KEY, "string");
         if (resourcesIdentifier == 0) {
-            Fabric.getLogger().mo4289d("Fabric", "Falling back to Crashlytics key lookup from Strings");
+            Fabric.getLogger().mo4753d("Fabric", "Falling back to Crashlytics key lookup from Strings");
             resourcesIdentifier = CommonUtils.getResourcesIdentifier(context, CRASHLYTICS_API_KEY, "string");
         }
         return resourcesIdentifier != 0 ? context.getResources().getString(resourcesIdentifier) : null;
@@ -66,6 +66,6 @@ public class ApiKey {
         if (Fabric.isDebuggable() || CommonUtils.isAppDebuggable(context)) {
             throw new IllegalArgumentException(buildApiKeyInstructions());
         }
-        Fabric.getLogger().mo4291e("Fabric", buildApiKeyInstructions());
+        Fabric.getLogger().mo4755e("Fabric", buildApiKeyInstructions());
     }
 }

@@ -343,8 +343,8 @@ abstract class MapCollections<K, V> {
             while (i < colGetSize) {
                 if (collection.contains(MapCollections.this.colGetEntry(i, 1))) {
                     MapCollections.this.colRemoveAt(i);
-                    colGetSize--;
                     i--;
+                    colGetSize--;
                     z = true;
                 }
                 i++;

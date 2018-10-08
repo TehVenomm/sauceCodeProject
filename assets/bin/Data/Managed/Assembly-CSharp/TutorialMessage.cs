@@ -403,16 +403,16 @@ public class TutorialMessage : UIBehaviour
 		{
 			if (msg == null)
 			{
-				((_003C_LoadMessageImage_003Ec__Iterator29C)/*Error near IL_0052: stateMachine*/)._003Clist_003E__1.Add(null);
+				((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_0052: stateMachine*/)._003Clist_003E__1.Add(null);
 			}
 			else if (string.IsNullOrEmpty(msg.imageResourceName))
 			{
-				((_003C_LoadMessageImage_003Ec__Iterator29C)/*Error near IL_0052: stateMachine*/)._003Clist_003E__1.Add(null);
+				((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_0052: stateMachine*/)._003Clist_003E__1.Add(null);
 			}
 			else
 			{
-				LoadObject item = ((_003C_LoadMessageImage_003Ec__Iterator29C)/*Error near IL_0052: stateMachine*/)._003Clo_queue_003E__0.Load(RESOURCE_CATEGORY.UI, msg.imageResourceName, false);
-				((_003C_LoadMessageImage_003Ec__Iterator29C)/*Error near IL_0052: stateMachine*/)._003Clist_003E__1.Add(item);
+				LoadObject item = ((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_0052: stateMachine*/)._003Clo_queue_003E__0.Load(RESOURCE_CATEGORY.UI, msg.imageResourceName, false);
+				((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_0052: stateMachine*/)._003Clist_003E__1.Add(item);
 			}
 		});
 		if (lo_queue.IsLoading())
@@ -421,14 +421,14 @@ public class TutorialMessage : UIBehaviour
 		}
 		list.ForEach(delegate(LoadObject data)
 		{
-			((_003C_LoadMessageImage_003Ec__Iterator29C)/*Error near IL_009d: stateMachine*/)._003Cindex_003E__2++;
+			((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_009d: stateMachine*/)._003Cindex_003E__2++;
 			if (data != null)
 			{
-				Transform val = ResourceUtility.Realizes(data.loadedObject, ((_003C_LoadMessageImage_003Ec__Iterator29C)/*Error near IL_009d: stateMachine*/)._003C_003Ef__this.GetCtrl(UI.OBJ_IMAGE_ROOT), 5);
+				Transform val = ResourceUtility.Realizes(data.loadedObject, ((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_009d: stateMachine*/)._003C_003Ef__this.GetCtrl(UI.OBJ_IMAGE_ROOT), 5);
 				if (val != null)
 				{
-					val.set_name(((_003C_LoadMessageImage_003Ec__Iterator29C)/*Error near IL_009d: stateMachine*/)._003Cindex_003E__2.ToString());
-					((_003C_LoadMessageImage_003Ec__Iterator29C)/*Error near IL_009d: stateMachine*/).tutorial_data.SetImage(((_003C_LoadMessageImage_003Ec__Iterator29C)/*Error near IL_009d: stateMachine*/)._003Cindex_003E__2, val);
+					val.set_name(((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_009d: stateMachine*/)._003Cindex_003E__2.ToString());
+					((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_009d: stateMachine*/).tutorial_data.SetImage(((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_009d: stateMachine*/)._003Cindex_003E__2, val);
 				}
 			}
 		});
@@ -1469,10 +1469,10 @@ public class TutorialMessage : UIBehaviour
 
 	public static bool IsActiveButton(GameObject button)
 	{
-		//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017e: Expected O, but got Unknown
-		//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a1: Expected O, but got Unknown
+		//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0204: Expected O, but got Unknown
+		//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0227: Expected O, but got Unknown
 		if (!MonoBehaviourSingleton<GameSceneManager>.IsValid() || (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.tutorialMessage == null) || button == null)
 		{
 			return true;
@@ -1486,7 +1486,15 @@ public class TutorialMessage : UIBehaviour
 		{
 			return true;
 		}
+		if (currentSectionName == "HomeTop" && MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_UPGRADE_ITEM) && (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2) || !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_MAINSTATUS) || !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_QUEST)))
+		{
+			return true;
+		}
 		if (currentSectionName == "HomeTop" && ((HomeBase.OnAfterGacha2Tutorial && MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2)) || HomeBase.OnTalkPamelaTutorial))
+		{
+			return false;
+		}
+		if (currentSectionName == "HomeTop" && HomeBase.OnClickQuestForTutorial)
 		{
 			return false;
 		}

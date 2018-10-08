@@ -5,15 +5,15 @@ import android.widget.TextView;
 
 public final class bv {
     /* renamed from: a */
-    public ImageView f1126a;
+    public ImageView f3514a;
     /* renamed from: b */
-    public TextView f1127b;
+    public TextView f3515b;
     /* renamed from: c */
-    public int f1128c;
+    public int f3516c;
 
     public bv(ImageView imageView, TextView textView, int i) {
-        this.f1126a = imageView;
-        this.f1127b = textView;
-        this.f1128c = i;
+        this.f3514a = imageView;
+        this.f3515b = textView;
+        this.f3516c = i;
     }
 }

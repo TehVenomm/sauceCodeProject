@@ -571,8 +571,8 @@ public class WorldMap : GameSection
 			}
 			selectWidget.get_gameObject().SetActive(false);
 		}
-		_003COnOpen_003Ec__AnonStorey4A6 _003COnOpen_003Ec__AnonStorey4A;
-		FadeInMap(new Action((object)_003COnOpen_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003COnOpen_003Ec__AnonStorey4B8 _003COnOpen_003Ec__AnonStorey4B;
+		FadeInMap(new Action((object)_003COnOpen_003Ec__AnonStorey4B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		base.collectUI = base._transform;
 		isChangingMap = false;
 		base.OnOpen();
@@ -724,8 +724,8 @@ public class WorldMap : GameSection
 		{
 			uiMapSprite.get_gameObject().SetActive(true);
 		}
-		_003CFadeInMap_003Ec__AnonStorey4A8 _003CFadeInMap_003Ec__AnonStorey4A;
-		this.StartCoroutine(DoFadeMap(0f, 1f, 0.4f, new Action((object)_003CFadeInMap_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+		_003CFadeInMap_003Ec__AnonStorey4BA _003CFadeInMap_003Ec__AnonStorey4BA;
+		this.StartCoroutine(DoFadeMap(0f, 1f, 0.4f, new Action((object)_003CFadeInMap_003Ec__AnonStorey4BA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 
 	public void DisableWorldMapObject()
@@ -840,8 +840,8 @@ public class WorldMap : GameSection
 		else
 		{
 			DisableWorldMapObject();
-			_003CEnterRegionMapEvent_003Ec__AnonStorey4A9 _003CEnterRegionMapEvent_003Ec__AnonStorey4A;
-			blurFilter.StartBlurFilter(0f, 0.25f, 0.25f, blurCenter, new Action((object)_003CEnterRegionMapEvent_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CEnterRegionMapEvent_003Ec__AnonStorey4BB _003CEnterRegionMapEvent_003Ec__AnonStorey4BB;
+			blurFilter.StartBlurFilter(0f, 0.25f, 0.25f, blurCenter, new Action((object)_003CEnterRegionMapEvent_003Ec__AnonStorey4BB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -1061,6 +1061,7 @@ public class WorldMap : GameSection
 		{
 			GameSection.ChangeStayEvent("INVALID_RELEASE", null);
 			GameSection.ResumeEvent(true, null);
+			releaseRegionId = -1;
 		}
 		else
 		{
@@ -1193,7 +1194,7 @@ public class WorldMap : GameSection
 			tweenCtrl.Reset();
 			tweenCtrl.Play(true, delegate
 			{
-				((_003CPlayOpenRegionMap_003Ec__Iterator193)/*Error near IL_0740: stateMachine*/)._003CisTweenEnd_003E__15 = true;
+				((_003CPlayOpenRegionMap_003Ec__Iterator19D)/*Error near IL_0740: stateMachine*/)._003CisTweenEnd_003E__15 = true;
 			});
 			SoundManager.PlayOneShotUISE(SE_ID_LOGO);
 			while (!isTweenEnd)

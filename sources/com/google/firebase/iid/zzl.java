@@ -25,7 +25,6 @@ import com.appsflyer.AppsFlyerProperties;
 import com.google.android.gms.common.util.zzp;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.MessengerCompat;
-import io.fabric.sdk.android.services.settings.SettingsJsonConstants;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -297,7 +296,7 @@ public final class zzl {
                     intent2.setPackage("com.google.example.invalidpackage");
                     zzhre = PendingIntent.getBroadcast(context, 0, intent2, 0);
                 }
-                Object obj = SettingsJsonConstants.APP_KEY;
+                Object obj = "app";
                 intent.putExtra(obj, zzhre);
             } finally {
                 Class cls = zzl.class;

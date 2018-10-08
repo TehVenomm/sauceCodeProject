@@ -419,7 +419,7 @@ public class zza implements Creator<ItemScopeEntity> {
                     list6 = com.google.android.gms.common.internal.safeparcel.zza.zzc(parcel, zzK, ItemScopeEntity.CREATOR);
                     hashSet.add(Integer.valueOf(41));
                     break;
-                case MotionEventCompat.AXIS_GENERIC_11 /*42*/:
+                case 42:
                     str23 = com.google.android.gms.common.internal.safeparcel.zza.zzo(parcel, zzK);
                     hashSet.add(Integer.valueOf(42));
                     break;

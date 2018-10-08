@@ -489,7 +489,7 @@ public interface zzd extends IInterface {
                     parcel2.writeNoException();
                     parcel2.writeString(accountName);
                     return true;
-                case MotionEventCompat.AXIS_GENERIC_11 /*42*/:
+                case 42:
                     parcel.enforceInterface("com.google.android.gms.plus.internal.IPlusService");
                     boolean zzvw = zzvw();
                     parcel2.writeNoException();

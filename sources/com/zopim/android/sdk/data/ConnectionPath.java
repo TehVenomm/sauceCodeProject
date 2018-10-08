@@ -71,7 +71,7 @@ public class ConnectionPath extends Path<Connection> {
     void update(String str) {
         if (str != null && !str.isEmpty()) {
             synchronized (this.mLock) {
-                this.mData = this.PARSER.parse(str, new C0863a(this));
+                this.mData = this.PARSER.parse(str, new C0862a(this));
             }
             broadcast(getData());
         }

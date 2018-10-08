@@ -50,7 +50,7 @@ public class LoungeMemberList : GameSection
 		bool isWait = true;
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.GetRallyList(delegate
 		{
-			((_003CDoInitialize_003Ec__IteratorE8)/*Error near IL_002d: stateMachine*/)._003CisWait_003E__0 = false;
+			((_003CDoInitialize_003Ec__IteratorEC)/*Error near IL_002d: stateMachine*/)._003CisWait_003E__0 = false;
 		});
 		while (isWait)
 		{

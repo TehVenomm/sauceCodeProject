@@ -114,9 +114,13 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 		base.GetComponent<UIGrid>((Enum)UI.GRD_WEAPON).Reposition();
 		base.GetComponent<UIGrid>((Enum)UI.GRD_ARMOR).Reposition();
 		base.UpdateUI();
-		if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.FORGE_ITEM) && MonoBehaviourSingleton<UIManager>.I.tutorialMessage != null)
+		if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.FORGE_ITEM))
 		{
-			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName(), "CreateItem", null);
+			SetBadge((Enum)UI.BTN_WEAPON_3, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.SPEAR) - 1, 6, 0, 0, true);
+			if (MonoBehaviourSingleton<UIManager>.I.tutorialMessage != null)
+			{
+				MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName(), "CreateItem", null);
+			}
 		}
 	}
 
@@ -163,8 +167,16 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 			bool _is_pickup = tYPE == SortBase.TYPE.WEAPON_ALL || tYPE == SortBase.TYPE.ARMOR_ALL;
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
-			_003CLocalInventory_003Ec__AnonStorey468 _003CLocalInventory_003Ec__AnonStorey;
+			bool initItem = false;
+			_003CLocalInventory_003Ec__AnonStorey479 _003CLocalInventory_003Ec__AnonStorey;
 			SetDynamicList((Enum)InventoryUI, string.Empty, localInventoryEquipData.Length, false, new Func<int, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetActive(GetCtrl(UI.OBJ_ROOT), UI.LBL_NO_ITEM, !initItem);
+			SetLabelText(GetCtrl(UI.OBJ_ROOT), UI.LBL_NO_ITEM, StringTable.Get(STRING_CATEGORY.COMMON, 19799u));
+		}
+		else
+		{
+			SetActive(GetCtrl(UI.OBJ_ROOT), UI.LBL_NO_ITEM, true);
+			SetLabelText(GetCtrl(UI.OBJ_ROOT), UI.LBL_NO_ITEM, StringTable.Get(STRING_CATEGORY.COMMON, 19799u));
 		}
 	}
 

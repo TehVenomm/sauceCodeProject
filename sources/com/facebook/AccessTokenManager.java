@@ -149,22 +149,24 @@ final class AccessTokenManager {
                             if (accessTokenRefreshCallback2 == null) {
                             }
                         } else {
-                            accessToken = new AccessToken(refreshResult.accessToken != null ? refreshResult.accessToken : accessToken.getToken(), accessToken.getApplicationId(), accessToken.getUserId(), atomicBoolean.get() ? hashSet : accessToken.getPermissions(), atomicBoolean.get() ? hashSet2 : accessToken.getDeclinedPermissions(), accessToken.getSource(), refreshResult.expiresAt != 0 ? new Date(((long) refreshResult.expiresAt) * 1000) : accessToken.getExpires(), new Date());
+                            AccessToken accessToken2 = new AccessToken(refreshResult.accessToken != null ? refreshResult.accessToken : accessToken.getToken(), accessToken.getApplicationId(), accessToken.getUserId(), atomicBoolean.get() ? hashSet : accessToken.getPermissions(), atomicBoolean.get() ? hashSet2 : accessToken.getDeclinedPermissions(), accessToken.getSource(), refreshResult.expiresAt != 0 ? new Date(((long) refreshResult.expiresAt) * 1000) : accessToken.getExpires(), new Date());
                             try {
-                                AccessTokenManager.getInstance().setCurrentAccessToken(accessToken);
+                                AccessTokenManager.getInstance().setCurrentAccessToken(accessToken2);
                                 AccessTokenManager.this.tokenRefreshInProgress.set(false);
-                                if (accessTokenRefreshCallback2 != null && accessToken != null) {
-                                    accessTokenRefreshCallback2.OnTokenRefreshed(accessToken);
+                                if (accessTokenRefreshCallback2 != null && accessToken2 != null) {
+                                    accessTokenRefreshCallback2.OnTokenRefreshed(accessToken2);
                                 }
                             } catch (Throwable th2) {
-                                th = th2;
+                                Throwable th3 = th2;
+                                accessToken = accessToken2;
+                                th = th3;
                                 AccessTokenManager.this.tokenRefreshInProgress.set(false);
                                 accessTokenRefreshCallback2.OnTokenRefreshed(accessToken);
                                 throw th;
                             }
                         }
-                    } catch (Throwable th3) {
-                        th = th3;
+                    } catch (Throwable th4) {
+                        th = th4;
                         accessToken = null;
                         AccessTokenManager.this.tokenRefreshInProgress.set(false);
                         if (!(accessTokenRefreshCallback2 == null || accessToken == null)) {

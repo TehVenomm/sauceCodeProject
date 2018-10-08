@@ -746,6 +746,20 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 		"ShopTop"
 	};
 
+	public List<int> noBlurEffectEventId = new List<int>
+	{
+		99001301
+	};
+
+	public List<int> noBlurEffectBossId = new List<int>
+	{
+		994419602,
+		993318100,
+		993218200,
+		300000522,
+		100000524
+	};
+
 	private Quaternion initLightRot;
 
 	private Quaternion initNpcLightRot;

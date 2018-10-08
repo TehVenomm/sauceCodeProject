@@ -21,7 +21,7 @@ import net.gogame.gowrap.ui.UIContext;
 import net.gogame.gowrap.ui.dialog.CustomDialog;
 import net.gogame.gowrap.ui.dialog.CustomDialog.Type;
 import net.gogame.gowrap.ui.download.ImageViewTarget;
-import net.gogame.gowrap.ui.dpro.C1155R;
+import net.gogame.gowrap.ui.dpro.C1471R;
 import net.gogame.gowrap.ui.dpro.model.equipmentcollection.Equipment;
 import net.gogame.gowrap.ui.dpro.model.equipmentcollection.EquipmentCollection;
 import net.gogame.gowrap.ui.dpro.model.equipmentcollection.EquipmentCollectionResponse;
@@ -41,8 +41,8 @@ public class EquipmentCollectionFragment extends Fragment {
     private UIContext uiContext;
 
     /* renamed from: net.gogame.gowrap.ui.dpro.ui.EquipmentCollectionFragment$1 */
-    class C11571 implements OnClickListener {
-        C11571() {
+    class C14731 implements OnClickListener {
+        C14731() {
         }
 
         public void onClick(View view) {
@@ -53,8 +53,8 @@ public class EquipmentCollectionFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.dpro.ui.EquipmentCollectionFragment$2 */
-    class C11582 implements OnClickListener {
-        C11582() {
+    class C14742 implements OnClickListener {
+        C14742() {
         }
 
         public void onClick(View view) {
@@ -63,8 +63,8 @@ public class EquipmentCollectionFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.dpro.ui.EquipmentCollectionFragment$3 */
-    class C11593 implements OnClickListener {
-        C11593() {
+    class C14753 implements OnClickListener {
+        C14753() {
         }
 
         public void onClick(View view) {
@@ -84,11 +84,11 @@ public class EquipmentCollectionFragment extends Fragment {
             try {
                 EquipmentCollectionFragment.this.onNetworkOperationEnded();
                 if (getExceptionToBeThrown() != null) {
-                    CustomDialog.newBuilder(EquipmentCollectionFragment.this.getActivity()).withType(Type.ALERT).withTitle(C1155R.string.net_gogame_gowrap_ranking_title).withMessage(getExceptionToBeThrown().getMessage()).build().show();
+                    CustomDialog.newBuilder(EquipmentCollectionFragment.this.getActivity()).withType(Type.ALERT).withTitle(C1471R.string.net_gogame_gowrap_ranking_title).withMessage(getExceptionToBeThrown().getMessage()).build().show();
                 } else if (equipmentCollectionResponse == null) {
-                    CustomDialog.newBuilder(EquipmentCollectionFragment.this.getActivity()).withType(Type.ALERT).withTitle(C1155R.string.net_gogame_gowrap_ranking_title).withMessage(C1155R.string.net_gogame_gowrap_ranking_no_data_error_message).build().show();
+                    CustomDialog.newBuilder(EquipmentCollectionFragment.this.getActivity()).withType(Type.ALERT).withTitle(C1471R.string.net_gogame_gowrap_ranking_title).withMessage(C1471R.string.net_gogame_gowrap_ranking_no_data_error_message).build().show();
                 } else if (equipmentCollectionResponse.getStatusCode() != 0) {
-                    CustomDialog.newBuilder(EquipmentCollectionFragment.this.getActivity()).withType(Type.ALERT).withTitle(C1155R.string.net_gogame_gowrap_ranking_title).withMessage(equipmentCollectionResponse.getErrorMessage()).build().show();
+                    CustomDialog.newBuilder(EquipmentCollectionFragment.this.getActivity()).withType(Type.ALERT).withTitle(C1471R.string.net_gogame_gowrap_ranking_title).withMessage(equipmentCollectionResponse.getErrorMessage()).build().show();
                 } else {
                     EquipmentCollectionFragment.this.equipmentCollection = equipmentCollectionResponse.getEquipmentCollection();
                     EquipmentCollectionFragment.this.pageNumber = 0;
@@ -108,32 +108,32 @@ public class EquipmentCollectionFragment extends Fragment {
         if (getActivity() instanceof UIContext) {
             this.uiContext = (UIContext) getActivity();
         }
-        View inflate = layoutInflater.inflate(C1155R.layout.net_gogame_gowrap_dpro_fragment_equipment_collection, viewGroup, false);
-        this.progressBar = (ProgressBar) inflate.findViewById(C1155R.id.net_gogame_gowrap_progress_indicator);
-        ViewGroup viewGroup2 = (ViewGroup) inflate.findViewById(C1155R.id.net_gogame_gowrap_equipment_collection_list);
+        View inflate = layoutInflater.inflate(C1471R.layout.net_gogame_gowrap_dpro_fragment_equipment_collection, viewGroup, false);
+        this.progressBar = (ProgressBar) inflate.findViewById(C1471R.id.net_gogame_gowrap_progress_indicator);
+        ViewGroup viewGroup2 = (ViewGroup) inflate.findViewById(C1471R.id.net_gogame_gowrap_equipment_collection_list);
         for (int i = 0; i < viewGroup2.getChildCount(); i++) {
             viewGroup2.getChildAt(i).setVisibility(8);
         }
         if (this.leaderboardEntry != null) {
-            ((TextView) inflate.findViewById(C1155R.id.net_gogame_gowrap_equipment_collection_user_name)).setText(this.leaderboardEntry.getUserName());
-            ((TextView) inflate.findViewById(C1155R.id.net_gogame_gowrap_equipment_collection_user_title)).setText(this.leaderboardEntry.getUserTitle());
+            ((TextView) inflate.findViewById(C1471R.id.net_gogame_gowrap_equipment_collection_user_name)).setText(this.leaderboardEntry.getUserName());
+            ((TextView) inflate.findViewById(C1471R.id.net_gogame_gowrap_equipment_collection_user_title)).setText(this.leaderboardEntry.getUserTitle());
             if (this.leaderboardEntry.getUserLevel() != null) {
-                ((TextView) inflate.findViewById(C1155R.id.net_gogame_gowrap_equipment_collection_user_level)).setText(String.format(Locale.getDefault(), "Lv %,d", new Object[]{this.leaderboardEntry.getUserLevel()}));
+                ((TextView) inflate.findViewById(C1471R.id.net_gogame_gowrap_equipment_collection_user_level)).setText(String.format(Locale.getDefault(), "Lv %,d", new Object[]{this.leaderboardEntry.getUserLevel()}));
             }
             if (this.leaderboardEntry.getValue() != null) {
-                ((TextView) inflate.findViewById(C1155R.id.net_gogame_gowrap_equipment_collection_points)).setText(String.format(Locale.getDefault(), "Points %,d", new Object[]{this.leaderboardEntry.getValue()}));
+                ((TextView) inflate.findViewById(C1471R.id.net_gogame_gowrap_equipment_collection_points)).setText(String.format(Locale.getDefault(), "Points %,d", new Object[]{this.leaderboardEntry.getValue()}));
             }
-            ((TextView) inflate.findViewById(C1155R.id.net_gogame_gowrap_equipment_collection_hunter_id)).setText(this.leaderboardEntry.getHunterId());
+            ((TextView) inflate.findViewById(C1471R.id.net_gogame_gowrap_equipment_collection_hunter_id)).setText(this.leaderboardEntry.getHunterId());
             if (this.leaderboardEntry.getHunterId() != null) {
                 new CustomEquipmentCollectionAsyncTask().execute(new String[]{this.leaderboardEntry.getHunterId()});
             }
         }
-        inflate.findViewById(C1155R.id.net_gogame_gowrap_back_button).setOnClickListener(new C11571());
-        View findViewById = inflate.findViewById(C1155R.id.net_gogame_gowrap_pager_previous_button);
-        View findViewById2 = inflate.findViewById(C1155R.id.net_gogame_gowrap_pager_next_button);
-        this.pagerText = (TextView) inflate.findViewById(C1155R.id.net_gogame_gowrap_pager_text);
-        findViewById.setOnClickListener(new C11582());
-        findViewById2.setOnClickListener(new C11593());
+        inflate.findViewById(C1471R.id.net_gogame_gowrap_back_button).setOnClickListener(new C14731());
+        View findViewById = inflate.findViewById(C1471R.id.net_gogame_gowrap_pager_previous_button);
+        View findViewById2 = inflate.findViewById(C1471R.id.net_gogame_gowrap_pager_next_button);
+        this.pagerText = (TextView) inflate.findViewById(C1471R.id.net_gogame_gowrap_pager_text);
+        findViewById.setOnClickListener(new C14742());
+        findViewById2.setOnClickListener(new C14753());
         return inflate;
     }
 
@@ -163,18 +163,18 @@ public class EquipmentCollectionFragment extends Fragment {
             cancelled.setCancelled(true);
         }
         this.imageViewTargetList.clear();
-        ((ScrollView) getView().findViewById(C1155R.id.net_gogame_gowrap_equipment_collection_container)).scrollTo(0, 0);
+        ((ScrollView) getView().findViewById(C1471R.id.net_gogame_gowrap_equipment_collection_container)).scrollTo(0, 0);
         if (this.equipmentCollection.getForgedEquipmentCount() != null) {
-            ((TextView) getView().findViewById(C1155R.id.net_gogame_gowrap_equipment_collection_forged_count)).setText(String.format(Locale.getDefault(), "Forged %,d", new Object[]{this.equipmentCollection.getForgedEquipmentCount()}));
+            ((TextView) getView().findViewById(C1471R.id.net_gogame_gowrap_equipment_collection_forged_count)).setText(String.format(Locale.getDefault(), "Forged %,d", new Object[]{this.equipmentCollection.getForgedEquipmentCount()}));
         }
         int size = this.equipmentCollection.getEquipmentList().size();
         if (this.equipmentCollection.getTotalEquipmentCount() != null) {
-            ((TextView) getView().findViewById(C1155R.id.net_gogame_gowrap_equipment_collection_total_count)).setText(String.format(Locale.getDefault(), "Total %,d", new Object[]{this.equipmentCollection.getTotalEquipmentCount()}));
+            ((TextView) getView().findViewById(C1471R.id.net_gogame_gowrap_equipment_collection_total_count)).setText(String.format(Locale.getDefault(), "Total %,d", new Object[]{this.equipmentCollection.getTotalEquipmentCount()}));
             intValue = this.equipmentCollection.getTotalEquipmentCount().intValue();
         } else {
             intValue = size;
         }
-        ViewGroup viewGroup = (ViewGroup) getView().findViewById(C1155R.id.net_gogame_gowrap_equipment_collection_list);
+        ViewGroup viewGroup = (ViewGroup) getView().findViewById(C1471R.id.net_gogame_gowrap_equipment_collection_list);
         int childCount = viewGroup.getChildCount();
         int i2 = ((intValue + childCount) - 1) / childCount;
         if (i < 0) {
@@ -189,11 +189,11 @@ public class EquipmentCollectionFragment extends Fragment {
         for (int i5 = i3; i5 < i4; i5++) {
             int i6 = i5 - i3;
             View childAt = viewGroup.getChildAt(i6);
-            ImageView imageView = (ImageView) childAt.findViewById(C1155R.id.net_gogame_gowrap_armory_equipment_icon);
-            ImageView imageView2 = (ImageView) childAt.findViewById(C1155R.id.net_gogame_gowrap_armory_equipment_frame);
-            ImageView imageView3 = (ImageView) childAt.findViewById(C1155R.id.net_gogame_gowrap_armory_equipment_rarity);
-            ImageView imageView4 = (ImageView) childAt.findViewById(C1155R.id.net_gogame_gowrap_armory_equipment_element);
-            TextView textView = (TextView) childAt.findViewById(C1155R.id.net_gogame_gowrap_armory_equipment_index);
+            ImageView imageView = (ImageView) childAt.findViewById(C1471R.id.net_gogame_gowrap_armory_equipment_icon);
+            ImageView imageView2 = (ImageView) childAt.findViewById(C1471R.id.net_gogame_gowrap_armory_equipment_frame);
+            ImageView imageView3 = (ImageView) childAt.findViewById(C1471R.id.net_gogame_gowrap_armory_equipment_rarity);
+            ImageView imageView4 = (ImageView) childAt.findViewById(C1471R.id.net_gogame_gowrap_armory_equipment_element);
+            TextView textView = (TextView) childAt.findViewById(C1471R.id.net_gogame_gowrap_armory_equipment_index);
             if (i5 < intValue) {
                 childAt.setVisibility(0);
                 textView.setText(String.format(Locale.ENGLISH, "No.%04d", new Object[]{Integer.valueOf(i5 + 1)}));
@@ -202,30 +202,30 @@ public class EquipmentCollectionFragment extends Fragment {
                     equipment = (Equipment) this.equipmentCollection.getEquipmentList().get(i5);
                 }
                 if (equipment == null || this.uiContext == null || i6 >= childCount) {
-                    imageView.setImageResource(C1155R.drawable.net_gogame_gowrap_dpro_icon_question_mark);
+                    imageView.setImageResource(C1471R.drawable.net_gogame_gowrap_dpro_icon_question_mark);
                     imageView2.setBackgroundResource(0);
                     imageView3.setImageResource(0);
                     imageView4.setImageResource(0);
                 } else {
                     String str = BASE_EQUIPMENT_ICON_URL + getIconId(equipment) + "0.png";
-                    imageView.setImageResource(C1155R.drawable.net_gogame_gowrap_dpro_icon_blank);
-                    imageView2.setBackgroundResource(C1155R.drawable.net_gogame_gowrap_dpro_equip_item_frame);
+                    imageView.setImageResource(C1471R.drawable.net_gogame_gowrap_dpro_icon_blank);
+                    imageView2.setBackgroundResource(C1471R.drawable.net_gogame_gowrap_dpro_equip_item_frame);
                     if (equipment.getRarity() != null) {
                         switch (equipment.getRarity().intValue()) {
                             case 1:
-                                imageView3.setImageResource(C1155R.drawable.net_gogame_gowrap_dpro_icon_rarity_c);
+                                imageView3.setImageResource(C1471R.drawable.net_gogame_gowrap_dpro_icon_rarity_c);
                                 break;
                             case 2:
-                                imageView3.setImageResource(C1155R.drawable.net_gogame_gowrap_dpro_icon_rarity_b);
+                                imageView3.setImageResource(C1471R.drawable.net_gogame_gowrap_dpro_icon_rarity_b);
                                 break;
                             case 3:
-                                imageView3.setImageResource(C1155R.drawable.net_gogame_gowrap_dpro_icon_rarity_a);
+                                imageView3.setImageResource(C1471R.drawable.net_gogame_gowrap_dpro_icon_rarity_a);
                                 break;
                             case 4:
-                                imageView3.setImageResource(C1155R.drawable.net_gogame_gowrap_dpro_icon_rarity_s);
+                                imageView3.setImageResource(C1471R.drawable.net_gogame_gowrap_dpro_icon_rarity_s);
                                 break;
                             case 5:
-                                imageView3.setImageResource(C1155R.drawable.net_gogame_gowrap_dpro_icon_rarity_ss);
+                                imageView3.setImageResource(C1471R.drawable.net_gogame_gowrap_dpro_icon_rarity_ss);
                                 break;
                             default:
                                 imageView3.setImageResource(0);
@@ -236,22 +236,22 @@ public class EquipmentCollectionFragment extends Fragment {
                     if (equipment.getElement() != null) {
                         switch (equipment.getElement().intValue()) {
                             case 1:
-                                imageView4.setImageResource(C1155R.drawable.net_gogame_gowrap_dpro_icon_element_fire);
+                                imageView4.setImageResource(C1471R.drawable.net_gogame_gowrap_dpro_icon_element_fire);
                                 break;
                             case 2:
-                                imageView4.setImageResource(C1155R.drawable.net_gogame_gowrap_dpro_icon_element_ice);
+                                imageView4.setImageResource(C1471R.drawable.net_gogame_gowrap_dpro_icon_element_ice);
                                 break;
                             case 3:
-                                imageView4.setImageResource(C1155R.drawable.net_gogame_gowrap_dpro_icon_element_wind);
+                                imageView4.setImageResource(C1471R.drawable.net_gogame_gowrap_dpro_icon_element_wind);
                                 break;
                             case 4:
-                                imageView4.setImageResource(C1155R.drawable.net_gogame_gowrap_dpro_icon_element_earth);
+                                imageView4.setImageResource(C1471R.drawable.net_gogame_gowrap_dpro_icon_element_earth);
                                 break;
                             case 5:
-                                imageView4.setImageResource(C1155R.drawable.net_gogame_gowrap_dpro_icon_element_light);
+                                imageView4.setImageResource(C1471R.drawable.net_gogame_gowrap_dpro_icon_element_light);
                                 break;
                             case 6:
-                                imageView4.setImageResource(C1155R.drawable.net_gogame_gowrap_dpro_icon_element_dark);
+                                imageView4.setImageResource(C1471R.drawable.net_gogame_gowrap_dpro_icon_element_dark);
                                 break;
                             default:
                                 imageView4.setImageResource(0);

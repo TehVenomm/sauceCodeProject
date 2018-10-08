@@ -11,7 +11,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import com.zopim.android.sdk.api.Chat;
 import com.zopim.android.sdk.api.Logger;
 import com.zopim.android.sdk.api.ZopimChat;
@@ -35,7 +35,7 @@ public class ZopimChatActivity extends AppCompatActivity implements ChatListener
         if (supportFragmentManager.findFragmentByTag(ZopimChatLogFragment.class.getName()) == null) {
             Fragment zopimChatLogFragment = new ZopimChatLogFragment();
             FragmentTransaction beginTransaction = supportFragmentManager.beginTransaction();
-            beginTransaction.add(C0785R.id.chat_fragment_container, zopimChatLogFragment, ZopimChatLogFragment.class.getName());
+            beginTransaction.add(C0784R.id.chat_fragment_container, zopimChatLogFragment, ZopimChatLogFragment.class.getName());
             beginTransaction.commit();
         }
     }
@@ -60,8 +60,8 @@ public class ZopimChatActivity extends AppCompatActivity implements ChatListener
 
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        setContentView(C0785R.layout.zopim_chat_activity);
-        setSupportActionBar((Toolbar) findViewById(C0785R.id.toolbar));
+        setContentView(C0784R.layout.zopim_chat_activity);
+        setSupportActionBar((Toolbar) findViewById(C0784R.id.toolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         if (bundle != null) {
             this.mChatInitialized = bundle.getBoolean(STATE_CHAT_INITIALIZED, false);
@@ -83,7 +83,7 @@ public class ZopimChatActivity extends AppCompatActivity implements ChatListener
                 }
                 Fragment newInstance = sessionConfig != null ? ZopimChatFragment.newInstance(sessionConfig) : new ZopimChatFragment();
                 FragmentTransaction beginTransaction = supportFragmentManager.beginTransaction();
-                beginTransaction.add(C0785R.id.chat_fragment_container, newInstance, ZopimChatFragment.class.getName());
+                beginTransaction.add(C0784R.id.chat_fragment_container, newInstance, ZopimChatFragment.class.getName());
                 beginTransaction.commit();
             }
         }

@@ -1,5 +1,8 @@
 package com.google.android.gms.internal;
 
+import android.os.RemoteException;
+import android.text.TextUtils;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
 final class zzceq implements Runnable {
@@ -19,94 +22,30 @@ final class zzceq implements Runnable {
         this.zzius = z;
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
     public final void run() {
-        /*
-        r8 = this;
-        r1 = r8.zzivx;
-        monitor-enter(r1);
-        r0 = r8.zzivw;	 Catch:{ RemoteException -> 0x0080 }
-        r0 = r0.zzivq;	 Catch:{ RemoteException -> 0x0080 }
-        if (r0 != 0) goto L_0x0034;
-    L_0x000b:
-        r0 = r8.zzivw;	 Catch:{ RemoteException -> 0x0080 }
-        r0 = r0.zzauk();	 Catch:{ RemoteException -> 0x0080 }
-        r0 = r0.zzayc();	 Catch:{ RemoteException -> 0x0080 }
-        r2 = "Failed to get user properties";
-        r3 = r8.zziab;	 Catch:{ RemoteException -> 0x0080 }
-        r3 = com.google.android.gms.internal.zzcbo.zzjf(r3);	 Catch:{ RemoteException -> 0x0080 }
-        r4 = r8.zziud;	 Catch:{ RemoteException -> 0x0080 }
-        r5 = r8.zziue;	 Catch:{ RemoteException -> 0x0080 }
-        r0.zzd(r2, r3, r4, r5);	 Catch:{ RemoteException -> 0x0080 }
-        r0 = r8.zzivx;	 Catch:{ RemoteException -> 0x0080 }
-        r2 = java.util.Collections.emptyList();	 Catch:{ RemoteException -> 0x0080 }
-        r0.set(r2);	 Catch:{ RemoteException -> 0x0080 }
-        r0 = r8.zzivx;	 Catch:{ all -> 0x006b }
-        r0.notify();	 Catch:{ all -> 0x006b }
-        monitor-exit(r1);	 Catch:{ all -> 0x006b }
-    L_0x0033:
-        return;
-    L_0x0034:
-        r2 = r8.zziab;	 Catch:{ RemoteException -> 0x0080 }
-        r2 = android.text.TextUtils.isEmpty(r2);	 Catch:{ RemoteException -> 0x0080 }
-        if (r2 == 0) goto L_0x006e;
-    L_0x003c:
-        r2 = r8.zzivx;	 Catch:{ RemoteException -> 0x0080 }
-        r3 = r8.zziud;	 Catch:{ RemoteException -> 0x0080 }
-        r4 = r8.zziue;	 Catch:{ RemoteException -> 0x0080 }
-        r5 = r8.zzius;	 Catch:{ RemoteException -> 0x0080 }
-        r6 = r8.zzivw;	 Catch:{ RemoteException -> 0x0080 }
-        r6 = r6.zzatz();	 Catch:{ RemoteException -> 0x0080 }
-        r7 = r8.zzivw;	 Catch:{ RemoteException -> 0x0080 }
-        r7 = r7.zzauk();	 Catch:{ RemoteException -> 0x0080 }
-        r7 = r7.zzayj();	 Catch:{ RemoteException -> 0x0080 }
-        r6 = r6.zzjb(r7);	 Catch:{ RemoteException -> 0x0080 }
-        r0 = r0.zza(r3, r4, r5, r6);	 Catch:{ RemoteException -> 0x0080 }
-        r2.set(r0);	 Catch:{ RemoteException -> 0x0080 }
-    L_0x005f:
-        r0 = r8.zzivw;	 Catch:{ RemoteException -> 0x0080 }
-        r0.zzwt();	 Catch:{ RemoteException -> 0x0080 }
-        r0 = r8.zzivx;	 Catch:{ all -> 0x006b }
-        r0.notify();	 Catch:{ all -> 0x006b }
-    L_0x0069:
-        monitor-exit(r1);	 Catch:{ all -> 0x006b }
-        goto L_0x0033;
-    L_0x006b:
-        r0 = move-exception;
-        monitor-exit(r1);	 Catch:{ all -> 0x006b }
-        throw r0;
-    L_0x006e:
-        r2 = r8.zzivx;	 Catch:{ RemoteException -> 0x0080 }
-        r3 = r8.zziab;	 Catch:{ RemoteException -> 0x0080 }
-        r4 = r8.zziud;	 Catch:{ RemoteException -> 0x0080 }
-        r5 = r8.zziue;	 Catch:{ RemoteException -> 0x0080 }
-        r6 = r8.zzius;	 Catch:{ RemoteException -> 0x0080 }
-        r0 = r0.zza(r3, r4, r5, r6);	 Catch:{ RemoteException -> 0x0080 }
-        r2.set(r0);	 Catch:{ RemoteException -> 0x0080 }
-        goto L_0x005f;
-    L_0x0080:
-        r0 = move-exception;
-        r2 = r8.zzivw;	 Catch:{ all -> 0x00a7 }
-        r2 = r2.zzauk();	 Catch:{ all -> 0x00a7 }
-        r2 = r2.zzayc();	 Catch:{ all -> 0x00a7 }
-        r3 = "Failed to get user properties";
-        r4 = r8.zziab;	 Catch:{ all -> 0x00a7 }
-        r4 = com.google.android.gms.internal.zzcbo.zzjf(r4);	 Catch:{ all -> 0x00a7 }
-        r5 = r8.zziud;	 Catch:{ all -> 0x00a7 }
-        r2.zzd(r3, r4, r5, r0);	 Catch:{ all -> 0x00a7 }
-        r0 = r8.zzivx;	 Catch:{ all -> 0x00a7 }
-        r2 = java.util.Collections.emptyList();	 Catch:{ all -> 0x00a7 }
-        r0.set(r2);	 Catch:{ all -> 0x00a7 }
-        r0 = r8.zzivx;	 Catch:{ all -> 0x006b }
-        r0.notify();	 Catch:{ all -> 0x006b }
-        goto L_0x0069;
-    L_0x00a7:
-        r0 = move-exception;
-        r2 = r8.zzivx;	 Catch:{ all -> 0x006b }
-        r2.notify();	 Catch:{ all -> 0x006b }
-        throw r0;	 Catch:{ all -> 0x006b }
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.internal.zzceq.run():void");
+        synchronized (this.zzivx) {
+            try {
+                zzcbg zzd = this.zzivw.zzivq;
+                if (zzd == null) {
+                    this.zzivw.zzauk().zzayc().zzd("Failed to get user properties", zzcbo.zzjf(this.zziab), this.zziud, this.zziue);
+                    this.zzivx.set(Collections.emptyList());
+                    this.zzivx.notify();
+                    return;
+                }
+                if (TextUtils.isEmpty(this.zziab)) {
+                    this.zzivx.set(zzd.zza(this.zziud, this.zziue, this.zzius, this.zzivw.zzatz().zzjb(this.zzivw.zzauk().zzayj())));
+                } else {
+                    this.zzivx.set(zzd.zza(this.zziab, this.zziud, this.zziue, this.zzius));
+                }
+                this.zzivw.zzwt();
+                this.zzivx.notify();
+            } catch (RemoteException e) {
+                this.zzivw.zzauk().zzayc().zzd("Failed to get user properties", zzcbo.zzjf(this.zziab), this.zziud, e);
+                this.zzivx.set(Collections.emptyList());
+                this.zzivx.notify();
+            } catch (Throwable th) {
+                this.zzivx.notify();
+            }
+        }
     }
 }

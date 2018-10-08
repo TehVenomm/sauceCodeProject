@@ -29,7 +29,7 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 
 	public PointShopManager PointShopManager = new PointShopManager();
 
-	private static readonly TUTORIAL_MENU_BIT[] needTutorialBits = new TUTORIAL_MENU_BIT[12]
+	private static readonly TUTORIAL_MENU_BIT[] needTutorialBits = new TUTORIAL_MENU_BIT[28]
 	{
 		TUTORIAL_MENU_BIT.GACHA1,
 		TUTORIAL_MENU_BIT.GACHA2,
@@ -42,7 +42,23 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		TUTORIAL_MENU_BIT.CLAIM_REWARD,
 		TUTORIAL_MENU_BIT.FORGE_ITEM,
 		TUTORIAL_MENU_BIT.AFTER_GACHA2,
-		TUTORIAL_MENU_BIT.WORLD_MAP
+		TUTORIAL_MENU_BIT.SHADOW_QUEST_START,
+		TUTORIAL_MENU_BIT.SHADOW_QUEST_WIN,
+		TUTORIAL_MENU_BIT.SHADOW_QUEST_RESULT,
+		TUTORIAL_MENU_BIT.SHADOW_QUEST_END,
+		TUTORIAL_MENU_BIT.UPGRADE_ITEM,
+		TUTORIAL_MENU_BIT.UPGRADE_LEVEL2,
+		TUTORIAL_MENU_BIT.UPGRADE_LEVEL3,
+		TUTORIAL_MENU_BIT.UPGRADE_LEVEL4,
+		TUTORIAL_MENU_BIT.UPGRADE_LEVEL5,
+		TUTORIAL_MENU_BIT.UPGRADE_LEVEL6,
+		TUTORIAL_MENU_BIT.UPGRADE_LEVEL7,
+		TUTORIAL_MENU_BIT.UPGRADE_LEVEL8,
+		TUTORIAL_MENU_BIT.AFTER_UPGRADE_ITEM,
+		TUTORIAL_MENU_BIT.WORLD_MAP,
+		TUTORIAL_MENU_BIT.AFTER_QUEST,
+		TUTORIAL_MENU_BIT.AFTER_MAINSTATUS,
+		TUTORIAL_MENU_BIT.DONE_CHANGE_WEAPON
 	};
 
 	public UserInfo userInfo
@@ -299,6 +315,19 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 
 	public bool IsEndTutorialBit()
 	{
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady)
+		{
+			return (userStatus.TutorialBit & 0x200000000) != 0;
+		}
+		return false;
+	}
+
+	public bool IsEndTutorial()
+	{
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady)
+		{
+			return MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_MAINSTATUS) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_QUEST);
+		}
 		return false;
 	}
 
@@ -1122,19 +1151,20 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		{
 			userStatus.tutorialStep = diff.tutorialStep[0];
 			flag = true;
-			if (userStatus.tutorialStep == 4)
+			if (userStatus.tutorialStep != 4)
 			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_mission_end, "Tutorial");
-			}
-			else if (userStatus.tutorialStep == 7)
-			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_weapon_crafting, "Tutorial");
-			}
-			else if (userStatus.tutorialStep == 8)
-			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_weapon_equip, "Tutorial");
+				if (userStatus.tutorialStep == 7)
+				{
+					MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_weapon_crafting, "Tutorial");
+				}
+				else if (userStatus.tutorialStep != 8)
+				{
+					goto IL_03b2;
+				}
 			}
 		}
+		goto IL_03b2;
+		IL_03b2:
 		if (Utility.IsExist(diff.tutorialBit))
 		{
 			long oldTutorialBit = 0L;
@@ -1152,27 +1182,17 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 			{
 				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_monster_gacha_fight, "Tutorial");
 			}
-			else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA2, oldTutorialBit))
+			else if (!CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA2, oldTutorialBit) && !CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.SKILL_EQUIP, oldTutorialBit) && !CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.CLAIM_REWARD, oldTutorialBit))
 			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_magi_gacha, "Tutorial");
-			}
-			else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.SKILL_EQUIP, oldTutorialBit))
-			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_magi_equip, "Tutorial");
-			}
-			else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.CLAIM_REWARD, oldTutorialBit))
-			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_crystal_claimed, "Tutorial");
-			}
-			else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.FORGE_ITEM, oldTutorialBit))
-			{
-				GameSaveData.instance.SetPushTrackEquipTutorial(true);
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_weapon_crafting, "Tutorial");
-			}
-			else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.AFTER_GACHA2, oldTutorialBit))
-			{
-				MonoBehaviourSingleton<NativeGameService>.I.SignInFirstTime();
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_equip_end, "Tutorial");
+				if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.FORGE_ITEM, oldTutorialBit))
+				{
+					GameSaveData.instance.SetPushTrackEquipTutorial(true);
+					MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_weapon_crafting, "Tutorial");
+				}
+				else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.AFTER_GACHA2, oldTutorialBit))
+				{
+					MonoBehaviourSingleton<NativeGameService>.I.SignInFirstTime();
+				}
 			}
 			if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.tutorialMessage != null)
 			{

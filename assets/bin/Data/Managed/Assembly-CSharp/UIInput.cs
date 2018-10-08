@@ -68,8 +68,8 @@ public class UIInput
 
 	public string savedAs;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private GameObject selectOnTab;
 
 	public Color activeTextColor = Color.get_white();
@@ -84,8 +84,8 @@ public class UIInput
 
 	public OnValidate onValidate;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected string mValue;
 
 	[NonSerialized]

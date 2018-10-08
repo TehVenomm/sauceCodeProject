@@ -1,5 +1,6 @@
 package io.fabric.sdk.android.services.network;
 
+import im.getsocial.sdk.ErrorCode;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -152,8 +153,8 @@ public class HttpRequest {
     }
 
     /* renamed from: io.fabric.sdk.android.services.network.HttpRequest$1 */
-    static final class C09371 implements X509TrustManager {
-        C09371() {
+    static final class C12531 implements X509TrustManager {
+        C12531() {
         }
 
         public void checkClientTrusted(X509Certificate[] x509CertificateArr, String str) {
@@ -168,8 +169,8 @@ public class HttpRequest {
     }
 
     /* renamed from: io.fabric.sdk.android.services.network.HttpRequest$2 */
-    static final class C09382 implements HostnameVerifier {
-        C09382() {
+    static final class C12542 implements HostnameVerifier {
+        C12542() {
         }
 
         public boolean verify(String str, SSLSession sSLSession) {
@@ -298,11 +299,11 @@ public class HttpRequest {
     }
 
     public interface ConnectionFactory {
-        public static final ConnectionFactory DEFAULT = new C09461();
+        public static final ConnectionFactory DEFAULT = new C12621();
 
         /* renamed from: io.fabric.sdk.android.services.network.HttpRequest$ConnectionFactory$1 */
-        static final class C09461 implements ConnectionFactory {
-            C09461() {
+        static final class C12621 implements ConnectionFactory {
+            C12621() {
             }
 
             public HttpURLConnection create(URL url) throws IOException {
@@ -525,10 +526,10 @@ public class HttpRequest {
 
     private static SSLSocketFactory getTrustedFactory() throws HttpRequestException {
         if (TRUSTED_FACTORY == null) {
-            C09371 c09371 = new C09371();
+            C12531 c12531 = new C12531();
             try {
                 SSLContext instance = SSLContext.getInstance("TLS");
-                TrustManager[] trustManagerArr = new TrustManager[]{c09371};
+                TrustManager[] trustManagerArr = new TrustManager[]{c12531};
                 instance.init(null, trustManagerArr, new SecureRandom());
                 TRUSTED_FACTORY = instance.getSocketFactory();
             } catch (Throwable e) {
@@ -542,7 +543,7 @@ public class HttpRequest {
 
     private static HostnameVerifier getTrustedVerifier() {
         if (TRUSTED_VERIFIER == null) {
-            TRUSTED_VERIFIER = new C09382();
+            TRUSTED_VERIFIER = new C12542();
         }
         return TRUSTED_VERIFIER;
     }
@@ -905,7 +906,7 @@ public class HttpRequest {
     }
 
     public boolean created() throws HttpRequestException {
-        return 201 == code();
+        return ErrorCode.ACTION_DENIED == code();
     }
 
     public long date() {

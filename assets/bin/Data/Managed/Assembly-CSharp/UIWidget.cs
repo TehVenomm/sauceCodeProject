@@ -40,12 +40,12 @@ public class UIWidget : UIRect
 	[SerializeField]
 	protected Pivot mPivot = Pivot.Center;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected int mWidth = 100;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected int mHeight = 100;
 
 	[HideInInspector]
@@ -783,8 +783,8 @@ public class UIWidget : UIRect
 		}
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static int FullCompareFunc(UIWidget left, UIWidget right)
 	{
 		int num = UIPanel.CompareFunc(left.panel, right.panel);

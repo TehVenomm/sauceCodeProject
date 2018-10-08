@@ -10,7 +10,6 @@ import android.os.Build.VERSION;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import com.appsflyer.share.Constants;
-import com.google.android.gms.games.quest.Quests;
 import io.fabric.sdk.android.Fabric;
 import io.fabric.sdk.android.Kit;
 import java.util.Collection;
@@ -53,9 +52,9 @@ public class IdManager {
         BLUETOOTH_MAC_ADDRESS(2),
         FONT_TOKEN(53),
         ANDROID_ID(100),
-        ANDROID_DEVICE_ID(Quests.SELECT_COMPLETED_UNCLAIMED),
+        ANDROID_DEVICE_ID(101),
         ANDROID_SERIAL(102),
-        ANDROID_ADVERTISING_ID(Quests.SELECT_RECENTLY_FAILED);
+        ANDROID_ADVERTISING_ID(103);
         
         public final int protobufIndex;
 
@@ -79,11 +78,11 @@ public class IdManager {
             this.installerPackageNameProvider = new InstallerPackageNameProvider();
             this.collectHardwareIds = CommonUtils.getBooleanResourceValue(context, COLLECT_DEVICE_IDENTIFIERS, true);
             if (!this.collectHardwareIds) {
-                Fabric.getLogger().mo4289d("Fabric", "Device ID collection disabled for " + context.getPackageName());
+                Fabric.getLogger().mo4753d("Fabric", "Device ID collection disabled for " + context.getPackageName());
             }
             this.collectUserIds = CommonUtils.getBooleanResourceValue(context, COLLECT_USER_IDENTIFIERS, true);
             if (!this.collectUserIds) {
-                Fabric.getLogger().mo4289d("Fabric", "User information collection disabled for " + context.getPackageName());
+                Fabric.getLogger().mo4753d("Fabric", "User information collection disabled for " + context.getPackageName());
             }
         }
     }
@@ -92,7 +91,7 @@ public class IdManager {
         try {
             jSONObject.put(APPLICATION_INSTALL_ID_FIELD.toLowerCase(Locale.US), getAppInstallIdentifier());
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Could not write application id to JSON", e);
+            Fabric.getLogger().mo4756e("Fabric", "Could not write application id to JSON", e);
         }
     }
 
@@ -101,7 +100,7 @@ public class IdManager {
             try {
                 jSONObject.put(((DeviceIdentifierType) entry.getKey()).name().toLowerCase(Locale.US), entry.getValue());
             } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "Could not write value to JSON: " + ((DeviceIdentifierType) entry.getKey()).name(), e);
+                Fabric.getLogger().mo4756e("Fabric", "Could not write value to JSON: " + ((DeviceIdentifierType) entry.getKey()).name(), e);
             }
         }
     }
@@ -110,7 +109,7 @@ public class IdManager {
         try {
             jSONObject.put(MODEL_FIELD, getModelName());
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Could not write model to JSON", e);
+            Fabric.getLogger().mo4756e("Fabric", "Could not write model to JSON", e);
         }
     }
 
@@ -118,7 +117,7 @@ public class IdManager {
         try {
             jSONObject.put(OS_VERSION_FIELD, getOsVersionString());
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Could not write OS version to JSON", e);
+            Fabric.getLogger().mo4756e("Fabric", "Could not write OS version to JSON", e);
         }
     }
 
@@ -178,11 +177,11 @@ public class IdManager {
             try {
                 return CommonUtils.hexify(createCipher.doFinal(jSONObject.toString().getBytes()));
             } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "Could not encrypt IDs", e);
+                Fabric.getLogger().mo4756e("Fabric", "Could not encrypt IDs", e);
                 return str3;
             }
         } catch (Throwable e2) {
-            Fabric.getLogger().mo4292e("Fabric", "Could not create cipher to encrypt headers.", e2);
+            Fabric.getLogger().mo4756e("Fabric", "Could not create cipher to encrypt headers.", e2);
             return "";
         }
     }
@@ -225,7 +224,7 @@ public class IdManager {
                     formatId(defaultAdapter.getAddress());
                 }
             } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", BLUETOOTH_ERROR_MESSAGE, e);
+                Fabric.getLogger().mo4756e("Fabric", BLUETOOTH_ERROR_MESSAGE, e);
             }
         }
         return null;
@@ -280,7 +279,7 @@ public class IdManager {
             try {
                 return formatId((String) Build.class.getField("SERIAL").get(null));
             } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "Could not retrieve android.os.Build.SERIAL value", e);
+                Fabric.getLogger().mo4756e("Fabric", "Could not retrieve android.os.Build.SERIAL value", e);
             }
         }
         return null;

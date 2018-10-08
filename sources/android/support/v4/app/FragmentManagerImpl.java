@@ -426,10 +426,10 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
                 indexOf = arrayList.indexOf(startEnterTransitionListener.mRecord);
                 if (indexOf != -1 && ((Boolean) arrayList2.get(indexOf)).booleanValue()) {
                     startEnterTransitionListener.cancelTransaction();
-                    int i2 = size;
-                    indexOf = i;
-                    i = indexOf + 1;
-                    size = i2;
+                    int i2 = i;
+                    indexOf = size;
+                    i = i2 + 1;
+                    size = indexOf;
                 }
             }
             if (startEnterTransitionListener.isReady() || (arrayList != null && startEnterTransitionListener.mRecord.interactsWith(arrayList, 0, arrayList.size()))) {
@@ -440,22 +440,22 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
                     indexOf = arrayList.indexOf(startEnterTransitionListener.mRecord);
                     if (indexOf != -1 && ((Boolean) arrayList2.get(indexOf)).booleanValue()) {
                         startEnterTransitionListener.cancelTransaction();
-                        i2 = size;
-                        indexOf = i;
-                        i = indexOf + 1;
-                        size = i2;
+                        i2 = i;
+                        indexOf = size;
+                        i = i2 + 1;
+                        size = indexOf;
                     }
                 }
                 startEnterTransitionListener.completeTransaction();
-                i2 = size;
-                indexOf = i;
-                i = indexOf + 1;
-                size = i2;
+                i2 = i;
+                indexOf = size;
+                i = i2 + 1;
+                size = indexOf;
             } else {
-                i2 = size;
-                indexOf = i;
-                i = indexOf + 1;
-                size = i2;
+                i2 = i;
+                indexOf = size;
+                i = i2 + 1;
+                size = indexOf;
             }
         }
     }
@@ -1326,11 +1326,12 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
     void doPendingDeferredStart() {
         if (this.mHavePendingDeferredStart) {
             int i = 0;
-            for (int i2 = 0; i2 < this.mActive.size(); i2++) {
+            int i2 = 0;
+            while (i2 < this.mActive.size()) {
                 Fragment fragment = (Fragment) this.mActive.get(i2);
-                if (!(fragment == null || fragment.mLoaderManager == null)) {
-                    i |= fragment.mLoaderManager.hasRunningLoaders();
-                }
+                int hasRunningLoaders = (fragment == null || fragment.mLoaderManager == null) ? i : i | fragment.mLoaderManager.hasRunningLoaders();
+                i2++;
+                i = hasRunningLoaders;
             }
             if (i == 0) {
                 this.mHavePendingDeferredStart = false;

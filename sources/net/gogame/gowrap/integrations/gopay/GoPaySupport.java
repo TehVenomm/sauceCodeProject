@@ -28,12 +28,12 @@ public class GoPaySupport extends AbstractIntegrationSupport implements CanSetGu
     public static final String METADATA_GAME_MANAGED_VIP_STATUS = "goWrap.goPay.gameManagedVipStatus";
     private String appId;
     private boolean gameManagedVipStatus = false;
-    private final Listener goPayClientListener = new C11131();
+    private final Listener goPayClientListener = new C14291();
     private IntegrationContext integrationContext;
 
     /* renamed from: net.gogame.gowrap.integrations.gopay.GoPaySupport$1 */
-    class C11131 implements Listener {
-        C11131() {
+    class C14291 implements Listener {
+        C14291() {
         }
 
         public void onVipStatus(VipStatus vipStatus) {

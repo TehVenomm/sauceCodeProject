@@ -15,7 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import com.zopim.android.sdk.api.Chat;
 import com.zopim.android.sdk.api.ChatConfig;
 import com.zopim.android.sdk.api.ChatSession;
@@ -38,15 +38,15 @@ public class ZopimChatFragment extends Fragment {
     private static final String STATE_NO_CONNECTION_ERROR_VISIBITLITY = "NO_CONNECTION_ERROR_VISIBILITY";
     private static final String STATE_PROGRESS_VISIBITLITY = "PROGRESS_VISIBILITY";
     private Chat mChat;
-    BroadcastReceiver mChatInitializationTimeout = new C0889k(this);
+    BroadcastReceiver mChatInitializationTimeout = new C0888k(this);
     private boolean mChatInitialized = false;
     private ChatListener mChatListener;
-    ConnectionObserver mConnectionObserver = new C0887i(this);
+    ConnectionObserver mConnectionObserver = new C0886i(this);
     private View mCouldNotConnectErrorView;
     private Handler mHandler = new Handler(Looper.getMainLooper());
     private View mNoAgentsView;
     private View mNoConnectionErrorView;
-    BroadcastReceiver mOfflineMessageReceiver = new C0888j(this);
+    BroadcastReceiver mOfflineMessageReceiver = new C0887j(this);
     private View mProgressBar;
 
     private void close() {
@@ -64,7 +64,7 @@ public class ZopimChatFragment extends Fragment {
     }
 
     private void onChatInitializationFailed() {
-        this.mHandler.post(new C0883e(this));
+        this.mHandler.post(new C0882e(this));
     }
 
     private void onChatInitialized() {
@@ -74,7 +74,7 @@ public class ZopimChatFragment extends Fragment {
         }
         Account account = ZopimChat.getDataSource().getAccount();
         if (account == null || Status.OFFLINE != account.getStatus()) {
-            this.mHandler.post(new C0882d(this));
+            this.mHandler.post(new C0881d(this));
         } else {
             showNoAgents();
         }
@@ -101,7 +101,7 @@ public class ZopimChatFragment extends Fragment {
     }
 
     private void showCouldNotConnectError() {
-        this.mHandler.post(new C0886h(this));
+        this.mHandler.post(new C0885h(this));
     }
 
     private boolean showField(Field field, String str) {
@@ -109,11 +109,11 @@ public class ZopimChatFragment extends Fragment {
     }
 
     private void showNoAgents() {
-        this.mHandler.post(new C0885g(this));
+        this.mHandler.post(new C0884g(this));
     }
 
     private void showNoConnectionError() {
-        this.mHandler.post(new C0884f(this));
+        this.mHandler.post(new C0883f(this));
     }
 
     private boolean showPreChat() {
@@ -181,7 +181,7 @@ public class ZopimChatFragment extends Fragment {
     }
 
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
-        return layoutInflater.inflate(C0785R.layout.zopim_chat_fragment, viewGroup, false);
+        return layoutInflater.inflate(C0784R.layout.zopim_chat_fragment, viewGroup, false);
     }
 
     public void onDetach() {
@@ -232,11 +232,11 @@ public class ZopimChatFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle bundle) {
         super.onViewCreated(view, bundle);
         setHasOptionsMenu(true);
-        this.mProgressBar = view.findViewById(C0785R.id.progress_container);
-        this.mNoConnectionErrorView = view.findViewById(C0785R.id.no_connection_error);
-        this.mNoAgentsView = view.findViewById(C0785R.id.no_agents);
-        this.mCouldNotConnectErrorView = view.findViewById(C0785R.id.could_not_connect_error);
-        ((Button) this.mNoAgentsView.findViewById(C0785R.id.no_agents_button)).setOnClickListener(new C0880b(this));
+        this.mProgressBar = view.findViewById(C0784R.id.progress_container);
+        this.mNoConnectionErrorView = view.findViewById(C0784R.id.no_connection_error);
+        this.mNoAgentsView = view.findViewById(C0784R.id.no_agents);
+        this.mCouldNotConnectErrorView = view.findViewById(C0784R.id.could_not_connect_error);
+        ((Button) this.mNoAgentsView.findViewById(C0784R.id.no_agents_button)).setOnClickListener(new C0879b(this));
     }
 
     public void onViewStateRestored(@Nullable Bundle bundle) {

@@ -46,12 +46,12 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 	[Tooltip("スクリ\u30fcン下オフセット")]
 	protected float screenBottomOffset = 140f;
 
-	[Tooltip("表示時のYオフセット")]
 	[SerializeField]
+	[Tooltip("表示時のYオフセット")]
 	protected float offsetY = 0.1f;
 
-	[Tooltip("HPの色")]
 	[SerializeField]
+	[Tooltip("HPの色")]
 	protected HpColorInfo[] hpColorInfo;
 
 	private readonly string kIconPrefix = "Ingame_portal_";

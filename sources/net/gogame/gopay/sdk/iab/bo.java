@@ -5,13 +5,13 @@ import android.view.View.OnClickListener;
 
 final class bo implements OnClickListener {
     /* renamed from: a */
-    final /* synthetic */ PurchaseActivity f1111a;
+    final /* synthetic */ PurchaseActivity f3499a;
 
     bo(PurchaseActivity purchaseActivity) {
-        this.f1111a = purchaseActivity;
+        this.f3499a = purchaseActivity;
     }
 
     public final void onClick(View view) {
-        PurchaseActivity.m821m(this.f1111a);
+        PurchaseActivity.m3846m(this.f3499a);
     }
 }

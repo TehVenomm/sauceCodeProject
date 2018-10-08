@@ -16,16 +16,16 @@ public class WebWidgetListener extends WebViewClient {
     private static final String DELIMITER = "z://";
     private static final String ENCODING = "utf-8";
     private static final String LOG_TAG = WebWidgetListener.class.getSimpleName();
-    private static final Executor MY_EXECUTOR = new C0873k(Executors.newCachedThreadPool());
+    private static final Executor MY_EXECUTOR = new C0872k(Executors.newCachedThreadPool());
 
     @TargetApi(11)
-    private void executePathUpdate(C0871i c0871i, String str) {
+    private void executePathUpdate(C0870i c0870i, String str) {
         try {
             if (VERSION.SDK_INT >= 11) {
-                c0871i.executeOnExecutor(MY_EXECUTOR, new String[]{str});
+                c0870i.executeOnExecutor(MY_EXECUTOR, new String[]{str});
                 return;
             }
-            c0871i.execute(new String[]{str});
+            c0870i.execute(new String[]{str});
         } catch (IllegalStateException e) {
             Log.w(LOG_TAG, "Could not execute path update due to a state error");
             e.printStackTrace();
@@ -34,7 +34,7 @@ public class WebWidgetListener extends WebViewClient {
 
     @JavascriptInterface
     public void msg(String str) {
-        executePathUpdate(new C0871i(), str);
+        executePathUpdate(new C0870i(), str);
     }
 
     public boolean shouldOverrideUrlLoading(WebView webView, String str) {
@@ -49,7 +49,7 @@ public class WebWidgetListener extends WebViewClient {
                     Log.e(LOG_TAG, "Error encoding " + decode);
                     e.printStackTrace();
                 }
-                executePathUpdate(new C0871i(), decode);
+                executePathUpdate(new C0870i(), decode);
             } catch (IndexOutOfBoundsException e2) {
                 Log.w(LOG_TAG, "Error parsing url. " + e2.getMessage());
             }

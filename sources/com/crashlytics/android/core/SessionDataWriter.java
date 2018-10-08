@@ -184,12 +184,12 @@ class SessionDataWriter {
     }
 
     private int getThreadSize(Thread thread, StackTraceElement[] stackTraceElementArr, int i, boolean z) {
-        int computeBytesSize = CodedOutputStream.computeBytesSize(1, ByteString.copyFromUtf8(thread.getName())) + CodedOutputStream.computeUInt32Size(2, i);
+        int computeUInt32Size = CodedOutputStream.computeUInt32Size(2, i) + CodedOutputStream.computeBytesSize(1, ByteString.copyFromUtf8(thread.getName()));
         for (StackTraceElement frameSize : stackTraceElementArr) {
             int frameSize2 = getFrameSize(frameSize, z);
-            computeBytesSize += frameSize2 + (CodedOutputStream.computeTagSize(3) + CodedOutputStream.computeRawVarint32Size(frameSize2));
+            computeUInt32Size += frameSize2 + (CodedOutputStream.computeTagSize(3) + CodedOutputStream.computeRawVarint32Size(frameSize2));
         }
-        return computeBytesSize;
+        return computeUInt32Size;
     }
 
     private ByteString stringToByteString(String str) {
@@ -383,7 +383,7 @@ class SessionDataWriter {
         this.threads = threadArr;
         ByteString byteStringForLog = logFileManager.getByteStringForLog();
         if (byteStringForLog == null) {
-            Fabric.getLogger().mo4289d("Fabric", "No log data to include with this event.");
+            Fabric.getLogger().mo4753d("Fabric", "No log data to include with this event.");
         }
         logFileManager.clearLog();
         codedOutputStream.writeTag(10, 2);

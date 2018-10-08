@@ -130,7 +130,7 @@ public class ZopimChat implements Chat, ChatSession {
         }
     }
 
-    public class DefaultConfig extends C0795i<DefaultConfig> {
+    public class DefaultConfig extends C0794i<DefaultConfig> {
         private static final long serialVersionUID = -3486736815047202381L;
         boolean disableVisitorInfoStorage;
         Long initializationTimeout;
@@ -204,7 +204,7 @@ public class ZopimChat implements Chat, ChatSession {
         }
     }
 
-    public static class SessionConfig extends C0795i<SessionConfig> implements Serializable {
+    public static class SessionConfig extends C0794i<SessionConfig> implements Serializable {
         private static final long serialVersionUID = -4343330703382755112L;
         Long initializationTimeout;
         Long sessionTimeout;
@@ -213,10 +213,10 @@ public class ZopimChat implements Chat, ChatSession {
         public Chat build(FragmentActivity fragmentActivity) {
             if (!ZopimChat.isInitialized()) {
                 Log.e(ZopimChat.LOG_TAG, "Have you initialized?");
-                return new C0818v();
+                return new C0817v();
             } else if (fragmentActivity == null) {
                 Log.e(ZopimChat.LOG_TAG, "Can not build the chat. Activity must not be null.");
-                return new C0818v();
+                return new C0817v();
             } else {
                 Storage.init(fragmentActivity);
                 if (ZopimChat.mDisableVisitorInfo) {
@@ -283,7 +283,7 @@ public class ZopimChat implements Chat, ChatSession {
     }
 
     /* renamed from: com.zopim.android.sdk.api.ZopimChat$a */
-    private static class C0796a {
+    private static class C0795a {
         /* renamed from: a */
         private static final ZopimChat f623a = new ZopimChat();
 
@@ -337,7 +337,7 @@ public class ZopimChat implements Chat, ChatSession {
         }
         if (singleton == null) {
             Log.i(LOG_TAG, "Initializing Chat SDK");
-            singleton = C0796a.m569b();
+            singleton = C0795a.m569b();
         }
         singleton.mAccountKey = str;
         Log.v(LOG_TAG, "Staring chat configuration");
@@ -383,14 +383,14 @@ public class ZopimChat implements Chat, ChatSession {
     }
 
     public static synchronized Chat resume(FragmentActivity fragmentActivity) {
-        Chat c0818v;
+        Chat c0817v;
         synchronized (ZopimChat.class) {
             if (!isInitialized()) {
                 Log.e(LOG_TAG, "Have you initialized?");
-                c0818v = new C0818v();
+                c0817v = new C0817v();
             } else if (fragmentActivity == null) {
                 Log.e(LOG_TAG, "Chat can not be resumed. Activity must not be null.");
-                c0818v = new C0818v();
+                c0817v = new C0817v();
             } else {
                 FragmentManager supportFragmentManager = fragmentActivity.getSupportFragmentManager();
                 if (supportFragmentManager.findFragmentByTag(ChatServiceBinder.class.getName()) == null) {
@@ -408,21 +408,21 @@ public class ZopimChat implements Chat, ChatSession {
                     String machineId = Storage.machineId().getMachineId();
                     if (machineId == null || machineId.isEmpty()) {
                         Logger.m562i(LOG_TAG, "Can not resume chat without machine id. Chat either expired or not yet started.");
-                        c0818v = new C0818v();
+                        c0817v = new C0817v();
                     } else {
                         Intent intent = new Intent(fragmentActivity.getApplicationContext(), ChatService.class);
                         intent.putExtra("ACCOUNT_KEY", singleton.mAccountKey);
                         intent.putExtra("MACHINE_ID", machineId);
                         intent.setAction("chat.action.RECONNECT");
                         fragmentActivity.getApplicationContext().startService(intent);
-                        c0818v = singleton;
+                        c0817v = singleton;
                     }
                 } else {
-                    c0818v = singleton;
+                    c0817v = singleton;
                 }
             }
         }
-        return c0818v;
+        return c0817v;
     }
 
     public static void setVisitorInfo(VisitorInfo visitorInfo) {

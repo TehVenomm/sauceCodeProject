@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/NGUI Unity2D Sprite")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/NGUI Unity2D Sprite")]
 public class UI2DSprite : UIBasicSprite
 {
 	[SerializeField]
@@ -17,8 +17,8 @@ public class UI2DSprite : UIBasicSprite
 	[SerializeField]
 	private Shader mShader;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Vector4 mBorder = Vector4.get_zero();
 
 	[HideInInspector]

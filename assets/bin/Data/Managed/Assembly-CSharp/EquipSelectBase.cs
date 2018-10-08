@@ -73,7 +73,9 @@ public abstract class EquipSelectBase : SmithEquipBase
 		BTN_WEAPON_4,
 		BTN_WEAPON_5,
 		OBJ_CAPTION_3,
-		LBL_CAPTION
+		LBL_CAPTION,
+		OBJ_ROOT,
+		LBL_NO_ITEM
 	}
 
 	protected SortCompareData[] localInventoryEquipData;
@@ -225,7 +227,7 @@ public abstract class EquipSelectBase : SmithEquipBase
 			if (item.ability != null && item.ability.Length > 0)
 			{
 				bool empty_ability = true;
-				_003CEquipParam_003Ec__AnonStorey351 _003CEquipParam_003Ec__AnonStorey;
+				_003CEquipParam_003Ec__AnonStorey360 _003CEquipParam_003Ec__AnonStorey;
 				SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", item.ability.Length, false, new Action<int, Transform, bool>((object)_003CEquipParam_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				if (empty_ability)
 				{
@@ -251,7 +253,16 @@ public abstract class EquipSelectBase : SmithEquipBase
 			SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
-			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length, false, new Func<int, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			bool initItem = false;
+			_003CLocalInventory_003Ec__AnonStorey361 _003CLocalInventory_003Ec__AnonStorey;
+			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length, false, new Func<int, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetActive(base._transform, UI.LBL_NO_ITEM, !initItem);
+			SetLabelText(base._transform, UI.LBL_NO_ITEM, StringTable.Get(STRING_CATEGORY.COMMON, 19799u));
+		}
+		else
+		{
+			SetActive(base._transform, UI.LBL_NO_ITEM, true);
+			SetLabelText(base._transform, UI.LBL_NO_ITEM, StringTable.Get(STRING_CATEGORY.COMMON, 19799u));
 		}
 	}
 

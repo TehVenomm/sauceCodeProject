@@ -70,7 +70,7 @@ public class SmithShadowEvolveDialog : GameSection
 		SmithManager.ResultData result_data = CreateResultData();
 		GameSection.SetEventData(result_data);
 		GameSection.StayEvent();
-		_003COnQuery_SmithShadowEvolveConfirm_YES_003Ec__AnonStorey480 _003COnQuery_SmithShadowEvolveConfirm_YES_003Ec__AnonStorey;
+		_003COnQuery_SmithShadowEvolveConfirm_YES_003Ec__AnonStorey491 _003COnQuery_SmithShadowEvolveConfirm_YES_003Ec__AnonStorey;
 		MonoBehaviourSingleton<SmithManager>.I.SendShadowEvolveEquipItem(itemInfo.uniqueID, createData.needMaterial[0].itemID, new Action<Error, EquipItemInfo>((object)_003COnQuery_SmithShadowEvolveConfirm_YES_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 }

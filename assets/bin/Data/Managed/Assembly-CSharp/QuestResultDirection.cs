@@ -44,8 +44,8 @@ public class QuestResultDirection : GameSection
 			bool waitLoad = true;
 			MonoBehaviourSingleton<InGameRecorder>.I.CreatePlayerModelsAsync(delegate(PlayerLoader[] loaders)
 			{
-				((_003CDoInitialize_003Ec__Iterator13E)/*Error near IL_016d: stateMachine*/)._003C_003Ef__this.players = loaders;
-				((_003CDoInitialize_003Ec__Iterator13E)/*Error near IL_016d: stateMachine*/)._003CwaitLoad_003E__5 = false;
+				((_003CDoInitialize_003Ec__Iterator142)/*Error near IL_016d: stateMachine*/)._003C_003Ef__this.players = loaders;
+				((_003CDoInitialize_003Ec__Iterator142)/*Error near IL_016d: stateMachine*/)._003CwaitLoad_003E__5 = false;
 			});
 			while (waitLoad)
 			{

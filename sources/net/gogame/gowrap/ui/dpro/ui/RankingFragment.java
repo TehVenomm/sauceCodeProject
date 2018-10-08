@@ -24,7 +24,7 @@ import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.support.StringUtils;
 import net.gogame.gowrap.ui.UIContext;
 import net.gogame.gowrap.ui.dialog.CustomDialog;
-import net.gogame.gowrap.ui.dpro.C1155R;
+import net.gogame.gowrap.ui.dpro.C1471R;
 import net.gogame.gowrap.ui.dpro.model.leaderboard.AbstractLeaderboardResponse;
 import net.gogame.gowrap.ui.dpro.model.leaderboard.EquipmentCollectionLeaderboardResponse;
 import net.gogame.gowrap.ui.dpro.model.leaderboard.FriendsLeaderboardRequest;
@@ -75,8 +75,8 @@ public class RankingFragment extends Fragment {
     private UIContext uiContext;
 
     /* renamed from: net.gogame.gowrap.ui.dpro.ui.RankingFragment$1 */
-    class C11621 implements OnItemClickListener {
-        C11621() {
+    class C14781 implements OnItemClickListener {
+        C14781() {
         }
 
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long j) {
@@ -85,8 +85,8 @@ public class RankingFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.dpro.ui.RankingFragment$2 */
-    class C11632 implements OnClickListener {
-        C11632() {
+    class C14792 implements OnClickListener {
+        C14792() {
         }
 
         public void onClick(View view) {
@@ -97,8 +97,8 @@ public class RankingFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.dpro.ui.RankingFragment$3 */
-    class C11643 implements OnClickListener {
-        C11643() {
+    class C14803 implements OnClickListener {
+        C14803() {
         }
 
         public void onClick(View view) {
@@ -109,8 +109,8 @@ public class RankingFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.dpro.ui.RankingFragment$4 */
-    class C11654 implements OnClickListener {
-        C11654() {
+    class C14814 implements OnClickListener {
+        C14814() {
         }
 
         public void onClick(View view) {
@@ -121,8 +121,8 @@ public class RankingFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.dpro.ui.RankingFragment$5 */
-    class C11665 implements OnClickListener {
-        C11665() {
+    class C14825 implements OnClickListener {
+        C14825() {
         }
 
         public void onClick(View view) {
@@ -132,8 +132,8 @@ public class RankingFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.dpro.ui.RankingFragment$6 */
-    class C11676 implements TextWatcher {
-        C11676() {
+    class C14836 implements TextWatcher {
+        C14836() {
         }
 
         public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -148,8 +148,8 @@ public class RankingFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.dpro.ui.RankingFragment$7 */
-    class C11687 extends RightDrawableOnTouchListener {
-        C11687() {
+    class C14847 extends RightDrawableOnTouchListener {
+        C14847() {
         }
 
         public boolean onDrawableTouch(MotionEvent motionEvent) {
@@ -159,8 +159,8 @@ public class RankingFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.dpro.ui.RankingFragment$8 */
-    class C11698 implements OnClickListener {
-        C11698() {
+    class C14858 implements OnClickListener {
+        C14858() {
         }
 
         public void onClick(View view) {
@@ -182,8 +182,8 @@ public class RankingFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.dpro.ui.RankingFragment$9 */
-    class C11709 implements OnClickListener {
-        C11709() {
+    class C14869 implements OnClickListener {
+        C14869() {
         }
 
         public void onClick(View view) {
@@ -215,11 +215,11 @@ public class RankingFragment extends Fragment {
             try {
                 RankingFragment.this.onNetworkOperationEnded();
                 if (getExceptionToBeThrown() != null) {
-                    CustomDialog.newBuilder(RankingFragment.this.getActivity()).withType(net.gogame.gowrap.ui.dialog.CustomDialog.Type.ALERT).withTitle(C1155R.string.net_gogame_gowrap_ranking_title).withMessage(getExceptionToBeThrown().getMessage()).build().show();
+                    CustomDialog.newBuilder(RankingFragment.this.getActivity()).withType(net.gogame.gowrap.ui.dialog.CustomDialog.Type.ALERT).withTitle(C1471R.string.net_gogame_gowrap_ranking_title).withMessage(getExceptionToBeThrown().getMessage()).build().show();
                 } else if (equipmentCollectionLeaderboardResponse == null) {
-                    CustomDialog.newBuilder(RankingFragment.this.getActivity()).withType(net.gogame.gowrap.ui.dialog.CustomDialog.Type.ALERT).withTitle(C1155R.string.net_gogame_gowrap_ranking_title).withMessage(C1155R.string.net_gogame_gowrap_ranking_no_data_error_message).build().show();
+                    CustomDialog.newBuilder(RankingFragment.this.getActivity()).withType(net.gogame.gowrap.ui.dialog.CustomDialog.Type.ALERT).withTitle(C1471R.string.net_gogame_gowrap_ranking_title).withMessage(C1471R.string.net_gogame_gowrap_ranking_no_data_error_message).build().show();
                 } else if (equipmentCollectionLeaderboardResponse.getStatusCode() != 0) {
-                    CustomDialog.newBuilder(RankingFragment.this.getActivity()).withType(net.gogame.gowrap.ui.dialog.CustomDialog.Type.ALERT).withTitle(C1155R.string.net_gogame_gowrap_ranking_title).withMessage(equipmentCollectionLeaderboardResponse.getErrorMessage()).build().show();
+                    CustomDialog.newBuilder(RankingFragment.this.getActivity()).withType(net.gogame.gowrap.ui.dialog.CustomDialog.Type.ALERT).withTitle(C1471R.string.net_gogame_gowrap_ranking_title).withMessage(equipmentCollectionLeaderboardResponse.getErrorMessage()).build().show();
                 } else {
                     RankingFragment.this.populate(equipmentCollectionLeaderboardResponse, this.newType, this.newPageNumber, this.hunterId);
                 }
@@ -248,11 +248,11 @@ public class RankingFragment extends Fragment {
             try {
                 RankingFragment.this.onNetworkOperationEnded();
                 if (getExceptionToBeThrown() != null) {
-                    CustomDialog.newBuilder(RankingFragment.this.getActivity()).withType(net.gogame.gowrap.ui.dialog.CustomDialog.Type.ALERT).withTitle(C1155R.string.net_gogame_gowrap_ranking_title).withMessage(getExceptionToBeThrown().getMessage()).build().show();
+                    CustomDialog.newBuilder(RankingFragment.this.getActivity()).withType(net.gogame.gowrap.ui.dialog.CustomDialog.Type.ALERT).withTitle(C1471R.string.net_gogame_gowrap_ranking_title).withMessage(getExceptionToBeThrown().getMessage()).build().show();
                 } else if (powerRatingLeaderboardResponse == null) {
-                    CustomDialog.newBuilder(RankingFragment.this.getActivity()).withType(net.gogame.gowrap.ui.dialog.CustomDialog.Type.ALERT).withTitle(C1155R.string.net_gogame_gowrap_ranking_title).withMessage(C1155R.string.net_gogame_gowrap_ranking_no_data_error_message).build().show();
+                    CustomDialog.newBuilder(RankingFragment.this.getActivity()).withType(net.gogame.gowrap.ui.dialog.CustomDialog.Type.ALERT).withTitle(C1471R.string.net_gogame_gowrap_ranking_title).withMessage(C1471R.string.net_gogame_gowrap_ranking_no_data_error_message).build().show();
                 } else if (powerRatingLeaderboardResponse.getStatusCode() != 0) {
-                    CustomDialog.newBuilder(RankingFragment.this.getActivity()).withType(net.gogame.gowrap.ui.dialog.CustomDialog.Type.ALERT).withTitle(C1155R.string.net_gogame_gowrap_ranking_title).withMessage(powerRatingLeaderboardResponse.getErrorMessage()).build().show();
+                    CustomDialog.newBuilder(RankingFragment.this.getActivity()).withType(net.gogame.gowrap.ui.dialog.CustomDialog.Type.ALERT).withTitle(C1471R.string.net_gogame_gowrap_ranking_title).withMessage(powerRatingLeaderboardResponse.getErrorMessage()).build().show();
                 } else {
                     RankingFragment.this.populate(powerRatingLeaderboardResponse, this.newType, this.newPageNumber, this.hunterId);
                 }
@@ -303,39 +303,39 @@ public class RankingFragment extends Fragment {
         if (getActivity() instanceof UIContext) {
             this.uiContext = (UIContext) getActivity();
         }
-        View inflate = layoutInflater.inflate(C1155R.layout.net_gogame_gowrap_dpro_fragment_ranking, viewGroup, false);
-        this.progressBar = (ProgressBar) inflate.findViewById(C1155R.id.net_gogame_gowrap_progress_indicator);
+        View inflate = layoutInflater.inflate(C1471R.layout.net_gogame_gowrap_dpro_fragment_ranking, viewGroup, false);
+        this.progressBar = (ProgressBar) inflate.findViewById(C1471R.id.net_gogame_gowrap_progress_indicator);
         this.listAdapter = new RankingListAdapter(getActivity());
         this.listAdapter.onRestoreInstanceState(getParcelable(KEY_LIST_ADAPTER));
-        this.buttonContainer = inflate.findViewById(C1155R.id.net_gogame_gowrap_ranking_button_container);
-        this.powerRankingAllUsersRanksButton = inflate.findViewById(C1155R.id.net_gogame_gowrap_ranking_power_rating_all_users_button);
-        this.powerRankingNewUsersButton = inflate.findViewById(C1155R.id.net_gogame_gowrap_ranking_power_rating_new_users_button);
-        this.equipmentCollectionAllUsersButton = inflate.findViewById(C1155R.id.net_gogame_gowrap_ranking_equipment_collection_all_users_button);
+        this.buttonContainer = inflate.findViewById(C1471R.id.net_gogame_gowrap_ranking_button_container);
+        this.powerRankingAllUsersRanksButton = inflate.findViewById(C1471R.id.net_gogame_gowrap_ranking_power_rating_all_users_button);
+        this.powerRankingNewUsersButton = inflate.findViewById(C1471R.id.net_gogame_gowrap_ranking_power_rating_new_users_button);
+        this.equipmentCollectionAllUsersButton = inflate.findViewById(C1471R.id.net_gogame_gowrap_ranking_equipment_collection_all_users_button);
         this.buttonGroup = new View[]{this.powerRankingAllUsersRanksButton, this.powerRankingNewUsersButton, this.equipmentCollectionAllUsersButton};
-        View findViewById = inflate.findViewById(C1155R.id.net_gogame_gowrap_ranking_search_button);
-        this.searchContainer = inflate.findViewById(C1155R.id.net_gogame_gowrap_ranking_search_container);
-        this.searchEditText = (EditText) inflate.findViewById(C1155R.id.net_gogame_gowrap_ranking_search);
-        this.searchSubmitButton = inflate.findViewById(C1155R.id.net_gogame_gowrap_ranking_search_submit_button);
-        this.resultsContainer = inflate.findViewById(C1155R.id.net_gogame_gowrap_ranking_results_container);
-        this.hunterEntryContainer = (LinearLayout) inflate.findViewById(C1155R.id.net_gogame_gowrap_ranking_hunter_entry_container);
-        this.hunterEntry = (LinearLayout) inflate.findViewById(C1155R.id.net_gogame_gowrap_ranking_hunter_entry);
-        this.listView = (ListView) inflate.findViewById(C1155R.id.net_gogame_gowrap_ranking_listview);
+        View findViewById = inflate.findViewById(C1471R.id.net_gogame_gowrap_ranking_search_button);
+        this.searchContainer = inflate.findViewById(C1471R.id.net_gogame_gowrap_ranking_search_container);
+        this.searchEditText = (EditText) inflate.findViewById(C1471R.id.net_gogame_gowrap_ranking_search);
+        this.searchSubmitButton = inflate.findViewById(C1471R.id.net_gogame_gowrap_ranking_search_submit_button);
+        this.resultsContainer = inflate.findViewById(C1471R.id.net_gogame_gowrap_ranking_results_container);
+        this.hunterEntryContainer = (LinearLayout) inflate.findViewById(C1471R.id.net_gogame_gowrap_ranking_hunter_entry_container);
+        this.hunterEntry = (LinearLayout) inflate.findViewById(C1471R.id.net_gogame_gowrap_ranking_hunter_entry);
+        this.listView = (ListView) inflate.findViewById(C1471R.id.net_gogame_gowrap_ranking_listview);
         this.listView.setAdapter(this.listAdapter);
-        this.listView.setOnItemClickListener(new C11621());
-        this.pagerContainer = inflate.findViewById(C1155R.id.net_gogame_gowrap_pager_container);
-        this.pagerPreviousButton = inflate.findViewById(C1155R.id.net_gogame_gowrap_pager_previous_button);
-        this.pagerNextButton = inflate.findViewById(C1155R.id.net_gogame_gowrap_pager_next_button);
-        this.pagerText = (TextView) inflate.findViewById(C1155R.id.net_gogame_gowrap_pager_text);
-        this.powerRankingAllUsersRanksButton.setOnClickListener(new C11632());
-        this.powerRankingNewUsersButton.setOnClickListener(new C11643());
-        this.equipmentCollectionAllUsersButton.setOnClickListener(new C11654());
-        findViewById.setOnClickListener(new C11665());
-        UIUtils.setupRightDrawable(getActivity(), this.searchEditText, C1155R.array.net_gogame_gowrap_dpro_search_edittext_drawables);
+        this.listView.setOnItemClickListener(new C14781());
+        this.pagerContainer = inflate.findViewById(C1471R.id.net_gogame_gowrap_pager_container);
+        this.pagerPreviousButton = inflate.findViewById(C1471R.id.net_gogame_gowrap_pager_previous_button);
+        this.pagerNextButton = inflate.findViewById(C1471R.id.net_gogame_gowrap_pager_next_button);
+        this.pagerText = (TextView) inflate.findViewById(C1471R.id.net_gogame_gowrap_pager_text);
+        this.powerRankingAllUsersRanksButton.setOnClickListener(new C14792());
+        this.powerRankingNewUsersButton.setOnClickListener(new C14803());
+        this.equipmentCollectionAllUsersButton.setOnClickListener(new C14814());
+        findViewById.setOnClickListener(new C14825());
+        UIUtils.setupRightDrawable(getActivity(), this.searchEditText, C1471R.array.net_gogame_gowrap_dpro_search_edittext_drawables);
         this.searchEditText.setText(this.uiContext.getGuid());
-        this.searchEditText.addTextChangedListener(new C11676());
-        this.searchEditText.setOnTouchListener(new C11687());
-        this.searchSubmitButton.setOnClickListener(new C11698());
-        this.pagerPreviousButton.setOnClickListener(new C11709());
+        this.searchEditText.addTextChangedListener(new C14836());
+        this.searchEditText.setOnTouchListener(new C14847());
+        this.searchSubmitButton.setOnClickListener(new C14858());
+        this.pagerPreviousButton.setOnClickListener(new C14869());
         this.pagerNextButton.setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
                 RankingFragment.this.load(RankingFragment.this.type, RankingFragment.this.pageNumber + 1, null);
@@ -515,13 +515,13 @@ public class RankingFragment extends Fragment {
         if (abstractLeaderboardResponse.getRecords() == null) {
             abstractLeaderboardResponse.setRecords(new ArrayList());
         }
-        TextView textView = (TextView) getView().findViewById(C1155R.id.net_gogame_gowrap_ranking_value);
+        TextView textView = (TextView) getView().findViewById(C1471R.id.net_gogame_gowrap_ranking_value);
         switch (type.getCategory()) {
             case POWER_RATING:
-                textView.setText(C1155R.string.net_gogame_gowrap_ranking_power_header_caption);
+                textView.setText(C1471R.string.net_gogame_gowrap_ranking_power_header_caption);
                 break;
             case EQUIPMENT_COLLECTION:
-                textView.setText(C1155R.string.net_gogame_gowrap_ranking_points_header_caption);
+                textView.setText(C1471R.string.net_gogame_gowrap_ranking_points_header_caption);
                 break;
             default:
                 textView.setText(null);

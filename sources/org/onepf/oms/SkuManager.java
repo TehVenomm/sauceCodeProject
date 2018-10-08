@@ -73,7 +73,7 @@ public class SkuManager {
         if (map == null || !map.containsKey(str2)) {
             return str2;
         }
-        Logger.m1001d("getSku() restore sku from storeSku: ", str2, " -> ", (String) map.get(str2));
+        Logger.m4026d("getSku() restore sku from storeSku: ", str2, " -> ", (String) map.get(str2));
         return (String) map.get(str2);
     }
 
@@ -88,7 +88,7 @@ public class SkuManager {
             if (map == null || !map.containsKey(str2)) {
                 return str2;
             }
-            Logger.m1001d("getStoreSku() using mapping for sku: ", str2, " -> ", (String) map.get(str2));
+            Logger.m4026d("getStoreSku() using mapping for sku: ", str2, " -> ", (String) map.get(str2));
             return (String) map.get(str2);
         }
     }

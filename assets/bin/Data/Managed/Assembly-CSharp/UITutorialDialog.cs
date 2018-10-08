@@ -156,6 +156,12 @@ public class UITutorialDialog
 		return root[4].get_isActiveAndEnabled();
 	}
 
+	public bool isTwoLineGameObjectActive()
+	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		return root[1].get_gameObject().get_activeSelf();
+	}
+
 	public void HideThreeLineLabel2()
 	{
 		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
@@ -178,5 +184,11 @@ public class UITutorialDialog
 				}
 			});
 		}
+	}
+
+	public void CloseaLLImmediately(int lineIndex = 0)
+	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		root[lineIndex].get_gameObject().SetActive(false);
 	}
 }

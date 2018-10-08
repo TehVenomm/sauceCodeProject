@@ -283,8 +283,8 @@ public class ArenaResultTop : QuestResultTop
 		SetActive((Enum)UI.OBJ_POINT_SHOP_RESULT_ROOT, flag);
 		if (flag)
 		{
-			_003CUpdateUI_003Ec__AnonStorey2CB _003CUpdateUI_003Ec__AnonStorey2CB;
-			SetGrid(UI.OBJ_POINT_SHOP_RESULT_ROOT, "QuestResultPointShop", pointShopResultData.Count, true, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey2CB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateUI_003Ec__AnonStorey2DA _003CUpdateUI_003Ec__AnonStorey2DA;
+			SetGrid(UI.OBJ_POINT_SHOP_RESULT_ROOT, "QuestResultPointShop", pointShopResultData.Count, true, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey2DA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		this.StartCoroutine(PlayAnimation());
 	}

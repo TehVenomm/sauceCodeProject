@@ -6,17 +6,17 @@ import android.view.View.OnClickListener;
 
 final class bg implements OnClickListener {
     /* renamed from: a */
-    final /* synthetic */ Dialog f1095a;
+    final /* synthetic */ Dialog f3483a;
     /* renamed from: b */
-    final /* synthetic */ PurchaseActivity f1096b;
+    final /* synthetic */ PurchaseActivity f3484b;
 
     bg(PurchaseActivity purchaseActivity, Dialog dialog) {
-        this.f1096b = purchaseActivity;
-        this.f1095a = dialog;
+        this.f3484b = purchaseActivity;
+        this.f3483a = dialog;
     }
 
     public final void onClick(View view) {
-        this.f1095a.dismiss();
-        this.f1096b.f1047z.setEnabled(true);
+        this.f3483a.dismiss();
+        this.f3484b.f3435z.setEnabled(true);
     }
 }

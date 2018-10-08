@@ -50,7 +50,7 @@ class Onboarding extends Kit<Boolean> {
             if (performCreateApp(str, appSettingsData, collection)) {
                 return Settings.getInstance().loadSettingsSkippingCache();
             }
-            Fabric.getLogger().mo4292e("Fabric", "Failed to create app with Crashlytics service.", null);
+            Fabric.getLogger().mo4756e("Fabric", "Failed to create app with Crashlytics service.", null);
             return false;
         } else if (AppSettingsData.STATUS_CONFIGURED.equals(appSettingsData.status)) {
             return Settings.getInstance().loadSettingsSkippingCache();
@@ -58,7 +58,7 @@ class Onboarding extends Kit<Boolean> {
             if (!appSettingsData.updateRequired) {
                 return true;
             }
-            Fabric.getLogger().mo4289d("Fabric", "Server says an update is required - forcing a full App update.");
+            Fabric.getLogger().mo4753d("Fabric", "Server says an update is required - forcing a full App update.");
             performUpdateApp(str, appSettingsData, (Collection) collection);
             return true;
         }
@@ -81,7 +81,7 @@ class Onboarding extends Kit<Boolean> {
             Settings.getInstance().initialize(this, this.idManager, this.requestFactory, this.versionCode, this.versionName, getOverridenSpiEndpoint()).loadSettingsData();
             return Settings.getInstance().awaitSettingsData();
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Error dealing with settings", e);
+            Fabric.getLogger().mo4756e("Fabric", "Error dealing with settings", e);
             return null;
         }
     }
@@ -94,7 +94,7 @@ class Onboarding extends Kit<Boolean> {
             try {
                 performAutoConfigure = performAutoConfigure(appIconHashOrNull, retrieveSettingsData.appData, mergeKits(this.kitsFinder != null ? (Map) this.kitsFinder.get() : new HashMap(), this.providedKits).values());
             } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "Error performing auto configuration.", e);
+                Fabric.getLogger().mo4756e("Fabric", "Error performing auto configuration.", e);
                 performAutoConfigure = false;
             }
         } else {
@@ -136,7 +136,7 @@ class Onboarding extends Kit<Boolean> {
             this.targetAndroidSdkVersion = Integer.toString(getContext().getApplicationInfo().targetSdkVersion);
             return true;
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Failed init", e);
+            Fabric.getLogger().mo4756e("Fabric", "Failed init", e);
             return false;
         }
     }

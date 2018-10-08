@@ -84,32 +84,32 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 	[SerializeField]
 	protected float selfShowTime = 5f;
 
-	[SerializeField]
 	[Tooltip("矢印横表示時のXオフセット")]
+	[SerializeField]
 	protected float arrowSideOffset = 25f;
 
-	[SerializeField]
 	[Tooltip("スクリ\u30fcン横オフセット")]
+	[SerializeField]
 	protected float screenSideOffset = 36f;
 
 	[SerializeField]
 	[Tooltip("スクリ\u30fcン下オフセット")]
 	protected float screenBottomOffset = 107f;
 
-	[Tooltip("スクリ\u30fcン下オフセット、フィ\u30fcルド時")]
 	[SerializeField]
+	[Tooltip("スクリ\u30fcン下オフセット、フィ\u30fcルド時")]
 	protected float screenBottomFieldOffset = 107f;
 
 	[SerializeField]
 	[Tooltip("チャット横オフセット")]
 	protected float chatSideOffset = 60f;
 
-	[SerializeField]
 	[Tooltip("チャット上オフセット")]
+	[SerializeField]
 	protected float chatTopOffset = 120f;
 
-	[SerializeField]
 	[Tooltip("チャットスタンプ横オフセット")]
+	[SerializeField]
 	protected float chatStampSideOffset = 60f;
 
 	[Tooltip("チャットスタンプ上オフセット")]

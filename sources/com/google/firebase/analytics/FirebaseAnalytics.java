@@ -12,7 +12,6 @@ import android.support.annotation.Size;
 import com.google.android.gms.common.internal.zzbp;
 import com.google.android.gms.internal.zzcco;
 import com.google.android.gms.tasks.Task;
-import io.fabric.sdk.android.services.settings.SettingsJsonConstants;
 
 @Keep
 public final class FirebaseAnalytics {
@@ -151,7 +150,7 @@ public final class FirebaseAnalytics {
     }
 
     public final void setUserId(String str) {
-        this.zzikb.zzayx().setUserPropertyInternal(SettingsJsonConstants.APP_KEY, "_id", str);
+        this.zzikb.zzayx().setUserPropertyInternal("app", "_id", str);
     }
 
     public final void setUserProperty(@Size(max = 24, min = 1) @NonNull String str, @Nullable @Size(max = 36) String str2) {

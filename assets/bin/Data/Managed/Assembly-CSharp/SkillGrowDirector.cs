@@ -203,8 +203,8 @@ public class SkillGrowDirector : AnimationDirector
 		{
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0016: Expected O, but got Unknown
-			((_003CTEst_003Ec__Iterator15E)/*Error near IL_0251: stateMachine*/)._003C_003Ef__this.SetNPC(((_003CTEst_003Ec__Iterator15E)/*Error near IL_0251: stateMachine*/)._003C_003Ef__this.npcParent.get_gameObject());
-			((_003CTEst_003Ec__Iterator15E)/*Error near IL_0251: stateMachine*/)._003Cwait_003E__9 = false;
+			((_003CTEst_003Ec__Iterator162)/*Error near IL_0251: stateMachine*/)._003C_003Ef__this.SetNPC(((_003CTEst_003Ec__Iterator162)/*Error near IL_0251: stateMachine*/)._003C_003Ef__this.npcParent.get_gameObject());
+			((_003CTEst_003Ec__Iterator162)/*Error near IL_0251: stateMachine*/)._003Cwait_003E__9 = false;
 		}, false);
 		GameObject[] materialObjects = (GameObject[])new GameObject[materials.Length];
 		for (int i = 0; i < materials.Length; i++)
@@ -220,11 +220,11 @@ public class SkillGrowDirector : AnimationDirector
 			yield return (object)null;
 		}
 		yield return (object)new WaitForSeconds(0.2f);
-		if (_003CTEst_003Ec__Iterator15E._003C_003Ef__am_0024cache13 == null)
+		if (_003CTEst_003Ec__Iterator162._003C_003Ef__am_0024cache13 == null)
 		{
-			_003CTEst_003Ec__Iterator15E._003C_003Ef__am_0024cache13 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CTEst_003Ec__Iterator162._003C_003Ef__am_0024cache13 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		StartDirection(_003CTEst_003Ec__Iterator15E._003C_003Ef__am_0024cache13);
+		StartDirection(_003CTEst_003Ec__Iterator162._003C_003Ef__am_0024cache13);
 	}
 
 	public void SetNPC(GameObject npc)
@@ -331,7 +331,7 @@ public class SkillGrowDirector : AnimationDirector
 			val.Play("CameraAnim_Start", 0, 0f);
 			val.Update(0f);
 		}
-		_003CStartDirection_003Ec__AnonStorey466 _003CStartDirection_003Ec__AnonStorey;
+		_003CStartDirection_003Ec__AnonStorey476 _003CStartDirection_003Ec__AnonStorey;
 		Play("MainAnim_Start", new Action((object)_003CStartDirection_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), 0f);
 	}
 

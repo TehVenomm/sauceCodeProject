@@ -22,7 +22,7 @@ class AdvertisingInfoReflectionStrategy implements AdvertisingInfoStrategy {
         try {
             return (String) Class.forName(CLASS_NAME_ADVERTISING_ID_CLIENT_INFO).getMethod(METHOD_NAME_GET_ID, new Class[0]).invoke(getInfo(), new Object[0]);
         } catch (Exception e) {
-            Fabric.getLogger().mo4302w("Fabric", "Could not call getId on com.google.android.gms.ads.identifier.AdvertisingIdClient$Info");
+            Fabric.getLogger().mo4766w("Fabric", "Could not call getId on com.google.android.gms.ads.identifier.AdvertisingIdClient$Info");
             return null;
         }
     }
@@ -32,7 +32,7 @@ class AdvertisingInfoReflectionStrategy implements AdvertisingInfoStrategy {
         try {
             obj = Class.forName(CLASS_NAME_ADVERTISING_ID_CLIENT).getMethod(METHOD_NAME_GET_ADVERTISING_ID_INFO, new Class[]{Context.class}).invoke(null, new Object[]{this.context});
         } catch (Exception e) {
-            Fabric.getLogger().mo4302w("Fabric", "Could not call getAdvertisingIdInfo on com.google.android.gms.ads.identifier.AdvertisingIdClient");
+            Fabric.getLogger().mo4766w("Fabric", "Could not call getAdvertisingIdInfo on com.google.android.gms.ads.identifier.AdvertisingIdClient");
         }
         return obj;
     }
@@ -41,7 +41,7 @@ class AdvertisingInfoReflectionStrategy implements AdvertisingInfoStrategy {
         try {
             return ((Boolean) Class.forName(CLASS_NAME_ADVERTISING_ID_CLIENT_INFO).getMethod(METHOD_NAME_IS_LIMITED_AD_TRACKING_ENABLED, new Class[0]).invoke(getInfo(), new Object[0])).booleanValue();
         } catch (Exception e) {
-            Fabric.getLogger().mo4302w("Fabric", "Could not call isLimitAdTrackingEnabled on com.google.android.gms.ads.identifier.AdvertisingIdClient$Info");
+            Fabric.getLogger().mo4766w("Fabric", "Could not call isLimitAdTrackingEnabled on com.google.android.gms.ads.identifier.AdvertisingIdClient$Info");
             return false;
         }
     }

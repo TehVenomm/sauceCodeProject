@@ -11,7 +11,7 @@ public class AndroidClipBoard : iClipBoard
 		//IL_0048: Expected O, but got Unknown
 		AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
 		AndroidJavaObject activity = val.GetStatic<AndroidJavaObject>("currentActivity");
-		_003CSetClipBoard_003Ec__AnonStorey707 _003CSetClipBoard_003Ec__AnonStorey;
+		_003CSetClipBoard_003Ec__AnonStorey719 _003CSetClipBoard_003Ec__AnonStorey;
 		activity.Call("runOnUiThread", new object[1]
 		{
 			(object)new AndroidJavaRunnable((object)_003CSetClipBoard_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)

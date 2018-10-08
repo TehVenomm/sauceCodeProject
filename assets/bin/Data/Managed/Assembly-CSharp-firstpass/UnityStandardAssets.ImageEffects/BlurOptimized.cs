@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace UnityStandardAssets.ImageEffects
 {
-	[RequireComponent(typeof(Camera))]
-	[AddComponentMenu("Image Effects/Blur/Blur (Optimized)")]
 	[ExecuteInEditMode]
+	[AddComponentMenu("Image Effects/Blur/Blur (Optimized)")]
+	[RequireComponent(typeof(Camera))]
 	public class BlurOptimized : PostEffectsBase
 	{
 		public enum BlurType

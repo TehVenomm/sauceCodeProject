@@ -10,8 +10,8 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import com.zopim.android.sdk.api.FileTransfers.C0793a;
-import com.zopim.android.sdk.api.FileTransfers.C0794b;
+import com.zopim.android.sdk.api.FileTransfers.C0792a;
+import com.zopim.android.sdk.api.FileTransfers.C0793b;
 import com.zopim.android.sdk.api.ZopimChat.SessionConfig;
 import com.zopim.android.sdk.attachment.SdkCache;
 import com.zopim.android.sdk.data.ConnectionPath.ConnectivityReceiver;
@@ -41,13 +41,13 @@ public class ChatService extends Service implements Chat {
     static final String EXTRA_MACHINE_ID = "MACHINE_ID";
     static final String EXTRA_SESSION_CONFIG = "SESSION_CONFIG";
     private static final String LOG_TAG = ChatService.class.getSimpleName();
-    private static C0797a mChat;
+    private static C0796a mChat;
     private long mChatInitializationTimeout;
     private boolean mChatInitialized;
-    ChatLogObserver mChatLogObserver = new C0799c(this);
+    ChatLogObserver mChatLogObserver = new C0798c(this);
     private long mChatSessionTimeout;
     private final ChatTimeoutReceiver mChatTimeoutReceiver = new ChatTimeoutReceiver();
-    ConnectionObserver mConnectionObserver = new C0803f(this);
+    ConnectionObserver mConnectionObserver = new C0802f(this);
     private final ConnectivityReceiver mConnectivityReceiver = new ConnectivityReceiver();
     private String mDepartment;
     private boolean mEnded;
@@ -101,7 +101,7 @@ public class ChatService extends Service implements Chat {
 
     private void onChatInitialized() {
         Log.v(LOG_TAG, "Chat initialization completed");
-        mChat.mo4234b();
+        mChat.mo4236b();
         this.mChatInitialized = true;
         configureInitializationTimeout(false);
         Profile profile = ZopimChat.getDataSource().getProfile();
@@ -113,7 +113,7 @@ public class ChatService extends Service implements Chat {
         setPhoneNumber(this.mVisitorPhoneNumber);
         setDepartment(this.mDepartment);
         if (this.mTags != null && this.mTags.length > 0) {
-            mChat.mo4233a(this.mTags);
+            mChat.mo4235a(this.mTags);
         }
     }
 
@@ -153,7 +153,7 @@ public class ChatService extends Service implements Chat {
     }
 
     public ChatConfig getConfig() {
-        return new C0804g(this);
+        return new C0803g(this);
     }
 
     public boolean hasEnded() {
@@ -215,7 +215,7 @@ public class ChatService extends Service implements Chat {
             Logger.m562i(LOG_TAG, "Chat service already running and initialized, no need to re-initialize the web widget");
             return 1;
         } else {
-            mChat = new C0821x(this);
+            mChat = new C0820x(this);
             this.mChatInitialized = false;
             this.mEnded = false;
             ZopimChat.getDataSource().clear();
@@ -254,8 +254,8 @@ public class ChatService extends Service implements Chat {
                 this.mChatSessionTimeout = ChatSession.DEFAULT_CHAT_SESSION_TIMEOUT;
             }
             configureInitializationTimeout(true);
-            this.mKeepAliveRunner = Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new C0798b(this), 1, 1, TimeUnit.MINUTES);
-            mChat.mo4232a(stringExtra, stringExtra2, this.mTitle, this.mReferrer);
+            this.mKeepAliveRunner = Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new C0797b(this), 1, 1, TimeUnit.MINUTES);
+            mChat.mo4234a(stringExtra, stringExtra2, this.mTitle, this.mReferrer);
             Log.v(LOG_TAG, "Chat service started");
             return 1;
         }
@@ -276,13 +276,13 @@ public class ChatService extends Service implements Chat {
 
     public void send(File file) {
         if (canCommunicate()) {
-            C0793a find = FileTransfers.INSTANCE.find(file);
-            if (find == null || find.f615b != C0794b.f620e) {
+            C0792a find = FileTransfers.INSTANCE.find(file);
+            if (find == null || find.f615b != C0793b.f620e) {
                 mChat.send(file);
                 return;
             }
             Logger.m564v(LOG_TAG, "Re-sending file");
-            find.f615b = C0794b.f617b;
+            find.f615b = C0793b.f617b;
             LivechatChatLogPath.getInstance().broadcast();
             return;
         }

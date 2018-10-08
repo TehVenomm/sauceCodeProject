@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import com.zopim.android.sdk.attachment.FileExtension;
 import com.zopim.android.sdk.util.CropSquareTransform;
 
@@ -45,13 +45,13 @@ final class VisitorMessageHolder extends ViewHolder {
 
     public VisitorMessageHolder(View view, OnClickListener onClickListener) {
         super(view);
-        this.f732a = view.findViewById(C0785R.id.message_container);
-        this.f733b = (TextView) view.findViewById(C0785R.id.message_text);
-        this.f735d = (TextView) view.findViewById(C0785R.id.send_failed_label);
-        this.f734c = (ImageView) view.findViewById(C0785R.id.send_failed_icon);
-        this.f736e = view.findViewById(C0785R.id.attachment_image_container);
-        this.f737f = (ImageView) view.findViewById(C0785R.id.attachment_thumbnail);
-        this.f738g = (ContentLoadingProgressBar) view.findViewById(C0785R.id.attachment_progress);
+        this.f732a = view.findViewById(C0784R.id.message_container);
+        this.f733b = (TextView) view.findViewById(C0784R.id.message_text);
+        this.f735d = (TextView) view.findViewById(C0784R.id.send_failed_label);
+        this.f734c = (ImageView) view.findViewById(C0784R.id.send_failed_icon);
+        this.f736e = view.findViewById(C0784R.id.attachment_image_container);
+        this.f737f = (ImageView) view.findViewById(C0784R.id.attachment_thumbnail);
+        this.f738g = (ContentLoadingProgressBar) view.findViewById(C0784R.id.attachment_progress);
         this.f739h = onClickListener;
         this.f737f.setOnClickListener(this.f741j);
         this.f740i.setFlags(1073741824);
@@ -80,7 +80,7 @@ final class VisitorMessageHolder extends ViewHolder {
                 case 3:
                 case 4:
                 case 5:
-                    Picasso.with(this.itemView.getContext()).load(abVar.f765a).error(C0785R.drawable.ic_chat_default_avatar).placeholder(C0785R.drawable.bg_picasso_placeholder).transform(new CropSquareTransform()).into(this.f737f, new ad(this, abVar));
+                    Picasso.with(this.itemView.getContext()).load(abVar.f765a).error(C0784R.drawable.ic_chat_default_avatar).placeholder(C0784R.drawable.bg_picasso_placeholder).transform(new CropSquareTransform()).into(this.f737f, new ad(this, abVar));
                     this.f733b.setVisibility(8);
                     this.f736e.setVisibility(0);
                     this.f740i.setDataAndType(Uri.fromFile(abVar.f765a), "image/*");

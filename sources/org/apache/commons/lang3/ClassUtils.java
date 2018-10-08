@@ -554,7 +554,7 @@ public class ClassUtils {
     }
 
     public static Iterable<Class<?>> hierarchy(final Class<?> cls, Interfaces interfaces) {
-        final Iterable<Class<?>> c12701 = new Iterable<Class<?>>() {
+        final Iterable<Class<?>> c15861 = new Iterable<Class<?>>() {
             public Iterator<Class<?>> iterator() {
                 final MutableObject mutableObject = new MutableObject(cls);
                 return new Iterator<Class<?>>() {
@@ -574,10 +574,10 @@ public class ClassUtils {
                 };
             }
         };
-        return interfaces != Interfaces.INCLUDE ? c12701 : new Iterable<Class<?>>() {
+        return interfaces != Interfaces.INCLUDE ? c15861 : new Iterable<Class<?>>() {
             public Iterator<Class<?>> iterator() {
                 final Set hashSet = new HashSet();
-                final Iterator it = c12701.iterator();
+                final Iterator it = c15861.iterator();
                 return new Iterator<Class<?>>() {
                     Iterator<Class<?>> interfaces = Collections.emptySet().iterator();
 

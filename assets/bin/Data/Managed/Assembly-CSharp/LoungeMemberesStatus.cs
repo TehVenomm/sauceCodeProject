@@ -31,7 +31,7 @@ public class LoungeMemberesStatus
 
 	public unsafe LoungeMemberStatus GetMemberData(int userId)
 	{
-		_003CGetMemberData_003Ec__AnonStorey657 _003CGetMemberData_003Ec__AnonStorey;
+		_003CGetMemberData_003Ec__AnonStorey669 _003CGetMemberData_003Ec__AnonStorey;
 		LoungeMemberStatus loungeMemberStatus = memberes.FirstOrDefault(new Func<LoungeMemberStatus, bool>((object)_003CGetMemberData_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (object.ReferenceEquals(null, loungeMemberStatus))
 		{
@@ -84,14 +84,14 @@ public class LoungeMemberesStatus
 	{
 		List<int> list = new List<int>();
 		List<int> list2 = new List<int>();
-		_003CSyncLoungeMember_003Ec__AnonStorey659 _003CSyncLoungeMember_003Ec__AnonStorey;
-		IEnumerable<LoungeModel.SlotInfo> source = lounge.slotInfos.Where(new Func<LoungeModel.SlotInfo, bool>((object)_003CSyncLoungeMember_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSyncLoungeMember_003Ec__AnonStorey66B _003CSyncLoungeMember_003Ec__AnonStorey66B;
+		IEnumerable<LoungeModel.SlotInfo> source = lounge.slotInfos.Where(new Func<LoungeModel.SlotInfo, bool>((object)_003CSyncLoungeMember_003Ec__AnonStorey66B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (_003C_003Ef__am_0024cache3 == null)
 		{
 			_003C_003Ef__am_0024cache3 = new Func<LoungeModel.SlotInfo, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 		list = source.Select<LoungeModel.SlotInfo, int>(_003C_003Ef__am_0024cache3).ToList();
-		IEnumerable<LoungeMemberStatus> source2 = memberes.Where(new Func<LoungeMemberStatus, bool>((object)_003CSyncLoungeMember_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		IEnumerable<LoungeMemberStatus> source2 = memberes.Where(new Func<LoungeMemberStatus, bool>((object)_003CSyncLoungeMember_003Ec__AnonStorey66B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (_003C_003Ef__am_0024cache4 == null)
 		{
 			_003C_003Ef__am_0024cache4 = new Func<LoungeMemberStatus, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);

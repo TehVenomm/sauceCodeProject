@@ -956,11 +956,11 @@ public class HomeLoginBonusTheater : GameSection
 				{
 					if (0 < o.reward.Count && 0 < o.count && 9 >= o.count)
 					{
-						GetIconName(o.reward[0], out ((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CiconName_003E__21, out ((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CiconBGName_003E__22);
-						((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CitemIconLOs_003E__19[o.count - 1] = ((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CloadQueue_003E__3.LoadItemIcon(((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CiconName_003E__21);
-						if (string.Empty != ((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CiconBGName_003E__22)
+						GetIconName(o.reward[0], out ((_003CDoInitialize_003Ec__Iterator9B)/*Error near IL_036d: stateMachine*/)._003CiconName_003E__21, out ((_003CDoInitialize_003Ec__Iterator9B)/*Error near IL_036d: stateMachine*/)._003CiconBGName_003E__22);
+						((_003CDoInitialize_003Ec__Iterator9B)/*Error near IL_036d: stateMachine*/)._003CitemIconLOs_003E__19[o.count - 1] = ((_003CDoInitialize_003Ec__Iterator9B)/*Error near IL_036d: stateMachine*/)._003CloadQueue_003E__3.LoadItemIcon(((_003CDoInitialize_003Ec__Iterator9B)/*Error near IL_036d: stateMachine*/)._003CiconName_003E__21);
+						if (string.Empty != ((_003CDoInitialize_003Ec__Iterator9B)/*Error near IL_036d: stateMachine*/)._003CiconBGName_003E__22)
 						{
-							((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CitemBGIconLOs_003E__20[o.count - 1] = ((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CloadQueue_003E__3.LoadItemIcon(((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CiconBGName_003E__22);
+							((_003CDoInitialize_003Ec__Iterator9B)/*Error near IL_036d: stateMachine*/)._003CitemBGIconLOs_003E__20[o.count - 1] = ((_003CDoInitialize_003Ec__Iterator9B)/*Error near IL_036d: stateMachine*/)._003CloadQueue_003E__3.LoadItemIcon(((_003CDoInitialize_003Ec__Iterator9B)/*Error near IL_036d: stateMachine*/)._003CiconBGName_003E__22);
 						}
 					}
 				});
@@ -1100,7 +1100,7 @@ public class HomeLoginBonusTheater : GameSection
 				fsmList_.Add(new FSMCamera());
 				fsmList_.ForEach(delegate(FSM o)
 				{
-					o.Init(((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_0df6: stateMachine*/)._003C_003Ef__this.fsmInfo_);
+					o.Init(((_003CDoInitialize_003Ec__Iterator9B)/*Error near IL_0df6: stateMachine*/)._003C_003Ef__this.fsmInfo_);
 				});
 				mainAction_ = new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 				base.Initialize();

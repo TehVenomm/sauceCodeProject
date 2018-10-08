@@ -67,7 +67,7 @@ class LogFileManager {
             setLogFile(getWorkingFileForSession(str), 65536);
             return;
         }
-        Fabric.getLogger().mo4289d("Fabric", "Preferences requested no custom logs. Aborting log file creation.");
+        Fabric.getLogger().mo4753d("Fabric", "Preferences requested no custom logs. Aborting log file creation.");
         this.currentLog = NOOP_LOG_STORE;
     }
 

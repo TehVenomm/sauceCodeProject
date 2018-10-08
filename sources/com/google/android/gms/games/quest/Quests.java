@@ -10,7 +10,7 @@ import com.google.android.gms.common.api.Result;
 public interface Quests {
     public static final String EXTRA_QUEST = "quest";
     public static final int SELECT_ACCEPTED = 3;
-    public static final int[] SELECT_ALL_QUESTS = new int[]{1, 2, 3, 4, SELECT_COMPLETED_UNCLAIMED, 5, 102, 6, SELECT_RECENTLY_FAILED};
+    public static final int[] SELECT_ALL_QUESTS = new int[]{1, 2, 3, 4, 101, 5, 102, 6, 103};
     public static final int SELECT_COMPLETED = 4;
     public static final int SELECT_COMPLETED_UNCLAIMED = 101;
     public static final int SELECT_ENDING_SOON = 102;

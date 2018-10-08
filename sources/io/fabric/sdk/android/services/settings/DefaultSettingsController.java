@@ -46,27 +46,27 @@ class DefaultSettingsController implements SettingsController {
                     long currentTimeMillis = this.currentTimeProvider.getCurrentTimeMillis();
                     if (SettingsCacheBehavior.IGNORE_CACHE_EXPIRATION.equals(settingsCacheBehavior) || !buildFromJson.isExpired(currentTimeMillis)) {
                         try {
-                            Fabric.getLogger().mo4289d("Fabric", "Returning cached settings.");
+                            Fabric.getLogger().mo4753d("Fabric", "Returning cached settings.");
                             return buildFromJson;
                         } catch (Throwable e) {
                             Throwable th2 = e;
                             settingsData = buildFromJson;
                             th = th2;
-                            Fabric.getLogger().mo4292e("Fabric", "Failed to get cached settings", th);
+                            Fabric.getLogger().mo4756e("Fabric", "Failed to get cached settings", th);
                             return settingsData;
                         }
                     }
-                    Fabric.getLogger().mo4289d("Fabric", "Cached settings have expired.");
+                    Fabric.getLogger().mo4753d("Fabric", "Cached settings have expired.");
                     return null;
                 }
-                Fabric.getLogger().mo4292e("Fabric", "Failed to transform cached settings data.", null);
+                Fabric.getLogger().mo4756e("Fabric", "Failed to transform cached settings data.", null);
                 return null;
             }
-            Fabric.getLogger().mo4289d("Fabric", "No cached settings data found.");
+            Fabric.getLogger().mo4753d("Fabric", "No cached settings data found.");
             return null;
         } catch (Exception e2) {
             th = e2;
-            Fabric.getLogger().mo4292e("Fabric", "Failed to get cached settings", th);
+            Fabric.getLogger().mo4756e("Fabric", "Failed to get cached settings", th);
             return settingsData;
         }
     }
@@ -75,7 +75,7 @@ class DefaultSettingsController implements SettingsController {
         if (!CommonUtils.isClsTrace(this.kit.getContext())) {
             jSONObject = this.settingsJsonTransform.sanitizeTraceInfo(jSONObject);
         }
-        Fabric.getLogger().mo4289d("Fabric", str + jSONObject.toString());
+        Fabric.getLogger().mo4753d("Fabric", str + jSONObject.toString());
     }
 
     boolean buildInstanceIdentifierChanged() {
@@ -117,7 +117,7 @@ class DefaultSettingsController implements SettingsController {
                                 settingsData = getCachedSettingsData(SettingsCacheBehavior.IGNORE_CACHE_EXPIRATION);
                             } catch (Exception e2) {
                                 e = e2;
-                                Fabric.getLogger().mo4292e("Fabric", LOAD_ERROR_MESSAGE, e);
+                                Fabric.getLogger().mo4756e("Fabric", LOAD_ERROR_MESSAGE, e);
                                 return settingsData;
                             }
                         }
@@ -127,7 +127,7 @@ class DefaultSettingsController implements SettingsController {
                     th = e3;
                     settingsData = settingsData2;
                     e = th;
-                    Fabric.getLogger().mo4292e("Fabric", LOAD_ERROR_MESSAGE, e);
+                    Fabric.getLogger().mo4756e("Fabric", LOAD_ERROR_MESSAGE, e);
                     return settingsData;
                 }
             }
@@ -139,7 +139,7 @@ class DefaultSettingsController implements SettingsController {
             th = e32;
             settingsData = null;
             e = th;
-            Fabric.getLogger().mo4292e("Fabric", LOAD_ERROR_MESSAGE, e);
+            Fabric.getLogger().mo4756e("Fabric", LOAD_ERROR_MESSAGE, e);
             return settingsData;
         }
         return settingsData;

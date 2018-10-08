@@ -1277,8 +1277,8 @@ public static class NGUITools
 		}
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	private static void CallCreatePanel(Transform t)
 	{
 		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
@@ -1331,8 +1331,8 @@ public static class NGUITools
 		return mb != null && mb.get_enabled() && mb.get_gameObject().get_activeInHierarchy();
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static bool GetActive(Behaviour mb)
 	{
 		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
@@ -1346,8 +1346,8 @@ public static class NGUITools
 		return Object.op_Implicit(go) && go.get_activeInHierarchy();
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static void SetActiveSelf(GameObject go, bool state)
 	{
 		go.SetActive(state);

@@ -97,7 +97,7 @@ public class LoungeTableSet
 		{
 			if (o.GetComponent<TablePoint>() != null)
 			{
-				((_003CCreateTable_003Ec__IteratorFF)/*Error near IL_00bf: stateMachine*/)._003C_003Ef__this.tablePoints.Add(o.GetComponent<TablePoint>());
+				((_003CCreateTable_003Ec__Iterator103)/*Error near IL_00bf: stateMachine*/)._003C_003Ef__this.tablePoints.Add(o.GetComponent<TablePoint>());
 			}
 			return false;
 		});
@@ -120,7 +120,7 @@ public class LoungeTableSet
 		{
 			if (o.get_name().StartsWith("SIT"))
 			{
-				((_003CCreateChair_003Ec__Iterator100)/*Error near IL_00bf: stateMachine*/)._003C_003Ef__this.chairSitPoints.Add(o.GetComponent<ChairPoint>());
+				((_003CCreateChair_003Ec__Iterator104)/*Error near IL_00bf: stateMachine*/)._003C_003Ef__this.chairSitPoints.Add(o.GetComponent<ChairPoint>());
 			}
 			return false;
 		});

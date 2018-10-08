@@ -134,10 +134,10 @@ public class AppEventsLogger {
         }
 
         private static void restoreAppSessionInformation(Context context) {
+            Closeable objectInputStream;
             Throwable th;
             Exception e;
             synchronized (staticLock) {
-                Closeable objectInputStream;
                 try {
                     if (!isLoaded) {
                         objectInputStream = new ObjectInputStream(context.openFileInput(PERSISTED_SESSION_INFO_FILENAME));

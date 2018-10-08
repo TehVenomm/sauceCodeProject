@@ -41,12 +41,12 @@ public class ZopimChatContext extends AbstractChatContext {
     private String agentNick = "";
     private final AgentTypingEntry agentTypingEntry = new AgentTypingEntry(false);
     private Map<String, Agent> agents;
-    private final AgentsObserver agentsObserver = new C10172();
+    private final AgentsObserver agentsObserver = new C13332();
     private final BroadcastReceiver broadcastReceiver = new ChatTimeoutReceiver();
     private ChatApi chat;
     private List<ChatLog> chatLogList = new ArrayList();
-    private final ChatLogObserver chatLogObserver = new C10183();
-    private final ConnectionObserver connectionObserver = new C10161();
+    private final ChatLogObserver chatLogObserver = new C13343();
+    private final ConnectionObserver connectionObserver = new C13321();
     private List<Boolean> profileIconToShowList = new ArrayList();
     private final List<File> queuedFiles = new ArrayList();
     private final SessionConfig sessionConfig;
@@ -54,8 +54,8 @@ public class ZopimChatContext extends AbstractChatContext {
     private final ChatAdapterViewFactory viewFactory;
 
     /* renamed from: net.gogame.chat.zopim.ZopimChatContext$1 */
-    class C10161 extends ConnectionObserver {
-        C10161() {
+    class C13321 extends ConnectionObserver {
+        C13321() {
         }
 
         public void update(Connection connection) {
@@ -63,8 +63,8 @@ public class ZopimChatContext extends AbstractChatContext {
     }
 
     /* renamed from: net.gogame.chat.zopim.ZopimChatContext$2 */
-    class C10172 extends AgentsObserver {
-        C10172() {
+    class C13332 extends AgentsObserver {
+        C13332() {
         }
 
         public void update(Map<String, Agent> map) {
@@ -73,8 +73,8 @@ public class ZopimChatContext extends AbstractChatContext {
     }
 
     /* renamed from: net.gogame.chat.zopim.ZopimChatContext$3 */
-    class C10183 extends ChatLogObserver {
-        C10183() {
+    class C13343 extends ChatLogObserver {
+        C13343() {
         }
 
         public void update(LinkedHashMap<String, ChatLog> linkedHashMap) {
@@ -83,8 +83,8 @@ public class ZopimChatContext extends AbstractChatContext {
     }
 
     /* renamed from: net.gogame.chat.zopim.ZopimChatContext$4 */
-    class C10194 implements Runnable {
-        C10194() {
+    class C13354 implements Runnable {
+        C13354() {
         }
 
         public void run() {
@@ -115,8 +115,8 @@ public class ZopimChatContext extends AbstractChatContext {
     }
 
     /* renamed from: net.gogame.chat.zopim.ZopimChatContext$5 */
-    class C10205 implements OptionListener {
-        C10205() {
+    class C13365 implements OptionListener {
+        C13365() {
         }
 
         public void onOptionSelected(Option option) {
@@ -125,8 +125,8 @@ public class ZopimChatContext extends AbstractChatContext {
     }
 
     /* renamed from: net.gogame.chat.zopim.ZopimChatContext$6 */
-    class C10216 implements RatingListener {
-        C10216() {
+    class C13376 implements RatingListener {
+        C13376() {
         }
 
         public void onRatingChanged(Rating rating) {
@@ -165,7 +165,7 @@ public class ZopimChatContext extends AbstractChatContext {
     }
 
     private void doNotifyDataSetChanged() {
-        this.activity.runOnUiThread(new C10194());
+        this.activity.runOnUiThread(new C13354());
     }
 
     public void start() {
@@ -274,7 +274,7 @@ public class ZopimChatContext extends AbstractChatContext {
                     }
                     return this.viewFactory.getAgentAttachmentView(view, viewGroup, booleanValue, displayName, str, chatLog.getAttachment().getUrl().toString(), chatLog.getAttachment().getThumbnail().toString());
                 } else if (chatLog.getOptions() != null && chatLog.getOptions().length > 0) {
-                    return this.viewFactory.getAgentOptionsView(view, viewGroup, booleanValue, displayName, str, chatLog.getMessage(), toOptions(chatLog.getOptions()), new C10205());
+                    return this.viewFactory.getAgentOptionsView(view, viewGroup, booleanValue, displayName, str, chatLog.getMessage(), toOptions(chatLog.getOptions()), new C13365());
                 } else if (chatLog.getMessage() == null) {
                     return this.viewFactory.getEmptyView(view, viewGroup);
                 } else {
@@ -302,7 +302,7 @@ public class ZopimChatContext extends AbstractChatContext {
                 }
                 return this.viewFactory.getVisitorMessageView(view, viewGroup, String.format("%s sent", new Object[]{chatLog.getFileName()}));
             case CHAT_RATING:
-                return this.viewFactory.getRatingView(view, viewGroup, toRating(chatLog.getRating()), new C10216());
+                return this.viewFactory.getRatingView(view, viewGroup, toRating(chatLog.getRating()), new C13376());
             case UNKNOWN:
                 log(chatLog);
                 return this.viewFactory.getEmptyView(view, viewGroup);

@@ -50,7 +50,7 @@ public class EquipmentSet extends BaseJsonObject {
         } else if (StringUtils.isEquals(str, KEY_HP)) {
             this.hp = JSONUtils.optLong(jsonReader);
             return true;
-        } else if (StringUtils.isEquals(str, KEY_USER)) {
+        } else if (StringUtils.isEquals(str, "user")) {
             if (jsonReader.peek() == JsonToken.NULL) {
                 jsonReader.nextNull();
                 return true;

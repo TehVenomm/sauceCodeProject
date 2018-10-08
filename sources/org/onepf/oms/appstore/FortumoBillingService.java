@@ -22,7 +22,7 @@ import org.onepf.oms.OpenIabHelper;
 import org.onepf.oms.appstore.fortumoUtils.InappBaseProduct;
 import org.onepf.oms.appstore.fortumoUtils.InappsXMLParser;
 import org.onepf.oms.appstore.googleUtils.IabException;
-import org.onepf.oms.appstore.googleUtils.IabHelper.OnIabPurchaseFinishedListener;
+import org.onepf.oms.appstore.googleUtils.IabHelper$OnIabPurchaseFinishedListener;
 import org.onepf.oms.appstore.googleUtils.IabHelper.OnIabSetupFinishedListener;
 import org.onepf.oms.appstore.googleUtils.IabResult;
 import org.onepf.oms.appstore.googleUtils.Inventory;
@@ -40,7 +40,7 @@ public class FortumoBillingService implements AppstoreInAppBillingService {
     private Map<String, FortumoProduct> inappsMap;
     private boolean isNook;
     @Nullable
-    private OnIabPurchaseFinishedListener purchaseFinishedListener;
+    private IabHelper$OnIabPurchaseFinishedListener purchaseFinishedListener;
 
     static class FortumoProduct extends InappBaseProduct {
         private FortumoDetails fortumoDetails;
@@ -335,7 +335,7 @@ public class FortumoBillingService implements AppstoreInAppBillingService {
         Editor edit = getFortumoSharedPrefs(context).edit();
         edit.putString(str, str2);
         edit.commit();
-        Logger.m1001d(str, " was added to pending");
+        Logger.m4026d(str, " was added to pending");
     }
 
     @NotNull
@@ -358,7 +358,7 @@ public class FortumoBillingService implements AppstoreInAppBillingService {
             if (TextUtils.isEmpty(nookInAppSecret)) {
                 nookInAppSecret = inappBaseProduct.getPriceDetails();
                 if (TextUtils.isEmpty(nookInAppSecret)) {
-                    Logger.m1001d(productId, " not available for this carrier and the price is not specified in the inapps_products.xml");
+                    Logger.m4026d(productId, " not available for this carrier and the price is not specified in the inapps_products.xml");
                     i++;
                 }
             }
@@ -410,7 +410,7 @@ public class FortumoBillingService implements AppstoreInAppBillingService {
         Editor edit = getFortumoSharedPrefs(context).edit();
         edit.remove(str);
         edit.commit();
-        Logger.m1001d(str, " was removed from pending");
+        Logger.m4026d(str, " was removed from pending");
     }
 
     public void consume(@NotNull Purchase purchase) throws IabException {
@@ -426,7 +426,7 @@ public class FortumoBillingService implements AppstoreInAppBillingService {
             return false;
         }
         if (intent == null) {
-            Logger.m1000d("handleActivityResult: null intent data");
+            Logger.m4025d("handleActivityResult: null intent data");
             this.purchaseFinishedListener.onIabPurchaseFinished(new IabResult(-1002, "Null data in Fortumo IAB result"), null);
         } else {
             Purchase purchase;
@@ -440,7 +440,7 @@ public class FortumoBillingService implements AppstoreInAppBillingService {
                     purchase = purchaseFromPaymentResponse;
                     i3 = 0;
                 } else if (paymentResponse.getBillingStatus() == 1) {
-                    Logger.m1001d("handleActivityResult: status pending for ", paymentResponse.getProductName());
+                    Logger.m4026d("handleActivityResult: status pending for ", paymentResponse.getProductName());
                     String str2 = "Purchase is pending";
                     if (((FortumoProduct) this.inappsMap.get(paymentResponse.getProductName())).isConsumable()) {
                         addPendingPayment(this.context, paymentResponse.getProductName(), String.valueOf(paymentResponse.getMessageId()));
@@ -461,19 +461,19 @@ public class FortumoBillingService implements AppstoreInAppBillingService {
                 i3 = 6;
             }
             this.developerPayload = null;
-            Logger.m1001d("handleActivityResult: ", new IabResult(i3, str));
+            Logger.m4026d("handleActivityResult: ", new IabResult(i3, str));
             this.purchaseFinishedListener.onIabPurchaseFinished(r5, purchase);
         }
         return true;
     }
 
-    public void launchPurchaseFlow(@NotNull Activity activity, String str, String str2, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str3) {
-        this.purchaseFinishedListener = onIabPurchaseFinishedListener;
+    public void launchPurchaseFlow(@NotNull Activity activity, String str, String str2, int i, IabHelper$OnIabPurchaseFinishedListener iabHelper$OnIabPurchaseFinishedListener, String str3) {
+        this.purchaseFinishedListener = iabHelper$OnIabPurchaseFinishedListener;
         this.activityRequestCode = i;
         this.developerPayload = str3;
         FortumoProduct fortumoProduct = (FortumoProduct) this.inappsMap.get(str);
         if (fortumoProduct == null) {
-            Logger.m1001d("launchPurchaseFlow: required sku ", str, " was not defined");
+            Logger.m4026d("launchPurchaseFlow: required sku ", str, " was not defined");
             this.purchaseFinishedListener.onIabPurchaseFinished(new IabResult(5, String.format("Required product %s was not defined in xml files.", new Object[]{str})), null);
             return;
         }
@@ -554,13 +554,13 @@ public class FortumoBillingService implements AppstoreInAppBillingService {
             this.inappsMap = getFortumoInapps(this.context, z);
             return true;
         } catch (Exception e) {
-            Logger.m1001d("billing is not supported due to ", e.getMessage());
+            Logger.m4026d("billing is not supported due to ", e.getMessage());
             return false;
         }
     }
 
     public void startSetup(@NotNull OnIabSetupFinishedListener onIabSetupFinishedListener) {
-        Logger.m1001d("Setup result: ", new IabResult(0, "Fortumo: successful setup."));
+        Logger.m4026d("Setup result: ", new IabResult(0, "Fortumo: successful setup."));
         onIabSetupFinishedListener.onIabSetupFinished(r0);
     }
 

@@ -41,7 +41,7 @@ public class SkubitAppstore extends DefaultAppstore {
             context.getPackageManager().getPackageInfo(str, 0);
             return true;
         } catch (NameNotFoundException e) {
-            Logger.m1001d(str, " package was not found.");
+            Logger.m4026d(str, " package was not found.");
             return false;
         }
     }
@@ -75,7 +75,7 @@ public class SkubitAppstore extends DefaultAppstore {
     }
 
     public boolean isBillingAvailable(final String str) {
-        Logger.m1001d("isBillingAvailable() packageName: ", str);
+        Logger.m4026d("isBillingAvailable() packageName: ", str);
         if (this.billingAvailable != null) {
             return this.billingAvailable.booleanValue();
         }
@@ -117,12 +117,12 @@ public class SkubitAppstore extends DefaultAppstore {
                             return;
                         L_0x0026:
                             r0 = "isBillingAvailable() Google Play billing unavaiable";
-                            org.onepf.oms.util.Logger.m1000d(r0);	 Catch:{ RemoteException -> 0x002c }
+                            org.onepf.oms.util.Logger.m4025d(r0);	 Catch:{ RemoteException -> 0x002c }
                             goto L_0x0019;
                         L_0x002c:
                             r0 = move-exception;
                             r1 = "isBillingAvailable() RemoteException while setting up in-app billing";
-                            org.onepf.oms.util.Logger.m1003e(r1, r0);	 Catch:{ all -> 0x003f }
+                            org.onepf.oms.util.Logger.m4028e(r1, r0);	 Catch:{ all -> 0x003f }
                             r0 = r1;
                             r0.countDown();
                             r0 = org.onepf.oms.appstore.SkubitAppstore.this;
@@ -149,7 +149,7 @@ public class SkubitAppstore extends DefaultAppstore {
                         } catch (InterruptedException e) {
                         }
                     }
-                    Logger.m1002e("isBillingAvailable() billing is not supported. Initialization error.");
+                    Logger.m4027e("isBillingAvailable() billing is not supported. Initialization error.");
                 }
             }
             return this.billingAvailable.booleanValue();

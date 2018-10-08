@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
-import net.gogame.gowrap.ui.common.C1135R;
+import net.gogame.gowrap.ui.common.C1451R;
 
 public class CustomGridLayout extends ViewGroup {
     private static final int DEFAULT_COLUMN_COUNT = 2;
@@ -24,7 +24,7 @@ public class CustomGridLayout extends ViewGroup {
     public static class LayoutParams extends android.widget.FrameLayout.LayoutParams {
         public LayoutParams(Context context, AttributeSet attributeSet) {
             super(context, attributeSet);
-            context.obtainStyledAttributes(attributeSet, C1135R.styleable.CustomGridLayout_Layout).recycle();
+            context.obtainStyledAttributes(attributeSet, C1451R.styleable.CustomGridLayout_Layout).recycle();
         }
 
         public LayoutParams(int i, int i2) {
@@ -56,11 +56,11 @@ public class CustomGridLayout extends ViewGroup {
         this.columnCount = 2;
         this.horizontalSpacing = 0;
         this.verticalSpacing = 0;
-        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, C1135R.styleable.CustomGridLayout, 0, 0);
+        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, C1451R.styleable.CustomGridLayout, 0, 0);
         try {
-            this.columnCount = obtainStyledAttributes.getInteger(C1135R.styleable.CustomGridLayout_column_count, 2);
-            this.horizontalSpacing = obtainStyledAttributes.getDimensionPixelSize(C1135R.styleable.CustomGridLayout_horizontal_spacing, 0);
-            this.verticalSpacing = obtainStyledAttributes.getDimensionPixelSize(C1135R.styleable.CustomGridLayout_vertical_spacing, 0);
+            this.columnCount = obtainStyledAttributes.getInteger(C1451R.styleable.CustomGridLayout_column_count, 2);
+            this.horizontalSpacing = obtainStyledAttributes.getDimensionPixelSize(C1451R.styleable.CustomGridLayout_horizontal_spacing, 0);
+            this.verticalSpacing = obtainStyledAttributes.getDimensionPixelSize(C1451R.styleable.CustomGridLayout_vertical_spacing, 0);
         } finally {
             obtainStyledAttributes.recycle();
         }

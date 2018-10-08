@@ -418,8 +418,8 @@ public class GameSection : UIBehaviour
 			}
 			MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(table.questID, is_free_join);
 			StayEvent();
-			_003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2BA _003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2BA;
-			CoopApp.EnterPartyQuest(new Action<bool, bool, bool, bool>((object)_003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2BA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2C9 _003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2C;
+			CoopApp.EnterPartyQuest(new Action<bool, bool, bool, bool>((object)_003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -752,7 +752,7 @@ public class GameSection : UIBehaviour
 	private void OnQuery_SCREENSHOT_SHARING()
 	{
 		MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("share_screenshot", "Social");
-		MonoBehaviourSingleton<NativeShare>.I.ShareScreenshotWithText();
+		MonoBehaviourSingleton<GGNativeShare>.I.ShareScreenshotWithText();
 		if (PlayerPrefs.GetInt("share_screenshot", -1) != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
 			StayEvent();
@@ -779,11 +779,11 @@ public class GameSection : UIBehaviour
 			{
 				LoungeMatchingManager i2 = MonoBehaviourSingleton<LoungeMatchingManager>.I;
 				string loungeNumber2 = roomPass;
-				if (_003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2BB._003C_003Ef__am_0024cache1 == null)
+				if (_003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2CA._003C_003Ef__am_0024cache1 == null)
 				{
-					_003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2BB._003C_003Ef__am_0024cache1 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					_003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2CA._003C_003Ef__am_0024cache1 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 				}
-				i2.SendApply(loungeNumber2, _003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2BB._003C_003Ef__am_0024cache1);
+				i2.SendApply(loungeNumber2, _003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2CA._003C_003Ef__am_0024cache1);
 			});
 		}
 		else

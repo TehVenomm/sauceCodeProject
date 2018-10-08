@@ -275,7 +275,7 @@ public class QuestRoom : GameSection
 		{
 			ResetIfNeeded();
 			isText = true;
-			chatTextLabel.text = message;
+			chatTextLabel.text = Utility.GetTrimLineText(3, message);
 			FitTextBG();
 			MoveTextBG();
 			PlayTween(chatTextTween);
@@ -529,9 +529,9 @@ public class QuestRoom : GameSection
 			isTutorialRoom = true;
 			int[] array = new int[3]
 			{
-				990,
-				991,
-				992
+				994,
+				995,
+				996
 			};
 			loadNPC = new bool[4];
 			for (int k = 0; k < 3; k++)
@@ -566,9 +566,9 @@ public class QuestRoom : GameSection
 		bool wait = true;
 		MonoBehaviourSingleton<PartyManager>.I.SendRepeat(MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest, delegate
 		{
-			((_003CSetDeaultRepeat_003Ec__Iterator120)/*Error near IL_004b: stateMachine*/)._003C_003Ef__this.SetActive((Enum)UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-			((_003CSetDeaultRepeat_003Ec__Iterator120)/*Error near IL_004b: stateMachine*/)._003C_003Ef__this.SetActive((Enum)UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-			((_003CSetDeaultRepeat_003Ec__Iterator120)/*Error near IL_004b: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CSetDeaultRepeat_003Ec__Iterator124)/*Error near IL_004b: stateMachine*/)._003C_003Ef__this.SetActive((Enum)UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			((_003CSetDeaultRepeat_003Ec__Iterator124)/*Error near IL_004b: stateMachine*/)._003C_003Ef__this.SetActive((Enum)UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			((_003CSetDeaultRepeat_003Ec__Iterator124)/*Error near IL_004b: stateMachine*/)._003Cwait_003E__0 = false;
 		});
 		while (wait)
 		{
@@ -598,7 +598,7 @@ public class QuestRoom : GameSection
 			bool wait = true;
 			MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate
 			{
-				((_003CDoExit_003Ec__Iterator121)/*Error near IL_0037: stateMachine*/)._003Cwait_003E__0 = false;
+				((_003CDoExit_003Ec__Iterator125)/*Error near IL_0037: stateMachine*/)._003Cwait_003E__0 = false;
 			});
 			while (wait)
 			{
@@ -990,6 +990,16 @@ public class QuestRoom : GameSection
 			if (MonoBehaviourSingleton<QuestManager>.I.IsTutorialOrderQuest(questId))
 			{
 				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.GACHA_QUEST_START, delegate(bool b)
+				{
+					if (b)
+					{
+						DispatchEvent("QUEST_ROOM_IN_GAME", questData);
+					}
+				});
+			}
+			else if (MonoBehaviourSingleton<QuestManager>.I.IsTutorialOrderShadowQuest())
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.SHADOW_QUEST_START, delegate(bool b)
 				{
 					if (b)
 					{

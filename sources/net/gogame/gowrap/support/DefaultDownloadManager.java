@@ -32,8 +32,8 @@ public class DefaultDownloadManager implements DownloadManager {
     private final Set<Listener> listeners = new HashSet();
 
     /* renamed from: net.gogame.gowrap.support.DefaultDownloadManager$1 */
-    class C11181 implements Runnable {
-        C11181() {
+    class C14341 implements Runnable {
+        C14341() {
         }
 
         public void run() {
@@ -103,7 +103,7 @@ public class DefaultDownloadManager implements DownloadManager {
             this.downloadCount = 0;
         }
         if (this.downloadCount == 0) {
-            this.handler.post(new C11181());
+            this.handler.post(new C14341());
         }
     }
 
@@ -157,8 +157,8 @@ public class DefaultDownloadManager implements DownloadManager {
                 }, false, new Callback() {
 
                     /* renamed from: net.gogame.gowrap.support.DefaultDownloadManager$4$1 */
-                    class C11211 implements Runnable {
-                        C11211() {
+                    class C14371 implements Runnable {
+                        C14371() {
                         }
 
                         public void run() {
@@ -171,8 +171,8 @@ public class DefaultDownloadManager implements DownloadManager {
                     }
 
                     /* renamed from: net.gogame.gowrap.support.DefaultDownloadManager$4$2 */
-                    class C11222 implements Runnable {
-                        C11222() {
+                    class C14382 implements Runnable {
+                        C14382() {
                         }
 
                         public void run() {
@@ -190,12 +190,12 @@ public class DefaultDownloadManager implements DownloadManager {
 
                     public void onDownloadSucceeded() {
                         DefaultDownloadManager.this.onDownloadFinished();
-                        DefaultDownloadManager.this.handler.post(new C11211());
+                        DefaultDownloadManager.this.handler.post(new C14371());
                     }
 
                     public void onDownloadFailed() {
                         DefaultDownloadManager.this.onDownloadFinished();
-                        DefaultDownloadManager.this.handler.post(new C11222());
+                        DefaultDownloadManager.this.handler.post(new C14382());
                     }
                 });
             } catch (Throwable e) {

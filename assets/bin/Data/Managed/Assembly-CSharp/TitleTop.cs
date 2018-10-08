@@ -47,7 +47,7 @@ public class TitleTop : GameSection
 			bool wait = true;
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator179)/*Error near IL_0045: stateMachine*/)._003Cwait_003E__0 = false;
+				((_003CDoInitialize_003Ec__Iterator17E)/*Error near IL_0045: stateMachine*/)._003Cwait_003E__0 = false;
 			}, false);
 			while (wait)
 			{
@@ -154,8 +154,10 @@ public class TitleTop : GameSection
 		DispatchEvent("START", null);
 	}
 
-	private void OnQuery_START()
+	private unsafe void OnQuery_START()
 	{
+		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ce: Expected O, but got Unknown
 		if (!MonoBehaviourSingleton<AccountManager>.I.account.IsRegist())
 		{
 			GameSection.StayEvent();
@@ -170,19 +172,26 @@ public class TitleTop : GameSection
 		}
 		else if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep > 0 && MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep <= 2)
 		{
-			if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 1)
+			if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep != 1 && MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep != 2)
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Title", "CharaMake", UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
+				goto IL_00a3;
 			}
-			else if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 2)
-			{
-				DispatchEvent("MAIN_MENU_HOME", null);
-			}
-			else
-			{
-				DispatchEvent("TUTORIAL_" + MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep.ToString(), null);
-			}
+			goto IL_00a3;
 		}
+		goto IL_00af;
+		IL_00af:
+		if (!TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.END))
+		{
+			if (_003C_003Ef__am_0024cache6 == null)
+			{
+				_003C_003Ef__am_0024cache6 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			Protocol.Force(_003C_003Ef__am_0024cache6);
+		}
+		return;
+		IL_00a3:
+		DispatchEvent("MAIN_MENU_HOME", null);
+		goto IL_00af;
 	}
 
 	private void OnQuery_HOST_SELECT()
@@ -210,10 +219,10 @@ public class TitleTop : GameSection
 
 	public static bool CheckTitleSkip()
 	{
-		if (!MonoBehaviourSingleton<AccountManager>.I.account.IsRegist())
+		if (MonoBehaviourSingleton<AccountManager>.I.account.IsRegist() && 1 <= MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep)
 		{
-			return false;
+			return true;
 		}
-		return 1 <= MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep;
+		return false;
 	}
 }

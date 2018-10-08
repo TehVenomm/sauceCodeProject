@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class EffectCtrl
 {
-	[Tooltip("ル\u30fcプエフェクトかどうか")]
 	[Header("-- Effect Settings --")]
+	[Tooltip("ル\u30fcプエフェクトかどうか")]
 	public bool loop;
 
 	[Tooltip("管理対象のParticleSystemの配列")]
@@ -15,8 +15,8 @@ public class EffectCtrl
 	[Tooltip("管理対象のAnimator\n空の場合はこのGameObjectにアタッチされたAnimatorが使用される")]
 	public Animator animator;
 
-	[Header("-- Loop End Behaviour --")]
 	[Tooltip("ル\u30fcプを抜ける時にパ\u30fcティクルを停止するかどうか")]
+	[Header("-- Loop End Behaviour --")]
 	public bool stopParticle = true;
 
 	[Tooltip("ル\u30fcプを抜ける時にAnimatorのENDを再生するかどうか")]
@@ -35,8 +35,8 @@ public class EffectCtrl
 	[Tooltip("アニメが最後まで再生されてから削除")]
 	public bool waitAnimationPlaying = true;
 
-	[Tooltip("同時に再生される可能性のあるAudioClip")]
 	[Header("-- Audio Destroy --")]
+	[Tooltip("同時に再生される可能性のあるAudioClip")]
 	public AudioClip attachedAudioClip;
 
 	[Tooltip("同時に再生される可能性のあるAudioClipのSE設定ID")]

@@ -1,6 +1,6 @@
 package com.github.droidfu;
 
-import net.gogame.dragon.C1024R;
+import net.gogame.dragon.C1340R;
 
 /* renamed from: com.github.droidfu.R */
 public final class C0585R {
@@ -26,7 +26,7 @@ public final class C0585R {
 
     /* renamed from: com.github.droidfu.R$styleable */
     public static final class styleable {
-        public static final int[] GalleryItem = new int[]{C1024R.attr.imageAspectRatioAdjust, C1024R.attr.imageAspectRatio, C1024R.attr.circleCrop, C1024R.attr.buttonSize};
+        public static final int[] GalleryItem = new int[]{C1340R.attr.imageAspectRatioAdjust, C1340R.attr.imageAspectRatio, C1340R.attr.circleCrop, C1340R.attr.buttonSize};
         public static final int GalleryItem_autoLoad = 1;
         public static final int GalleryItem_imageUrl = 0;
         public static final int GalleryItem_progressDrawable = 2;

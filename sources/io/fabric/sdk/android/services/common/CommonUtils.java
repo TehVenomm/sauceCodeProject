@@ -67,7 +67,7 @@ public class CommonUtils {
     public static final int DEVICE_STATE_VENDORINTERNAL = 16;
     static final String ENCRYPTION_AES = "AES/ECB/PKCS7Padding";
     static final String FABRIC_BUILD_ID = "io.fabric.android.build_id";
-    public static final Comparator<File> FILE_MODIFIED_COMPARATOR = new C09181();
+    public static final Comparator<File> FILE_MODIFIED_COMPARATOR = new C12341();
     public static final String GOOGLE_SDK = "google_sdk";
     private static final char[] HEX_VALUES = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     private static final boolean LOGGING_DISABLED_DEFAULT = false;
@@ -88,8 +88,8 @@ public class CommonUtils {
     private static long totalRamInBytes = -1;
 
     /* renamed from: io.fabric.sdk.android.services.common.CommonUtils$1 */
-    static final class C09181 implements Comparator<File> {
-        C09181() {
+    static final class C12341 implements Comparator<File> {
+        C12341() {
         }
 
         public int compare(File file, File file2) {
@@ -121,7 +121,7 @@ public class CommonUtils {
         static Architecture getValue() {
             Object obj = Build.CPU_ABI;
             if (TextUtils.isEmpty(obj)) {
-                Fabric.getLogger().mo4289d("Fabric", "Architecture#getValue()::Build.CPU_ABI returned null or empty");
+                Fabric.getLogger().mo4753d("Fabric", "Architecture#getValue()::Build.CPU_ABI returned null or empty");
                 return UNKNOWN;
             }
             Architecture architecture = (Architecture) matcher.get(obj.toLowerCase(Locale.US));
@@ -158,7 +158,7 @@ public class CommonUtils {
             try {
                 closeable.close();
             } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", str, e);
+                Fabric.getLogger().mo4756e("Fabric", str, e);
             }
         }
     }
@@ -200,7 +200,7 @@ public class CommonUtils {
             instance.init(i, secretKeySpec);
             return instance;
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Could not create Cipher for AES/ECB/PKCS7Padding - should never happen.", e);
+            Fabric.getLogger().mo4756e("Fabric", "Could not create Cipher for AES/ECB/PKCS7Padding - should never happen.", e);
             throw new RuntimeException(e);
         }
     }
@@ -239,11 +239,11 @@ public class CommonUtils {
     }
 
     public static String extractFieldFromSystemFile(File file, String str) {
-        Closeable bufferedReader;
         Throwable e;
         Throwable th;
         String str2 = null;
         if (file.exists()) {
+            Closeable bufferedReader;
             try {
                 String[] split;
                 bufferedReader = new BufferedReader(new FileReader(file), 1024);
@@ -269,7 +269,7 @@ public class CommonUtils {
                 e = e3;
                 bufferedReader = null;
                 try {
-                    Fabric.getLogger().mo4292e("Fabric", "Error parsing " + file, e);
+                    Fabric.getLogger().mo4756e("Fabric", "Error parsing " + file, e);
                     closeOrLog(bufferedReader, "Failed to close system file reader.");
                     return str2;
                 } catch (Throwable th3) {
@@ -311,7 +311,7 @@ public class CommonUtils {
             try {
                 flushable.flush();
             } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", str, e);
+                Fabric.getLogger().mo4756e("Fabric", str, e);
             }
         }
     }
@@ -332,7 +332,7 @@ public class CommonUtils {
             } catch (Exception e2) {
                 e = e2;
                 try {
-                    Fabric.getLogger().mo4292e("Fabric", "Could not calculate hash for app icon.", e);
+                    Fabric.getLogger().mo4756e("Fabric", "Could not calculate hash for app icon.", e);
                     closeOrLog(openRawResource, "Failed to close icon input stream.");
                     return str;
                 } catch (Throwable th2) {
@@ -344,7 +344,7 @@ public class CommonUtils {
         } catch (Exception e3) {
             e = e3;
             openRawResource = null;
-            Fabric.getLogger().mo4292e("Fabric", "Could not calculate hash for app icon.", e);
+            Fabric.getLogger().mo4756e("Fabric", "Could not calculate hash for app icon.", e);
             closeOrLog(openRawResource, "Failed to close icon input stream.");
             return str;
         } catch (Throwable e4) {
@@ -459,14 +459,14 @@ public class CommonUtils {
                         } else if (toUpperCase.endsWith("GB")) {
                             j = convertMemInfoToBytes(toUpperCase, "GB", BYTES_IN_A_GIGABYTE);
                         } else {
-                            Fabric.getLogger().mo4289d("Fabric", "Unexpected meminfo format while computing RAM: " + toUpperCase);
+                            Fabric.getLogger().mo4753d("Fabric", "Unexpected meminfo format while computing RAM: " + toUpperCase);
                             j = 0;
                         }
                     }
                     totalRamInBytes = j;
                 }
             } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "Unexpected meminfo format while computing RAM: " + toUpperCase, e);
+                Fabric.getLogger().mo4756e("Fabric", "Unexpected meminfo format while computing RAM: " + toUpperCase, e);
                 j = 0;
             } catch (Throwable th) {
                 Class cls = CommonUtils.class;
@@ -488,7 +488,7 @@ public class CommonUtils {
                 instance.update(bArr, 0, read);
             }
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Could not calculate hash for app icon.", e);
+            Fabric.getLogger().mo4756e("Fabric", "Could not calculate hash for app icon.", e);
             return "";
         }
     }
@@ -503,7 +503,7 @@ public class CommonUtils {
             instance.update(bArr);
             return hexify(instance.digest());
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Could not create hashing algorithm: " + str + ", returning empty string.", e);
+            Fabric.getLogger().mo4756e("Fabric", "Could not create hashing algorithm: " + str + ", returning empty string.", e);
             return "";
         }
     }
@@ -576,13 +576,13 @@ public class CommonUtils {
 
     public static void logControlled(Context context, String str) {
         if (isClsTrace(context)) {
-            Fabric.getLogger().mo4289d("Fabric", str);
+            Fabric.getLogger().mo4753d("Fabric", str);
         }
     }
 
     public static void logControlledError(Context context, String str, Throwable th) {
         if (isClsTrace(context)) {
-            Fabric.getLogger().mo4291e("Fabric", str);
+            Fabric.getLogger().mo4755e("Fabric", str);
         }
     }
 
@@ -590,14 +590,14 @@ public class CommonUtils {
         if (Fabric.isDebuggable()) {
             throw new IllegalArgumentException(str2);
         }
-        Fabric.getLogger().mo4302w(str, str2);
+        Fabric.getLogger().mo4766w(str, str2);
     }
 
     public static void logOrThrowIllegalStateException(String str, String str2) {
         if (Fabric.isDebuggable()) {
             throw new IllegalStateException(str2);
         }
-        Fabric.getLogger().mo4302w(str, str2);
+        Fabric.getLogger().mo4766w(str, str2);
     }
 
     public static String logPriorityToString(int i) {
@@ -650,7 +650,7 @@ public class CommonUtils {
             return null;
         }
         String string = context.getResources().getString(resourcesIdentifier);
-        Fabric.getLogger().mo4289d("Fabric", "Build ID is: " + string);
+        Fabric.getLogger().mo4753d("Fabric", "Build ID is: " + string);
         return string;
     }
 

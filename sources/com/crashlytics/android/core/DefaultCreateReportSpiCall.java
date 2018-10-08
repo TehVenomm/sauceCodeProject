@@ -38,10 +38,10 @@ class DefaultCreateReportSpiCall extends AbstractSpiCall implements CreateReport
 
     public boolean invoke(CreateReportRequest createReportRequest) {
         HttpRequest applyMultipartDataTo = applyMultipartDataTo(applyHeadersTo(getHttpRequest(), createReportRequest), createReportRequest);
-        Fabric.getLogger().mo4289d("Fabric", "Sending report to: " + getUrl());
+        Fabric.getLogger().mo4753d("Fabric", "Sending report to: " + getUrl());
         int code = applyMultipartDataTo.code();
-        Fabric.getLogger().mo4289d("Fabric", "Create report request ID: " + applyMultipartDataTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
-        Fabric.getLogger().mo4289d("Fabric", "Result was: " + code);
+        Fabric.getLogger().mo4753d("Fabric", "Create report request ID: " + applyMultipartDataTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
+        Fabric.getLogger().mo4753d("Fabric", "Result was: " + code);
         return ResponseParser.parse(code) == 0;
     }
 }

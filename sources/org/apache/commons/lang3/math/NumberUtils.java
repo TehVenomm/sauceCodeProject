@@ -1,7 +1,6 @@
 package org.apache.commons.lang3.math;
 
 import com.facebook.appevents.AppEventsConstants;
-import com.google.android.gms.games.quest.Quests;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -155,7 +154,7 @@ public class NumberUtils {
         String str4;
         char charAt2 = str.charAt(str.length() - 1);
         i2 = str.indexOf(46);
-        int indexOf = (str.indexOf(Quests.SELECT_COMPLETED_UNCLAIMED) + str.indexOf(69)) + 1;
+        int indexOf = (str.indexOf(101) + str.indexOf(69)) + 1;
         String substring;
         if (i2 > -1) {
             if (indexOf <= -1) {

@@ -355,8 +355,8 @@ public class FortuneWheelSpinHandle
 	private unsafe void ScaleItemFinal(float deg)
 	{
 		int index = GetCurrentIndexFromDeg(deg);
-		_003CScaleItemFinal_003Ec__AnonStorey2FA _003CScaleItemFinal_003Ec__AnonStorey2FA;
-		FortuneWheelSpinItem fortuneWheelSpinItem = pinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)_003CScaleItemFinal_003Ec__AnonStorey2FA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
+		_003CScaleItemFinal_003Ec__AnonStorey309 _003CScaleItemFinal_003Ec__AnonStorey;
+		FortuneWheelSpinItem fortuneWheelSpinItem = pinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)_003CScaleItemFinal_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
 		fortuneWheelSpinItem.SetScale(DEFAULT_ACTIVE_SCALE);
 		for (int i = 0; i < pinItem.Count; i++)
 		{
@@ -370,8 +370,8 @@ public class FortuneWheelSpinHandle
 	private unsafe int GetReplaceIndex(int index)
 	{
 		index = ((index < DEFAULT_WHEEL_ITEMS_LENGTH) ? index : (index % DEFAULT_WHEEL_ITEMS_LENGTH));
-		_003CGetReplaceIndex_003Ec__AnonStorey2FB _003CGetReplaceIndex_003Ec__AnonStorey2FB;
-		FortuneWheelSpinItem fortuneWheelSpinItem = pinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)_003CGetReplaceIndex_003Ec__AnonStorey2FB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
+		_003CGetReplaceIndex_003Ec__AnonStorey30A _003CGetReplaceIndex_003Ec__AnonStorey30A;
+		FortuneWheelSpinItem fortuneWheelSpinItem = pinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)_003CGetReplaceIndex_003Ec__AnonStorey30A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
 		if (fortuneWheelSpinItem.type == REWARD_TYPE.JACKPOT)
 		{
 			return GetReplaceIndex(++index);
@@ -402,15 +402,15 @@ public class FortuneWheelSpinHandle
 		if (currentReward != null)
 		{
 			FortuneWheelSpinItem fortuneWheelSpinItem = null;
-			_003CReplaceRewardIcon_003Ec__AnonStorey2FC _003CReplaceRewardIcon_003Ec__AnonStorey2FC;
-			IEnumerable<FortuneWheelSpinItem> enumerable = initialSpinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)_003CReplaceRewardIcon_003Ec__AnonStorey2FC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CReplaceRewardIcon_003Ec__AnonStorey30B _003CReplaceRewardIcon_003Ec__AnonStorey30B;
+			IEnumerable<FortuneWheelSpinItem> enumerable = initialSpinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)_003CReplaceRewardIcon_003Ec__AnonStorey30B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			if (enumerable != null && enumerable.Count() > 0 && hiddenSpinItemList.IndexOf(enumerable.First()) > -1)
 			{
 				fortuneWheelSpinItem = enumerable.First();
 			}
 			else if (updatedItemList != null && updatedItemList.Count > 0)
 			{
-				IEnumerable<FortuneWheelItem> enumerable2 = updatedItemList.Where(new Func<FortuneWheelItem, bool>((object)_003CReplaceRewardIcon_003Ec__AnonStorey2FC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				IEnumerable<FortuneWheelItem> enumerable2 = updatedItemList.Where(new Func<FortuneWheelItem, bool>((object)_003CReplaceRewardIcon_003Ec__AnonStorey30B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				if (enumerable2 != null && enumerable2.Count() > 0)
 				{
 					FortuneWheelItem data = enumerable2.First();
@@ -422,7 +422,7 @@ public class FortuneWheelSpinHandle
 					initialSpinItem.Add(component);
 				}
 			}
-			FortuneWheelSpinItem fortuneWheelSpinItem2 = pinItem.First(new Func<FortuneWheelSpinItem, bool>((object)_003CReplaceRewardIcon_003Ec__AnonStorey2FC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			FortuneWheelSpinItem fortuneWheelSpinItem2 = pinItem.First(new Func<FortuneWheelSpinItem, bool>((object)_003CReplaceRewardIcon_003Ec__AnonStorey30B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			fortuneWheelSpinItem2._trans.set_localPosition(hidePosition);
 			fortuneWheelSpinItem2.indexPos = -1;
 			fortuneWheelSpinItem._trans.set_localPosition(wayPoints[replaceIndex]);

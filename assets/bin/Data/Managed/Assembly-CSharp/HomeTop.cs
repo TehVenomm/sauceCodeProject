@@ -93,7 +93,7 @@ public class HomeTop : HomeBase
 
 	protected override void UpdateUIOfTutorial()
 	{
-		bool flag = HomeTutorialManager.ShouldRunGachaTutorial();
+		bool flag = HomeTutorialManager.ShouldRunGachaTutorial() || HomeTutorialManager.ShouldRunQuestShadowTutorial();
 		bool flag2 = TutorialStep.HasAllTutorialCompleted();
 		bool flag3 = !flag && flag2;
 		bool flag4 = MonoBehaviourSingleton<LoungeMatchingManager>.IsValid() && MonoBehaviourSingleton<LoungeMatchingManager>.I.isOpenLounge;
@@ -104,7 +104,7 @@ public class HomeTop : HomeBase
 		bool is_visible2 = flag3 && !flag4;
 		SetActive((Enum)UI.OBJ_LOUNGE, is_visible);
 		SetActive((Enum)UI.BTN_EXPLORE, is_visible2);
-		bool flag6 = !HomeTutorialManager.ShouldRunGachaTutorial();
+		bool flag6 = !HomeTutorialManager.ShouldRunGachaTutorial() && !HomeTutorialManager.ShouldRunQuestShadowTutorial();
 		bool flag7 = MonoBehaviourSingleton<UIManager>.I.mainChat != null && TutorialStep.HasAllTutorialCompleted() && flag6;
 		SetActive((Enum)UI.OBJ_MENU_GG, flag7);
 		if (flag7)
@@ -174,6 +174,10 @@ public class HomeTop : HomeBase
 			MonoBehaviourSingleton<HomeManager>.I.IsJumpToGacha = false;
 			DispatchEvent("GACHA_QUEST_COUNTER_AREA", null);
 			return true;
+		}
+		if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM) && MonoBehaviourSingleton<QuestManager>.I.isBackGachaQuest)
+		{
+			MonoBehaviourSingleton<QuestManager>.I.isBackGachaQuest = false;
 		}
 		if (MonoBehaviourSingleton<QuestManager>.I.isBackGachaQuest)
 		{
@@ -488,18 +492,18 @@ public class HomeTop : HomeBase
 			if (ret.Error == Error.None)
 			{
 				bool flag = PlayerPrefs.GetInt("Pike_Shop_Event", 0) == 1;
-				HomeTop _003C_003Ef__this = ((_003CWaitForCheckpikeShop_003Ec__IteratorA5)/*Error near IL_0024: stateMachine*/)._003C_003Ef__this;
+				HomeTop _003C_003Ef__this = ((_003CWaitForCheckpikeShop_003Ec__IteratorA6)/*Error near IL_0024: stateMachine*/)._003C_003Ef__this;
 				List<PointShop> result = ret.result;
-				if (_003CWaitForCheckpikeShop_003Ec__IteratorA5._003C_003Ef__am_0024cache3 == null)
+				if (_003CWaitForCheckpikeShop_003Ec__IteratorA6._003C_003Ef__am_0024cache3 == null)
 				{
-					_003CWaitForCheckpikeShop_003Ec__IteratorA5._003C_003Ef__am_0024cache3 = new Func<PointShop, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					_003CWaitForCheckpikeShop_003Ec__IteratorA6._003C_003Ef__am_0024cache3 = new Func<PointShop, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 				}
-				_003C_003Ef__this.isHighlightPikeShop = result.Any(_003CWaitForCheckpikeShop_003Ec__IteratorA5._003C_003Ef__am_0024cache3);
-				if (((_003CWaitForCheckpikeShop_003Ec__IteratorA5)/*Error near IL_0024: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop)
+				_003C_003Ef__this.isHighlightPikeShop = result.Any(_003CWaitForCheckpikeShop_003Ec__IteratorA6._003C_003Ef__am_0024cache3);
+				if (((_003CWaitForCheckpikeShop_003Ec__IteratorA6)/*Error near IL_0024: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop)
 				{
 					if (flag)
 					{
-						((_003CWaitForCheckpikeShop_003Ec__IteratorA5)/*Error near IL_0024: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop = false;
+						((_003CWaitForCheckpikeShop_003Ec__IteratorA6)/*Error near IL_0024: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop = false;
 					}
 				}
 				else

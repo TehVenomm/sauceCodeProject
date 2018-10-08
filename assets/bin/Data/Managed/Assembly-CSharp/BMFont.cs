@@ -5,24 +5,24 @@ using UnityEngine;
 [Serializable]
 public class BMFont
 {
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private int mSize = 16;
 
 	[HideInInspector]
 	[SerializeField]
 	private int mBase;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private int mWidth;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private int mHeight;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private string mSpriteName;
 
 	[SerializeField]

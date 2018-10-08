@@ -190,7 +190,6 @@ public class StatusEquipSecond : StatusEquip
 		if (GameSaveData.instance.canPushTrackEquipTutorial)
 		{
 			GameSaveData.instance.SetPushTrackEquipTutorial(false);
-			MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_weapon_equip, "Tutorial");
 		}
 		base.OnQuery_TRY_ON();
 		GameSection.ChangeEvent("SELECT_ITEM", null);

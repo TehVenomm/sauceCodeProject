@@ -21,7 +21,7 @@ final class ab extends aa<ab> {
 
     /* renamed from: a */
     public void m674a(ab abVar) {
-        super.mo4242a(abVar);
+        super.mo4244a(abVar);
         this.f765a = abVar.f765a;
         this.f766b = abVar.f766b;
         this.f767c = abVar.f767c;

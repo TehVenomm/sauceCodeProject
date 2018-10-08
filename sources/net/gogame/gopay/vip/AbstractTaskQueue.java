@@ -5,11 +5,11 @@ import net.gogame.gopay.vip.TaskQueue.Listener;
 public abstract class AbstractTaskQueue<T> implements Runnable, TaskQueue<T> {
     public static final long DEFAULT_DELAY = 60000;
     /* renamed from: a */
-    private final Listener<T> f1259a;
+    private final Listener<T> f3647a;
     /* renamed from: b */
-    private long f1260b = 60000;
+    private long f3648b = 60000;
     /* renamed from: c */
-    private Thread f1261c = null;
+    private Thread f3649c = null;
 
     protected abstract T peek();
 
@@ -18,21 +18,21 @@ public abstract class AbstractTaskQueue<T> implements Runnable, TaskQueue<T> {
     protected abstract boolean shouldProcess();
 
     public AbstractTaskQueue(Listener<T> listener) {
-        this.f1259a = listener;
+        this.f3647a = listener;
     }
 
     public long getDelay() {
-        return this.f1260b;
+        return this.f3648b;
     }
 
     public void setDelay(long j) {
-        this.f1260b = j;
+        this.f3648b = j;
     }
 
     public void start() {
-        if (this.f1261c == null || !this.f1261c.isAlive()) {
-            this.f1261c = new Thread(this);
-            this.f1261c.start();
+        if (this.f3649c == null || !this.f3649c.isAlive()) {
+            this.f3649c = new Thread(this);
+            this.f3649c.start();
             return;
         }
         throw new IllegalStateException();
@@ -50,17 +50,17 @@ public abstract class AbstractTaskQueue<T> implements Runnable, TaskQueue<T> {
         r0 = r3.peek();	 Catch:{ InterruptedException -> 0x0012, Exception -> 0x002d }
         if (r0 != 0) goto L_0x0014;
     L_0x000c:
-        r0 = r3.f1260b;	 Catch:{ InterruptedException -> 0x0012, Exception -> 0x002d }
+        r0 = r3.f3648b;	 Catch:{ InterruptedException -> 0x0012, Exception -> 0x002d }
         java.lang.Thread.sleep(r0);	 Catch:{ InterruptedException -> 0x0012, Exception -> 0x002d }
         goto L_0x0000;
     L_0x0012:
         r0 = move-exception;
         return;
     L_0x0014:
-        r1 = r3.f1259a;	 Catch:{ Exception -> 0x0024, InterruptedException -> 0x0012 }
+        r1 = r3.f3647a;	 Catch:{ Exception -> 0x0024, InterruptedException -> 0x0012 }
         if (r1 == 0) goto L_0x0036;
     L_0x0018:
-        r1 = r3.f1259a;	 Catch:{ Exception -> 0x0024, InterruptedException -> 0x0012 }
+        r1 = r3.f3647a;	 Catch:{ Exception -> 0x0024, InterruptedException -> 0x0012 }
         r0 = r1.onTask(r0);	 Catch:{ Exception -> 0x0024, InterruptedException -> 0x0012 }
         if (r0 == 0) goto L_0x000c;
     L_0x0020:

@@ -92,7 +92,7 @@ public class GuildMemberList : GameSection
 		else
 		{
 			int online_count = 0;
-			_003CUpdateUI_003Ec__AnonStorey326 _003CUpdateUI_003Ec__AnonStorey;
+			_003CUpdateUI_003Ec__AnonStorey335 _003CUpdateUI_003Ec__AnonStorey;
 			SetDynamicList((Enum)UI.GRD_LIST, "GuildMemberListItem", allMember.Count, true, null, null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			SetLabelText((Enum)UI.LBL_GUILD_NUMBER_NOW, online_count.ToString());
 			SetActive((Enum)UI.STR_NON_LIST, false);
@@ -102,7 +102,7 @@ public class GuildMemberList : GameSection
 
 	protected unsafe virtual void GetListItem(Action<bool, object> callback)
 	{
-		_003CGetListItem_003Ec__AnonStorey327 _003CGetListItem_003Ec__AnonStorey;
+		_003CGetListItem_003Ec__AnonStorey336 _003CGetListItem_003Ec__AnonStorey;
 		MonoBehaviourSingleton<GuildManager>.I.SendMemberList(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId, new Action<bool, GuildMemberListModel>((object)_003CGetListItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

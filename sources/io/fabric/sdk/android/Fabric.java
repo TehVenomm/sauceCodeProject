@@ -43,8 +43,8 @@ public class Fabric {
     private final Handler mainHandler;
 
     /* renamed from: io.fabric.sdk.android.Fabric$1 */
-    class C09131 extends Callbacks {
-        C09131() {
+    class C12291 extends Callbacks {
+        C12291() {
         }
 
         public void onActivityCreated(Activity activity, Bundle bundle) {
@@ -223,7 +223,7 @@ public class Fabric {
     private void init() {
         setCurrentActivity(extractActivity(this.context));
         this.activityLifecycleManager = new ActivityLifecycleManager(this.context);
-        this.activityLifecycleManager.registerCallbacks(new C09131());
+        this.activityLifecycleManager.registerCallbacks(new C12291());
         initializeKits(this.context);
     }
 
@@ -379,7 +379,7 @@ public class Fabric {
             }
         }
         if (append != null) {
-            getLogger().mo4289d("Fabric", append.toString());
+            getLogger().mo4753d("Fabric", append.toString());
         }
     }
 

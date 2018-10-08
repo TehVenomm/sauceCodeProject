@@ -1,5 +1,6 @@
 package org.apache.commons.lang3.time;
 
+import im.getsocial.sdk.consts.LanguageCodes;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -48,7 +49,7 @@ public class FastDateParser implements DateParser, Serializable {
     private static final Strategy HOUR_OF_DAY_STRATEGY = new NumberStrategy(11);
     private static final Strategy HOUR_STRATEGY = new NumberStrategy(10);
     private static final Strategy ISO_8601_STRATEGY = new ISO8601TimeZoneStrategy("(Z|(?:[+-]\\d{2}(?::?\\d{2})?))");
-    static final Locale JAPANESE_IMPERIAL = new Locale("ja", "JP", "JP");
+    static final Locale JAPANESE_IMPERIAL = new Locale(LanguageCodes.JAPANESE, "JP", "JP");
     private static final Strategy LITERAL_YEAR_STRATEGY = new NumberStrategy(1);
     private static final Strategy MILLISECOND_STRATEGY = new NumberStrategy(14);
     private static final Strategy MINUTE_STRATEGY = new NumberStrategy(12);

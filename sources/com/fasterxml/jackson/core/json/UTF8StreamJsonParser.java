@@ -18,7 +18,6 @@ import com.fasterxml.jackson.core.io.IOContext;
 import com.fasterxml.jackson.core.sym.ByteQuadsCanonicalizer;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.github.droidfu.support.DisplaySupport;
-import com.google.android.gms.games.quest.Quests;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -1185,7 +1184,7 @@ public class UTF8StreamJsonParser extends ParserBase {
                 emptyAndGetCurrentSegment[i3] = (char) i5;
                 i3 = i2;
                 i2 = i4;
-            } else if (i5 == 46 || i5 == Quests.SELECT_COMPLETED_UNCLAIMED || i5 == 69) {
+            } else if (i5 == 46 || i5 == 101 || i5 == 69) {
                 return _parseFloat(emptyAndGetCurrentSegment, i3, i5, false, i2);
             } else {
                 this._inputPtr--;
@@ -1235,7 +1234,7 @@ public class UTF8StreamJsonParser extends ParserBase {
                 i4 = i + 1;
                 emptyAndGetCurrentSegment[i] = (char) i5;
                 i = i4;
-            } else if (i5 == 46 || i5 == Quests.SELECT_COMPLETED_UNCLAIMED || i5 == 69) {
+            } else if (i5 == 46 || i5 == 101 || i5 == 69) {
                 return _parseFloat(emptyAndGetCurrentSegment, i, i5, true, i3);
             } else {
                 this._inputPtr--;
@@ -1277,7 +1276,7 @@ public class UTF8StreamJsonParser extends ParserBase {
                 return resetInt(z, i4);
             }
         }
-        if (i3 == 46 || i3 == Quests.SELECT_COMPLETED_UNCLAIMED || i3 == 69) {
+        if (i3 == 46 || i3 == 101 || i3 == 69) {
             return _parseFloat(cArr2, i5, i3, z, i4);
         }
         this._inputPtr--;
@@ -3049,7 +3048,7 @@ public class UTF8StreamJsonParser extends ParserBase {
                         case 13:
                             _skipCR();
                             continue;
-                        case MotionEventCompat.AXIS_GENERIC_11 /*42*/:
+                        case 42:
                             if (this._inputPtr >= this._inputEnd && !loadMore()) {
                                 break;
                             } else if (this._inputBuffer[this._inputPtr] == (byte) 47) {
@@ -3104,7 +3103,7 @@ public class UTF8StreamJsonParser extends ParserBase {
                         case 13:
                             _skipCR();
                             return;
-                        case MotionEventCompat.AXIS_GENERIC_11 /*42*/:
+                        case 42:
                             break;
                         default:
                             if (i >= 0) {

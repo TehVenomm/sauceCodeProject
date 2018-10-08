@@ -30,14 +30,14 @@ public final class ExecutorUtils {
         Runtime.getRuntime().addShutdownHook(new Thread(new BackgroundPriorityRunnable() {
             public void onRun() {
                 try {
-                    Fabric.getLogger().mo4289d("Fabric", "Executing shutdown hook for " + str2);
+                    Fabric.getLogger().mo4753d("Fabric", "Executing shutdown hook for " + str2);
                     executorService2.shutdown();
                     if (!executorService2.awaitTermination(j2, timeUnit2)) {
-                        Fabric.getLogger().mo4289d("Fabric", str2 + " did not shut down in the" + " allocated time. Requesting immediate shutdown.");
+                        Fabric.getLogger().mo4753d("Fabric", str2 + " did not shut down in the" + " allocated time. Requesting immediate shutdown.");
                         executorService2.shutdownNow();
                     }
                 } catch (InterruptedException e) {
-                    Fabric.getLogger().mo4289d("Fabric", String.format(Locale.US, "Interrupted while waiting for %s to shut down. Requesting immediate shutdown.", new Object[]{str2}));
+                    Fabric.getLogger().mo4753d("Fabric", String.format(Locale.US, "Interrupted while waiting for %s to shut down. Requesting immediate shutdown.", new Object[]{str2}));
                     executorService2.shutdownNow();
                 }
             }

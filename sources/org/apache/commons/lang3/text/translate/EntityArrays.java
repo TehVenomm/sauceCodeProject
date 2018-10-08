@@ -3,7 +3,6 @@ package org.apache.commons.lang3.text.translate;
 import android.support.v4.media.TransportMediator;
 import com.github.droidfu.support.DisplaySupport;
 import com.google.android.gms.drive.MetadataChangeSet;
-import com.google.android.gms.games.quest.Quests;
 import java.lang.reflect.Array;
 import org.apache.commons.lang3.StringUtils;
 
@@ -224,9 +223,9 @@ public class EntityArrays {
         r0[98] = new String[]{"≅", "&cong;"};
         r0[99] = new String[]{"≈", "&asymp;"};
         r0[100] = new String[]{"≠", "&ne;"};
-        r0[Quests.SELECT_COMPLETED_UNCLAIMED] = new String[]{"≡", "&equiv;"};
+        r0[101] = new String[]{"≡", "&equiv;"};
         r0[102] = new String[]{"≤", "&le;"};
-        r0[Quests.SELECT_RECENTLY_FAILED] = new String[]{"≥", "&ge;"};
+        r0[103] = new String[]{"≥", "&ge;"};
         r0[104] = new String[]{"⊂", "&sub;"};
         r0[105] = new String[]{"⊃", "&sup;"};
         r0[106] = new String[]{"⊆", "&sube;"};

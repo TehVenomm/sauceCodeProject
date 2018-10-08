@@ -96,16 +96,16 @@ public class UI_Common : UIBehaviour
 			Transform val = Attach(target_ui, GetCtrl(uI));
 			val.get_gameObject().set_name(UI.OBJ_CAPTION.ToString());
 			SetLabelText(val, UI.LBL_CAPTION, caption);
-			UITweenCtrl component = val.get_gameObject().GetComponent<UITweenCtrl>();
-			if (component != null)
+			UITweenCtrl componentInChildren = val.get_gameObject().GetComponentInChildren<UITweenCtrl>();
+			if (componentInChildren != null)
 			{
-				component.Reset();
+				componentInChildren.Reset();
 				int i = 0;
-				for (int num = component.tweens.Length; i < num; i++)
+				for (int num = componentInChildren.tweens.Length; i < num; i++)
 				{
-					component.tweens[i].ResetToBeginning();
+					componentInChildren.tweens[i].ResetToBeginning();
 				}
-				component.Play(true, null);
+				componentInChildren.Play(true, null);
 			}
 		}
 	}
@@ -282,8 +282,10 @@ public class UI_Common : UIBehaviour
 	{
 		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0022: Expected O, but got Unknown
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Expected O, but got Unknown
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Expected O, but got Unknown
+		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Expected O, but got Unknown
 		UIVirtualScreen component = target_ui.collectUI.GetComponent<UIVirtualScreen>();
 		if (component == null)
 		{
@@ -295,7 +297,21 @@ public class UI_Common : UIBehaviour
 		{
 			if (component2.leftAnchor != null)
 			{
-				((UIRect)component2).SetAnchor(component.get_gameObject());
+				if (FixedPanelNGUI.CheckResolutionCanFix())
+				{
+					if (component2.leftAnchor.target.get_name() == "UI_Root")
+					{
+						component2.SetAnchor(FixedPanelNGUI.Root);
+					}
+					else
+					{
+						((UIRect)component2).SetAnchor(component.get_gameObject());
+					}
+				}
+				else
+				{
+					((UIRect)component2).SetAnchor(component.get_gameObject());
+				}
 			}
 			else
 			{

@@ -27,7 +27,7 @@ public class FormattableUtils {
     public static Formatter append(CharSequence charSequence, Formatter formatter, int i, int i2, int i3, char c, CharSequence charSequence2) {
         int i4 = 1;
         boolean z = charSequence2 == null || i3 < 0 || charSequence2.length() <= i3;
-        Validate.isTrue(z, "Specified ellipsis '%1$s' exceeds precision of %2$s", charSequence2, Integer.valueOf(i3));
+        Validate.isTrue(z, "Specified ellipsis '%1$s' exceeds precision of %2$s", new Object[]{charSequence2, Integer.valueOf(i3)});
         StringBuilder stringBuilder = new StringBuilder(charSequence);
         if (i3 >= 0 && i3 < charSequence.length()) {
             CharSequence charSequence3 = (CharSequence) ObjectUtils.defaultIfNull(charSequence2, "");

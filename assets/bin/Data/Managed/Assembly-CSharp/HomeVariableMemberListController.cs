@@ -250,6 +250,11 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 		}
 	}
 
+	private void Update()
+	{
+		ProcessBackKey();
+	}
+
 	public void InvokeCoroutine(IEnumerator _enumerator)
 	{
 		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
@@ -391,6 +396,14 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 		WidgetBotButtonsRoot.rightAnchor.Set(1f, val.y);
 		WidgetBotButtonsRoot.bottomAnchor.Set(0f, val.z);
 		WidgetBotButtonsRoot.topAnchor.Set(0f, val.w);
+	}
+
+	public void ProcessBackKey()
+	{
+		if (Input.GetKeyUp(27))
+		{
+			OnClickBackButton();
+		}
 	}
 
 	public void OnClickBackButton()

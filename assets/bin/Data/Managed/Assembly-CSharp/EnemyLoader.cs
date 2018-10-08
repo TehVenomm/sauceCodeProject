@@ -277,17 +277,17 @@ public class EnemyLoader : ModelLoaderBase
 					{
 						material = material
 					};
-					if (materialParams.hasRimPower = material.HasProperty(((_003CDoLoad_003Ec__Iterator26B)/*Error near IL_062e: stateMachine*/)._003CID_RIM_POWER_003E__16))
+					if (materialParams.hasRimPower = material.HasProperty(((_003CDoLoad_003Ec__Iterator27A)/*Error near IL_062e: stateMachine*/)._003CID_RIM_POWER_003E__16))
 					{
-						materialParams.defaultRimPower = material.GetFloat(((_003CDoLoad_003Ec__Iterator26B)/*Error near IL_062e: stateMachine*/)._003CID_RIM_POWER_003E__16);
+						materialParams.defaultRimPower = material.GetFloat(((_003CDoLoad_003Ec__Iterator27A)/*Error near IL_062e: stateMachine*/)._003CID_RIM_POWER_003E__16);
 					}
-					if (materialParams.hasRimWidth = material.HasProperty(((_003CDoLoad_003Ec__Iterator26B)/*Error near IL_062e: stateMachine*/)._003CID_RIM_WIDTH_003E__17))
+					if (materialParams.hasRimWidth = material.HasProperty(((_003CDoLoad_003Ec__Iterator27A)/*Error near IL_062e: stateMachine*/)._003CID_RIM_WIDTH_003E__17))
 					{
-						materialParams.defaultRimWidth = material.GetFloat(((_003CDoLoad_003Ec__Iterator26B)/*Error near IL_062e: stateMachine*/)._003CID_RIM_WIDTH_003E__17);
+						materialParams.defaultRimWidth = material.GetFloat(((_003CDoLoad_003Ec__Iterator27A)/*Error near IL_062e: stateMachine*/)._003CID_RIM_WIDTH_003E__17);
 					}
-					materialParams.hasVanishFlag = material.HasProperty(((_003CDoLoad_003Ec__Iterator26B)/*Error near IL_062e: stateMachine*/)._003CID_VANISH_FLAG_003E__18);
-					materialParams.hasVanishRate = material.HasProperty(((_003CDoLoad_003Ec__Iterator26B)/*Error near IL_062e: stateMachine*/)._003CID_VANISH_RATE_003E__19);
-					((_003CDoLoad_003Ec__Iterator26B)/*Error near IL_062e: stateMachine*/)._003C_003Ef__this.materialParamsList.Add(materialParams);
+					materialParams.hasVanishFlag = material.HasProperty(((_003CDoLoad_003Ec__Iterator27A)/*Error near IL_062e: stateMachine*/)._003CID_VANISH_FLAG_003E__18);
+					materialParams.hasVanishRate = material.HasProperty(((_003CDoLoad_003Ec__Iterator27A)/*Error near IL_062e: stateMachine*/)._003CID_VANISH_RATE_003E__19);
+					((_003CDoLoad_003Ec__Iterator27A)/*Error near IL_062e: stateMachine*/)._003C_003Ef__this.materialParamsList.Add(materialParams);
 				}
 			});
 		}

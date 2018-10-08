@@ -20,7 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,11 +36,11 @@ public class ChatFragment extends Fragment {
     @Nullable
     public View onCreateView(LayoutInflater layoutInflater, @Nullable ViewGroup viewGroup, @Nullable Bundle bundle) {
         this.chatAdapter = ((ZopimMainActivity) getActivity()).getChatAdapter();
-        View inflate = layoutInflater.inflate(C0785R.layout.net_gogame_chat_fragment_chat, viewGroup, false);
-        ListView listView = (ListView) inflate.findViewById(C0785R.id.listView);
+        View inflate = layoutInflater.inflate(C0784R.layout.net_gogame_chat_fragment_chat, viewGroup, false);
+        ListView listView = (ListView) inflate.findViewById(C0784R.id.listView);
         listView.setAdapter(this.chatAdapter);
         listView.setDivider(null);
-        final EditText editText = (EditText) inflate.findViewById(C0785R.id.editText);
+        final EditText editText = (EditText) inflate.findViewById(C0784R.id.editText);
         editText.setImeOptions(4);
         editText.setOnEditorActionListener(new OnEditorActionListener() {
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -62,7 +62,7 @@ public class ChatFragment extends Fragment {
                 return true;
             }
         });
-        final ImageButton imageButton = (ImageButton) inflate.findViewById(C0785R.id.sendButton);
+        final ImageButton imageButton = (ImageButton) inflate.findViewById(C0784R.id.sendButton);
         imageButton.setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
                 if (ChatFragment.this.isSendButton(imageButton, editText.getText())) {
@@ -110,9 +110,9 @@ public class ChatFragment extends Fragment {
 
     private void updateSendButton(ImageButton imageButton, Editable editable) {
         if (isSendButton(imageButton, editable)) {
-            imageButton.setBackgroundResource(C0785R.drawable.net_gogame_chat_send_message_icon);
+            imageButton.setBackgroundResource(C0784R.drawable.net_gogame_chat_send_message_icon);
         } else {
-            imageButton.setBackgroundResource(C0785R.drawable.net_gogame_chat_attachment_icon);
+            imageButton.setBackgroundResource(C0784R.drawable.net_gogame_chat_attachment_icon);
         }
     }
 
@@ -129,6 +129,7 @@ public class ChatFragment extends Fragment {
     }
 
     private void send(Uri uri) {
+        OutputStream fileOutputStream;
         try {
             String filename = ContentUtils.getFilename(getActivity(), uri);
             if (filename == null) {
@@ -136,13 +137,12 @@ public class ChatFragment extends Fragment {
             }
             File file = new File(getActivity().getCacheDir(), filename);
             InputStream openInputStream = getActivity().getContentResolver().openInputStream(uri);
-            OutputStream fileOutputStream;
             try {
                 fileOutputStream = new FileOutputStream(file);
                 IOUtils.copy(openInputStream, fileOutputStream);
                 IOUtils.closeQuietly(fileOutputStream);
                 if (file.length() > Constants.MAX_IMAGE_SIZE) {
-                    Toast.makeText(getActivity(), C0785R.string.net_gogame_chat_image_too_big_message, 1).show();
+                    Toast.makeText(getActivity(), C0784R.string.net_gogame_chat_image_too_big_message, 1).show();
                     IOUtils.closeQuietly(openInputStream);
                     return;
                 }
@@ -153,7 +153,7 @@ public class ChatFragment extends Fragment {
                 IOUtils.closeQuietly(openInputStream);
             }
         } catch (IOException e) {
-            Toast.makeText(getActivity(), C0785R.string.net_gogame_chat_error_sending_picture_message, 1).show();
+            Toast.makeText(getActivity(), C0784R.string.net_gogame_chat_error_sending_picture_message, 1).show();
         }
     }
 }

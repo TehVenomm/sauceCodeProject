@@ -607,36 +607,36 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 			[Tooltip("[Burst] 距離減衰の最小減衰距離")]
 			private float MinAttenuationDistance = 10f;
 
-			[SerializeField]
 			[Tooltip("[Burst] 距離減衰の最大減衰距離")]
+			[SerializeField]
 			private float MaxAttenuationDistance = 1000f;
 
 			[Tooltip("[Burst] 距離減衰の最小ダメ\u30fcジレ\u30fcト")]
 			[SerializeField]
 			private float MinAttenuationDmgRate = 0.01f;
 
-			[SerializeField]
 			[Tooltip("[Burst] 距離減衰の最大ダメ\u30fcジレ\u30fcト")]
+			[SerializeField]
 			private float MaxAttenuationDmgRate = 1f;
 
-			[Tooltip("[Burst] 距離減衰定義(X:正規化距離[0.0 1.0] Y:正規化ダメ\u30fcジ補正値[0.0 1.0]")]
 			[SerializeField]
+			[Tooltip("[Burst] 距離減衰定義(X:正規化距離[0.0 1.0] Y:正規化ダメ\u30fcジ補正値[0.0 1.0]")]
 			private AnimationCurve AnimCurve = Curves.CreateEaseInCurve();
 
-			[SerializeField]
 			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
+			[SerializeField]
 			public float SingleShotBaseDmgRate = 1f;
 
-			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			[SerializeField]
+			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			public float SingleShotElementDmgRate = 2f;
 
 			[SerializeField]
 			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			public float FullBurstBaseDmgRate = 2f;
 
-			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			[SerializeField]
+			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			public float FullBurstElementDmgRate = 4f;
 
 			[Tooltip("単発ショットのヒットエフェクト(属性差分あり")]
@@ -1911,20 +1911,44 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 		[Tooltip("チュ\u30fcトリアルボスレベル")]
 		public int enemyLv = 1;
 
-		[Tooltip("一人で戦っている間の秒数、この秒数をすぎたら強制的にスキル説明")]
-		public float soloBattleTimeLimit = 20f;
-
-		[Tooltip("スキル打たずにこの時間が経過したら次のチュ\u30fcトリアルへ進む")]
-		public float skillWaitLimitTime = 20f;
-
-		[Tooltip("仲間と一緒い戦っている間の秒数")]
-		public float battleWithFriendTime = 35f;
-
 		[Tooltip("ボスの最小HPの割合(これ以下は減らない)")]
 		public float bossMinHpRate = 0.2f;
 
 		[Tooltip("ボス逃走開始HPの割合(bossMinHpRateより大きい値を設定すること)")]
 		public float bossEscapeHpRate = 0.5f;
+
+		[Tooltip("一人で戦っている間の秒数、この秒数をすぎたら強制的にスキル説明")]
+		public float soloBattleTimeLimit = 30f;
+
+		[Tooltip("スキル打たずにこの時間が経過したら次のチュ\u30fcトリアルへ進む")]
+		public float skillWaitLimitTime = 30f;
+
+		[Tooltip("仲間と一緒い戦っている間の秒数")]
+		public float battleWithFriendTime = 35f;
+
+		public float bossRefillHpRate = 0.25f;
+
+		public int[] botWeaponIds = new int[2]
+		{
+			20160111,
+			20260860
+		};
+
+		public int[] botSkillIds = new int[2]
+		{
+			100200100,
+			100200601
+		};
+
+		public float atkIncreaseRate = 0.1f;
+
+		public float deplayTimeNpcUseSkill = 6f;
+
+		public int deplayTimeNpcUseSkillOffset = 10;
+
+		public int bossMultiXHp = 5;
+
+		public float bossScale = 1.5f;
 	}
 
 	[Serializable]

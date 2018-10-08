@@ -77,8 +77,8 @@ public class QuestResultFriend : GameSection
 			bool waitLoad = true;
 			MonoBehaviourSingleton<InGameRecorder>.I.CreatePlayerModelsAsync(delegate(PlayerLoader[] loaders)
 			{
-				((_003CDoInitialize_003Ec__Iterator13F)/*Error near IL_013a: stateMachine*/)._003C_003Ef__this.playersModels = loaders;
-				((_003CDoInitialize_003Ec__Iterator13F)/*Error near IL_013a: stateMachine*/)._003CwaitLoad_003E__2 = false;
+				((_003CDoInitialize_003Ec__Iterator143)/*Error near IL_013a: stateMachine*/)._003C_003Ef__this.playersModels = loaders;
+				((_003CDoInitialize_003Ec__Iterator143)/*Error near IL_013a: stateMachine*/)._003CwaitLoad_003E__2 = false;
 			});
 			while (waitLoad)
 			{
@@ -398,8 +398,8 @@ public class QuestResultFriend : GameSection
 			GameSection.StayEvent();
 			List<int> list = new List<int>();
 			list.Add(record.charaInfo.userId);
-			_003COnQuery_FOLLOW_003Ec__AnonStorey42D _003COnQuery_FOLLOW_003Ec__AnonStorey42D;
-			MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(list, new Action<Error, List<int>>((object)_003COnQuery_FOLLOW_003Ec__AnonStorey42D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003COnQuery_FOLLOW_003Ec__AnonStorey43D _003COnQuery_FOLLOW_003Ec__AnonStorey43D;
+			MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(list, new Action<Error, List<int>>((object)_003COnQuery_FOLLOW_003Ec__AnonStorey43D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 

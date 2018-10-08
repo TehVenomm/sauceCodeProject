@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:colopl="http://schemas.android.com/apk/res/REMOVED_APPID" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:card_view="http://schemas.android.com/apk/res-auto" xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads" android:focusable="true" android:fitsSystemWindows="true" android:clickable="true" android:layout_width="match_parent" android:layout_height="match_parent">
+    <FrameLayout android:id="@+id/layoutWindowFrame" android:focusable="true" android:clickable="true" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_centerInParent="true">
+        <RelativeLayout android:id="@+id/layoutContent" android:layout_width="match_parent" android:layout_height="match_parent"/>
+        <RelativeLayout android:id="@+id/layoutHeader" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <im.getsocial.sdk.ui.internal.views.AssetButton android:id="@+id/buttonBack" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentLeft="true"/>
+            <im.getsocial.sdk.ui.internal.views.AssetButton android:id="@+id/buttonClose" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true"/>
+            <TextView android:gravity="center_horizontal" android:id="@+id/titleViewWindowTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLines="1" android:layout_alignParentTop="true" android:layout_alignParentBottom="true" android:layout_centerInParent="true" android:foregroundGravity="center"/>
+        </RelativeLayout>
+    </FrameLayout>
+</RelativeLayout>

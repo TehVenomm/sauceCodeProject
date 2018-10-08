@@ -45,32 +45,32 @@ class CheckForUpdatesRequest extends AbstractSpiCall {
             Map queryParamsFor = getQueryParamsFor(buildProperties);
             try {
                 applyHeadersTo = applyHeadersTo(getHttpRequest(queryParamsFor), str, str2);
-                Fabric.getLogger().mo4289d(Beta.TAG, "Checking for updates from " + getUrl());
-                Fabric.getLogger().mo4289d(Beta.TAG, "Checking for updates query params are: " + queryParamsFor);
+                Fabric.getLogger().mo4753d(Beta.TAG, "Checking for updates from " + getUrl());
+                Fabric.getLogger().mo4753d(Beta.TAG, "Checking for updates query params are: " + queryParamsFor);
                 if (applyHeadersTo.ok()) {
-                    Fabric.getLogger().mo4289d(Beta.TAG, "Checking for updates was successful");
+                    Fabric.getLogger().mo4753d(Beta.TAG, "Checking for updates was successful");
                     checkForUpdatesResponse = this.responseTransform.fromJson(new JSONObject(applyHeadersTo.body()));
                     if (applyHeadersTo != null) {
-                        Fabric.getLogger().mo4289d("Fabric", "Checking for updates request ID: " + applyHeadersTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
+                        Fabric.getLogger().mo4753d("Fabric", "Checking for updates request ID: " + applyHeadersTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
                     }
                 } else {
-                    Fabric.getLogger().mo4291e(Beta.TAG, "Checking for updates failed. Response code: " + applyHeadersTo.code());
+                    Fabric.getLogger().mo4755e(Beta.TAG, "Checking for updates failed. Response code: " + applyHeadersTo.code());
                     if (applyHeadersTo != null) {
-                        Fabric.getLogger().mo4289d("Fabric", "Checking for updates request ID: " + applyHeadersTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
+                        Fabric.getLogger().mo4753d("Fabric", "Checking for updates request ID: " + applyHeadersTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
                     }
                 }
             } catch (Exception e2) {
                 e = e2;
                 try {
-                    Fabric.getLogger().mo4292e(Beta.TAG, "Error while checking for updates from " + getUrl(), e);
+                    Fabric.getLogger().mo4756e(Beta.TAG, "Error while checking for updates from " + getUrl(), e);
                     if (applyHeadersTo != null) {
-                        Fabric.getLogger().mo4289d("Fabric", "Checking for updates request ID: " + applyHeadersTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
+                        Fabric.getLogger().mo4753d("Fabric", "Checking for updates request ID: " + applyHeadersTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
                     }
                     return checkForUpdatesResponse;
                 } catch (Throwable th2) {
                     th = th2;
                     if (applyHeadersTo != null) {
-                        Fabric.getLogger().mo4289d("Fabric", "Checking for updates request ID: " + applyHeadersTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
+                        Fabric.getLogger().mo4753d("Fabric", "Checking for updates request ID: " + applyHeadersTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
                     }
                     throw th;
                 }
@@ -78,16 +78,16 @@ class CheckForUpdatesRequest extends AbstractSpiCall {
         } catch (Exception e3) {
             e = e3;
             applyHeadersTo = null;
-            Fabric.getLogger().mo4292e(Beta.TAG, "Error while checking for updates from " + getUrl(), e);
+            Fabric.getLogger().mo4756e(Beta.TAG, "Error while checking for updates from " + getUrl(), e);
             if (applyHeadersTo != null) {
-                Fabric.getLogger().mo4289d("Fabric", "Checking for updates request ID: " + applyHeadersTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
+                Fabric.getLogger().mo4753d("Fabric", "Checking for updates request ID: " + applyHeadersTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
             }
             return checkForUpdatesResponse;
         } catch (Throwable e4) {
             applyHeadersTo = null;
             th = e4;
             if (applyHeadersTo != null) {
-                Fabric.getLogger().mo4289d("Fabric", "Checking for updates request ID: " + applyHeadersTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
+                Fabric.getLogger().mo4753d("Fabric", "Checking for updates request ID: " + applyHeadersTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
             }
             throw th;
         }

@@ -10,8 +10,8 @@ public abstract class EventsHandler<T> implements EventsStorageListener {
     protected EventsStrategy<T> strategy;
 
     /* renamed from: io.fabric.sdk.android.services.events.EventsHandler$3 */
-    class C09343 implements Runnable {
-        C09343() {
+    class C12503 implements Runnable {
+        C12503() {
         }
 
         public void run() {
@@ -24,8 +24,8 @@ public abstract class EventsHandler<T> implements EventsStorageListener {
     }
 
     /* renamed from: io.fabric.sdk.android.services.events.EventsHandler$4 */
-    class C09354 implements Runnable {
-        C09354() {
+    class C12514 implements Runnable {
+        C12514() {
         }
 
         public void run() {
@@ -47,7 +47,7 @@ public abstract class EventsHandler<T> implements EventsStorageListener {
     }
 
     public void disable() {
-        executeAsync(new C09354());
+        executeAsync(new C12514());
     }
 
     protected void executeAsync(Runnable runnable) {
@@ -69,7 +69,7 @@ public abstract class EventsHandler<T> implements EventsStorageListener {
     protected abstract EventsStrategy<T> getDisabledEventsStrategy();
 
     public void onRollOver(String str) {
-        executeAsync(new C09343());
+        executeAsync(new C12503());
     }
 
     public void recordEventAsync(final T t, final boolean z) {

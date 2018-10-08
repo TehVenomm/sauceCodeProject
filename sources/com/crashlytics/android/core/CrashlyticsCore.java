@@ -105,7 +105,7 @@ public class CrashlyticsCore extends Kit<Void> {
 
         public Void call() throws Exception {
             CrashlyticsCore.this.initializationMarkerFile.createNewFile();
-            Fabric.getLogger().mo4289d("Fabric", "Initialization marker file created.");
+            Fabric.getLogger().mo4753d("Fabric", "Initialization marker file created.");
             return null;
         }
     }
@@ -118,10 +118,10 @@ public class CrashlyticsCore extends Kit<Void> {
         public Boolean call() throws Exception {
             try {
                 boolean delete = CrashlyticsCore.this.initializationMarkerFile.delete();
-                Fabric.getLogger().mo4289d("Fabric", "Initialization marker file removed: " + delete);
+                Fabric.getLogger().mo4753d("Fabric", "Initialization marker file removed: " + delete);
                 return Boolean.valueOf(delete);
             } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "Problem encountered deleting Crashlytics initialization marker.", e);
+                Fabric.getLogger().mo4756e("Fabric", "Problem encountered deleting Crashlytics initialization marker.", e);
                 return Boolean.valueOf(false);
             }
         }
@@ -284,7 +284,7 @@ public class CrashlyticsCore extends Kit<Void> {
         if (instance != null && instance.handler != null) {
             return true;
         }
-        Fabric.getLogger().mo4292e("Fabric", "Crashlytics must be initialized by calling Fabric.with(Context) " + str, null);
+        Fabric.getLogger().mo4756e("Fabric", "Crashlytics must be initialized by calling Fabric.with(Context) " + str, null);
         return false;
     }
 
@@ -294,15 +294,15 @@ public class CrashlyticsCore extends Kit<Void> {
             c03091.addDependency(addDependency);
         }
         Future submit = getFabric().getExecutorService().submit(c03091);
-        Fabric.getLogger().mo4289d("Fabric", "Crashlytics detected incomplete initialization on previous app launch. Will initialize synchronously.");
+        Fabric.getLogger().mo4753d("Fabric", "Crashlytics detected incomplete initialization on previous app launch. Will initialize synchronously.");
         try {
             submit.get(4, TimeUnit.SECONDS);
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Crashlytics was interrupted during initialization.", e);
+            Fabric.getLogger().mo4756e("Fabric", "Crashlytics was interrupted during initialization.", e);
         } catch (Throwable e2) {
-            Fabric.getLogger().mo4292e("Fabric", "Problem encountered during Crashlytics initialization.", e2);
+            Fabric.getLogger().mo4756e("Fabric", "Problem encountered during Crashlytics initialization.", e2);
         } catch (Throwable e22) {
-            Fabric.getLogger().mo4292e("Fabric", "Crashlytics timed out during initialization.", e22);
+            Fabric.getLogger().mo4756e("Fabric", "Crashlytics timed out during initialization.", e22);
         }
     }
 
@@ -379,7 +379,7 @@ public class CrashlyticsCore extends Kit<Void> {
                 builder.show();
             }
         });
-        Fabric.getLogger().mo4289d("Fabric", "Waiting for user opt-in.");
+        Fabric.getLogger().mo4753d("Fabric", "Waiting for user opt-in.");
         optInLatch.await();
         return optInLatch.getOptIn();
     }
@@ -417,13 +417,13 @@ public class CrashlyticsCore extends Kit<Void> {
         try {
             this.packageName = context.getPackageName();
             this.installerPackageName = getIdManager().getInstallerPackageName();
-            Fabric.getLogger().mo4289d("Fabric", "Installer package name is: " + this.installerPackageName);
+            Fabric.getLogger().mo4753d("Fabric", "Installer package name is: " + this.installerPackageName);
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(this.packageName, 0);
             this.versionCode = Integer.toString(packageInfo.versionCode);
             this.versionName = packageInfo.versionName == null ? IdManager.DEFAULT_VERSION_NAME : packageInfo.versionName;
             this.buildId = CommonUtils.resolveBuildId(context);
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Error setting up app properties", e);
+            Fabric.getLogger().mo4756e("Fabric", "Error setting up app properties", e);
         }
         getIdManager().getBluetoothMacAddress();
         getBuildIdValidator(this.buildId, isRequiringBuildId(context)).validate(str, this.packageName);
@@ -450,7 +450,7 @@ public class CrashlyticsCore extends Kit<Void> {
         try {
             SettingsData awaitSettingsData = Settings.getInstance().awaitSettingsData();
             if (awaitSettingsData == null) {
-                Fabric.getLogger().mo4302w("Fabric", "Received null settings, skipping initialization!");
+                Fabric.getLogger().mo4766w("Fabric", "Received null settings, skipping initialization!");
                 markInitializationComplete();
                 return null;
             }
@@ -461,18 +461,18 @@ public class CrashlyticsCore extends Kit<Void> {
                     if (createReportSpiCall != null) {
                         new ReportUploader(createReportSpiCall).uploadReports(this.delay);
                     } else {
-                        Fabric.getLogger().mo4302w("Fabric", "Unable to create a call to upload reports.");
+                        Fabric.getLogger().mo4766w("Fabric", "Unable to create a call to upload reports.");
                     }
                 } catch (Exception e2) {
                     e = e2;
                     obj = null;
-                    Fabric.getLogger().mo4292e("Fabric", "Error dealing with settings", e);
+                    Fabric.getLogger().mo4756e("Fabric", "Error dealing with settings", e);
                     obj2 = obj;
                     if (obj2 != null) {
                         try {
-                            Fabric.getLogger().mo4289d("Fabric", "Crash reporting disabled.");
+                            Fabric.getLogger().mo4753d("Fabric", "Crash reporting disabled.");
                         } catch (Throwable e3) {
-                            Fabric.getLogger().mo4292e("Fabric", "Problem encountered during Crashlytics initialization.", e3);
+                            Fabric.getLogger().mo4756e("Fabric", "Problem encountered during Crashlytics initialization.", e3);
                         } finally {
                             markInitializationComplete();
                         }
@@ -483,16 +483,16 @@ public class CrashlyticsCore extends Kit<Void> {
             }
             int i = 1;
             if (obj2 != null) {
-                Fabric.getLogger().mo4289d("Fabric", "Crash reporting disabled.");
+                Fabric.getLogger().mo4753d("Fabric", "Crash reporting disabled.");
             }
             markInitializationComplete();
             return null;
         } catch (Exception e4) {
             e3 = e4;
-            Fabric.getLogger().mo4292e("Fabric", "Error dealing with settings", e3);
+            Fabric.getLogger().mo4756e("Fabric", "Error dealing with settings", e3);
             obj2 = obj;
             if (obj2 != null) {
-                Fabric.getLogger().mo4289d("Fabric", "Crash reporting disabled.");
+                Fabric.getLogger().mo4753d("Fabric", "Crash reporting disabled.");
             }
             markInitializationComplete();
             return null;
@@ -648,7 +648,7 @@ public class CrashlyticsCore extends Kit<Void> {
         r4 = r8.getVersion();
         r3 = r3.append(r4);
         r3 = r3.toString();
-        r1.mo4294i(r2, r3);
+        r1.mo4758i(r2, r3);
         r1 = new java.io.File;
         r2 = r8.getSdkDirectory();
         r3 = "initialization_marker";
@@ -663,7 +663,7 @@ public class CrashlyticsCore extends Kit<Void> {
         r0 = io.fabric.sdk.android.Fabric.getLogger();	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
         r1 = "Fabric";
         r2 = "Installing exception handler...";
-        r0.mo4289d(r1, r2);	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
+        r0.mo4753d(r1, r2);	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
         r0 = new com.crashlytics.android.core.CrashlyticsUncaughtExceptionHandler;	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
         r1 = java.lang.Thread.getDefaultUncaughtExceptionHandler();	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
         r2 = r8.listener;	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
@@ -680,7 +680,7 @@ public class CrashlyticsCore extends Kit<Void> {
         r0 = io.fabric.sdk.android.Fabric.getLogger();	 Catch:{ Exception -> 0x00c0, CrashlyticsMissingDependencyException -> 0x00a7 }
         r2 = "Fabric";
         r3 = "Successfully installed exception handler.";
-        r0.mo4289d(r2, r3);	 Catch:{ Exception -> 0x00c0, CrashlyticsMissingDependencyException -> 0x00a7 }
+        r0.mo4753d(r2, r3);	 Catch:{ Exception -> 0x00c0, CrashlyticsMissingDependencyException -> 0x00a7 }
     L_0x008b:
         if (r1 == 0) goto L_0x00ae;
     L_0x008d:
@@ -697,7 +697,7 @@ public class CrashlyticsCore extends Kit<Void> {
         r2 = io.fabric.sdk.android.Fabric.getLogger();	 Catch:{ CrashlyticsMissingDependencyException -> 0x00a7, Exception -> 0x00b1 }
         r3 = "Fabric";
         r4 = "There was a problem installing the exception handler.";
-        r2.mo4292e(r3, r4, r0);	 Catch:{ CrashlyticsMissingDependencyException -> 0x00a7, Exception -> 0x00b1 }
+        r2.mo4756e(r3, r4, r0);	 Catch:{ CrashlyticsMissingDependencyException -> 0x00a7, Exception -> 0x00b1 }
         goto L_0x008b;
     L_0x00a7:
         r0 = move-exception;
@@ -712,7 +712,7 @@ public class CrashlyticsCore extends Kit<Void> {
         r1 = io.fabric.sdk.android.Fabric.getLogger();
         r2 = "Fabric";
         r3 = "Crashlytics was not started due to an exception during initialization";
-        r1.mo4292e(r2, r3, r0);
+        r1.mo4756e(r2, r3, r0);
         r0 = r7;
         goto L_0x0006;
     L_0x00c0:
@@ -745,7 +745,7 @@ public class CrashlyticsCore extends Kit<Void> {
     @Deprecated
     public void setListener(CrashlyticsListener crashlyticsListener) {
         synchronized (this) {
-            Fabric.getLogger().mo4302w("Fabric", "Use of setListener is deprecated.");
+            Fabric.getLogger().mo4766w("Fabric", "Use of setListener is deprecated.");
             if (crashlyticsListener == null) {
                 throw new IllegalArgumentException("listener must not be null.");
             }
@@ -772,9 +772,9 @@ public class CrashlyticsCore extends Kit<Void> {
                     this.handler.cacheKeyData(this.attributes);
                     return;
                 }
-                Fabric.getLogger().mo4289d("Fabric", "Exceeded maximum number of custom attributes (64)");
+                Fabric.getLogger().mo4753d("Fabric", "Exceeded maximum number of custom attributes (64)");
             } else if (getContext() == null || !CommonUtils.isAppDebuggable(getContext())) {
-                Fabric.getLogger().mo4292e("Fabric", "Attempting to set custom attribute with null key, ignoring.", null);
+                Fabric.getLogger().mo4756e("Fabric", "Attempting to set custom attribute with null key, ignoring.", null);
             } else {
                 throw new IllegalArgumentException("Custom attribute key must not be null.");
             }
@@ -814,7 +814,7 @@ public class CrashlyticsCore extends Kit<Void> {
         try {
             return internalVerifyPinning(url);
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Could not verify SSL pinning", e);
+            Fabric.getLogger().mo4756e("Fabric", "Could not verify SSL pinning", e);
             return false;
         }
     }

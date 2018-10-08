@@ -16,8 +16,8 @@ public class MultiChatContext extends AbstractChatContext {
     private final Listener listener;
 
     /* renamed from: net.gogame.chat.MultiChatContext$1 */
-    class C10111 extends DataSetObserver {
-        C10111() {
+    class C13271 extends DataSetObserver {
+        C13271() {
         }
 
         public void onChanged() {
@@ -34,7 +34,7 @@ public class MultiChatContext extends AbstractChatContext {
         this.chatContexts = new ArrayList();
         this.currentChatContext = null;
         this.agentTypingEntry = new AgentTypingEntry(false);
-        this.dataSetObserver = new C10111();
+        this.dataSetObserver = new C13271();
         this.listener = null;
     }
 
@@ -42,7 +42,7 @@ public class MultiChatContext extends AbstractChatContext {
         this.chatContexts = new ArrayList();
         this.currentChatContext = null;
         this.agentTypingEntry = new AgentTypingEntry(false);
-        this.dataSetObserver = new C10111();
+        this.dataSetObserver = new C13271();
         this.listener = listener;
     }
 

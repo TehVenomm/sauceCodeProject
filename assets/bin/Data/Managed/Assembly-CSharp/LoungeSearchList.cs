@@ -83,8 +83,8 @@ public class LoungeSearchList : GameSection
 
 	private unsafe void SendRequest(Action onFinish, Action<bool> cb)
 	{
-		_003CSendRequest_003Ec__AnonStorey3EB _003CSendRequest_003Ec__AnonStorey3EB;
-		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendSearch(new Action<bool, Error>((object)_003CSendRequest_003Ec__AnonStorey3EB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
+		_003CSendRequest_003Ec__AnonStorey3FB _003CSendRequest_003Ec__AnonStorey3FB;
+		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendSearch(new Action<bool, Error>((object)_003CSendRequest_003Ec__AnonStorey3FB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
 	}
 
 	private unsafe void SetLoungeData(LoungeModel.Lounge lounge, Transform t)
@@ -105,8 +105,8 @@ public class LoungeSearchList : GameSection
 		SetLabelText(t, UI.LBL_LABEL, text);
 		SetStamp(t, lounge.stampId);
 		int num = lounge.num + 1;
-		_003CSetLoungeData_003Ec__AnonStorey3EC _003CSetLoungeData_003Ec__AnonStorey3EC;
-		int num2 = lounge.slotInfos.Count(new Func<LoungeModel.SlotInfo, bool>((object)_003CSetLoungeData_003Ec__AnonStorey3EC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSetLoungeData_003Ec__AnonStorey3FC _003CSetLoungeData_003Ec__AnonStorey3FC;
+		int num2 = lounge.slotInfos.Count(new Func<LoungeModel.SlotInfo, bool>((object)_003CSetLoungeData_003Ec__AnonStorey3FC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		for (int j = 0; j < 7; j++)
 		{
 			bool is_visible = j < num - 1;

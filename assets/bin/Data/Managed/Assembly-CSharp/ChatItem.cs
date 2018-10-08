@@ -111,6 +111,8 @@ public class ChatItem
 		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
 		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0181: Unknown result type (might be due to invalid IL or missing references)
 		m_LabelMessage.text = message;
 		m_LabelMessage.pivot = (isMyMessage ? UIWidget.Pivot.TopRight : UIWidget.Pivot.TopLeft);
 		if (isMyMessage)
@@ -139,6 +141,9 @@ public class ChatItem
 		UISprite spriteBase2 = m_SpriteBase;
 		Vector2 printedSize3 = m_LabelMessage.printedSize;
 		spriteBase2.height = (int)(printedSize3.y + 25f);
+		UISprite notificationSpriteBase = m_NotificationSpriteBase;
+		Vector2 printedSize4 = m_LabelMessage.printedSize;
+		notificationSpriteBase.height = (int)(printedSize4.y + 25f);
 	}
 
 	public void Init(int userId, string userName, int stampId)

@@ -598,8 +598,8 @@ public class GuildMemberInfo : SkillInfoBase
 	protected unsafe void SendFollow(List<int> send_follow_list, Action<bool> callback = null)
 	{
 		GameSection.StayEvent();
-		_003CSendFollow_003Ec__AnonStorey33C _003CSendFollow_003Ec__AnonStorey33C;
-		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(send_follow_list, new Action<Error, List<int>>((object)_003CSendFollow_003Ec__AnonStorey33C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendFollow_003Ec__AnonStorey34B _003CSendFollow_003Ec__AnonStorey34B;
+		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(send_follow_list, new Action<Error, List<int>>((object)_003CSendFollow_003Ec__AnonStorey34B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected void SendUnFollow(int send_unfollow, Action<bool> callback = null)

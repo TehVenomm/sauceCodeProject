@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace UnityStandardAssets.ImageEffects
 {
+	[AddComponentMenu("Image Effects/Bloom and Glow/Bloom")]
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(Camera))]
-	[AddComponentMenu("Image Effects/Bloom and Glow/Bloom")]
 	public class Bloom : PostEffectsBase
 	{
 		public enum LensFlareStyle

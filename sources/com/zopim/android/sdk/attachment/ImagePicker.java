@@ -41,54 +41,54 @@ public enum ImagePicker {
     }
 
     /* renamed from: com.zopim.android.sdk.attachment.ImagePicker$a */
-    class C0824a extends AsyncTask<Pair<Context, List<Uri>>, Void, List<C0825b>> {
+    class C0823a extends AsyncTask<Pair<Context, List<Uri>>, Void, List<C0824b>> {
         /* renamed from: a */
         final Callback f683a;
         /* renamed from: b */
         final /* synthetic */ ImagePicker f684b;
 
-        C0824a(ImagePicker imagePicker, Callback callback) {
+        C0823a(ImagePicker imagePicker, Callback callback) {
             this.f684b = imagePicker;
             this.f683a = callback;
         }
 
         /* renamed from: a */
-        private List<C0825b> m638a(Context context, List<Uri> list) {
-            List<C0825b> arrayList = new ArrayList();
+        private List<C0824b> m638a(Context context, List<Uri> list) {
+            List<C0824b> arrayList = new ArrayList();
             for (Uri uri : list) {
-                arrayList.add(new C0825b(this.f684b, uri, UriToFileUtil.getFile(context, uri)));
+                arrayList.add(new C0824b(this.f684b, uri, UriToFileUtil.getFile(context, uri)));
             }
             return arrayList;
         }
 
         /* renamed from: a */
-        protected List<C0825b> m639a(Pair<Context, List<Uri>>... pairArr) {
+        protected List<C0824b> m639a(Pair<Context, List<Uri>>... pairArr) {
             InputStream openInputStream;
-            FileOutputStream fileOutputStream;
             Throwable e;
             Throwable th;
             Context context = (Context) pairArr[0].first;
-            List<C0825b> a = m638a(context, (List) pairArr[0].second);
-            List<C0825b> arrayList = new ArrayList();
-            List<C0825b> arrayList2 = new ArrayList();
-            for (C0825b c0825b : a) {
-                if (c0825b.m641a()) {
-                    arrayList.add(c0825b);
+            List<C0824b> a = m638a(context, (List) pairArr[0].second);
+            List<C0824b> arrayList = new ArrayList();
+            List<C0824b> arrayList2 = new ArrayList();
+            for (C0824b c0824b : a) {
+                if (c0824b.m641a()) {
+                    arrayList.add(c0824b);
                 } else {
-                    arrayList2.add(c0825b);
+                    arrayList2.add(c0824b);
                 }
             }
-            for (C0825b c0825b2 : arrayList2) {
+            for (C0824b c0824b2 : arrayList2) {
+                FileOutputStream fileOutputStream;
                 try {
                     File file = new File(SdkCache.INSTANCE.getSdkCacheDir(context) + File.separator + String.format(Locale.US, "attachment-%s.jpg", new Object[]{Long.valueOf(System.currentTimeMillis())}));
-                    openInputStream = context.getContentResolver().openInputStream(c0825b2.m642b());
+                    openInputStream = context.getContentResolver().openInputStream(c0824b2.m642b());
                     try {
                         fileOutputStream = new FileOutputStream(file);
                     } catch (FileNotFoundException e2) {
                         e = e2;
                         fileOutputStream = null;
                         try {
-                            Logger.m561e(ImagePicker.LOG_TAG, String.format(Locale.US, "File not found error copying file, uri: %s", new Object[]{c0825b2.m642b()}), e);
+                            Logger.m561e(ImagePicker.LOG_TAG, String.format(Locale.US, "File not found error copying file, uri: %s", new Object[]{c0824b2.m642b()}), e);
                             if (openInputStream != null) {
                                 try {
                                     openInputStream.close();
@@ -109,7 +109,7 @@ public enum ImagePicker {
                     } catch (IOException e4) {
                         e = e4;
                         fileOutputStream = null;
-                        Logger.m561e(ImagePicker.LOG_TAG, String.format(Locale.US, "IO Error copying file, uri: %s", new Object[]{c0825b2.m642b()}), e);
+                        Logger.m561e(ImagePicker.LOG_TAG, String.format(Locale.US, "IO Error copying file, uri: %s", new Object[]{c0824b2.m642b()}), e);
                         if (openInputStream != null) {
                             try {
                                 openInputStream.close();
@@ -137,7 +137,7 @@ public enum ImagePicker {
                             }
                             fileOutputStream.write(bArr, 0, read);
                         }
-                        arrayList.add(new C0825b(this.f684b, c0825b2.m642b(), file));
+                        arrayList.add(new C0824b(this.f684b, c0824b2.m642b(), file));
                         file.deleteOnExit();
                         if (openInputStream != null) {
                             try {
@@ -155,7 +155,7 @@ public enum ImagePicker {
                         }
                     } catch (FileNotFoundException e5) {
                         e = e5;
-                        Logger.m561e(ImagePicker.LOG_TAG, String.format(Locale.US, "File not found error copying file, uri: %s", new Object[]{c0825b2.m642b()}), e);
+                        Logger.m561e(ImagePicker.LOG_TAG, String.format(Locale.US, "File not found error copying file, uri: %s", new Object[]{c0824b2.m642b()}), e);
                         if (openInputStream != null) {
                             openInputStream.close();
                         }
@@ -164,7 +164,7 @@ public enum ImagePicker {
                         }
                     } catch (IOException e6) {
                         e = e6;
-                        Logger.m561e(ImagePicker.LOG_TAG, String.format(Locale.US, "IO Error copying file, uri: %s", new Object[]{c0825b2.m642b()}), e);
+                        Logger.m561e(ImagePicker.LOG_TAG, String.format(Locale.US, "IO Error copying file, uri: %s", new Object[]{c0824b2.m642b()}), e);
                         if (openInputStream != null) {
                             openInputStream.close();
                         }
@@ -176,7 +176,7 @@ public enum ImagePicker {
                     e = e7;
                     fileOutputStream = null;
                     openInputStream = null;
-                    Logger.m561e(ImagePicker.LOG_TAG, String.format(Locale.US, "File not found error copying file, uri: %s", new Object[]{c0825b2.m642b()}), e);
+                    Logger.m561e(ImagePicker.LOG_TAG, String.format(Locale.US, "File not found error copying file, uri: %s", new Object[]{c0824b2.m642b()}), e);
                     if (openInputStream != null) {
                         openInputStream.close();
                     }
@@ -187,7 +187,7 @@ public enum ImagePicker {
                     e = e8;
                     fileOutputStream = null;
                     openInputStream = null;
-                    Logger.m561e(ImagePicker.LOG_TAG, String.format(Locale.US, "IO Error copying file, uri: %s", new Object[]{c0825b2.m642b()}), e);
+                    Logger.m561e(ImagePicker.LOG_TAG, String.format(Locale.US, "IO Error copying file, uri: %s", new Object[]{c0824b2.m642b()}), e);
                     if (openInputStream != null) {
                         openInputStream.close();
                     }
@@ -224,13 +224,13 @@ public enum ImagePicker {
         }
 
         /* renamed from: a */
-        protected void m640a(List<C0825b> list) {
+        protected void m640a(List<C0824b> list) {
             super.onPostExecute(list);
             if (this.f683a != null) {
                 List arrayList = new ArrayList();
-                for (C0825b c0825b : list) {
-                    if (c0825b.m641a()) {
-                        arrayList.add(c0825b.m643c());
+                for (C0824b c0824b : list) {
+                    if (c0824b.m641a()) {
+                        arrayList.add(c0824b.m643c());
                     }
                 }
                 this.f683a.onSuccess(arrayList);
@@ -247,7 +247,7 @@ public enum ImagePicker {
     }
 
     /* renamed from: com.zopim.android.sdk.attachment.ImagePicker$b */
-    class C0825b {
+    class C0824b {
         /* renamed from: a */
         final /* synthetic */ ImagePicker f685a;
         /* renamed from: b */
@@ -257,7 +257,7 @@ public enum ImagePicker {
         /* renamed from: d */
         private final File f688d;
 
-        C0825b(ImagePicker imagePicker, Uri uri, File file) {
+        C0824b(ImagePicker imagePicker, Uri uri, File file) {
             this.f685a = imagePicker;
             this.f687c = uri;
             this.f688d = file;
@@ -348,12 +348,12 @@ public enum ImagePicker {
             answerCallback(new ArrayList(), callback);
         } else if (i == GALLERY_REQUEST_ID) {
             List extractUrisFromIntent = extractUrisFromIntent(intent);
-            new C0824a(this, callback).execute(new Pair[]{new Pair(context, extractUrisFromIntent)});
+            new C0823a(this, callback).execute(new Pair[]{new Pair(context, extractUrisFromIntent)});
         } else if (this.mCameraImages.containsKey(Integer.valueOf(i))) {
             File file = (File) this.mCameraImages.get(Integer.valueOf(i));
             this.mCameraImages.remove(Integer.valueOf(i));
             Logger.m558d(LOG_TAG, String.format(Locale.US, "Image from camera: %s\n", new Object[]{file.getAbsolutePath()}));
-            answerCallback(new C0826a(this, file), callback);
+            answerCallback(new C0825a(this, file), callback);
         } else {
             answerCallback(new ArrayList(), callback);
         }

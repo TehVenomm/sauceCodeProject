@@ -53,8 +53,8 @@ public class LoungeInviteFriend : QuestAcceptRoomInviteFriend
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey3E7 _003CSendGetList_003Ec__AnonStorey3E;
-		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInviteList(new Action<bool, LoungeInviteCharaInfo[]>((object)_003CSendGetList_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendGetList_003Ec__AnonStorey3F7 _003CSendGetList_003Ec__AnonStorey3F;
+		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInviteList(new Action<bool, LoungeInviteCharaInfo[]>((object)_003CSendGetList_003Ec__AnonStorey3F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override NOTIFY_FLAG GetUpdateUINotifyFlags()

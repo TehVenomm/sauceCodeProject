@@ -9,13 +9,9 @@
           "title" : "Guaranteed SS Behemoth & Magi",
           "body" : "<body> \n <p>In the new mechanic,&nbsp;you'll receive a guaranteed SS Behemoth/Magi on your fifth 10+1 summon.<br><br>After your fourth summon, the \"Get 1 S and above!\" icon will change into \"Get 1 SS!\", informing you that the next one will have a guaranteed SS Behemoth/Magi.</p> \n <figure> \n  <img src=\"http://gw-sites.gogame.net/zendesk/DragonProject/images/gogamesupport_115004802833_s.jpg\" alt=\"s.png\" width=\"156\" height=\"69\"> \n  <p>Get 1 S and Above! icon</p> \n </figure> \n <figure> \n  <img src=\"http://gw-sites.gogame.net/zendesk/DragonProject/images/gogamesupport_115004843854_ss_behem.jpg\" alt=\"ss_behem.png\" width=\"360\" height=\"159\"> \n  <p>Get 1 SS! icon</p> \n </figure> \n</body>",
           "updatedAt" : 1516640361000
-        }, {
-          "title" : "[News] Begin Your Dragon Project Journey with Freebies and an Awesome Starter Pack!",
-          "body" : "<body> \n <p><strong><font size=\"3\" face=\"Calibri\">Exciting News Hunters!</font></strong></p> \n <p><font size=\"3\" face=\"Calibri\">As Dragon Project goes GLOBAL, we’ll be giving out lots of freebies through our <strong>15-day Global Launch Bonus</strong>! You can also get a <strong>Rainbow Arc Lapis</strong> if you log in for <strong>17 days</strong> and <strong>50 Summon Tickets</strong> if you log in for <strong>19 days</strong>! The Global Launch Login Bonus will run from <strong>October 2</strong> to <strong>December 31, 2017.</strong></font></p> \n <p><font size=\"3\" face=\"Calibri\"><img src=\"http://gw-sites.gogame.net/zendesk/DragonProject/images/gogamesupport_115003012973_DPro-Global-Launch-login.jpg\" alt=\"DPro-Global-Launch-login.jpg\" width=\"360\" height=\"360\"></font></p> \n <p><font size=\"3\" face=\"Calibri\">And if that’s not enough, you can also purchase the <strong>Starter Pack</strong> and get an <strong>S-Rank Healing Magi</strong>! The Starter Pack also includes <strong>Luck Potions (x3)</strong>, <strong>EXP Potions (x3)</strong>, and <strong>10,000 Gold</strong>.</font></p> \n <p><font size=\"3\" face=\"Calibri\">&nbsp;<img src=\"http://gw-sites.gogame.net/zendesk/DragonProject/images/gogamesupport_115003012993_DPro-Starter-Bundle.jpg\" alt=\"DPro-Starter-Bundle.jpg\" width=\"360\" height=\"360\"></font></p> \n <p><font size=\"3\" face=\"Calibri\">So what are you waiting for? Download Dragon Project, invite your friends to play, and start your monster-slaying journey now!</font></p> \n <p><font size=\"3\" face=\"Calibri\">&nbsp;</font></p> \n <p><font size=\"3\" face=\"Calibri\">Have fun in the hunt!</font></p> \n <p><font size=\"3\" face=\"Calibri\">The Dragon Project Team </font></p> \n</body>",
-          "updatedAt" : 1523966201000
         } ],
-        "updatedAt" : 1523966201000,
-        "overallUpdatedAt" : 1523966201000
+        "updatedAt" : 1533535983000,
+        "overallUpdatedAt" : 1533535983000
       }, {
         "name" : "Account",
         "articles" : [ {
@@ -205,9 +201,9 @@
         "updatedAt" : 1503195404000,
         "overallUpdatedAt" : 1503195404000
       } ],
-      "updatedAt" : 1531814211000,
-      "overallUpdatedAt" : 1531814211000
+      "updatedAt" : 1533535983000,
+      "overallUpdatedAt" : 1533535983000
     }
   },
-  "overallUpdatedAt" : 1531814211000
+  "overallUpdatedAt" : 1533535983000
 }

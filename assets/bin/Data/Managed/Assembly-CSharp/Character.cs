@@ -216,6 +216,8 @@ public class Character : StageObject, IAnimEvent
 
 	public static readonly string[] motionStateName;
 
+	public static readonly string poseStateName;
+
 	private static int[] motionHashCaches;
 
 	private static readonly MotionHashTable motionHash;
@@ -374,6 +376,8 @@ public class Character : StageObject, IAnimEvent
 	protected List<string> hideRendererList = new List<string>();
 
 	protected bool isPlayingEndMotion;
+
+	private bool isImmortal;
 
 	public ContinusAttackParam continusAttackParam;
 
@@ -1289,8 +1293,8 @@ public class Character : StageObject, IAnimEvent
 
 	static Character()
 	{
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
 		motionStateName = new string[16]
 		{
 			string.Empty,
@@ -1310,6 +1314,7 @@ public class Character : StageObject, IAnimEvent
 			"move_lookat",
 			"attack_{0:00}"
 		};
+		poseStateName = "pose";
 		motionHashCaches = new int[15];
 		DEFAULT_MOVE_POINT = Vector3.get_zero();
 		stateNameBuilder = new StringBuilder(1024);
@@ -1354,6 +1359,11 @@ public class Character : StageObject, IAnimEvent
 	public virtual float GetEffectScaleDependValue()
 	{
 		return 1f;
+	}
+
+	public void SetImmortal()
+	{
+		isImmortal = true;
 	}
 
 	public bool IsAbleToInvincibleBuff()
@@ -2219,6 +2229,14 @@ public class Character : StageObject, IAnimEvent
 	{
 		isPause = pause;
 		UpdateAnimatorSpeed();
+	}
+
+	public void setPauseWithAnim(bool pause)
+	{
+		if (pause)
+		{
+			ActIdle(false, -1f);
+		}
 	}
 
 	protected virtual float GetAnimatorSpeed()
@@ -3868,7 +3886,11 @@ public class Character : StageObject, IAnimEvent
 		{
 			stateNameBuilder.Length = 0;
 			stateNameBuilder.Append(value);
-			if (motion_id >= 15 && motion_id <= 114)
+			if (motion_id == 40)
+			{
+				stateNameBuilder.Append(poseStateName);
+			}
+			else if (motion_id >= 15 && motion_id <= 114)
 			{
 				stateNameBuilder.AppendFormat(motionStateName[15], motion_id - 15);
 			}
@@ -4611,13 +4633,13 @@ public class Character : StageObject, IAnimEvent
 		//IL_0361: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0365: Unknown result type (might be due to invalid IL or missing references)
 		//IL_036a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0450: Unknown result type (might be due to invalid IL or missing references)
-		//IL_045c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0461: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0465: Unknown result type (might be due to invalid IL or missing references)
-		//IL_046a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0408: Unknown result type (might be due to invalid IL or missing references)
+		//IL_040d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0468: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0474: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0479: Unknown result type (might be due to invalid IL or missing references)
+		//IL_047d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0482: Unknown result type (might be due to invalid IL or missing references)
 		if (base.controller != null)
 		{
 			base.controller.OnCharacterAttackedHitOwner(status);
@@ -4724,10 +4746,17 @@ public class Character : StageObject, IAnimEvent
 		float y = eulerAngles.y;
 		if (status.afterHP <= 0)
 		{
-			status.reactionType = 8;
-			if (flag)
+			if (isImmortal)
 			{
-				PlayImmediateDeathEffect();
+				status.reactionType = 11;
+			}
+			else
+			{
+				status.reactionType = 8;
+				if (flag)
+				{
+					PlayImmediateDeathEffect();
+				}
 			}
 		}
 		else if (status.reactionType == 0 && !isDead)

@@ -216,7 +216,7 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 		GameSection.StayEvent();
 		int retryCount = 0;
 		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 1);
-		_003COnQuery_MATCHING_003Ec__AnonStorey419 _003COnQuery_MATCHING_003Ec__AnonStorey;
+		_003COnQuery_MATCHING_003Ec__AnonStorey429 _003COnQuery_MATCHING_003Ec__AnonStorey;
 		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, true, new Action<bool, int, bool, float>((object)_003COnQuery_MATCHING_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

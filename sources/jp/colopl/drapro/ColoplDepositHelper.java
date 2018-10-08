@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
 import com.google.android.gms.nearby.messages.Strategy;
+import im.getsocial.sdk.ErrorCode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +72,7 @@ public class ColoplDepositHelper {
         }
 
         public boolean isValidStatusCode() {
-            return this.statusCode == 100 || this.statusCode == Strategy.TTL_SECONDS_DEFAULT || this.statusCode == 203;
+            return this.statusCode == 100 || this.statusCode == Strategy.TTL_SECONDS_DEFAULT || this.statusCode == ErrorCode.SDK_INITIALIZATION_FAILED;
         }
 
         public void setErrorMessage(int i) {

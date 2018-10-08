@@ -21,8 +21,8 @@ public class DoCoMoLocationInfoHandler extends DefaultHandler {
     private ResultInfo resultInfo = null;
 
     /* renamed from: jp.colopl.api.docomo.DoCoMoLocationInfoHandler$1 */
-    class C09481 implements StartElementListener {
-        C09481() {
+    class C12641 implements StartElementListener {
+        C12641() {
         }
 
         public void start(Attributes attributes) {
@@ -31,8 +31,8 @@ public class DoCoMoLocationInfoHandler extends DefaultHandler {
     }
 
     /* renamed from: jp.colopl.api.docomo.DoCoMoLocationInfoHandler$2 */
-    class C09492 implements StartElementListener {
-        C09492() {
+    class C12652 implements StartElementListener {
+        C12652() {
         }
 
         public void start(Attributes attributes) {
@@ -41,8 +41,8 @@ public class DoCoMoLocationInfoHandler extends DefaultHandler {
     }
 
     /* renamed from: jp.colopl.api.docomo.DoCoMoLocationInfoHandler$3 */
-    class C09503 implements EndTextElementListener {
-        C09503() {
+    class C12663 implements EndTextElementListener {
+        C12663() {
         }
 
         public void end(String str) {
@@ -51,8 +51,8 @@ public class DoCoMoLocationInfoHandler extends DefaultHandler {
     }
 
     /* renamed from: jp.colopl.api.docomo.DoCoMoLocationInfoHandler$4 */
-    class C09514 implements EndTextElementListener {
-        C09514() {
+    class C12674 implements EndTextElementListener {
+        C12674() {
         }
 
         public void end(String str) {
@@ -61,8 +61,8 @@ public class DoCoMoLocationInfoHandler extends DefaultHandler {
     }
 
     /* renamed from: jp.colopl.api.docomo.DoCoMoLocationInfoHandler$5 */
-    class C09525 implements EndTextElementListener {
-        C09525() {
+    class C12685 implements EndTextElementListener {
+        C12685() {
         }
 
         public void end(String str) {
@@ -71,8 +71,8 @@ public class DoCoMoLocationInfoHandler extends DefaultHandler {
     }
 
     /* renamed from: jp.colopl.api.docomo.DoCoMoLocationInfoHandler$6 */
-    class C09536 implements StartElementListener {
-        C09536() {
+    class C12696 implements StartElementListener {
+        C12696() {
         }
 
         public void start(Attributes attributes) {
@@ -82,8 +82,8 @@ public class DoCoMoLocationInfoHandler extends DefaultHandler {
     }
 
     /* renamed from: jp.colopl.api.docomo.DoCoMoLocationInfoHandler$7 */
-    class C09547 implements EndTextElementListener {
-        C09547() {
+    class C12707 implements EndTextElementListener {
+        C12707() {
         }
 
         public void end(String str) {
@@ -92,8 +92,8 @@ public class DoCoMoLocationInfoHandler extends DefaultHandler {
     }
 
     /* renamed from: jp.colopl.api.docomo.DoCoMoLocationInfoHandler$8 */
-    class C09558 implements EndTextElementListener {
-        C09558() {
+    class C12718 implements EndTextElementListener {
+        C12718() {
         }
 
         public void end(String str) {
@@ -102,8 +102,8 @@ public class DoCoMoLocationInfoHandler extends DefaultHandler {
     }
 
     /* renamed from: jp.colopl.api.docomo.DoCoMoLocationInfoHandler$9 */
-    class C09569 implements EndTextElementListener {
-        C09569() {
+    class C12729 implements EndTextElementListener {
+        C12729() {
         }
 
         public void end(String str) {
@@ -134,15 +134,15 @@ public class DoCoMoLocationInfoHandler extends DefaultHandler {
         Element child12 = child9.getChild("Adr");
         Element child13 = child9.getChild("AdrCode");
         child9 = child9.getChild("PostCode");
-        rootElement.setStartElementListener(new C09481());
-        child.setStartElementListener(new C09492());
-        child2.setEndTextElementListener(new C09503());
-        child3.setEndTextElementListener(new C09514());
-        child4.setEndTextElementListener(new C09525());
-        child5.setStartElementListener(new C09536());
-        child7.setEndTextElementListener(new C09547());
-        child8.setEndTextElementListener(new C09558());
-        child6.setEndTextElementListener(new C09569());
+        rootElement.setStartElementListener(new C12641());
+        child.setStartElementListener(new C12652());
+        child2.setEndTextElementListener(new C12663());
+        child3.setEndTextElementListener(new C12674());
+        child4.setEndTextElementListener(new C12685());
+        child5.setStartElementListener(new C12696());
+        child7.setEndTextElementListener(new C12707());
+        child8.setEndTextElementListener(new C12718());
+        child6.setEndTextElementListener(new C12729());
         child10.setEndTextElementListener(new EndTextElementListener() {
             public void end(String str) {
                 DoCoMoLocationInfoHandler.this.feature.setAreaCode(str);

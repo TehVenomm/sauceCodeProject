@@ -142,7 +142,7 @@ class PersistentHitStore implements HitStore {
                         }
                         i++;
                     }
-                    if (i3 == 0 || r1 == 0) {
+                    if (i3 == 0 || r0 == 0) {
                         Referrer referrer;
                         if (query.moveToFirst()) {
                             int columnIndex = query.getColumnIndex(PersistentHitStore.REFERRER_VISIT);
@@ -237,43 +237,43 @@ class PersistentHitStore implements HitStore {
 
         private void migratePreV4Referrer(SQLiteDatabase sQLiteDatabase) {
             Cursor query;
+            Cursor query2;
             SQLiteException e;
             Throwable th;
             Cursor cursor = null;
-            Cursor query2;
             try {
-                query2 = sQLiteDatabase.query("install_referrer", new String[]{"referrer"}, null, null, null, null, null);
+                query = sQLiteDatabase.query("install_referrer", new String[]{"referrer"}, null, null, null, null, null);
                 try {
                     Cursor cursor2;
-                    if (query2.moveToFirst()) {
-                        String string = query2.getString(0);
-                        query = sQLiteDatabase.query(SettingsJsonConstants.SESSION_KEY, null, null, null, null, null, null);
+                    if (query.moveToFirst()) {
+                        String string = query.getString(0);
+                        query2 = sQLiteDatabase.query(SettingsJsonConstants.SESSION_KEY, null, null, null, null, null, null);
                         try {
-                            long j = query.moveToFirst() ? query.getLong(0) : 0;
+                            long j = query2.moveToFirst() ? query2.getLong(0) : 0;
                             ContentValues contentValues = new ContentValues();
                             contentValues.put("referrer", string);
                             contentValues.put(PersistentHitStore.TIMESTAMP_REFERRER, Long.valueOf(j));
                             contentValues.put(PersistentHitStore.REFERRER_VISIT, Integer.valueOf(1));
                             contentValues.put(PersistentHitStore.REFERRER_INDEX, Integer.valueOf(1));
                             sQLiteDatabase.insert("referrer", null, contentValues);
-                            cursor2 = query;
+                            cursor2 = query2;
                         } catch (SQLiteException e2) {
                             e = e2;
-                            cursor = query;
-                            query = query2;
+                            cursor = query2;
+                            query2 = query;
                             try {
                                 Log.e(GoogleAnalyticsTracker.LOG_TAG, e.toString());
-                                if (query != null) {
-                                    query.close();
+                                if (query2 != null) {
+                                    query2.close();
                                 }
                                 if (cursor == null) {
                                     cursor.close();
                                 }
                             } catch (Throwable th2) {
                                 th = th2;
-                                query2 = query;
-                                if (query2 != null) {
-                                    query2.close();
+                                query = query2;
+                                if (query != null) {
+                                    query.close();
                                 }
                                 if (cursor != null) {
                                     cursor.close();
@@ -282,9 +282,9 @@ class PersistentHitStore implements HitStore {
                             }
                         } catch (Throwable th3) {
                             th = th3;
-                            cursor = query;
-                            if (query2 != null) {
-                                query2.close();
+                            cursor = query2;
+                            if (query != null) {
+                                query.close();
                             }
                             if (cursor != null) {
                                 cursor.close();
@@ -293,26 +293,26 @@ class PersistentHitStore implements HitStore {
                         }
                     }
                     cursor2 = null;
-                    if (query2 != null) {
-                        query2.close();
+                    if (query != null) {
+                        query.close();
                     }
                     if (cursor2 != null) {
                         cursor2.close();
                     }
                 } catch (SQLiteException e3) {
                     e = e3;
-                    query = query2;
+                    query2 = query;
                     Log.e(GoogleAnalyticsTracker.LOG_TAG, e.toString());
-                    if (query != null) {
-                        query.close();
+                    if (query2 != null) {
+                        query2.close();
                     }
                     if (cursor == null) {
                         cursor.close();
                     }
                 } catch (Throwable th4) {
                     th = th4;
-                    if (query2 != null) {
-                        query2.close();
+                    if (query != null) {
+                        query.close();
                     }
                     if (cursor != null) {
                         cursor.close();
@@ -321,19 +321,19 @@ class PersistentHitStore implements HitStore {
                 }
             } catch (SQLiteException e4) {
                 e = e4;
-                query = null;
+                query2 = null;
                 Log.e(GoogleAnalyticsTracker.LOG_TAG, e.toString());
-                if (query != null) {
-                    query.close();
+                if (query2 != null) {
+                    query2.close();
                 }
                 if (cursor == null) {
                     cursor.close();
                 }
             } catch (Throwable th5) {
                 th = th5;
-                query2 = null;
-                if (query2 != null) {
-                    query2.close();
+                query = null;
+                if (query != null) {
+                    query.close();
                 }
                 if (cursor != null) {
                     cursor.close();
@@ -504,16 +504,16 @@ class PersistentHitStore implements HitStore {
         r4[5] = new String[]{"utmctr", (String) parseURLParameters.get("utm_term")};
         r4[6] = new String[]{"utmcct", (String) parseURLParameters.get("utm_content")};
         StringBuilder stringBuilder = new StringBuilder();
-        i2 = 1;
-        for (i = 0; i < r4.length; i++) {
-            if (r4[i][1] != null) {
-                String replace = r4[i][1].replace("+", "%20").replace(" ", "%20");
-                if (i2 != 0) {
-                    i2 = 0;
+        i = 1;
+        for (i2 = 0; i2 < r4.length; i2++) {
+            if (r4[i2][1] != null) {
+                String replace = r4[i2][1].replace("+", "%20").replace(" ", "%20");
+                if (i != 0) {
+                    i = 0;
                 } else {
                     stringBuilder.append("|");
                 }
-                stringBuilder.append(r4[i][0]).append("=").append(replace);
+                stringBuilder.append(r4[i2][0]).append("=").append(replace);
             }
         }
         return stringBuilder.toString();
@@ -903,10 +903,10 @@ class PersistentHitStore implements HitStore {
     }
 
     public void loadExistingSession(SQLiteDatabase sQLiteDatabase) {
+        Cursor query;
         SQLiteException sQLiteException;
         Cursor cursor;
         Throwable th;
-        Cursor query;
         try {
             query = sQLiteDatabase.query(SettingsJsonConstants.SESSION_KEY, null, null, null, null, null, null);
             try {

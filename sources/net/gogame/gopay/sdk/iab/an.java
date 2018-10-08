@@ -1,16 +1,16 @@
 package net.gogame.gopay.sdk.iab;
 
-final class an implements C1036h {
+final class an implements C1352h {
     /* renamed from: a */
-    final /* synthetic */ PurchaseActivity f1067a;
+    final /* synthetic */ PurchaseActivity f3455a;
 
     an(PurchaseActivity purchaseActivity) {
-        this.f1067a = purchaseActivity;
+        this.f3455a = purchaseActivity;
     }
 
     /* renamed from: a */
-    public final void mo4422a() {
-        this.f1067a.m784a();
-        this.f1067a.f1043v.post(new ao(this));
+    public final void mo4870a() {
+        this.f3455a.m3809a();
+        this.f3455a.f3431v.post(new ao(this));
     }
 }

@@ -6,7 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 
 public class SupportCustomImageButton extends AbstractCustomImageButton {
     public SupportCustomImageButton(Context context) {
@@ -31,13 +31,13 @@ public class SupportCustomImageButton extends AbstractCustomImageButton {
     }
 
     protected void init(AttributeSet attributeSet) {
-        addView(((LayoutInflater) getContext().getSystemService("layout_inflater")).inflate(C1110R.layout.net_gogame_gowrap_support_image_button, this, false));
-        TypedArray obtainStyledAttributes = getContext().getTheme().obtainStyledAttributes(attributeSet, C1110R.styleable.CustomImageButton, 0, 0);
+        addView(((LayoutInflater) getContext().getSystemService("layout_inflater")).inflate(C1426R.layout.net_gogame_gowrap_support_image_button, this, false));
+        TypedArray obtainStyledAttributes = getContext().getTheme().obtainStyledAttributes(attributeSet, C1426R.styleable.CustomImageButton, 0, 0);
         try {
-            Drawable drawable = obtainStyledAttributes.getDrawable(C1110R.styleable.CustomImageButton_image);
-            String string = obtainStyledAttributes.getString(C1110R.styleable.CustomImageButton_caption);
-            String string2 = obtainStyledAttributes.getString(C1110R.styleable.CustomImageButton_subcaption);
-            int i = obtainStyledAttributes.getInt(C1110R.styleable.CustomImageButton_level, 0);
+            Drawable drawable = obtainStyledAttributes.getDrawable(C1426R.styleable.CustomImageButton_image);
+            String string = obtainStyledAttributes.getString(C1426R.styleable.CustomImageButton_caption);
+            String string2 = obtainStyledAttributes.getString(C1426R.styleable.CustomImageButton_subcaption);
+            int i = obtainStyledAttributes.getInt(C1426R.styleable.CustomImageButton_level, 0);
             setImage(drawable);
             setCaption(string);
             setSubCaption(string2);

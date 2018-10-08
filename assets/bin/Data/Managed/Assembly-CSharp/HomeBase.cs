@@ -49,6 +49,12 @@ public abstract class HomeBase : GameSection
 
 	private Transform mdlArrow;
 
+	private Transform mdlArrowQuest;
+
+	public static bool OnClickQuestForTutorial;
+
+	public static bool isFirstTimeDisplayTextTutorial;
+
 	private static bool _isHomeInfoCached;
 
 	private static int _taskBadgeNum;
@@ -61,7 +67,11 @@ public abstract class HomeBase : GameSection
 
 	private bool triger_tutorial_force_item;
 
+	private bool triger_tutorial_change_item;
+
 	private bool triger_tutorial_gacha_2;
+
+	private bool triger_tutorial_upgrade;
 
 	protected Transform eventLockMesh;
 
@@ -143,6 +153,15 @@ public abstract class HomeBase : GameSection
 
 	public override bool useOnPressBackKey => true;
 
+	private void OnDisable()
+	{
+		if (homeTutorialManager != null)
+		{
+			homeTutorialManager.DeleteArrow();
+			Debug.Log((object)"Delete Arrow");
+		}
+	}
+
 	public override void OnPressBackKey()
 	{
 		Native.applicationQuit();
@@ -161,7 +180,7 @@ public abstract class HomeBase : GameSection
 		{
 			yield return (object)new WaitForSeconds(0.04f);
 		}
-		if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP) && limitedLoginBonus != null && limitedLoginBonus.Count > 0)
+		if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM) && limitedLoginBonus != null && limitedLoginBonus.Count > 0)
 		{
 			SetupLoginBonus();
 		}
@@ -233,7 +252,7 @@ public abstract class HomeBase : GameSection
 			}
 			else
 			{
-				if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP))
+				if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
 				{
 					SetupLoginBonus();
 				}
@@ -559,24 +578,59 @@ public abstract class HomeBase : GameSection
 			if (!(homeTutorialManager == null))
 			{
 				homeTutorialManager.SetupGachaQuestTutorial();
+				OnClickQuestForTutorial = true;
 				while (homeTutorialManager.IsLoading())
 				{
 					yield return (object)null;
 				}
 			}
 		}
-		else if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP) && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2))
+		else if (HomeTutorialManager.ShouldRunQuestShadowTutorial() && !MonoBehaviourSingleton<GameSceneManager>.I.IsExecutionAutoEvent())
 		{
-			homeTutorialManager = this.get_gameObject().AddComponent<HomeTutorialManager>();
+			homeTutorialManager = this.get_gameObject().GetComponent<HomeTutorialManager>();
+			if (homeTutorialManager == null)
+			{
+				homeTutorialManager = this.get_gameObject().AddComponent<HomeTutorialManager>();
+			}
 			if (!(homeTutorialManager == null))
 			{
-				homeTutorialManager.Setup();
-				this.StartCoroutine(SetupArrow());
+				homeTutorialManager.SetupGachaQuestTutorial();
+				this.StartCoroutine(SetupArrowForQuest());
+				OnClickQuestForTutorial = true;
 				while (homeTutorialManager.IsLoading())
 				{
 					yield return (object)null;
 				}
-				OnAfterGacha2Tutorial = true;
+			}
+		}
+		else if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM) && (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2) || !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_QUEST) || !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_MAINSTATUS)))
+		{
+			isFirstTimeDisplayTextTutorial = false;
+			bool loadNeedBit = false;
+			if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_UPGRADE_ITEM))
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.AFTER_UPGRADE_ITEM, delegate
+				{
+					isFirstTimeDisplayTextTutorial = true;
+					((_003CDoTutorial_003Ec__Iterator75)/*Error near IL_0316: stateMachine*/)._003CloadNeedBit_003E__1 = true;
+				});
+			}
+			else
+			{
+				loadNeedBit = true;
+			}
+			while (!loadNeedBit)
+			{
+				yield return (object)null;
+			}
+			homeTutorialManager = this.get_gameObject().AddComponent<HomeTutorialManager>();
+			if (!(homeTutorialManager == null))
+			{
+				homeTutorialManager.Setup();
+				while (homeTutorialManager.IsLoading())
+				{
+					yield return (object)null;
+				}
 			}
 		}
 	}
@@ -598,6 +652,36 @@ public abstract class HomeBase : GameSection
 		ResourceUtility.Realizes(loadedArrow.loadedObject, mdlArrow, -1);
 		mdlArrow.set_localScale(ARROW_SCALE);
 		mdlArrow.set_position(ARROW_OFFSET);
+	}
+
+	private IEnumerator SetupArrowForQuest()
+	{
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject loadedArrow = loadingQueue.Load(RESOURCE_CATEGORY.SYSTEM, "SystemCommon", new string[1]
+		{
+			"mdl_arrow_01"
+		}, false);
+		loadingQueue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialHomeDialog", false);
+		if (loadingQueue.IsLoading())
+		{
+			yield return (object)loadingQueue.Wait();
+		}
+		Vector3 ARROW_SCALE = new Vector3(4f, 4f, 4f);
+		Vector3 ARROW_OFFSET = new Vector3(3.2f, 2.8f, 14f);
+		mdlArrowQuest = Utility.CreateGameObject("MdlArrow", MonoBehaviourSingleton<AppMain>.I._transform, -1);
+		ResourceUtility.Realizes(loadedArrow.loadedObject, mdlArrowQuest, -1);
+		mdlArrowQuest.set_localScale(ARROW_SCALE);
+		mdlArrowQuest.set_position(ARROW_OFFSET);
+		homeTutorialManager = this.get_gameObject().GetComponent<HomeTutorialManager>();
+		if (homeTutorialManager == null)
+		{
+			homeTutorialManager = this.get_gameObject().AddComponent<HomeTutorialManager>();
+		}
+		if (homeTutorialManager != null)
+		{
+			homeTutorialManager.dialog.OpenAfterGacha2();
+			homeTutorialManager.dialog.OpenMessage(StringTable.Get(STRING_CATEGORY.TUTORIAL_NEW_STR, 4u));
+		}
 	}
 
 	private unsafe IEnumerator LoadTutorialMessage()
@@ -629,7 +713,7 @@ public abstract class HomeBase : GameSection
 	protected unsafe virtual IEnumerator SendHomeInfo()
 	{
 		bool wait = true;
-		if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP))
+		if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_UPGRADE_ITEM))
 		{
 			if (_isHomeInfoCached)
 			{
@@ -638,24 +722,24 @@ public abstract class HomeBase : GameSection
 				{
 					MonoBehaviourSingleton<AccountManager>.I.SendLogInBonus(delegate
 					{
-						((_003CSendHomeInfo_003Ec__Iterator78)/*Error near IL_0081: stateMachine*/)._003Cwait_003E__0 = false;
-						MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(new Action<bool, bool, int>((object)/*Error near IL_0081: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+						((_003CSendHomeInfo_003Ec__Iterator79)/*Error near IL_0082: stateMachine*/)._003Cwait_003E__0 = false;
+						MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(new Action<bool, bool, int>((object)/*Error near IL_0082: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					});
 				}
 				else
 				{
 					wait = false;
-					MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(new Action<bool, bool, int>((object)/*Error near IL_00a3: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(new Action<bool, bool, int>((object)/*Error near IL_00a4: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 			}
 			else
 			{
-				MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(new Action<bool, bool, int>((object)/*Error near IL_00be: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(new Action<bool, bool, int>((object)/*Error near IL_00bf: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 		else
 		{
-			MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(new Action<bool, bool, int>((object)/*Error near IL_00d9: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(new Action<bool, bool, int>((object)/*Error near IL_00da: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		while (wait)
 		{
@@ -693,7 +777,7 @@ public abstract class HomeBase : GameSection
 		bool flag = MonoBehaviourSingleton<AccountManager>.I.IsRecvLogInBonus && MonoBehaviourSingleton<AccountManager>.I.logInBonus != null && MonoBehaviourSingleton<AccountManager>.I.logInBonus.Count > 0;
 		bool flag2 = TutorialStep.HasDailyBonusUnlocked();
 		bool flag3 = MonoBehaviourSingleton<GameSceneManager>.I.IsExecutionAutoEvent();
-		validLoginBonus = (flag && flag2 && !flag3);
+		validLoginBonus = (flag && flag2 && !flag3 && MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.IsEndTutorial());
 	}
 
 	protected virtual void SetIconAndBalloon()
@@ -950,7 +1034,7 @@ public abstract class HomeBase : GameSection
 			MonoBehaviourSingleton<AccountManager>.I.logInBonus.Clear();
 			MonoBehaviourSingleton<AccountManager>.I.logInBonus.AddRange(limitedLoginBonus);
 		}
-		MonoBehaviourSingleton<AccountManager>.I.logInBonus.RemoveAll((LoginBonus x) => x.priority == 0 && x.type != 0);
+		MonoBehaviourSingleton<AccountManager>.I.logInBonus.RemoveAll((LoginBonus x) => (x.priority == 0 && x.type != 0) || x.reward == null || x.reward.Count == 0);
 		List<LoginBonus> list = MonoBehaviourSingleton<AccountManager>.I.logInBonus.FindAll((LoginBonus x) => x.priority == 0 && x.type == 0);
 		if (list != null && list.Count > 0)
 		{
@@ -975,17 +1059,38 @@ public abstract class HomeBase : GameSection
 			GameSection.StopEvent();
 			DispatchEvent("LIMITED_LOGIN_BONUS", null);
 		}
-		else if (logInBonusLimitedCount == 2)
+		else
 		{
-			MonoBehaviourSingleton<AccountManager>.I.logInBonus.RemoveAll((LoginBonus x) => x.type == 0);
-			List<LoginBonus> collection2 = MonoBehaviourSingleton<AccountManager>.I.logInBonus.FindAll((LoginBonus x) => x.priority == 0);
-			MonoBehaviourSingleton<AccountManager>.I.logInBonus.Sort((LoginBonus x, LoginBonus y) => y.priority - x.priority);
-			for (int num2 = MonoBehaviourSingleton<AccountManager>.I.logInBonus.Count - 1; num2 >= 2; num2--)
+			switch (logInBonusLimitedCount)
 			{
-				MonoBehaviourSingleton<AccountManager>.I.logInBonus.RemoveAt(num2);
+			case 2:
+			{
+				MonoBehaviourSingleton<AccountManager>.I.logInBonus.RemoveAll((LoginBonus x) => x.type == 0);
+				List<LoginBonus> collection3 = MonoBehaviourSingleton<AccountManager>.I.logInBonus.FindAll((LoginBonus x) => x.priority == 0);
+				MonoBehaviourSingleton<AccountManager>.I.logInBonus.Sort((LoginBonus x, LoginBonus y) => y.priority - x.priority);
+				for (int num3 = MonoBehaviourSingleton<AccountManager>.I.logInBonus.Count - 1; num3 >= 2; num3--)
+				{
+					MonoBehaviourSingleton<AccountManager>.I.logInBonus.RemoveAt(num3);
+				}
+				MonoBehaviourSingleton<AccountManager>.I.logInBonus.AddRange(collection3);
+				DispatchEvent("LIMITED_LOGIN_BONUS", null);
+				break;
 			}
-			MonoBehaviourSingleton<AccountManager>.I.logInBonus.AddRange(collection2);
-			DispatchEvent("LIMITED_LOGIN_BONUS", null);
+			case 1:
+			{
+				List<LoginBonus> collection2 = MonoBehaviourSingleton<AccountManager>.I.logInBonus.FindAll((LoginBonus x) => x.priority == 0 && x.type != 0);
+				for (int num2 = MonoBehaviourSingleton<AccountManager>.I.logInBonus.Count - 1; num2 > 0; num2--)
+				{
+					if (MonoBehaviourSingleton<AccountManager>.I.logInBonus[num2].priority == 0 && MonoBehaviourSingleton<AccountManager>.I.logInBonus[num2].type != 0)
+					{
+						MonoBehaviourSingleton<AccountManager>.I.logInBonus.RemoveAt(num2);
+					}
+				}
+				MonoBehaviourSingleton<AccountManager>.I.logInBonus.AddRange(collection2);
+				DispatchEvent("LIMITED_LOGIN_BONUS", null);
+				break;
+			}
+			}
 		}
 	}
 
@@ -1027,16 +1132,16 @@ public abstract class HomeBase : GameSection
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
 			List<GuildRequestItem> guildRequestItemList = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList;
-			if (_003C_003Ef__am_0024cache3D == null)
+			if (_003C_003Ef__am_0024cache43 == null)
 			{
-				_003C_003Ef__am_0024cache3D = new Func<GuildRequestItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				_003C_003Ef__am_0024cache43 = new Func<GuildRequestItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			}
-			IEnumerable<GuildRequestItem> source = guildRequestItemList.Where(_003C_003Ef__am_0024cache3D);
-			if (_003C_003Ef__am_0024cache3E == null)
+			IEnumerable<GuildRequestItem> source = guildRequestItemList.Where(_003C_003Ef__am_0024cache43);
+			if (_003C_003Ef__am_0024cache44 == null)
 			{
-				_003C_003Ef__am_0024cache3E = new Func<GuildRequestItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				_003C_003Ef__am_0024cache44 = new Func<GuildRequestItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			}
-			int num = source.Where(_003C_003Ef__am_0024cache3E).Count();
+			int num = source.Where(_003C_003Ef__am_0024cache44).Count();
 			SetBadge(GetCtrl(UI.BTN_GUILD_REQUEST), num, 3, -8, -8, false);
 		}
 	}
@@ -1086,81 +1191,98 @@ public abstract class HomeBase : GameSection
 						DispatchEvent("HOME_TUTORIAL", null);
 					}
 				}
-				else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.FORGE_ITEM))
+				else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA1) || MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA_QUEST_WIN))
 				{
-					if (!triger_tutorial_force_item)
+					if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.FORGE_ITEM) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA_QUEST_WIN))
 					{
-						DispatchEvent("HOME_TUTORIAL", null);
-					}
-				}
-				else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA2))
-				{
-					if (!triger_tutorial_gacha_2)
-					{
-						DispatchEvent("HOME_TUTORIAL", null);
-					}
-				}
-				else if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2))
-				{
-					if (executeTutorialStep6)
-					{
-						TutorialStep_6();
-					}
-					else if (executeTutorialEnd)
-					{
-						TutorialStep_END();
-					}
-					else if (MonoBehaviourSingleton<DeliveryManager>.IsValid())
-					{
-						if (!transferNoticeNewDelivery)
+						if (!triger_tutorial_force_item)
 						{
-							transferNoticeNewDelivery = true;
-							int[] ary = MonoBehaviourSingleton<DeliveryManager>.I.GetRecvStoryDelivery();
-							if (ary != null && ary.Length > 0)
+							DispatchEvent("HOME_TUTORIAL", null);
+						}
+					}
+					else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.DONE_CHANGE_WEAPON) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.FORGE_ITEM))
+					{
+						if (!triger_tutorial_change_item)
+						{
+							DispatchEvent("HOME_TUTORIAL", null);
+						}
+					}
+					else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA2))
+					{
+						if (!triger_tutorial_gacha_2)
+						{
+							DispatchEvent("HOME_TUTORIAL", null);
+						}
+					}
+					else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SHADOW_QUEST_WIN))
+					{
+						if (!triger_tutorial_upgrade)
+						{
+							DispatchEvent("HOME_TUTORIAL", null);
+						}
+					}
+					else if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2))
+					{
+						if (executeTutorialStep6)
+						{
+							TutorialStep_6();
+						}
+						else if (executeTutorialEnd)
+						{
+							TutorialStep_END();
+						}
+						else if (MonoBehaviourSingleton<DeliveryManager>.IsValid())
+						{
+							if (!transferNoticeNewDelivery)
 							{
-								int i = 0;
-								for (int num = ary.Length; i < num; i++)
+								transferNoticeNewDelivery = true;
+								int[] ary = MonoBehaviourSingleton<DeliveryManager>.I.GetRecvStoryDelivery();
+								if (ary != null && ary.Length > 0)
 								{
-									if (MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene.FindIndex((int id) => id == ary[i]) == -1)
+									int i = 0;
+									for (int num = ary.Length; i < num; i++)
 									{
-										MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene.Add(ary[i]);
+										if (MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene.FindIndex((int id) => id == ary[i]) == -1)
+										{
+											MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene.Add(ary[i]);
+										}
 									}
 								}
 							}
-						}
-						if (MonoBehaviourSingleton<DeliveryManager>.I.isNoticeNewDeliveryAtHomeScene)
-						{
-							if (TutorialStep.HasChangeEquipCompleted() && !TutorialStep.isSendFirstRewardComplete)
+							if (MonoBehaviourSingleton<DeliveryManager>.I.isNoticeNewDeliveryAtHomeScene)
 							{
-								int num2 = MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene[0];
-								if (num2 != 0)
+								if (TutorialStep.HasChangeEquipCompleted() && !TutorialStep.isSendFirstRewardComplete)
 								{
-									MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene.RemoveAt(0);
-									DispatchEvent("NOTICE_NEW_DELIVERY", num2);
+									int num2 = MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene[0];
+									if (num2 != 0)
+									{
+										MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene.RemoveAt(0);
+										DispatchEvent("NOTICE_NEW_DELIVERY", num2);
+									}
 								}
 							}
-						}
-						else if (MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableStoryDelivery() != 0)
-						{
-							MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = true;
-							EventData[] autoEvents = new EventData[2]
+							else if (MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableStoryDelivery() != 0)
 							{
-								new EventData("QUEST_COUNTER", null),
-								new EventData("SELECT_DELIVERY", MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableStoryDelivery())
-							};
-							MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
-						}
-						else if (MonoBehaviourSingleton<DeliveryManager>.I.GetEventCleardDeliveryData() != null)
-						{
-							Network.EventData eventCleardDeliveryData = MonoBehaviourSingleton<DeliveryManager>.I.GetEventCleardDeliveryData();
-							EventData[] autoEvents2 = CreateAutoClearDeliveryEvent(eventCleardDeliveryData);
-							MonoBehaviourSingleton<DeliveryManager>.I.DeleteCleardDeliveryId();
-							MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents2);
-						}
-						else if (TutorialStep.HasAllTutorialCompleted() && base.isOpen && !sendTutorialTrigger)
-						{
-							sendTutorialTrigger = true;
-							DispatchEvent("HOME_TUTORIAL", null);
+								MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = true;
+								EventData[] autoEvents = new EventData[2]
+								{
+									new EventData("QUEST_COUNTER", null),
+									new EventData("SELECT_DELIVERY", MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableStoryDelivery())
+								};
+								MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
+							}
+							else if (MonoBehaviourSingleton<DeliveryManager>.I.GetEventCleardDeliveryData() != null)
+							{
+								Network.EventData eventCleardDeliveryData = MonoBehaviourSingleton<DeliveryManager>.I.GetEventCleardDeliveryData();
+								EventData[] autoEvents2 = CreateAutoClearDeliveryEvent(eventCleardDeliveryData);
+								MonoBehaviourSingleton<DeliveryManager>.I.DeleteCleardDeliveryId();
+								MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents2);
+							}
+							else if (TutorialStep.HasAllTutorialCompleted() && base.isOpen && !sendTutorialTrigger)
+							{
+								sendTutorialTrigger = true;
+								DispatchEvent("HOME_TUTORIAL", null);
+							}
 						}
 					}
 				}
@@ -1297,7 +1419,7 @@ public abstract class HomeBase : GameSection
 				return true;
 			}
 		}
-		if (MonoBehaviourSingleton<UserInfoManager>.I.needOpenNewsPage && TutorialStep.HasAllTutorialCompleted() && MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP))
+		if (MonoBehaviourSingleton<UserInfoManager>.I.needOpenNewsPage && TutorialStep.HasAllTutorialCompleted() && MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
 		{
 			MonoBehaviourSingleton<UserInfoManager>.I.OnOpenNewsPage();
 			MonoBehaviourSingleton<GoWrapManager>.I.ShowMenu();
@@ -1384,6 +1506,10 @@ public abstract class HomeBase : GameSection
 			return false;
 		}
 		if (!IsCurrentSectionHomeOrLounge())
+		{
+			return false;
+		}
+		if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2))
 		{
 			return false;
 		}
@@ -1939,7 +2065,7 @@ public abstract class HomeBase : GameSection
 
 	protected bool StopEventUntilTheAllTutorialCompleted()
 	{
-		if (!MonoBehaviourSingleton<GameSceneManager>.I.IsExecutionAutoEvent() && (!TutorialStep.HasAllTutorialCompleted() || MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() || TutorialMessage.GetCursor(0) != null || (homeTutorialManager != null && HomeTutorialManager.ShouldRunGachaTutorial())))
+		if (!MonoBehaviourSingleton<GameSceneManager>.I.IsExecutionAutoEvent() && (!TutorialStep.HasAllTutorialCompleted() || MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() || TutorialMessage.GetCursor(0) != null || (homeTutorialManager != null && HomeTutorialManager.ShouldRunGachaTutorial()) || (homeTutorialManager != null && HomeTutorialManager.ShouldRunQuestShadowTutorial())))
 		{
 			GameSection.StopEvent();
 			return true;
@@ -1984,11 +2110,11 @@ public abstract class HomeBase : GameSection
 		GameSection.StayEvent();
 		DeliveryManager i = MonoBehaviourSingleton<DeliveryManager>.I;
 		int scriptId = num;
-		if (_003C_003Ef__am_0024cache3F == null)
+		if (_003C_003Ef__am_0024cache45 == null)
 		{
-			_003C_003Ef__am_0024cache3F = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003C_003Ef__am_0024cache45 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		i.SendReadStoryRead(scriptId, _003C_003Ef__am_0024cache3F);
+		i.SendReadStoryRead(scriptId, _003C_003Ef__am_0024cache45);
 	}
 
 	private void OnQuery_TO_GIFTBOX()
@@ -2084,7 +2210,7 @@ public abstract class HomeBase : GameSection
 					Network.EventData firstEvent = validBingoDataListInSection[0];
 					List<DeliveryTable.DeliveryData> deliveryTableDataList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryTableDataList(false);
 					List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
-					_003COnQuery_BINGO_003Ec__AnonStorey358 _003COnQuery_BINGO_003Ec__AnonStorey;
+					_003COnQuery_BINGO_003Ec__AnonStorey368 _003COnQuery_BINGO_003Ec__AnonStorey;
 					int num = deliveryTableDataList.Where(new Func<DeliveryTable.DeliveryData, bool>((object)_003COnQuery_BINGO_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 					int num2 = 0;
 					for (int i = 0; i < clearStatusDelivery.Count; i++)
@@ -2116,7 +2242,17 @@ public abstract class HomeBase : GameSection
 
 	private void OnQuery_QUEST_COUNTER()
 	{
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+		if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
+		{
+			TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2, delegate
+			{
+				if (homeTutorialManager != null)
+				{
+					homeTutorialManager.ForceDeleteArrow(true);
+				}
+			});
+		}
 		fromQuestCounterAreaEvent = true;
 		bool flag = !fromQuestCounterAreaEvent;
 		fromQuestCounterAreaEvent = false;
@@ -2129,7 +2265,7 @@ public abstract class HomeBase : GameSection
 		}
 		else if (homeTutorialManager != null)
 		{
-			if (HomeTutorialManager.ShouldRunGachaTutorial())
+			if (HomeTutorialManager.ShouldRunGachaTutorial() || HomeTutorialManager.ShouldRunQuestShadowTutorial())
 			{
 				GameSection.StopEvent();
 				return;
@@ -2194,20 +2330,40 @@ public abstract class HomeBase : GameSection
 
 	private void OnQuery_GACHA_QUEST_COUNTER()
 	{
+		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_QUEST) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
+		{
+			TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.AFTER_QUEST, delegate
+			{
+				if (homeTutorialManager != null)
+				{
+					homeTutorialManager.ForceDeleteArrow(false);
+				}
+			});
+		}
+		fromQuestCounterAreaEvent = true;
 		bool flag = !fromQuestCounterAreaEvent;
 		fromQuestCounterAreaEvent = false;
 		if (flag)
 		{
 			StopEventUntilTheAllTutorialCompleted();
 		}
-		else if (homeTutorialManager != null)
+		else
 		{
-			if (HomeTutorialManager.DoesTutorial())
+			if (homeTutorialManager != null)
 			{
-				GameSection.StopEvent();
-				return;
+				if (HomeTutorialManager.DoesTutorial())
+				{
+					GameSection.StopEvent();
+					return;
+				}
+				homeTutorialManager.CloseDialog();
 			}
-			homeTutorialManager.CloseDialog();
+			OnClickQuestForTutorial = false;
+			if (mdlArrowQuest != null)
+			{
+				Object.Destroy(mdlArrowQuest.get_gameObject());
+			}
 		}
 		if (!GameSceneManager.isAutoEventSkip)
 		{
@@ -2258,9 +2414,17 @@ public abstract class HomeBase : GameSection
 		{
 			triger_tutorial_force_item = true;
 		}
+		if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.DONE_CHANGE_WEAPON) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.FORGE_ITEM))
+		{
+			triger_tutorial_change_item = true;
+		}
 		if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA2))
 		{
 			triger_tutorial_gacha_2 = true;
+		}
+		if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
+		{
+			triger_tutorial_upgrade = true;
 		}
 	}
 

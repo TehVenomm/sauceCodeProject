@@ -10,11 +10,11 @@ import java.util.Set;
 
 public final class zzn implements Creator<zzm> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        ArrayList arrayList = null;
+        zzp zzp = null;
         int i = 0;
         int zzd = zzb.zzd(parcel);
         Set hashSet = new HashSet();
-        zzp zzp = null;
+        ArrayList arrayList = null;
         int i2 = 0;
         while (parcel.dataPosition() < zzd) {
             int readInt = parcel.readInt();

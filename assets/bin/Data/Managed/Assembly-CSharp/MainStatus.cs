@@ -24,7 +24,8 @@ public class MainStatus : UIBehaviour
 		OBJ_BOOST_DROP_ROOT,
 		OBJ_BOOST_GOLD_ROOT,
 		OBJ_BOOST_HGP_ROOT,
-		OBJ_BOOST_NOVICE_DROP_ROOT
+		OBJ_BOOST_NOVICE_DROP_ROOT,
+		SPR_TUTORIAL_CURSOR_UP
 	}
 
 	private StatusBoostAnimator boostAnimator;
@@ -55,7 +56,7 @@ public class MainStatus : UIBehaviour
 		SetLabelText((Enum)UI.LBL_MONEY, userStatus.money.ToString("N0"));
 		SetProgressValue((Enum)UI.PBR_EXP, userStatus.ExpProgress01);
 		InitDeactive((Enum)UI.SPR_EXP_NEXT);
-		if (TutorialStep.HasAllTutorialCompleted() && !MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() && TutorialMessage.GetCursor(0) == null)
+		if (TutorialStep.HasAllTutorialCompleted() && !MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() && TutorialMessage.GetCursor(0) == null && userStatus.IsTutorialBitReady && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
 		{
 			SetTouchAndRelease((Enum)UI.SPR_BG02, "EXP_NEXT_SHOW", "EXP_NEXT_HIDE", (object)null);
 		}
@@ -88,6 +89,10 @@ public class MainStatus : UIBehaviour
 		});
 		SetFontStyle((Enum)UI.LBL_BOOST_RATE, 2);
 		SetFontStyle((Enum)UI.LBL_BOOST_TIME, 2);
+		if (!MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName().Contains("HomeScene"))
+		{
+			SetActive((Enum)UI.SPR_TUTORIAL_CURSOR_UP, false);
+		}
 	}
 
 	public void OnQuery_EXP_NEXT_SHOW()
@@ -120,6 +125,13 @@ public class MainStatus : UIBehaviour
 	public void OnQuery_SHOW_PROFILE_DIALOG()
 	{
 		MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Profile", null, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
+		if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_MAINSTATUS) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
+		{
+			TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.AFTER_MAINSTATUS, delegate
+			{
+				SetTutArrowActive(false);
+			});
+		}
 	}
 
 	public void SetMenuButtonEnable(bool is_enable)
@@ -179,6 +191,18 @@ public class MainStatus : UIBehaviour
 			SetLabelText((Enum)UI.LBL_BOOST_RATE, boost.GetBoostRateText());
 			SetLabelText((Enum)UI.LBL_BOOST_TIME, (boost.type != 210) ? boost.GetRemainTime() : string.Empty);
 			break;
+		}
+	}
+
+	public void SetTutArrowActive(bool isActive)
+	{
+		if (isActive)
+		{
+			SetActive((Enum)UI.SPR_TUTORIAL_CURSOR_UP, true);
+		}
+		else
+		{
+			SetActive((Enum)UI.SPR_TUTORIAL_CURSOR_UP, false);
 		}
 	}
 }

@@ -58,7 +58,7 @@ public class Answers extends Kit<Boolean> {
                 this.sessionAnalyticsManager = AutoSessionAnalyticsManager.build(application, sessionEventMetadata, sessionAnalyticsFilesManager, new DefaultHttpRequestFactory(Fabric.getLogger()));
             }
             if (isFirstLaunch(this.installedAt)) {
-                Fabric.getLogger().mo4289d(TAG, "First launch");
+                Fabric.getLogger().mo4753d(TAG, "First launch");
                 this.sessionAnalyticsManager.onInstall();
                 this.preferenceStore.save(this.preferenceStore.edit().putBoolean(PREFKEY_ANALYTICS_LAUNCHED, true));
             }
@@ -83,7 +83,7 @@ public class Answers extends Kit<Boolean> {
             this.sessionAnalyticsManager.disable();
             return Boolean.valueOf(false);
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e(TAG, "Error dealing with settings", e);
+            Fabric.getLogger().mo4756e(TAG, "Error dealing with settings", e);
             return Boolean.valueOf(false);
         }
     }
@@ -157,7 +157,7 @@ public class Answers extends Kit<Boolean> {
             }
             return true;
         } catch (Throwable e) {
-            Fabric.getLogger().mo4292e(TAG, "Error setting up app properties", e);
+            Fabric.getLogger().mo4756e(TAG, "Error setting up app properties", e);
             return false;
         }
     }

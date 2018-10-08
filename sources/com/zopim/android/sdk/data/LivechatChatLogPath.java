@@ -8,7 +8,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.util.Pair;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import com.zopim.android.sdk.api.ChatSession;
 import com.zopim.android.sdk.api.FileTransfers;
 import com.zopim.android.sdk.api.Logger;
@@ -27,7 +27,7 @@ public class LivechatChatLogPath extends Path<LinkedHashMap<String, ChatLog>> {
     private static final String LOG_TAG = LivechatChatLogPath.class.getSimpleName();
     Pair<String, ChatLog> mChatRatingEntry;
     private final Object mLock;
-    private C0862b mTimeoutManager;
+    private C0861b mTimeoutManager;
     private LinkedList<Pair<String, ChatLog>> mUnmatchedAgentQuestionnaire;
     Map<String, String> mUploadedFiles;
 
@@ -37,14 +37,14 @@ public class LivechatChatLogPath extends Path<LinkedHashMap<String, ChatLog>> {
                 Log.w(LivechatChatLogPath.LOG_TAG, "onReceive: intent was null or getAction() was mismatched");
                 return;
             }
-            ChatLog chatLog = new ChatLog(null, Type.CHAT_MSG_TRIGGER, context.getResources().getString(C0785R.string.chat_session_timeout_message));
+            ChatLog chatLog = new ChatLog(null, Type.CHAT_MSG_TRIGGER, context.getResources().getString(C0784R.string.chat_session_timeout_message));
             ((LinkedHashMap) LivechatChatLogPath.INSTANCE.mData).put(chatLog.getTimestamp().toString(), chatLog);
             LivechatChatLogPath.INSTANCE.broadcast(LivechatChatLogPath.INSTANCE.getData());
         }
     }
 
     /* renamed from: com.zopim.android.sdk.data.LivechatChatLogPath$a */
-    class C0861a implements Runnable {
+    class C0860a implements Runnable {
         /* renamed from: a */
         String f843a;
         /* renamed from: b */
@@ -52,7 +52,7 @@ public class LivechatChatLogPath extends Path<LinkedHashMap<String, ChatLog>> {
         /* renamed from: c */
         final /* synthetic */ LivechatChatLogPath f845c;
 
-        C0861a(LivechatChatLogPath livechatChatLogPath, String str, ChatLog chatLog) {
+        C0860a(LivechatChatLogPath livechatChatLogPath, String str, ChatLog chatLog) {
             this.f845c = livechatChatLogPath;
             this.f844b = chatLog;
             this.f843a = str;
@@ -68,15 +68,15 @@ public class LivechatChatLogPath extends Path<LinkedHashMap<String, ChatLog>> {
     }
 
     /* renamed from: com.zopim.android.sdk.data.LivechatChatLogPath$b */
-    class C0862b {
+    class C0861b {
         /* renamed from: a */
         final /* synthetic */ LivechatChatLogPath f846a;
         /* renamed from: b */
         private Handler f847b = new Handler(Looper.myLooper());
         /* renamed from: c */
-        private Map<String, C0861a> f848c = new HashMap();
+        private Map<String, C0860a> f848c = new HashMap();
 
-        C0862b(LivechatChatLogPath livechatChatLogPath) {
+        C0861b(LivechatChatLogPath livechatChatLogPath) {
             this.f846a = livechatChatLogPath;
         }
 
@@ -93,22 +93,22 @@ public class LivechatChatLogPath extends Path<LinkedHashMap<String, ChatLog>> {
             } else if (chatLog == null) {
                 Log.w(LivechatChatLogPath.LOG_TAG, "Can not add chat log that is null");
             } else {
-                C0861a c0861a = (C0861a) this.f848c.get(str);
-                if (c0861a != null) {
+                C0860a c0860a = (C0860a) this.f848c.get(str);
+                if (c0860a != null) {
                     Logger.m564v(LivechatChatLogPath.LOG_TAG, "Removing previous timeout");
-                    this.f847b.removeCallbacks(c0861a);
+                    this.f847b.removeCallbacks(c0860a);
                 }
-                Runnable c0861a2 = new C0861a(this.f846a, str, chatLog);
-                this.f848c.put(str, c0861a2);
+                Runnable c0860a2 = new C0860a(this.f846a, str, chatLog);
+                this.f848c.put(str, c0860a2);
                 Logger.m564v(LivechatChatLogPath.LOG_TAG, "Scheduling timeout runnable");
-                this.f847b.postDelayed(c0861a2, 5000);
+                this.f847b.postDelayed(c0860a2, 5000);
             }
         }
     }
 
     private LivechatChatLogPath() {
         this.mLock = new Object();
-        this.mTimeoutManager = new C0862b(this);
+        this.mTimeoutManager = new C0861b(this);
         this.mUploadedFiles = new HashMap();
         this.mUnmatchedAgentQuestionnaire = new LinkedList();
         this.mData = new LinkedHashMap();
@@ -317,7 +317,7 @@ public class LivechatChatLogPath extends Path<LinkedHashMap<String, ChatLog>> {
         if (isClearRequired(str)) {
             clear();
         } else if (!str.isEmpty()) {
-            updateInternal((LinkedHashMap) this.PARSER.parse(str, new C0866d(this)));
+            updateInternal((LinkedHashMap) this.PARSER.parse(str, new C0865d(this)));
         }
     }
 }

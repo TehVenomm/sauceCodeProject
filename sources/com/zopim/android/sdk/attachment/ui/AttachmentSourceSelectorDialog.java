@@ -14,7 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import com.zopim.android.sdk.api.Logger;
 import com.zopim.android.sdk.attachment.ImagePicker;
 import java.util.ArrayList;
@@ -25,37 +25,37 @@ public class AttachmentSourceSelectorDialog extends DialogFragment {
     private ListView mListView;
 
     /* renamed from: com.zopim.android.sdk.attachment.ui.AttachmentSourceSelectorDialog$a */
-    enum C0827a {
+    enum C0826a {
         GALLERY,
         CAMERA
     }
 
     /* renamed from: com.zopim.android.sdk.attachment.ui.AttachmentSourceSelectorDialog$b */
-    class C0828b extends ArrayAdapter<C0829c> {
+    class C0827b extends ArrayAdapter<C0828c> {
         /* renamed from: a */
         final /* synthetic */ AttachmentSourceSelectorDialog f694a;
         /* renamed from: b */
         private Context f695b;
 
-        C0828b(AttachmentSourceSelectorDialog attachmentSourceSelectorDialog, Context context, int i, List<C0829c> list) {
+        C0827b(AttachmentSourceSelectorDialog attachmentSourceSelectorDialog, Context context, int i, List<C0828c> list) {
             this.f694a = attachmentSourceSelectorDialog;
             super(context, i, list);
             this.f695b = context;
         }
 
         public View getView(int i, View view, ViewGroup viewGroup) {
-            C0829c c0829c = (C0829c) getItem(i);
+            C0828c c0828c = (C0828c) getItem(i);
             if (view == null) {
-                view = LayoutInflater.from(this.f695b).inflate(C0785R.layout.row_attachment_source_selector, viewGroup, false);
+                view = LayoutInflater.from(this.f695b).inflate(C0784R.layout.row_attachment_source_selector, viewGroup, false);
             }
-            ((ImageView) view.findViewById(C0785R.id.attachment_selector_image)).setImageDrawable(ContextCompat.getDrawable(this.f695b, c0829c.m644a()));
-            ((TextView) view.findViewById(C0785R.id.attachment_selector_text)).setText(c0829c.m645b());
+            ((ImageView) view.findViewById(C0784R.id.attachment_selector_image)).setImageDrawable(ContextCompat.getDrawable(this.f695b, c0828c.m644a()));
+            ((TextView) view.findViewById(C0784R.id.attachment_selector_text)).setText(c0828c.m645b());
             return view;
         }
     }
 
     /* renamed from: com.zopim.android.sdk.attachment.ui.AttachmentSourceSelectorDialog$c */
-    class C0829c {
+    class C0828c {
         /* renamed from: a */
         final /* synthetic */ AttachmentSourceSelectorDialog f696a;
         /* renamed from: b */
@@ -63,13 +63,13 @@ public class AttachmentSourceSelectorDialog extends DialogFragment {
         /* renamed from: c */
         private final String f698c;
         /* renamed from: d */
-        private final C0827a f699d;
+        private final C0826a f699d;
 
-        C0829c(AttachmentSourceSelectorDialog attachmentSourceSelectorDialog, int i, String str, C0827a c0827a) {
+        C0828c(AttachmentSourceSelectorDialog attachmentSourceSelectorDialog, int i, String str, C0826a c0826a) {
             this.f696a = attachmentSourceSelectorDialog;
             this.f697b = i;
             this.f698c = str;
-            this.f699d = c0827a;
+            this.f699d = c0826a;
         }
 
         /* renamed from: a */
@@ -83,7 +83,7 @@ public class AttachmentSourceSelectorDialog extends DialogFragment {
         }
 
         /* renamed from: c */
-        public C0827a m646c() {
+        public C0826a m646c() {
             return this.f699d;
         }
     }
@@ -92,17 +92,17 @@ public class AttachmentSourceSelectorDialog extends DialogFragment {
         List arrayList = new ArrayList();
         Context activity = fragment.getActivity();
         if (ImagePicker.INSTANCE.hasPermissionForCamera(activity)) {
-            arrayList.add(new C0829c(this, C0785R.drawable.ic_chat_action_camera, getString(C0785R.string.attachment_upload_source_camera_button), C0827a.CAMERA));
+            arrayList.add(new C0828c(this, C0784R.drawable.ic_chat_action_camera, getString(C0784R.string.attachment_upload_source_camera_button), C0826a.CAMERA));
         }
         if (ImagePicker.INSTANCE.hasPermissionForGallery(activity)) {
-            arrayList.add(new C0829c(this, C0785R.drawable.ic_chat_action_picture, getString(C0785R.string.attachment_upload_source_gallery_button), C0827a.GALLERY));
+            arrayList.add(new C0828c(this, C0784R.drawable.ic_chat_action_picture, getString(C0784R.string.attachment_upload_source_gallery_button), C0826a.GALLERY));
         }
         if (arrayList.size() < 1) {
             Logger.m558d(TAG, "No permissions for opening images, dismiss dialog");
             dismiss();
         }
-        this.mListView.setAdapter(new C0828b(this, activity, C0785R.layout.row_attachment_source_selector, arrayList));
-        this.mListView.setOnItemClickListener(new C0830a(this, fragment));
+        this.mListView.setAdapter(new C0827b(this, activity, C0784R.layout.row_attachment_source_selector, arrayList));
+        this.mListView.setOnItemClickListener(new C0829a(this, fragment));
     }
 
     public static void showDialog(FragmentManager fragmentManager) {
@@ -120,8 +120,8 @@ public class AttachmentSourceSelectorDialog extends DialogFragment {
     }
 
     public View onCreateView(LayoutInflater layoutInflater, @Nullable ViewGroup viewGroup, @Nullable Bundle bundle) {
-        View inflate = layoutInflater.inflate(C0785R.layout.fragment_dialog_attachment_source, viewGroup, false);
-        this.mListView = (ListView) inflate.findViewById(C0785R.id.dialog_attachment_source_listview);
+        View inflate = layoutInflater.inflate(C0784R.layout.fragment_dialog_attachment_source, viewGroup, false);
+        this.mListView = (ListView) inflate.findViewById(C0784R.id.dialog_attachment_source_listview);
         return inflate;
     }
 }

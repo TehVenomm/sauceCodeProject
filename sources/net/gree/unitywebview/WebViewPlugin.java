@@ -30,8 +30,8 @@ public class WebViewPlugin {
     private int topMargin;
 
     /* renamed from: net.gree.unitywebview.WebViewPlugin$2 */
-    class C12612 implements Runnable {
-        C12612() {
+    class C15772 implements Runnable {
+        C15772() {
         }
 
         public void run() {
@@ -47,7 +47,7 @@ public class WebViewPlugin {
 
     public void Destroy() {
         this.isDestroyed = true;
-        UnityPlayer.currentActivity.runOnUiThread(new C12612());
+        UnityPlayer.currentActivity.runOnUiThread(new C15772());
     }
 
     public void EvaluateJS(final String str) {

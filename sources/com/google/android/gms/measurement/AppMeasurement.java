@@ -19,7 +19,6 @@ import com.google.android.gms.internal.zzcco;
 import com.google.android.gms.internal.zzcdo;
 import com.google.android.gms.internal.zzcfl;
 import com.google.android.gms.internal.zzcfo;
-import io.fabric.sdk.android.services.settings.SettingsJsonConstants;
 import java.util.List;
 import java.util.Map;
 
@@ -300,7 +299,7 @@ public class AppMeasurement {
                 return;
             }
         }
-        this.zzikb.zzaty().zza(SettingsJsonConstants.APP_KEY, str, bundle, true);
+        this.zzikb.zzaty().zza("app", str, bundle, true);
     }
 
     @Keep
@@ -362,7 +361,7 @@ public class AppMeasurement {
             this.zzikb.zzaug().zza(zzjx, "_ev", zzcfo.zza(str, zzcap.zzavn(), true), str != null ? str.length() : 0);
             return;
         }
-        setUserPropertyInternal(SettingsJsonConstants.APP_KEY, str, str2);
+        setUserPropertyInternal("app", str, str2);
     }
 
     @KeepForSdk

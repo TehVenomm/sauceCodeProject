@@ -33,10 +33,10 @@ public class MutualFollowFBInviteDialog : GameSection
 		bool getInvitableFriendFinish = false;
 		MonoBehaviourSingleton<FBManager>.I.GetInvitableFriends(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator103)/*Error near IL_0034: stateMachine*/)._003CgetInvitableFriendFinish_003E__1 = true;
+			((_003CDoInitialize_003Ec__Iterator107)/*Error near IL_0034: stateMachine*/)._003CgetInvitableFriendFinish_003E__1 = true;
 			MonoBehaviourSingleton<FBManager>.I.GetFriends(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator103)/*Error near IL_0034: stateMachine*/)._003CgetFriendFinish_003E__0 = true;
+				((_003CDoInitialize_003Ec__Iterator107)/*Error near IL_0034: stateMachine*/)._003CgetFriendFinish_003E__0 = true;
 			});
 		});
 		while (!getInvitableFriendFinish || !getFriendFinish)
@@ -45,8 +45,8 @@ public class MutualFollowFBInviteDialog : GameSection
 		}
 		SetInput((Enum)UI.IPT_NAME, string.Empty, 0, (EventDelegate.Callback)delegate
 		{
-			string inputValue = ((_003CDoInitialize_003Ec__Iterator103)/*Error near IL_0085: stateMachine*/)._003C_003Ef__this.GetInputValue((Enum)UI.IPT_NAME);
-			((_003CDoInitialize_003Ec__Iterator103)/*Error near IL_0085: stateMachine*/)._003C_003Ef__this.SetWrapContentFilterText((Enum)UI.WRP_LIST, inputValue);
+			string inputValue = ((_003CDoInitialize_003Ec__Iterator107)/*Error near IL_0085: stateMachine*/)._003C_003Ef__this.GetInputValue((Enum)UI.IPT_NAME);
+			((_003CDoInitialize_003Ec__Iterator107)/*Error near IL_0085: stateMachine*/)._003C_003Ef__this.SetWrapContentFilterText((Enum)UI.WRP_LIST, inputValue);
 		});
 		base.Initialize();
 	}
@@ -63,8 +63,8 @@ public class MutualFollowFBInviteDialog : GameSection
 	{
 		List<FBManager.FriendData> friendList = invitable_friend_info.data;
 		int i = 0;
-		_003C_UpdateListFriend_003Ec__AnonStorey3ED _003C_UpdateListFriend_003Ec__AnonStorey3ED;
-		SetWrapContentFilter(UI.WRP_LIST, "MutualFollowFBInviteListItem", friendList.Count, false, new Action<int, Transform, bool>((object)_003C_UpdateListFriend_003Ec__AnonStorey3ED, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<int, string, bool>((object)_003C_UpdateListFriend_003Ec__AnonStorey3ED, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003C_UpdateListFriend_003Ec__AnonStorey3FD _003C_UpdateListFriend_003Ec__AnonStorey3FD;
+		SetWrapContentFilter(UI.WRP_LIST, "MutualFollowFBInviteListItem", friendList.Count, false, new Action<int, Transform, bool>((object)_003C_UpdateListFriend_003Ec__AnonStorey3FD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<int, string, bool>((object)_003C_UpdateListFriend_003Ec__AnonStorey3FD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void _UpdateSelected()

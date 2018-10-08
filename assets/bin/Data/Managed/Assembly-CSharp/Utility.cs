@@ -1723,4 +1723,46 @@ public static class Utility
 		}
 		return false;
 	}
+
+	public static int GetTipTypeFromTutorial()
+	{
+		if (PlayerPrefs.HasKey("Tut_Weapon_Type"))
+		{
+			int @int = PlayerPrefs.GetInt("Tut_Weapon_Type");
+			Random.Range(1, 3);
+			switch (@int)
+			{
+			case 0:
+				return Random.Range(1, 3);
+			case 1:
+				return Random.Range(5, 8);
+			case 2:
+				return Random.Range(8, 10);
+			case 4:
+				return Random.Range(10, 12);
+			case 5:
+				return Random.Range(12, 15);
+			default:
+				return -1;
+			}
+		}
+		return -1;
+	}
+
+	public static string GetTrimLineText(int maxLine, string text)
+	{
+		int num = 0;
+		for (int i = 0; i < text.Length; i++)
+		{
+			if (text[i] == '\n')
+			{
+				num++;
+			}
+			if (num == maxLine && i + 1 < text.Length)
+			{
+				return text.Substring(0, i) + "...";
+			}
+		}
+		return text;
+	}
 }

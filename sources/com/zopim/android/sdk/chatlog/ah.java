@@ -4,7 +4,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import com.zopim.android.sdk.model.Profile;
 
 class ah implements OnClickListener {
@@ -38,6 +38,6 @@ class ah implements OnClickListener {
             }
             return;
         }
-        this.f778c.setError(this.f779d.getResources().getText(C0785R.string.email_transcript_email_message));
+        this.f778c.setError(this.f779d.getResources().getText(C0784R.string.email_transcript_email_message));
     }
 }

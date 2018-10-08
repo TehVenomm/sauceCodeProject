@@ -2,6 +2,7 @@ package com.crashlytics.android.beta;
 
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
+import im.getsocial.sdk.consts.LanguageCodes;
 import io.fabric.sdk.android.Fabric;
 import io.fabric.sdk.android.services.cache.ValueLoader;
 import java.io.FileInputStream;
@@ -40,34 +41,34 @@ public class DeviceTokenLoader implements ValueLoader<String> {
                 try {
                     zipInputStream.close();
                 } catch (Throwable e) {
-                    Fabric.getLogger().mo4292e(Beta.TAG, "Failed to close the APK file", e);
+                    Fabric.getLogger().mo4756e(Beta.TAG, "Failed to close the APK file", e);
                 }
             }
         } catch (Throwable e2) {
-            Fabric.getLogger().mo4292e(Beta.TAG, "Failed to find this app in the PackageManager", e2);
+            Fabric.getLogger().mo4756e(Beta.TAG, "Failed to find this app in the PackageManager", e2);
             if (zipInputStream != null) {
                 try {
                     zipInputStream.close();
                 } catch (Throwable e22) {
-                    Fabric.getLogger().mo4292e(Beta.TAG, "Failed to close the APK file", e22);
+                    Fabric.getLogger().mo4756e(Beta.TAG, "Failed to close the APK file", e22);
                 }
             }
         } catch (Throwable e222) {
-            Fabric.getLogger().mo4292e(Beta.TAG, "Failed to find the APK file", e222);
+            Fabric.getLogger().mo4756e(Beta.TAG, "Failed to find the APK file", e222);
             if (zipInputStream != null) {
                 try {
                     zipInputStream.close();
                 } catch (Throwable e2222) {
-                    Fabric.getLogger().mo4292e(Beta.TAG, "Failed to close the APK file", e2222);
+                    Fabric.getLogger().mo4756e(Beta.TAG, "Failed to close the APK file", e2222);
                 }
             }
         } catch (Throwable e22222) {
-            Fabric.getLogger().mo4292e(Beta.TAG, "Failed to read the APK file", e22222);
+            Fabric.getLogger().mo4756e(Beta.TAG, "Failed to read the APK file", e22222);
             if (zipInputStream != null) {
                 try {
                     zipInputStream.close();
                 } catch (Throwable e222222) {
-                    Fabric.getLogger().mo4292e(Beta.TAG, "Failed to close the APK file", e222222);
+                    Fabric.getLogger().mo4756e(Beta.TAG, "Failed to close the APK file", e222222);
                 }
             }
         } catch (Throwable th) {
@@ -75,11 +76,11 @@ public class DeviceTokenLoader implements ValueLoader<String> {
                 try {
                     zipInputStream.close();
                 } catch (Throwable e2222222) {
-                    Fabric.getLogger().mo4292e(Beta.TAG, "Failed to close the APK file", e2222222);
+                    Fabric.getLogger().mo4756e(Beta.TAG, "Failed to close the APK file", e2222222);
                 }
             }
         }
-        Fabric.getLogger().mo4289d(Beta.TAG, "Beta device token load took " + (((double) (System.nanoTime() - nanoTime)) / 1000000.0d) + "ms");
+        Fabric.getLogger().mo4753d(Beta.TAG, "Beta device token load took " + (((double) (System.nanoTime() - nanoTime)) / 1000000.0d) + LanguageCodes.MALAY);
         return str;
     }
 }

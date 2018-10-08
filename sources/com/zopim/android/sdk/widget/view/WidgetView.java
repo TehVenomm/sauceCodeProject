@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 
 public class WidgetView extends RelativeLayout {
     private int mPosition = Anchor.UNKNOWN.getValue();
@@ -42,9 +42,9 @@ public class WidgetView extends RelativeLayout {
 
     public WidgetView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
-        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, C0785R.styleable.WidgetView, 0, 0);
+        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, C0784R.styleable.WidgetView, 0, 0);
         try {
-            this.mPosition = obtainStyledAttributes.getInteger(C0785R.styleable.WidgetView_anchor, Anchor.UNKNOWN.getValue());
+            this.mPosition = obtainStyledAttributes.getInteger(C0784R.styleable.WidgetView_anchor, Anchor.UNKNOWN.getValue());
         } finally {
             obtainStyledAttributes.recycle();
         }

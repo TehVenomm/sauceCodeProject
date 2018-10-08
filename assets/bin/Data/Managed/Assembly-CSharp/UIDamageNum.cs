@@ -50,8 +50,8 @@ public class UIDamageNum
 
 	public Color fireOutLineColor = new Color(0.03f, 0.08f, 0.14f);
 
-	[FormerlySerializedAs("iceColor")]
 	[Tooltip("水時カラ\u30fc")]
+	[FormerlySerializedAs("iceColor")]
 	public Color waterColor;
 
 	public Color waterOutLineColor = new Color(0.03f, 0.08f, 0.14f);

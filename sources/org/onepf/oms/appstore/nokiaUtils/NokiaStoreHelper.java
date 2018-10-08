@@ -26,7 +26,7 @@ import org.onepf.oms.SkuManager;
 import org.onepf.oms.appstore.AmazonAppstoreBillingService;
 import org.onepf.oms.appstore.NokiaStore;
 import org.onepf.oms.appstore.googleUtils.IabException;
-import org.onepf.oms.appstore.googleUtils.IabHelper.OnIabPurchaseFinishedListener;
+import org.onepf.oms.appstore.googleUtils.IabHelper$OnIabPurchaseFinishedListener;
 import org.onepf.oms.appstore.googleUtils.IabHelper.OnIabSetupFinishedListener;
 import org.onepf.oms.appstore.googleUtils.IabResult;
 import org.onepf.oms.appstore.googleUtils.Inventory;
@@ -48,7 +48,7 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
     public static final int RESULT_USER_CANCELED = 1;
     private final Context mContext;
     @Nullable
-    private OnIabPurchaseFinishedListener mPurchaseListener = null;
+    private IabHelper$OnIabPurchaseFinishedListener mPurchaseListener = null;
     int mRequestCode;
     @Nullable
     private INokiaIAPService mService = null;
@@ -67,7 +67,7 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
     }
 
     private void processDetailsList(@NotNull List<String> list, @NotNull Inventory inventory) throws JSONException {
-        Logger.m1006i("NokiaStoreHelper.processDetailsList");
+        Logger.m4031i("NokiaStoreHelper.processDetailsList");
         for (String jSONObject : list) {
             JSONObject jSONObject2 = new JSONObject(jSONObject);
             inventory.addSkuDetails(new SkuDetails("inapp", SkuManager.getInstance().getSku(OpenIabHelper.NAME_NOKIA, jSONObject2.getString(AmazonAppstoreBillingService.JSON_KEY_PRODUCT_ID)), jSONObject2.getString("title"), jSONObject2.getString(Param.PRICE), jSONObject2.getString("shortdescription")));
@@ -75,11 +75,11 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
     }
 
     private void processPurchaseSuccess(String str) {
-        Logger.m1006i("NokiaStoreHelper.processPurchaseSuccess");
-        Logger.m1001d("purchaseData = ", str);
+        Logger.m4031i("NokiaStoreHelper.processPurchaseSuccess");
+        Logger.m4026d("purchaseData = ", str);
         try {
             JSONObject jSONObject = new JSONObject(str);
-            Logger.m1001d("sku = ", SkuManager.getInstance().getSku(OpenIabHelper.NAME_NOKIA, jSONObject.getString(AmazonAppstoreBillingService.JSON_KEY_PRODUCT_ID)));
+            Logger.m4026d("sku = ", SkuManager.getInstance().getSku(OpenIabHelper.NAME_NOKIA, jSONObject.getString(AmazonAppstoreBillingService.JSON_KEY_PRODUCT_ID)));
             Purchase purchase = new Purchase(OpenIabHelper.NAME_NOKIA);
             purchase.setItemType("inapp");
             purchase.setOrderId(jSONObject.getString(AmazonAppstoreBillingService.JSON_KEY_ORDER_ID));
@@ -91,7 +91,7 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
                 this.mPurchaseListener.onIabPurchaseFinished(new NokiaResult(0, "Success"), purchase);
             }
         } catch (Throwable e) {
-            Logger.m1004e(e, "JSONException: ", e);
+            Logger.m4029e(e, "JSONException: ", e);
             IabResult nokiaResult = new NokiaResult(-1002, "Failed to parse purchase data.");
             if (this.mPurchaseListener != null) {
                 this.mPurchaseListener.onIabPurchaseFinished(nokiaResult, null);
@@ -100,7 +100,7 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
     }
 
     private void processPurchasedList(@NotNull ArrayList<String> arrayList, @NotNull Inventory inventory) {
-        Logger.m1006i("NokiaStoreHelper.processPurchasedList");
+        Logger.m4031i("NokiaStoreHelper.processPurchasedList");
         Iterator it = arrayList.iterator();
         while (it.hasNext()) {
             try {
@@ -114,13 +114,13 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
                 purchase.setDeveloperPayload(jSONObject.optString("developerPayload", ""));
                 inventory.addPurchase(purchase);
             } catch (Throwable e) {
-                Logger.m1004e(e, "Exception: ", e);
+                Logger.m4029e(e, "Exception: ", e);
             }
         }
     }
 
     private void refreshItemDetails(@Nullable List<String> list, @NotNull Inventory inventory) throws IabException {
-        Logger.m1006i("NokiaStoreHelper.refreshItemDetails");
+        Logger.m4031i("NokiaStoreHelper.refreshItemDetails");
         Bundle bundle = new Bundle(32);
         ArrayList arrayList = new ArrayList(32);
         Collection allStoreSkus = SkuManager.getInstance().getAllStoreSkus(OpenIabHelper.NAME_NOKIA);
@@ -135,27 +135,27 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
         bundle.putStringArrayList("ITEM_ID_LIST", arrayList);
         try {
             if (this.mService == null) {
-                Logger.m1002e("Unable to refresh item details.");
+                Logger.m4027e("Unable to refresh item details.");
                 throw new IabException(-1002, "Error refreshing item details.");
             }
             Bundle productDetails = this.mService.getProductDetails(3, getPackageName(), "inapp", bundle);
             int i = productDetails.getInt("RESPONSE_CODE");
             List stringArrayList = productDetails.getStringArrayList("DETAILS_LIST");
-            Logger.m1001d("responseCode = ", Integer.valueOf(i));
-            Logger.m1001d("detailsList = ", stringArrayList);
+            Logger.m4026d("responseCode = ", Integer.valueOf(i));
+            Logger.m4026d("detailsList = ", stringArrayList);
             if (i != 0) {
                 throw new IabException(new NokiaResult(i, "Error refreshing inventory (querying prices of items)."));
             }
             processDetailsList(stringArrayList, inventory);
         } catch (Throwable e) {
-            Logger.m1004e(e, "Exception: ", e);
+            Logger.m4029e(e, "Exception: ", e);
         } catch (Throwable e2) {
-            Logger.m1004e(e2, "Exception: ", e2);
+            Logger.m4029e(e2, "Exception: ", e2);
         }
     }
 
     private void refreshPurchasedItems(@Nullable List<String> list, @NotNull Inventory inventory) throws IabException {
-        Logger.m1006i("NokiaStoreHelper.refreshPurchasedItems");
+        Logger.m4031i("NokiaStoreHelper.refreshPurchasedItems");
         ArrayList arrayList = new ArrayList(SkuManager.getInstance().getAllStoreSkus(OpenIabHelper.NAME_NOKIA));
         Bundle bundle = new Bundle(32);
         if (list != null) {
@@ -166,51 +166,51 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
         bundle.putStringArrayList("ITEM_ID_LIST", arrayList);
         try {
             if (this.mService == null) {
-                Logger.m1002e("Unable to refresh purchased items.");
+                Logger.m4027e("Unable to refresh purchased items.");
                 throw new IabException(-1002, "Error refreshing inventory (querying owned items).");
             }
             Bundle purchases = this.mService.getPurchases(3, getPackageName(), "inapp", bundle, null);
             int i = purchases.getInt("RESPONSE_CODE");
             ArrayList stringArrayList = purchases.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
             ArrayList stringArrayList2 = purchases.getStringArrayList("INAPP_PURCHASE_DATA_LIST");
-            Logger.m1001d("responseCode = ", Integer.valueOf(i));
-            Logger.m1001d("purchasedItemList = ", stringArrayList);
-            Logger.m1001d("purchasedDataList = ", stringArrayList2);
+            Logger.m4026d("responseCode = ", Integer.valueOf(i));
+            Logger.m4026d("purchasedItemList = ", stringArrayList);
+            Logger.m4026d("purchasedDataList = ", stringArrayList2);
             if (i != 0) {
                 throw new IabException(new NokiaResult(i, "Error refreshing inventory (querying owned items)."));
             }
             processPurchasedList(stringArrayList2, inventory);
         } catch (Throwable e) {
-            Logger.m1004e(e, "Exception: ", e);
+            Logger.m4029e(e, "Exception: ", e);
         }
     }
 
     public void consume(@NotNull Purchase purchase) throws IabException {
         int consumePurchase;
-        Logger.m1006i("NokiaStoreHelper.consume");
+        Logger.m4031i("NokiaStoreHelper.consume");
         String token = purchase.getToken();
         String sku = purchase.getSku();
         String packageName = purchase.getPackageName();
-        Logger.m1001d("productId = ", sku);
-        Logger.m1001d("token = ", token);
-        Logger.m1001d("packageName = ", packageName);
+        Logger.m4026d("productId = ", sku);
+        Logger.m4026d("token = ", token);
+        Logger.m4026d("packageName = ", packageName);
         try {
             consumePurchase = this.mService.consumePurchase(3, packageName, sku, token);
         } catch (Throwable e) {
-            Logger.m1004e(e, "RemoteException: ", e);
+            Logger.m4029e(e, "RemoteException: ", e);
             consumePurchase = 0;
         }
         if (consumePurchase == 0) {
-            Logger.m1001d("Successfully consumed productId: ", sku);
-            Logger.m1000d("consume: done");
+            Logger.m4026d("Successfully consumed productId: ", sku);
+            Logger.m4025d("consume: done");
             return;
         }
-        Logger.m1001d("Error consuming consuming productId ", sku, ". Code: ", Integer.valueOf(consumePurchase));
+        Logger.m4026d("Error consuming consuming productId ", sku, ". Code: ", Integer.valueOf(consumePurchase));
         throw new IabException(new NokiaResult(consumePurchase, "Error consuming productId " + sku));
     }
 
     public void dispose() {
-        Logger.m1006i("NokiaStoreHelper.dispose");
+        Logger.m4031i("NokiaStoreHelper.dispose");
         if (this.mServiceConn != null) {
             if (this.mContext != null) {
                 this.mContext.unbindService(this.mServiceConn);
@@ -225,13 +225,13 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
     }
 
     public boolean handleActivityResult(int i, int i2, @Nullable Intent intent) {
-        Logger.m1006i("NokiaStoreHelper.handleActivityResult");
+        Logger.m4031i("NokiaStoreHelper.handleActivityResult");
         if (i != this.mRequestCode) {
             return false;
         }
         IabResult nokiaResult;
         if (intent == null) {
-            Logger.m1002e("Null data in IAB activity result.");
+            Logger.m4027e("Null data in IAB activity result.");
             nokiaResult = new NokiaResult(-1002, "Null data in IAB result");
             if (this.mPurchaseListener == null) {
                 return true;
@@ -241,8 +241,8 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
         }
         int intExtra = intent.getIntExtra("RESPONSE_CODE", 0);
         String stringExtra = intent.getStringExtra("INAPP_PURCHASE_DATA");
-        Logger.m1001d("responseCode = ", Integer.valueOf(intExtra));
-        Logger.m1001d("purchaseData = ", stringExtra);
+        Logger.m4026d("responseCode = ", Integer.valueOf(intExtra));
+        Logger.m4026d("purchaseData = ", stringExtra);
         if (i2 == -1 && intExtra == 0) {
             processPurchaseSuccess(stringExtra);
             return true;
@@ -250,7 +250,7 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
             processPurchaseFail(intExtra);
             return true;
         } else if (i2 == 0) {
-            Logger.m1001d("Purchase canceled - Response: ", Integer.valueOf(intExtra));
+            Logger.m4026d("Purchase canceled - Response: ", Integer.valueOf(intExtra));
             nokiaResult = new NokiaResult(-1005, "User canceled.");
             if (this.mPurchaseListener == null) {
                 return true;
@@ -258,7 +258,7 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
             this.mPurchaseListener.onIabPurchaseFinished(nokiaResult, null);
             return true;
         } else {
-            Logger.m1005e("Purchase failed. Result code: ", Integer.valueOf(i2));
+            Logger.m4030e("Purchase failed. Result code: ", Integer.valueOf(i2));
             nokiaResult = new NokiaResult(-1006, "Unknown purchase response.");
             if (this.mPurchaseListener == null) {
                 return true;
@@ -268,13 +268,13 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
         }
     }
 
-    public void launchPurchaseFlow(@NotNull Activity activity, String str, @NotNull String str2, int i, @Nullable OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str3) {
-        Logger.m1006i("NokiaStoreHelper.launchPurchaseFlow");
+    public void launchPurchaseFlow(@NotNull Activity activity, String str, @NotNull String str2, int i, @Nullable IabHelper$OnIabPurchaseFinishedListener iabHelper$OnIabPurchaseFinishedListener, String str3) {
         IabResult iabResult;
+        Logger.m4031i("NokiaStoreHelper.launchPurchaseFlow");
         if (str2.equals("subs")) {
             iabResult = new IabResult(-1009, "Subscriptions are not available.");
-            if (onIabPurchaseFinishedListener != null) {
-                onIabPurchaseFinishedListener.onIabPurchaseFinished(iabResult, null);
+            if (iabHelper$OnIabPurchaseFinishedListener != null) {
+                iabHelper$OnIabPurchaseFinishedListener.onIabPurchaseFinished(iabResult, null);
                 return;
             }
             return;
@@ -282,37 +282,37 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
         try {
             if (this.mService != null) {
                 Bundle buyIntent = this.mService.getBuyIntent(3, getPackageName(), str, "inapp", str3);
-                Logger.m1001d("buyIntentBundle = ", buyIntent);
+                Logger.m4026d("buyIntentBundle = ", buyIntent);
                 int i2 = buyIntent.getInt("RESPONSE_CODE", 0);
                 PendingIntent pendingIntent = (PendingIntent) buyIntent.getParcelable("BUY_INTENT");
                 if (i2 == 0) {
                     this.mRequestCode = i;
-                    this.mPurchaseListener = onIabPurchaseFinishedListener;
+                    this.mPurchaseListener = iabHelper$OnIabPurchaseFinishedListener;
                     activity.startIntentSenderForResult(pendingIntent.getIntentSender(), i, new Intent(), 0, 0, 0);
-                } else if (onIabPurchaseFinishedListener != null) {
-                    onIabPurchaseFinishedListener.onIabPurchaseFinished(new NokiaResult(i2, "Failed to get buy intent."), null);
+                } else if (iabHelper$OnIabPurchaseFinishedListener != null) {
+                    iabHelper$OnIabPurchaseFinishedListener.onIabPurchaseFinished(new NokiaResult(i2, "Failed to get buy intent."), null);
                 }
-            } else if (onIabPurchaseFinishedListener != null) {
-                Logger.m1002e("Unable to buy item, Error response: service is not connected.");
-                onIabPurchaseFinishedListener.onIabPurchaseFinished(new NokiaResult(6, "Unable to buy item"), null);
+            } else if (iabHelper$OnIabPurchaseFinishedListener != null) {
+                Logger.m4027e("Unable to buy item, Error response: service is not connected.");
+                iabHelper$OnIabPurchaseFinishedListener.onIabPurchaseFinished(new NokiaResult(6, "Unable to buy item"), null);
             }
         } catch (Throwable e) {
-            Logger.m1004e(e, "RemoteException: ", e);
+            Logger.m4029e(e, "RemoteException: ", e);
             iabResult = new NokiaResult(-1004, "Failed to send intent.");
-            if (onIabPurchaseFinishedListener != null) {
-                onIabPurchaseFinishedListener.onIabPurchaseFinished(iabResult, null);
+            if (iabHelper$OnIabPurchaseFinishedListener != null) {
+                iabHelper$OnIabPurchaseFinishedListener.onIabPurchaseFinished(iabResult, null);
             }
         } catch (Throwable e2) {
-            Logger.m1004e(e2, "SendIntentException: ", e2);
+            Logger.m4029e(e2, "SendIntentException: ", e2);
             iabResult = new NokiaResult(-1001, "Remote exception while starting purchase flow");
-            if (onIabPurchaseFinishedListener != null) {
-                onIabPurchaseFinishedListener.onIabPurchaseFinished(iabResult, null);
+            if (iabHelper$OnIabPurchaseFinishedListener != null) {
+                iabHelper$OnIabPurchaseFinishedListener.onIabPurchaseFinished(iabResult, null);
             }
         }
     }
 
     public void processPurchaseFail(int i) {
-        Logger.m1001d("Result code was OK but in-app billing response was not OK: ", Integer.valueOf(i));
+        Logger.m4026d("Result code was OK but in-app billing response was not OK: ", Integer.valueOf(i));
         if (this.mPurchaseListener != null) {
             this.mPurchaseListener.onIabPurchaseFinished(new NokiaResult(i, "Problem purchashing item."), null);
         }
@@ -320,9 +320,9 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
 
     public Inventory queryInventory(boolean z, List<String> list, List<String> list2) throws IabException {
         Inventory inventory = new Inventory();
-        Logger.m1006i("NokiaStoreHelper.queryInventory");
-        Logger.m1001d("querySkuDetails = ", Boolean.valueOf(z));
-        Logger.m1001d("moreItemSkus = ", list);
+        Logger.m4031i("NokiaStoreHelper.queryInventory");
+        Logger.m4026d("querySkuDetails = ", Boolean.valueOf(z));
+        Logger.m4026d("moreItemSkus = ", list);
         if (z) {
             refreshItemDetails(list, inventory);
         }
@@ -331,11 +331,11 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
     }
 
     public void startSetup(@Nullable final OnIabSetupFinishedListener onIabSetupFinishedListener) {
-        Logger.m1006i("NokiaStoreHelper.startSetup");
+        Logger.m4031i("NokiaStoreHelper.startSetup");
         this.mServiceConn = new ServiceConnection() {
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                Logger.m1006i("NokiaStoreHelper:startSetup.onServiceConnected");
-                Logger.m1000d("name = " + componentName);
+                Logger.m4031i("NokiaStoreHelper:startSetup.onServiceConnected");
+                Logger.m4025d("name = " + componentName);
                 NokiaStoreHelper.this.mService = Stub.asInterface(iBinder);
                 try {
                     int isBillingSupported = NokiaStoreHelper.this.mService.isBillingSupported(3, NokiaStoreHelper.this.getPackageName(), "inapp");
@@ -350,13 +350,13 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
                     if (onIabSetupFinishedListener != null) {
                         onIabSetupFinishedListener.onIabSetupFinished(new NokiaResult(-1001, "RemoteException while setting up in-app billing."));
                     }
-                    Logger.m1004e(e, "Exception: ", e);
+                    Logger.m4029e(e, "Exception: ", e);
                 }
             }
 
             public void onServiceDisconnected(ComponentName componentName) {
-                Logger.m1006i("NokiaStoreHelper:startSetup.onServiceDisconnected");
-                Logger.m1001d("name = ", componentName);
+                Logger.m4031i("NokiaStoreHelper:startSetup.onServiceDisconnected");
+                Logger.m4026d("name = ", componentName);
                 NokiaStoreHelper.this.mService = null;
             }
         };
@@ -366,7 +366,7 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
             try {
                 this.mContext.bindService(serviceIntent, this.mServiceConn, 1);
             } catch (Throwable e) {
-                Logger.m1003e("Can't bind to the service", e);
+                Logger.m4028e("Can't bind to the service", e);
                 if (onIabSetupFinishedListener != null) {
                     onIabSetupFinishedListener.onIabSetupFinished(new NokiaResult(3, "Billing service unavailable on device due to lack of the permission \"com.nokia.payment.BILLING\"."));
                 }

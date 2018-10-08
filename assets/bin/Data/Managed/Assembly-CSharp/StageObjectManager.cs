@@ -600,11 +600,11 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 	public void Init(InGameManager.IntervalTransferInfo transfer_info = null)
 	{
 		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0290: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0293: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02f4: Unknown result type (might be due to invalid IL or missing references)
 		Self self = null;
 		if (transfer_info != null)
 		{
@@ -620,7 +620,7 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 				}
 				if (playerInfo.isSelf)
 				{
-					player = CreatePlayer(0, playerInfo.createInfo, true, Vector3.get_zero(), 0f, playerInfo.transferInfo, null);
+					player = CreatePlayer(0, playerInfo.createInfo, true, Vector3.get_zero(), 0f, playerInfo.transferInfo, null, false);
 					if (player == null)
 					{
 						continue;
@@ -644,7 +644,7 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 					}
 					if (flag || playerInfo.coopMode == StageObject.COOP_MODE_TYPE.NONE || playerInfo.coopMode == StageObject.COOP_MODE_TYPE.ORIGINAL)
 					{
-						player = CreatePlayer(playerInfo.id, playerInfo.createInfo, false, Vector3.get_zero(), 0f, playerInfo.transferInfo, null);
+						player = CreatePlayer(playerInfo.id, playerInfo.createInfo, false, Vector3.get_zero(), 0f, playerInfo.transferInfo, null, false);
 						if (player == null)
 						{
 							continue;
@@ -664,7 +664,7 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 							player2.get_gameObject().SetActive(false);
 							MonoBehaviourSingleton<StageObjectManager>.I.AddCacheObject(player2);
 						};
-						player = CreatePlayer(playerInfo.id, playerInfo.createInfo, false, Vector3.get_zero(), 0f, playerInfo.transferInfo, callback);
+						player = CreatePlayer(playerInfo.id, playerInfo.createInfo, false, Vector3.get_zero(), 0f, playerInfo.transferInfo, callback, false);
 						if (player == null)
 						{
 							continue;
@@ -716,12 +716,12 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 	public void InitForArena(InGameManager.IntervalTransferInfo transferInfo = null)
 	{
 		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
 		Self self = null;
 		if (transferInfo != null)
 		{
 			InGameManager.IntervalTransferInfo.PlayerInfo playerInfo = transferInfo.playerInfoList[0];
-			self = (CreatePlayer(0, playerInfo.createInfo, true, Vector3.get_zero(), 0f, playerInfo.transferInfo, null) as Self);
+			self = (CreatePlayer(0, playerInfo.createInfo, true, Vector3.get_zero(), 0f, playerInfo.transferInfo, null, false) as Self);
 			self.taskChecker = playerInfo.taskChecker;
 			if (self.controller != null)
 			{
@@ -759,7 +759,7 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 		{
 			AssignedEquipmentTable.MergeAssignedEquip(ref createinfo, MonoBehaviourSingleton<StatusManager>.I.EventEquipSet);
 		}
-		return CreatePlayer(id, createinfo, true, pos, dir, null, null) as Self;
+		return CreatePlayer(id, createinfo, true, pos, dir, null, null, false) as Self;
 	}
 
 	public Player CreateNonPlayer(int id, PlayerLoader.OnCompleteLoad callback = null)
@@ -787,7 +787,8 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 
 	public Player CreateNonPlayer(int id, CreatePlayerInfo.ExtentionInfo extention_info, Vector3 pos, float dir, PlayerTransferInfo transfer_info = null, PlayerLoader.OnCompleteLoad callback = null)
 	{
-		//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0382: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0403: Unknown result type (might be due to invalid IL or missing references)
 		CreatePlayerInfo createPlayerInfo = new CreatePlayerInfo();
 		createPlayerInfo.charaInfo = new CharaInfo();
 		bool flag = QuestManager.IsValidInGame() && MonoBehaviourSingleton<QuestManager>.I.GetVorgonQuestType() != QuestManager.VorgonQuetType.NONE;
@@ -805,10 +806,10 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 		if (flag2)
 		{
 			List<int> list = new List<int>();
-			int i = 0;
-			for (int count = nonplayerList.Count; i < count; i++)
+			int j = 0;
+			for (int count = nonplayerList.Count; j < count; j++)
 			{
-				NonPlayer nonPlayer = nonplayerList[i] as NonPlayer;
+				NonPlayer nonPlayer = nonplayerList[j] as NonPlayer;
 				if (nonPlayer != null)
 				{
 					list.Add(nonPlayer.npcId);
@@ -882,32 +883,54 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 		{
 			return null;
 		}
-		npcLevelData.CopyHomeCharaInfo(createPlayerInfo.charaInfo, (!flag2) ? null : createPlayerInfo.extentionInfo);
+		if (MonoBehaviourSingleton<FieldManager>.I.isTutorialField && (id == 991 || id == 992 || id == 990))
+		{
+			npcLevelData.CopyHomeCharaInfo(createPlayerInfo.charaInfo, (!flag2) ? null : createPlayerInfo.extentionInfo, MonoBehaviourSingleton<InGameSettingsManager>.I.tutorialParam.atkIncreaseRate);
+			InGameSettingsManager.TutorialParam tutParams = MonoBehaviourSingleton<InGameSettingsManager>.I.tutorialParam;
+			CharaInfo.EquipItem equipItem = createPlayerInfo.charaInfo.equipSet.Find((CharaInfo.EquipItem i) => i.eId == tutParams.botWeaponIds[0]);
+			if (equipItem != null)
+			{
+				equipItem.sIds.Add(tutParams.botSkillIds[0]);
+			}
+			else
+			{
+				equipItem = createPlayerInfo.charaInfo.equipSet.Find((CharaInfo.EquipItem i) => i.eId == tutParams.botWeaponIds[1]);
+				equipItem?.sIds.Add(tutParams.botSkillIds[1]);
+			}
+			if (equipItem != null)
+			{
+				equipItem.lv = 1;
+				equipItem.sLvs.Add(1);
+				equipItem.sExs.Add(0);
+			}
+			return CreatePlayer(id, createPlayerInfo, false, pos, dir, transfer_info, callback, true);
+		}
+		npcLevelData.CopyHomeCharaInfo(createPlayerInfo.charaInfo, (!flag2) ? null : createPlayerInfo.extentionInfo, 1f);
 		if (flag)
 		{
-			for (int j = 0; j < createPlayerInfo.charaInfo.equipSet.Count; j++)
+			for (int k = 0; k < createPlayerInfo.charaInfo.equipSet.Count; k++)
 			{
-				createPlayerInfo.charaInfo.equipSet[j].eId = VorgonPreEventController.NPC_WEAPON_ID_LIST[id % 3];
+				createPlayerInfo.charaInfo.equipSet[k].eId = VorgonPreEventController.NPC_WEAPON_ID_LIST[id % 3];
 			}
 		}
-		return CreatePlayer(id, createPlayerInfo, false, pos, dir, transfer_info, callback);
+		return CreatePlayer(id, createPlayerInfo, false, pos, dir, transfer_info, callback, false);
 	}
 
 	public Player CreateGuest(int id, CharaInfo charaInfo, PlayerLoader.OnCompleteLoad callback = null)
 	{
 		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		CreatePlayerInfo createinfo = new CreatePlayerInfo();
 		createinfo.charaInfo = charaInfo;
 		if (MonoBehaviourSingleton<StatusManager>.I.HasEventEquipSet())
 		{
 			AssignedEquipmentTable.MergeAssignedEquip(ref createinfo, MonoBehaviourSingleton<StatusManager>.I.EventEquipSet);
 		}
-		Player player = CreatePlayer(id, createinfo, false, Vector3.get_zero(), 0f, null, callback);
+		Player player = CreatePlayer(id, createinfo, false, Vector3.get_zero(), 0f, null, callback, false);
 		Vector3 appearPosGuest = Vector3.get_zero();
 		if (boss != null)
 		{
@@ -917,7 +940,7 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 		return player;
 	}
 
-	public Player CreatePlayer(int id, CreatePlayerInfo create_info, bool self, Vector3 pos, float dir, PlayerTransferInfo transfer_info = null, PlayerLoader.OnCompleteLoad callback = null)
+	public Player CreatePlayer(int id, CreatePlayerInfo create_info, bool self, Vector3 pos, float dir, PlayerTransferInfo transfer_info = null, PlayerLoader.OnCompleteLoad callback = null, bool usingRealAtk = false)
 	{
 		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0022: Expected O, but got Unknown
@@ -1001,7 +1024,7 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 		}
 		playerLoadInfo.Apply(create_info.charaInfo, false, true, true, true);
 		player.Load(playerLoadInfo, callback);
-		player.OnSetPlayerStatus(create_info.charaInfo.level, create_info.charaInfo.atk, create_info.charaInfo.def, create_info.charaInfo.hp, false, transfer_info);
+		player.OnSetPlayerStatus(create_info.charaInfo.level, create_info.charaInfo.atk, create_info.charaInfo.def, create_info.charaInfo.hp, false, transfer_info, usingRealAtk);
 		player.StartFieldBuff(MonoBehaviourSingleton<FieldManager>.IsValid() ? MonoBehaviourSingleton<FieldManager>.I.currentFieldBuffId : 0);
 		return player;
 	}
@@ -1104,7 +1127,7 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 		return enemy;
 	}
 
-	public Enemy CreateEnemy(int id, Vector3 pos, float dir, int enemy_id, int enemy_lv, bool is_boss, bool is_big_monster, bool set_ai = true, bool willStock = false, EnemyLoader.OnCompleteLoad callback = null)
+	public Enemy CreateEnemy(int id, Vector3 pos, float dir, int enemy_id, int enemy_lv, bool is_boss, bool is_big_monster, bool set_ai = true, bool willStock = false, EnemyLoader.OnCompleteLoad callback = null, bool isOverrideScale = false)
 	{
 		//IL_010c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0111: Expected O, but got Unknown
@@ -1112,7 +1135,7 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 		//IL_0160: Expected O, but got Unknown
 		//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0318: Unknown result type (might be due to invalid IL or missing references)
 		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)enemy_id);
 		uint growId = enemyData.growId;
 		GrowEnemyTable.GrowEnemyData growEnemyData = Singleton<GrowEnemyTable>.I.GetGrowEnemyData(growId, enemy_lv);
@@ -1196,6 +1219,7 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 		enemy._transform.set_parent(base._transform);
 		enemy._transform.set_position(pos);
 		enemy._transform.set_eulerAngles(new Vector3(0f, dir, 0f));
+		float scale = (!isOverrideScale) ? enemyData.modelScale : MonoBehaviourSingleton<InGameSettingsManager>.I.tutorialParam.bossScale;
 		callback = CreateWrappedEnemyLoadCompletedDelegate(callback);
 		if (flag)
 		{
@@ -1210,7 +1234,7 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 		}
 		else
 		{
-			enemy.loader.StartLoad(enemyData.modelId, enemyData.animId, enemyData.modelScale, enemyData.baseEffectName, enemyData.baseEffectNode, true, true, true, ShaderGlobal.GetCharacterShaderType(), -1, null, false, willStock, callback);
+			enemy.loader.StartLoad(enemyData.modelId, enemyData.animId, scale, enemyData.baseEffectName, enemyData.baseEffectNode, true, true, true, ShaderGlobal.GetCharacterShaderType(), -1, null, false, willStock, callback);
 		}
 		return enemy;
 	}
@@ -1249,7 +1273,7 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 		}
 		int currentQuestEnemyID = i.GetCurrentQuestEnemyID(index);
 		int currentQuestEnemyLv = i.GetCurrentQuestEnemyLv(index);
-		return CreateEnemy(id, Vector3.get_zero(), 0f, currentQuestEnemyID, currentQuestEnemyLv, true, true, true, false, callback);
+		return CreateEnemy(id, Vector3.get_zero(), 0f, currentQuestEnemyID, currentQuestEnemyLv, true, true, true, false, callback, false);
 	}
 
 	private EnemyLoader.OnCompleteLoad CreateWrappedEnemyLoadCompletedDelegate(EnemyLoader.OnCompleteLoad callback)
@@ -1689,7 +1713,7 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 			enemy.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.DEFAULT);
 		}
 		enemy.PlayMotion(124, -1f);
-		_003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey505 _003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey;
+		_003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey518 _003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey;
 		this.StartCoroutine(SimpleMoveCharacterY(enemy, (float)num, to, 1f, new Action((object)_003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 

@@ -39,9 +39,9 @@ public class ImageUtil {
     }
 
     public static Uri addImageAsApplication(ContentResolver contentResolver, String str, long j, String str2, String str3, Bitmap bitmap, byte[] bArr) {
-        OutputStream fileOutputStream;
         Throwable th;
         String str4 = str2 + Constants.URL_PATH_DELIMITER + str3;
+        OutputStream fileOutputStream;
         try {
             File file = new File(str2);
             if (!file.exists()) {
@@ -268,13 +268,13 @@ public class ImageUtil {
         }
         int i2;
         if (width > height) {
-            i2 = i;
-            i = (int) ((((float) i) * ((float) height)) / ((float) width));
+            i2 = (int) ((((float) i) * ((float) height)) / ((float) width));
         } else {
-            i2 = (int) ((((float) i) * ((float) width)) / ((float) height));
+            i2 = i;
+            i = (int) ((((float) i) * ((float) width)) / ((float) height));
         }
-        float f = ((float) i2) / ((float) width);
-        float f2 = ((float) i) / ((float) height);
+        float f = ((float) i) / ((float) width);
+        float f2 = ((float) i2) / ((float) height);
         Matrix matrix = new Matrix();
         matrix.postScale(f, f2);
         return Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, false);

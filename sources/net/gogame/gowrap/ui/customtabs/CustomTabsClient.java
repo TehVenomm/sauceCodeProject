@@ -95,7 +95,7 @@ public class CustomTabsClient {
     }
 
     public CustomTabsSession newSession(final CustomTabsCallback customTabsCallback) {
-        ICustomTabsCallback c11442 = new Stub() {
+        ICustomTabsCallback c14602 = new Stub() {
             private Handler mHandler = new Handler(Looper.getMainLooper());
 
             public void onNavigationEvent(final int i, final Bundle bundle) {
@@ -153,8 +153,8 @@ public class CustomTabsClient {
             }
         };
         try {
-            if (this.mService.newSession(c11442)) {
-                return new CustomTabsSession(this.mService, c11442, this.mServiceComponentName);
+            if (this.mService.newSession(c14602)) {
+                return new CustomTabsSession(this.mService, c14602, this.mServiceComponentName);
             }
             return null;
         } catch (RemoteException e) {

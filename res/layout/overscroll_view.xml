@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="64.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <im.getsocial.sdk.ui.internal.views.MultiTextView android:gravity="center" android:id="@id/text_view_loading" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+    <im.getsocial.sdk.ui.internal.views.LoadingIndicator android:id="@id/progress_bar_loading" android:padding="12.0dip" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+</LinearLayout>

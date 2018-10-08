@@ -8,21 +8,21 @@ import android.widget.AdapterView.OnItemClickListener;
 
 final class bh implements OnItemClickListener {
     /* renamed from: a */
-    final /* synthetic */ OnClickListener f1097a;
+    final /* synthetic */ OnClickListener f3485a;
     /* renamed from: b */
-    final /* synthetic */ Dialog f1098b;
+    final /* synthetic */ Dialog f3486b;
     /* renamed from: c */
-    final /* synthetic */ PurchaseActivity f1099c;
+    final /* synthetic */ PurchaseActivity f3487c;
 
     bh(PurchaseActivity purchaseActivity, OnClickListener onClickListener, Dialog dialog) {
-        this.f1099c = purchaseActivity;
-        this.f1097a = onClickListener;
-        this.f1098b = dialog;
+        this.f3487c = purchaseActivity;
+        this.f3485a = onClickListener;
+        this.f3486b = dialog;
     }
 
     public final void onItemClick(AdapterView adapterView, View view, int i, long j) {
-        this.f1097a.onClick(null, i);
-        this.f1099c.f1047z.setEnabled(true);
-        this.f1098b.dismiss();
+        this.f3485a.onClick(null, i);
+        this.f3487c.f3435z.setEnabled(true);
+        this.f3486b.dismiss();
     }
 }

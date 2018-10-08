@@ -1399,8 +1399,8 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				InGameMain gameMain = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection() as InGameMain;
 				if (gameMain != null)
 				{
-					_003CBattleComplete_003Ec__AnonStorey61A _003CBattleComplete_003Ec__AnonStorey61A;
-					gameMain.cutScenePlayer.Play(new Action((object)_003CBattleComplete_003Ec__AnonStorey61A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					_003CBattleComplete_003Ec__AnonStorey62C _003CBattleComplete_003Ec__AnonStorey62C;
+					gameMain.cutScenePlayer.Play(new Action((object)_003CBattleComplete_003Ec__AnonStorey62C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 				return true;
 			}
@@ -2329,7 +2329,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			bool wait2 = true;
 			MonoBehaviourSingleton<CoopManager>.I.coopStage.fieldRewardPool.SendFieldDrop(delegate
 			{
-				((_003COnProgressEnd_003Ec__Iterator233)/*Error near IL_1386: stateMachine*/)._003Cwait_003E__22 = false;
+				((_003COnProgressEnd_003Ec__Iterator242)/*Error near IL_1386: stateMachine*/)._003Cwait_003E__22 = false;
 			});
 			while (wait2)
 			{
@@ -2343,7 +2343,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			bool wait = true;
 			MonoBehaviourSingleton<CoopApp>.I.Leave(delegate
 			{
-				((_003COnProgressEnd_003Ec__Iterator233)/*Error near IL_140c: stateMachine*/)._003Cwait_003E__25 = false;
+				((_003COnProgressEnd_003Ec__Iterator242)/*Error near IL_140c: stateMachine*/)._003Cwait_003E__25 = false;
 			}, toHome, fieldRetire);
 			while (wait)
 			{
@@ -2975,7 +2975,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		bool isTimeout = remaindTime <= 0f;
 		CoopApp.ArenaRetire(isTimeout, delegate
 		{
-			((_003CDoSendArenaRetire_003Ec__Iterator239)/*Error near IL_0075: stateMachine*/)._003C_003Ef__this.isRecvQuestComplete = true;
+			((_003CDoSendArenaRetire_003Ec__Iterator248)/*Error near IL_0075: stateMachine*/)._003C_003Ef__this.isRecvQuestComplete = true;
 		});
 	}
 
@@ -2995,7 +2995,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		bool is_timeout = remaindTime <= 0f;
 		CoopApp.QuestRetire(is_timeout, delegate
 		{
-			((_003CDoSendRetire_003Ec__Iterator23A)/*Error near IL_0075: stateMachine*/)._003C_003Ef__this.isRecvQuestComplete = true;
+			((_003CDoSendRetire_003Ec__Iterator249)/*Error near IL_0075: stateMachine*/)._003C_003Ef__this.isRecvQuestComplete = true;
 		});
 	}
 
@@ -3198,7 +3198,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		Delivery[] deliveryList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList(true);
 		Delivery delivery = Array.Find(deliveryList, delegate(Delivery o)
 		{
-			if (o.dId == (int)((_003CDoChangeSceneToStory_003Ec__Iterator242)/*Error near IL_0077: stateMachine*/).deliveryID)
+			if (o.dId == (int)((_003CDoChangeSceneToStory_003Ec__Iterator251)/*Error near IL_0077: stateMachine*/).deliveryID)
 			{
 				return true;
 			}
@@ -3858,7 +3858,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				bool load_finish = false;
 				enemy_loader.StartLoad(enemy_data.modelId, anim_id, enemy_data.modelScale, enemy_data.baseEffectName, enemy_data.baseEffectNode, true, true, true, ShaderGlobal.GetCharacterShaderType(), 18, null, true, false, delegate
 				{
-					((_003CDoHappenQuestDirection_003Ec__Iterator247)/*Error near IL_068b: stateMachine*/)._003Cload_finish_003E__18 = true;
+					((_003CDoHappenQuestDirection_003Ec__Iterator256)/*Error near IL_068b: stateMachine*/)._003Cload_finish_003E__18 = true;
 				});
 				while (!load_finish)
 				{

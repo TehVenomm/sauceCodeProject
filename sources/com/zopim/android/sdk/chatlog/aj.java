@@ -1,7 +1,7 @@
 package com.zopim.android.sdk.chatlog;
 
 import android.app.AlertDialog.Builder;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 
 class aj implements Runnable {
     /* renamed from: a */
@@ -12,6 +12,6 @@ class aj implements Runnable {
     }
 
     public void run() {
-        this.f782a.mReconnectTimeoutDialog = new Builder(this.f782a.getActivity()).setTitle(C0785R.string.reconnect_timeout_title).setMessage(C0785R.string.reconnect_timeout_message).setPositiveButton(C0785R.string.reconnect_timeout_confirm_button, new al(this)).setNegativeButton(C0785R.string.reconnect_timeout_cancel_button, new ak(this)).show();
+        this.f782a.mReconnectTimeoutDialog = new Builder(this.f782a.getActivity()).setTitle(C0784R.string.reconnect_timeout_title).setMessage(C0784R.string.reconnect_timeout_message).setPositiveButton(C0784R.string.reconnect_timeout_confirm_button, new al(this)).setNegativeButton(C0784R.string.reconnect_timeout_cancel_button, new ak(this)).show();
     }
 }

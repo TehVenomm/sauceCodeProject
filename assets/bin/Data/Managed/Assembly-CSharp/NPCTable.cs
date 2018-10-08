@@ -133,8 +133,8 @@ public class NPCTable : Singleton<NPCTable>, IDataTable
 			int num = Singleton<HomeThemeTable>.I.GetNpcModelID(homeThemeData, id);
 			int num2 = (num <= 0) ? specialModelID : num;
 			int npc_model_id = (!useSpecialModel || num2 <= 0) ? npcModelID : num2;
-			_003CLoadModel_003Ec__AnonStorey789 _003CLoadModel_003Ec__AnonStorey;
-			loader2.Load(npc_model_id, go.get_layer(), need_shadow, enable_light_probe, (!enable_light_probe) ? SHADER_TYPE.UI : ShaderGlobal.GetCharacterShaderType(), new Action((object)_003CLoadModel_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
+			_003CLoadModel_003Ec__AnonStorey79B _003CLoadModel_003Ec__AnonStorey79B;
+			loader2.Load(npc_model_id, go.get_layer(), need_shadow, enable_light_probe, (!enable_light_probe) ? SHADER_TYPE.UI : ShaderGlobal.GetCharacterShaderType(), new Action((object)_003CLoadModel_003Ec__AnonStorey79B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
 			return loader2;
 		}
 

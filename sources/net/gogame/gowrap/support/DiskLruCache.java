@@ -46,7 +46,7 @@ public final class DiskLruCache implements Closeable {
     private static final Charset UTF_8 = Charset.forName("UTF-8");
     static final String VERSION_1 = "1";
     private final int appVersion;
-    private final Callable<Void> cleanupCallable = new C11241();
+    private final Callable<Void> cleanupCallable = new C14401();
     private final File directory;
     private final ExecutorService executorService = new ThreadPoolExecutor(0, 1, 60, TimeUnit.SECONDS, new LinkedBlockingQueue());
     private final File journalFile;
@@ -60,8 +60,8 @@ public final class DiskLruCache implements Closeable {
     private final int valueCount;
 
     /* renamed from: net.gogame.gowrap.support.DiskLruCache$1 */
-    class C11241 implements Callable<Void> {
-        C11241() {
+    class C14401 implements Callable<Void> {
+        C14401() {
         }
 
         public Void call() throws Exception {
@@ -156,8 +156,8 @@ public final class DiskLruCache implements Closeable {
         }
 
         public void set(int i, String str) throws IOException {
-            Throwable th;
             Closeable outputStreamWriter;
+            Throwable th;
             try {
                 outputStreamWriter = new OutputStreamWriter(newOutputStream(i), DiskLruCache.UTF_8);
                 try {

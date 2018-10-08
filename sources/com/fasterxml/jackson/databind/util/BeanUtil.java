@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.databind.util;
 
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
+import im.getsocial.sdk.consts.LanguageCodes;
 
 public class BeanUtil {
     public static String okNameForGetter(AnnotatedMethod annotatedMethod, boolean z) {
@@ -27,7 +28,7 @@ public class BeanUtil {
     }
 
     public static String okNameForIsGetter(AnnotatedMethod annotatedMethod, String str, boolean z) {
-        if (str.startsWith("is")) {
+        if (str.startsWith(LanguageCodes.ICELANDIC)) {
             Class rawType = annotatedMethod.getRawType();
             if (rawType == Boolean.class || rawType == Boolean.TYPE) {
                 return z ? stdManglePropertyName(str, 2) : legacyManglePropertyName(str, 2);

@@ -37,7 +37,7 @@ public class GooglePlay extends DefaultAppstore {
             context.getPackageManager().getPackageInfo(str, 0);
             return true;
         } catch (NameNotFoundException e) {
-            Logger.m1001d(str, " package was not found.");
+            Logger.m4026d(str, " package was not found.");
             return false;
         }
     }
@@ -58,7 +58,7 @@ public class GooglePlay extends DefaultAppstore {
     }
 
     public boolean isBillingAvailable(final String str) {
-        Logger.m1001d("isBillingAvailable() packageName: ", str);
+        Logger.m4026d("isBillingAvailable() packageName: ", str);
         if (this.billingAvailable != null) {
             return this.billingAvailable.booleanValue();
         }
@@ -68,7 +68,7 @@ public class GooglePlay extends DefaultAppstore {
             Intent intent = new Intent(VENDING_ACTION);
             intent.setPackage("com.android.vending");
             if (CollectionUtils.isEmpty(this.context.getPackageManager().queryIntentServices(intent, 0))) {
-                Logger.m1002e("isBillingAvailable() billing service is not available, even though Google Play application seems to be installed.");
+                Logger.m4027e("isBillingAvailable() billing service is not available, even though Google Play application seems to be installed.");
                 return false;
             }
             final CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -106,7 +106,7 @@ public class GooglePlay extends DefaultAppstore {
                     r2 = r3[r2];
                     r2 = java.lang.Boolean.valueOf(r2);
                     r0[r1] = r2;
-                    org.onepf.oms.util.Logger.m1001d(r0);
+                    org.onepf.oms.util.Logger.m4026d(r0);
                     return;
                 L_0x0039:
                     r0 = r2;
@@ -118,7 +118,7 @@ public class GooglePlay extends DefaultAppstore {
                     r5 = 0;
                     r3[r4] = r5;	 Catch:{ all -> 0x0056 }
                     r3 = "isBillingAvailable() RemoteException while setting up in-app billing";
-                    org.onepf.oms.util.Logger.m1003e(r3, r0);	 Catch:{ all -> 0x0056 }
+                    org.onepf.oms.util.Logger.m4028e(r3, r0);	 Catch:{ all -> 0x0056 }
                     r0 = r2;
                     r0.countDown();
                     r0 = org.onepf.oms.appstore.GooglePlay.this;
@@ -143,17 +143,17 @@ public class GooglePlay extends DefaultAppstore {
                 try {
                     countDownLatch.await();
                 } catch (Throwable e) {
-                    Logger.m1003e("isBillingAvailable() InterruptedException while setting up in-app billing", e);
+                    Logger.m4028e("isBillingAvailable() InterruptedException while setting up in-app billing", e);
                 }
             } else {
                 zArr[0] = false;
-                Logger.m1002e("isBillingAvailable() billing is not supported. Initialization error.");
+                Logger.m4027e("isBillingAvailable() billing is not supported. Initialization error.");
             }
             Boolean valueOf = Boolean.valueOf(zArr[0]);
             this.billingAvailable = valueOf;
             return valueOf.booleanValue();
         } else {
-            Logger.m1000d("isBillingAvailable() Google Play is not available.");
+            Logger.m4025d("isBillingAvailable() Google Play is not available.");
             return false;
         }
     }

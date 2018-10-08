@@ -12,26 +12,71 @@
     <item type="id" name="com_facebook_button_xout">false</item>
     <item type="id" name="com_facebook_tooltip_bubble_view_text_body">false</item>
     <item type="id" name="com_facebook_tooltip_bubble_view_bottom_pointer">false</item>
+    <item type="id" name="container_activities">false</item>
+    <item type="id" name="list_view_activity_likers">false</item>
+    <item type="id" name="list_view_comments">false</item>
+    <item type="id" name="post_comment_container">false</item>
+    <item type="id" name="list_view_invite_providers">false</item>
     <item type="id" name="rootProgressDialog">false</item>
     <item type="id" name="progressDialogMessage">false</item>
     <item type="id" name="progressDialogAnimationImage">false</item>
+    <item type="id" name="header_activity_post_view">false</item>
+    <item type="id" name="load_more_button_container">false</item>
+    <item type="id" name="load_more_button">false</item>
+    <item type="id" name="image_view_user_avatar">false</item>
+    <item type="id" name="text_view_user_name">false</item>
+    <item type="id" name="divider">false</item>
+    <item type="id" name="container_activity_content">false</item>
+    <item type="id" name="user_name_section">false</item>
+    <item type="id" name="button_more">false</item>
+    <item type="id" name="text_view_activity_text">false</item>
+    <item type="id" name="text_view_posted_time">false</item>
+    <item type="id" name="container_extras">false</item>
+    <item type="id" name="media_content">false</item>
+    <item type="id" name="image_view_activity_image">false</item>
+    <item type="id" name="video_overlay">false</item>
+    <item type="id" name="video_play_image">false</item>
+    <item type="id" name="rounded_corners_view">false</item>
+    <item type="id" name="button_action">false</item>
+    <item type="id" name="container_likes_comments">false</item>
+    <item type="id" name="text_view_likes">false</item>
+    <item type="id" name="text_view_comments">false</item>
+    <item type="id" name="button_like">false</item>
+    <item type="id" name="imageViewInviteIcon">false</item>
+    <item type="id" name="textViewInviteName">false</item>
+    <item type="id" name="text_view_tag_name">false</item>
     <item type="id" name="BaseLayout">false</item>
     <item type="id" name="UnityLayout">false</item>
     <item type="id" name="text_purchase_status">false</item>
     <item type="id" name="linearLayout1">false</item>
     <item type="id" name="textView1">false</item>
     <item type="id" name="progressBar1">false</item>
+    <item type="id" name="list_view_suggestions">false</item>
     <item type="id" name="messenger_send_button">false</item>
     <item type="id" name="root">false</item>
     <item type="id" name="img">false</item>
     <item type="id" name="title">false</item>
     <item type="id" name="message">false</item>
     <item type="id" name="time">false</item>
+    <item type="id" name="text_view_loading">false</item>
+    <item type="id" name="progress_bar_loading">false</item>
+    <item type="id" name="placeholder_image">false</item>
+    <item type="id" name="placeholder_title">false</item>
+    <item type="id" name="placeholder_text">false</item>
+    <item type="id" name="edit_text_post_comment">false</item>
+    <item type="id" name="button_post_comment">false</item>
     <item type="id" name="notification_row">false</item>
     <item type="id" name="purchased_order_id">false</item>
     <item type="id" name="purchased_state">false</item>
     <item type="id" name="purchased_time">false</item>
     <item type="id" name="purchased_item_name">false</item>
+    <item type="id" name="layoutWindowFrame">false</item>
+    <item type="id" name="layoutContent">false</item>
+    <item type="id" name="layoutHeader">false</item>
+    <item type="id" name="buttonBack">false</item>
+    <item type="id" name="buttonClose">false</item>
+    <item type="id" name="titleViewWindowTitle">false</item>
+    <item type="id" name="rounded_corners_drawable">false</item>
     <item type="id" name="net_gogame_zopim_header_bar">false</item>
     <item type="id" name="backButton">false</item>
     <item type="id" name="switchButton">false</item>

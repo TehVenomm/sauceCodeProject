@@ -165,7 +165,10 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 		{
 			if (!isSelectedSecretQuest)
 			{
-				CheckChangeEvent(is_send_event, "NON_SELECT_SECRET_QUESTION", null);
+				CheckChangeEvent(is_send_event, "EMPTY", new object[1]
+				{
+					base.sectionData.GetText("STR_SECRET_QUESTION_TEXT")
+				});
 				return false;
 			}
 			empty2 = base.GetComponent<UILabel>((Enum)UI.LBL_SECRET_ANSER).text;
@@ -173,7 +176,7 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 			{
 				CheckChangeEvent(is_send_event, "EMPTY", new object[1]
 				{
-					base.sectionData.GetText("STR_SECRET_QUESTION_TEXT")
+					base.sectionData.GetText("STR_SECRET_ANSER_TEXT")
 				});
 				return false;
 			}

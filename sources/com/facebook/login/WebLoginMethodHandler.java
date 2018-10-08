@@ -102,17 +102,16 @@ abstract class WebLoginMethodHandler extends LoginMethodHandler {
         } else if (facebookException instanceof FacebookOperationCanceledException) {
             createTokenResult = Result.createCancelResult(this.loginClient.getPendingRequest(), "User canceled log in.");
         } else {
-            String facebookRequestError;
+            String format;
             this.e2e = null;
             String message = facebookException.getMessage();
             if (facebookException instanceof FacebookServiceException) {
-                message = String.format(Locale.ROOT, "%d", new Object[]{Integer.valueOf(((FacebookServiceException) facebookException).getRequestError().getErrorCode())});
-                facebookRequestError = r2.toString();
+                format = String.format(Locale.ROOT, "%d", new Object[]{Integer.valueOf(((FacebookServiceException) facebookException).getRequestError().getErrorCode())});
+                message = r0.toString();
             } else {
-                facebookRequestError = message;
-                message = null;
+                format = null;
             }
-            createTokenResult = Result.createErrorResult(this.loginClient.getPendingRequest(), null, facebookRequestError, message);
+            createTokenResult = Result.createErrorResult(this.loginClient.getPendingRequest(), null, message, format);
         }
         if (!Utility.isNullOrEmpty(this.e2e)) {
             logWebLoginCompleted(this.e2e);

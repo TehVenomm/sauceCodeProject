@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import jp.colopl.drapro.LocalNotificationAlarmReceiver;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.GoWrapImpl;
 import net.gogame.gowrap.InternalConstants;
 import net.gogame.gowrap.integrations.core.CoreSupport;
@@ -34,11 +34,11 @@ public final class SupportManager {
 
     public static List<SupportCategory> getCategories() {
         List<SupportCategory> arrayList = new ArrayList();
-        arrayList.add(new SupportCategory("billing", C1110R.string.net_gogame_gowrap_support_category_billing));
-        arrayList.add(new SupportCategory("connection", C1110R.string.net_gogame_gowrap_support_category_connection));
-        arrayList.add(new SupportCategory("game_play", C1110R.string.net_gogame_gowrap_support_category_gameplay));
-        arrayList.add(new SupportCategory("feedback", C1110R.string.net_gogame_gowrap_support_category_feedback));
-        arrayList.add(new SupportCategory("account_lost", C1110R.string.net_gogame_gowrap_support_category_account_lost));
+        arrayList.add(new SupportCategory("billing", C1426R.string.net_gogame_gowrap_support_category_billing));
+        arrayList.add(new SupportCategory("connection", C1426R.string.net_gogame_gowrap_support_category_connection));
+        arrayList.add(new SupportCategory("game_play", C1426R.string.net_gogame_gowrap_support_category_gameplay));
+        arrayList.add(new SupportCategory("feedback", C1426R.string.net_gogame_gowrap_support_category_feedback));
+        arrayList.add(new SupportCategory("account_lost", C1426R.string.net_gogame_gowrap_support_category_account_lost));
         return arrayList;
     }
 
@@ -50,7 +50,6 @@ public final class SupportManager {
     }
 
     public static Long send(Context context, SupportRequest supportRequest) throws SupportServiceException {
-        OutputStream byteArrayOutputStream;
         Long l = null;
         try {
             String string;
@@ -75,7 +74,7 @@ public final class SupportManager {
                     string = null;
                 }
                 if (string == null) {
-                    string = context.getResources().getString(C1110R.string.net_gogame_gowrap_support_category_default);
+                    string = context.getResources().getString(C1426R.string.net_gogame_gowrap_support_category_default);
                 }
                 if (string != null) {
                     multipartUtility.addFormField("subject", string);
@@ -95,6 +94,7 @@ public final class SupportManager {
             multipartUtility.addFormField("extraData", getExtraData(context, supportRequest.getName(), supportRequest.getCategory()));
             if (supportRequest.getAttachment() != null) {
                 InputStream openInputStream = context.getContentResolver().openInputStream(supportRequest.getAttachment());
+                OutputStream byteArrayOutputStream;
                 try {
                     byteArrayOutputStream = new ByteArrayOutputStream();
                     IOUtils.copy(openInputStream, byteArrayOutputStream);

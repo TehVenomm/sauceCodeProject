@@ -51,17 +51,17 @@ public class FileStoreImpl implements FileStore {
         if ("mounted".equals(Environment.getExternalStorageState())) {
             return true;
         }
-        Fabric.getLogger().mo4302w("Fabric", "External Storage is not mounted and/or writable\nHave you declared android.permission.WRITE_EXTERNAL_STORAGE in the manifest?");
+        Fabric.getLogger().mo4766w("Fabric", "External Storage is not mounted and/or writable\nHave you declared android.permission.WRITE_EXTERNAL_STORAGE in the manifest?");
         return false;
     }
 
     File prepare(File file) {
         if (file == null) {
-            Fabric.getLogger().mo4289d("Fabric", "Null File");
+            Fabric.getLogger().mo4753d("Fabric", "Null File");
         } else if (file.exists() || file.mkdirs()) {
             return file;
         } else {
-            Fabric.getLogger().mo4302w("Fabric", "Couldn't create file");
+            Fabric.getLogger().mo4766w("Fabric", "Couldn't create file");
         }
         return null;
     }

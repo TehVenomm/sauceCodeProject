@@ -174,8 +174,9 @@ public class Opening : GameSection
 		}
 		titleAnimation = titleObjectRoot.GetComponent<Animation>();
 		cutSceneAnimation.Stop();
-		MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapPortalID(10000100u);
-		MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_start_screen, "Tutorial");
+		MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapPortalID(10000101u);
+		MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_1_login_screen, "Tutorial");
+		Debug.Log((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_1_login_screen.ToString()));
 		MonoBehaviourSingleton<UIManager>.I.loading.HideAllPermissionMsg();
 		base.Initialize();
 		PredownloadManager.openingMode = true;
@@ -185,12 +186,12 @@ public class Opening : GameSection
 		DataTableManager dataTableManager = MonoBehaviourSingleton<DataTableManager>.I;
 		Protocol.Send<CheckRegisterModel>(CheckRegisterModel.URL, delegate
 		{
-			((_003CDoInitialzie_003Ec__Iterator10A)/*Error near IL_0399: stateMachine*/)._003CupdatedTableIndex_003E__15 = true;
+			((_003CDoInitialzie_003Ec__Iterator10E)/*Error near IL_03b5: stateMachine*/)._003CupdatedTableIndex_003E__15 = true;
 		}, string.Empty);
-		yield return (object)new WaitUntil(new Func<bool>((object)/*Error near IL_03b0: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		yield return (object)new WaitUntil(new Func<bool>((object)/*Error near IL_03cc: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		isDownloading = true;
 		dataTableManager.InitializeForDownload();
-		dataTableManager.UpdateManifest(new Action((object)/*Error near IL_03ef: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		dataTableManager.UpdateManifest(new Action((object)/*Error near IL_040b: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		TitleTop.isFirstBoot = false;
 	}
 
@@ -469,15 +470,10 @@ public class Opening : GameSection
 	public override void Exit()
 	{
 		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		base.Exit();
-		if (!isCacheClear)
+		if (!isCacheClear && !MonoBehaviourSingleton<LoadingProcess>.IsValid())
 		{
-			if (!MonoBehaviourSingleton<LoadingProcess>.IsValid())
-			{
-				MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<LoadingProcess>();
-			}
-			MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<InGameTutorialManager>();
+			MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<LoadingProcess>();
 		}
 	}
 

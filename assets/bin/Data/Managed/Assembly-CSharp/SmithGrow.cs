@@ -1,5 +1,6 @@
 using Network;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -26,6 +27,7 @@ public class SmithGrow : EquipMaterialBase
 
 	public override void Initialize()
 	{
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
 		smithType = SmithType.GROW;
 		SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
 		GameSection.SetEventData(smithData.selectEquipData);
@@ -37,6 +39,10 @@ public class SmithGrow : EquipMaterialBase
 			MonoBehaviourSingleton<UIManager>.I.common.AttachCaption(this, base.sectionData.backButtonIndex, caption);
 		}
 		aimLv = GetEquipData().level + 1;
+		if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
+		{
+			this.StartCoroutine(UPGRADE_TOTURIAL_EVENT());
+		}
 	}
 
 	protected override void OnOpen()
@@ -234,6 +240,51 @@ public class SmithGrow : EquipMaterialBase
 
 	private void OnQuery_AIM_R()
 	{
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
+		{
+			if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL2) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SHADOW_QUEST_WIN))
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL2, delegate
+				{
+				});
+			}
+			else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL3) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL2))
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL3, delegate
+				{
+				});
+			}
+			else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL4) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL3))
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL4, delegate
+				{
+				});
+			}
+			else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL5) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL4))
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL5, delegate
+				{
+				});
+			}
+			else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL6) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL5))
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL6, delegate
+				{
+				});
+			}
+			else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL7) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL6))
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL7, delegate
+				{
+				});
+			}
+			else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL8) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL7))
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL8, delegate
+				{
+				});
+			}
+		}
 		EquipItemInfo equipData = GetEquipData();
 		if (aimLv != equipData.tableData.maxLv)
 		{
@@ -252,6 +303,15 @@ public class SmithGrow : EquipMaterialBase
 					TerminateRepeatButton((Enum)UI.BTN_AIM_R);
 				}
 			}
+		}
+	}
+
+	private IEnumerator UPGRADE_TOTURIAL_EVENT()
+	{
+		while (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
+		{
+			DispatchEvent("UPGRADE_TOTURIAL", null);
+			yield return (object)null;
 		}
 	}
 
@@ -297,8 +357,8 @@ public class SmithGrow : EquipMaterialBase
 				GameSection.SetEventData(result_data);
 				isNotifySelfUpdate = true;
 				GameSection.StayEvent();
-				_003CSend_003Ec__AnonStorey46E _003CSend_003Ec__AnonStorey46E;
-				MonoBehaviourSingleton<SmithManager>.I.SendGrowEquipItem(selectEquipData.uniqueID, aimLv, new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey46E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CSend_003Ec__AnonStorey47F _003CSend_003Ec__AnonStorey47F;
+				MonoBehaviourSingleton<SmithManager>.I.SendGrowEquipItem(selectEquipData.uniqueID, aimLv, new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey47F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}

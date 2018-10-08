@@ -16,8 +16,8 @@ public class BannerHelper {
     private final View view;
 
     /* renamed from: net.gogame.gowrap.wrapper.BannerHelper$1 */
-    class C12481 implements Runnable {
-        C12481() {
+    class C15641 implements Runnable {
+        C15641() {
         }
 
         public void run() {
@@ -51,7 +51,7 @@ public class BannerHelper {
             }
             this.parentLayout = (ViewGroup) rootView;
         }
-        new Handler(this.activity.getMainLooper()).post(new C12481());
+        new Handler(this.activity.getMainLooper()).post(new C15641());
         return true;
     }
 

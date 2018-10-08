@@ -156,7 +156,7 @@ public class FriendArenaRankingLast : FriendArenaRankingBase
 	protected unsafe override void SendGetList(int nowPage, Action<bool> callback)
 	{
 		int isContaionSelf = isOwn ? 1 : 0;
-		_003CSendGetList_003Ec__AnonStorey309 _003CSendGetList_003Ec__AnonStorey;
+		_003CSendGetList_003Ec__AnonStorey318 _003CSendGetList_003Ec__AnonStorey;
 		MonoBehaviourSingleton<FriendManager>.I.SendGetLastRanking(-1, isContaionSelf, new Action<bool, ArenaLastRankingModel.Param>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

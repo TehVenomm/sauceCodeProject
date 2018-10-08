@@ -11,7 +11,7 @@ namespace Network
 
 		public unsafe StoreData getProduct(string id)
 		{
-			_003CgetProduct_003Ec__AnonStorey557 _003CgetProduct_003Ec__AnonStorey;
+			_003CgetProduct_003Ec__AnonStorey569 _003CgetProduct_003Ec__AnonStorey;
 			return shopList.FirstOrDefault(new Func<StoreData, bool>((object)_003CgetProduct_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

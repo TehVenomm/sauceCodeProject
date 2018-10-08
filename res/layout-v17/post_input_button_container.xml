@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditText android:id="@id/edit_text_post_comment" android:paddingLeft="10.0dip" android:paddingTop="2.0dip" android:paddingRight="0.0dip" android:paddingBottom="2.0dip" android:layout_width="fill_parent" android:layout_height="40.0dip" android:maxLines="3" android:layout_toLeftOf="@id/button_post_comment" android:layout_alignParentLeft="true" android:inputType="textNoSuggestions" android:paddingStart="10.0dip" android:paddingEnd="0.0dip" android:layout_toStartOf="@id/button_post_comment" android:layout_alignParentStart="true" />
+    <im.getsocial.sdk.ui.internal.views.AssetButton android:id="@id/button_post_comment" android:layout_width="60.0dip" android:layout_height="40.0dip" android:layout_alignParentRight="true" android:layout_alignParentEnd="true" />
+</RelativeLayout>

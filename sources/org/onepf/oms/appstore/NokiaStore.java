@@ -26,7 +26,7 @@ public class NokiaStore extends DefaultAppstore {
     private final Context context;
 
     public NokiaStore(Context context) {
-        Logger.m1006i("NokiaStore.NokiaStore");
+        Logger.m4031i("NokiaStore.NokiaStore");
         this.context = context;
     }
 
@@ -51,7 +51,7 @@ public class NokiaStore extends DefaultAppstore {
             PackageInfo packageInfo = this.context.getPackageManager().getPackageInfo(NOKIA_INSTALLER, 64);
             if (packageInfo.signatures.length == 1) {
                 if (Arrays.equals(MessageDigest.getInstance("SHA1").digest(packageInfo.signatures[0].toByteArray()), hexStringToByteArray(EXPECTED_SHA1_FINGERPRINT))) {
-                    Logger.m1007i("isBillingAvailable", "NIAP signature verified");
+                    Logger.m4032i("isBillingAvailable", "NIAP signature verified");
                     return true;
                 }
             }
@@ -76,13 +76,13 @@ public class NokiaStore extends DefaultAppstore {
     }
 
     public int getPackageVersion(String str) {
-        Logger.m1000d("getPackageVersion: packageName = " + str);
+        Logger.m4025d("getPackageVersion: packageName = " + str);
         return -1;
     }
 
     public boolean isBillingAvailable(String str) {
-        Logger.m1006i("NokiaStore.isBillingAvailable");
-        Logger.m1001d("packageName = ", str);
+        Logger.m4031i("NokiaStore.isBillingAvailable");
+        Logger.m4026d("packageName = ", str);
         for (PackageInfo packageInfo : this.context.getPackageManager().getInstalledPackages(0)) {
             if (NOKIA_INSTALLER.equals(packageInfo.packageName)) {
                 return verifyFingreprint();
@@ -92,8 +92,8 @@ public class NokiaStore extends DefaultAppstore {
     }
 
     public boolean isPackageInstaller(String str) {
-        Logger.m1001d("sPackageInstaller: packageName = ", str);
-        Logger.m1001d("installerPackageName = ", this.context.getPackageManager().getInstallerPackageName(str));
+        Logger.m4026d("sPackageInstaller: packageName = ", str);
+        Logger.m4026d("installerPackageName = ", this.context.getPackageManager().getInstallerPackageName(str));
         return NOKIA_INSTALLER.equals(this.context.getPackageManager().getInstallerPackageName(str));
     }
 }

@@ -26,7 +26,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import java.util.ArrayList;
 import java.util.List;
-import net.gogame.gowrap.ui.dpro.C1155R;
+import net.gogame.gowrap.ui.dpro.C1471R;
 import net.gogame.gowrap.ui.utils.DisplayUtils;
 
 public class CustomTabbelPanel extends ViewGroup {
@@ -132,7 +132,7 @@ public class CustomTabbelPanel extends ViewGroup {
     public static class LayoutParams extends android.widget.FrameLayout.LayoutParams {
         public LayoutParams(Context context, AttributeSet attributeSet) {
             super(context, attributeSet);
-            context.obtainStyledAttributes(attributeSet, C1155R.styleable.CustomTabbedPanel_Layout).recycle();
+            context.obtainStyledAttributes(attributeSet, C1471R.styleable.CustomTabbedPanel_Layout).recycle();
         }
 
         public LayoutParams(int i, int i2) {
@@ -217,32 +217,32 @@ public class CustomTabbelPanel extends ViewGroup {
 
     public CustomTabbelPanel(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
-        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, C1155R.styleable.CustomTabbelPanel, 0, 0);
+        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, C1471R.styleable.CustomTabbelPanel, 0, 0);
         try {
-            this.mCloseButtonDrawable = obtainStyledAttributes.getDrawable(C1155R.styleable.CustomTabbelPanel_closeButton);
-            this.mPathOffset = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_pathOffset, fromDp(DEFAULT_PATH_OFFSET));
-            this.mTabSlope = obtainStyledAttributes.getFloat(C1155R.styleable.CustomTabbelPanel_tabSlope, DEFAULT_TAB_SLOPE);
-            this.mTabFillColor = obtainStyledAttributes.getColor(C1155R.styleable.CustomTabbelPanel_tabFillColor, -1071245480);
-            this.mFillColor = obtainStyledAttributes.getColor(C1155R.styleable.CustomTabbelPanel_fillColor, -1071245480);
-            this.mOuterLineColor = obtainStyledAttributes.getColor(C1155R.styleable.CustomTabbelPanel_outerLineColor, DEFAULT_OUTER_LINE_COLOR);
-            this.mOuterLineWidth = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_outerLineWidth, fromDp(1.0f));
-            this.mOuterLineChamfer = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_outerLineChamfer, fromDp(8.0f));
-            this.mInnerLineColor = obtainStyledAttributes.getColor(C1155R.styleable.CustomTabbelPanel_innerLineColor, DEFAULT_INNER_LINE_COLOR);
-            this.mInnerLineWidth = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_innerLineWidth, fromDp(1.0f));
-            this.mFontFamily = obtainStyledAttributes.getString(C1155R.styleable.CustomTabbelPanel_fontFamily);
-            this.mTextSize = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_textSize, fromSp(DEFAULT_TEXT_SIZE));
-            this.mTextStyle = obtainStyledAttributes.getInteger(C1155R.styleable.CustomTabbelPanel_textStyle, 0);
-            this.mTextColor = obtainStyledAttributes.getColor(C1155R.styleable.CustomTabbelPanel_textColor, -1);
-            this.mSelectedTextStyle = obtainStyledAttributes.getInteger(C1155R.styleable.CustomTabbelPanel_selectedTextStyle, 1);
-            this.mSelectedTextColor = obtainStyledAttributes.getColor(C1155R.styleable.CustomTabbelPanel_selectedTextColor, -1);
-            this.mTabLabelMarginLeft = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelMarginLeft, fromDp(8.0f));
-            this.mTabLabelMarginTop = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelMarginTop, fromDp(16.0f));
-            this.mTabLabelMarginRight = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelMarginRight, fromDp(8.0f));
-            this.mTabLabelMarginBottom = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelMarginBottom, fromDp(16.0f));
-            this.mTabLabelPaddingLeft = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelPaddingLeft, fromDp(0.0f));
-            this.mTabLabelPaddingTop = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelPaddingTop, fromDp(0.0f));
-            this.mTabLabelPaddingRight = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelPaddingRight, fromDp(0.0f));
-            this.mTabLabelPaddingBottom = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelPaddingBottom, fromDp(0.0f));
+            this.mCloseButtonDrawable = obtainStyledAttributes.getDrawable(C1471R.styleable.CustomTabbelPanel_closeButton);
+            this.mPathOffset = obtainStyledAttributes.getDimension(C1471R.styleable.CustomTabbelPanel_pathOffset, fromDp(DEFAULT_PATH_OFFSET));
+            this.mTabSlope = obtainStyledAttributes.getFloat(C1471R.styleable.CustomTabbelPanel_tabSlope, DEFAULT_TAB_SLOPE);
+            this.mTabFillColor = obtainStyledAttributes.getColor(C1471R.styleable.CustomTabbelPanel_tabFillColor, -1071245480);
+            this.mFillColor = obtainStyledAttributes.getColor(C1471R.styleable.CustomTabbelPanel_fillColor, -1071245480);
+            this.mOuterLineColor = obtainStyledAttributes.getColor(C1471R.styleable.CustomTabbelPanel_outerLineColor, DEFAULT_OUTER_LINE_COLOR);
+            this.mOuterLineWidth = obtainStyledAttributes.getDimension(C1471R.styleable.CustomTabbelPanel_outerLineWidth, fromDp(1.0f));
+            this.mOuterLineChamfer = obtainStyledAttributes.getDimension(C1471R.styleable.CustomTabbelPanel_outerLineChamfer, fromDp(8.0f));
+            this.mInnerLineColor = obtainStyledAttributes.getColor(C1471R.styleable.CustomTabbelPanel_innerLineColor, DEFAULT_INNER_LINE_COLOR);
+            this.mInnerLineWidth = obtainStyledAttributes.getDimension(C1471R.styleable.CustomTabbelPanel_innerLineWidth, fromDp(1.0f));
+            this.mFontFamily = obtainStyledAttributes.getString(C1471R.styleable.CustomTabbelPanel_fontFamily);
+            this.mTextSize = obtainStyledAttributes.getDimension(C1471R.styleable.CustomTabbelPanel_textSize, fromSp(DEFAULT_TEXT_SIZE));
+            this.mTextStyle = obtainStyledAttributes.getInteger(C1471R.styleable.CustomTabbelPanel_textStyle, 0);
+            this.mTextColor = obtainStyledAttributes.getColor(C1471R.styleable.CustomTabbelPanel_textColor, -1);
+            this.mSelectedTextStyle = obtainStyledAttributes.getInteger(C1471R.styleable.CustomTabbelPanel_selectedTextStyle, 1);
+            this.mSelectedTextColor = obtainStyledAttributes.getColor(C1471R.styleable.CustomTabbelPanel_selectedTextColor, -1);
+            this.mTabLabelMarginLeft = obtainStyledAttributes.getDimension(C1471R.styleable.CustomTabbelPanel_tabLabelMarginLeft, fromDp(8.0f));
+            this.mTabLabelMarginTop = obtainStyledAttributes.getDimension(C1471R.styleable.CustomTabbelPanel_tabLabelMarginTop, fromDp(16.0f));
+            this.mTabLabelMarginRight = obtainStyledAttributes.getDimension(C1471R.styleable.CustomTabbelPanel_tabLabelMarginRight, fromDp(8.0f));
+            this.mTabLabelMarginBottom = obtainStyledAttributes.getDimension(C1471R.styleable.CustomTabbelPanel_tabLabelMarginBottom, fromDp(16.0f));
+            this.mTabLabelPaddingLeft = obtainStyledAttributes.getDimension(C1471R.styleable.CustomTabbelPanel_tabLabelPaddingLeft, fromDp(0.0f));
+            this.mTabLabelPaddingTop = obtainStyledAttributes.getDimension(C1471R.styleable.CustomTabbelPanel_tabLabelPaddingTop, fromDp(0.0f));
+            this.mTabLabelPaddingRight = obtainStyledAttributes.getDimension(C1471R.styleable.CustomTabbelPanel_tabLabelPaddingRight, fromDp(0.0f));
+            this.mTabLabelPaddingBottom = obtainStyledAttributes.getDimension(C1471R.styleable.CustomTabbelPanel_tabLabelPaddingBottom, fromDp(0.0f));
             init();
         } finally {
             obtainStyledAttributes.recycle();

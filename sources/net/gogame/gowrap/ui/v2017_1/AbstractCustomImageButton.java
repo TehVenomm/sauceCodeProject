@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 
 public abstract class AbstractCustomImageButton extends FrameLayout {
     protected abstract void init(AttributeSet attributeSet);
@@ -35,15 +35,15 @@ public abstract class AbstractCustomImageButton extends FrameLayout {
     }
 
     public void setLevel(int i) {
-        ((ImageView) findViewById(C1110R.id.net_gogame_gowrap_image_button_content_background)).setImageLevel(i);
+        ((ImageView) findViewById(C1426R.id.net_gogame_gowrap_image_button_content_background)).setImageLevel(i);
     }
 
     public void setImage(Drawable drawable) {
-        ((ImageView) findViewById(C1110R.id.net_gogame_gowrap_image_button_image)).setImageDrawable(drawable);
+        ((ImageView) findViewById(C1426R.id.net_gogame_gowrap_image_button_image)).setImageDrawable(drawable);
     }
 
     public void setCaption(String str) {
-        TextView textView = (TextView) findViewById(C1110R.id.net_gogame_gowrap_image_button_caption);
+        TextView textView = (TextView) findViewById(C1426R.id.net_gogame_gowrap_image_button_caption);
         if (str != null) {
             textView.setText(str);
             textView.setVisibility(0);
@@ -53,7 +53,7 @@ public abstract class AbstractCustomImageButton extends FrameLayout {
     }
 
     public void setSubCaption(String str) {
-        TextView textView = (TextView) findViewById(C1110R.id.net_gogame_gowrap_image_button_subcaption);
+        TextView textView = (TextView) findViewById(C1426R.id.net_gogame_gowrap_image_button_subcaption);
         if (textView == null) {
             return;
         }
@@ -66,7 +66,7 @@ public abstract class AbstractCustomImageButton extends FrameLayout {
     }
 
     public void setMasked(boolean z) {
-        View findViewById = findViewById(C1110R.id.net_gogame_gowrap_image_button_mask);
+        View findViewById = findViewById(C1426R.id.net_gogame_gowrap_image_button_mask);
         if (findViewById == null) {
             return;
         }

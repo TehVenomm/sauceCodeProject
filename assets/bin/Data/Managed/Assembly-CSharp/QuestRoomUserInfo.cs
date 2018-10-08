@@ -88,9 +88,9 @@ public class QuestRoomUserInfo
 				//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 				//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-				((_003CLoading_003Ec__Iterator128)/*Error near IL_0168: stateMachine*/)._003Cwait_003E__4 = false;
-				float num = (((_003CLoading_003Ec__Iterator128)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.userInfo.sex != 0) ? MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleFemale : MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleMale;
-				((_003CLoading_003Ec__Iterator128)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.loader.get_transform().set_localScale(((_003CLoading_003Ec__Iterator128)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.loader.get_transform().get_localScale().Mul(new Vector3(num, num, num)));
+				((_003CLoading_003Ec__Iterator12C)/*Error near IL_0168: stateMachine*/)._003Cwait_003E__4 = false;
+				float num = (((_003CLoading_003Ec__Iterator12C)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.userInfo.sex != 0) ? MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleFemale : MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleMale;
+				((_003CLoading_003Ec__Iterator12C)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.loader.get_transform().set_localScale(((_003CLoading_003Ec__Iterator12C)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.loader.get_transform().get_localScale().Mul(new Vector3(num, num, num)));
 			}, true, -1);
 			int voice_id = -1;
 			if (!is_owner)

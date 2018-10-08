@@ -35,7 +35,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import com.appsflyer.share.Constants;
 import io.fabric.sdk.android.services.common.AbstractSpiCall;
-import io.fabric.sdk.android.services.settings.SettingsJsonConstants;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import org.apache.commons.lang3.ClassUtils;
@@ -255,7 +254,7 @@ public class FragmentActivity extends BaseFragmentActivityJB implements OnReques
                         str = AbstractSpiCall.ANDROID_CLIENT_TYPE;
                         break;
                     case 2130706432:
-                        str = SettingsJsonConstants.APP_KEY;
+                        str = "app";
                         break;
                     default:
                         try {

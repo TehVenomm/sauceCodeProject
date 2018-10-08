@@ -44,7 +44,7 @@ class FabricKitsFinder implements Callable<Map<String, KitInfo>> {
             } catch (IOException e2) {
                 e = e2;
                 try {
-                    Fabric.getLogger().mo4292e("Fabric", "Error when parsing fabric properties " + zipEntry.getName(), e);
+                    Fabric.getLogger().mo4756e("Fabric", "Error when parsing fabric properties " + zipEntry.getName(), e);
                     CommonUtils.closeQuietly(inputStream);
                     return null;
                 } catch (Throwable th) {
@@ -56,7 +56,7 @@ class FabricKitsFinder implements Callable<Map<String, KitInfo>> {
         } catch (IOException e3) {
             e = e3;
             inputStream = null;
-            Fabric.getLogger().mo4292e("Fabric", "Error when parsing fabric properties " + zipEntry.getName(), e);
+            Fabric.getLogger().mo4756e("Fabric", "Error when parsing fabric properties " + zipEntry.getName(), e);
             CommonUtils.closeQuietly(inputStream);
             return null;
         } catch (Throwable th2) {
@@ -80,7 +80,7 @@ class FabricKitsFinder implements Callable<Map<String, KitInfo>> {
                 KitInfo loadKitInfo = loadKitInfo(zipEntry, loadApkFile);
                 if (loadKitInfo != null) {
                     hashMap.put(loadKitInfo.getIdentifier(), loadKitInfo);
-                    Fabric.getLogger().mo4300v("Fabric", String.format("Found kit:[%s] version:[%s]", new Object[]{loadKitInfo.getIdentifier(), loadKitInfo.getVersion()}));
+                    Fabric.getLogger().mo4764v("Fabric", String.format("Found kit:[%s] version:[%s]", new Object[]{loadKitInfo.getIdentifier(), loadKitInfo.getVersion()}));
                     i = i2;
                 }
             }
@@ -92,7 +92,7 @@ class FabricKitsFinder implements Callable<Map<String, KitInfo>> {
             } catch (IOException e) {
             }
         }
-        Fabric.getLogger().mo4300v("Fabric", "finish scanning in " + (SystemClock.elapsedRealtime() - elapsedRealtime) + " reading:" + i);
+        Fabric.getLogger().mo4764v("Fabric", "finish scanning in " + (SystemClock.elapsedRealtime() - elapsedRealtime) + " reading:" + i);
         return hashMap;
     }
 

@@ -51,6 +51,11 @@ public class NetworkNative
 		}
 	}
 
+	public static string getIPAHash()
+	{
+		return string.Empty;
+	}
+
 	public static string getUniqueDeviceId()
 	{
 		//IL_0015: Unknown result type (might be due to invalid IL or missing references)

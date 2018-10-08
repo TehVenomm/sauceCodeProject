@@ -35,7 +35,7 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 
 	public const uint NUMBERTOP_MAPID_QUEST = 3u;
 
-	public const uint TUTORIAL_FIELD_ID_0 = 10000100u;
+	public const uint TUTORIAL_FIELD_ID_0 = 10000101u;
 
 	public const uint TUTORIAL_FIELD_ID_1 = 10000101u;
 
@@ -129,7 +129,7 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		set;
 	}
 
-	public bool isTutorialField => currentPortalID == 10000100 || currentPortalID == 10000101;
+	public bool isTutorialField => currentPortalID == 10000101 || currentPortalID == 10000101;
 
 	public FieldManager()
 	{

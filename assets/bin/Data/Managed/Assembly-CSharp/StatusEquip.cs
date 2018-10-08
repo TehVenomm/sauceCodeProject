@@ -446,7 +446,7 @@ public class StatusEquip : EquipSelectBase
 			created_remove_btn = IsCreateRemoveButton();
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
-			_003CLocalInventory_003Ec__AnonStorey424 _003CLocalInventory_003Ec__AnonStorey;
+			_003CLocalInventory_003Ec__AnonStorey434 _003CLocalInventory_003Ec__AnonStorey;
 			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length + 2, false, new Func<int, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
@@ -765,7 +765,7 @@ public class StatusEquip : EquipSelectBase
 						{
 							toSlot = migrationSelectItem.GetExceedSkillSlotNo(j);
 						}
-						_003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey425 _003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey;
+						_003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey435 _003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey;
 						if (list2.All(new Func<MigrationSkillData, bool>((object)_003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
 						{
 							MigrationSkillData item = new MigrationSkillData(migrationSelectItem.uniqueID, toSlot, skillItem);
@@ -795,8 +795,8 @@ public class StatusEquip : EquipSelectBase
 			MigrationSkillData i = item;
 			MonoBehaviourSingleton<StatusManager>.I.SendSetSkill(i.toUniqueId, i.skill.uniqueID, i.toSlotNo, MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo(), delegate(bool isSucces)
 			{
-				((_003CSendReplacementSkill_003Ec__Iterator132)/*Error near IL_00ac: stateMachine*/)._003C_003Ef__this.MigrationSkillCallback(isSucces);
-				((_003CSendReplacementSkill_003Ec__Iterator132)/*Error near IL_00ac: stateMachine*/)._003CisSendFinish_003E__0 = true;
+				((_003CSendReplacementSkill_003Ec__Iterator136)/*Error near IL_00ac: stateMachine*/)._003C_003Ef__this.MigrationSkillCallback(isSucces);
+				((_003CSendReplacementSkill_003Ec__Iterator136)/*Error near IL_00ac: stateMachine*/)._003CisSendFinish_003E__0 = true;
 			});
 			if (!isSendFinish2)
 			{
@@ -810,8 +810,8 @@ public class StatusEquip : EquipSelectBase
 			EquipSetSkillData setInfo = d.equipSetSkill.Find((EquipSetSkillData x) => x.equipSetNo == MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo());
 			MonoBehaviourSingleton<StatusManager>.I.SendDetachSkill(setInfo.equipItemUniqId, setInfo.equipSlotNo, setInfo.equipSetNo, delegate(bool isSucces)
 			{
-				((_003CSendReplacementSkill_003Ec__Iterator132)/*Error near IL_01a9: stateMachine*/)._003C_003Ef__this.MigrationSkillCallback(isSucces);
-				((_003CSendReplacementSkill_003Ec__Iterator132)/*Error near IL_01a9: stateMachine*/)._003CisSendFinish_003E__0 = true;
+				((_003CSendReplacementSkill_003Ec__Iterator136)/*Error near IL_01a9: stateMachine*/)._003C_003Ef__this.MigrationSkillCallback(isSucces);
+				((_003CSendReplacementSkill_003Ec__Iterator136)/*Error near IL_01a9: stateMachine*/)._003CisSendFinish_003E__0 = true;
 			});
 			if (!isSendFinish2)
 			{
@@ -859,8 +859,8 @@ public class StatusEquip : EquipSelectBase
 		migrationSendCount = 1;
 		MonoBehaviourSingleton<StatusManager>.I.SendDetachAllSkill(_equipmentId, _setNo, delegate(bool isSucces)
 		{
-			((_003CSendRemoveAllSkill_003Ec__Iterator133)/*Error near IL_0045: stateMachine*/)._003C_003Ef__this.MigrationSkillCallback(isSucces);
-			((_003CSendRemoveAllSkill_003Ec__Iterator133)/*Error near IL_0045: stateMachine*/)._003CisSendFinish_003E__0 = true;
+			((_003CSendRemoveAllSkill_003Ec__Iterator137)/*Error near IL_0045: stateMachine*/)._003C_003Ef__this.MigrationSkillCallback(isSucces);
+			((_003CSendRemoveAllSkill_003Ec__Iterator137)/*Error near IL_0045: stateMachine*/)._003CisSendFinish_003E__0 = true;
 		});
 		if (!isSendFinish)
 		{

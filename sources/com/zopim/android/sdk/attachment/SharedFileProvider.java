@@ -4,7 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import java.io.File;
 
 public enum SharedFileProvider {
@@ -21,7 +21,7 @@ public enum SharedFileProvider {
         if (file == null || context == null) {
             Log.w(LOG_TAG, "Can not provide uri. File or context must not be null");
         } else {
-            String string = context.getResources().getString(C0785R.string.file_provider_authority);
+            String string = context.getResources().getString(C0784R.string.file_provider_authority);
             try {
                 uri = FileProvider.getUriForFile(context, string, file);
             } catch (IllegalArgumentException e) {

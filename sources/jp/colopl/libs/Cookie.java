@@ -2,13 +2,13 @@ package jp.colopl.libs;
 
 public class Cookie {
     /* renamed from: a */
-    private static String f944a = "";
+    private static String f3332a = "";
 
     public static String getCookieToken() {
-        return f944a;
+        return f3332a;
     }
 
     public static void setCookieToken(String str) {
-        f944a = str;
+        f3332a = str;
     }
 }

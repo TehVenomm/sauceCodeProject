@@ -229,55 +229,54 @@ public final class zzcdo extends zzcdm {
                     this.zzikb.zzaug().zza(str3, zzjw, "_ev", zzcfo.zza(str2, zzcap.zzavm(), true), str2 != null ? str2.length() : 0);
                     return;
                 }
-                int i;
                 Bundle zza;
                 List singletonList = Collections.singletonList("_o");
                 Bundle zza2 = zzaug().zza(str2, bundle, singletonList, z3, true);
                 List arrayList = new ArrayList();
                 arrayList.add(zza2);
                 long nextLong = zzaug().zzazx().nextLong();
-                int i2 = 0;
+                int i = 0;
                 String[] strArr = (String[]) zza2.keySet().toArray(new String[bundle.size()]);
                 Arrays.sort(strArr);
                 int length = strArr.length;
-                int i3 = 0;
-                while (i3 < length) {
+                int i2 = 0;
+                while (i2 < length) {
                     int length2;
-                    String str4 = strArr[i3];
+                    String str4 = strArr[i2];
                     Object obj = zza2.get(str4);
                     zzaug();
                     Bundle[] zzac = zzcfo.zzac(obj);
                     if (zzac != null) {
                         zza2.putInt(str4, zzac.length);
-                        for (i = 0; i < zzac.length; i++) {
-                            zza = zzaug().zza("_ep", zzac[i], singletonList, z3, false);
+                        for (int i3 = 0; i3 < zzac.length; i3++) {
+                            zza = zzaug().zza("_ep", zzac[i3], singletonList, z3, false);
                             zza.putString("_en", str2);
                             zza.putLong("_eid", nextLong);
                             zza.putString("_gn", str4);
                             zza.putInt("_ll", zzac.length);
-                            zza.putInt("_i", i);
+                            zza.putInt("_i", i3);
                             arrayList.add(zza);
                         }
-                        length2 = zzac.length + i2;
+                        length2 = zzac.length + i;
                     } else {
-                        length2 = i2;
+                        length2 = i;
                     }
-                    i3++;
-                    i2 = length2;
+                    i2++;
+                    i = length2;
                 }
-                if (i2 != 0) {
+                if (i != 0) {
                     zza2.putLong("_eid", nextLong);
-                    zza2.putInt("_epc", i2);
+                    zza2.putInt("_epc", i);
                 }
                 zzcap.zzawj();
                 zzb zzazm = zzauc().zzazm();
                 if (!(zzazm == null || zza2.containsKey("_sc"))) {
                     zzazm.zzivo = true;
                 }
-                i = 0;
-                while (i < arrayList.size()) {
-                    zza = (Bundle) arrayList.get(i);
-                    String str5 = (i != 0 ? 1 : null) != null ? "_ep" : str2;
+                int i4 = 0;
+                while (i4 < arrayList.size()) {
+                    zza = (Bundle) arrayList.get(i4);
+                    String str5 = (i4 != 0 ? 1 : null) != null ? "_ep" : str2;
                     zza.putString("_o", str);
                     if (!zza.containsKey("_sc")) {
                         zzcec.zza(zzazm, zza);
@@ -290,7 +289,7 @@ public final class zzcdo extends zzcdm {
                             onEvent.onEvent(str, str2, new Bundle(zzx), j);
                         }
                     }
-                    i++;
+                    i4++;
                 }
                 zzcap.zzawj();
                 if (zzauc().zzazm() != null && Event.APP_EXCEPTION.equals(str2)) {

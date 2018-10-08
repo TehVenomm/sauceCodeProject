@@ -1,24 +1,24 @@
 using System;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/NGUI Texture")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/NGUI Texture")]
 public class UITexture : UIBasicSprite
 {
 	[SerializeField]
 	[HideInInspector]
 	private Rect mRect = new Rect(0f, 0f, 1f, 1f);
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Texture mTexture;
 
 	[SerializeField]
 	[HideInInspector]
 	private Material mMat;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Shader mShader;
 
 	[HideInInspector]

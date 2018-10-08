@@ -192,6 +192,32 @@ public class EquipItemInfo : ItemInfoBase<EquipItem>
 		SetValue(equipItem);
 	}
 
+	public EquipItemInfo(uint id)
+	{
+		EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(id);
+		EquipItem equipItem = new EquipItem
+		{
+			uniqId = "0",
+			equipItemId = id,
+			level = (XorInt)equipItemData.maxLv,
+			exceed = 4,
+			price = 0,
+			is_locked = 0,
+			ability = new List<EquipItem.Ability>()
+		};
+		int i = 0;
+		for (int num = equipItemData.fixedAbility.Length; i < num; i++)
+		{
+			EquipItem.Ability item = new EquipItem.Ability
+			{
+				id = equipItemData.fixedAbility[i].id,
+				pt = 1
+			};
+			equipItem.ability.Add(item);
+		}
+		SetValue(equipItem);
+	}
+
 	public override void SetValue(EquipItem recv_data)
 	{
 		ulong.TryParse(recv_data.uniqId, out ulong result);

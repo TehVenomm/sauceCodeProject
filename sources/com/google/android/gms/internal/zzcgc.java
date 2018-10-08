@@ -2,6 +2,7 @@ package com.google.android.gms.internal;
 
 import android.support.v4.media.TransportMediator;
 import com.github.droidfu.support.DisplaySupport;
+import im.getsocial.sdk.ErrorCode;
 import java.io.IOException;
 import jp.colopl.util.ImageUtil;
 
@@ -477,10 +478,10 @@ public final class zzcgc extends zzegi<zzcgc> {
                 case 194:
                     this.zzilr = zzegf.readString();
                     continue;
-                case 202:
+                case ErrorCode.SDK_NOT_INITIALIZED /*202*/:
                     this.zziln = zzegf.readString();
                     continue;
-                case 208:
+                case ErrorCode.USER_IS_BANNED /*208*/:
                     this.zzizf = Long.valueOf(zzegf.zzcdu());
                     continue;
                 case 224:

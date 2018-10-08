@@ -22,12 +22,12 @@ class CrashlyticsExecutorServiceWrapper {
                     try {
                         runnable.run();
                     } catch (Throwable e) {
-                        Fabric.getLogger().mo4292e("Fabric", "Failed to execute task.", e);
+                        Fabric.getLogger().mo4756e("Fabric", "Failed to execute task.", e);
                     }
                 }
             });
         } catch (RejectedExecutionException e) {
-            Fabric.getLogger().mo4289d("Fabric", "Executor is shut down because we're handling a fatal crash.");
+            Fabric.getLogger().mo4753d("Fabric", "Executor is shut down because we're handling a fatal crash.");
             return null;
         }
     }
@@ -39,13 +39,13 @@ class CrashlyticsExecutorServiceWrapper {
                     try {
                         return callable.call();
                     } catch (Throwable e) {
-                        Fabric.getLogger().mo4292e("Fabric", "Failed to execute task.", e);
+                        Fabric.getLogger().mo4756e("Fabric", "Failed to execute task.", e);
                         return null;
                     }
                 }
             });
         } catch (RejectedExecutionException e) {
-            Fabric.getLogger().mo4289d("Fabric", "Executor is shut down because we're handling a fatal crash.");
+            Fabric.getLogger().mo4753d("Fabric", "Executor is shut down because we're handling a fatal crash.");
             return null;
         }
     }
@@ -54,10 +54,10 @@ class CrashlyticsExecutorServiceWrapper {
         try {
             return Looper.getMainLooper() == Looper.myLooper() ? this.executorService.submit(callable).get(4, TimeUnit.SECONDS) : this.executorService.submit(callable).get();
         } catch (RejectedExecutionException e) {
-            Fabric.getLogger().mo4289d("Fabric", "Executor is shut down because we're handling a fatal crash.");
+            Fabric.getLogger().mo4753d("Fabric", "Executor is shut down because we're handling a fatal crash.");
             return null;
         } catch (Throwable e2) {
-            Fabric.getLogger().mo4292e("Fabric", "Failed to execute task.", e2);
+            Fabric.getLogger().mo4756e("Fabric", "Failed to execute task.", e2);
             return null;
         }
     }

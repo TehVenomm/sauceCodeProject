@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <FrameLayout android:id="@id/list_view_comments" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_above="@id/post_comment_container" android:layout_alignParentTop="true" />
+    <im.getsocial.sdk.ui.internal.views.InputContainer android:id="@id/post_comment_container" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true" />
+</RelativeLayout>

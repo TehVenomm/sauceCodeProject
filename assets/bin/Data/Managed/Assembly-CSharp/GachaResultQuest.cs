@@ -287,6 +287,10 @@ public class GachaResultQuest : GachaResultBase
 			SetActive((Enum)UI.FOOTER_GUARANTEE_ROOT, false);
 			GetCtrl(UI.BG_MULTI).GetComponent<UISprite>().height = 740;
 		}
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA_QUEST_WIN))
+		{
+			SetActive(footerRoot, UI.BTN_BACK, false);
+		}
 		int num = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
 		if (MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId > 0)
 		{
@@ -449,6 +453,12 @@ public class GachaResultQuest : GachaResultBase
 				GameSection.SetEventData(questSortData);
 			}
 		}
+	}
+
+	private void OnQuery_BATTLE()
+	{
+		isJumpToBattle = true;
+		OnCloseDialog_GachaResultToBattleConfirm();
 	}
 
 	private void OnQuery_GachaResultToBattleConfirm_YES()

@@ -52,7 +52,7 @@ public class Settings {
             this.settingsDataLatch.await();
             return (SettingsData) this.settingsData.get();
         } catch (InterruptedException e) {
-            Fabric.getLogger().mo4291e("Fabric", "Interrupted while waiting for settings data.");
+            Fabric.getLogger().mo4755e("Fabric", "Interrupted while waiting for settings data.");
             return null;
         }
     }
@@ -101,7 +101,7 @@ public class Settings {
             SettingsData loadSettingsData = this.settingsController.loadSettingsData(SettingsCacheBehavior.SKIP_CACHE_LOOKUP);
             setSettingsData(loadSettingsData);
             if (loadSettingsData == null) {
-                Fabric.getLogger().mo4292e("Fabric", "Failed to force reload of settings from Crashlytics.", null);
+                Fabric.getLogger().mo4756e("Fabric", "Failed to force reload of settings from Crashlytics.", null);
             }
             z = loadSettingsData != null;
         }

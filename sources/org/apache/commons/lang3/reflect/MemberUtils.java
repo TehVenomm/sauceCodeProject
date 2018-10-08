@@ -57,16 +57,15 @@ abstract class MemberUtils {
             return getPrimitivePromotionCost(cls, cls2);
         }
         float f = 0.0f;
-        Class superclass;
-        while (superclass != null && !cls2.equals(superclass)) {
-            if (cls2.isInterface() && ClassUtils.isAssignable(superclass, (Class) cls2)) {
+        while (cls != null && !cls2.equals(cls)) {
+            if (cls2.isInterface() && ClassUtils.isAssignable(cls, cls2)) {
                 f += 0.25f;
                 break;
             }
             f += 1.0f;
-            superclass = superclass.getSuperclass();
+            cls = cls.getSuperclass();
         }
-        if (superclass == null) {
+        if (cls == null) {
             return f + 1.5f;
         }
         return f;

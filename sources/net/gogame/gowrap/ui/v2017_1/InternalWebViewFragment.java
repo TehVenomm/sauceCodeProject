@@ -3,7 +3,7 @@ package net.gogame.gowrap.ui.v2017_1;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.ui.InternalWebViewContext;
 import net.gogame.gowrap.ui.utils.ExternalAppLauncher;
@@ -13,7 +13,7 @@ public class InternalWebViewFragment extends AbstractWebViewFragment implements 
     public static final String START_HTML_ARGUMENT = "startHtml";
 
     public InternalWebViewFragment() {
-        super(C1110R.layout.net_gogame_gowrap_fragment_webview_internal);
+        super(C1426R.layout.net_gogame_gowrap_fragment_webview_internal);
     }
 
     public static InternalWebViewFragment newFragmentWithHtml(String str, String str2) {

@@ -250,13 +250,10 @@ class NativeCrashWriter {
 
         public int getSize() {
             int i = 0;
-            ProtobufMessage[] protobufMessageArr = this.messages;
-            int i2 = 0;
-            while (i < protobufMessageArr.length) {
-                i2 += protobufMessageArr[i].getSize();
-                i++;
+            for (ProtobufMessage size : this.messages) {
+                i += size.getSize();
             }
-            return i2;
+            return i;
         }
 
         public void write(CodedOutputStream codedOutputStream) throws IOException {
@@ -345,7 +342,7 @@ class NativeCrashWriter {
         DeviceMessage createDeviceMessage = createDeviceMessage(sessionEventData.deviceData);
         ByteString byteStringForLog = logFileManager.getByteStringForLog();
         if (byteStringForLog == null) {
-            Fabric.getLogger().mo4289d("Fabric", "No log data to include with this event.");
+            Fabric.getLogger().mo4753d("Fabric", "No log data to include with this event.");
         }
         logFileManager.clearLog();
         LogMessage logMessage = byteStringForLog != null ? new LogMessage(byteStringForLog) : new NullMessage();

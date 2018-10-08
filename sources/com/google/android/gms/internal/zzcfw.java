@@ -104,7 +104,7 @@ public final class zzcfw extends zzegi<zzcfw> {
                     zzegf.zza(obj[zzcbr]);
                     this.zziyj = obj;
                     continue;
-                case MotionEventCompat.AXIS_GENERIC_11 /*42*/:
+                case 42:
                     zzb = zzegr.zzb(zzegf, 42);
                     zzcbr = this.zziyk == null ? 0 : this.zziyk.length;
                     obj = new zzcfv[(zzb + zzcbr)];

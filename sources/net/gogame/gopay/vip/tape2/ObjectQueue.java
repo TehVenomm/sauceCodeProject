@@ -28,11 +28,11 @@ public abstract class ObjectQueue<T> implements Closeable, Iterable<T> {
     public abstract int size();
 
     public static <T> ObjectQueue<T> create(File file, Converter<T> converter) throws IOException {
-        return new C1103a(file, converter);
+        return new C1419a(file, converter);
     }
 
     public static <T> ObjectQueue<T> createInMemory() {
-        return new C1105b();
+        return new C1421b();
     }
 
     public boolean isEmpty() {

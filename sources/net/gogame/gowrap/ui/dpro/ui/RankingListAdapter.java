@@ -11,7 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import net.gogame.gowrap.ui.dpro.C1155R;
+import net.gogame.gowrap.ui.dpro.C1471R;
 import net.gogame.gowrap.ui.dpro.model.leaderboard.LeaderboardEntry;
 
 public class RankingListAdapter extends BaseAdapter {
@@ -65,15 +65,15 @@ public class RankingListAdapter extends BaseAdapter {
 
     public View getView(int i, LeaderboardEntry leaderboardEntry, View view, ViewGroup viewGroup) {
         if (view == null) {
-            view = ((LayoutInflater) this.context.getSystemService("layout_inflater")).inflate(C1155R.layout.net_gogame_gowrap_dpro_ranking_list_item, viewGroup, false);
+            view = ((LayoutInflater) this.context.getSystemService("layout_inflater")).inflate(C1471R.layout.net_gogame_gowrap_dpro_ranking_list_item, viewGroup, false);
         }
         view.setBackgroundColor(BACKGROUND_COLORS[i % BACKGROUND_COLORS.length]);
-        TextView textView = (TextView) view.findViewById(C1155R.id.net_gogame_gowrap_ranking_position);
-        TextView textView2 = (TextView) view.findViewById(C1155R.id.net_gogame_gowrap_ranking_name);
-        TextView textView3 = (TextView) view.findViewById(C1155R.id.net_gogame_gowrap_ranking_title);
-        TextView textView4 = (TextView) view.findViewById(C1155R.id.net_gogame_gowrap_ranking_hunter_id);
-        TextView textView5 = (TextView) view.findViewById(C1155R.id.net_gogame_gowrap_ranking_level);
-        TextView textView6 = (TextView) view.findViewById(C1155R.id.net_gogame_gowrap_ranking_value);
+        TextView textView = (TextView) view.findViewById(C1471R.id.net_gogame_gowrap_ranking_position);
+        TextView textView2 = (TextView) view.findViewById(C1471R.id.net_gogame_gowrap_ranking_name);
+        TextView textView3 = (TextView) view.findViewById(C1471R.id.net_gogame_gowrap_ranking_title);
+        TextView textView4 = (TextView) view.findViewById(C1471R.id.net_gogame_gowrap_ranking_hunter_id);
+        TextView textView5 = (TextView) view.findViewById(C1471R.id.net_gogame_gowrap_ranking_level);
+        TextView textView6 = (TextView) view.findViewById(C1471R.id.net_gogame_gowrap_ranking_value);
         if (leaderboardEntry != null) {
             if (leaderboardEntry.getPosition() != null) {
                 textView.setText(String.format(Locale.getDefault(), "%,d", new Object[]{leaderboardEntry.getPosition()}));

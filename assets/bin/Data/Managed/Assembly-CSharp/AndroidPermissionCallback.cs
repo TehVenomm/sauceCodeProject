@@ -7,7 +7,7 @@ public class AndroidPermissionCallback
 	private event Action<string> OnPermissionDeniedAction;
 
 	public AndroidPermissionCallback(Action<string> onGrantedCallback, Action<string> onDeniedCallback)
-		: this("com.unity3d.player.UnityAndroidPermissions$IPermissionRequestResult")
+		: this("com.unity3d.plugin.UnityAndroidPermissions$IPermissionRequestResult")
 	{
 		if (onGrantedCallback != null)
 		{

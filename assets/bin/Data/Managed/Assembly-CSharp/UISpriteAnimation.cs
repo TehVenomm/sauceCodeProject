@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
 [RequireComponent(typeof(UISprite))]
 [AddComponentMenu("NGUI/UI/Sprite Animation")]
-[ExecuteInEditMode]
 public class UISpriteAnimation
 {
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected int mFPS = 30;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected string mPrefix = string.Empty;
 
 	[SerializeField]

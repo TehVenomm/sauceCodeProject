@@ -153,7 +153,7 @@ public class ChatLog implements Comparable<ChatLog> {
     }
 
     /* renamed from: com.zopim.android.sdk.model.ChatLog$a */
-    private enum C0875a {
+    private enum C0874a {
         AGENT_SYSTEM("agent:system"),
         AGENT_TRIGGER("agent:trigger"),
         AGENT_MSG("agent"),
@@ -163,13 +163,13 @@ public class ChatLog implements Comparable<ChatLog> {
         /* renamed from: f */
         final String f881f;
 
-        private C0875a(String str) {
+        private C0874a(String str) {
             this.f881f = str;
         }
 
         @NonNull
         /* renamed from: a */
-        public static C0875a m705a(String str) {
+        public static C0874a m705a(String str) {
             return (str == null || str.isEmpty()) ? UNKNOWN : "agent:system".equals(str) ? AGENT_SYSTEM : "agent:trigger".equals(str) ? AGENT_TRIGGER : str.contains("agent") ? AGENT_MSG : str.contains("visitor") ? VISITOR_MSG : UNKNOWN;
         }
 
@@ -180,7 +180,7 @@ public class ChatLog implements Comparable<ChatLog> {
     }
 
     /* renamed from: com.zopim.android.sdk.model.ChatLog$b */
-    private enum C0876b {
+    private enum C0875b {
         CHAT_MSG("chat.msg"),
         MEMBER_JOIN("chat.memberjoin"),
         MEMBER_LEAVE("chat.memberleave"),
@@ -195,16 +195,16 @@ public class ChatLog implements Comparable<ChatLog> {
         /* renamed from: k */
         final String f893k;
 
-        private C0876b(String str) {
+        private C0875b(String str) {
             this.f893k = str;
         }
 
         @NonNull
         /* renamed from: a */
-        public static C0876b m707a(String str) {
-            for (C0876b c0876b : C0876b.values()) {
-                if (c0876b.m708a().equals(str)) {
-                    return c0876b;
+        public static C0875b m707a(String str) {
+            for (C0875b c0875b : C0875b.values()) {
+                if (c0875b.m708a().equals(str)) {
+                    return c0875b;
                 }
             }
             return UNKNOWN;
@@ -227,31 +227,31 @@ public class ChatLog implements Comparable<ChatLog> {
         this.message = str2;
         this.unverified = Boolean.valueOf(true);
         this.failed = Boolean.valueOf(false);
-        switch (C0877a.f894a[type.ordinal()]) {
+        switch (C0876a.f894a[type.ordinal()]) {
             case 1:
-                this.type = C0876b.CHAT_MSG.m708a();
-                this.nick = C0875a.VISITOR_MSG.m706a();
+                this.type = C0875b.CHAT_MSG.m708a();
+                this.nick = C0874a.VISITOR_MSG.m706a();
                 return;
             case 2:
-                this.type = C0876b.CHAT_MSG.m708a();
-                this.nick = C0875a.AGENT_MSG.m706a();
+                this.type = C0875b.CHAT_MSG.m708a();
+                this.nick = C0874a.AGENT_MSG.m706a();
                 return;
             case 3:
-                this.type = C0876b.CHAT_EVENT.m708a();
-                this.nick = C0875a.AGENT_SYSTEM.m706a();
+                this.type = C0875b.CHAT_EVENT.m708a();
+                this.nick = C0874a.AGENT_SYSTEM.m706a();
                 return;
             case 4:
-                this.type = C0876b.CHAT_MSG.m708a();
-                this.nick = C0875a.AGENT_TRIGGER.m706a();
+                this.type = C0875b.CHAT_MSG.m708a();
+                this.nick = C0874a.AGENT_TRIGGER.m706a();
                 return;
             case 5:
-                this.type = C0876b.MEMBER_JOIN.m708a();
+                this.type = C0875b.MEMBER_JOIN.m708a();
                 return;
             case 6:
-                this.type = C0876b.MEMBER_LEAVE.m708a();
+                this.type = C0875b.MEMBER_LEAVE.m708a();
                 return;
             case 7:
-                this.type = C0876b.SYSTEM_OFFLINE.m708a();
+                this.type = C0875b.SYSTEM_OFFLINE.m708a();
                 return;
             default:
                 return;
@@ -356,9 +356,9 @@ public class ChatLog implements Comparable<ChatLog> {
 
     @NonNull
     public Type getType() {
-        switch (C0877a.f896c[C0876b.m707a(this.type).ordinal()]) {
+        switch (C0876a.f896c[C0875b.m707a(this.type).ordinal()]) {
             case 1:
-                switch (C0877a.f895b[C0875a.m705a(this.nick).ordinal()]) {
+                switch (C0876a.f895b[C0874a.m705a(this.nick).ordinal()]) {
                     case 1:
                         return Type.CHAT_MSG_SYSTEM;
                     case 2:

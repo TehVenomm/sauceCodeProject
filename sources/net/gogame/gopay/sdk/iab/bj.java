@@ -1,28 +1,28 @@
 package net.gogame.gopay.sdk.iab;
 
-import net.gogame.gopay.sdk.C1033g;
-import net.gogame.gopay.sdk.support.C1039r;
+import net.gogame.gopay.sdk.C1349g;
+import net.gogame.gopay.sdk.support.C1355r;
 
-final class bj implements C1039r {
+final class bj implements C1355r {
     /* renamed from: a */
-    final /* synthetic */ C1033g f1101a;
+    final /* synthetic */ C1349g f3489a;
     /* renamed from: b */
-    final /* synthetic */ bi f1102b;
+    final /* synthetic */ bi f3490b;
 
-    bj(bi biVar, C1033g c1033g) {
-        this.f1102b = biVar;
-        this.f1101a = c1033g;
+    bj(bi biVar, C1349g c1349g) {
+        this.f3490b = biVar;
+        this.f3489a = c1349g;
     }
 
     /* renamed from: a */
-    public final void mo4425a() {
+    public final void mo4873a() {
         boolean z = true;
-        int i = this.f1102b.f1100a.getResources().getConfiguration().orientation;
-        PurchaseActivity purchaseActivity = this.f1102b.f1100a;
-        C1033g c1033g = this.f1101a;
+        int i = this.f3490b.f3488a.getResources().getConfiguration().orientation;
+        PurchaseActivity purchaseActivity = this.f3490b.f3488a;
+        C1349g c1349g = this.f3489a;
         if (i != 1) {
             z = false;
         }
-        PurchaseActivity.m791a(purchaseActivity, c1033g, z);
+        PurchaseActivity.m3816a(purchaseActivity, c1349g, z);
     }
 }

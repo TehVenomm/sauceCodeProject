@@ -1,6 +1,5 @@
 package com.google.android.gms.internal;
 
-import android.support.v4.view.MotionEventCompat;
 import java.io.IOException;
 
 public final class zzcfq extends zzegi<zzcfq> {
@@ -120,7 +119,7 @@ public final class zzcfq extends zzegi<zzcfq> {
                 case 32:
                     this.zzixl = Boolean.valueOf(zzegf.zzcds());
                     continue;
-                case MotionEventCompat.AXIS_GENERIC_11 /*42*/:
+                case 42:
                     if (this.zzixm == null) {
                         this.zzixm = new zzcfs();
                     }

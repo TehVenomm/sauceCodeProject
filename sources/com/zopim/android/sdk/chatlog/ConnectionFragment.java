@@ -11,7 +11,7 @@ import com.zopim.android.sdk.model.Connection;
 
 public class ConnectionFragment extends Fragment {
     private static final String LOG_TAG = ConnectionFragment.class.getSimpleName();
-    ConnectionObserver mConnectionObserver = new C0854u(this);
+    ConnectionObserver mConnectionObserver = new C0853u(this);
     private Handler mHandler = new Handler(Looper.getMainLooper());
     private ConnectionListener mListener;
 
@@ -26,7 +26,7 @@ public class ConnectionFragment extends Fragment {
             Log.w(LOG_TAG, "Connection must not be null. Can not update visibility.");
             return;
         }
-        switch (C0857w.f838a[connection.getStatus().ordinal()]) {
+        switch (C0856w.f838a[connection.getStatus().ordinal()]) {
             case 1:
             case 2:
             case 3:

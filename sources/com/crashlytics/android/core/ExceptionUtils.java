@@ -34,7 +34,7 @@ final class ExceptionUtils {
                 closeable = printWriter;
                 th3 = th2;
                 try {
-                    Fabric.getLogger().mo4292e("Fabric", "Failed to create PrintWriter", th3);
+                    Fabric.getLogger().mo4756e("Fabric", "Failed to create PrintWriter", th3);
                     CommonUtils.closeOrLog(closeable, "Failed to close stack trace writer.");
                 } catch (Throwable th32) {
                     th2 = th32;
@@ -50,7 +50,7 @@ final class ExceptionUtils {
             }
         } catch (Exception e3) {
             th32 = e3;
-            Fabric.getLogger().mo4292e("Fabric", "Failed to create PrintWriter", th32);
+            Fabric.getLogger().mo4756e("Fabric", "Failed to create PrintWriter", th32);
             CommonUtils.closeOrLog(closeable, "Failed to close stack trace writer.");
         } catch (Throwable th322) {
             th2 = th322;
@@ -62,11 +62,11 @@ final class ExceptionUtils {
     }
 
     private static void writeStackTrace(Throwable th, OutputStream outputStream) {
-        Closeable printWriter;
         Throwable th2;
         Throwable e;
         Throwable th3;
         Closeable closeable = null;
+        Closeable printWriter;
         try {
             printWriter = new PrintWriter(outputStream);
             try {
@@ -77,7 +77,7 @@ final class ExceptionUtils {
                 closeable = printWriter;
                 th3 = th2;
                 try {
-                    Fabric.getLogger().mo4292e("Fabric", "Failed to create PrintWriter", th3);
+                    Fabric.getLogger().mo4756e("Fabric", "Failed to create PrintWriter", th3);
                     CommonUtils.closeOrLog(closeable, "Failed to close stack trace writer.");
                 } catch (Throwable th32) {
                     th2 = th32;
@@ -93,7 +93,7 @@ final class ExceptionUtils {
             }
         } catch (Exception e3) {
             th32 = e3;
-            Fabric.getLogger().mo4292e("Fabric", "Failed to create PrintWriter", th32);
+            Fabric.getLogger().mo4756e("Fabric", "Failed to create PrintWriter", th32);
             CommonUtils.closeOrLog(closeable, "Failed to close stack trace writer.");
         } catch (Throwable th322) {
             th2 = th322;
@@ -116,7 +116,7 @@ final class ExceptionUtils {
                 th = th.getCause();
                 obj = null;
             } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "Could not write stack trace", e);
+                Fabric.getLogger().mo4756e("Fabric", "Could not write stack trace", e);
                 return;
             }
         }

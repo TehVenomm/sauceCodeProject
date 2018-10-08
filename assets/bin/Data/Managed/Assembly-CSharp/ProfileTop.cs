@@ -96,8 +96,8 @@ public class ProfileTop : GameSection
 		EnableRenderTexture(UI.TEX_MODEL);
 		SetRenderPlayerModel((Enum)UI.TEX_MODEL, load_info, PLAYER_ANIM_TYPE.GetStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex), param.playerPos, new Vector3(0f, param.playerRot, 0f), is_show_helm, (Action<PlayerLoader>)delegate(PlayerLoader x)
 		{
-			((_003CDoInitialize_003Ec__Iterator112)/*Error near IL_01e7: stateMachine*/)._003C_003Ef__this.playerLoader = x;
-			((_003CDoInitialize_003Ec__Iterator112)/*Error near IL_01e7: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CDoInitialize_003Ec__Iterator116)/*Error near IL_01e7: stateMachine*/)._003C_003Ef__this.playerLoader = x;
+			((_003CDoInitialize_003Ec__Iterator116)/*Error near IL_01e7: stateMachine*/)._003Cwait_003E__0 = false;
 		});
 		if (eventListener == null)
 		{

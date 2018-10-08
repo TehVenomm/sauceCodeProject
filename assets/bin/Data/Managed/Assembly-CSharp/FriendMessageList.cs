@@ -110,7 +110,7 @@ public class FriendMessageList : FollowListBase
 				base.ScrollGrid.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 			}
 			CleanItemList();
-			_003CUpdateDynamicList_003Ec__AnonStorey314 _003CUpdateDynamicList_003Ec__AnonStorey;
+			_003CUpdateDynamicList_003Ec__AnonStorey323 _003CUpdateDynamicList_003Ec__AnonStorey;
 			SetDynamicList((Enum)UI.GRD_LIST, "FollowListBaseItem", pageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
@@ -122,7 +122,7 @@ public class FriendMessageList : FollowListBase
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback = null)
 	{
-		_003CSendGetList_003Ec__AnonStorey315 _003CSendGetList_003Ec__AnonStorey;
+		_003CSendGetList_003Ec__AnonStorey324 _003CSendGetList_003Ec__AnonStorey;
 		MonoBehaviourSingleton<FriendManager>.I.SendGetMessageUserList(page, new Action<bool, FriendMessageUserListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

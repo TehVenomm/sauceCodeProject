@@ -54,8 +54,8 @@ public class QuestResultMutualFollowBonusDialog : ItemSellConfirm
 		}
 		bool shouldAddGold = totalGold > 0;
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		_003CDrawIcon_003Ec__AnonStorey42F _003CDrawIcon_003Ec__AnonStorey42F;
-		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey42F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CDrawIcon_003Ec__AnonStorey43F _003CDrawIcon_003Ec__AnonStorey43F;
+		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey43F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override int GetSellGold()

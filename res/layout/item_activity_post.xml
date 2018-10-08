@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <View android:layout_gravity="end|bottom|center" android:id="@id/divider" android:layout_width="fill_parent" android:layout_height="1.0dip" android:layout_marginLeft="56.0dip" android:layout_marginTop="10.0dip" />
+    <RelativeLayout android:padding="10.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <ImageView android:id="@id/image_view_user_avatar" android:layout_width="36.0dip" android:layout_height="36.0dip" android:layout_marginRight="10.0dip" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" />
+        <RelativeLayout android:id="@id/container_activity_content" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_toRightOf="@id/image_view_user_avatar" android:layout_alignParentTop="true">
+            <RelativeLayout android:gravity="center_vertical" android:id="@id/user_name_section" android:layout_width="fill_parent" android:layout_height="wrap_content" android:baselineAligned="false">
+                <im.getsocial.sdk.ui.internal.views.AssetButton android:id="@id/button_more" android:layout_width="36.0dip" android:layout_height="20.0dip" android:layout_alignParentRight="true" />
+                <TextView android:ellipsize="end" android:id="@id/text_view_user_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:maxLines="1" android:layout_toLeftOf="@id/button_more" android:layout_alignParentLeft="true" />
+            </RelativeLayout>
+            <TextView android:ellipsize="end" android:id="@id/text_view_activity_text" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/user_name_section" android:layout_alignParentLeft="true" />
+            <TextView android:id="@id/text_view_posted_time" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/text_view_activity_text" android:layout_alignParentLeft="true" />
+            <FrameLayout android:id="@id/container_extras" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/text_view_posted_time" android:layout_alignParentLeft="true">
+                <im.getsocial.sdk.ui.internal.views.MediaContentView android:id="@id/media_content" android:layout_width="fill_parent" android:layout_height="120.0dip">
+                    <im.getsocial.sdk.ui.internal.views.AspectRatioImageView android:id="@id/image_view_activity_image" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="fill_parent" android:adjustViewBounds="true" />
+                    <FrameLayout android:id="@id/video_overlay" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="fill_parent" android:scaleType="centerCrop">
+                        <ImageView android:layout_gravity="center" android:id="@id/video_play_image" android:layout_width="wrap_content" android:layout_height="wrap_content" android:scaleType="centerCrop" />
+                    </FrameLayout>
+                    <im.getsocial.sdk.ui.internal.views.RoundedCornerMaskView android:id="@id/rounded_corners_view" android:visibility="visible" android:layout_width="fill_parent" android:layout_height="fill_parent" android:src="@drawable/rounded_corners_drawable" />
+                </im.getsocial.sdk.ui.internal.views.MediaContentView>
+                <im.getsocial.sdk.ui.internal.views.AssetButton android:layout_gravity="end|bottom|center" android:id="@id/button_action" android:paddingLeft="8.0dip" android:paddingRight="8.0dip" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="35.0dip" android:layout_marginTop="10.0dip" android:layout_marginBottom="10.0dip" android:minWidth="64.0dip" />
+            </FrameLayout>
+        </RelativeLayout>
+        <RelativeLayout android:id="@id/container_likes_comments" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="8.0dip" android:layout_toRightOf="@id/image_view_user_avatar" android:layout_below="@id/container_activity_content">
+            <im.getsocial.sdk.ui.internal.views.MultiTextView android:id="@id/text_view_likes" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="5.0dip" android:layout_alignParentLeft="true" />
+            <im.getsocial.sdk.ui.internal.views.MultiTextView android:id="@id/text_view_comments" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toRightOf="@id/text_view_likes" />
+            <im.getsocial.sdk.ui.internal.views.AssetButton android:id="@id/button_like" android:layout_width="20.0dip" android:layout_height="20.0dip" android:layout_alignParentRight="true" />
+        </RelativeLayout>
+    </RelativeLayout>
+</FrameLayout>

@@ -40,7 +40,7 @@ class SessionReport implements Report {
     }
 
     public boolean remove() {
-        Fabric.getLogger().mo4289d("Fabric", "Removing report at " + this.file.getPath());
+        Fabric.getLogger().mo4753d("Fabric", "Removing report at " + this.file.getPath());
         return this.file.delete();
     }
 }

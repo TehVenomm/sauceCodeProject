@@ -20,12 +20,12 @@ public final class zzq {
     }
 
     private static String zzcg(int i) {
-        ThreadPolicy allowThreadDiskReads;
-        Closeable bufferedReader;
         String trim;
         Throwable th;
         Closeable closeable = null;
         if (i > 0) {
+            ThreadPolicy allowThreadDiskReads;
+            Closeable bufferedReader;
             try {
                 allowThreadDiskReads = StrictMode.allowThreadDiskReads();
                 bufferedReader = new BufferedReader(new FileReader("/proc/" + i + "/cmdline"));

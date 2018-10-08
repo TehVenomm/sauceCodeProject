@@ -8,14 +8,13 @@ public class AndroidPermissionsManager
 
 	private static AndroidJavaObject GetActivity()
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
-		if (m_Activity != null)
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0014: Expected O, but got Unknown
+		if (m_Activity == null)
 		{
-			return m_Activity;
+			AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+			m_Activity = val.GetStatic<AndroidJavaObject>("currentActivity");
 		}
-		AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-		m_Activity = val.GetStatic<AndroidJavaObject>("currentActivity");
 		return m_Activity;
 	}
 
@@ -27,20 +26,11 @@ public class AndroidPermissionsManager
 		object obj = m_PermissionService;
 		if (obj == null)
 		{
-			AndroidJavaObject val = new AndroidJavaObject("com.unity3d.player.UnityAndroidPermissions", new object[0]);
+			AndroidJavaObject val = new AndroidJavaObject("com.unity3d.plugin.UnityAndroidPermissions", new object[0]);
 			obj = (object)val;
 			m_PermissionService = val;
 		}
 		return obj;
-	}
-
-	public static bool IsPermissionGranted(string permissionName)
-	{
-		return GetPermissionsService().Call<bool>("IsPermissionGranted", new object[2]
-		{
-			GetActivity(),
-			permissionName
-		});
 	}
 
 	public static bool ShouldShowRequestPermission(string permissionName)
@@ -58,6 +48,23 @@ public class AndroidPermissionsManager
 		{
 			GetActivity()
 		});
+	}
+
+	public static bool IsPermissionGranted(string permissionName)
+	{
+		return GetPermissionsService().Call<bool>("IsPermissionGranted", new object[2]
+		{
+			GetActivity(),
+			permissionName
+		});
+	}
+
+	public static void RequestPermission(string permissionName, AndroidPermissionCallback callback)
+	{
+		RequestPermission(new string[1]
+		{
+			permissionName
+		}, callback);
 	}
 
 	public static void RequestPermission(string[] permissionNames, AndroidPermissionCallback callback)

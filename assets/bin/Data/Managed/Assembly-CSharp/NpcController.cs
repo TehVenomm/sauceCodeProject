@@ -9,7 +9,15 @@ public class NpcController : ControllerBase
 
 	protected float startWaitTime;
 
+	private bool isPose;
+
 	private Player player
+	{
+		get;
+		set;
+	}
+
+	public NonPlayer nonPlayer
 	{
 		get;
 		set;
@@ -47,9 +55,11 @@ public class NpcController : ControllerBase
 
 	protected override void Awake()
 	{
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		player = (character as Player);
 		npcBrain = AttachBrain<NpcBrain>();
+		nonPlayer = this.get_gameObject().GetComponent<NonPlayer>();
 	}
 
 	protected override void Start()
@@ -120,6 +130,10 @@ public class NpcController : ControllerBase
 
 	private IEnumerator AIMain()
 	{
+		while (isPose)
+		{
+			yield return (object)null;
+		}
 		while (base.brain == null || !base.brain.isInitialized)
 		{
 			yield return (object)0;
@@ -477,5 +491,21 @@ public class NpcController : ControllerBase
 				}
 			}
 		}
+	}
+
+	public void UseSkill()
+	{
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		if (nonPlayer != null)
+		{
+			nonPlayer = this.get_gameObject().GetComponent<NonPlayer>();
+		}
+		Debug.Log((object)"UseSkill");
+		nonPlayer.NPCSkillAction(0, false);
+	}
+
+	public void SetPose(bool isActivePose)
+	{
+		isPose = isActivePose;
 	}
 }

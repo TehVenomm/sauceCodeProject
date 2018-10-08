@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.integrations.core.CoreSupport;
 import net.gogame.gowrap.integrations.core.Wrapper;
@@ -49,7 +49,7 @@ public class NewsFeedFragment extends Fragment {
     private static final String SCROLL_VIEW_BUNDLE_PROPERTY_NAME_SCROLL_Y = "scrollY";
     private static final boolean VIDEO_ENABLED = false;
     private CustomGridLayout customGridLayout;
-    private Listener downloadManagerListener = new C11941();
+    private Listener downloadManagerListener = new C15101();
     private boolean downloadingFeed;
     private Feed feed;
     private View moreButton;
@@ -63,8 +63,8 @@ public class NewsFeedFragment extends Fragment {
     private View visitSiteForMoreButton;
 
     /* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment$1 */
-    class C11941 implements Listener {
-        C11941() {
+    class C15101 implements Listener {
+        C15101() {
         }
 
         public void onDownloadsStarted() {
@@ -77,8 +77,8 @@ public class NewsFeedFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment$3 */
-    class C12003 implements OnClickListener {
-        C12003() {
+    class C15163 implements OnClickListener {
+        C15163() {
         }
 
         public void onClick(View view) {
@@ -87,8 +87,8 @@ public class NewsFeedFragment extends Fragment {
     }
 
     /* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment$4 */
-    class C12014 implements OnClickListener {
-        C12014() {
+    class C15174 implements OnClickListener {
+        C15174() {
         }
 
         public void onClick(View view) {
@@ -100,15 +100,15 @@ public class NewsFeedFragment extends Fragment {
     }
 
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
-        View inflate = layoutInflater.inflate(C1110R.layout.net_gogame_gowrap_fragment_newsfeed, viewGroup, false);
-        this.customGridLayout = (CustomGridLayout) inflate.findViewById(C1110R.id.net_gogame_gowrap_newsfeed);
+        View inflate = layoutInflater.inflate(C1426R.layout.net_gogame_gowrap_fragment_newsfeed, viewGroup, false);
+        this.customGridLayout = (CustomGridLayout) inflate.findViewById(C1426R.id.net_gogame_gowrap_newsfeed);
         this.viewExists = true;
         if (getActivity() instanceof UIContext) {
             this.uiContext = (UIContext) getActivity();
         }
-        this.progressBar = (ProgressBar) inflate.findViewById(C1110R.id.net_gogame_gowrap_progressBar);
-        this.progressBar2 = (ProgressBar) inflate.findViewById(C1110R.id.net_gogame_gowrap_progressBar2);
-        this.scrollView = (ScrollView) inflate.findViewById(C1110R.id.net_gogame_gowrap_newsfeed_scroll_view);
+        this.progressBar = (ProgressBar) inflate.findViewById(C1426R.id.net_gogame_gowrap_progressBar);
+        this.progressBar2 = (ProgressBar) inflate.findViewById(C1426R.id.net_gogame_gowrap_progressBar2);
+        this.scrollView = (ScrollView) inflate.findViewById(C1426R.id.net_gogame_gowrap_newsfeed_scroll_view);
         if (CoreSupport.INSTANCE.getAppId() != null) {
             try {
                 URL url = new URL("http://gw-sites.gogame.net/sites/" + CoreSupport.INSTANCE.getAppId() + "/data/feed.json");
@@ -119,8 +119,8 @@ public class NewsFeedFragment extends Fragment {
                 DownloadUtils.download(getActivity(), url, new FileTarget(file), file.isFile(), new Callback() {
 
                     /* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment$2$1 */
-                    class C11951 implements Runnable {
-                        C11951() {
+                    class C15111 implements Runnable {
+                        C15111() {
                         }
 
                         public void run() {
@@ -129,8 +129,8 @@ public class NewsFeedFragment extends Fragment {
                     }
 
                     /* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment$2$2 */
-                    class C11962 implements Runnable {
-                        C11962() {
+                    class C15122 implements Runnable {
+                        C15122() {
                         }
 
                         public void run() {
@@ -139,8 +139,8 @@ public class NewsFeedFragment extends Fragment {
                     }
 
                     /* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment$2$3 */
-                    class C11973 implements Runnable {
-                        C11973() {
+                    class C15133 implements Runnable {
+                        C15133() {
                         }
 
                         public void run() {
@@ -150,8 +150,8 @@ public class NewsFeedFragment extends Fragment {
                     }
 
                     /* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment$2$4 */
-                    class C11984 implements Runnable {
-                        C11984() {
+                    class C15144 implements Runnable {
+                        C15144() {
                         }
 
                         public void run() {
@@ -164,13 +164,13 @@ public class NewsFeedFragment extends Fragment {
                         NewsFeedFragment.this.downloadingFeed = false;
                         if (NewsFeedFragment.this.getActivity() != null) {
                             try {
-                                NewsFeedFragment.this.getActivity().runOnUiThread(new C11951());
+                                NewsFeedFragment.this.getActivity().runOnUiThread(new C15111());
                                 NewsFeedFragment.this.feed = NewsFeedFragment.this.readFeed(file);
-                                NewsFeedFragment.this.getActivity().runOnUiThread(new C11962());
+                                NewsFeedFragment.this.getActivity().runOnUiThread(new C15122());
                             } catch (Throwable th) {
                                 Log.e(Constants.TAG, "Exception", th);
                                 try {
-                                    NewsFeedFragment.this.getActivity().runOnUiThread(new C11973());
+                                    NewsFeedFragment.this.getActivity().runOnUiThread(new C15133());
                                 } catch (Throwable th2) {
                                     Log.e(Constants.TAG, "Exception", th2);
                                 }
@@ -182,7 +182,7 @@ public class NewsFeedFragment extends Fragment {
                         NewsFeedFragment.this.downloadingFeed = false;
                         if (NewsFeedFragment.this.getActivity() != null) {
                             try {
-                                NewsFeedFragment.this.getActivity().runOnUiThread(new C11984());
+                                NewsFeedFragment.this.getActivity().runOnUiThread(new C15144());
                             } catch (Throwable e) {
                                 Log.e(Constants.TAG, "Exception", e);
                             }
@@ -193,10 +193,10 @@ public class NewsFeedFragment extends Fragment {
                 Log.e(Constants.TAG, "Exception", e);
             }
         }
-        this.moreButton = inflate.findViewById(C1110R.id.net_gogame_gowrap_newsfeed_button_more);
-        this.moreButton.setOnClickListener(new C12003());
-        this.visitSiteForMoreButton = inflate.findViewById(C1110R.id.net_gogame_gowrap_newsfeed_button_visit_site_for_more);
-        this.visitSiteForMoreButton.setOnClickListener(new C12014());
+        this.moreButton = inflate.findViewById(C1426R.id.net_gogame_gowrap_newsfeed_button_more);
+        this.moreButton.setOnClickListener(new C15163());
+        this.visitSiteForMoreButton = inflate.findViewById(C1426R.id.net_gogame_gowrap_newsfeed_button_visit_site_for_more);
+        this.visitSiteForMoreButton.setOnClickListener(new C15174());
         return inflate;
     }
 
@@ -324,7 +324,7 @@ public class NewsFeedFragment extends Fragment {
                 if (photoNewsFeedItemView != null) {
                     photoNewsFeedItemView.setTimestamp(item.getCreatedTime());
                     photoNewsFeedItemView.setMessage(sanitizeMessage(item.getMessage()));
-                    photoNewsFeedItemView.setButtonImage(getActivity().getResources().getDrawable(C1110R.drawable.net_gogame_gowrap_icon_share));
+                    photoNewsFeedItemView.setButtonImage(getActivity().getResources().getDrawable(C1426R.drawable.net_gogame_gowrap_icon_share));
                     photoNewsFeedItemView.setAspectRatio(aspectRatio.doubleValue());
                     photoNewsFeedItemView.setPosition(childCount);
                     if (!(this.uiContext == null || (item.getLink() == null && item.getArticleLink() == null))) {
@@ -367,10 +367,10 @@ public class NewsFeedFragment extends Fragment {
     }
 
     private Feed readFeed(File file) throws IOException {
-        JsonReader jsonReader;
         InputStream fileInputStream = new FileInputStream(file);
         try {
             Reader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+            JsonReader jsonReader;
             try {
                 jsonReader = new JsonReader(inputStreamReader);
                 Feed feed = new Feed(jsonReader);

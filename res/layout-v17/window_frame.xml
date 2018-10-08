@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:focusable="true" android:fitsSystemWindows="true" android:clickable="true" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <FrameLayout android:id="@id/layoutWindowFrame" android:focusable="true" android:clickable="true" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_centerInParent="true">
+        <RelativeLayout android:id="@id/layoutContent" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+        <RelativeLayout android:id="@id/layoutHeader" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <im.getsocial.sdk.ui.internal.views.AssetButton android:id="@id/buttonBack" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:layout_alignParentStart="true" />
+            <im.getsocial.sdk.ui.internal.views.AssetButton android:id="@id/buttonClose" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_alignParentEnd="true" />
+            <TextView android:gravity="center_horizontal" android:id="@id/titleViewWindowTitle" android:layout_width="fill_parent" android:layout_height="wrap_content" android:maxLines="1" android:layout_alignParentTop="true" android:layout_alignParentBottom="true" android:layout_centerInParent="true" android:foregroundGravity="center" android:layout_toStartOf="@id/buttonClose" android:layout_toEndOf="@id/buttonBack" />
+        </RelativeLayout>
+    </FrameLayout>
+</RelativeLayout>

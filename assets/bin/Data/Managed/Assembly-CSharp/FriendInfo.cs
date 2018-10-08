@@ -619,7 +619,7 @@ public class FriendInfo : SkillInfoBase
 	protected unsafe void SendFollow(List<int> send_follow_list, Action<bool> callback = null)
 	{
 		GameSection.StayEvent();
-		_003CSendFollow_003Ec__AnonStorey306 _003CSendFollow_003Ec__AnonStorey;
+		_003CSendFollow_003Ec__AnonStorey315 _003CSendFollow_003Ec__AnonStorey;
 		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(send_follow_list, new Action<Error, List<int>>((object)_003CSendFollow_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

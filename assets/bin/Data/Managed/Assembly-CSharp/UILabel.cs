@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/NGUI Label")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/NGUI Label")]
 public class UILabel : UIWidget
 {
 	public enum Effect
@@ -33,12 +33,12 @@ public class UILabel : UIWidget
 
 	public Crispness keepCrispWhenShrunk = Crispness.OnDesktop;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Font mTrueTypeFont;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UIFont mFont;
 
 	[Multiline(6)]
@@ -50,16 +50,16 @@ public class UILabel : UIWidget
 	[SerializeField]
 	private int mFontSize = 16;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private FontStyle mFontStyle;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private NGUIText.Alignment mAlignment;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool mEncoding = true;
 
 	[HideInInspector]
@@ -70,32 +70,32 @@ public class UILabel : UIWidget
 	[HideInInspector]
 	private Effect mEffectStyle;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Color mEffectColor = Color.get_black();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private NGUIText.SymbolStyle mSymbols = NGUIText.SymbolStyle.Normal;
 
 	[HideInInspector]
 	[SerializeField]
 	private Vector2 mEffectDistance = Vector2.get_one();
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Overflow mOverflow;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Material mMaterial;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool mApplyGradient;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Color mGradientTop = Color.get_white();
 
 	[HideInInspector]
@@ -106,8 +106,8 @@ public class UILabel : UIWidget
 	[SerializeField]
 	private int mSpacingX;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private int mSpacingY;
 
 	[SerializeField]
@@ -122,16 +122,16 @@ public class UILabel : UIWidget
 	[SerializeField]
 	private float mFloatSpacingY;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool mShrinkToFit;
 
 	[SerializeField]
 	[HideInInspector]
 	private int mMaxLineWidth;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private int mMaxLineHeight;
 
 	[HideInInspector]

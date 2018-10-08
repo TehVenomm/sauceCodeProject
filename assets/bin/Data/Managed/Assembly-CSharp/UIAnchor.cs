@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/Anchor")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/Anchor")]
 public class UIAnchor
 {
 	public enum Side
@@ -30,8 +30,8 @@ public class UIAnchor
 
 	public Vector2 pixelOffset = Vector2.get_zero();
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private UIWidget widgetContainer;
 
 	private Transform mTrans;

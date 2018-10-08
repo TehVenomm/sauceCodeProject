@@ -11,20 +11,20 @@ import org.apache.commons.lang3.Validate;
 
 public class DurationFormatUtils {
     /* renamed from: H */
-    static final Object f1351H = "H";
+    static final Object f3739H = "H";
     public static final String ISO_EXTENDED_FORMAT_PATTERN = "'P'yyyy'Y'M'M'd'DT'H'H'm'M's.SSS'S'";
     /* renamed from: M */
-    static final Object f1352M = "M";
+    static final Object f3740M = "M";
     /* renamed from: S */
-    static final Object f1353S = "S";
+    static final Object f3741S = "S";
     /* renamed from: d */
-    static final Object f1354d = "d";
+    static final Object f3742d = "d";
     /* renamed from: m */
-    static final Object f1355m = "m";
+    static final Object f3743m = "m";
     /* renamed from: s */
-    static final Object f1356s = "s";
+    static final Object f3744s = "s";
     /* renamed from: y */
-    static final Object f1357y = "y";
+    static final Object f3745y = "y";
 
     static class Token {
         private int count;
@@ -110,19 +110,19 @@ public class DurationFormatUtils {
         long j4 = 0;
         long j5 = 0;
         long j6 = 0;
-        if (Token.containsTokenWithValue(lexx, f1354d)) {
+        if (Token.containsTokenWithValue(lexx, f3742d)) {
             j3 = j / DateUtils.MILLIS_PER_DAY;
             j -= DateUtils.MILLIS_PER_DAY * j3;
         }
-        if (Token.containsTokenWithValue(lexx, f1351H)) {
+        if (Token.containsTokenWithValue(lexx, f3739H)) {
             j4 = j / DateUtils.MILLIS_PER_HOUR;
             j -= DateUtils.MILLIS_PER_HOUR * j4;
         }
-        if (Token.containsTokenWithValue(lexx, f1355m)) {
+        if (Token.containsTokenWithValue(lexx, f3743m)) {
             j5 = j / 60000;
             j -= 60000 * j5;
         }
-        if (Token.containsTokenWithValue(lexx, f1356s)) {
+        if (Token.containsTokenWithValue(lexx, f3744s)) {
             j6 = j / 1000;
             j2 = j - (1000 * j6);
         } else {
@@ -212,7 +212,7 @@ public class DurationFormatUtils {
             i9 += 24;
             i10--;
         }
-        if (Token.containsTokenWithValue(lexx, f1352M)) {
+        if (Token.containsTokenWithValue(lexx, f3740M)) {
             int i13 = i11;
             i11 = i10;
             i10 = i13;
@@ -225,14 +225,14 @@ public class DurationFormatUtils {
                 i10 += 12;
                 i12--;
             }
-            if (!(Token.containsTokenWithValue(lexx, f1357y) || i12 == 0)) {
+            if (!(Token.containsTokenWithValue(lexx, f3745y) || i12 == 0)) {
                 while (i12 != 0) {
                     i10 += i12 * 12;
                     i12 = 0;
                 }
             }
         } else {
-            if (!Token.containsTokenWithValue(lexx, f1357y)) {
+            if (!Token.containsTokenWithValue(lexx, f3745y)) {
                 i12 = instance2.get(1);
                 if (i11 < 0) {
                     i12--;
@@ -261,28 +261,28 @@ public class DurationFormatUtils {
         }
         int i14 = i10;
         i10 = i11;
-        if (Token.containsTokenWithValue(lexx, f1354d)) {
+        if (Token.containsTokenWithValue(lexx, f3742d)) {
             i = i10;
             i10 = i9;
         } else {
             i = 0;
             i10 = i9 + (i10 * 24);
         }
-        if (Token.containsTokenWithValue(lexx, f1351H)) {
+        if (Token.containsTokenWithValue(lexx, f3739H)) {
             i2 = i10;
             i10 = i8;
         } else {
             i2 = 0;
             i10 = i8 + (i10 * 60);
         }
-        if (Token.containsTokenWithValue(lexx, f1355m)) {
+        if (Token.containsTokenWithValue(lexx, f3743m)) {
             i3 = i10;
             i10 = i7;
         } else {
             i3 = 0;
             i10 = i7 + (i10 * 60);
         }
-        if (Token.containsTokenWithValue(lexx, f1356s)) {
+        if (Token.containsTokenWithValue(lexx, f3744s)) {
             i4 = i10;
             i5 = i6;
         } else {
@@ -300,25 +300,25 @@ public class DurationFormatUtils {
             int count = token.getCount();
             if (value instanceof StringBuilder) {
                 stringBuilder.append(value.toString());
-            } else if (value == f1357y) {
+            } else if (value == f3745y) {
                 stringBuilder.append(paddedValue(j, z, count));
                 obj = null;
-            } else if (value == f1352M) {
+            } else if (value == f3740M) {
                 stringBuilder.append(paddedValue(j2, z, count));
                 obj = null;
-            } else if (value == f1354d) {
+            } else if (value == f3742d) {
                 stringBuilder.append(paddedValue(j3, z, count));
                 obj = null;
-            } else if (value == f1351H) {
+            } else if (value == f3739H) {
                 stringBuilder.append(paddedValue(j4, z, count));
                 obj = null;
-            } else if (value == f1355m) {
+            } else if (value == f3743m) {
                 stringBuilder.append(paddedValue(j5, z, count));
                 obj = null;
-            } else if (value == f1356s) {
+            } else if (value == f3744s) {
                 stringBuilder.append(paddedValue(j6, z, count));
                 obj = 1;
-            } else if (value == f1353S) {
+            } else if (value == f3741S) {
                 if (obj != null) {
                     stringBuilder.append(paddedValue(j7, true, z ? Math.max(3, count) : 3));
                 } else {
@@ -358,25 +358,25 @@ public class DurationFormatUtils {
                         obj = null;
                         break;
                     case 'H':
-                        obj2 = f1351H;
+                        obj2 = f3739H;
                         break;
                     case 'M':
-                        obj2 = f1352M;
+                        obj2 = f3740M;
                         break;
                     case 'S':
-                        obj2 = f1353S;
+                        obj2 = f3741S;
                         break;
                     case 'd':
-                        obj2 = f1354d;
+                        obj2 = f3742d;
                         break;
                     case 'm':
-                        obj2 = f1355m;
+                        obj2 = f3743m;
                         break;
                     case 's':
-                        obj2 = f1356s;
+                        obj2 = f3744s;
                         break;
                     case 'y':
-                        obj2 = f1357y;
+                        obj2 = f3745y;
                         break;
                     default:
                         if (stringBuilder == null) {

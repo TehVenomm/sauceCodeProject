@@ -177,7 +177,7 @@ public class UIBehaviour
 		"ItemIconKind_Brade",
 		"ItemIconKind_Lance",
 		"ItemIconKind_Edge",
-		"ItemIconKind_Allow",
+		"ItemIconKind_Arrow",
 		"ItemIconKind_Armor",
 		"ItemIconKind_Helm",
 		"ItemIconKind_Arm",

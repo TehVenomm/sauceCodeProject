@@ -148,11 +148,11 @@ public final class zzcgd extends zzegi<zzcgd> {
         if (this.zzjaa == null || this.zzjaa.length <= 0) {
             i = zzn;
         } else {
-            i = 0;
+            i2 = 0;
             for (long zzcp : this.zzjaa) {
-                i += zzegg.zzcp(zzcp);
+                i2 += zzegg.zzcp(zzcp);
             }
-            i = (this.zzjaa.length * 1) + (zzn + i);
+            i = (this.zzjaa.length * 1) + (i2 + zzn);
         }
         if (this.zzjab == null || this.zzjab.length <= 0) {
             return i;

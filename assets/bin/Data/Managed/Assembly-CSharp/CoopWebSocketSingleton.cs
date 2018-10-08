@@ -508,9 +508,9 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 				List<uint> delete_keys = new List<uint>();
 				this.resendPackets.ForEach((Action<ResendPacket>)delegate(ResendPacket resend)
 				{
-					if (((_003CResendMonitor_003Ec__Iterator221)/*Error near IL_0058: stateMachine*/)._003Cnow_003E__0 - resend.lastSendTime > ((_003CResendMonitor_003Ec__Iterator221)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.resendInterval)
+					if (((_003CResendMonitor_003Ec__Iterator230)/*Error near IL_0058: stateMachine*/)._003Cnow_003E__0 - resend.lastSendTime > ((_003CResendMonitor_003Ec__Iterator230)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.resendInterval)
 					{
-						((_003CResendMonitor_003Ec__Iterator221)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.LogDebug("Resend packet: {0}", new object[1]
+						((_003CResendMonitor_003Ec__Iterator230)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.LogDebug("Resend packet: {0}", new object[1]
 						{
 							resend.packet
 						});
@@ -528,30 +528,30 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 							}
 							if (!flag)
 							{
-								((_003CResendMonitor_003Ec__Iterator221)/*Error near IL_0058: stateMachine*/)._003Cdelete_keys_003E__1.Add((uint)resend.packet.sequenceNo);
-								((_003CResendMonitor_003Ec__Iterator221)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.LogDebug("Delete resend packet: sequence={0}", new object[1]
+								((_003CResendMonitor_003Ec__Iterator230)/*Error near IL_0058: stateMachine*/)._003Cdelete_keys_003E__1.Add((uint)resend.packet.sequenceNo);
+								((_003CResendMonitor_003Ec__Iterator230)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.LogDebug("Delete resend packet: sequence={0}", new object[1]
 								{
 									resend.packet.sequenceNo
 								});
 								return;
 							}
 						}
-						PacketStream stream = ((_003CResendMonitor_003Ec__Iterator221)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.serializer.Serialize(resend.packet);
-						((_003CResendMonitor_003Ec__Iterator221)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.NativeSend(stream);
-						resend.lastSendTime = ((_003CResendMonitor_003Ec__Iterator221)/*Error near IL_0058: stateMachine*/)._003Cnow_003E__0;
+						PacketStream stream = ((_003CResendMonitor_003Ec__Iterator230)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.serializer.Serialize(resend.packet);
+						((_003CResendMonitor_003Ec__Iterator230)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.NativeSend(stream);
+						resend.lastSendTime = ((_003CResendMonitor_003Ec__Iterator230)/*Error near IL_0058: stateMachine*/)._003Cnow_003E__0;
 						resend.resendCount++;
 					}
 				});
 				delete_keys.ForEach((Action<uint>)delegate(uint key)
 				{
-					((_003CResendMonitor_003Ec__Iterator221)/*Error near IL_006f: stateMachine*/)._003C_003Ef__this.resendPackets.Remove(key);
+					((_003CResendMonitor_003Ec__Iterator230)/*Error near IL_006f: stateMachine*/)._003C_003Ef__this.resendPackets.Remove(key);
 				});
 				yield return (object)new WaitForSeconds(this.resendInterval);
 			}
 		}
 		finally
 		{
-			((_003CResendMonitor_003Ec__Iterator221)/*Error near IL_00bd: stateMachine*/)._003C_003E__Finally0();
+			((_003CResendMonitor_003Ec__Iterator230)/*Error near IL_00bd: stateMachine*/)._003C_003E__Finally0();
 		}
 	}
 

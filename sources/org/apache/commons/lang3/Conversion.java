@@ -1,7 +1,6 @@
 package org.apache.commons.lang3;
 
 import com.facebook.GraphRequest;
-import com.google.android.gms.games.quest.Quests;
 import java.util.UUID;
 
 public class Conversion {
@@ -66,7 +65,7 @@ public class Conversion {
             case 'd':
                 return 11;
             case 'E':
-            case Quests.SELECT_COMPLETED_UNCLAIMED /*101*/:
+            case 'e':
                 return 7;
             case 'F':
             case 'f':
@@ -111,7 +110,7 @@ public class Conversion {
             case 'd':
                 return (boolean[]) TFTT.clone();
             case 'E':
-            case Quests.SELECT_COMPLETED_UNCLAIMED /*101*/:
+            case 'e':
                 return (boolean[]) FTTT.clone();
             case 'F':
             case 'f':
@@ -156,7 +155,7 @@ public class Conversion {
             case 'd':
                 return (boolean[]) TTFT.clone();
             case 'E':
-            case Quests.SELECT_COMPLETED_UNCLAIMED /*101*/:
+            case 'e':
                 return (boolean[]) TTTF.clone();
             case 'F':
             case 'f':

@@ -150,8 +150,8 @@ public class QuestRushSelectList : QuestEventSelectList
 				}
 			}
 			bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-			_003CUpdateTable_003Ec__AnonStorey40F _003CUpdateTable_003Ec__AnonStorey40F;
-			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num3, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey40F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey40F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateTable_003Ec__AnonStorey41F _003CUpdateTable_003Ec__AnonStorey41F;
+			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num3, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey41F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey41F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
 			component.set_enabled(true);
 			RepositionTable();
@@ -220,7 +220,7 @@ public class QuestRushSelectList : QuestEventSelectList
 			bool enable_clear_event = table.clearEventID != 0;
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-			_003COnQuery_SELECT_RUSH_003Ec__AnonStorey410 _003COnQuery_SELECT_RUSH_003Ec__AnonStorey;
+			_003COnQuery_SELECT_RUSH_003Ec__AnonStorey420 _003COnQuery_SELECT_RUSH_003Ec__AnonStorey;
 			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo[num].uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003COnQuery_SELECT_RUSH_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		else
@@ -313,8 +313,8 @@ public class QuestRushSelectList : QuestEventSelectList
 			eid = eventData.eventId
 		}, url: QuestRushPointModel.URL, callBack: (Action<QuestRushPointModel>)delegate(QuestRushPointModel result)
 		{
-			((_003CGetCurrentStatus_003Ec__Iterator125)/*Error near IL_0059: stateMachine*/)._003CisRequest_003E__0 = false;
-			((_003CGetCurrentStatus_003Ec__Iterator125)/*Error near IL_0059: stateMachine*/)._003C_003Ef__this.currentData = result.result;
+			((_003CGetCurrentStatus_003Ec__Iterator129)/*Error near IL_0059: stateMachine*/)._003CisRequest_003E__0 = false;
+			((_003CGetCurrentStatus_003Ec__Iterator129)/*Error near IL_0059: stateMachine*/)._003C_003Ef__this.currentData = result.result;
 		}, getParam: string.Empty);
 		while (isRequest)
 		{

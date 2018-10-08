@@ -431,6 +431,92 @@ public class UITutorialOperationHelper
 		}
 	}
 
+	[Serializable]
+	public class TutorialBasicNew
+	{
+		[SerializeField]
+		private GameObject helpUI;
+
+		[SerializeField]
+		private GameObject helpImage_1;
+
+		[SerializeField]
+		private GameObject helpImage_2;
+
+		[SerializeField]
+		private GameObject helpImageIOS_1;
+
+		[SerializeField]
+		private GameObject helpImageIOS_2;
+
+		[SerializeField]
+		private UIButton okBtn;
+
+		[SerializeField]
+		private UILabel okLbl;
+
+		private Action OnCloseHelp;
+
+		public void SetLabel(int counter)
+		{
+			if (okLbl != null)
+			{
+				okLbl.text = string.Format(STR_BASIC_NEW, counter);
+			}
+		}
+
+		public bool isActive()
+		{
+			return helpUI.get_activeInHierarchy();
+		}
+
+		public void ShowHelpPicture(Action OnCloseHelp)
+		{
+			if (OnCloseHelp != null)
+			{
+				this.OnCloseHelp = OnCloseHelp;
+			}
+			if (okBtn != null)
+			{
+				okBtn.onClick.Add(new EventDelegate(delegate
+				{
+					HideHelpPicture(null);
+				}));
+			}
+			if (helpUI != null)
+			{
+				helpUI.SetActive(true);
+			}
+			if (helpImage_1 != null && helpImage_2 != null)
+			{
+				helpImage_1.SetActive(true);
+				helpImage_2.SetActive(true);
+			}
+			if (helpImageIOS_1 != null && helpImageIOS_2 != null)
+			{
+				helpImageIOS_1.SetActive(false);
+				helpImageIOS_2.SetActive(false);
+			}
+		}
+
+		public void HideHelpPicture(Action onHided = null)
+		{
+			SoundManager.PlaySystemSE(SoundID.UISE.CLICK, 1f);
+			if (helpUI != null)
+			{
+				helpUI.SetActive(false);
+				if (OnCloseHelp != null)
+				{
+					OnCloseHelp.Invoke();
+				}
+			}
+		}
+	}
+
+	public static readonly string STR_BASIC_NEW = "LET'S FIGHT! ({0})";
+
+	public static readonly float WAITING_BASIC_TIME = 5f;
+
 	public static readonly int SE_ID_COMPLETE = 40000100;
 
 	public static readonly int SE_ID_THUNDERSTORM_01 = 40000110;
@@ -475,6 +561,9 @@ public class UITutorialOperationHelper
 	private TutorialBoss _bossHelper = new TutorialBoss();
 
 	[SerializeField]
+	private TutorialBasicNew _basicNewHelper = new TutorialBasicNew();
+
+	[SerializeField]
 	private Transform _fingerMove;
 
 	[SerializeField]
@@ -485,6 +574,10 @@ public class UITutorialOperationHelper
 
 	[SerializeField]
 	private Transform _fingerAttack;
+
+	private float counterTimer;
+
+	private int countTime;
 
 	public TutorialCommon commonHelper => _commonHelper;
 
@@ -499,6 +592,8 @@ public class UITutorialOperationHelper
 	public TutorialBattle battleHelper => _battleHelper;
 
 	public TutorialBoss bossHelper => _bossHelper;
+
+	public TutorialBasicNew basicNewHelper => _basicNewHelper;
 
 	public Transform fingerMove => _fingerMove;
 
@@ -539,5 +634,36 @@ public class UITutorialOperationHelper
 			}
 			Object.Destroy(ta);
 		});
+	}
+
+	private void Awake()
+	{
+		countTime = (int)WAITING_BASIC_TIME;
+		if (_basicNewHelper != null)
+		{
+			_basicNewHelper.HideHelpPicture(null);
+		}
+	}
+
+	private void Update()
+	{
+		if (_basicNewHelper.isActive() && countTime >= 0)
+		{
+			_basicNewHelper.SetLabel(countTime);
+			counterTimer += Time.get_deltaTime();
+			if (counterTimer >= 1f)
+			{
+				countTime--;
+				counterTimer = 0f;
+				if (countTime >= 0)
+				{
+					_basicNewHelper.SetLabel(countTime);
+				}
+			}
+		}
+		else if (_basicNewHelper.isActive())
+		{
+			_basicNewHelper.HideHelpPicture(null);
+		}
 	}
 }

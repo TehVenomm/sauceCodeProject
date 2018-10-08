@@ -38,7 +38,7 @@ abstract class AbstractCheckForUpdatesController implements UpdatesController {
     }
 
     private void performUpdateCheck() {
-        Fabric.getLogger().mo4289d(Beta.TAG, "Performing update check");
+        Fabric.getLogger().mo4753d(Beta.TAG, "Performing update check");
         String value = new ApiKey().getValue(this.context);
         new CheckForUpdatesRequest(this.beta, this.beta.getOverridenSpiEndpoint(), this.betaSettings.updateUrl, this.httpRequestFactory, new CheckForUpdatesResponseTransform()).invoke(value, this.idManager.createIdHeaderValue(value, this.buildProps.packageName), this.buildProps);
     }
@@ -52,10 +52,10 @@ abstract class AbstractCheckForUpdatesController implements UpdatesController {
         }
         long currentTimeMillis = this.currentTimeProvider.getCurrentTimeMillis();
         long j = ((long) this.betaSettings.updateSuspendDurationSeconds) * 1000;
-        Fabric.getLogger().mo4289d(Beta.TAG, "Check for updates delay: " + j);
-        Fabric.getLogger().mo4289d(Beta.TAG, "Check for updates last check time: " + getLastCheckTimeMillis());
+        Fabric.getLogger().mo4753d(Beta.TAG, "Check for updates delay: " + j);
+        Fabric.getLogger().mo4753d(Beta.TAG, "Check for updates last check time: " + getLastCheckTimeMillis());
         j += getLastCheckTimeMillis();
-        Fabric.getLogger().mo4289d(Beta.TAG, "Check for updates current time: " + currentTimeMillis + ", next check time: " + j);
+        Fabric.getLogger().mo4753d(Beta.TAG, "Check for updates current time: " + currentTimeMillis + ", next check time: " + j);
         if (currentTimeMillis >= j) {
             try {
                 performUpdateCheck();
@@ -63,7 +63,7 @@ abstract class AbstractCheckForUpdatesController implements UpdatesController {
                 setLastCheckTimeMillis(currentTimeMillis);
             }
         } else {
-            Fabric.getLogger().mo4289d(Beta.TAG, "Check for updates next check time was not passed");
+            Fabric.getLogger().mo4753d(Beta.TAG, "Check for updates next check time was not passed");
         }
     }
 

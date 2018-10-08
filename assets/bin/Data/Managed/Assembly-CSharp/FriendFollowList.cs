@@ -40,8 +40,8 @@ public class FriendFollowList : FollowListBase
 				base.ScrollGrid.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 			}
 			CleanItemList();
-			_003CUpdateDynamicList_003Ec__AnonStorey30D _003CUpdateDynamicList_003Ec__AnonStorey30D;
-			SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, pageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey30D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateDynamicList_003Ec__AnonStorey31C _003CUpdateDynamicList_003Ec__AnonStorey31C;
+			SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, pageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey31C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -52,8 +52,8 @@ public class FriendFollowList : FollowListBase
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey30E _003CSendGetList_003Ec__AnonStorey30E;
-		MonoBehaviourSingleton<FriendManager>.I.SendGetFollowList(page, new Action<bool, FriendFollowListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey30E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendGetList_003Ec__AnonStorey31D _003CSendGetList_003Ec__AnonStorey31D;
+		MonoBehaviourSingleton<FriendManager>.I.SendGetFollowList(page, new Action<bool, FriendFollowListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey31D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void PostSendGetListByReopen(int page)
@@ -126,7 +126,16 @@ public class FriendFollowList : FollowListBase
 
 	protected override void OnQuery_SORT()
 	{
-		base.OnQuery_SORT();
-		GameSaveData.instance.SetFollowListSortType((int)m_currentSortType);
+		if (recvList.Count > 0)
+		{
+			base.OnQuery_SORT();
+			GameSaveData.instance.SetFollowListSortType((int)m_currentSortType);
+		}
+		else
+		{
+			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "You have no Following Hunters", StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u), null, null, null), delegate
+			{
+			}, false, 0);
+		}
 	}
 }

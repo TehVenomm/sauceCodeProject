@@ -13,7 +13,6 @@ import com.facebook.appevents.AppEventsConstants;
 import com.facebook.applinks.AppLinkData;
 import com.facebook.internal.AnalyticsEvents;
 import com.facebook.share.internal.ShareConstants;
-import io.fabric.sdk.android.services.settings.SettingsJsonConstants;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +36,7 @@ public class AppLinkNavigation {
     public enum NavigationResult {
         FAILED("failed", false),
         WEB(AnalyticsEvents.PARAMETER_SHARE_DIALOG_SHOW_WEB, true),
-        APP(SettingsJsonConstants.APP_KEY, true);
+        APP("app", true);
         
         private String code;
         private boolean succeeded;

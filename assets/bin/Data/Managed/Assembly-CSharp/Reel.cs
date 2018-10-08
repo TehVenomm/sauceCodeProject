@@ -65,8 +65,8 @@ public class Reel : GameSection
 			digits += ((data <= 0) ? 1 : data);
 		});
 		int reel_list_width_base = width / digits;
-		_003CUpdateUI_003Ec__AnonStorey7BB _003CUpdateUI_003Ec__AnonStorey7BB;
-		SetTable(UI.TBL_REEL, "ReelList", initData.digit.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey7BB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateUI_003Ec__AnonStorey7CD _003CUpdateUI_003Ec__AnonStorey7CD;
+		SetTable(UI.TBL_REEL, "ReelList", initData.digit.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey7CD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public void OnCenter(GameObject go)

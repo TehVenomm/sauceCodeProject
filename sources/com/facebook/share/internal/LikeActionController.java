@@ -709,8 +709,8 @@ public class LikeActionController {
                     String access$900 = LikeActionController.this.socialSentenceWithLike;
                     String access$1000 = LikeActionController.this.socialSentenceWithoutLike;
                     if (bundle.containsKey(LikeActionController.LIKE_DIALOG_RESPONSE_SOCIAL_SENTENCE_KEY)) {
-                        access$900 = bundle.getString(LikeActionController.LIKE_DIALOG_RESPONSE_SOCIAL_SENTENCE_KEY);
-                        access$1000 = access$900;
+                        access$1000 = bundle.getString(LikeActionController.LIKE_DIALOG_RESPONSE_SOCIAL_SENTENCE_KEY);
+                        access$900 = access$1000;
                     }
                     String string = bundle.containsKey(LikeActionController.LIKE_DIALOG_RESPONSE_OBJECT_IS_LIKED_KEY) ? bundle.getString("unlike_token") : LikeActionController.this.unlikeToken;
                     Bundle bundle2 = bundle == null ? new Bundle() : bundle;
@@ -955,7 +955,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find block by offs
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1731295355.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
 */
         /*
         r1 = 0;

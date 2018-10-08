@@ -28,15 +28,15 @@ public final class Utils {
             }
             z = false;
         } catch (Throwable e) {
-            Logger.m1004e(e, "Error during checking permission ", str);
+            Logger.m4029e(e, "Error during checking permission ", str);
             z = false;
         }
-        Logger.m1001d("hasRequestedPermission() is ", Boolean.valueOf(z), " for ", str);
+        Logger.m4026d("hasRequestedPermission() is ", Boolean.valueOf(z), " for ", str);
         return z;
     }
 
     public static boolean isPackageInstaller(@NotNull Context context, String str) {
-        Logger.m1001d("isPackageInstaller() is ", Boolean.valueOf(TextUtils.equals(context.getPackageManager().getInstallerPackageName(context.getPackageName()), str)), " for ", str);
+        Logger.m4026d("isPackageInstaller() is ", Boolean.valueOf(TextUtils.equals(context.getPackageManager().getInstallerPackageName(context.getPackageName()), str)), " for ", str);
         return TextUtils.equals(context.getPackageManager().getInstallerPackageName(context.getPackageName()), str);
     }
 
@@ -48,7 +48,7 @@ public final class Utils {
         } catch (NameNotFoundException e) {
             z = false;
         }
-        Logger.m1001d("packageInstalled() is ", Boolean.valueOf(z), " for ", str);
+        Logger.m4026d("packageInstalled() is ", Boolean.valueOf(z), " for ", str);
         return z;
     }
 

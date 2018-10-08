@@ -34,12 +34,12 @@ public class FortumoStore extends DefaultAppstore {
                         if (z) {
                             try {
                                 if (fortumoStore.getInAppBillingService().queryInventory(false, null, null).getAllPurchases().isEmpty()) {
-                                    Logger.m1000d("Purchases not found");
+                                    Logger.m4025d("Purchases not found");
                                 } else {
                                     fortumoStoreArr[0] = fortumoStore;
                                 }
                             } catch (Throwable e) {
-                                Logger.m1003e("Error while requesting purchases", e);
+                                Logger.m4028e("Error while requesting purchases", e);
                             }
                         } else {
                             fortumoStoreArr[0] = fortumoStore;
@@ -51,7 +51,7 @@ public class FortumoStore extends DefaultAppstore {
             try {
                 countDownLatch.await();
             } catch (Throwable e) {
-                Logger.m1003e("Setup was interrupted", e);
+                Logger.m4028e("Setup was interrupted", e);
             }
         }
         return fortumoStoreArr[0];
@@ -84,7 +84,7 @@ public class FortumoStore extends DefaultAppstore {
         }
         this.billingService = (FortumoBillingService) getInAppBillingService();
         this.isBillingAvailable = Boolean.valueOf(this.billingService.setupBilling(this.isNookDevice));
-        Logger.m1001d("isBillingAvailable: ", this.isBillingAvailable);
+        Logger.m4026d("isBillingAvailable: ", this.isBillingAvailable);
         return this.isBillingAvailable.booleanValue();
     }
 

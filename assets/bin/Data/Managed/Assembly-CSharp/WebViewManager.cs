@@ -9,6 +9,8 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 
 	private Action<string> onClose;
 
+	private Vector2 resokution;
+
 	[SerializeField]
 	private Rect m_Margine;
 
@@ -71,9 +73,37 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 		return string.Format(NewsWithLinkParamFormat, link_param);
 	}
 
-	public void Open(string url, Action<string> _onClose = null)
+	private Vector2 GetResokution()
 	{
 		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+		FixedNGUIThrowIphoneX component = this.GetComponent<FixedNGUIThrowIphoneX>();
+		Vector2 val = default(Vector2);
+		if (!FixedPanelNGUI.IsIphoneX())
+		{
+			return FixedPanelNGUI.GetResolutionFixed(false);
+		}
+		if (!(component != null))
+		{
+			return FixedPanelNGUI.GetResolutionFixed(false);
+		}
+		return FixedPanelNGUI.GetResolutionFixed(component.LockRatioPosition);
+	}
+
+	public void Open(string url, Action<string> _onClose = null)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		resokution = GetResokution();
 		onClose = _onClose;
 		webViewObject = this.get_gameObject().AddComponent<WebViewObject>();
 		webViewObject.Init(string.Empty, string.Empty, string.Empty);
@@ -93,11 +123,19 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 			num = MonoBehaviourSingleton<AppMain>.I.defaultScreenWidth;
 			num2 = MonoBehaviourSingleton<AppMain>.I.defaultScreenHeight;
 		}
-		int left = (int)((float)num * m_Margine.get_xMin());
-		int top = (int)((float)num2 * m_Margine.get_yMin());
-		int right = (int)((float)num * m_Margine.get_width());
-		int bottom = (int)((float)num2 * m_Margine.get_height());
-		webViewObject.SetMargins(left, top, right, bottom);
+		int num3 = (int)((float)num * m_Margine.get_xMin());
+		int num4 = (int)((float)num2 * m_Margine.get_yMin());
+		int num5 = (int)((float)num * m_Margine.get_width());
+		int num6 = (int)((float)num2 * m_Margine.get_height());
+		if (FixedPanelNGUI.IsIphoneX())
+		{
+			float num7 = FixedPanelNGUI.GetOffseMoveHeightIfIphoneX(resokution.y) / 2f;
+			num4 += (int)(5f * num7 / 2f);
+			num6 -= (int)num7;
+			num3 += (int)num7;
+			num5 += (int)num7;
+		}
+		webViewObject.SetMargins(num3, num4, num5, num6);
 	}
 
 	public unsafe void OnWebViewEvent(string msg)
@@ -145,21 +183,21 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 				case "tutorial":
 				{
 					WebViewObject obj2 = webViewObject;
-					if (_003C_003Ef__am_0024cache4 == null)
+					if (_003C_003Ef__am_0024cache5 == null)
 					{
-						_003C_003Ef__am_0024cache4 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+						_003C_003Ef__am_0024cache5 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 					}
-					obj2.onDestroy = _003C_003Ef__am_0024cache4;
+					obj2.onDestroy = _003C_003Ef__am_0024cache5;
 					break;
 				}
 				case "skill":
 				{
 					WebViewObject obj = webViewObject;
-					if (_003C_003Ef__am_0024cache5 == null)
+					if (_003C_003Ef__am_0024cache6 == null)
 					{
-						_003C_003Ef__am_0024cache5 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+						_003C_003Ef__am_0024cache6 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 					}
-					obj.onDestroy = _003C_003Ef__am_0024cache5;
+					obj.onDestroy = _003C_003Ef__am_0024cache6;
 					break;
 				}
 				}

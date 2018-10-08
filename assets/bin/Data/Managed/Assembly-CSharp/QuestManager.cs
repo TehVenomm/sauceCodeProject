@@ -639,7 +639,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 					if (fieldPortal == null || fieldPortal.point < portalPoint)
 					{
 						SetExplorePortalPoint(portalId, point);
-						_003CUpdatePortalPointForExplore_003Ec__AnonStorey682 _003CUpdatePortalPointForExplore_003Ec__AnonStorey;
+						_003CUpdatePortalPointForExplore_003Ec__AnonStorey694 _003CUpdatePortalPointForExplore_003Ec__AnonStorey;
 						MonoBehaviourSingleton<FieldManager>.I.SendFieldQuestOpenPortal(portalId, new Action<bool, Error>((object)_003CUpdatePortalPointForExplore_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					}
 					else
@@ -1362,6 +1362,15 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		return false;
 	}
 
+	public bool IsTutorialOrderShadowQuest()
+	{
+		if (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.FORGE_ITEM))
+		{
+			return !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SHADOW_QUEST_END);
+		}
+		return false;
+	}
+
 	public ClearStatusQuestEnemySpecies GetClearStatusQuestEnemySpecies(uint questId)
 	{
 		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(questId);
@@ -1668,8 +1677,8 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		{
 			excludeLocationType = EVENT_DISPLAY_LOCATION_TYPE.FIELD;
 		}
-		_003CGetValidBingoDataListInSection_003Ec__AnonStorey690 _003CGetValidBingoDataListInSection_003Ec__AnonStorey;
-		return bingoEventList.Where(new Func<Network.EventData, bool>((object)_003CGetValidBingoDataListInSection_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList();
+		_003CGetValidBingoDataListInSection_003Ec__AnonStorey6A2 _003CGetValidBingoDataListInSection_003Ec__AnonStorey6A;
+		return bingoEventList.Where(new Func<Network.EventData, bool>((object)_003CGetValidBingoDataListInSection_003Ec__AnonStorey6A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList();
 	}
 
 	public bool IsBingoPlayableEventExist()

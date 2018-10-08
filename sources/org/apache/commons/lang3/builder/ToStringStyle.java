@@ -875,7 +875,7 @@ public abstract class ToStringStyle implements Serializable {
     }
 
     protected String getShortClassName(Class<?> cls) {
-        return ClassUtils.getShortClassName((Class) cls);
+        return ClassUtils.getShortClassName(cls);
     }
 
     protected boolean isUseClassName() {

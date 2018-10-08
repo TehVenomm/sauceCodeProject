@@ -78,6 +78,15 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 	[SerializeField]
 	protected UIHGauge shadowSealingGaugeUI;
 
+	[SerializeField]
+	protected UITweenCtrl hpMultiXTween;
+
+	[SerializeField]
+	protected GameObject tutorialObj;
+
+	[SerializeField]
+	protected UILabel multiX;
+
 	private Coroutine shakeCoroutine;
 
 	private Vector3 shakeTargetDefaultPos = Vector3.get_zero();
@@ -118,6 +127,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 		base.Awake();
 		this.get_gameObject().SetActive(false);
 		SetGaugeType(GaugeType.HP);
+		SetActiveTutorialObj(false);
 	}
 
 	private void Start()
@@ -462,7 +472,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 			yield return (object)new WaitForSeconds(downEffectTime / speed);
 			effects.ForEach(delegate(GameObject obj)
 			{
-				((_003C_DirectionDownParticle_003Ec__Iterator1FD)/*Error near IL_0233: stateMachine*/)._003C_003Ef__this.playEffects.Remove(obj);
+				((_003C_DirectionDownParticle_003Ec__Iterator20C)/*Error near IL_0233: stateMachine*/)._003C_003Ef__this.playEffects.Remove(obj);
 				EffectManager.ReleaseEffect(obj, true, false);
 			});
 		}
@@ -699,7 +709,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 			yield return (object)new WaitForSeconds(downEffectTime);
 			effects.ForEach(delegate(GameObject obj)
 			{
-				((_003C_DirectionShadowSealingGauge_003Ec__Iterator1FF)/*Error near IL_025b: stateMachine*/)._003C_003Ef__this.playShadowSealingEffects.Remove(obj);
+				((_003C_DirectionShadowSealingGauge_003Ec__Iterator20E)/*Error near IL_025b: stateMachine*/)._003C_003Ef__this.playShadowSealingEffects.Remove(obj);
 				EffectManager.ReleaseEffect(obj, true, false);
 			});
 		}
@@ -748,6 +758,38 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 					hpFocusFrame.SetActive(true);
 				}
 			}
+		}
+	}
+
+	public void PlayShakeHpMultiX()
+	{
+		if (hpMultiXTween != null)
+		{
+			Debug.Log((object)"Shake");
+			hpMultiXTween.Reset();
+			hpMultiXTween.Play(true, null);
+		}
+	}
+
+	public void SetHpMultiX(int x)
+	{
+		if (tutorialObj != null)
+		{
+			multiX.text = $"x.{x}";
+		}
+	}
+
+	public void SetActiveTutorialObj(bool isActive)
+	{
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+		if (tutorialObj != null)
+		{
+			tutorialObj.SetActive(isActive);
+			weakRootName.get_gameObject().SetActive(!isActive);
+			enemyName.get_gameObject().SetActive(!isActive);
+			sprElement.get_gameObject().SetActive(!isActive);
 		}
 	}
 }

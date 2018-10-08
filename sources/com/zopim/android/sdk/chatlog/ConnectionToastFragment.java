@@ -14,7 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import com.zopim.android.sdk.anim.AnimatorPack;
 import com.zopim.android.sdk.anim.AnimatorPack.Direction;
 import com.zopim.android.sdk.api.ZopimChat;
@@ -24,14 +24,14 @@ import com.zopim.android.sdk.model.Connection;
 public class ConnectionToastFragment extends Fragment {
     private static final String LOG_TAG = ConnectionToastFragment.class.getSimpleName();
     private static final String STATE_SHOW_TOAST = "SHOW_TOAST";
-    ConnectionObserver mConnectionObserver = new C0858x(this);
+    ConnectionObserver mConnectionObserver = new C0857x(this);
     private Handler mHandler = new Handler(Looper.getMainLooper());
     private TextView mMessageView;
-    private C0832a mToastListener;
+    private C0831a mToastListener;
     private View mToastView;
 
     /* renamed from: com.zopim.android.sdk.chatlog.ConnectionToastFragment$a */
-    interface C0832a {
+    interface C0831a {
         void onHideToast();
 
         void onShowToast();
@@ -74,17 +74,17 @@ public class ConnectionToastFragment extends Fragment {
             Log.w(LOG_TAG, "Connection must not be null. Can not update visibility.");
             return;
         }
-        switch (C0860z.f842a[connection.getStatus().ordinal()]) {
+        switch (C0859z.f842a[connection.getStatus().ordinal()]) {
             case 1:
-                this.mMessageView.setText(getResources().getString(C0785R.string.no_connectivity_toast_message));
+                this.mMessageView.setText(getResources().getString(C0784R.string.no_connectivity_toast_message));
                 showToast();
                 return;
             case 2:
-                this.mMessageView.setText(getResources().getString(C0785R.string.reconnecting_toast_message));
+                this.mMessageView.setText(getResources().getString(C0784R.string.reconnecting_toast_message));
                 showToast();
                 return;
             case 3:
-                this.mMessageView.setText(getResources().getString(C0785R.string.no_connectivity_toast_message));
+                this.mMessageView.setText(getResources().getString(C0784R.string.no_connectivity_toast_message));
                 showToast();
                 return;
             case 4:
@@ -97,11 +97,11 @@ public class ConnectionToastFragment extends Fragment {
 
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof C0832a) {
-            this.mToastListener = (C0832a) activity;
+        if (activity instanceof C0831a) {
+            this.mToastListener = (C0831a) activity;
         }
-        if (getParentFragment() instanceof C0832a) {
-            this.mToastListener = (C0832a) getParentFragment();
+        if (getParentFragment() instanceof C0831a) {
+            this.mToastListener = (C0831a) getParentFragment();
         }
     }
 
@@ -115,7 +115,7 @@ public class ConnectionToastFragment extends Fragment {
     }
 
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, @Nullable Bundle bundle) {
-        return layoutInflater.inflate(C0785R.layout.zopim_toast_fragment, viewGroup, false);
+        return layoutInflater.inflate(C0784R.layout.zopim_toast_fragment, viewGroup, false);
     }
 
     public void onDestroy() {
@@ -145,8 +145,8 @@ public class ConnectionToastFragment extends Fragment {
 
     public void onViewCreated(View view, @Nullable Bundle bundle) {
         super.onViewCreated(view, bundle);
-        this.mToastView = view.findViewById(C0785R.id.network_no_connectivity);
-        this.mMessageView = (TextView) view.findViewById(C0785R.id.message_text);
+        this.mToastView = view.findViewById(C0784R.id.network_no_connectivity);
+        this.mMessageView = (TextView) view.findViewById(C0784R.id.message_text);
     }
 
     public void onViewStateRestored(@Nullable Bundle bundle) {

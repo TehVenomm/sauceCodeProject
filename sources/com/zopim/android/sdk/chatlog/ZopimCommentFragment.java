@@ -13,7 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import com.zopim.android.sdk.api.Chat;
 import com.zopim.android.sdk.api.ZopimChat;
 import com.zopim.android.sdk.chatlog.ConnectionFragment.ConnectionListener;
@@ -48,7 +48,7 @@ public class ZopimCommentFragment extends Fragment implements ConnectionListener
     public void onConnected() {
         this.mNoConnection = false;
         if (this.mMenu != null) {
-            MenuItem findItem = this.mMenu.findItem(C0785R.id.send_comment);
+            MenuItem findItem = this.mMenu.findItem(C0784R.id.send_comment);
             if (findItem != null && !findItem.isEnabled()) {
                 findItem.setEnabled(true);
             }
@@ -62,7 +62,7 @@ public class ZopimCommentFragment extends Fragment implements ConnectionListener
             Fragment connectionToastFragment = new ConnectionToastFragment();
             Fragment connectionFragment = new ConnectionFragment();
             FragmentTransaction beginTransaction = getChildFragmentManager().beginTransaction();
-            beginTransaction.add(C0785R.id.toast_fragment_container, connectionToastFragment, ConnectionToastFragment.class.getName());
+            beginTransaction.add(C0784R.id.toast_fragment_container, connectionToastFragment, ConnectionToastFragment.class.getName());
             beginTransaction.add(connectionFragment, ConnectionFragment.class.getName());
             beginTransaction.commit();
         }
@@ -70,19 +70,19 @@ public class ZopimCommentFragment extends Fragment implements ConnectionListener
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         super.onCreateOptionsMenu(menu, menuInflater);
-        menuInflater.inflate(C0785R.menu.chat_comment_menu, menu);
-        menu.findItem(C0785R.id.send_comment).setEnabled(this.mStateMenuItemEnabled);
+        menuInflater.inflate(C0784R.menu.chat_comment_menu, menu);
+        menu.findItem(C0784R.id.send_comment).setEnabled(this.mStateMenuItemEnabled);
         this.mMenu = menu;
     }
 
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
-        return layoutInflater.inflate(C0785R.layout.zopim_comment_fragment, viewGroup, false);
+        return layoutInflater.inflate(C0784R.layout.zopim_comment_fragment, viewGroup, false);
     }
 
     public void onDisconnected() {
         this.mNoConnection = true;
         if (this.mMenu != null) {
-            MenuItem findItem = this.mMenu.findItem(C0785R.id.send_comment);
+            MenuItem findItem = this.mMenu.findItem(C0784R.id.send_comment);
             if (findItem != null && findItem.isEnabled()) {
                 findItem.setEnabled(false);
             }
@@ -90,7 +90,7 @@ public class ZopimCommentFragment extends Fragment implements ConnectionListener
     }
 
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-        if (C0785R.id.send_comment != menuItem.getItemId()) {
+        if (C0784R.id.send_comment != menuItem.getItemId()) {
             return super.onOptionsItemSelected(menuItem);
         }
         if (!this.mChat.hasEnded()) {
@@ -123,13 +123,13 @@ public class ZopimCommentFragment extends Fragment implements ConnectionListener
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
         bundle.putBoolean(STATE_NO_CONNECTION, this.mNoConnection);
-        bundle.putBoolean("MENU_ITEM_ENABLED", this.mMenu.findItem(C0785R.id.send_comment).isEnabled());
+        bundle.putBoolean("MENU_ITEM_ENABLED", this.mMenu.findItem(C0784R.id.send_comment).isEnabled());
     }
 
     public void onViewCreated(View view, @Nullable Bundle bundle) {
         super.onViewCreated(view, bundle);
         setHasOptionsMenu(true);
-        this.mCommentEditor = (EditText) view.findViewById(C0785R.id.comment_editor);
+        this.mCommentEditor = (EditText) view.findViewById(C0784R.id.comment_editor);
     }
 
     public void onViewStateRestored(@Nullable Bundle bundle) {

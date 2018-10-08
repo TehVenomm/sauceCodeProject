@@ -75,7 +75,7 @@ public class GoWrapImpl implements GoWrap {
     private List<String> customUrlSchemes = null;
     private GoWrapDelegate delegate = null;
     private String guid = null;
-    private final IntegrationContext integrationContext = new C11061();
+    private final IntegrationContext integrationContext = new C14221();
     private final List<IntegrationSupport> integrationSupportList = new ArrayList();
     private final AdManager<CanShowInterstitialAd, InterstitialAdSize> interstitialAdManager = new AdManager<CanShowInterstitialAd, InterstitialAdSize>("interstitial", this.canShowInterstitialAdList) {
         protected boolean hasAds(CanShowInterstitialAd canShowInterstitialAd, InterstitialAdSize interstitialAdSize) {
@@ -106,8 +106,8 @@ public class GoWrapImpl implements GoWrap {
     private VipStatus vipStatus = null;
 
     /* renamed from: net.gogame.gowrap.GoWrapImpl$1 */
-    class C11061 implements IntegrationContext {
-        C11061() {
+    class C14221 implements IntegrationContext {
+        C14221() {
         }
 
         public String getAppId() {

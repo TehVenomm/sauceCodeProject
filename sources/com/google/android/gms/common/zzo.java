@@ -20,6 +20,7 @@ import com.google.android.gms.common.internal.zzbe;
 import com.google.android.gms.common.util.zzi;
 import com.google.android.gms.common.util.zzp;
 import com.google.android.gms.common.util.zzv;
+import im.getsocial.sdk.activities.MentionTypes;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class zzo {
@@ -272,7 +273,7 @@ public class zzo {
             if (applicationInfo.enabled) {
                 Object obj;
                 if (zzp.zzalg()) {
-                    Bundle applicationRestrictions = ((UserManager) context.getSystemService("user")).getApplicationRestrictions(context.getPackageName());
+                    Bundle applicationRestrictions = ((UserManager) context.getSystemService(MentionTypes.USER)).getApplicationRestrictions(context.getPackageName());
                     if (applicationRestrictions != null && ServerProtocol.DIALOG_RETURN_SCOPES_TRUE.equals(applicationRestrictions.getString("restricted_profile"))) {
                         obj = 1;
                         if (obj == null) {

@@ -309,8 +309,8 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		}
 		else
 		{
-			_003CSendGetUserListMessagedOnce_003Ec__AnonStorey5C0 _003CSendGetUserListMessagedOnce_003Ec__AnonStorey5C;
-			Protocol.Try(new Action((object)_003CSendGetUserListMessagedOnce_003Ec__AnonStorey5C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSendGetUserListMessagedOnce_003Ec__AnonStorey5D2 _003CSendGetUserListMessagedOnce_003Ec__AnonStorey5D;
+			Protocol.Try(new Action((object)_003CSendGetUserListMessagedOnce_003Ec__AnonStorey5D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -354,8 +354,8 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		}
 		else
 		{
-			_003CSendGetMessageUserList_003Ec__AnonStorey5C3 _003CSendGetMessageUserList_003Ec__AnonStorey5C;
-			Protocol.Try(new Action((object)_003CSendGetMessageUserList_003Ec__AnonStorey5C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSendGetMessageUserList_003Ec__AnonStorey5D5 _003CSendGetMessageUserList_003Ec__AnonStorey5D;
+			Protocol.Try(new Action((object)_003CSendGetMessageUserList_003Ec__AnonStorey5D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -369,8 +369,8 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		}
 		else
 		{
-			_003CSendGetMessageDetailList_003Ec__AnonStorey5C4 _003CSendGetMessageDetailList_003Ec__AnonStorey5C;
-			Protocol.Try(new Action((object)_003CSendGetMessageDetailList_003Ec__AnonStorey5C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSendGetMessageDetailList_003Ec__AnonStorey5D6 _003CSendGetMessageDetailList_003Ec__AnonStorey5D;
+			Protocol.Try(new Action((object)_003CSendGetMessageDetailList_003Ec__AnonStorey5D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -432,8 +432,8 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		}
 		else
 		{
-			_003CSendFriendMessage_003Ec__AnonStorey5C7 _003CSendFriendMessage_003Ec__AnonStorey5C;
-			Protocol.Try(new Action((object)_003CSendFriendMessage_003Ec__AnonStorey5C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSendFriendMessage_003Ec__AnonStorey5D9 _003CSendFriendMessage_003Ec__AnonStorey5D;
+			Protocol.Try(new Action((object)_003CSendFriendMessage_003Ec__AnonStorey5D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -463,8 +463,8 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		}
 		else
 		{
-			_003CSendGetNoreadMessage_003Ec__AnonStorey5C9 _003CSendGetNoreadMessage_003Ec__AnonStorey5C;
-			Protocol.Try(new Action((object)_003CSendGetNoreadMessage_003Ec__AnonStorey5C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSendGetNoreadMessage_003Ec__AnonStorey5DB _003CSendGetNoreadMessage_003Ec__AnonStorey5DB;
+			Protocol.Try(new Action((object)_003CSendGetNoreadMessage_003Ec__AnonStorey5DB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 

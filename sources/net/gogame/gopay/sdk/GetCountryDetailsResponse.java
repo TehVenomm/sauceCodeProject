@@ -5,27 +5,27 @@ import java.util.Map;
 
 public class GetCountryDetailsResponse {
     /* renamed from: a */
-    private final String f954a;
+    private final String f3342a;
     /* renamed from: b */
-    private final List f955b;
+    private final List f3343b;
     /* renamed from: c */
-    private final Map f956c;
+    private final Map f3344c;
 
     public GetCountryDetailsResponse(String str, List list, Map map) {
-        this.f954a = str;
-        this.f955b = list;
-        this.f956c = map;
+        this.f3342a = str;
+        this.f3343b = list;
+        this.f3344c = map;
     }
 
     public Map getBaseUrls() {
-        return this.f956c;
+        return this.f3344c;
     }
 
     public List getCountries() {
-        return this.f955b;
+        return this.f3343b;
     }
 
     public String getCountry() {
-        return this.f954a;
+        return this.f3342a;
     }
 }

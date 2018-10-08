@@ -149,7 +149,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 			ScrollGrid.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 		}
 		CleanItemList();
-		_003CUpdateDynamicList_003Ec__AnonStorey301 _003CUpdateDynamicList_003Ec__AnonStorey;
+		_003CUpdateDynamicList_003Ec__AnonStorey310 _003CUpdateDynamicList_003Ec__AnonStorey;
 		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

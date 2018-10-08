@@ -35,7 +35,7 @@ class MetaDataStore {
     }
 
     private File getUserDataFileForSession(String str) {
-        return new File(this.filesDir, str + USERDATA_SUFFIX + METADATA_EXT);
+        return new File(this.filesDir, str + "user" + METADATA_EXT);
     }
 
     private static Map<String, String> jsonToKeysData(String str) throws JSONException {
@@ -68,12 +68,12 @@ class MetaDataStore {
     }
 
     public Map<String, String> readKeyData(String str) {
+        Closeable fileInputStream;
         Throwable e;
         File keysFileForSession = getKeysFileForSession(str);
         if (!keysFileForSession.exists()) {
             return Collections.emptyMap();
         }
-        Closeable fileInputStream;
         try {
             fileInputStream = new FileInputStream(keysFileForSession);
             try {
@@ -83,7 +83,7 @@ class MetaDataStore {
             } catch (Exception e2) {
                 e = e2;
                 try {
-                    Fabric.getLogger().mo4292e("Fabric", "Error deserializing user metadata.", e);
+                    Fabric.getLogger().mo4756e("Fabric", "Error deserializing user metadata.", e);
                     CommonUtils.closeOrLog(fileInputStream, "Failed to close user metadata file.");
                     return Collections.emptyMap();
                 } catch (Throwable th) {
@@ -99,7 +99,7 @@ class MetaDataStore {
         } catch (Exception e3) {
             e = e3;
             fileInputStream = null;
-            Fabric.getLogger().mo4292e("Fabric", "Error deserializing user metadata.", e);
+            Fabric.getLogger().mo4756e("Fabric", "Error deserializing user metadata.", e);
             CommonUtils.closeOrLog(fileInputStream, "Failed to close user metadata file.");
             return Collections.emptyMap();
         } catch (Throwable th3) {
@@ -126,7 +126,7 @@ class MetaDataStore {
             } catch (Exception e2) {
                 e = e2;
                 try {
-                    Fabric.getLogger().mo4292e("Fabric", "Error deserializing user metadata.", e);
+                    Fabric.getLogger().mo4756e("Fabric", "Error deserializing user metadata.", e);
                     CommonUtils.closeOrLog(fileInputStream, "Failed to close user metadata file.");
                     return UserMetaData.EMPTY;
                 } catch (Throwable th) {
@@ -142,7 +142,7 @@ class MetaDataStore {
         } catch (Exception e3) {
             e = e3;
             fileInputStream = null;
-            Fabric.getLogger().mo4292e("Fabric", "Error deserializing user metadata.", e);
+            Fabric.getLogger().mo4756e("Fabric", "Error deserializing user metadata.", e);
             CommonUtils.closeOrLog(fileInputStream, "Failed to close user metadata file.");
             return UserMetaData.EMPTY;
         } catch (Throwable th3) {
@@ -167,7 +167,7 @@ class MetaDataStore {
             } catch (Exception e2) {
                 e = e2;
                 try {
-                    Fabric.getLogger().mo4292e("Fabric", "Error serializing key/value metadata.", e);
+                    Fabric.getLogger().mo4756e("Fabric", "Error serializing key/value metadata.", e);
                     CommonUtils.closeOrLog(bufferedWriter, "Failed to close key/value metadata file.");
                 } catch (Throwable th) {
                     e = th;
@@ -182,7 +182,7 @@ class MetaDataStore {
         } catch (Exception e3) {
             e = e3;
             bufferedWriter = null;
-            Fabric.getLogger().mo4292e("Fabric", "Error serializing key/value metadata.", e);
+            Fabric.getLogger().mo4756e("Fabric", "Error serializing key/value metadata.", e);
             CommonUtils.closeOrLog(bufferedWriter, "Failed to close key/value metadata file.");
         } catch (Throwable th3) {
             e = th3;
@@ -206,7 +206,7 @@ class MetaDataStore {
             } catch (Exception e2) {
                 e = e2;
                 try {
-                    Fabric.getLogger().mo4292e("Fabric", "Error serializing user metadata.", e);
+                    Fabric.getLogger().mo4756e("Fabric", "Error serializing user metadata.", e);
                     CommonUtils.closeOrLog(bufferedWriter, "Failed to close user metadata file.");
                 } catch (Throwable th) {
                     e = th;
@@ -221,7 +221,7 @@ class MetaDataStore {
         } catch (Exception e3) {
             e = e3;
             bufferedWriter = null;
-            Fabric.getLogger().mo4292e("Fabric", "Error serializing user metadata.", e);
+            Fabric.getLogger().mo4756e("Fabric", "Error serializing user metadata.", e);
             CommonUtils.closeOrLog(bufferedWriter, "Failed to close user metadata file.");
         } catch (Throwable th3) {
             e = th3;

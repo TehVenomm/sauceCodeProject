@@ -10,12 +10,12 @@ import org.json.JSONObject;
 public class GoWrapUnityPlugin {
     private static final GoWrapUnityPlugin INSTANCE = new GoWrapUnityPlugin();
     private static final String TAG = "goWrap-Unity";
-    private final GoWrapDelegateV2 delegate = new C12471();
+    private final GoWrapDelegateV2 delegate = new C15631();
     private String gameObjectName = Constants.TAG;
 
     /* renamed from: net.gogame.gowrap.unity.GoWrapUnityPlugin$1 */
-    class C12471 implements GoWrapDelegateV2 {
-        C12471() {
+    class C15631 implements GoWrapDelegateV2 {
+        C15631() {
         }
 
         public void didCompleteRewardedAd(String str, int i) {

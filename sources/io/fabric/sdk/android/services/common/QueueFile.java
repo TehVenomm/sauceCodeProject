@@ -236,9 +236,12 @@ public class QueueFile implements Closeable {
 
     private static void writeInts(byte[] bArr, int... iArr) {
         int i = 0;
-        for (int writeInt : iArr) {
-            writeInt(bArr, i, writeInt);
-            i += 4;
+        int length = iArr.length;
+        int i2 = 0;
+        while (i < length) {
+            writeInt(bArr, i2, iArr[i]);
+            i2 += 4;
+            i++;
         }
     }
 

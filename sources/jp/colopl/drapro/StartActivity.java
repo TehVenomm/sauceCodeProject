@@ -75,7 +75,7 @@ public class StartActivity extends Activity {
     private boolean mBillingRunning = false;
     IabBroadcastReceiver mBroadcastReceiver;
     private ColoplDepositHelper mColoDepositHelper = null;
-    OnConsumeFinishedListener mConsumeFinishedListener = new C09877();
+    OnConsumeFinishedListener mConsumeFinishedListener = new C13037();
     PostDepositFinishedListener mDepositPostListener = new PostDepositFinishedListener() {
         public void onPostDepositFinished(final PostDepositResult postDepositResult) {
             Util.dLog("StartActivity", "Resultcode:" + postDepositResult.getStatusCode());
@@ -115,10 +115,10 @@ public class StartActivity extends Activity {
             }
         }
     };
-    PrepareDepositFinishedListener mDepositPrepareListener = new C09909();
-    QueryInventoryFinishedListener mGotInventoryListener = new C09846();
+    PrepareDepositFinishedListener mDepositPrepareListener = new C13069();
+    QueryInventoryFinishedListener mGotInventoryListener = new C13006();
     ProgressDialog mProgressDialog = null;
-    OnIabPurchaseFinishedListener mPurchaseFinishedListener = new C09898();
+    OnIabPurchaseFinishedListener mPurchaseFinishedListener = new C13058();
     ArrayList<Purchase> mPurchaseList = new ArrayList();
     ArrayList<Purchase> mUndepositedPurcahseList = new ArrayList();
     protected UnityPlayer mUnityPlayer;
@@ -126,8 +126,8 @@ public class StartActivity extends Activity {
     private TextView purchaseStatusText;
 
     /* renamed from: jp.colopl.drapro.StartActivity$1 */
-    class C09791 implements IabBroadcastListener {
-        C09791() {
+    class C12951 implements IabBroadcastListener {
+        C12951() {
         }
 
         public void receivedBroadcast() {
@@ -137,8 +137,8 @@ public class StartActivity extends Activity {
     }
 
     /* renamed from: jp.colopl.drapro.StartActivity$2 */
-    class C09802 implements OnIabSetupFinishedListener {
-        C09802() {
+    class C12962 implements OnIabSetupFinishedListener {
+        C12962() {
         }
 
         public void onIabSetupFinished(IabResult iabResult) {
@@ -149,8 +149,8 @@ public class StartActivity extends Activity {
     }
 
     /* renamed from: jp.colopl.drapro.StartActivity$3 */
-    class C09813 implements Runnable {
-        C09813() {
+    class C12973 implements Runnable {
+        C12973() {
         }
 
         public void run() {
@@ -159,8 +159,8 @@ public class StartActivity extends Activity {
     }
 
     /* renamed from: jp.colopl.drapro.StartActivity$6 */
-    class C09846 implements QueryInventoryFinishedListener {
-        C09846() {
+    class C13006 implements QueryInventoryFinishedListener {
+        C13006() {
         }
 
         public void onQueryInventoryFinished(IabResult iabResult, Inventory inventory) {
@@ -218,8 +218,8 @@ public class StartActivity extends Activity {
     }
 
     /* renamed from: jp.colopl.drapro.StartActivity$7 */
-    class C09877 implements OnConsumeFinishedListener {
-        C09877() {
+    class C13037 implements OnConsumeFinishedListener {
+        C13037() {
         }
 
         public void onConsumeFinished(final Purchase purchase, IabResult iabResult) {
@@ -255,8 +255,8 @@ public class StartActivity extends Activity {
     }
 
     /* renamed from: jp.colopl.drapro.StartActivity$8 */
-    class C09898 implements OnIabPurchaseFinishedListener {
-        C09898() {
+    class C13058 implements OnIabPurchaseFinishedListener {
+        C13058() {
         }
 
         public void onIabPurchaseFinished(IabResult iabResult, final Purchase purchase) {
@@ -281,8 +281,8 @@ public class StartActivity extends Activity {
     }
 
     /* renamed from: jp.colopl.drapro.StartActivity$9 */
-    class C09909 implements PrepareDepositFinishedListener {
-        C09909() {
+    class C13069 implements PrepareDepositFinishedListener {
+        C13069() {
         }
 
         public void onPrepareDepositFinished(PrepareResult prepareResult) {
@@ -335,7 +335,7 @@ public class StartActivity extends Activity {
         this.consumptionRetry = 0;
         this.depositRetry = 0;
         this.mBillingRunning = false;
-        this.mBillingHelper.startSetup(new C09802());
+        this.mBillingHelper.startSetup(new C12962());
     }
 
     private void initPromoCodeReceiver() {
@@ -343,7 +343,7 @@ public class StartActivity extends Activity {
         Intent intent = new Intent("com.android.vending.billing.PURCHASES_UPDATED");
         intent.setPackage(getPackageName());
         sendBroadcast(intent);
-        this.mBroadcastReceiver = new IabBroadcastReceiver(new C09791());
+        this.mBroadcastReceiver = new IabBroadcastReceiver(new C12951());
         registerReceiver(this.mBroadcastReceiver, new IntentFilter("com.android.vending.billing.PURCHASES_UPDATED"));
     }
 
@@ -455,7 +455,7 @@ public class StartActivity extends Activity {
             this.mBillingRunning = true;
             this.consumptionRetry = 0;
             this.depositRetry = 0;
-            runOnUiThread(new C09813());
+            runOnUiThread(new C12973());
         }
     }
 
@@ -623,7 +623,7 @@ public class StartActivity extends Activity {
         this.mBillingRunning = true;
         this.consumptionRetry = 0;
         this.depositRetry = 0;
-        final QueryInventoryFinishedListener c09824 = new QueryInventoryFinishedListener() {
+        final QueryInventoryFinishedListener c12984 = new QueryInventoryFinishedListener() {
             public void onQueryInventoryFinished(IabResult iabResult, Inventory inventory) {
                 Util.dLog("StartActivity", "[IABV3] onQueryInventoryFinished");
                 if (iabResult.isFailure()) {
@@ -678,13 +678,13 @@ public class StartActivity extends Activity {
             this.handler.post(new Runnable() {
                 public void run() {
                     StartActivity.this.showProgressDialog2(0, StartActivity.this.getResources().getIdentifier("payment_checking_inventory", "string", StartActivity.this.getPackageName()));
-                    StartActivity.this.mBillingHelper.queryInventoryAsync(c09824);
+                    StartActivity.this.mBillingHelper.queryInventoryAsync(c12984);
                 }
             });
             return;
         }
         Util.dLog("StartActivity", "[IABV3] restoreInventory start querying inventory");
-        this.mBillingHelper.queryInventoryAsync(c09824);
+        this.mBillingHelper.queryInventoryAsync(c12984);
     }
 
     public void showAchievementsList() {

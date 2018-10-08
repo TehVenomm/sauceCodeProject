@@ -44,7 +44,8 @@ public class LoadingUI : UIBehaviour
 		OBJ_CHANGE_PERMISSION_MASSAGE,
 		LBL_FIRST_MASSAGE,
 		LBL_FIRST_TUTORIAL_MESSAGE,
-		LBL_FIRST_TUTORIAL_MESSAGE_END
+		LBL_FIRST_TUTORIAL_MESSAGE_END,
+		SPR_BG_TUTORIAL
 	}
 
 	private const float COUNT_ANIM_SPEED = 0.5f;
@@ -70,6 +71,8 @@ public class LoadingUI : UIBehaviour
 	private int cnt_timeBonus;
 
 	private IProgress currentProgress;
+
+	private UITweenCtrl tutorialTweenCtrl;
 
 	public bool downloadGaugeVisible
 	{
@@ -112,6 +115,7 @@ public class LoadingUI : UIBehaviour
 			ResourceManager i = MonoBehaviourSingleton<ResourceManager>.I;
 			i.onAddRequest = Delegate.Remove((Delegate)i.onAddRequest, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
+		PlayerPrefs.SetInt("Tut_Weapon_Type", -1);
 	}
 
 	public override void UpdateUI()
@@ -238,8 +242,8 @@ public class LoadingUI : UIBehaviour
 			QuestRushProgressData.RushTimeBonus[] bonus = MonoBehaviourSingleton<InGameProgress>.I.rushTimeBonus.ToArray();
 			int plusSec = 0;
 			List<Transform> t_timeBonusItem = new List<Transform>();
-			_003CShowRushTimeBonus_003Ec__AnonStorey7B7 _003CShowRushTimeBonus_003Ec__AnonStorey7B;
-			SetGrid(UI.GRD_TIME_BONUS_ROOT, null, bonus.Length, true, new Action<int, Transform, bool>((object)_003CShowRushTimeBonus_003Ec__AnonStorey7B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CShowRushTimeBonus_003Ec__AnonStorey7C9 _003CShowRushTimeBonus_003Ec__AnonStorey7C;
+			SetGrid(UI.GRD_TIME_BONUS_ROOT, null, bonus.Length, true, new Action<int, Transform, bool>((object)_003CShowRushTimeBonus_003Ec__AnonStorey7C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 			{
 				MonoBehaviourSingleton<InGameProgress>.I.PlayTimeBonusSE();
@@ -315,8 +319,8 @@ public class LoadingUI : UIBehaviour
 			QuestArenaProgressData.ArenaTimeBonus[] bonus = MonoBehaviourSingleton<InGameProgress>.I.arenaTimeBonus.ToArray();
 			int plusSec = 0;
 			List<Transform> timeBonusItemTransList = new List<Transform>();
-			_003CShowArenaTimeBonus_003Ec__AnonStorey7B9 _003CShowArenaTimeBonus_003Ec__AnonStorey7B;
-			SetGrid(UI.GRD_TIME_BONUS_ROOT, null, bonus.Length, true, new Action<int, Transform, bool>((object)_003CShowArenaTimeBonus_003Ec__AnonStorey7B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CShowArenaTimeBonus_003Ec__AnonStorey7CB _003CShowArenaTimeBonus_003Ec__AnonStorey7CB;
+			SetGrid(UI.GRD_TIME_BONUS_ROOT, null, bonus.Length, true, new Action<int, Transform, bool>((object)_003CShowArenaTimeBonus_003Ec__AnonStorey7CB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 			{
 				MonoBehaviourSingleton<InGameProgress>.I.PlayTimeBonusSE();
@@ -482,10 +486,15 @@ public class LoadingUI : UIBehaviour
 		string tips;
 		do
 		{
-			tips_index = Random.Range(1, tips_count + 1);
+			int tipFromTutorial = Utility.GetTipTypeFromTutorial();
+			tips_index = ((tipFromTutorial == -1) ? Random.Range(1, tips_count + 1) : tipFromTutorial);
 			if (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name == "/colopl_rob")
 			{
 				tips_index = 1;
+			}
+			if (tipFromTutorial != -1)
+			{
+				tips_index = tipFromTutorial;
 			}
 			tips = StringTable.Get(category, (uint)tips_index);
 		}
@@ -683,6 +692,10 @@ public class LoadingUI : UIBehaviour
 
 	public void ShowTutorialMsg(string msg, string endTxt)
 	{
+		if (tutorialTweenCtrl == null)
+		{
+			tutorialTweenCtrl = base.GetComponent<UITweenCtrl>((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE);
+		}
 		SetActive((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE, true);
 		SetSupportEncoding(UI.LBL_FIRST_TUTORIAL_MESSAGE, true);
 		SetFontStyle((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE, 2);
@@ -691,11 +704,18 @@ public class LoadingUI : UIBehaviour
 		SetSupportEncoding(UI.LBL_FIRST_TUTORIAL_MESSAGE_END, true);
 		SetFontStyle((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE_END, 2);
 		SetLabelText((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE_END, endTxt);
+		tutorialTweenCtrl.Reset();
+		tutorialTweenCtrl.Play(true, null);
 	}
 
 	public void HideTutorialMsg()
 	{
 		SetActive((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE_END, false);
 		SetActive((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE, false);
+	}
+
+	public void ShowTutorialBg(bool isShow)
+	{
+		SetActive((Enum)UI.SPR_BG_TUTORIAL, isShow);
 	}
 }

@@ -234,7 +234,7 @@ public class InGameMain : GameSection
 					cutScenePlayer = questControllerObj.AddComponent<CutScenePlayer>();
 					cutScenePlayer.Init(path, delegate
 					{
-						((_003CDoInitialize_003Ec__IteratorCB)/*Error near IL_04dc: stateMachine*/)._003Cwait_003E__12 = false;
+						((_003CDoInitialize_003Ec__IteratorCF)/*Error near IL_04dc: stateMachine*/)._003Cwait_003E__12 = false;
 					});
 					while (wait)
 					{
@@ -357,6 +357,13 @@ public class InGameMain : GameSection
 			goto IL_0aba;
 		}
 		goto IL_0aba;
+		IL_1932:
+		if (MonoBehaviourSingleton<UIQuestRepeat>.IsValid())
+		{
+			MonoBehaviourSingleton<UIQuestRepeat>.I.InitData();
+		}
+		base.Initialize();
+		yield break;
 		IL_0aba:
 		if (MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
@@ -669,22 +676,18 @@ public class InGameMain : GameSection
 		{
 			MonoBehaviourSingleton<UIPlayerStatus>.I.autoBattleButton.GetAutoPlayTime(delegate
 			{
-				((_003CDoInitialize_003Ec__IteratorCB)/*Error near IL_18e8: stateMachine*/)._003CwaitGetAutoTime_003E__70 = false;
+				((_003CDoInitialize_003Ec__IteratorCF)/*Error near IL_18e8: stateMachine*/)._003CwaitGetAutoTime_003E__70 = false;
 			});
 		}
 		while (waitGetAutoTime)
 		{
 			yield return (object)null;
 		}
-		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 3)
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep != 3)
 		{
-			MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_mission_start, "Tutorial");
+			goto IL_1932;
 		}
-		if (MonoBehaviourSingleton<UIQuestRepeat>.IsValid())
-		{
-			MonoBehaviourSingleton<UIQuestRepeat>.I.InitData();
-		}
-		base.Initialize();
+		goto IL_1932;
 	}
 
 	public void SetMapButtonState()
@@ -914,8 +917,8 @@ public class InGameMain : GameSection
 					Network.EventData firstEvent = validBingoDataListInSection[0];
 					List<DeliveryTable.DeliveryData> deliveryTableDataList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryTableDataList(false);
 					List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
-					_003COnQuery_BINGO_003Ec__AnonStorey3A0 _003COnQuery_BINGO_003Ec__AnonStorey3A;
-					int num = deliveryTableDataList.Where(new Func<DeliveryTable.DeliveryData, bool>((object)_003COnQuery_BINGO_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
+					_003COnQuery_BINGO_003Ec__AnonStorey3B0 _003COnQuery_BINGO_003Ec__AnonStorey3B;
+					int num = deliveryTableDataList.Where(new Func<DeliveryTable.DeliveryData, bool>((object)_003COnQuery_BINGO_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 					int num2 = 0;
 					for (int i = 0; i < clearStatusDelivery.Count; i++)
 					{
@@ -1033,7 +1036,6 @@ public class InGameMain : GameSection
 	{
 		if (FieldManager.IsValidInTutorial())
 		{
-			MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_guide_movement, "Tutorial");
 			MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapPortalID(MonoBehaviourSingleton<InGameProgress>.I.checkPortalObject.portalID);
 			MonoBehaviourSingleton<FieldManager>.I.useFastTravel = true;
 			GameSceneEvent.Cancel();
@@ -1177,7 +1179,7 @@ public class InGameMain : GameSection
 		{
 			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
 			{
-				MonoBehaviourSingleton<StageObjectManager>.I.self.OnSetPlayerStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.atk, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.def, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.hp, true, null);
+				MonoBehaviourSingleton<StageObjectManager>.I.self.OnSetPlayerStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.atk, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.def, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.hp, true, null, false);
 			}
 			if (MonoBehaviourSingleton<UIManager>.IsValid())
 			{
@@ -1369,8 +1371,8 @@ public class InGameMain : GameSection
 				component.bottomAnchor.Set(0f, num);
 				component.UpdateAnchors();
 				AppMain i = MonoBehaviourSingleton<AppMain>.I;
-				_003COnScreenRotate_003Ec__AnonStorey3A1 _003COnScreenRotate_003Ec__AnonStorey3A;
-				i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003COnScreenRotate_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003COnScreenRotate_003Ec__AnonStorey3B1 _003COnScreenRotate_003Ec__AnonStorey3B;
+				i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003COnScreenRotate_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}

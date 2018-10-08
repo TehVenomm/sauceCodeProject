@@ -9,35 +9,35 @@ import org.jetbrains.annotations.Nullable;
 import org.onepf.oms.Appstore;
 import org.onepf.oms.AppstoreInAppBillingService;
 import org.onepf.oms.OpenIabHelper;
-import org.onepf.oms.OpenIabHelper.Options.Builder;
+import org.onepf.oms.OpenIabHelper$Options.Builder;
 import org.onepf.oms.appstore.googleUtils.IabException;
 import org.onepf.oms.appstore.googleUtils.IabResult;
 
 public class GoGameStore implements GoPayInAppBillingServiceExt, Appstore {
     /* renamed from: a */
-    private final GoPayInAppBillingService f990a;
+    private final GoPayInAppBillingService f3378a;
     /* renamed from: b */
-    private final Context f991b;
+    private final Context f3379b;
 
     @Deprecated
     public GoGameStore(@NotNull Context context, @NotNull String str, @NotNull String str2, @NotNull String str3) {
-        this.f991b = context;
-        this.f990a = new GoPayInAppBillingService(context, str, str2, null, str3);
+        this.f3379b = context;
+        this.f3378a = new GoPayInAppBillingService(context, str, str2, null, str3);
     }
 
     public GoGameStore(@NotNull Context context, @NotNull String str, @NotNull String str2, @NotNull String str3, @NotNull String str4) {
-        this.f991b = context;
-        this.f990a = new GoPayInAppBillingService(context, str, str2, str4, str3);
+        this.f3379b = context;
+        this.f3378a = new GoPayInAppBillingService(context, str, str2, str4, str3);
     }
 
     public GoGameStore(@NotNull Context context, @NotNull String str, @NotNull String str2, @NotNull String str3, @NotNull String str4, @NotNull String str5) {
         this(context, str, str2, str3, str4);
-        this.f990a.setGameLanguage(str5);
+        this.f3378a.setGameLanguage(str5);
     }
 
     @Deprecated
     public static OpenIabHelper newOpenIabHelper(Context context, String str, String str2, String str3) {
-        return new OpenIabHelper(context, new Builder().addAvailableStoreNames("GoGameStore").addAvailableStores(new GoGameStore(context, str, str2, str3)).setCheckInventory(false).setStoreSearchStrategy(1).build());
+        return new OpenIabHelper(context, new Builder().addAvailableStoreNames(new String[]{"GoGameStore"}).addAvailableStores(new Appstore[]{new GoGameStore(context, str, str2, str3)}).setCheckInventory(false).setStoreSearchStrategy(1).build());
     }
 
     public boolean areOutsideLinksAllowed() {
@@ -66,7 +66,7 @@ public class GoGameStore implements GoPayInAppBillingServiceExt, Appstore {
 
     @Nullable
     public AppstoreInAppBillingService getInAppBillingService() {
-        return this.f990a;
+        return this.f3378a;
     }
 
     public int getPackageVersion(String str) {

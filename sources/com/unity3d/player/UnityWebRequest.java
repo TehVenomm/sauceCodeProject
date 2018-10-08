@@ -49,7 +49,7 @@ class UnityWebRequest implements Runnable {
     private static native void errorCallback(long j, int i, String str);
 
     private static SSLSocketFactory getSSLSocketFactory() {
-        if (C0774q.f541g) {
+        if (C0773q.f541g) {
             return null;
         }
         if (f470f != null) {
@@ -68,7 +68,7 @@ class UnityWebRequest implements Runnable {
                     f470f = socketFactory;
                     return socketFactory;
                 } catch (Exception e) {
-                    C0768m.Log(5, "UnityWebRequest: No support for " + str + " (" + e.getMessage() + ")");
+                    C0767m.Log(5, "UnityWebRequest: No support for " + str + " (" + e.getMessage() + ")");
                     i++;
                 }
             }

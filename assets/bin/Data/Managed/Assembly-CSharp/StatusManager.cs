@@ -561,15 +561,15 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		{
 			if (!is_success)
 			{
-				if (((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0034: stateMachine*/).callback != null)
+				if (((_003C_CheckChangeEquipCoroutine_003Ec__Iterator25B)/*Error near IL_0034: stateMachine*/).callback != null)
 				{
-					((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0034: stateMachine*/).callback(false);
+					((_003C_CheckChangeEquipCoroutine_003Ec__Iterator25B)/*Error near IL_0034: stateMachine*/).callback(false);
 				}
-				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0034: stateMachine*/)._003Crecv_break_003E__0 = true;
+				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator25B)/*Error near IL_0034: stateMachine*/)._003Crecv_break_003E__0 = true;
 			}
 			else
 			{
-				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0034: stateMachine*/)._003Cwait_visual_equip_003E__1 = false;
+				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator25B)/*Error near IL_0034: stateMachine*/)._003Cwait_visual_equip_003E__1 = false;
 			}
 		});
 		bool wait_equip = true;
@@ -577,13 +577,13 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		{
 			if (!is_success)
 			{
-				if (((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0057: stateMachine*/).callback != null)
+				if (((_003C_CheckChangeEquipCoroutine_003Ec__Iterator25B)/*Error near IL_0057: stateMachine*/).callback != null)
 				{
-					((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0057: stateMachine*/).callback(false);
+					((_003C_CheckChangeEquipCoroutine_003Ec__Iterator25B)/*Error near IL_0057: stateMachine*/).callback(false);
 				}
-				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0057: stateMachine*/)._003Crecv_break_003E__0 = true;
+				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator25B)/*Error near IL_0057: stateMachine*/)._003Crecv_break_003E__0 = true;
 			}
-			((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24C)/*Error near IL_0057: stateMachine*/)._003Cwait_equip_003E__2 = false;
+			((_003C_CheckChangeEquipCoroutine_003Ec__Iterator25B)/*Error near IL_0057: stateMachine*/)._003Cwait_equip_003E__2 = false;
 		});
 		while (wait_equip || wait_visual_equip)
 		{
@@ -639,10 +639,10 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 	public unsafe void UpdateEquip(EquipItemInfo equip)
 	{
 		int i = 0;
-		_003CUpdateEquip_003Ec__AnonStorey6BE _003CUpdateEquip_003Ec__AnonStorey6BE;
+		_003CUpdateEquip_003Ec__AnonStorey6D0 _003CUpdateEquip_003Ec__AnonStorey6D;
 		for (int num = equipSet.Length; i < num; i++)
 		{
-			IsEquipping(i, equip, new Action<int, int>((object)_003CUpdateEquip_003Ec__AnonStorey6BE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			IsEquipping(i, equip, new Action<int, int>((object)_003CUpdateEquip_003Ec__AnonStorey6D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -706,16 +706,18 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		createPlayerInfo.extentionInfo = new StageObjectManager.CreatePlayerInfo.ExtentionInfo();
 		if (MonoBehaviourSingleton<FieldManager>.I.isTutorialField)
 		{
-			createPlayerInfo.charaInfo.name = "???";
+			createPlayerInfo.charaInfo.name = ((!PlayerPrefs.HasKey("Tut_Name")) ? "???" : PlayerPrefs.GetString("Tut_Name"));
 			createPlayerInfo.charaInfo.comment = string.Empty;
 			createPlayerInfo.charaInfo.hp = 200;
 			createPlayerInfo.charaInfo.atk = 100;
 			createPlayerInfo.charaInfo.def = 100;
 			createPlayerInfo.charaInfo.level = 1;
-			createPlayerInfo.charaInfo.aId = 11000001;
-			createPlayerInfo.charaInfo.hId = 0;
-			createPlayerInfo.charaInfo.rId = 0;
-			createPlayerInfo.charaInfo.lId = 0;
+			createPlayerInfo.charaInfo.aId = PlayerPrefs.GetInt("Tut_Armor");
+			createPlayerInfo.charaInfo.hId = PlayerPrefs.GetInt("Tut_Head");
+			createPlayerInfo.charaInfo.rId = PlayerPrefs.GetInt("Tut_Arm");
+			createPlayerInfo.charaInfo.lId = PlayerPrefs.GetInt("Tut_Leg");
+			createPlayerInfo.charaInfo.sex = PlayerPrefs.GetInt("Tut_Sex");
+			createPlayerInfo.charaInfo.showHelm = 1;
 		}
 		else if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
 		{
@@ -787,9 +789,9 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			if (MonoBehaviourSingleton<FieldManager>.I.isTutorialField && i == 0)
 			{
 				equipItem = new CharaInfo.EquipItem();
-				equipItem.eId = 10000001;
+				equipItem.eId = PlayerPrefs.GetInt("Tut_Weapon");
 				equipItem.lv = 1;
-				equipItem.sIds.Add(100200001);
+				equipItem.sIds.Add(100102102);
 				equipItem.sLvs.Add(1);
 				equipItem.sExs.Add(0);
 			}

@@ -43,7 +43,7 @@ class BuildIdValidator {
             Log.e("Fabric", AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER);
             throw new CrashlyticsMissingDependencyException(message);
         } else if (!this.requiringBuildId) {
-            Fabric.getLogger().mo4289d("Fabric", "Configured not to require a build ID.");
+            Fabric.getLogger().mo4753d("Fabric", "Configured not to require a build ID.");
         }
     }
 }

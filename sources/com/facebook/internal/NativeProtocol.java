@@ -17,6 +17,7 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
 import com.facebook.FacebookSdk;
 import com.facebook.login.DefaultAudience;
+import im.getsocial.sdk.invites.InviteChannelIds;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -197,7 +198,7 @@ public final class NativeProtocol {
         public boolean validateSignature(Context context, String str) {
             String str2 = Build.BRAND;
             int i = context.getApplicationInfo().flags;
-            if (str2.startsWith("generic") && (i & 2) != 0) {
+            if (str2.startsWith(InviteChannelIds.GENERIC) && (i & 2) != 0) {
                 return true;
             }
             try {

@@ -19,12 +19,12 @@ public class LogUtil {
     private static BufferedWriter writer = null;
 
     /* renamed from: d */
-    public static void m742d(String str, String str2) {
+    public static void m3767d(String str, String str2) {
         logToFile(3, str, str2);
     }
 
     /* renamed from: e */
-    public static void m743e(String str, String str2) {
+    public static void m3768e(String str, String str2) {
         logToFile(6, str, str2);
     }
 
@@ -68,7 +68,7 @@ public class LogUtil {
     }
 
     /* renamed from: i */
-    public static void m744i(String str, String str2) {
+    public static void m3769i(String str, String str2) {
         logToFile(4, str, str2);
     }
 
@@ -105,12 +105,12 @@ public class LogUtil {
     }
 
     /* renamed from: v */
-    public static void m745v(String str, String str2) {
+    public static void m3770v(String str, String str2) {
         logToFile(2, str, str2);
     }
 
     /* renamed from: w */
-    public static void m746w(String str, String str2) {
+    public static void m3771w(String str, String str2) {
         logToFile(5, str, str2);
     }
 }

@@ -22,8 +22,8 @@ public class TimedSemaphore {
     private final TimeUnit unit;
 
     /* renamed from: org.apache.commons.lang3.concurrent.TimedSemaphore$1 */
-    class C12841 implements Runnable {
-        C12841() {
+    class C16011 implements Runnable {
+        C16011() {
         }
 
         public void run() {
@@ -125,7 +125,7 @@ public class TimedSemaphore {
     }
 
     protected ScheduledFuture<?> startTimer() {
-        return getExecutorService().scheduleAtFixedRate(new C12841(), getPeriod(), getPeriod(), getUnit());
+        return getExecutorService().scheduleAtFixedRate(new C16011(), getPeriod(), getPeriod(), getUnit());
     }
 
     synchronized void endOfPeriod() {

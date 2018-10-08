@@ -35,33 +35,38 @@ public class UITutorialHomeDialog
 	[SerializeField]
 	private UIAtlas[] atlases;
 
-	public GameObject AfterGacha2Tutorial;
+	[SerializeField]
+	private GameObject afterGacha2Tutorial;
+
+	[SerializeField]
+	private UILabel afterGacha2TutorialMessage;
 
 	public UITutorialHomeDialog()
 		: this()
 	{
 	}
 
+	public void OpenMessage(string message)
+	{
+		if (afterGacha2TutorialMessage != null)
+		{
+			afterGacha2TutorialMessage.text = message;
+		}
+	}
+
 	public void OpenAfterGacha2()
 	{
-		AfterGacha2Tutorial.SetActive(true);
-		AfterGacha2Tutorial.GetComponent<UIPanel>().alpha = 0f;
-		TweenAlpha.Begin(AfterGacha2Tutorial, 0.3f, 1f);
+		afterGacha2Tutorial.SetActive(true);
+		afterGacha2Tutorial.GetComponent<UIPanel>().alpha = 0f;
+		TweenAlpha.Begin(afterGacha2Tutorial, 0.3f, 1f);
 	}
 
 	public void CloseAfterGacha2(Action onClose = null)
 	{
-		TweenAlpha ta = TweenAlpha.Begin(AfterGacha2Tutorial, 0.3f, 0f);
-		if (onClose != null)
+		TweenAlpha tweenAlpha = TweenAlpha.Begin(afterGacha2Tutorial, 0.3f, 0f);
+		if (onClose == null)
 		{
-			ta.AddOnFinished(delegate
-			{
-				Object.DestroyImmediate(ta);
-				if (onClose != null)
-				{
-					onClose.Invoke();
-				}
-			});
+			return;
 		}
 	}
 
@@ -178,7 +183,7 @@ public class UITutorialHomeDialog
 		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0046: Expected O, but got Unknown
-		if (AfterGacha2Tutorial.get_gameObject().get_activeSelf())
+		if (afterGacha2Tutorial.get_gameObject().get_activeSelf())
 		{
 			CloseAfterGacha2(onClose);
 		}

@@ -251,9 +251,9 @@ public class LimitedLoginBonus : GameSection
 				{
 					if (ret != null && ret.result != null && ret.result.Count > 0)
 					{
-						((_003CDoInitialize_003Ec__IteratorA8)/*Error near IL_0071: stateMachine*/)._003C_003Ef__this.lb = ret.result[0];
+						((_003CDoInitialize_003Ec__IteratorA9)/*Error near IL_0071: stateMachine*/)._003C_003Ef__this.lb = ret.result[0];
 					}
-					((_003CDoInitialize_003Ec__IteratorA8)/*Error near IL_0071: stateMachine*/)._003Cconnect_003E__0 = true;
+					((_003CDoInitialize_003Ec__IteratorA9)/*Error near IL_0071: stateMachine*/)._003Cconnect_003E__0 = true;
 				}
 			}, getParam: string.Empty);
 			while (!connect)

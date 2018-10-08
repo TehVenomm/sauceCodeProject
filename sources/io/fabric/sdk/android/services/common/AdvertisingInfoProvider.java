@@ -22,13 +22,13 @@ class AdvertisingInfoProvider {
     private AdvertisingInfo getAdvertisingInfoFromStrategies() {
         AdvertisingInfo advertisingInfo = getReflectionStrategy().getAdvertisingInfo();
         if (isInfoValid(advertisingInfo)) {
-            Fabric.getLogger().mo4289d("Fabric", "Using AdvertisingInfo from Reflection Provider");
+            Fabric.getLogger().mo4753d("Fabric", "Using AdvertisingInfo from Reflection Provider");
         } else {
             advertisingInfo = getServiceStrategy().getAdvertisingInfo();
             if (isInfoValid(advertisingInfo)) {
-                Fabric.getLogger().mo4289d("Fabric", "Using AdvertisingInfo from Service Provider");
+                Fabric.getLogger().mo4753d("Fabric", "Using AdvertisingInfo from Service Provider");
             } else {
-                Fabric.getLogger().mo4289d("Fabric", "AdvertisingInfo not present");
+                Fabric.getLogger().mo4753d("Fabric", "AdvertisingInfo not present");
             }
         }
         return advertisingInfo;
@@ -43,7 +43,7 @@ class AdvertisingInfoProvider {
             public void onRun() {
                 AdvertisingInfo access$000 = AdvertisingInfoProvider.this.getAdvertisingInfoFromStrategies();
                 if (!advertisingInfo.equals(access$000)) {
-                    Fabric.getLogger().mo4289d("Fabric", "Asychronously getting Advertising Info and storing it to preferences");
+                    Fabric.getLogger().mo4753d("Fabric", "Asychronously getting Advertising Info and storing it to preferences");
                     AdvertisingInfoProvider.this.storeInfoToPreferences(access$000);
                 }
             }
@@ -62,7 +62,7 @@ class AdvertisingInfoProvider {
     public AdvertisingInfo getAdvertisingInfo() {
         AdvertisingInfo infoFromPreferences = getInfoFromPreferences();
         if (isInfoValid(infoFromPreferences)) {
-            Fabric.getLogger().mo4289d("Fabric", "Using AdvertisingInfo from Preference Store");
+            Fabric.getLogger().mo4753d("Fabric", "Using AdvertisingInfo from Preference Store");
             refreshInfoIfNeededAsync(infoFromPreferences);
             return infoFromPreferences;
         }

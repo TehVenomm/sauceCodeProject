@@ -18,7 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import com.zopim.android.sdk.api.Chat;
 import com.zopim.android.sdk.api.ZopimChat;
 import com.zopim.android.sdk.chatlog.ConnectionFragment;
@@ -35,14 +35,14 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
     private Chat mChat;
     private ChatListener mChatListener;
     private EditText mEmailEdit;
-    FormsObserver mFormsObserver = new C0893o(this);
+    FormsObserver mFormsObserver = new C0892o(this);
     private Handler mHandler = new Handler(Looper.getMainLooper());
     private Menu mMenu;
     private EditText mMessageEdit;
     private EditText mNameEdit;
     private View mProgressBar;
     private AlertDialog mSendTimeoutDialog;
-    Runnable mShowSendTimeoutDialog = new C0890l(this);
+    Runnable mShowSendTimeoutDialog = new C0889l(this);
     private boolean mStateMenuItemEnabled = true;
     private VisitorInfo mVisitorInfo;
 
@@ -62,8 +62,8 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
         if (this.mNameEdit.getVisibility() == 0) {
             trim = this.mNameEdit.getText().toString().trim();
             if (trim.isEmpty()) {
-                this.mNameEdit.setError(getResources().getString(C0785R.string.offline_name_error_message));
-                this.mNameEdit.setHint(C0785R.string.offline_name_error_hint);
+                this.mNameEdit.setError(getResources().getString(C0784R.string.offline_name_error_message));
+                this.mNameEdit.setHint(C0784R.string.offline_name_error_hint);
                 i = 0;
             } else {
                 i = 1;
@@ -79,8 +79,8 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
                 i2 = i;
                 CharSequence charSequence2 = charSequence;
             } else {
-                this.mEmailEdit.setError(getResources().getString(C0785R.string.offline_email_error_message));
-                this.mEmailEdit.setHint(C0785R.string.offline_email_error_hint);
+                this.mEmailEdit.setError(getResources().getString(C0784R.string.offline_email_error_message));
+                this.mEmailEdit.setHint(C0784R.string.offline_email_error_hint);
                 str = trim2;
                 i2 = 0;
             }
@@ -91,8 +91,8 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
         if (this.mMessageEdit.getVisibility() == 0) {
             String trim3 = this.mMessageEdit.getText().toString().trim();
             if (trim3.isEmpty()) {
-                this.mMessageEdit.setError(getResources().getString(C0785R.string.offline_message_error_message));
-                this.mMessageEdit.setHint(C0785R.string.offline_message_error_hint);
+                this.mMessageEdit.setError(getResources().getString(C0784R.string.offline_message_error_message));
+                this.mMessageEdit.setHint(C0784R.string.offline_message_error_hint);
                 str2 = trim3;
                 i3 = 0;
             } else {
@@ -105,7 +105,7 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
             str2 = null;
         }
         if (i3 == 0) {
-            Toast.makeText(getActivity(), C0785R.string.offline_validation_error_message, 1).show();
+            Toast.makeText(getActivity(), C0784R.string.offline_validation_error_message, 1).show();
         } else if (this.mChat.sendOfflineMessage(trim, str, str2)) {
             this.mProgressBar.setVisibility(0);
             this.mHandler.postDelayed(this.mShowSendTimeoutDialog, ZopimChat.getInitializationTimeout().longValue());
@@ -143,7 +143,7 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
 
     public void onConnected() {
         if (this.mMenu != null) {
-            MenuItem findItem = this.mMenu.findItem(C0785R.id.start_chat);
+            MenuItem findItem = this.mMenu.findItem(C0784R.id.start_chat);
             if (findItem != null && findItem.isEnabled()) {
                 findItem.setEnabled(false);
             }
@@ -163,7 +163,7 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
             Fragment connectionToastFragment = new ConnectionToastFragment();
             Fragment connectionFragment = new ConnectionFragment();
             FragmentTransaction beginTransaction = getChildFragmentManager().beginTransaction();
-            beginTransaction.add(C0785R.id.toast_fragment_container, connectionToastFragment, ConnectionToastFragment.class.getName());
+            beginTransaction.add(C0784R.id.toast_fragment_container, connectionToastFragment, ConnectionToastFragment.class.getName());
             beginTransaction.add(connectionFragment, ConnectionFragment.class.getName());
             beginTransaction.commit();
         }
@@ -171,18 +171,18 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         super.onCreateOptionsMenu(menu, menuInflater);
-        menuInflater.inflate(C0785R.menu.chat_offline_message_menu, menu);
-        menu.findItem(C0785R.id.send).setEnabled(this.mStateMenuItemEnabled);
+        menuInflater.inflate(C0784R.menu.chat_offline_message_menu, menu);
+        menu.findItem(C0784R.id.send).setEnabled(this.mStateMenuItemEnabled);
         this.mMenu = menu;
     }
 
     public View onCreateView(LayoutInflater layoutInflater, @Nullable ViewGroup viewGroup, @Nullable Bundle bundle) {
-        return layoutInflater.inflate(C0785R.layout.zopim_offline_message_fragment, viewGroup, false);
+        return layoutInflater.inflate(C0784R.layout.zopim_offline_message_fragment, viewGroup, false);
     }
 
     public void onDisconnected() {
         if (this.mMenu != null) {
-            MenuItem findItem = this.mMenu.findItem(C0785R.id.start_chat);
+            MenuItem findItem = this.mMenu.findItem(C0784R.id.start_chat);
             if (findItem != null && !findItem.isEnabled()) {
                 findItem.setEnabled(true);
             }
@@ -197,7 +197,7 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
                 this.mChatListener.onChatEnded();
             }
             return super.onOptionsItemSelected(menuItem);
-        } else if (C0785R.id.send != menuItem.getItemId()) {
+        } else if (C0784R.id.send != menuItem.getItemId()) {
             return super.onOptionsItemSelected(menuItem);
         } else {
             sendOfflineMessage();
@@ -207,7 +207,7 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
 
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
-        bundle.putBoolean(STATE_MENU_ITEM_ENABLED, this.mMenu.findItem(C0785R.id.send).isEnabled());
+        bundle.putBoolean(STATE_MENU_ITEM_ENABLED, this.mMenu.findItem(C0784R.id.send).isEnabled());
         bundle.putInt(STATE_PROGRESS_VISIBITLITY, this.mProgressBar.getVisibility());
     }
 
@@ -224,13 +224,13 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
 
     public void onViewCreated(View view, @Nullable Bundle bundle) {
         super.onViewCreated(view, bundle);
-        this.mNameEdit = (EditText) view.findViewById(C0785R.id.name);
-        this.mEmailEdit = (EditText) view.findViewById(C0785R.id.email);
-        this.mMessageEdit = (EditText) view.findViewById(C0785R.id.message);
-        this.mProgressBar = view.findViewById(C0785R.id.progress);
-        this.mNameEdit.setHint(String.format(getResources().getString(C0785R.string.required_field_template), new Object[]{this.mNameEdit.getHint()}));
-        this.mEmailEdit.setHint(String.format(getResources().getString(C0785R.string.required_field_template), new Object[]{this.mEmailEdit.getHint()}));
-        this.mMessageEdit.setHint(String.format(getResources().getString(C0785R.string.required_field_template), new Object[]{this.mMessageEdit.getHint()}));
+        this.mNameEdit = (EditText) view.findViewById(C0784R.id.name);
+        this.mEmailEdit = (EditText) view.findViewById(C0784R.id.email);
+        this.mMessageEdit = (EditText) view.findViewById(C0784R.id.message);
+        this.mProgressBar = view.findViewById(C0784R.id.progress);
+        this.mNameEdit.setHint(String.format(getResources().getString(C0784R.string.required_field_template), new Object[]{this.mNameEdit.getHint()}));
+        this.mEmailEdit.setHint(String.format(getResources().getString(C0784R.string.required_field_template), new Object[]{this.mEmailEdit.getHint()}));
+        this.mMessageEdit.setHint(String.format(getResources().getString(C0784R.string.required_field_template), new Object[]{this.mMessageEdit.getHint()}));
         if (!(this.mVisitorInfo.getName() == null || this.mVisitorInfo.getName().isEmpty())) {
             this.mNameEdit.setVisibility(8);
         }

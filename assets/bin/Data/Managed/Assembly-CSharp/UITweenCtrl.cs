@@ -159,8 +159,8 @@ public class UITweenCtrl
 				if (GameSceneManager.isAutoEventSkip)
 				{
 					AppMain i2 = MonoBehaviourSingleton<AppMain>.I;
-					_003C_Play_003Ec__AnonStorey7C5 _003C_Play_003Ec__AnonStorey7C;
-					i2.onDelayCall = Delegate.Combine((Delegate)i2.onDelayCall, (Delegate)new Action((object)_003C_Play_003Ec__AnonStorey7C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					_003C_Play_003Ec__AnonStorey7D7 _003C_Play_003Ec__AnonStorey7D;
+					i2.onDelayCall = Delegate.Combine((Delegate)i2.onDelayCall, (Delegate)new Action((object)_003C_Play_003Ec__AnonStorey7D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 			}
 		}

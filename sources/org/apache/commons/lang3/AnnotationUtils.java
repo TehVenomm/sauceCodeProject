@@ -9,13 +9,13 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class AnnotationUtils {
-    private static final ToStringStyle TO_STRING_STYLE = new C12661();
+    private static final ToStringStyle TO_STRING_STYLE = new C15821();
 
     /* renamed from: org.apache.commons.lang3.AnnotationUtils$1 */
-    static class C12661 extends ToStringStyle {
+    static class C15821 extends ToStringStyle {
         private static final long serialVersionUID = 1;
 
-        C12661() {
+        C15821() {
             setDefaultFullDetail(true);
             setArrayContentDetail(true);
             setUseClassName(true);

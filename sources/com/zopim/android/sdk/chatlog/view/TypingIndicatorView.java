@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import java.util.concurrent.TimeUnit;
 
 public class TypingIndicatorView extends LinearLayout {
@@ -29,10 +29,10 @@ public class TypingIndicatorView extends LinearLayout {
     @TargetApi(16)
     private AnimationDrawable[] prepareAnimations() {
         int childCount = getChildCount();
-        int integer = getResources().getInteger(C0785R.integer.typing_dot_duration);
+        int integer = getResources().getInteger(C0784R.integer.typing_dot_duration);
         this.mTransitionDelay = ((long) integer) > TYPING_INDICATOR_MAX_DELAY ? TYPING_INDICATOR_MAX_DELAY : (long) integer;
-        Drawable drawable = getResources().getDrawable(C0785R.drawable.ic_typing_dot_secondary);
-        Drawable drawable2 = getResources().getDrawable(C0785R.drawable.ic_typing_dot_primary);
+        Drawable drawable = getResources().getDrawable(C0784R.drawable.ic_typing_dot_secondary);
+        Drawable drawable2 = getResources().getDrawable(C0784R.drawable.ic_typing_dot_primary);
         AnimationDrawable[] animationDrawableArr = new AnimationDrawable[childCount];
         int i = 0;
         while (getChildAt(i) instanceof ImageView) {
@@ -56,8 +56,8 @@ public class TypingIndicatorView extends LinearLayout {
     public void start() {
         this.mAnimations = prepareAnimations();
         long j = 0;
-        for (AnimationDrawable c0856a : this.mAnimations) {
-            postDelayed(new C0856a(this, c0856a), j);
+        for (AnimationDrawable c0855a : this.mAnimations) {
+            postDelayed(new C0855a(this, c0855a), j);
             j += this.mTransitionDelay;
         }
     }

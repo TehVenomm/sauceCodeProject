@@ -20,7 +20,7 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C0784R;
 import com.zopim.android.sdk.api.Chat;
 import com.zopim.android.sdk.api.ChatConfig;
 import com.zopim.android.sdk.api.Logger;
@@ -76,7 +76,7 @@ public class ZopimPreChatFragment extends Fragment implements ConnectionListener
     }
 
     private void setupVisitorField(Field field, EditText editText, String str) {
-        switch (C0897s.f914a[field.ordinal()]) {
+        switch (C0896s.f914a[field.ordinal()]) {
             case 1:
                 editText.setVisibility(8);
                 return;
@@ -105,7 +105,7 @@ public class ZopimPreChatFragment extends Fragment implements ConnectionListener
                 return;
         }
         if (safeIsEmpty(str)) {
-            editText.setHint(String.format(getResources().getString(C0785R.string.required_field_template), new Object[]{editText.getHint()}));
+            editText.setHint(String.format(getResources().getString(C0784R.string.required_field_template), new Object[]{editText.getHint()}));
             return;
         }
         editText.setVisibility(8);
@@ -120,7 +120,7 @@ public class ZopimPreChatFragment extends Fragment implements ConnectionListener
 
     public void onConnected() {
         if (this.mMenu != null) {
-            MenuItem findItem = this.mMenu.findItem(C0785R.id.start_chat);
+            MenuItem findItem = this.mMenu.findItem(C0784R.id.start_chat);
             if (findItem != null && !findItem.isEnabled()) {
                 findItem.setEnabled(true);
             }
@@ -141,7 +141,7 @@ public class ZopimPreChatFragment extends Fragment implements ConnectionListener
             Fragment connectionToastFragment = new ConnectionToastFragment();
             Fragment connectionFragment = new ConnectionFragment();
             FragmentTransaction beginTransaction = getChildFragmentManager().beginTransaction();
-            beginTransaction.add(C0785R.id.toast_fragment_container, connectionToastFragment, ConnectionToastFragment.class.getName());
+            beginTransaction.add(C0784R.id.toast_fragment_container, connectionToastFragment, ConnectionToastFragment.class.getName());
             beginTransaction.add(connectionFragment, ConnectionFragment.class.getName());
             beginTransaction.commit();
         }
@@ -149,18 +149,18 @@ public class ZopimPreChatFragment extends Fragment implements ConnectionListener
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         super.onCreateOptionsMenu(menu, menuInflater);
-        menuInflater.inflate(C0785R.menu.pre_chat_menu, menu);
-        menu.findItem(C0785R.id.start_chat).setEnabled(this.mStateMenuItemEnabled);
+        menuInflater.inflate(C0784R.menu.pre_chat_menu, menu);
+        menu.findItem(C0784R.id.start_chat).setEnabled(this.mStateMenuItemEnabled);
         this.mMenu = menu;
     }
 
     public View onCreateView(LayoutInflater layoutInflater, @Nullable ViewGroup viewGroup, @Nullable Bundle bundle) {
-        return layoutInflater.inflate(C0785R.layout.zopim_pre_chat_fragment, viewGroup, false);
+        return layoutInflater.inflate(C0784R.layout.zopim_pre_chat_fragment, viewGroup, false);
     }
 
     public void onDisconnected() {
         if (this.mMenu != null) {
-            MenuItem findItem = this.mMenu.findItem(C0785R.id.start_chat);
+            MenuItem findItem = this.mMenu.findItem(C0784R.id.start_chat);
             if (findItem != null && findItem.isEnabled()) {
                 findItem.setEnabled(false);
             }
@@ -171,7 +171,7 @@ public class ZopimPreChatFragment extends Fragment implements ConnectionListener
         if (16908332 == menuItem.getItemId()) {
             close();
         }
-        if (C0785R.id.start_chat != menuItem.getItemId()) {
+        if (C0784R.id.start_chat != menuItem.getItemId()) {
             return super.onOptionsItemSelected(menuItem);
         }
         boolean z;
@@ -179,26 +179,26 @@ public class ZopimPreChatFragment extends Fragment implements ConnectionListener
             z = true;
         } else {
             TextView textView = (TextView) this.mDepartmentSpinner.getSelectedView();
-            textView.setError(getResources().getText(C0785R.string.pre_chat_departments_error_message));
-            textView.setText(C0785R.string.pre_chat_departments_error_hint);
+            textView.setError(getResources().getText(C0784R.string.pre_chat_departments_error_message));
+            textView.setText(C0784R.string.pre_chat_departments_error_hint);
             z = false;
         }
         if (this.mEmailEdit.getVisibility() == 0) {
             CharSequence trim = this.mEmailEdit.getText().toString().trim();
-            switch (C0897s.f914a[this.mPreChatForm.getEmail().ordinal()]) {
+            switch (C0896s.f914a[this.mPreChatForm.getEmail().ordinal()]) {
                 case 2:
                 case 3:
                     if (!(trim.isEmpty() || Patterns.EMAIL_ADDRESS.matcher(trim).matches())) {
-                        this.mEmailEdit.setError(getResources().getString(C0785R.string.pre_chat_email_error_message));
-                        this.mEmailEdit.setHint(C0785R.string.pre_chat_email_error_hint);
+                        this.mEmailEdit.setError(getResources().getString(C0784R.string.pre_chat_email_error_message));
+                        this.mEmailEdit.setHint(C0784R.string.pre_chat_email_error_hint);
                         z = false;
                         break;
                     }
                 case 4:
                 case 5:
                     if (!Patterns.EMAIL_ADDRESS.matcher(trim).matches()) {
-                        this.mEmailEdit.setError(getResources().getString(C0785R.string.pre_chat_email_error_message));
-                        this.mEmailEdit.setHint(C0785R.string.pre_chat_email_error_hint);
+                        this.mEmailEdit.setError(getResources().getString(C0784R.string.pre_chat_email_error_message));
+                        this.mEmailEdit.setHint(C0784R.string.pre_chat_email_error_hint);
                         z = false;
                         break;
                     }
@@ -206,18 +206,18 @@ public class ZopimPreChatFragment extends Fragment implements ConnectionListener
             }
         }
         if (this.mNameEdit.getVisibility() == 0 && ((Field.REQUIRED.equals(this.mPreChatForm.getName()) || Field.REQUIRED_EDITABLE.equals(this.mPreChatForm.getName())) && this.mNameEdit.getText().toString().trim().isEmpty())) {
-            this.mNameEdit.setError(getResources().getString(C0785R.string.pre_chat_name_error_message));
-            this.mNameEdit.setHint(C0785R.string.pre_chat_name_error_hint);
+            this.mNameEdit.setError(getResources().getString(C0784R.string.pre_chat_name_error_message));
+            this.mNameEdit.setHint(C0784R.string.pre_chat_name_error_hint);
             z = false;
         }
         if (this.mPhoneNumberEdit.getVisibility() == 0 && ((Field.REQUIRED.equals(this.mPreChatForm.getPhoneNumber()) || Field.REQUIRED_EDITABLE.equals(this.mPreChatForm.getPhoneNumber())) && this.mPhoneNumberEdit.getText().toString().trim().isEmpty())) {
-            this.mPhoneNumberEdit.setError(getResources().getString(C0785R.string.pre_chat_phone_error_message));
-            this.mPhoneNumberEdit.setHint(C0785R.string.pre_chat_phone_error_hint);
+            this.mPhoneNumberEdit.setError(getResources().getString(C0784R.string.pre_chat_phone_error_message));
+            this.mPhoneNumberEdit.setHint(C0784R.string.pre_chat_phone_error_hint);
             z = false;
         }
         if (this.mMessageEdit.getVisibility() == 0 && ((Field.REQUIRED.equals(this.mPreChatForm.getMessage()) || Field.REQUIRED_EDITABLE.equals(this.mPreChatForm.getMessage())) && this.mMessageEdit.getText().toString().trim().isEmpty())) {
-            this.mMessageEdit.setError(getResources().getString(C0785R.string.pre_chat_message_error_message));
-            this.mMessageEdit.setHint(C0785R.string.pre_chat_message_error_hint);
+            this.mMessageEdit.setError(getResources().getString(C0784R.string.pre_chat_message_error_message));
+            this.mMessageEdit.setHint(C0784R.string.pre_chat_message_error_hint);
             z = false;
         }
         if (z) {
@@ -245,18 +245,18 @@ public class ZopimPreChatFragment extends Fragment implements ConnectionListener
             }
             Fragment zopimChatLogFragment = new ZopimChatLogFragment();
             FragmentTransaction beginTransaction = getFragmentManager().beginTransaction();
-            beginTransaction.replace(C0785R.id.chat_fragment_container, zopimChatLogFragment, ZopimChatLogFragment.class.getName());
+            beginTransaction.replace(C0784R.id.chat_fragment_container, zopimChatLogFragment, ZopimChatLogFragment.class.getName());
             beginTransaction.remove(this);
             beginTransaction.commit();
             return true;
         }
-        Toast.makeText(getActivity(), C0785R.string.pre_chat_validation_error_message, 1).show();
+        Toast.makeText(getActivity(), C0784R.string.pre_chat_validation_error_message, 1).show();
         return true;
     }
 
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
-        bundle.putBoolean("MENU_ITEM_ENABLED", this.mMenu.findItem(C0785R.id.start_chat).isEnabled());
+        bundle.putBoolean("MENU_ITEM_ENABLED", this.mMenu.findItem(C0784R.id.start_chat).isEnabled());
     }
 
     public void onStop() {
@@ -275,12 +275,12 @@ public class ZopimPreChatFragment extends Fragment implements ConnectionListener
         String str = null;
         super.onViewCreated(view, bundle);
         VisitorInfo visitorInfo = this.mChat.getConfig().getVisitorInfo();
-        this.mNameEdit = (EditText) view.findViewById(C0785R.id.name);
-        this.mEmailEdit = (EditText) view.findViewById(C0785R.id.email);
-        this.mPhoneNumberEdit = (EditText) view.findViewById(C0785R.id.phoneNumber);
-        this.mDepartmentSpinner = (Spinner) view.findViewById(C0785R.id.departments);
-        this.mMessageEdit = (EditText) view.findViewById(C0785R.id.message);
-        switch (C0897s.f914a[this.mPreChatForm.getDepartment().ordinal()]) {
+        this.mNameEdit = (EditText) view.findViewById(C0784R.id.name);
+        this.mEmailEdit = (EditText) view.findViewById(C0784R.id.email);
+        this.mPhoneNumberEdit = (EditText) view.findViewById(C0784R.id.phoneNumber);
+        this.mDepartmentSpinner = (Spinner) view.findViewById(C0784R.id.departments);
+        this.mMessageEdit = (EditText) view.findViewById(C0784R.id.message);
+        switch (C0896s.f914a[this.mPreChatForm.getDepartment().ordinal()]) {
             case 1:
                 this.mDepartmentSpinner.setVisibility(8);
                 break;
@@ -291,16 +291,16 @@ public class ZopimPreChatFragment extends Fragment implements ConnectionListener
                     for (Department name : values) {
                         arrayList.add(name.getName());
                     }
-                    Object string = getResources().getString(C0785R.string.pre_chat_departments_hint);
+                    Object string = getResources().getString(C0784R.string.pre_chat_departments_hint);
                     if (Field.REQUIRED.equals(this.mPreChatForm.getDepartment()) || Field.REQUIRED_EDITABLE.equals(this.mPreChatForm.getDepartment())) {
-                        string = String.format(getResources().getString(C0785R.string.required_field_template), new Object[]{string});
+                        string = String.format(getResources().getString(C0784R.string.required_field_template), new Object[]{string});
                     }
                     arrayList.add(string);
-                    SpinnerAdapter c0895q = new C0895q(this, getActivity(), C0785R.layout.spinner_list_item, arrayList);
-                    c0895q.setDropDownViewResource(C0785R.layout.support_simple_spinner_dropdown_item);
-                    this.mDepartmentSpinner.setAdapter(c0895q);
+                    SpinnerAdapter c0894q = new C0894q(this, getActivity(), C0784R.layout.spinner_list_item, arrayList);
+                    c0894q.setDropDownViewResource(C0784R.layout.support_simple_spinner_dropdown_item);
+                    this.mDepartmentSpinner.setAdapter(c0894q);
                     this.mDepartmentSpinner.setSelection(arrayList.size() - 1);
-                    this.mDepartmentSpinner.setOnItemSelectedListener(new C0896r(this));
+                    this.mDepartmentSpinner.setOnItemSelectedListener(new C0895r(this));
                     break;
                 }
                 this.mDepartmentSpinner.setVisibility(8);
