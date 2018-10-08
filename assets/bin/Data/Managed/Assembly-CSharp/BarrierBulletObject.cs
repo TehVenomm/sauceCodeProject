@@ -60,10 +60,11 @@ public class BarrierBulletObject : StageObject
 
 	public void Initialize(BulletObject bulletObj)
 	{
-		base.gameObject.layer = 31;
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().set_layer(31);
 		this.bulletObj = bulletObj;
 		owner = (bulletObj.stageObject as Player);
-		if ((Object)owner != (Object)null)
+		if (owner != null)
 		{
 			int num = owner.id % 110000;
 			int weaponIndex = owner.weaponIndex;
@@ -78,10 +79,10 @@ public class BarrierBulletObject : StageObject
 			}
 			id = 1000000 + int.Parse(num.ToString() + weaponIndex.ToString() + skillIndex.ToString() + owner.bulletIndex.ToString("D3"));
 		}
-		base._rigidbody = GetComponent<Rigidbody>();
-		base._rigidbody.useGravity = false;
-		base._rigidbody.isKinematic = true;
-		if ((Object)bulletObj != (Object)null && (Object)bulletObj.bulletEffect != (Object)null)
+		base._rigidbody = this.GetComponent<Rigidbody>();
+		base._rigidbody.set_useGravity(false);
+		base._rigidbody.set_isKinematic(true);
+		if (bulletObj != null && bulletObj.bulletEffect != null)
 		{
 			effectColorCtrl = bulletObj.bulletEffect.GetComponent<EffectColorCtrl>();
 		}
@@ -102,14 +103,14 @@ public class BarrierBulletObject : StageObject
 		if (owner.IsOriginal())
 		{
 			SetCoopMode(COOP_MODE_TYPE.ORIGINAL, 0);
-			if ((Object)base.packetSender != (Object)null)
+			if (base.packetSender != null)
 			{
 				base.packetSender.OnSetCoopMode(COOP_MODE_TYPE.PUPPET);
 			}
 		}
 		effectNameInBarrier = bulletObj.bulletData.dataBarrier.effectNameInBarrier;
 		BarrierBulletObject activeBulletBarrierObject = owner.activeBulletBarrierObject;
-		if ((Object)activeBulletBarrierObject != (Object)null)
+		if (activeBulletBarrierObject != null)
 		{
 			owner.activeBulletBarrierObject.bulletObj.ForceBreak();
 		}
@@ -120,7 +121,7 @@ public class BarrierBulletObject : StageObject
 	protected override void Update()
 	{
 		base.Update();
-		if ((Object)effectColorCtrl != (Object)null)
+		if (effectColorCtrl != null)
 		{
 			effectColorCtrl.UpdateColor((float)hp / (float)hpMax);
 		}
@@ -141,7 +142,7 @@ public class BarrierBulletObject : StageObject
 		if (status.hitParam.processor != null)
 		{
 			BulletObject bulletObject = status.hitParam.processor.colliderInterface as BulletObject;
-			if ((Object)bulletObject != (Object)null)
+			if (bulletObject != null)
 			{
 				status.atk = bulletObject.masterAtk;
 				status.skillParam = bulletObject.masterSkill;
@@ -156,7 +157,7 @@ public class BarrierBulletObject : StageObject
 		if (status.fromType == OBJECT_TYPE.ENEMY)
 		{
 			status.validDamage = true;
-			if ((Object)effectColorCtrl != (Object)null)
+			if (effectColorCtrl != null)
 			{
 				effectColorCtrl.PlayHitEffect();
 			}
@@ -184,6 +185,7 @@ public class BarrierBulletObject : StageObject
 
 	public override void OnAttackedHitFix(AttackedHitStatusFix status)
 	{
+		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 		hp = status.afterHP;
 		if (bulletObj.IsEnable())
 		{
@@ -206,7 +208,7 @@ public class BarrierBulletObject : StageObject
 			else if (!string.IsNullOrEmpty(status.attackInfo.remainEffectName))
 			{
 				Transform effect = EffectManager.GetEffect(status.attackInfo.remainEffectName, base._transform);
-				effect.position = status.hitPos;
+				effect.set_position(status.hitPos);
 			}
 		}
 	}
@@ -218,7 +220,7 @@ public class BarrierBulletObject : StageObject
 		atkAttribute.Mul(status.attackInfo.atkRate);
 		int enemyLevel = 1;
 		Enemy enemy = status.fromObject as Enemy;
-		if ((Object)enemy != (Object)null)
+		if (enemy != null)
 		{
 			enemyLevel = enemy.enemyLevel;
 		}
@@ -257,7 +259,7 @@ public class BarrierBulletObject : StageObject
 
 	public void ForceExitThroughProcessor(Collider exitCollider)
 	{
-		if (!((Object)exitCollider == (Object)null) && !((Object)bulletObj == (Object)null))
+		if (!(exitCollider == null) && !(bulletObj == null))
 		{
 			bulletObj.OnTriggerExit(exitCollider);
 		}
@@ -266,7 +268,7 @@ public class BarrierBulletObject : StageObject
 	public override void OnRecvSetCoopMode(Coop_Model_ObjectCoopInfo model, CoopPacket packet)
 	{
 		StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.FindObject(model.id);
-		if (!((Object)stageObject == (Object)null))
+		if (!(stageObject == null))
 		{
 			stageObject.SetCoopMode(model.CoopModeType, packet.fromClientId);
 		}

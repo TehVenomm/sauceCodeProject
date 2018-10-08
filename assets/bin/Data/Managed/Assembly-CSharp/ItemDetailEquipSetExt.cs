@@ -1,3 +1,5 @@
+using System;
+
 public class ItemDetailEquipSetExt : GameSection
 {
 	protected enum UI
@@ -30,12 +32,12 @@ public class ItemDetailEquipSetExt : GameSection
 	{
 		ItemInfo itemInfo = data.GetItemData() as ItemInfo;
 		SetRenderItemModel(UI.TEX_MODEL, itemInfo.tableID);
-		SetActive(UI.STR_SELL, data.CanSale());
-		SetActive(UI.BTN_DETAIL_SELL, data.CanSale() && MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
-		SetLabelText(UI.LBL_NAME, data.GetName());
-		SetLabelText(UI.LBL_HAVE_NUM, data.GetNum().ToString());
-		SetLabelText(UI.LBL_DESCRIPTION, itemInfo.tableData.text);
-		SetLabelText(UI.LBL_SELL, data.GetSalePrice().ToString());
+		SetActive((Enum)UI.STR_SELL, data.CanSale());
+		SetActive((Enum)UI.BTN_DETAIL_SELL, data.CanSale() && MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
+		SetLabelText((Enum)UI.LBL_NAME, data.GetName());
+		SetLabelText((Enum)UI.LBL_HAVE_NUM, data.GetNum().ToString());
+		SetLabelText((Enum)UI.LBL_DESCRIPTION, itemInfo.tableData.text);
+		SetLabelText((Enum)UI.LBL_SELL, data.GetSalePrice().ToString());
 		int num = 0;
 		int num2 = 0;
 		num = itemInfo.tableData.enemyIconID;

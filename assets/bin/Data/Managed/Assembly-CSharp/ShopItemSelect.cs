@@ -1,4 +1,5 @@
 using Network;
+using System;
 using UnityEngine;
 
 public class ShopItemSelect : GameSection
@@ -21,23 +22,10 @@ public class ShopItemSelect : GameSection
 		base.Initialize();
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetTable(UI.TBL_LIST, "ShopItemListItem", MonoBehaviourSingleton<ShopManager>.I.shopData.lineups.Count, false, delegate(int i, Transform t, bool b)
-		{
-			ShopList.ShopLineup shopLineup = MonoBehaviourSingleton<ShopManager>.I.shopData.lineups[i];
-			SetLabelText(t, UI.LBL_NAME, shopLineup.name);
-			SetLabelText(t, UI.LBL_DESCRIPTION, shopLineup.description);
-			SetLabelText(t, UI.LBL_CRYSTAL_NUM, shopLineup.crystalNum.ToString());
-			SetEvent(t, "SELECT", shopLineup.shopLineupId);
-			uint itemId = (uint)shopLineup.itemIds[0];
-			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.ITEM, itemId, FindCtrl(t, UI.OBJ_ICON_ROOT), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-			if ((Object)itemIcon != (Object)null)
-			{
-				itemIcon.SetEnableCollider(false);
-			}
-		});
+		SetTable(UI.TBL_LIST, "ShopItemListItem", MonoBehaviourSingleton<ShopManager>.I.shopData.lineups.Count, false, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnQuery_SELECT()

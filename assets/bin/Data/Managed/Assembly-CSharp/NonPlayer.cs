@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class NonPlayer : Player
 {
 	public enum eNpcAllayState
@@ -102,7 +100,7 @@ public class NonPlayer : Player
 		StageObject allyTarget = base.controller.brain.targetCtrl.GetAllyTarget();
 		if (!object.ReferenceEquals(allyTarget, null))
 		{
-			if ((Object)allyTarget == (Object)client)
+			if (allyTarget == client)
 			{
 				return eNpcAllayState.SAME;
 			}

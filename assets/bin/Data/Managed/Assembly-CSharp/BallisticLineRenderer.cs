@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BallisticLineRenderer : MonoBehaviour
+public class BallisticLineRenderer
 {
 	private const int lineDivide = 30;
 
@@ -8,17 +8,25 @@ public class BallisticLineRenderer : MonoBehaviour
 
 	private BulletData bulletData;
 
+	public BallisticLineRenderer()
+		: this()
+	{
+	}
+
 	private void Start()
 	{
-		Transform transform = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.bulletLine, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-		if (!((Object)transform == (Object)null))
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		Transform val = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.bulletLine, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
+		if (!(val == null))
 		{
-			lineRenderer = transform.GetComponent<LineRenderer>();
-			if ((Object)lineRenderer != (Object)null)
+			lineRenderer = val.GetComponent<LineRenderer>();
+			if (lineRenderer != null)
 			{
-				lineRenderer.enabled = false;
-				lineRenderer.SetColors(Color.yellow, Color.yellow);
-				lineRenderer.material.renderQueue = 3001;
+				lineRenderer.set_enabled(false);
+				lineRenderer.SetColors(Color.get_yellow(), Color.get_yellow());
+				lineRenderer.get_material().set_renderQueue(3001);
 			}
 		}
 	}
@@ -30,52 +38,71 @@ public class BallisticLineRenderer : MonoBehaviour
 
 	public void SetVisible(bool enabled)
 	{
-		lineRenderer.enabled = enabled;
+		lineRenderer.set_enabled(enabled);
 	}
 
 	public void UpdateLine(Vector3 shotPos, Vector3 shotVec)
 	{
-		if (!((Object)lineRenderer == (Object)null) && lineRenderer.enabled && !((Object)bulletData == (Object)null))
+		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+		if (!(lineRenderer == null) && lineRenderer.get_enabled() && !(bulletData == null))
 		{
 			shotVec.Normalize();
-			float d = 0f;
 			float num = 0f;
-			float d2 = 0f;
+			float num2 = 0f;
+			float num3 = 0f;
 			if (bulletData.type == BulletData.BULLET_TYPE.FALL)
 			{
-				d = bulletData.dataFall.gravityRate;
-				num = bulletData.dataFall.gravityStartTime;
-				d2 = bulletData.data.speed;
+				num = bulletData.dataFall.gravityRate;
+				num2 = bulletData.dataFall.gravityStartTime;
+				num3 = bulletData.data.speed;
 			}
 			else if (bulletData.type == BulletData.BULLET_TYPE.CANNONBALL)
 			{
-				d = bulletData.dataCannonball.gravityRate;
-				num = bulletData.dataCannonball.gravityStartTime;
-				d2 = bulletData.data.speed;
+				num = bulletData.dataCannonball.gravityRate;
+				num2 = bulletData.dataCannonball.gravityStartTime;
+				num3 = bulletData.data.speed;
 			}
-			Vector3 a = Physics.gravity * d;
+			Vector3 val = Physics.get_gravity() * num;
 			lineRenderer.SetVertexCount(30);
 			lineRenderer.SetPosition(0, shotPos);
-			float num2 = bulletData.data.appearTime / 30f;
-			float num3 = 0f;
+			float num4 = bulletData.data.appearTime / 30f;
+			float num5 = 0f;
 			for (int i = 1; i < 30; i++)
 			{
-				num3 = ((!(num3 <= num)) ? (num3 + num2) : (num3 + num2 * 0.1f));
-				Vector3 vector = shotPos + shotVec * d2 * num3;
-				if (num3 >= num)
+				num5 = ((!(num5 <= num2)) ? (num5 + num4) : (num5 + num4 * 0.1f));
+				Vector3 val2 = shotPos + shotVec * num3 * num5;
+				if (num5 >= num2)
 				{
-					vector += a * (num3 - num) * (num3 - num) / 2f;
+					val2 += val * (num5 - num2) * (num5 - num2) / 2f;
 				}
-				lineRenderer.SetPosition(i, vector);
+				lineRenderer.SetPosition(i, val2);
 			}
 		}
 	}
 
 	private void OnDestroy()
 	{
-		if ((Object)lineRenderer != (Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		if (lineRenderer != null)
 		{
-			Object.Destroy(lineRenderer.gameObject);
+			Object.Destroy(lineRenderer.get_gameObject());
 			lineRenderer = null;
 		}
 	}

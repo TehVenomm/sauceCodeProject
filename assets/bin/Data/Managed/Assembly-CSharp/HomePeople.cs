@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HomePeople : MonoBehaviour
+public class HomePeople
 {
 	private const int charaMax = 14;
 
@@ -50,9 +50,14 @@ public class HomePeople : MonoBehaviour
 		private set;
 	}
 
+	public HomePeople()
+		: this()
+	{
+	}
+
 	public void CreateSelfCharacter(Action<HomeStageAreaEvent> notice_callback)
 	{
-		if (!((UnityEngine.Object)selfChara != (UnityEngine.Object)null))
+		if (!(selfChara != null))
 		{
 			selfChara = (creater.CreateSelf(this, peopleRoot, notice_callback) as HomeSelfCharacter);
 			charas.Add(selfChara);
@@ -61,6 +66,7 @@ public class HomePeople : MonoBehaviour
 
 	public bool CreateLoungePlayer(LoungeModel.SlotInfo slotInfo, bool useMovingEntry, bool checkEquip)
 	{
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		if (slotInfo == null)
 		{
 			return false;
@@ -71,11 +77,11 @@ public class HomePeople : MonoBehaviour
 		}
 		CharaInfo userInfo = slotInfo.userInfo;
 		LoungePlayer loungePlayer = GetLoungePlayer(userInfo.userId);
-		if ((UnityEngine.Object)loungePlayer != (UnityEngine.Object)null)
+		if (loungePlayer != null)
 		{
 			if (checkEquip)
 			{
-				StartCoroutine(CheckEquipChanged(loungePlayer.LoungeCharaInfo, userInfo, useMovingEntry));
+				this.StartCoroutine(CheckEquipChanged(loungePlayer.LoungeCharaInfo, userInfo, useMovingEntry));
 			}
 			return false;
 		}
@@ -87,26 +93,32 @@ public class HomePeople : MonoBehaviour
 
 	public bool DestroyLoungePlayer(int id)
 	{
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		LoungePlayer loungePlayer = GetLoungePlayer(id);
-		if ((UnityEngine.Object)loungePlayer == (UnityEngine.Object)null || (UnityEngine.Object)loungePlayer.gameObject == (UnityEngine.Object)null)
+		if (loungePlayer == null || loungePlayer.get_gameObject() == null)
 		{
 			return false;
 		}
 		OnDestroyHomeCharacter(loungePlayer);
 		OnDestroyLoungePlayer(loungePlayer);
-		UnityEngine.Object.DestroyObject(loungePlayer.gameObject);
+		Object.DestroyObject(loungePlayer.get_gameObject());
 		return true;
 	}
 
 	public void SetInitialPositionLoungePlayer(int id, Vector3 initialPos, LOUNGE_ACTION_TYPE type)
 	{
-		StartCoroutine(DoSetInitialPositionLoungePlayer(id, initialPos, type));
+		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoSetInitialPositionLoungePlayer(id, initialPos, type));
 	}
 
 	public void MoveLoungePlayer(int id, Vector3 targetPos)
 	{
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		LoungePlayer loungePlayer = GetLoungePlayer(id);
-		if (!((UnityEngine.Object)loungePlayer == (UnityEngine.Object)null) && !((UnityEngine.Object)loungePlayer.gameObject == (UnityEngine.Object)null))
+		if (!(loungePlayer == null) && !(loungePlayer.get_gameObject() == null))
 		{
 			loungePlayer.SetMoveTargetPosition(targetPos);
 		}
@@ -114,6 +126,25 @@ public class HomePeople : MonoBehaviour
 
 	public Vector3 GetTargetPos(HomeCharacterBase chara, WayPoint wayPoint)
 	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<LoungeManager>.IsValid())
 		{
 			return GetLoungeMoveNPCTargetPosition(chara, wayPoint);
@@ -121,26 +152,35 @@ public class HomePeople : MonoBehaviour
 		float num = 1.5f;
 		num *= num;
 		bool flag = groupCenterPos.y != -1f;
-		Vector2 b = groupCenterPos.ToVector2XZ();
+		Vector2 val = groupCenterPos.ToVector2XZ();
 		for (int i = 0; i < 8; i++)
 		{
-			Vector2 vector = wayPoint.GetPosInCollider().ToVector2XZ();
-			if (!flag || !((vector - b).sqrMagnitude < num))
+			Vector2 val2 = wayPoint.GetPosInCollider().ToVector2XZ();
+			if (flag)
 			{
-				int j = 0;
-				int count;
-				for (count = charas.Count; j < count; j++)
+				Vector2 val3 = val2 - val;
+				if (val3.get_sqrMagnitude() < num)
 				{
-					HomeCharacterBase homeCharacterBase = charas[j];
-					if ((UnityEngine.Object)homeCharacterBase != (UnityEngine.Object)chara && !homeCharacterBase.isLoading && homeCharacterBase.isActiveAndEnabled && (vector - homeCharacterBase.moveTargetPos.ToVector2XZ()).sqrMagnitude < 0.25f)
+					continue;
+				}
+			}
+			int j = 0;
+			int count;
+			for (count = charas.Count; j < count; j++)
+			{
+				HomeCharacterBase homeCharacterBase = charas[j];
+				if (homeCharacterBase != chara && !homeCharacterBase.isLoading && homeCharacterBase.get_isActiveAndEnabled())
+				{
+					Vector2 val4 = val2 - homeCharacterBase.moveTargetPos.ToVector2XZ();
+					if (val4.get_sqrMagnitude() < 0.25f)
 					{
 						break;
 					}
 				}
-				if (j == count)
-				{
-					return vector.ToVector3XZ();
-				}
+			}
+			if (j == count)
+			{
+				return val2.ToVector3XZ();
 			}
 		}
 		return wayPoint.GetPosInCollider();
@@ -156,7 +196,7 @@ public class HomePeople : MonoBehaviour
 		for (int i = 0; i < charas.Count; i++)
 		{
 			HomeNPCCharacter homeNPCCharacter = charas[i] as HomeNPCCharacter;
-			if (!((UnityEngine.Object)homeNPCCharacter == (UnityEngine.Object)null) && npcID == homeNPCCharacter.npcInfo.npcID)
+			if (!(homeNPCCharacter == null) && npcID == homeNPCCharacter.npcInfo.npcID)
 			{
 				result = homeNPCCharacter;
 				break;
@@ -183,26 +223,26 @@ public class HomePeople : MonoBehaviour
 		{
 			loungePlayers = new List<LoungePlayer>(8);
 		}
-		peopleRoot = Utility.CreateGameObject("PeopleRoot", base.transform, -1);
+		peopleRoot = Utility.CreateGameObject("PeopleRoot", this.get_transform(), -1);
 		if (MonoBehaviourSingleton<LoungeManager>.IsValid())
 		{
-			yield return (object)StartCoroutine(SetupLounge());
+			yield return (object)this.StartCoroutine(SetupLounge());
 		}
 		else if (MonoBehaviourSingleton<GuildStageManager>.IsValid())
 		{
-			yield return (object)StartCoroutine(SetupGuild());
+			yield return (object)this.StartCoroutine(SetupGuild());
 		}
 		else
 		{
-			yield return (object)StartCoroutine(LoadPeopleWayPoint());
+			yield return (object)this.StartCoroutine(LoadPeopleWayPoint());
 			if (TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.ENTER_FIELD_03))
 			{
-				yield return (object)StartCoroutine(GetHomePlayerCharacterList());
+				yield return (object)this.StartCoroutine(GetHomePlayerCharacterList());
 			}
 			isInitialized = true;
-			yield return (object)StartCoroutine(LocateHomePeople());
+			yield return (object)this.StartCoroutine(LocateHomePeople());
 			isPeopleInitialized = true;
-			yield return (object)StartCoroutine(WatchHomePeople());
+			yield return (object)this.StartCoroutine(WatchHomePeople());
 		}
 	}
 
@@ -211,7 +251,7 @@ public class HomePeople : MonoBehaviour
 		bool wait = true;
 		MonoBehaviourSingleton<FriendManager>.I.SendHomeCharaList(delegate
 		{
-			((_003CGetHomePlayerCharacterList_003Ec__IteratorB4)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CGetHomePlayerCharacterList_003Ec__IteratorBB)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
 		});
 		while (wait)
 		{
@@ -221,8 +261,12 @@ public class HomePeople : MonoBehaviour
 
 	private IEnumerator DoSetInitialPositionLoungePlayer(int id, Vector3 pos, LOUNGE_ACTION_TYPE type)
 	{
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 		LoungePlayer target = GetLoungePlayer(id);
-		while ((UnityEngine.Object)target == (UnityEngine.Object)null || (UnityEngine.Object)target.gameObject == (UnityEngine.Object)null)
+		while (target == null || target.get_gameObject() == null)
 		{
 			target = GetLoungePlayer(id);
 			yield return (object)null;
@@ -246,16 +290,16 @@ public class HomePeople : MonoBehaviour
 		{
 			yield return (object)load_queue.Wait();
 		}
-		Transform wayPoints = ResourceUtility.Realizes(lo_way_points.loadedObject, base.transform, -1);
+		Transform wayPoints = ResourceUtility.Realizes(lo_way_points.loadedObject, this.get_transform(), -1);
 		Utility.ForEach(wayPoints, delegate(Transform o)
 		{
-			if (o.name.StartsWith("LEAF"))
+			if (o.get_name().StartsWith("LEAF"))
 			{
-				((_003CLoadPeopleWayPoint_003Ec__IteratorB6)/*Error near IL_00ba: stateMachine*/)._003C_003Ef__this.leafPoints.Add(o.GetComponent<WayPoint>());
+				((_003CLoadPeopleWayPoint_003Ec__IteratorBD)/*Error near IL_00ba: stateMachine*/)._003C_003Ef__this.leafPoints.Add(o.GetComponent<WayPoint>());
 			}
-			else if (o.name == "CENTER")
+			else if (o.get_name() == "CENTER")
 			{
-				((_003CLoadPeopleWayPoint_003Ec__IteratorB6)/*Error near IL_00ba: stateMachine*/)._003C_003Ef__this.centerPoint = o.GetComponent<WayPoint>();
+				((_003CLoadPeopleWayPoint_003Ec__IteratorBD)/*Error near IL_00ba: stateMachine*/)._003C_003Ef__this.centerPoint = o.GetComponent<WayPoint>();
 			}
 			return false;
 		});
@@ -272,12 +316,12 @@ public class HomePeople : MonoBehaviour
 		{
 			yield return (object)loadQueue.Wait();
 		}
-		Transform wayPoints = ResourceUtility.Realizes(loadWayPoints.loadedObject, base.transform, -1);
+		Transform wayPoints = ResourceUtility.Realizes(loadWayPoints.loadedObject, this.get_transform(), -1);
 		Utility.ForEach(wayPoints, delegate(Transform o)
 		{
-			if (o.name == "CENTER")
+			if (o.get_name() == "CENTER")
 			{
-				((_003CLoadLoungeWayPoint_003Ec__IteratorB7)/*Error near IL_00af: stateMachine*/)._003C_003Ef__this.centerPoint = o.GetComponent<WayPoint>();
+				((_003CLoadLoungeWayPoint_003Ec__IteratorBE)/*Error near IL_00af: stateMachine*/)._003C_003Ef__this.centerPoint = o.GetComponent<WayPoint>();
 			}
 			return false;
 		});
@@ -290,12 +334,12 @@ public class HomePeople : MonoBehaviour
 			yield return (object)null;
 			if (TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.ENTER_FIELD_03) && charas.Count < 14)
 			{
-				yield return (object)new WaitForSeconds(UnityEngine.Random.Range(3f, 6f));
+				yield return (object)new WaitForSeconds(Random.Range(3f, 6f));
 				if (AppMain.isReset)
 				{
 					break;
 				}
-				WayPoint way_point = leafPoints[UnityEngine.Random.Range(0, leafPoints.Count)];
+				WayPoint way_point = leafPoints[Random.Range(0, leafPoints.Count)];
 				CreateChara(way_point);
 			}
 		}
@@ -308,29 +352,29 @@ public class HomePeople : MonoBehaviour
 		foreach (OutGameSettingsManager.HomeScene.NPC npc in npcs)
 		{
 			HomeCharacterBase chara = creater.CreateNPC(this, peopleRoot, npc);
-			if ((UnityEngine.Object)chara != (UnityEngine.Object)null)
+			if (chara != null)
 			{
 				charas.Add(chara);
 			}
 		}
 		groupCenterPos = new Vector3(0f, -1f, 0f);
-		if (UnityEngine.Random.Range(0, 8) == 0)
+		if (Random.Range(0, 8) == 0)
 		{
-			int num2 = UnityEngine.Random.Range(2, 5);
+			int num2 = Random.Range(2, 5);
 			List<HomeCharacterBase> list = new List<HomeCharacterBase>();
 			for (int k = 0; k < num2; k++)
 			{
 				list.Add(CreateChara(centerPoint));
 			}
-			groupCenterPos = list[0]._transform.localPosition;
+			groupCenterPos = list[0]._transform.get_localPosition();
 			float angle_step = 360f / (float)num2;
-			float angle = UnityEngine.Random.value * 360f;
+			float angle = Random.get_value() * 360f;
 			Vector3 DIST = new Vector3(0f, 0f, 1f);
 			int j = 0;
 			while (j < num2)
 			{
 				Transform t = list[j]._transform;
-				t.localPosition = Quaternion.AngleAxis(angle, Vector3.up) * DIST + groupCenterPos;
+				t.set_localPosition(Quaternion.AngleAxis(angle, Vector3.get_up()) * DIST + groupCenterPos);
 				t.LookAt(groupCenterPos);
 				list[j].StopDiscussion();
 				j++;
@@ -339,7 +383,7 @@ public class HomePeople : MonoBehaviour
 		}
 		else
 		{
-			int num = UnityEngine.Random.Range(1, 5);
+			int num = Random.Range(1, 5);
 			if (!TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.ENTER_FIELD_03))
 			{
 				num = 0;
@@ -368,10 +412,10 @@ public class HomePeople : MonoBehaviour
 			}
 			else
 			{
-				yield return (object)StartCoroutine(LoadLoungeWayPoint(npc.wayPointName));
+				yield return (object)this.StartCoroutine(LoadLoungeWayPoint(npc.wayPointName));
 				chara = creater.CreateLoungeMoveNPC(this, peopleRoot, centerPoint, npc);
 			}
-			if ((UnityEngine.Object)chara != (UnityEngine.Object)null)
+			if (chara != null)
 			{
 				charas.Add(chara);
 			}
@@ -391,7 +435,7 @@ public class HomePeople : MonoBehaviour
 		foreach (OutGameSettingsManager.GuildScene.NPC npc in npcs)
 		{
 			HomeCharacterBase chara = creater.CreateNPC(this, peopleRoot, npc);
-			if ((UnityEngine.Object)chara != (UnityEngine.Object)null)
+			if (chara != null)
 			{
 				charas.Add(chara);
 			}
@@ -460,24 +504,24 @@ public class HomePeople : MonoBehaviour
 
 	private bool IsLoadingCharacter()
 	{
-		return (UnityEngine.Object)charas.Find((HomeCharacterBase o) => o.isLoading) != (UnityEngine.Object)null;
+		return charas.Find((HomeCharacterBase o) => o.isLoading) != null;
 	}
 
 	private HomeCharacterBase CreateChara(WayPoint way_point)
 	{
 		FriendCharaInfo chara_info = null;
-		if (UnityEngine.Random.Range(0, 1) == 0)
+		if (Random.Range(0, 1) == 0)
 		{
 			List<FriendCharaInfo> chara = MonoBehaviourSingleton<FriendManager>.I.homeCharas.chara;
 			int count = chara.Count;
 			if (count > 0)
 			{
-				int num = UnityEngine.Random.Range(0, count);
+				int num = Random.Range(0, count);
 				int num2 = num;
 				do
 				{
 					FriendCharaInfo info = chara[num2];
-					if (info != null && !((UnityEngine.Object)charas.Find((HomeCharacterBase o) => o.GetFriendCharaInfo() != null && o.GetFriendCharaInfo().userId == info.userId) != (UnityEngine.Object)null))
+					if (info != null && !(charas.Find((HomeCharacterBase o) => o.GetFriendCharaInfo() != null && o.GetFriendCharaInfo().userId == info.userId) != null))
 					{
 						chara_info = info;
 						break;
@@ -494,52 +538,82 @@ public class HomePeople : MonoBehaviour
 
 	private void LateUpdate()
 	{
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int count = charas.Count; i < count; i++)
 		{
 			HomeCharacterBase homeCharacterBase = charas[i];
-			if (!homeCharacterBase.isLoading && homeCharacterBase.isActiveAndEnabled)
+			if (!homeCharacterBase.isLoading && homeCharacterBase.get_isActiveAndEnabled())
 			{
-				Vector2 a = homeCharacterBase._transform.localPosition.ToVector2XZ();
+				Vector2 val = homeCharacterBase._transform.get_localPosition().ToVector2XZ();
 				HomeCharacterBase homeCharacterBase2 = null;
 				float num = 9f;
-				Vector2 a2 = new Vector2(0f, 0f);
-				Vector2 a3 = new Vector2(0f, 0f);
+				Vector2 val2 = default(Vector2);
+				val2._002Ector(0f, 0f);
+				Vector2 val3 = default(Vector2);
+				val3._002Ector(0f, 0f);
 				for (int j = i + 1; j < count; j++)
 				{
 					HomeCharacterBase homeCharacterBase3 = charas[j];
-					if (!homeCharacterBase3.isLoading && homeCharacterBase3.isActiveAndEnabled)
+					if (!homeCharacterBase3.isLoading && homeCharacterBase3.get_isActiveAndEnabled())
 					{
-						Vector2 vector = homeCharacterBase3._transform.localPosition.ToVector2XZ();
-						Vector2 vector2 = a - vector;
-						float sqrMagnitude = vector2.sqrMagnitude;
+						Vector2 val4 = homeCharacterBase3._transform.get_localPosition().ToVector2XZ();
+						Vector2 val5 = val - val4;
+						float sqrMagnitude = val5.get_sqrMagnitude();
 						if (sqrMagnitude > 0f && sqrMagnitude < num)
 						{
 							homeCharacterBase2 = homeCharacterBase3;
-							a3 = vector;
-							a2 = vector2;
+							val3 = val4;
+							val2 = val5;
 							num = sqrMagnitude;
 						}
 					}
 				}
-				if ((UnityEngine.Object)homeCharacterBase2 != (UnityEngine.Object)null)
+				if (homeCharacterBase2 != null)
 				{
 					float num2 = Mathf.Sqrt(num);
-					Vector2 a4 = a2 / num2;
+					Vector2 val6 = val2 / num2;
 					float num3 = 1f - num2 / 3f;
-					num3 = num3 * Time.deltaTime * 0.9f;
+					num3 = num3 * Time.get_deltaTime() * 0.9f;
 					if (num3 > 0.5f)
 					{
 						num3 = 0.5f;
 					}
-					Vector2 b = a4 * num3;
+					Vector2 val7 = val6 * num3;
 					if (!homeCharacterBase.isStop)
 					{
-						homeCharacterBase._transform.localPosition = (a + b).ToVector3XZ();
+						homeCharacterBase._transform.set_localPosition((val + val7).ToVector3XZ());
 					}
 					if (!homeCharacterBase2.isStop)
 					{
-						homeCharacterBase2._transform.localPosition = (a3 - b).ToVector3XZ();
+						homeCharacterBase2._transform.set_localPosition((val3 - val7).ToVector3XZ());
 					}
 				}
 			}
@@ -548,6 +622,12 @@ public class HomePeople : MonoBehaviour
 
 	private Vector3 GetLoungeMoveNPCTargetPosition(HomeCharacterBase chara, WayPoint wayPoint)
 	{
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		if (!(chara is LoungeMoveNPC))
 		{
 			return wayPoint.GetPosInCollider();

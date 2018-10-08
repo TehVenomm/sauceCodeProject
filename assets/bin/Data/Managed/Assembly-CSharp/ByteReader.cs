@@ -21,7 +21,7 @@ public class ByteReader
 
 	public ByteReader(TextAsset asset)
 	{
-		mBuffer = asset.bytes;
+		mBuffer = asset.get_bytes();
 	}
 
 	public static ByteReader Open(string path)

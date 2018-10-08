@@ -4,9 +4,11 @@ public class PlayerAttackFunnelBit : AttackFunnelBit
 {
 	public override void Initialize(StageObject attacker, AttackInfo atkInfo, StageObject targetObj, Transform launchTrans, Vector3 offsetPos, Quaternion offsetRot)
 	{
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(attacker, atkInfo, targetObj, launchTrans, offsetPos, offsetRot);
 		Player player = attacker as Player;
-		if ((Object)player != (Object)null)
+		if (player != null)
 		{
 			AtkAttribute atk = new AtkAttribute();
 			attacker.GetAtk(atkInfo as AttackHitInfo, ref atk);
@@ -18,12 +20,15 @@ public class PlayerAttackFunnelBit : AttackFunnelBit
 
 	protected override bool CheckTargetDead()
 	{
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Enemy enemy = base.TargetObject as Enemy;
-		return (Object)enemy == (Object)null || enemy.isDead || !enemy.enabled || !enemy.gameObject.activeInHierarchy;
+		return enemy == null || enemy.isDead || !enemy.get_enabled() || !enemy.get_gameObject().get_activeInHierarchy();
 	}
 
 	protected override StageObject SearchNearestTarget(Vector2 bulletPos, float searchRadius)
 	{
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 		float num = 3.40282347E+38f;
 		StageObject result = null;
 		int count = MonoBehaviourSingleton<StageObjectManager>.I.EnemyList.Count;
@@ -47,7 +52,7 @@ public class PlayerAttackFunnelBit : AttackFunnelBit
 	{
 		float num = base.GetAttackStartRange();
 		Enemy enemy = base.TargetObject as Enemy;
-		if ((Object)enemy != (Object)null)
+		if (enemy != null)
 		{
 			num += enemy.bodyRadius;
 		}
@@ -58,7 +63,7 @@ public class PlayerAttackFunnelBit : AttackFunnelBit
 	{
 		float num = base.GetFloatingHeight();
 		Enemy enemy = base.TargetObject as Enemy;
-		if ((Object)enemy != (Object)null)
+		if (enemy != null)
 		{
 			num += enemy.bodyRadius;
 		}

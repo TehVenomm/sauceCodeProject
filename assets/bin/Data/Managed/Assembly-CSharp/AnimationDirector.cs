@@ -2,7 +2,7 @@ using rhyme;
 using System;
 using UnityEngine;
 
-public class AnimationDirector : MonoBehaviour
+public class AnimationDirector
 {
 	public const string TAG = "Direction";
 
@@ -40,28 +40,39 @@ public class AnimationDirector : MonoBehaviour
 
 	public bool isPlaying => playingStateHash != 0;
 
+	public AnimationDirector()
+		: this()
+	{
+	}
+
 	public void __FUNCTION__InstantiatePrefab(string game_object_name)
 	{
-		GameObject gameObject = GameObject.Find(game_object_name);
-		if (!((UnityEngine.Object)gameObject == (UnityEngine.Object)null))
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Expected O, but got Unknown
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0035: Expected O, but got Unknown
+		GameObject val = GameObject.Find(game_object_name);
+		if (!(val == null))
 		{
-			DirectionPrefabObject component = gameObject.GetComponent<DirectionPrefabObject>();
-			if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
+			DirectionPrefabObject component = val.GetComponent<DirectionPrefabObject>();
+			if (!(component == null))
 			{
-				CreateEffect(component.prefab, component.transform);
+				CreateEffect(component.prefab, component.get_transform());
 			}
 		}
 	}
 
 	public void __FUNCTION__PlayAudio(string game_object_name)
 	{
-		GameObject gameObject = GameObject.Find(game_object_name);
-		if (!((UnityEngine.Object)gameObject == (UnityEngine.Object)null))
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Expected O, but got Unknown
+		GameObject val = GameObject.Find(game_object_name);
+		if (!(val == null))
 		{
-			AudioSource component = gameObject.GetComponent<AudioSource>();
-			if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
+			AudioSource component = val.GetComponent<AudioSource>();
+			if (!(component == null))
 			{
-				gameObject.tag = "Direction";
+				val.set_tag("Direction");
 				component.Play();
 			}
 		}
@@ -74,43 +85,44 @@ public class AnimationDirector : MonoBehaviour
 
 	public void __FUNCTION_Command(string command)
 	{
-		if ((UnityEngine.Object)commandReceiver != (UnityEngine.Object)null)
+		if (commandReceiver != null)
 		{
-			commandReceiver.SendMessage("OnDirectionCommand", command);
+			commandReceiver.SendMessage("OnDirectionCommand", (object)command);
 		}
 	}
 
 	protected Transform CreateEffect(GameObject effect_prefab, Transform parent)
 	{
-		Transform transform = ResourceUtility.Realizes(effect_prefab, parent, -1);
-		if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		Transform val = ResourceUtility.Realizes(effect_prefab, parent, -1);
+		if (val == null)
 		{
 			return null;
 		}
-		transform.gameObject.tag = "Direction";
-		rymFX component = transform.GetComponent<rymFX>();
-		if ((UnityEngine.Object)component != (UnityEngine.Object)null && (UnityEngine.Object)useCamera != (UnityEngine.Object)null)
+		val.get_gameObject().set_tag("Direction");
+		rymFX component = val.GetComponent<rymFX>();
+		if (component != null && useCamera != null)
 		{
-			component.Cameras = new Camera[1]
+			component.Cameras = (Camera[])new Camera[1]
 			{
 				MonoBehaviourSingleton<AppMain>.I.mainCamera
 			};
 		}
-		return transform;
+		return val;
 	}
 
 	protected virtual void Awake()
 	{
-		if ((UnityEngine.Object)I == (UnityEngine.Object)null)
+		if (I == null)
 		{
 			I = this;
 		}
-		_animator = GetComponent<Animator>();
-		if (MonoBehaviourSingleton<AppMain>.IsValid() && (UnityEngine.Object)useCamera != (UnityEngine.Object)null)
+		_animator = this.GetComponent<Animator>();
+		if (MonoBehaviourSingleton<AppMain>.IsValid() && useCamera != null)
 		{
-			useCamera.enabled = false;
+			useCamera.set_enabled(false);
 		}
-		if ((UnityEngine.Object)fader != (UnityEngine.Object)null)
+		if (fader != null)
 		{
 			fader.SetActive(false);
 		}
@@ -122,7 +134,7 @@ public class AnimationDirector : MonoBehaviour
 		{
 			isDestroy = true;
 			SetLinkCamera(false);
-			if ((UnityEngine.Object)I == (UnityEngine.Object)this)
+			if (I == this)
 			{
 				I = null;
 			}
@@ -133,27 +145,29 @@ public class AnimationDirector : MonoBehaviour
 	{
 		playingStateHash = Animator.StringToHash("Base Layer." + state_name);
 		endCallback = end_callback;
-		_animator.enabled = true;
+		_animator.set_enabled(true);
 		_animator.Play(playingStateHash, 0, normalizedTime);
 		_animator.Update(0f);
 	}
 
 	protected virtual void Update()
 	{
-		if (!((UnityEngine.Object)_animator == (UnityEngine.Object)null))
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		if (!(_animator == null))
 		{
-			_animator.speed = ((!skip) ? 1f : 10000f);
+			_animator.set_speed((!skip) ? 1f : 10000f);
 			if (playingStateHash != 0)
 			{
 				AnimatorStateInfo currentAnimatorStateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.fullPathHash == playingStateHash && currentAnimatorStateInfo.normalizedTime >= 1f)
+				if (currentAnimatorStateInfo.get_fullPathHash() == playingStateHash && currentAnimatorStateInfo.get_normalizedTime() >= 1f)
 				{
 					playingStateHash = 0;
 					if (endCallback != null)
 					{
-						Action action = endCallback;
+						Action val = endCallback;
 						endCallback = null;
-						action();
+						val.Invoke();
 					}
 				}
 			}
@@ -170,45 +184,63 @@ public class AnimationDirector : MonoBehaviour
 
 	public void SetLinkCamera(bool is_link)
 	{
-		if (!((UnityEngine.Object)useCamera == (UnityEngine.Object)null) && linkCamera != is_link)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Expected O, but got Unknown
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Expected O, but got Unknown
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+		if (!(useCamera == null) && linkCamera != is_link)
 		{
 			linkCamera = is_link;
 			if (is_link)
 			{
-				if ((UnityEngine.Object)saveCameraParams == (UnityEngine.Object)null)
+				if (saveCameraParams == null)
 				{
-					saveCameraParamsObject = Utility.CreateGameObject("saveCameraParams", base.transform, -1);
-					saveCameraParams = saveCameraParamsObject.gameObject.AddComponent<Camera>();
+					saveCameraParamsObject = Utility.CreateGameObject("saveCameraParams", this.get_transform(), -1);
+					saveCameraParams = saveCameraParamsObject.get_gameObject().AddComponent<Camera>();
 				}
-				Transform transform = base.transform;
-				Vector3 position = transform.position;
-				Quaternion rotation = transform.rotation;
+				Transform val = this.get_transform();
+				Vector3 position = val.get_position();
+				Quaternion rotation = val.get_rotation();
 				saveCameraParams.CopyFrom(MonoBehaviourSingleton<AppMain>.I.mainCamera);
-				saveCameraPos = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.position;
-				saveCameraRot = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.rotation;
-				transform.position = position;
-				transform.rotation = rotation;
-				saveCameraParams.enabled = false;
-				if ((UnityEngine.Object)fader != (UnityEngine.Object)null)
+				saveCameraPos = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_position();
+				saveCameraRot = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_rotation();
+				val.set_position(position);
+				val.set_rotation(rotation);
+				saveCameraParams.set_enabled(false);
+				if (fader != null)
 				{
 					fader.SetActive(true);
 				}
 			}
 			else
 			{
-				if ((UnityEngine.Object)saveCameraParams != (UnityEngine.Object)null)
+				if (saveCameraParams != null)
 				{
 					MonoBehaviourSingleton<AppMain>.I.mainCamera.CopyFrom(saveCameraParams);
-					MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.position = saveCameraPos;
-					MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.rotation = saveCameraRot;
+					MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_position(saveCameraPos);
+					MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_rotation(saveCameraRot);
 					if (!isDestroy)
 					{
-						UnityEngine.Object.DestroyImmediate(saveCameraParamsObject.gameObject);
+						Object.DestroyImmediate(saveCameraParamsObject.get_gameObject());
 					}
 					saveCameraParamsObject = null;
 					saveCameraParams = null;
 				}
-				if ((UnityEngine.Object)fader != (UnityEngine.Object)null)
+				if (fader != null)
 				{
 					fader.SetActive(false);
 				}

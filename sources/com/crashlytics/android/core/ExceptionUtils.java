@@ -62,11 +62,11 @@ final class ExceptionUtils {
     }
 
     private static void writeStackTrace(Throwable th, OutputStream outputStream) {
-        Closeable printWriter;
         Throwable th2;
         Throwable e;
         Throwable th3;
         Closeable closeable = null;
+        Closeable printWriter;
         try {
             printWriter = new PrintWriter(outputStream);
             try {

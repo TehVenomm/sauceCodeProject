@@ -14,6 +14,6 @@ abstract class zzbkb extends zzbiu<FileUploadPreferencesResult> {
     }
 
     protected final /* synthetic */ Result zzb(Status status) {
-        return new zzbka(this.zzgic, status, null, null);
+        return new zzbka(this.zzgic, status, null);
     }
 }

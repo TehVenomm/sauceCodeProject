@@ -118,11 +118,13 @@ namespace BestHTTP
 		{
 			get
 			{
+				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+				//IL_002d: Expected O, but got Unknown
 				if (Data == null)
 				{
 					return null;
 				}
-				if ((UnityEngine.Object)texture != (UnityEngine.Object)null)
+				if (texture != null)
 				{
 					return texture;
 				}

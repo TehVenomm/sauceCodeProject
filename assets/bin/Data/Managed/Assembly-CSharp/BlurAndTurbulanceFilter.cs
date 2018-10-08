@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BlurAndTurbulanceFilter : MonoBehaviour
+public class BlurAndTurbulanceFilter
 {
 	[SerializeField]
 	private Material blurMaterial;
@@ -26,8 +26,15 @@ public class BlurAndTurbulanceFilter : MonoBehaviour
 	[SerializeField]
 	private float brightness;
 
+	public BlurAndTurbulanceFilter()
+		: this()
+	{
+	}
+
 	public void SetBlurPram(float _power, Vector2 _center)
 	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		blurPower = _power;
 		center = _center;
 	}
@@ -41,27 +48,33 @@ public class BlurAndTurbulanceFilter : MonoBehaviour
 
 	private void Awake()
 	{
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0010: Expected O, but got Unknown
 		blurMaterial = new Material(ResourceUtility.FindShader("mobile/Custom/ImageEffect/RadialBlurFilter"));
 	}
 
 	private void OnRenderImage(RenderTexture src, RenderTexture dst)
 	{
-		if ((Object)blurMaterial == (Object)null || (Object)turbulanceMaterial == (Object)null || blurPower <= 0.01f)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004b: Expected O, but got Unknown
+		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+		if (blurMaterial == null || turbulanceMaterial == null || blurPower <= 0.01f)
 		{
 			Graphics.Blit(src, dst);
 		}
 		else
 		{
-			RenderTexture temporary = RenderTexture.GetTemporary(Screen.width, Screen.height, 0, RenderTextureFormat.RGB565);
+			RenderTexture val = RenderTexture.GetTemporary(Screen.get_width(), Screen.get_height(), 0, 4);
 			blurMaterial.SetVector("_Origin", new Vector4(center.x, center.y, 0f, 0f));
 			blurMaterial.SetFloat("_Power", blurPower);
-			Graphics.Blit(src, temporary, blurMaterial);
+			Graphics.Blit(src, val, blurMaterial);
 			turbulanceMaterial.SetTextureOffset("_WarpTex", scroll);
 			turbulanceMaterial.SetFloat("_Power", turbulancePower);
 			turbulanceMaterial.SetFloat("_ScaleRate", scale);
 			turbulanceMaterial.SetFloat("_Bright", brightness);
-			Graphics.Blit(temporary, null, turbulanceMaterial);
-			RenderTexture.ReleaseTemporary(temporary);
+			Graphics.Blit(val, null, turbulanceMaterial);
+			RenderTexture.ReleaseTemporary(val);
 		}
 	}
 }

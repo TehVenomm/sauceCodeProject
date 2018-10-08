@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackNWayLaser : MonoBehaviour
+public class AttackNWayLaser
 {
 	private List<LaserAttackObject> m_laserAttackList = new List<LaserAttackObject>();
 
@@ -41,10 +41,26 @@ public class AttackNWayLaser : MonoBehaviour
 		}
 	}
 
+	public AttackNWayLaser()
+		: this()
+	{
+	}
+
 	public void Initialize(StageObject attacker, Transform parentTrans, AttackInfo atkInfo, int numLaser)
 	{
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009a: Expected O, but got Unknown
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0145: Expected O, but got Unknown
+		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0164: Unknown result type (might be due to invalid IL or missing references)
 		BulletData bulletData = atkInfo.bulletData;
-		if (!((Object)bulletData == (Object)null))
+		if (!(bulletData == null))
 		{
 			BulletData.BulletBase data = bulletData.data;
 			BulletData.BulletLaser dataLaser = bulletData.dataLaser;
@@ -62,18 +78,18 @@ public class AttackNWayLaser : MonoBehaviour
 					attackHitInfo.enableIdentityCheck = false;
 				}
 				m_atkInfoName = atkInfo.name;
-				Transform transform = base.transform;
+				Transform val = this.get_transform();
 				if (m_laserData.isLinkPositionOnly)
 				{
-					transform.parent = ((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
-					transform.position = parentTrans.position;
+					val.set_parent((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
+					val.set_position(parentTrans.get_position());
 				}
 				else
 				{
-					transform.parent = parentTrans;
-					transform.localPosition = Vector3.zero;
+					val.set_parent(parentTrans);
+					val.set_localPosition(Vector3.get_zero());
 				}
-				transform.localRotation = Quaternion.identity;
+				val.set_localRotation(Quaternion.get_identity());
 				float radius = data.radius;
 				float capsuleHeight = dataLaser.capsuleHeight;
 				Vector3 offsetPosition = dataLaser.offsetPosition;
@@ -81,9 +97,9 @@ public class AttackNWayLaser : MonoBehaviour
 				float num2 = 0f;
 				for (int i = 0; i < numLaser; i++)
 				{
-					GameObject gameObject = new GameObject("LaserAttackObject");
-					LaserAttackObject laserAttackObject = gameObject.AddComponent<LaserAttackObject>();
-					laserAttackObject.Initialize(attacker, transform, atkInfo, offsetPosition, new Vector3(0f, num2, 0f), radius, capsuleHeight, attackLayer);
+					GameObject val2 = new GameObject("LaserAttackObject");
+					LaserAttackObject laserAttackObject = val2.AddComponent<LaserAttackObject>();
+					laserAttackObject.Initialize(attacker, val, atkInfo, offsetPosition, new Vector3(0f, num2, 0f), radius, capsuleHeight, attackLayer);
 					laserAttackObject.CreateEffect(data);
 					m_laserAttackList.Add(laserAttackObject);
 					num2 += num;
@@ -94,16 +110,21 @@ public class AttackNWayLaser : MonoBehaviour
 
 	public void Destroy()
 	{
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsDeleted)
 		{
 			int count = m_laserAttackList.Count;
 			for (int i = 0; i < count; i++)
 			{
-				if ((Object)m_laserAttackList[i] != (Object)null)
+				if (m_laserAttackList[i] != null)
 				{
-					if ((bool)m_laserAttackList[i].transform.GetChild(0).GetComponent<Animator>())
+					if (Object.op_Implicit(m_laserAttackList[i].get_transform().GetChild(0).GetComponent<Animator>()))
 					{
-						Animator component = m_laserAttackList[i].transform.GetChild(0).GetComponent<Animator>();
+						Animator component = m_laserAttackList[i].get_transform().GetChild(0).GetComponent<Animator>();
 						component.Play("END");
 					}
 					else
@@ -114,21 +135,21 @@ public class AttackNWayLaser : MonoBehaviour
 				}
 			}
 			m_laserAttackList.Clear();
-			if ((Object)m_attacker != (Object)null)
+			if (m_attacker != null)
 			{
 				Enemy enemy = m_attacker as Enemy;
-				if ((Object)enemy != (Object)null)
+				if (enemy != null)
 				{
 					enemy.OnDestroyLaser(this);
 				}
 				Player player = m_attacker as Player;
-				if ((Object)player != (Object)null)
+				if (player != null)
 				{
 					player.OnDestroyLaser(this);
 				}
 			}
 			m_isDelete = true;
-			Object.Destroy(base.gameObject);
+			Object.Destroy(this.get_gameObject());
 		}
 	}
 
@@ -139,6 +160,8 @@ public class AttackNWayLaser : MonoBehaviour
 
 	public void AnimEnd()
 	{
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsDeleted && m_isAtkEnd)
 		{
 			bool flag = true;
@@ -147,10 +170,11 @@ public class AttackNWayLaser : MonoBehaviour
 			{
 				for (int i = 0; i < count; i++)
 				{
-					if ((Object)m_laserAttackList[i] != (Object)null && (Object)m_laserAttackList[i].m_effectAnimator != (Object)null)
+					if (m_laserAttackList[i] != null && m_laserAttackList[i].m_effectAnimator != null)
 					{
 						Animator effectAnimator = m_laserAttackList[i].m_effectAnimator;
-						if (effectAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
+						AnimatorStateInfo currentAnimatorStateInfo = effectAnimator.GetCurrentAnimatorStateInfo(0);
+						if (currentAnimatorStateInfo.get_normalizedTime() < 1f)
 						{
 							flag = false;
 						}
@@ -161,14 +185,14 @@ public class AttackNWayLaser : MonoBehaviour
 			{
 				for (int j = 0; j < count; j++)
 				{
-					if ((Object)m_laserAttackList[j] != (Object)null)
+					if (m_laserAttackList[j] != null)
 					{
-						if ((Object)m_laserAttackList[j].m_capCollider != (Object)null)
+						if (m_laserAttackList[j].m_capCollider != null)
 						{
 							Object.Destroy(m_laserAttackList[j].m_capCollider);
 							m_laserAttackList[j].m_capCollider = null;
 						}
-						if ((Object)m_laserAttackList[j].m_effectAnimator != (Object)null)
+						if (m_laserAttackList[j].m_effectAnimator != null)
 						{
 							Animator effectAnimator2 = m_laserAttackList[j].m_effectAnimator;
 							effectAnimator2.Play("END");
@@ -199,7 +223,7 @@ public class AttackNWayLaser : MonoBehaviour
 				{
 					m_aliveTimer = 0f;
 				}
-				m_aliveTimer -= Time.deltaTime;
+				m_aliveTimer -= Time.get_deltaTime();
 				if (m_aliveTimer <= 0f)
 				{
 					m_isAtkEnd = true;
@@ -210,14 +234,22 @@ public class AttackNWayLaser : MonoBehaviour
 
 	private void LateUpdate()
 	{
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsDeleted)
 		{
 			BulletData.BulletLaser laserData = m_laserData;
-			if (laserData.isLinkPositionOnly && (Object)m_parentTrans != (Object)null)
+			if (laserData.isLinkPositionOnly && m_parentTrans != null)
 			{
-				base.transform.position = m_parentTrans.position;
+				this.get_transform().set_position(m_parentTrans.get_position());
 			}
-			m_nowAngleSpeed += laserData.addAngleSpeed * Time.deltaTime;
+			m_nowAngleSpeed += laserData.addAngleSpeed * Time.get_deltaTime();
 			if (laserData.addAngleSpeed > 0f)
 			{
 				m_nowAngleSpeed = Mathf.Min(m_nowAngleSpeed, laserData.limitAngleSpeed);
@@ -226,7 +258,7 @@ public class AttackNWayLaser : MonoBehaviour
 			{
 				m_nowAngleSpeed = Mathf.Max(m_nowAngleSpeed, 0f - laserData.limitAngleSpeed);
 			}
-			base.transform.localRotation = base.transform.localRotation * Quaternion.AngleAxis(m_nowAngleSpeed * Time.deltaTime, Vector3.up);
+			this.get_transform().set_localRotation(this.get_transform().get_localRotation() * Quaternion.AngleAxis(m_nowAngleSpeed * Time.get_deltaTime(), Vector3.get_up()));
 		}
 	}
 }

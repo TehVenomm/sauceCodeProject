@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -38,12 +39,13 @@ public class HomeCountdown : GameSection
 
 	public override void Initialize()
 	{
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		ready = false;
 		showID = (int)GameSection.GetEventData();
 		PlayerPrefs.SetInt("COUNTDOWN_SHOWED_REMAIN", showID);
-		SetFullScreenButton(UI.BTN_SKIP_FULL_SCREEN);
-		InitTween(UI.OBJ_COUNTDOWN_ROOT);
-		StartCoroutine(DoInitialize());
+		SetFullScreenButton((Enum)UI.BTN_SKIP_FULL_SCREEN);
+		InitTween((Enum)UI.OBJ_COUNTDOWN_ROOT);
+		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -58,7 +60,7 @@ public class HomeCountdown : GameSection
 		{
 			yield return (object)loadQueue.Wait();
 		}
-		if (lo_image.loadedObject == (Object)null)
+		if (lo_image.loadedObject == null)
 		{
 			yield return (object)null;
 		}
@@ -71,21 +73,24 @@ public class HomeCountdown : GameSection
 
 	private void Update()
 	{
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 		if (!stateInitialized)
 		{
 			switch (currentState)
 			{
 			case State.START:
-				StartCoroutine(StartAnimation());
+				this.StartCoroutine(StartAnimation());
 				stateInitialized = true;
 				break;
 			case State.SHOW:
 				showTimer = 0f;
-				StartCoroutine(ShowCountdown());
+				this.StartCoroutine(ShowCountdown());
 				stateInitialized = true;
 				break;
 			case State.END:
-				StartCoroutine(EndAnimation());
+				this.StartCoroutine(EndAnimation());
 				stateInitialized = true;
 				break;
 			}
@@ -100,12 +105,12 @@ public class HomeCountdown : GameSection
 
 	private IEnumerator StartAnimation()
 	{
-		SetActive(UI.BTN_SKIP_FULL_SCREEN, false);
+		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, false);
 		bool wait = true;
 		PlayAudio(AUDIO.START, 1.3f, false);
-		PlayTween(UI.OBJ_COUNTDOWN_ROOT, true, delegate
+		PlayTween((Enum)UI.OBJ_COUNTDOWN_ROOT, true, (EventDelegate.Callback)delegate
 		{
-			((_003CStartAnimation_003Ec__Iterator8C)/*Error near IL_0062: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CStartAnimation_003Ec__Iterator93)/*Error near IL_0062: stateMachine*/)._003Cwait_003E__0 = false;
 		}, true, 0);
 		while (wait)
 		{
@@ -120,10 +125,10 @@ public class HomeCountdown : GameSection
 		Transform skip = GetCtrl(UI.BTN_SKIP_FULL_SCREEN);
 		while (wait)
 		{
-			showTimer += Time.deltaTime;
-			if (1.2f < showTimer && !skip.gameObject.activeSelf)
+			showTimer += Time.get_deltaTime();
+			if (1.2f < showTimer && !skip.get_gameObject().get_activeSelf())
 			{
-				SetActive(UI.BTN_SKIP_FULL_SCREEN, true);
+				SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, true);
 			}
 			if (skipRequest && 1.2f < showTimer)
 			{
@@ -137,9 +142,9 @@ public class HomeCountdown : GameSection
 	private IEnumerator EndAnimation()
 	{
 		bool wait = true;
-		PlayTween(UI.OBJ_COUNTDOWN_ROOT, false, delegate
+		PlayTween((Enum)UI.OBJ_COUNTDOWN_ROOT, false, (EventDelegate.Callback)delegate
 		{
-			((_003CEndAnimation_003Ec__Iterator8E)/*Error near IL_0035: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CEndAnimation_003Ec__Iterator95)/*Error near IL_0035: stateMachine*/)._003Cwait_003E__0 = false;
 		}, true, 0);
 		while (wait)
 		{

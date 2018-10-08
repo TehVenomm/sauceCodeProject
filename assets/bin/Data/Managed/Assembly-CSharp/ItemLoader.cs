@@ -83,7 +83,9 @@ public class ItemLoader : ModelLoaderBase
 
 	private void Awake()
 	{
-		_transform = base.transform;
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Expected O, but got Unknown
+		_transform = this.get_transform();
 		Clear();
 	}
 
@@ -111,7 +113,10 @@ public class ItemLoader : ModelLoaderBase
 	{
 		if (equipItemID == equip_item_id && sexID == sex_id && faceID == face_id)
 		{
-			_callback?.Invoke();
+			if (_callback != null)
+			{
+				_callback.Invoke();
+			}
 		}
 		else
 		{
@@ -223,6 +228,8 @@ public class ItemLoader : ModelLoaderBase
 
 	private void Init(IEnumerator _coroutine, Transform parent, int layer, int sex_id, int face_id, Action _callback)
 	{
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 		Clear();
 		if (sex_id == -1)
 		{
@@ -243,20 +250,22 @@ public class ItemLoader : ModelLoaderBase
 		}
 		callback = _callback;
 		loadingQueue = new LoadingQueue(this);
-		_transform.gameObject.layer = layer;
+		_transform.get_gameObject().set_layer(layer);
 		coroutine = _coroutine;
-		StartCoroutine(_coroutine);
+		this.StartCoroutine(_coroutine);
 	}
 
 	public void Clear()
 	{
-		for (int num = _transform.childCount - 1; num >= 0; num--)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		for (int num = _transform.get_childCount() - 1; num >= 0; num--)
 		{
-			UnityEngine.Object.Destroy(_transform.GetChild(num).gameObject);
+			Object.Destroy(_transform.GetChild(num).get_gameObject());
 		}
 		if (coroutine != null)
 		{
-			StopCoroutine(coroutine);
+			this.StopCoroutine(coroutine);
 			coroutine = null;
 		}
 		nodeSub = null;
@@ -292,9 +301,9 @@ public class ItemLoader : ModelLoaderBase
 		LoadObject lo = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_WEAPON, name);
 		LoadObject lo_high_reso_tex = PlayerLoader.LoadHighResoTexs(loadingQueue, name, highTex);
 		yield return (object)loadingQueue.Wait();
-		Transform weapon = lo.Realizes(_transform, _transform.gameObject.layer);
-		weapon.localPosition = Vector3.zero;
-		weapon.localRotation = Quaternion.identity;
+		Transform weapon = lo.Realizes(_transform, _transform.get_gameObject().get_layer());
+		weapon.set_localPosition(Vector3.get_zero());
+		weapon.set_localRotation(Quaternion.get_identity());
 		Renderer[] renderers = weapon.GetComponentsInChildren<Renderer>();
 		PlayerLoader.SetEquipColor3(renderers, NGUIMath.IntToColor(data.modelColor0), NGUIMath.IntToColor(data.modelColor1), NGUIMath.IntToColor(data.modelColor2));
 		Material materialR = null;
@@ -303,18 +312,18 @@ public class ItemLoader : ModelLoaderBase
 		for (int i = renderers.Length; j < i; j++)
 		{
 			Renderer r = renderers[j];
-			if (r.name.EndsWith("_L"))
+			if (r.get_name().EndsWith("_L"))
 			{
-				materialL = r.material;
-				nodeSub = r.transform;
+				materialL = r.get_material();
+				nodeSub = r.get_transform();
 			}
 			else
 			{
-				materialR = r.material;
-				nodeMain = r.transform;
+				materialR = r.get_material();
+				nodeMain = r.get_transform();
 			}
 		}
-		yield return (object)StartCoroutine(InitRoopEffect(loadingQueue, weapon, SHADER_TYPE.NORMAL));
+		yield return (object)this.StartCoroutine(InitRoopEffect(loadingQueue, weapon, SHADER_TYPE.NORMAL));
 		PlayerLoader.ApplyWeaponHighResoTexs(lo_high_reso_tex, highTex, materialR, materialL);
 		displayInfo = new GlobalSettingsManager.UIModelRenderingParam.DisplayInfo(MonoBehaviourSingleton<GlobalSettingsManager>.I.uiModelRendering.WeaponDisplayInfos[(int)data.type]);
 		if (data.id == 50020201 || data.id == 50020200)
@@ -353,9 +362,9 @@ public class ItemLoader : ModelLoaderBase
 		LoadObject lo_arm = (!model_data.needArm || arm_id <= -1) ? null : loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_ARM, ResourceName.GetPlayerArm(arm_id));
 		LoadObject lo_leg = (!model_data.needLeg || leg_id <= -1) ? null : loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_LEG, ResourceName.GetPlayerLeg(leg_id));
 		yield return (object)loadingQueue.Wait();
-		Transform body = lo_body.Realizes(_transform, _transform.gameObject.layer);
-		body.localPosition = Vector3.zero;
-		body.localRotation = Quaternion.identity;
+		Transform body = lo_body.Realizes(_transform, _transform.get_gameObject().get_layer());
+		body.set_localPosition(Vector3.get_zero());
+		body.set_localRotation(Quaternion.get_identity());
 		PlayerLoader.SetSkinAndEquipColor(body, skin_color, (!is_bdy) ? mannequin_color : equip_color, 0f);
 		if (!is_bdy)
 		{
@@ -363,37 +372,37 @@ public class ItemLoader : ModelLoaderBase
 		}
 		else
 		{
-			yield return (object)StartCoroutine(InitRoopEffect(loadingQueue, body, SHADER_TYPE.NORMAL));
+			yield return (object)this.StartCoroutine(InitRoopEffect(loadingQueue, body, SHADER_TYPE.NORMAL));
 		}
 		nodeMain = body;
 		SkinnedMeshRenderer body_skin = body.GetComponentInChildren<SkinnedMeshRenderer>();
 		Transform head_node = Utility.Find(body, "Head");
 		Transform L_Upperarm = Utility.Find(body, "L_Upperarm");
 		Transform R_Upperarm = Utility.Find(body, "R_Upperarm");
-		if ((UnityEngine.Object)L_Upperarm != (UnityEngine.Object)null && (UnityEngine.Object)R_Upperarm != (UnityEngine.Object)null)
+		if (L_Upperarm != null && R_Upperarm != null)
 		{
-			Vector3 angle = L_Upperarm.localEulerAngles;
+			Vector3 angle = L_Upperarm.get_localEulerAngles();
 			angle.y = -40f;
-			L_Upperarm.localEulerAngles = angle;
-			angle = R_Upperarm.localEulerAngles;
+			L_Upperarm.set_localEulerAngles(angle);
+			angle = R_Upperarm.get_localEulerAngles();
 			angle.y = -40f;
-			R_Upperarm.localEulerAngles = angle;
+			R_Upperarm.set_localEulerAngles(angle);
 		}
 		if (lo_face != null)
 		{
-			Transform face = lo_face.Realizes(head_node, _transform.gameObject.layer);
+			Transform face = lo_face.Realizes(head_node, _transform.get_gameObject().get_layer());
 			PlayerLoader.SetSkinColor(face, skin_color);
 			_SetMannequinMaterial(face);
 		}
 		if (lo_hair != null)
 		{
-			Transform hair = lo_hair.Realizes(head_node, _transform.gameObject.layer);
+			Transform hair = lo_hair.Realizes(head_node, _transform.get_gameObject().get_layer());
 			PlayerLoader.SetEquipColor(hair, hair_color);
 			_SetMannequinMaterial(hair);
 		}
 		if (lo_arm != null)
 		{
-			Transform arm = PlayerLoader.AddSkin(lo_arm, body_skin, _transform.gameObject.layer);
+			Transform arm = PlayerLoader.AddSkin(lo_arm, body_skin, _transform.get_gameObject().get_layer());
 			PlayerLoader.SetSkinAndEquipColor(arm, skin_color, (!is_arm) ? mannequin_color : equip_color, (!is_arm) ? 0.0001f : model_data.GetZBias());
 			if (is_arm)
 			{
@@ -406,7 +415,7 @@ public class ItemLoader : ModelLoaderBase
 		}
 		if (lo_leg != null)
 		{
-			Transform leg = PlayerLoader.AddSkin(lo_leg, body_skin, _transform.gameObject.layer);
+			Transform leg = PlayerLoader.AddSkin(lo_leg, body_skin, _transform.get_gameObject().get_layer());
 			PlayerLoader.SetSkinAndEquipColor(leg, skin_color, (!is_leg) ? mannequin_color : equip_color, (!is_leg) ? 0.0001f : model_data.GetZBias());
 			if (!is_leg)
 			{
@@ -434,7 +443,7 @@ public class ItemLoader : ModelLoaderBase
 		int i = 0;
 		for (int num = componentsInChildren.Length; i < num; i++)
 		{
-			componentsInChildren[i].material = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.mannequinMaterial;
+			componentsInChildren[i].set_material(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.mannequinMaterial);
 		}
 	}
 
@@ -448,15 +457,15 @@ public class ItemLoader : ModelLoaderBase
 			lo_face = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_FACE, ResourceName.GetPlayerFace(faceModelID));
 		}
 		yield return (object)loadingQueue.Wait();
-		Transform head = lo_head.Realizes(_transform, _transform.gameObject.layer);
-		head.localPosition = Vector3.zero;
-		head.localRotation = Quaternion.identity;
+		Transform head = lo_head.Realizes(_transform, _transform.get_gameObject().get_layer());
+		head.set_localPosition(Vector3.get_zero());
+		head.set_localRotation(Quaternion.get_identity());
 		PlayerLoader.SetEquipColor(head, NGUIMath.IntToColor(data.modelColor0));
 		nodeMain = head;
-		yield return (object)StartCoroutine(InitRoopEffect(loadingQueue, head, SHADER_TYPE.NORMAL));
+		yield return (object)this.StartCoroutine(InitRoopEffect(loadingQueue, head, SHADER_TYPE.NORMAL));
 		if (lo_face != null)
 		{
-			Transform face = lo_face.Realizes(head, _transform.gameObject.layer);
+			Transform face = lo_face.Realizes(head, _transform.get_gameObject().get_layer());
 			_SetMannequinMaterial(face);
 		}
 		displayInfo = MonoBehaviourSingleton<GlobalSettingsManager>.I.uiModelRendering.helmDisplayInfo;
@@ -472,9 +481,9 @@ public class ItemLoader : ModelLoaderBase
 	{
 		LoadObject lo = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.ITEM_MODEL, ResourceName.GetItemModel((int)itemID));
 		yield return (object)loadingQueue.Wait();
-		Transform item = lo.Realizes(_transform, _transform.gameObject.layer);
-		item.localPosition = Vector3.zero;
-		item.localRotation = Quaternion.identity;
+		Transform item = lo.Realizes(_transform, _transform.get_gameObject().get_layer());
+		item.set_localPosition(Vector3.get_zero());
+		item.set_localRotation(Quaternion.get_identity());
 		nodeMain = item;
 		displayInfo = MonoBehaviourSingleton<GlobalSettingsManager>.I.uiModelRendering.itemDisplayInfo;
 		OnLoadFinished();
@@ -484,9 +493,9 @@ public class ItemLoader : ModelLoaderBase
 	{
 		LoadObject lo = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.ITEM_MODEL, ResourceName.GetSkillItemModel(data.modelID));
 		yield return (object)loadingQueue.Wait();
-		Transform item = lo.Realizes(_transform, _transform.gameObject.layer);
-		item.localPosition = Vector3.zero;
-		item.localRotation = Quaternion.identity;
+		Transform item = lo.Realizes(_transform, _transform.get_gameObject().get_layer());
+		item.set_localPosition(Vector3.get_zero());
+		item.set_localRotation(Quaternion.get_identity());
 		PlayerLoader.SetEquipColor(item, data.modelColor.ToColor());
 		nodeMain = item;
 		displayInfo = MonoBehaviourSingleton<GlobalSettingsManager>.I.uiModelRendering.itemDisplayInfo;
@@ -497,9 +506,9 @@ public class ItemLoader : ModelLoaderBase
 	{
 		LoadObject lo = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.ITEM_MODEL, ResourceName.GetSkillItemSymbolModel(data.iconID));
 		yield return (object)loadingQueue.Wait();
-		Transform item = lo.Realizes(_transform, _transform.gameObject.layer);
-		item.localPosition = Vector3.zero;
-		item.localRotation = Quaternion.identity;
+		Transform item = lo.Realizes(_transform, _transform.get_gameObject().get_layer());
+		item.set_localPosition(Vector3.get_zero());
+		item.set_localRotation(Quaternion.get_identity());
 		nodeMain = item;
 		displayInfo = MonoBehaviourSingleton<GlobalSettingsManager>.I.uiModelRendering.itemDisplayInfo;
 		OnLoadFinished();
@@ -509,9 +518,9 @@ public class ItemLoader : ModelLoaderBase
 	{
 		LoadObject lo = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_ACCESSORY, ResourceName.GetPlayerAccessory(accessoryID));
 		yield return (object)loadingQueue.Wait();
-		Transform item = lo.Realizes(_transform, _transform.gameObject.layer);
-		item.localPosition = Vector3.zero;
-		item.localRotation = Quaternion.identity;
+		Transform item = lo.Realizes(_transform, _transform.get_gameObject().get_layer());
+		item.set_localPosition(Vector3.get_zero());
+		item.set_localRotation(Quaternion.get_identity());
 		nodeMain = item;
 		displayInfo = MonoBehaviourSingleton<GlobalSettingsManager>.I.uiModelRendering.itemDisplayInfo;
 		OnLoadFinished();
@@ -522,38 +531,42 @@ public class ItemLoader : ModelLoaderBase
 		ApplyDisplayInfo();
 		if (coroutine != null)
 		{
-			StopCoroutine(coroutine);
+			this.StopCoroutine(coroutine);
 			coroutine = null;
 		}
-		Renderer[] componentsInChildren = GetComponentsInChildren<Renderer>();
+		Renderer[] componentsInChildren = this.GetComponentsInChildren<Renderer>();
 		ShaderGlobal.ChangeWantUIShader(componentsInChildren);
 		if (callback != null)
 		{
-			callback();
+			callback.Invoke();
 		}
 	}
 
 	public void ApplyDisplayInfo()
 	{
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 		if (displayInfo != null)
 		{
-			if ((UnityEngine.Object)nodeMain != (UnityEngine.Object)null)
+			if (nodeMain != null)
 			{
-				nodeMain.localPosition = displayInfo.mainPos;
-				nodeMain.localEulerAngles = displayInfo.mainRot;
+				nodeMain.set_localPosition(displayInfo.mainPos);
+				nodeMain.set_localEulerAngles(displayInfo.mainRot);
 			}
-			if ((UnityEngine.Object)nodeSub != (UnityEngine.Object)null)
+			if (nodeSub != null)
 			{
-				nodeSub.localPosition = displayInfo.subPos;
-				nodeSub.localEulerAngles = displayInfo.subRot;
+				nodeSub.set_localPosition(displayInfo.subPos);
+				nodeSub.set_localEulerAngles(displayInfo.subRot);
 			}
 		}
 	}
 
 	public static IEnumerator InitRoopEffect(LoadingQueue queue, Transform equipItemRoot, SHADER_TYPE shaderType = SHADER_TYPE.NORMAL)
 	{
-		EffectPlayProcessor processor = equipItemRoot.gameObject.GetComponentInChildren<EffectPlayProcessor>();
-		if ((UnityEngine.Object)processor != (UnityEngine.Object)null && processor.effectSettings != null)
+		EffectPlayProcessor processor = equipItemRoot.get_gameObject().GetComponentInChildren<EffectPlayProcessor>();
+		if (processor != null && processor.effectSettings != null)
 		{
 			int j = 0;
 			for (int len = processor.effectSettings.Length; j < len; j++)
@@ -565,14 +578,14 @@ public class ItemLoader : ModelLoaderBase
 			}
 		}
 		yield return (object)queue.Wait();
-		if ((UnityEngine.Object)processor != (UnityEngine.Object)null)
+		if (processor != null)
 		{
 			List<Transform> trans = processor.PlayEffect("InitRoop", null);
 			if (trans != null)
 			{
 				for (int i = 0; i < trans.Count; i++)
 				{
-					Utility.SetLayerWithChildren(trans[i], equipItemRoot.gameObject.layer);
+					Utility.SetLayerWithChildren(trans[i], equipItemRoot.get_gameObject().get_layer());
 					if (shaderType != 0)
 					{
 						Renderer[] rs = trans[i].GetComponentsInChildren<Renderer>();

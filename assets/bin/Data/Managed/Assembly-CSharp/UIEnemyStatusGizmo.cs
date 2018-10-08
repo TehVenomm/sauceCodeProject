@@ -26,16 +26,18 @@ public class UIEnemyStatusGizmo : UIStatusGizmoBase
 		}
 		set
 		{
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			_targetEnemy = value;
-			if ((Object)_targetEnemy != (Object)null)
+			if (_targetEnemy != null)
 			{
-				base.gameObject.SetActive(true);
+				this.get_gameObject().SetActive(true);
 				hight = _targetEnemy.uiHeight;
 				if (_targetEnemy.enemyTableData != null)
 				{
 					hight *= _targetEnemy.enemyTableData.modelScale;
 				}
-				if ((Object)nameLabel != (Object)null)
+				if (nameLabel != null)
 				{
 					nameLabel.text = $"{_targetEnemy.charaName} Lv.{_targetEnemy.enemyLevel}";
 				}
@@ -44,30 +46,49 @@ public class UIEnemyStatusGizmo : UIStatusGizmoBase
 			}
 			else
 			{
-				base.gameObject.SetActive(false);
+				this.get_gameObject().SetActive(false);
 			}
 		}
 	}
 
 	protected override void UpdateParam()
 	{
-		if (!((Object)targetEnemy == (Object)null))
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+		if (!(targetEnemy == null))
 		{
 			Vector3 position = targetEnemy._position;
 			position.y += hight;
-			Vector3 vector = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(position);
-			screenZ = vector.z;
-			if (vector.z < 0f)
+			Vector3 val = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(position);
+			screenZ = val.z;
+			if (val.z < 0f)
 			{
-				vector *= -1f;
+				val *= -1f;
 			}
-			vector.z = 0f;
-			Vector3 vector2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(vector);
-			if ((transform.position - vector2).sqrMagnitude >= 2E-05f)
+			val.z = 0f;
+			Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
+			Vector3 val3 = transform.get_position() - val2;
+			if (val3.get_sqrMagnitude() >= 2E-05f)
 			{
-				transform.position = vector2;
+				transform.set_position(val2);
 			}
-			if ((Object)gaugeUI != (Object)null)
+			if (gaugeUI != null)
 			{
 				float num = (float)targetEnemy.hpShow / (float)targetEnemy.hpMax;
 				if (num < 0f)
@@ -79,7 +100,7 @@ public class UIEnemyStatusGizmo : UIStatusGizmoBase
 					gaugeUI.SetPercent(num, true);
 				}
 			}
-			if ((Object)gaugeAegisUI != (Object)null)
+			if (gaugeAegisUI != null)
 			{
 				float aegisPercent = targetEnemy.GetAegisPercent();
 				bool flag = aegisPercent > 0f;
@@ -87,9 +108,9 @@ public class UIEnemyStatusGizmo : UIStatusGizmoBase
 				{
 					gaugeAegisUI.SetPercent(aegisPercent, true);
 				}
-				if (gaugeAegisUI.gameObject.activeSelf != flag)
+				if (gaugeAegisUI.get_gameObject().get_activeSelf() != flag)
 				{
-					gaugeAegisUI.gameObject.SetActive(flag);
+					gaugeAegisUI.get_gameObject().SetActive(flag);
 				}
 			}
 		}

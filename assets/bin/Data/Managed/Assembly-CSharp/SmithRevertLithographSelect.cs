@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class SmithRevertLithographSelect : SmithEquipSelectBase
@@ -32,8 +33,12 @@ public class SmithRevertLithographSelect : SmithEquipSelectBase
 
 	public override void UpdateUI()
 	{
-		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).parent, false);
-		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).parent, false);
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Expected O, but got Unknown
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Expected O, but got Unknown
+		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).get_parent(), false);
+		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).get_parent(), false);
 		base.UpdateUI();
 	}
 
@@ -51,57 +56,15 @@ public class SmithRevertLithographSelect : SmithEquipSelectBase
 		localInventoryEquipData = sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortData>(MonoBehaviourSingleton<SmithManager>.I.localInventoryEquipData as EquipItemInfo[]);
 	}
 
-	protected override void LocalInventory()
+	protected unsafe override void LocalInventory()
 	{
 		SetupEnableInventoryUI();
 		if (localInventoryEquipData != null)
 		{
-			SetLabelText(UI.LBL_SORT, sortSettings.GetSortLabel());
+			SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
-			SetDynamicList(InventoryUI, null, localInventoryEquipData.Length, false, delegate(int i)
-			{
-				SortCompareData sortCompareData = localInventoryEquipData[i];
-				if (sortCompareData == null || !sortCompareData.IsPriority(sortSettings.orderTypeAsc))
-				{
-					return false;
-				}
-				uint tableID = localInventoryEquipData[i].GetTableID();
-				EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(tableID);
-				if (!equipItemData.IsRevertable())
-				{
-					return false;
-				}
-				return true;
-			}, null, delegate(int i, Transform t, bool is_recycle)
-			{
-				if (localInventoryEquipData[i].GetTableID() == 0)
-				{
-					SetActive(t, false);
-				}
-				else
-				{
-					SetActive(t, true);
-					EquipItemSortData equipItemSortData = localInventoryEquipData[i] as EquipItemSortData;
-					EquipItemInfo equip = equipItemSortData.GetItemData() as EquipItemInfo;
-					ITEM_ICON_TYPE iconType = equipItemSortData.GetIconType();
-					bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, equipItemSortData.GetUniqID());
-					SkillSlotUIData[] skillSlotData = GetSkillSlotData(equip);
-					ItemIcon itemIcon = CreateItemIconDetail(equipItemSortData, skillSlotData, base.IsShowMainStatus, t, "SELECT_ITEM", i, ItemIconDetail.ICON_STATUS.NONE, is_new, -1, false, -1);
-					itemIcon.SetItemID(equipItemSortData.GetTableID());
-					itemIcon.SetButtonColor(localInventoryEquipData[i].IsPriority(sortSettings.orderTypeAsc), true);
-					itemIcon.SetGrayout(IsRequiredIconGrayOut(equipItemSortData));
-					SetLongTouch(itemIcon.transform, "DETAIL", i);
-					if ((Object)itemIcon != (Object)null && equipItemSortData != null)
-					{
-						itemIcon.SetInitData(equipItemSortData);
-					}
-					if ((Object)itemIcon != (Object)null && !m_generatedIconList.Contains(itemIcon))
-					{
-						m_generatedIconList.Add(itemIcon);
-					}
-				}
-			});
+			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length, false, new Func<int, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 

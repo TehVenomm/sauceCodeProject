@@ -33,10 +33,10 @@ public class HealAttackZoneObject : HealAttackObject
 			{
 				collInfo.Add(name, true);
 			}
-			if (lastTime != Time.time)
+			if (lastTime != Time.get_time())
 			{
-				sec += Time.deltaTime;
-				lastTime = Time.time;
+				sec += Time.get_deltaTime();
+				lastTime = Time.get_time();
 			}
 		}
 
@@ -91,7 +91,7 @@ public class HealAttackZoneObject : HealAttackObject
 
 	protected override void Update()
 	{
-		m_timeCount += Time.deltaTime;
+		m_timeCount += Time.get_deltaTime();
 	}
 
 	protected override void OnTriggerEnter(Collider collider)
@@ -101,12 +101,12 @@ public class HealAttackZoneObject : HealAttackObject
 		{
 			if (targetCollection.ContainsKey(enemy.id))
 			{
-				targetCollection[enemy.id].Enter(collider.name);
+				targetCollection[enemy.id].Enter(collider.get_name());
 			}
 			else
 			{
 				TargetInfo targetInfo = new TargetInfo();
-				targetInfo.Enter(collider.name);
+				targetInfo.Enter(collider.get_name());
 				targetCollection.Add(enemy.id, targetInfo);
 			}
 		}
@@ -121,7 +121,7 @@ public class HealAttackZoneObject : HealAttackObject
 			{
 				targetCollection.Add(enemy.id, new TargetInfo());
 			}
-			targetCollection[enemy.id].Stay(collider.name);
+			targetCollection[enemy.id].Stay(collider.get_name());
 			if (targetCollection[enemy.id].sec >= intervalTime)
 			{
 				targetCollection[enemy.id].sec -= intervalTime;
@@ -136,13 +136,14 @@ public class HealAttackZoneObject : HealAttackObject
 		Enemy enemy = _GetValidEnemy(collider);
 		if (!object.ReferenceEquals(enemy, null) && targetCollection.ContainsKey(enemy.id))
 		{
-			targetCollection[enemy.id].Exit(collider.name);
+			targetCollection[enemy.id].Exit(collider.get_name());
 		}
 	}
 
 	private Enemy _GetValidEnemy(Collider collider)
 	{
-		Enemy componentInParent = collider.gameObject.GetComponentInParent<Enemy>();
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		Enemy componentInParent = collider.get_gameObject().GetComponentInParent<Enemy>();
 		if (object.ReferenceEquals(componentInParent, null))
 		{
 			return null;

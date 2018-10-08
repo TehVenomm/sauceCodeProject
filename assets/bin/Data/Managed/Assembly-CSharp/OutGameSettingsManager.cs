@@ -195,7 +195,7 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 			{
 				NPC nPC = npcs[i];
 				nPC.selectSituationID = -1;
-				int num2 = UnityEngine.Random.Range(0, 100);
+				int num2 = Random.Range(0, 100);
 				int num3 = 0;
 				if (nPC.enabled)
 				{
@@ -338,7 +338,7 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 			{
 				NPC nPC = npcs[i];
 				nPC.selectSituationID = -1;
-				int num2 = UnityEngine.Random.Range(0, 100);
+				int num2 = Random.Range(0, 100);
 				int num3 = 0;
 				if (nPC.enabled)
 				{
@@ -417,7 +417,7 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 			{
 				NPC nPC = npcs[i];
 				nPC.selectSituationID = -1;
-				int num2 = UnityEngine.Random.Range(0, 100);
+				int num2 = Random.Range(0, 100);
 				int num3 = 0;
 				if (nPC.enabled)
 				{
@@ -471,7 +471,7 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 	[Serializable]
 	public class QuestMap
 	{
-		public Color monsterAmbientColor = Color.white;
+		public Color monsterAmbientColor = Color.get_white();
 
 		public float cameraFieldOfViwe = 40f;
 

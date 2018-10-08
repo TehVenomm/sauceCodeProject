@@ -39,46 +39,40 @@ public class LoungeSearchList : GameSection
 		UI.TGL_L_MEMBER_7
 	};
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
 		if (!LoungeMatchingManager.IsValidNotEmptyList())
 		{
-			SetActive(UI.GRD_LOUNGE, false);
-			SetActive(UI.STR_NON_LIST, true);
+			SetActive((Enum)UI.GRD_LOUNGE, false);
+			SetActive((Enum)UI.STR_NON_LIST, true);
 		}
 		else
 		{
 			lounges = MonoBehaviourSingleton<LoungeMatchingManager>.I.lounges.ToArray();
-			SetActive(UI.GRD_LOUNGE, true);
-			SetActive(UI.STR_NON_LIST, false);
-			SetGrid(UI.GRD_LOUNGE, "LoungeSearchListItem", lounges.Length, false, delegate(int i, Transform t, bool is_recycle)
-			{
-				SetEvent(t, "SELECT_LOUNGE", i);
-				SetLoungeData(lounges[i], t);
-			});
+			SetActive((Enum)UI.GRD_LOUNGE, true);
+			SetActive((Enum)UI.STR_NON_LIST, false);
+			SetGrid(UI.GRD_LOUNGE, "LoungeSearchListItem", lounges.Length, false, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			base.UpdateUI();
 		}
 	}
 
 	public override void Initialize()
 	{
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.ResetLoungeSearchRequest();
-		StartCoroutine(DoInitialize());
+		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		yield return (object)StartCoroutine(Reload(null));
+		yield return (object)this.StartCoroutine(Reload(null));
 		base.Initialize();
 	}
 
-	private IEnumerator Reload(Action<bool> cb = null)
+	private unsafe IEnumerator Reload(Action<bool> cb = null)
 	{
 		bool is_recv = false;
-		SendRequest(delegate
-		{
-			((_003CReload_003Ec__IteratorE4)/*Error near IL_002e: stateMachine*/)._003Cis_recv_003E__0 = true;
-		}, cb);
+		SendRequest(new Action((object)/*Error near IL_002e: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), cb);
 		while (!is_recv)
 		{
 			yield return (object)null;
@@ -87,19 +81,13 @@ public class LoungeSearchList : GameSection
 		RefreshUI();
 	}
 
-	private void SendRequest(Action onFinish, Action<bool> cb)
+	private unsafe void SendRequest(Action onFinish, Action<bool> cb)
 	{
-		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendSearch(delegate(bool isSuccess, Error error)
-		{
-			onFinish();
-			if (cb != null)
-			{
-				cb(isSuccess);
-			}
-		}, false);
+		_003CSendRequest_003Ec__AnonStorey3E2 _003CSendRequest_003Ec__AnonStorey3E;
+		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendSearch(new Action<bool, Error>((object)_003CSendRequest_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
 	}
 
-	private void SetLoungeData(LoungeModel.Lounge lounge, Transform t)
+	private unsafe void SetLoungeData(LoungeModel.Lounge lounge, Transform t)
 	{
 		CharaInfo charaInfo = null;
 		for (int i = 0; i < lounge.slotInfos.Count; i++)
@@ -117,7 +105,8 @@ public class LoungeSearchList : GameSection
 		SetLabelText(t, UI.LBL_LABEL, text);
 		SetStamp(t, lounge.stampId);
 		int num = lounge.num + 1;
-		int num2 = lounge.slotInfos.Count((LoungeModel.SlotInfo slotInfo) => slotInfo != null && slotInfo.userInfo != null && slotInfo.userInfo.userId != lounge.ownerUserId);
+		_003CSetLoungeData_003Ec__AnonStorey3E3 _003CSetLoungeData_003Ec__AnonStorey3E;
+		int num2 = lounge.slotInfos.Count(new Func<LoungeModel.SlotInfo, bool>((object)_003CSetLoungeData_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		for (int j = 0; j < 7; j++)
 		{
 			bool is_visible = j < num - 1;
@@ -128,8 +117,9 @@ public class LoungeSearchList : GameSection
 
 	private void OnQuery_RELOAD()
 	{
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		GameSection.StayEvent();
-		StartCoroutine(Reload(delegate(bool b)
+		this.StartCoroutine(Reload(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b, null);
 		}));
@@ -152,10 +142,11 @@ public class LoungeSearchList : GameSection
 
 	private void SetStamp(Transform root, int stampId)
 	{
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		StampTable.Data data = Singleton<StampTable>.I.GetData((uint)stampId);
 		if (data != null)
 		{
-			StartCoroutine(LoadStamp(root, stampId));
+			this.StartCoroutine(LoadStamp(root, stampId));
 		}
 	}
 
@@ -167,10 +158,10 @@ public class LoungeSearchList : GameSection
 		{
 			yield return (object)null;
 		}
-		if (lo_stamp.loadedObject != (UnityEngine.Object)null)
+		if (lo_stamp.loadedObject != null)
 		{
 			Texture2D stamp = lo_stamp.loadedObject as Texture2D;
-			SetActive(UI.OBJ_SYMBOL, true);
+			SetActive((Enum)UI.OBJ_SYMBOL, true);
 			SetTexture(root, UI.TEX_STAMP, stamp);
 		}
 	}

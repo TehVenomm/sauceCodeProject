@@ -201,12 +201,18 @@ namespace BestHTTP
 
 		private void Connect()
 		{
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Expected O, but got Unknown
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Expected O, but got Unknown
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 			Uri currentUri = CurrentRequest.CurrentUri;
 			if (Client == null)
 			{
 				Client = new TcpClient();
 			}
-			if (!Client.Connected)
+			if (!Client.get_Connected())
 			{
 				Client.Connect(currentUri.Host, currentUri.Port);
 			}
@@ -216,9 +222,9 @@ namespace BestHTTP
 				{
 					if (CurrentRequest.UseAlternateSSL)
 					{
-						TlsProtocolHandler tlsProtocolHandler = new TlsProtocolHandler(Client.GetStream());
-						tlsProtocolHandler.Connect(new LegacyTlsClient(new AlwaysValidVerifyer()));
-						Stream = tlsProtocolHandler.Stream;
+						TlsProtocolHandler val = new TlsProtocolHandler(Client.GetStream());
+						val.Connect(new LegacyTlsClient(new AlwaysValidVerifyer()));
+						Stream = val.get_Stream();
 					}
 					else
 					{

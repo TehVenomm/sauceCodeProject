@@ -2,13 +2,18 @@ using UnityEngine;
 
 [RequireComponent(typeof(UIPopupList))]
 [AddComponentMenu("NGUI/Interaction/Language Selection")]
-public class LanguageSelection : MonoBehaviour
+public class LanguageSelection
 {
 	private UIPopupList mList;
 
+	public LanguageSelection()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
-		mList = GetComponent<UIPopupList>();
+		mList = this.GetComponent<UIPopupList>();
 		Refresh();
 	}
 
@@ -22,7 +27,7 @@ public class LanguageSelection : MonoBehaviour
 
 	public void Refresh()
 	{
-		if ((Object)mList != (Object)null && Localization.knownLanguages != null)
+		if (mList != null && Localization.knownLanguages != null)
 		{
 			mList.Clear();
 			int i = 0;

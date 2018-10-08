@@ -52,7 +52,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 		int num = changeEndAnimTweens.Length;
 		for (int i = 0; i < num; i++)
 		{
-			changeEndAnimTweens[i].enabled = false;
+			changeEndAnimTweens[i].set_enabled(false);
 			changeEndAnimTweens[i].Sample(1f, true);
 		}
 		num = skillButtons.Count;
@@ -76,7 +76,9 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 
 	public void UpdateIndex()
 	{
-		if (!((Object)target == (Object)null) && target.weaponData != null)
+		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+		if (!(target == null) && target.weaponData != null)
 		{
 			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)target.weaponData.eId);
 			if (equipItemData != null)
@@ -104,7 +106,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 				int j = array.Length - num;
 				for (int count = skillButtons.Count; j < count; j++)
 				{
-					skillButtons[num3].gameObject.SetActive(false);
+					skillButtons[num3].get_gameObject().SetActive(false);
 					skillButtons[num3].SetButtonIndex(-1);
 					num3++;
 				}
@@ -118,7 +120,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 					}
 					if (array[k].slotType == SKILL_SLOT_TYPE.ATTACK || array[k].slotType == SKILL_SLOT_TYPE.SUPPORT || array[k].slotType == SKILL_SLOT_TYPE.HEAL)
 					{
-						skillButtons[num3].gameObject.SetActive(true);
+						skillButtons[num3].get_gameObject().SetActive(true);
 						SkillInfo.SkillParam skillParam = target.skillInfo.GetSkillParam(target.skillInfo.weaponOffset + num4);
 						if (skillParam != null && skillParam.tableData.type == array[k].slotType)
 						{
@@ -138,9 +140,10 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 
 	private void Update()
 	{
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsEnable())
 		{
-			base.gameObject.SetActive(false);
+			this.get_gameObject().SetActive(false);
 		}
 	}
 
@@ -150,12 +153,12 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 		{
 			return false;
 		}
-		if ((Object)target == (Object)null)
+		if (target == null)
 		{
 			return false;
 		}
-		SelfController x = target.controller as SelfController;
-		if ((Object)x == (Object)null)
+		SelfController selfController = target.controller as SelfController;
+		if (selfController == null)
 		{
 			return false;
 		}
@@ -168,10 +171,12 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 
 	public void ChangeAnimStart()
 	{
-		if (base.gameObject.activeInHierarchy)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		if (this.get_gameObject().get_activeInHierarchy())
 		{
 			isChangeAnimStartWait = true;
-			StartCoroutine(_ChangeAnimStart());
+			this.StartCoroutine(_ChangeAnimStart());
 		}
 	}
 
@@ -192,7 +197,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 		}
 		for (int k = 0; k < m; k++)
 		{
-			while (changeStartAnimTweens[k].isActiveAndEnabled)
+			while (changeStartAnimTweens[k].get_isActiveAndEnabled())
 			{
 				yield return (object)null;
 			}
@@ -208,7 +213,9 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 
 	public void ChangeAnimEnd()
 	{
-		if (!base.gameObject.activeInHierarchy)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+		if (!this.get_gameObject().get_activeInHierarchy())
 		{
 			int num = changeEndAnimTweens.Length;
 			for (int i = 0; i < num; i++)
@@ -223,7 +230,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 		}
 		else
 		{
-			StartCoroutine(_ChangeAnimEnd());
+			this.StartCoroutine(_ChangeAnimEnd());
 		}
 	}
 
@@ -236,7 +243,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 		}
 		for (int k = 0; k < m; k++)
 		{
-			while (changeEndAnimTweens[k].isActiveAndEnabled)
+			while (changeEndAnimTweens[k].get_isActiveAndEnabled())
 			{
 				yield return (object)null;
 			}
@@ -265,11 +272,13 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 
 	public void DoEnable()
 	{
-		base.gameObject.SetActive(true);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().SetActive(true);
 	}
 
 	public void DoDisable()
 	{
-		base.gameObject.SetActive(false);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().SetActive(false);
 	}
 }

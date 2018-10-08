@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MiniMapIcon : MonoBehaviour
+public class MiniMapIcon
 {
 	[SerializeField]
 	protected UISprite icon;
@@ -20,12 +20,14 @@ public class MiniMapIcon : MonoBehaviour
 		}
 		set
 		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			if (_isOver != value)
 			{
-				icon.gameObject.SetActive(!value);
-				if ((Object)overIcon != (Object)null)
+				icon.get_gameObject().SetActive(!value);
+				if (overIcon != null)
 				{
-					overIcon.gameObject.SetActive(value);
+					overIcon.get_gameObject().SetActive(value);
 				}
 			}
 			_isOver = value;
@@ -44,29 +46,39 @@ public class MiniMapIcon : MonoBehaviour
 		set;
 	}
 
+	public MiniMapIcon()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
-		icon.gameObject.SetActive(true);
-		if ((Object)overIcon != (Object)null)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Expected O, but got Unknown
+		icon.get_gameObject().SetActive(true);
+		if (overIcon != null)
 		{
-			overIcon.gameObject.SetActive(false);
+			overIcon.get_gameObject().SetActive(false);
 		}
-		_trasform = base.transform;
+		_trasform = this.get_transform();
 	}
 
 	public virtual void Initialize(MonoBehaviour root_object)
 	{
-		base.gameObject.SetActive(false);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().SetActive(false);
 		isInitialized = true;
 	}
 
 	public void SetIconSprite(string spriteName)
 	{
-		if ((Object)icon != (Object)null)
+		if (icon != null)
 		{
 			icon.spriteName = spriteName;
 		}
-		if ((Object)overIcon != (Object)null)
+		if (overIcon != null)
 		{
 			overIcon.spriteName = spriteName;
 		}
@@ -74,26 +86,36 @@ public class MiniMapIcon : MonoBehaviour
 
 	public void UpdateIcon(float center_x, float center_y, float scaling, float ui_radius)
 	{
-		if (!((Object)target == (Object)null))
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+		if (!(target == null))
 		{
 			if (isInitialized)
 			{
-				base.gameObject.SetActive(true);
+				this.get_gameObject().SetActive(true);
 				isInitialized = false;
 			}
 			bool flag = true;
-			Vector3 localPosition = target.position;
+			Vector3 localPosition = target.get_position();
 			localPosition.x = (localPosition.x - center_x) * scaling;
 			localPosition.y = (localPosition.z - center_y) * scaling;
 			localPosition.z = 0f;
-			if (localPosition.magnitude > ui_radius)
+			if (localPosition.get_magnitude() > ui_radius)
 			{
 				flag = false;
-				localPosition = localPosition.normalized * ui_radius;
+				localPosition = localPosition.get_normalized() * ui_radius;
 			}
 			isOver = !flag;
-			_trasform.localPosition = localPosition;
-			_trasform.localRotation = Quaternion.Inverse(_trasform.parent.localRotation);
+			_trasform.set_localPosition(localPosition);
+			_trasform.set_localRotation(Quaternion.Inverse(_trasform.get_parent().get_localRotation()));
 		}
 	}
 }

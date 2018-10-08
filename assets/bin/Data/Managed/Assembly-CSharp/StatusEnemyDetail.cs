@@ -140,10 +140,11 @@ public class StatusEnemyDetail : GameSection
 
 	public override void Initialize()
 	{
-		StartCoroutine(DoInitialize());
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoInitialize());
 	}
 
-	public IEnumerator DoInitialize()
+	public unsafe IEnumerator DoInitialize()
 	{
 		LoadingQueue loadQueue = new LoadingQueue(this);
 		if (reInitialize)
@@ -174,11 +175,11 @@ public class StatusEnemyDetail : GameSection
 			enemyCollectionData = Singleton<EnemyCollectionTable>.I.GetEnemyCollectionData(enemyCollectionId);
 			regionData = Singleton<RegionTable>.I.GetData(enemyCollectionData.regionId);
 			achievementCounter = MonoBehaviourSingleton<AchievementManager>.I.monsterCollectionList;
-			SetText(UI.STR_TOTAL_DEFEAT_TITLE, "TOTAL_DEFEAT");
+			SetText((Enum)UI.STR_TOTAL_DEFEAT_TITLE, "TOTAL_DEFEAT");
 			SetLabelText(text: string.Format(base.sectionData.GetText("AREA_DEFEAT"), regionData.regionName), label_enum: UI.STR_FIELD_DEFEAT_TITLE);
-			SetText(UI.STR_FLAVOR_TITLE, "FLAVOR_TITLE");
-			SetText(UI.STR_BREAK_REWARD_TITLE, "BREAK_REWARD_TITLE");
-			SetText(UI.STR_REWARD_TITLE, "DEFEAT_REWARD_TITLE");
+			SetText((Enum)UI.STR_FLAVOR_TITLE, "FLAVOR_TITLE");
+			SetText((Enum)UI.STR_BREAK_REWARD_TITLE, "BREAK_REWARD_TITLE");
+			SetText((Enum)UI.STR_REWARD_TITLE, "DEFEAT_REWARD_TITLE");
 			OnQuery_TO_FRONT();
 			string foundationName = string.Empty;
 			popMapIds = new List<uint>();
@@ -227,73 +228,84 @@ public class StatusEnemyDetail : GameSection
 			}
 			if (popMapIds != null)
 			{
-				popMapIds = (from x in popMapIds
-				where MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledMap((int)x)
-				select x).ToList();
+				List<uint> source = popMapIds;
+				if (_003CDoInitialize_003Ec__Iterator16F._003C_003Ef__am_0024cache18 == null)
+				{
+					_003CDoInitialize_003Ec__Iterator16F._003C_003Ef__am_0024cache18 = new Func<uint, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				popMapIds = source.Where(_003CDoInitialize_003Ec__Iterator16F._003C_003Ef__am_0024cache18).ToList();
 			}
 			if (string.IsNullOrEmpty(foundationName))
 			{
 				foundationName = base.sectionData.GetText("DEFAULT_STGE_NAME");
 			}
-			sameMonsterCounter = (from x in achievementCounter
-			where x.Count != 0
-			where Singleton<EnemyCollectionTable>.I.GetEnemyCollectionData((uint)x.subType).enemySpeciesId == ((_003CDoInitialize_003Ec__Iterator168)/*Error near IL_0597: stateMachine*/)._003C_003Ef__this.enemyCollectionData.enemySpeciesId
-			select x).ToList();
-			SetLabelText(UI.LBL_ENEMY_NAME, enemyData.name);
+			List<AchievementCounter> source2 = achievementCounter;
+			if (_003CDoInitialize_003Ec__Iterator16F._003C_003Ef__am_0024cache19 == null)
+			{
+				_003CDoInitialize_003Ec__Iterator16F._003C_003Ef__am_0024cache19 = new Func<AchievementCounter, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			sameMonsterCounter = source2.Where(_003CDoInitialize_003Ec__Iterator16F._003C_003Ef__am_0024cache19).Where(new Func<AchievementCounter, bool>((object)/*Error near IL_0597: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList();
+			SetLabelText((Enum)UI.LBL_ENEMY_NAME, enemyData.name);
 			SetFrame(GetCtrl(UI.OBJ_FRAME), (int)enemyCollectionData.collectionType);
-			isUnknown = !sameMonsterCounter.Any((AchievementCounter x) => x.subType == ((_003CDoInitialize_003Ec__Iterator168)/*Error near IL_0612: stateMachine*/)._003C_003Ef__this.enemyCollectionId);
-			SetActive(UI.OBJ_UNKNOWN, isUnknown);
-			SetActive(UI.LBL_UNKNOWN_WEAKPOINT, isUnknown || enemyData.weakElement == ELEMENT_TYPE.MAX);
-			SetActive(UI.LBL_ELEMENT, isUnknown || enemyData.element == ELEMENT_TYPE.MAX);
-			SetActive(UI.SPR_WEAK_ELEMENT, !isUnknown);
-			SetActive(UI.SPR_ELEMENT, !isUnknown);
+			isUnknown = !sameMonsterCounter.Any(new Func<AchievementCounter, bool>((object)/*Error near IL_0612: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetActive((Enum)UI.OBJ_UNKNOWN, isUnknown);
+			SetActive((Enum)UI.LBL_UNKNOWN_WEAKPOINT, isUnknown || enemyData.weakElement == ELEMENT_TYPE.MAX);
+			SetActive((Enum)UI.LBL_ELEMENT, isUnknown || enemyData.element == ELEMENT_TYPE.MAX);
+			SetActive((Enum)UI.SPR_WEAK_ELEMENT, !isUnknown);
+			SetActive((Enum)UI.SPR_ELEMENT, !isUnknown);
 			InitRenderTexture(UI.TEX_ENEMY_MODEL, -1f, false);
 			bool activeAppearButton = !isUnknown && popMapIds != null && popMapIds.Any();
-			SetActive(UI.OBJ_APPEAR_MAP_ON, activeAppearButton);
-			SetActive(UI.OBJ_APPEAR_MAP_OFF, !activeAppearButton);
+			SetActive((Enum)UI.OBJ_APPEAR_MAP_ON, activeAppearButton);
+			SetActive((Enum)UI.OBJ_APPEAR_MAP_OFF, !activeAppearButton);
 			if (isUnknown)
 			{
-				SetRenderEnemyModel(UI.TEX_ENEMY_MODEL, enemyData.id, foundationName, OutGameSettingsManager.EnemyDisplayInfo.SCENE.GACHA, null, UIModelRenderTexture.ENEMY_MOVE_TYPE.STOP, true);
-				enemyModelRenderTexture = GetComponent<UIModelRenderTexture>(UI.TEX_ENEMY_MODEL);
-				UITexture rendererTexture2 = GetComponent<UITexture>(UI.TEX_ENEMY_MODEL);
-				rendererTexture2.color = Color.black;
-				SetActive(UI.TEX_ENEMYICON, false);
-				SetText(UI.LBL_ENEMY_NAME, "???");
-				SetText(UI.LBL_REWARD_LIST, "???");
-				SetText(UI.LBL_BREAK_REWARD_LIST, "???");
-				SetText(UI.LBL_FLAVOR_TEXT, "???");
-				SetText(UI.LBL_UNKNOWN_WEAKPOINT, "?");
-				SetText(UI.LBL_ELEMENT, "?");
-				SetLabelText(UI.LBL_FIELD_DEFEAT, "0");
-				SetLabelText(UI.LBL_TOTAL_DEFEAT, "0");
+				SetRenderEnemyModel((Enum)UI.TEX_ENEMY_MODEL, enemyData.id, foundationName, OutGameSettingsManager.EnemyDisplayInfo.SCENE.GACHA, null, UIModelRenderTexture.ENEMY_MOVE_TYPE.STOP, true);
+				enemyModelRenderTexture = base.GetComponent<UIModelRenderTexture>((Enum)UI.TEX_ENEMY_MODEL);
+				UITexture rendererTexture2 = base.GetComponent<UITexture>((Enum)UI.TEX_ENEMY_MODEL);
+				rendererTexture2.color = Color.get_black();
+				SetActive((Enum)UI.TEX_ENEMYICON, false);
+				SetText((Enum)UI.LBL_ENEMY_NAME, "???");
+				SetText((Enum)UI.LBL_REWARD_LIST, "???");
+				SetText((Enum)UI.LBL_BREAK_REWARD_LIST, "???");
+				SetText((Enum)UI.LBL_FLAVOR_TEXT, "???");
+				SetText((Enum)UI.LBL_UNKNOWN_WEAKPOINT, "?");
+				SetText((Enum)UI.LBL_ELEMENT, "?");
+				SetLabelText((Enum)UI.LBL_FIELD_DEFEAT, "0");
+				SetLabelText((Enum)UI.LBL_TOTAL_DEFEAT, "0");
 			}
 			else
 			{
-				SetRenderEnemyModel(UI.TEX_ENEMY_MODEL, enemyData.id, foundationName, OutGameSettingsManager.EnemyDisplayInfo.SCENE.GACHA, null, UIModelRenderTexture.ENEMY_MOVE_TYPE.DONT_MOVE, true);
-				enemyModelRenderTexture = GetComponent<UIModelRenderTexture>(UI.TEX_ENEMY_MODEL);
-				UITexture rendererTexture = GetComponent<UITexture>(UI.TEX_ENEMY_MODEL);
-				rendererTexture.color = Color.white;
-				SetActive(UI.TEX_ENEMYICON, true);
-				SetEnemyIcon(UI.TEX_ENEMYICON, enemyData.iconId);
-				SetElementSprite(UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
-				SetElementSprite(UI.SPR_ELEMENT, (int)enemyData.element);
+				SetRenderEnemyModel((Enum)UI.TEX_ENEMY_MODEL, enemyData.id, foundationName, OutGameSettingsManager.EnemyDisplayInfo.SCENE.GACHA, null, UIModelRenderTexture.ENEMY_MOVE_TYPE.DONT_MOVE, true);
+				enemyModelRenderTexture = base.GetComponent<UIModelRenderTexture>((Enum)UI.TEX_ENEMY_MODEL);
+				UITexture rendererTexture = base.GetComponent<UITexture>((Enum)UI.TEX_ENEMY_MODEL);
+				rendererTexture.color = Color.get_white();
+				SetActive((Enum)UI.TEX_ENEMYICON, true);
+				SetEnemyIcon((Enum)UI.TEX_ENEMYICON, enemyData.iconId);
+				SetElementSprite((Enum)UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
+				SetElementSprite((Enum)UI.SPR_ELEMENT, (int)enemyData.element);
 				if (enemyData.weakElement == ELEMENT_TYPE.MAX)
 				{
-					SetText(UI.LBL_UNKNOWN_WEAKPOINT, "NONE_WEAK_POINT");
+					SetText((Enum)UI.LBL_UNKNOWN_WEAKPOINT, "NONE_WEAK_POINT");
 				}
 				if (enemyData.element == ELEMENT_TYPE.MAX)
 				{
-					SetText(UI.LBL_ELEMENT, "NONE_WEAK_POINT");
+					SetText((Enum)UI.LBL_ELEMENT, "NONE_WEAK_POINT");
 				}
-				SetLabelText(UI.LBL_ENEMY_NAME, enemyData.name);
-				SetLabelText(UI.LBL_REWARD_LIST, GetDefeatRewardText());
-				SetLabelText(UI.LBL_BREAK_REWARD_LIST, GetBreakRewardText());
-				SetLabelText(UI.LBL_FLAVOR_TEXT, enemyCollectionData.flavorText);
-				SetLabelText(UI.LBL_FIELD_DEFEAT, sameMonsterCounter.First((AchievementCounter x) => x.subType == ((_003CDoInitialize_003Ec__Iterator168)/*Error near IL_0a9a: stateMachine*/)._003C_003Ef__this.enemyCollectionData.id).count);
-				SetLabelText(UI.LBL_TOTAL_DEFEAT, sameMonsterCounter.Sum((AchievementCounter x) => x.Count).ToString());
+				SetLabelText((Enum)UI.LBL_ENEMY_NAME, enemyData.name);
+				SetLabelText((Enum)UI.LBL_REWARD_LIST, GetDefeatRewardText());
+				SetLabelText((Enum)UI.LBL_BREAK_REWARD_LIST, GetBreakRewardText());
+				SetLabelText((Enum)UI.LBL_FLAVOR_TEXT, enemyCollectionData.flavorText);
+				SetLabelText((Enum)UI.LBL_FIELD_DEFEAT, sameMonsterCounter.First(new Func<AchievementCounter, bool>((object)/*Error near IL_0a9a: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).count);
+				object label_enum = UI.LBL_TOTAL_DEFEAT;
+				List<AchievementCounter> source3 = sameMonsterCounter;
+				if (_003CDoInitialize_003Ec__Iterator16F._003C_003Ef__am_0024cache1A == null)
+				{
+					_003CDoInitialize_003Ec__Iterator16F._003C_003Ef__am_0024cache1A = new Func<AchievementCounter, long>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				SetLabelText((Enum)label_enum, source3.Sum(_003CDoInitialize_003Ec__Iterator16F._003C_003Ef__am_0024cache1A).ToString());
 			}
-			eventListener = GetComponent<UIEventListener>(UI.TEX_ENEMY_MODEL);
-			if ((UnityEngine.Object)eventListener != (UnityEngine.Object)null)
+			eventListener = base.GetComponent<UIEventListener>((Enum)UI.TEX_ENEMY_MODEL);
+			if (eventListener != null)
 			{
 				UIEventListener uIEventListener = eventListener;
 				uIEventListener.onClick = (UIEventListener.VoidDelegate)Delegate.Combine(uIEventListener.onClick, new UIEventListener.VoidDelegate(OnTap));
@@ -307,7 +319,7 @@ public class StatusEnemyDetail : GameSection
 
 	protected override void OnClose()
 	{
-		if ((UnityEngine.Object)eventListener != (UnityEngine.Object)null)
+		if (eventListener != null)
 		{
 			UIEventListener uIEventListener = eventListener;
 			uIEventListener.onClick = (UIEventListener.VoidDelegate)Delegate.Remove(uIEventListener.onClick, new UIEventListener.VoidDelegate(OnTap));
@@ -327,13 +339,13 @@ public class StatusEnemyDetail : GameSection
 		}
 		foreach (KeyValuePair<UI, string> uI_COLOR_CHANGE_TARGET in UI_COLOR_CHANGE_TARGETS)
 		{
-			SetSprite(uI_COLOR_CHANGE_TARGET.Key, string.Format(uI_COLOR_CHANGE_TARGET.Value, RARITY_FUTTER[rarity]));
+			SetSprite((Enum)uI_COLOR_CHANGE_TARGET.Key, string.Format(uI_COLOR_CHANGE_TARGET.Value, RARITY_FUTTER[rarity]));
 		}
 	}
 
 	private void OnTap(GameObject obj)
 	{
-		if (!isUnknown && (UnityEngine.Object)enemyModelRenderTexture != (UnityEngine.Object)null)
+		if (!isUnknown && enemyModelRenderTexture != null)
 		{
 			enemyModelRenderTexture.SetApplyEnemyRootMotion(false);
 			enemyModelRenderTexture.PlayRandomEnemyAnimation();
@@ -342,11 +354,17 @@ public class StatusEnemyDetail : GameSection
 
 	private void OnDrag(GameObject obj, Vector2 delta)
 	{
-		if (!((UnityEngine.Object)enemyModelRenderTexture == (UnityEngine.Object)null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable())
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Expected O, but got Unknown
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		if (!(enemyModelRenderTexture == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable())
 		{
-			foreach (Transform item in enemyModelRenderTexture.GetModelTransform().parent)
+			foreach (Transform item in enemyModelRenderTexture.GetModelTransform().get_parent())
 			{
-				item.Rotate(GameDefine.GetCharaRotateVector(delta));
+				Transform val = item;
+				val.Rotate(GameDefine.GetCharaRotateVector(delta));
 			}
 		}
 	}
@@ -355,8 +373,8 @@ public class StatusEnemyDetail : GameSection
 	{
 		if (!reInitialize)
 		{
-			SetActive(UI.OBJ_FLAVOR, true);
-			SetActive(UI.OBJ_FRONT, false);
+			SetActive((Enum)UI.OBJ_FLAVOR, true);
+			SetActive((Enum)UI.OBJ_FRONT, false);
 		}
 	}
 
@@ -364,8 +382,8 @@ public class StatusEnemyDetail : GameSection
 	{
 		if (!reInitialize)
 		{
-			SetActive(UI.OBJ_FLAVOR, false);
-			SetActive(UI.OBJ_FRONT, true);
+			SetActive((Enum)UI.OBJ_FLAVOR, false);
+			SetActive((Enum)UI.OBJ_FRONT, true);
 		}
 	}
 
@@ -420,13 +438,18 @@ public class StatusEnemyDetail : GameSection
 		}
 	}
 
-	private string GetDefeatRewardText()
+	private unsafe string GetDefeatRewardText()
 	{
 		string text = string.Empty;
 		List<uint> list = new List<uint>();
 		foreach (EnemyFieldDropItemTable.EnemyFieldDropItemData enemyDatum in Singleton<EnemyFieldDropItemTable>.I.GetEnemyData(enemyData.id))
 		{
-			if (enemyDatum.partIds.Any((int x) => x == 0) && !list.Contains(enemyDatum.itemId))
+			List<int> partIds = enemyDatum.partIds;
+			if (_003C_003Ef__am_0024cacheF == null)
+			{
+				_003C_003Ef__am_0024cacheF = new Func<int, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			if (partIds.Any(_003C_003Ef__am_0024cacheF) && !list.Contains(enemyDatum.itemId))
 			{
 				ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(enemyDatum.itemId);
 				if (!string.IsNullOrEmpty(text))
@@ -444,13 +467,18 @@ public class StatusEnemyDetail : GameSection
 		return text;
 	}
 
-	private string GetBreakRewardText()
+	private unsafe string GetBreakRewardText()
 	{
 		string text = string.Empty;
 		List<uint> list = new List<uint>();
 		foreach (EnemyFieldDropItemTable.EnemyFieldDropItemData enemyDatum in Singleton<EnemyFieldDropItemTable>.I.GetEnemyData(enemyData.id))
 		{
-			if (enemyDatum.partIds.Any((int x) => x > 0) && !list.Contains(enemyDatum.itemId))
+			List<int> partIds = enemyDatum.partIds;
+			if (_003C_003Ef__am_0024cache10 == null)
+			{
+				_003C_003Ef__am_0024cache10 = new Func<int, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			if (partIds.Any(_003C_003Ef__am_0024cache10) && !list.Contains(enemyDatum.itemId))
 			{
 				ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(enemyDatum.itemId);
 				if (!string.IsNullOrEmpty(text))

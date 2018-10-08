@@ -19,9 +19,9 @@ public class ExternalAppLauncher {
     private static final boolean USE_CUSTOM_TABS = true;
 
     public static boolean openUrlInExternalBrowser(Activity activity, String str) {
+        Intent intent;
         Uri parse = Uri.parse(str);
         if (parse.getHost() != null && parse.getHost().endsWith(".facebook.com") && parse.getPath().startsWith("/groups/")) {
-            Intent intent;
             intent = new Intent("android.intent.action.VIEW", parse);
             intent.setPackage(FACEBOOK_PACKAGE_NAME);
             if (doLaunchActivity(activity, intent)) {

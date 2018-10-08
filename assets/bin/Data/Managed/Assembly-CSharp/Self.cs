@@ -19,11 +19,11 @@ public class Self : Player
 
 	private const float CANNON_ANGLE_LIMIT_DOWN = 10f;
 
-	protected Vector3 arrowAimLineVec = Vector3.forward;
+	protected Vector3 arrowAimLineVec = Vector3.get_forward();
 
-	protected Vector2 arrowAimInputVec = Vector2.zero;
+	protected Vector2 arrowAimInputVec = Vector2.get_zero();
 
-	protected Vector2 arrowAimInputOffset = Vector2.zero;
+	protected Vector2 arrowAimInputOffset = Vector2.get_zero();
 
 	protected GameObject arrowAimLesserCursorEffect;
 
@@ -57,15 +57,15 @@ public class Self : Player
 
 	private float _blindTimer;
 
-	public Vector3 cannonAimForward = Vector3.zero;
+	public Vector3 cannonAimForward = Vector3.get_zero();
 
-	private Vector3 cannonAimEuler = Vector3.zero;
+	private Vector3 cannonAimEuler = Vector3.get_zero();
 
 	private float baseEulerX;
 
 	private bool isPlayingRotateSE;
 
-	private Vector2 baseInputVec = Vector2.zero;
+	private Vector2 baseInputVec = Vector2.get_zero();
 
 	private bool isBaseInputVec;
 
@@ -129,8 +129,22 @@ public class Self : Player
 
 	public Self()
 	{
-		arrowAimForward = Vector3.zero;
-		arrowAimLesserCursorPos = Vector3.zero;
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+		arrowAimForward = Vector3.get_zero();
+		arrowAimLesserCursorPos = Vector3.get_zero();
 		bulletLineRenderer = null;
 		base.objectType = OBJECT_TYPE.SELF;
 	}
@@ -149,7 +163,7 @@ public class Self : Player
 	public override void OnLoadComplete()
 	{
 		base.OnLoadComplete();
-		if ((Object)stepCtrl != (Object)null)
+		if (stepCtrl != null)
 		{
 			stepCtrl.stampDistance = 1000f;
 		}
@@ -177,9 +191,10 @@ public class Self : Player
 
 	protected override void OnDisable()
 	{
-		if ((Object)bulletLineRenderer != (Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		if (bulletLineRenderer != null)
 		{
-			Object.Destroy(bulletLineRenderer.gameObject);
+			Object.Destroy(bulletLineRenderer.get_gameObject());
 		}
 		base.OnDisable();
 	}
@@ -207,29 +222,32 @@ public class Self : Player
 
 	protected override void Initialize()
 	{
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize();
-		if ((Object)bulletLineRenderer == (Object)null)
+		if (bulletLineRenderer == null)
 		{
-			Transform transform = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.bulletLine, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-			if ((Object)transform == (Object)null)
+			Transform val = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.bulletLine, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
+			if (val == null)
 			{
 				return;
 			}
-			bulletLineRenderer = transform.GetComponent<LineRenderer>();
-			if ((Object)bulletLineRenderer != (Object)null)
+			bulletLineRenderer = val.GetComponent<LineRenderer>();
+			if (bulletLineRenderer != null)
 			{
-				bulletLineRenderer.enabled = false;
-				bulletLineRenderer.SetColors(Color.yellow, Color.yellow);
-				bulletLineRenderer.material.renderQueue = 3001;
+				bulletLineRenderer.set_enabled(false);
+				bulletLineRenderer.SetColors(Color.get_yellow(), Color.get_yellow());
+				bulletLineRenderer.get_material().set_renderQueue(3001);
 			}
 		}
 		soulEnergyCtrl = new SoulEnergyController();
 		soulEnergyCtrl.Initialize(this);
-		if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid() && (Object)MonoBehaviourSingleton<UIPlayerStatus>.I.targetPlayer != (Object)this)
+		if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid() && MonoBehaviourSingleton<UIPlayerStatus>.I.targetPlayer != this)
 		{
 			MonoBehaviourSingleton<UIPlayerStatus>.I.SetTarget(this);
 		}
-		if (MonoBehaviourSingleton<UIEnduranceStatus>.IsValid() && (Object)MonoBehaviourSingleton<UIEnduranceStatus>.I.targetPlayer != (Object)this)
+		if (MonoBehaviourSingleton<UIEnduranceStatus>.IsValid() && MonoBehaviourSingleton<UIEnduranceStatus>.I.targetPlayer != this)
 		{
 			MonoBehaviourSingleton<UIEnduranceStatus>.I.SetTarget(this);
 		}
@@ -249,8 +267,9 @@ public class Self : Player
 
 	protected override void Update()
 	{
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		base.Update();
-		if (MonoBehaviourSingleton<UIContinueButton>.IsValid() && !MonoBehaviourSingleton<UIContinueButton>.I.gameObject.activeSelf && MonoBehaviourSingleton<UIContinueButton>.I.CheckVisible() && (Object)MonoBehaviourSingleton<StageObjectManager>.I.self == (Object)this)
+		if (MonoBehaviourSingleton<UIContinueButton>.IsValid() && !MonoBehaviourSingleton<UIContinueButton>.I.get_gameObject().get_activeSelf() && MonoBehaviourSingleton<UIContinueButton>.I.CheckVisible() && MonoBehaviourSingleton<StageObjectManager>.I.self == this)
 		{
 			bool flag = false;
 			if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<InGameProgress>.I.isHappenQuestDirection)
@@ -281,7 +300,7 @@ public class Self : Player
 		}
 		if (QuestManager.IsValidInGameExplore())
 		{
-			statusSyncTime -= Time.deltaTime;
+			statusSyncTime -= Time.get_deltaTime();
 			if (statusSyncTime <= 0f && syncHp != base.hp)
 			{
 				SendExploreSyncPlayerStatus();
@@ -364,10 +383,16 @@ public class Self : Player
 
 	public override void ActAttack(int id, bool send_packet = true, bool sync_immediately = false, string _motionLayerName = "")
 	{
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		if (base.isArrowAimBossMode && base.isArrowAimKeep)
 		{
 			arrowAimInputOffset += arrowAimInputVec;
-			arrowAimInputVec = Vector2.zero;
+			arrowAimInputVec = Vector2.get_zero();
 		}
 		if (CheckAttackModeAndSpType(ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.HEAT) && id == 98)
 		{
@@ -394,6 +419,12 @@ public class Self : Player
 
 	public override void SetChargeRelease(float charge_rate)
 	{
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(true, 0f);
 		if (base.isArrowAimBossMode)
 		{
@@ -412,6 +443,7 @@ public class Self : Player
 
 	public override void SetInputAxis(Vector2 input_vec)
 	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		bool startInputRotate = base.startInputRotate;
 		base.SetInputAxis(input_vec);
 		if (startInputRotate != base.startInputRotate)
@@ -553,9 +585,9 @@ public class Self : Player
 		{
 			MonoBehaviourSingleton<UIPlayerStatus>.I.UpDateStatusIcon();
 		}
-		if ((Object)bulletLineRenderer != (Object)null)
+		if (bulletLineRenderer != null)
 		{
-			bulletLineRenderer.enabled = false;
+			bulletLineRenderer.set_enabled(false);
 		}
 		if (MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
 		{
@@ -662,6 +694,7 @@ public class Self : Player
 
 	protected override void OnAttackFromHitDirection(AttackedHitStatusDirection status, StageObject to_object)
 	{
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 		base.OnAttackFromHitDirection(status, to_object);
 		if (status.attackInfo.shakeCameraPercent != 0f && to_object.objectType == OBJECT_TYPE.ENEMY && MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
@@ -680,6 +713,7 @@ public class Self : Player
 
 	public override void OnAttackedHitFix(AttackedHitStatusFix status)
 	{
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		if (!TutorialStep.HasAllTutorialCompleted() || MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA_QUEST_WIN))
 		{
 			base.OnAttackedHitFix(status);
@@ -687,7 +721,7 @@ public class Self : Player
 			{
 				MonoBehaviourSingleton<InGameCameraManager>.I.SetShakeCamera(status.hitPos, status.attackInfo.shakeCameraPercent, status.attackInfo.shakeCycleTime);
 			}
-			if (status.damage + status.shieldDamage > 0 && (Object)uiPlayerStatusGizmo != (Object)null)
+			if (status.damage + status.shieldDamage > 0 && uiPlayerStatusGizmo != null)
 			{
 				uiPlayerStatusGizmo.OnDamageSelf();
 				if (MonoBehaviourSingleton<UIDamageManager>.IsValid())
@@ -700,12 +734,19 @@ public class Self : Player
 
 	public override Vector3 GetCameraTargetPos()
 	{
-		Vector3 vector = base.GetCameraTargetPos();
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		Vector3 val = base.GetCameraTargetPos();
 		if (base.isArrowAimLesserMode)
 		{
-			vector += arrowAimLesserCursorPos;
+			val += arrowAimLesserCursorPos;
 		}
-		return vector;
+		return val;
 	}
 
 	public override bool CanPlayEffectEvent()
@@ -720,7 +761,7 @@ public class Self : Player
 		case AnimEventFormat.ID.COMBO_INPUT_ON:
 		{
 			SelfController selfController = base.controller as SelfController;
-			if ((Object)selfController != (Object)null && selfController.nextCommand != null && selfController.nextCommand.type == SelfController.COMMAND_TYPE.ATTACK)
+			if (selfController != null && selfController.nextCommand != null && selfController.nextCommand.type == SelfController.COMMAND_TYPE.ATTACK)
 			{
 				selfController.CancelInput();
 			}
@@ -793,6 +834,10 @@ public class Self : Player
 
 	protected override void EventCameraTargetOffsetOn(AnimEventData.EventData data)
 	{
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
 			float[] floatArgs = data.floatArgs;
@@ -813,11 +858,21 @@ public class Self : Player
 
 	protected override void EventCameraStopOn(AnimEventData.EventData data)
 	{
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && data.floatArgs.Length >= 6)
 		{
 			InGameCameraManager i = MonoBehaviourSingleton<InGameCameraManager>.I;
 			i.SetStopPos(i.movePosition + new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]));
-			i.SetStopRotEular(i.moveRotation.eulerAngles + new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
+			InGameCameraManager inGameCameraManager = i;
+			Quaternion moveRotation = i.moveRotation;
+			inGameCameraManager.SetStopRotEular(moveRotation.get_eulerAngles() + new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
 			i.SetCameraMode(InGameCameraManager.CAMERA_MODE.STOP);
 		}
 	}
@@ -832,27 +887,61 @@ public class Self : Player
 
 	protected override void EventCameraCutOn(AnimEventData.EventData data)
 	{
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && !FieldManager.IsValidInGameNoBoss() && data.floatArgs.Length >= 6)
 		{
-			Vector3 vector = _position + Quaternion.LookRotation(_forward) * new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-			Vector3 vector2 = _position + Quaternion.LookRotation(_forward) * new Vector3(0f - data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+			Vector3 val = _position + Quaternion.LookRotation(_forward) * new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+			Vector3 val2 = _position + Quaternion.LookRotation(_forward) * new Vector3(0f - data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
 			Quaternion cutRot = Quaternion.LookRotation(_forward) * Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
 			Quaternion cutRot2 = Quaternion.LookRotation(_forward) * Quaternion.Euler(new Vector3(data.floatArgs[3], 0f - data.floatArgs[4], data.floatArgs[5]));
 			RaycastHit hit = default(RaycastHit);
 			RaycastHit hit2 = default(RaycastHit);
-			bool flag = AIUtility.RaycastObstacle(this, vector, out hit);
-			bool flag2 = AIUtility.RaycastObstacle(this, vector2, out hit2);
+			bool flag = AIUtility.RaycastObstacle(this, val, out hit);
+			bool flag2 = AIUtility.RaycastObstacle(this, val2, out hit2);
 			if (!flag || !flag2)
 			{
 				InGameCameraManager i = MonoBehaviourSingleton<InGameCameraManager>.I;
 				if (!flag)
 				{
-					i.SetCutPos(vector);
+					i.SetCutPos(val);
 					i.SetCutRot(cutRot);
 				}
 				else if (!flag2)
 				{
-					i.SetCutPos(vector2);
+					i.SetCutPos(val2);
 					i.SetCutRot(cutRot2);
 				}
 				i.SetCameraMode(InGameCameraManager.CAMERA_MODE.CUT);
@@ -870,6 +959,8 @@ public class Self : Player
 
 	public override void ShotArrow(Vector3 shot_pos, Quaternion shot_rot, AttackInfo attack_info, bool isSitShot, bool isAimEnd)
 	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		if (attack_info != null)
 		{
 			base.ShotArrow(shot_pos, shot_rot, attack_info, isSitShot, isAimEnd);
@@ -892,40 +983,60 @@ public class Self : Player
 
 	public override Vector3 GetBulletShotVec(Vector3 appear_pos)
 	{
-		if (base.isArrowAimBossMode || (base.isArrowAimLesserMode && (Object)base.targetingPoint == (Object)null))
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		if (base.isArrowAimBossMode || (base.isArrowAimLesserMode && base.targetingPoint == null))
 		{
-			return (Quaternion.LookRotation(arrowAimForward) * arrowAimLineVec).normalized;
+			Vector3 val = Quaternion.LookRotation(arrowAimForward) * arrowAimLineVec;
+			return val.get_normalized();
 		}
 		return base.GetBulletShotVec(appear_pos);
 	}
 
 	public override void SetArrowAimBossMode(bool enable)
 	{
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
 		if (enable)
 		{
-			if ((Object)base.actionTarget != (Object)null)
+			if (base.actionTarget != null)
 			{
 				LookAt(base.actionTarget._position, true);
 			}
-			else if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (Object)MonoBehaviourSingleton<StageObjectManager>.I.boss != (Object)null)
+			else if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
 			{
-				LookAt(MonoBehaviourSingleton<StageObjectManager>.I.boss.transform.position, false);
+				LookAt(MonoBehaviourSingleton<StageObjectManager>.I.boss.get_transform().get_position(), false);
 			}
 			base.isActSpecialAction = true;
 		}
 		else
 		{
 			base.targetingPointList.Clear();
-			if ((Object)base.targetAimAfeterPoint != (Object)null)
+			if (base.targetAimAfeterPoint != null)
 			{
 				base.targetingPointList.Add(base.targetAimAfeterPoint);
 			}
 		}
 		arrowTmpFoward = _forward;
 		arrowAimForward = _forward;
-		arrowAimLineVec = Vector3.forward;
-		arrowAimInputVec = Vector2.zero;
-		arrowAimInputOffset = Vector2.zero;
+		arrowAimLineVec = Vector3.get_forward();
+		arrowAimInputVec = Vector2.get_zero();
+		arrowAimInputOffset = Vector2.get_zero();
 		base.SetArrowAimBossMode(enable);
 		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
@@ -948,9 +1059,9 @@ public class Self : Player
 	protected override void SetArrowAimBossVisible(bool enable)
 	{
 		base.SetArrowAimBossVisible(enable);
-		if ((Object)bulletLineRenderer != (Object)null)
+		if (bulletLineRenderer != null)
 		{
-			bulletLineRenderer.enabled = enable;
+			bulletLineRenderer.set_enabled(enable);
 			if (enable)
 			{
 				SetBulletLineColor(false);
@@ -961,6 +1072,43 @@ public class Self : Player
 
 	public void UpdateArrowAimBossMode(Vector2 input_vec, Vector2 input_pos)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0294: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0299: Unknown result type (might be due to invalid IL or missing references)
+		//IL_029f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_034e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0353: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0358: Unknown result type (might be due to invalid IL or missing references)
+		//IL_035d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_036e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0373: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0379: Unknown result type (might be due to invalid IL or missing references)
+		//IL_037e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0383: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0386: Unknown result type (might be due to invalid IL or missing references)
 		Vector3 bulletAppearPos = GetBulletAppearPos();
 		Vector3 bulletShotVec = GetBulletShotVec(bulletAppearPos);
 		arrowAimInputVec = input_vec;
@@ -974,7 +1122,7 @@ public class Self : Player
 		}
 		num3 *= Mathf.Sign(num2) * arrowAimBossSettings.overSpeedRate;
 		num3 = Mathf.Clamp(num3, 0f - arrowAimBossSettings.overSpeedLimit, arrowAimBossSettings.overSpeedLimit);
-		float num4 = input_pos.x / (float)Screen.width;
+		float num4 = input_pos.x / (float)Screen.get_width();
 		float num5 = 1f;
 		if (num <= 0f)
 		{
@@ -1008,9 +1156,9 @@ public class Self : Player
 				int i = 0;
 				for (int count = base.targetingPointList.Count; i < count; i++)
 				{
-					Vector3 to = base.targetingPointList[i].param.markerPos - bulletAppearPos;
-					to.y = 0f;
-					float num9 = Vector3.Angle(bulletShotVec, to);
+					Vector3 val = base.targetingPointList[i].param.markerPos - bulletAppearPos;
+					val.y = 0f;
+					float num9 = Vector3.Angle(bulletShotVec, val);
 					if (i == 0 || num9 < num8)
 					{
 						num8 = num9;
@@ -1035,67 +1183,81 @@ public class Self : Player
 		}
 		num2 = Mathf.Clamp(num2, 0f - arrowAimBossSettings.angleLimitSide, arrowAimBossSettings.angleLimitSide);
 		arrowAimForward = Quaternion.Euler(new Vector3(0f, num3, 0f)) * arrowAimForward;
-		Vector3 normalized = (MonoBehaviourSingleton<StageObjectManager>.I.boss._position - _position).normalized;
-		Vector3 vector = Vector3.Cross(arrowTmpFoward, normalized);
-		arrowAimSign = ((vector.y >= 0f) ? 1 : (-1));
-		float f = input_vec.y + arrowAimInputOffset.y;
-		float value = arrowAimBossSettings.dragRateY * (0f - Mathf.Sign(f)) * Mathf.Abs(f);
-		value = Mathf.Clamp(value, 0f - arrowAimBossSettings.angleLimitUp, arrowAimBossSettings.angleLimitUp);
-		arrowAimLineVec = Quaternion.Euler(value, num2, 0f) * Vector3.forward;
+		Vector3 val2 = MonoBehaviourSingleton<StageObjectManager>.I.boss._position - _position;
+		Vector3 normalized = val2.get_normalized();
+		Vector3 val3 = Vector3.Cross(arrowTmpFoward, normalized);
+		arrowAimSign = ((val3.y >= 0f) ? 1 : (-1));
+		float num11 = input_vec.y + arrowAimInputOffset.y;
+		float num12 = arrowAimBossSettings.dragRateY * (0f - Mathf.Sign(num11)) * Mathf.Abs(num11);
+		num12 = Mathf.Clamp(num12, 0f - arrowAimBossSettings.angleLimitUp, arrowAimBossSettings.angleLimitUp);
+		arrowAimLineVec = Quaternion.Euler(num12, num2, 0f) * Vector3.get_forward();
 		Vector3 lerpRotation = Quaternion.Euler(new Vector3(0f, num2, 0f)) * arrowAimForward;
 		SetLerpRotation(lerpRotation);
 	}
 
 	public override void SetArrowAimLesserMode(bool enable)
 	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		if (enable)
 		{
-			arrowAimLesserCursorStartTime = Time.time;
-			arrowAimLesserCursorPos = Vector3.zero;
+			arrowAimLesserCursorStartTime = Time.get_time();
+			arrowAimLesserCursorPos = Vector3.get_zero();
 			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(false, 0f);
 		}
 		else
 		{
 			arrowAimLesserCursorStartTime = -1f;
-			arrowAimLesserCursorPos = Vector3.zero;
+			arrowAimLesserCursorPos = Vector3.get_zero();
 		}
 		base.SetArrowAimLesserMode(enable);
 	}
 
 	protected override void SetArrowAimLesserVisible(bool enable)
 	{
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0088: Expected O, but got Unknown
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
 		base.SetArrowAimLesserVisible(enable);
 		if (enable)
 		{
-			if ((Object)arrowAimLesserCursorEffect == (Object)null)
+			if (arrowAimLesserCursorEffect == null)
 			{
-				Transform transform = (!CheckAttackModeAndSpType(ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.HEAT)) ? EffectManager.GetEffect(base.playerParameter.specialActionInfo.arrowAimLesserCursorEffectName, base._transform) : EffectManager.GetEffect("ef_btl_target_e_01", base._transform);
-				if (!((Object)transform == (Object)null))
+				Transform val = (!CheckAttackModeAndSpType(ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.HEAT)) ? EffectManager.GetEffect(base.playerParameter.specialActionInfo.arrowAimLesserCursorEffectName, base._transform) : EffectManager.GetEffect("ef_btl_target_e_01", base._transform);
+				if (!(val == null))
 				{
 					float num = 2f;
-					transform.localScale = Vector3.one * num;
-					arrowAimLesserCursorEffect = transform.gameObject;
-					transform.position = _position + arrowAimLesserCursorPos;
-					Rigidbody rigidbody = transform.gameObject.AddComponent<Rigidbody>();
-					rigidbody.mass = 1f;
-					rigidbody.angularDrag = 100f;
-					rigidbody.isKinematic = false;
-					rigidbody.constraints = (RigidbodyConstraints)116;
-					rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
-					CapsuleCollider capsuleCollider = base._collider as CapsuleCollider;
-					if ((Object)capsuleCollider != (Object)null)
+					val.set_localScale(Vector3.get_one() * num);
+					arrowAimLesserCursorEffect = val.get_gameObject();
+					val.set_position(_position + arrowAimLesserCursorPos);
+					Rigidbody val2 = val.get_gameObject().AddComponent<Rigidbody>();
+					val2.set_mass(1f);
+					val2.set_angularDrag(100f);
+					val2.set_isKinematic(false);
+					val2.set_constraints(116);
+					val2.set_collisionDetectionMode(1);
+					CapsuleCollider val3 = base._collider as CapsuleCollider;
+					if (val3 != null)
 					{
-						CapsuleCollider capsuleCollider2 = transform.gameObject.AddComponent<CapsuleCollider>();
-						capsuleCollider2.direction = capsuleCollider.direction;
-						capsuleCollider2.height = capsuleCollider.height / num;
-						capsuleCollider2.radius = capsuleCollider.radius / num;
-						capsuleCollider2.center = capsuleCollider.center / num;
+						CapsuleCollider val4 = val.get_gameObject().AddComponent<CapsuleCollider>();
+						val4.set_direction(val3.get_direction());
+						val4.set_height(val3.get_height() / num);
+						val4.set_radius(val3.get_radius() / num);
+						val4.set_center(val3.get_center() / num);
 					}
-					Utility.SetLayerWithChildren(transform, 29);
+					Utility.SetLayerWithChildren(val, 29);
 				}
 			}
 		}
-		else if ((Object)arrowAimLesserCursorEffect != (Object)null)
+		else if (arrowAimLesserCursorEffect != null)
 		{
 			Object.Destroy(arrowAimLesserCursorEffect);
 			arrowAimLesserCursorEffect = null;
@@ -1104,6 +1266,69 @@ public class Self : Player
 
 	public override void UpdateArrowAimLesserMode(Vector2 input_vec)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0295: Unknown result type (might be due to invalid IL or missing references)
+		//IL_029d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02f3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_030a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_030f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0313: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0318: Unknown result type (might be due to invalid IL or missing references)
+		//IL_031a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_031c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0338: Unknown result type (might be due to invalid IL or missing references)
+		//IL_033d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0367: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0369: Unknown result type (might be due to invalid IL or missing references)
+		//IL_036d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0377: Unknown result type (might be due to invalid IL or missing references)
+		//IL_037c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0381: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0384: Unknown result type (might be due to invalid IL or missing references)
 		base.UpdateArrowAimLesserMode(input_vec);
 		InGameSettingsManager.SelfController.ArrowAimLesserSettings arrowAimLesserSettings;
 		if (CheckAttackModeAndSpType(ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.HEAT))
@@ -1115,40 +1340,42 @@ public class Self : Player
 		{
 			arrowAimLesserSettings = MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.arrowAimLesserSettings;
 		}
-		Rigidbody rigidbody = null;
-		if ((Object)arrowAimLesserCursorEffect != (Object)null)
+		Rigidbody val = null;
+		if (arrowAimLesserCursorEffect != null)
 		{
-			rigidbody = arrowAimLesserCursorEffect.GetComponent<Rigidbody>();
-			if ((Object)rigidbody != (Object)null)
+			val = arrowAimLesserCursorEffect.GetComponent<Rigidbody>();
+			if (val != null)
 			{
-				Vector3 arrowAimLesserCursorPos = rigidbody.position - _position;
+				Vector3 arrowAimLesserCursorPos = val.get_position() - _position;
 				arrowAimLesserCursorPos.y = 0f;
 				this.arrowAimLesserCursorPos = arrowAimLesserCursorPos;
-				if (this.arrowAimLesserCursorPos.magnitude >= arrowAimLesserSettings.cursorMaxDistance)
+				Vector3 arrowAimLesserCursorPos2 = this.arrowAimLesserCursorPos;
+				if (arrowAimLesserCursorPos2.get_magnitude() >= arrowAimLesserSettings.cursorMaxDistance)
 				{
-					this.arrowAimLesserCursorPos = this.arrowAimLesserCursorPos.normalized * arrowAimLesserSettings.cursorMaxDistance;
+					Vector3 arrowAimLesserCursorPos3 = this.arrowAimLesserCursorPos;
+					this.arrowAimLesserCursorPos = arrowAimLesserCursorPos3.get_normalized() * arrowAimLesserSettings.cursorMaxDistance;
 				}
-				rigidbody.position = this.arrowAimLesserCursorPos + _position;
+				val.set_position(this.arrowAimLesserCursorPos + _position);
 			}
 		}
-		if (this.arrowAimLesserCursorPos == Vector3.zero)
+		if (this.arrowAimLesserCursorPos == Vector3.get_zero())
 		{
 			arrowAimForward = _forward;
 		}
 		else
 		{
-			arrowAimForward = Quaternion.LookRotation(this.arrowAimLesserCursorPos) * Vector3.forward;
+			arrowAimForward = Quaternion.LookRotation(this.arrowAimLesserCursorPos) * Vector3.get_forward();
 		}
-		arrowAimLineVec = Vector3.forward;
+		arrowAimLineVec = Vector3.get_forward();
 		SetLerpRotation(this.arrowAimLesserCursorPos);
-		Vector3 right = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.right;
-		Vector3 forward = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.forward;
+		Vector3 right = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_right();
+		Vector3 forward = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_forward();
 		right.y = 0f;
 		right.Normalize();
 		forward.y = 0f;
 		forward.Normalize();
-		Vector3 vector = Vector3.zero;
-		float magnitude = input_vec.magnitude;
+		Vector3 val2 = Vector3.get_zero();
+		float magnitude = input_vec.get_magnitude();
 		if (magnitude >= arrowAimLesserSettings.dragMinLength && magnitude > 0f)
 		{
 			float num = magnitude;
@@ -1159,53 +1386,94 @@ public class Self : Player
 			num -= arrowAimLesserSettings.dragMinLength;
 			float num2 = num / (arrowAimLesserSettings.dragMaxLength - arrowAimLesserSettings.dragMinLength);
 			input_vec *= num2 / magnitude;
-			vector = right * input_vec.x + forward * input_vec.y;
+			val2 = right * input_vec.x + forward * input_vec.y;
 			float num3 = 0f;
 			if (arrowAimLesserCursorStartTime >= 0f)
 			{
 				float cursorStartSpeedTime = arrowAimLesserSettings.cursorStartSpeedTime;
-				num3 = (cursorStartSpeedTime - (Time.time - arrowAimLesserCursorStartTime)) / cursorStartSpeedTime;
+				num3 = (cursorStartSpeedTime - (Time.get_time() - arrowAimLesserCursorStartTime)) / cursorStartSpeedTime;
 				if (num3 < 0f)
 				{
 					num3 = 0f;
 					arrowAimLesserCursorStartTime = -1f;
 				}
 			}
-			float d = 1f;
-			if ((Object)base.actionTarget != (Object)null)
+			float num4 = 1f;
+			if (base.actionTarget != null)
 			{
-				d = arrowAimLesserSettings.cursorTargetingSpeedRate;
+				num4 = arrowAimLesserSettings.cursorTargetingSpeedRate;
 			}
-			float d2 = num3 * (arrowAimLesserSettings.cursorStartSpeedRate - 1f) + 1f;
-			vector = vector * arrowAimLesserSettings.cursorSpeed * d2 * d;
-			if ((Object)arrowAimLesserCursorEffect != (Object)null)
+			float num5 = num3 * (arrowAimLesserSettings.cursorStartSpeedRate - 1f) + 1f;
+			val2 = val2 * arrowAimLesserSettings.cursorSpeed * num5 * num4;
+			if (arrowAimLesserCursorEffect != null)
 			{
-				float num4 = 1f;
-				float d3 = num4 + (arrowAimLesserSettings.cursorScale - num4) * (1f - num3);
-				arrowAimLesserCursorEffect.transform.localScale = Vector3.one * d3;
+				float num6 = 1f;
+				float num7 = num6 + (arrowAimLesserSettings.cursorScale - num6) * (1f - num3);
+				arrowAimLesserCursorEffect.get_transform().set_localScale(Vector3.get_one() * num7);
 			}
 		}
-		if ((Object)rigidbody != (Object)null)
+		if (val != null)
 		{
-			Vector3 normalized = this.arrowAimLesserCursorPos.normalized;
-			float num5 = Vector3.Dot(normalized, vector) * Time.deltaTime;
-			if (num5 > 0f)
+			Vector3 arrowAimLesserCursorPos4 = this.arrowAimLesserCursorPos;
+			Vector3 normalized = arrowAimLesserCursorPos4.get_normalized();
+			float num8 = Vector3.Dot(normalized, val2) * Time.get_deltaTime();
+			if (num8 > 0f)
 			{
-				float magnitude2 = this.arrowAimLesserCursorPos.magnitude;
-				float num6 = magnitude2 + num5;
-				if (num6 > arrowAimLesserSettings.cursorMaxDistance)
+				Vector3 arrowAimLesserCursorPos5 = this.arrowAimLesserCursorPos;
+				float magnitude2 = arrowAimLesserCursorPos5.get_magnitude();
+				float num9 = magnitude2 + num8;
+				if (num9 > arrowAimLesserSettings.cursorMaxDistance)
 				{
-					float d4 = num6 - arrowAimLesserSettings.cursorMaxDistance;
-					vector -= normalized * d4 / Time.deltaTime;
+					float num10 = num9 - arrowAimLesserSettings.cursorMaxDistance;
+					val2 -= normalized * num10 / Time.get_deltaTime();
 				}
 			}
-			rigidbody.velocity = vector;
+			val.set_velocity(val2);
 		}
 	}
 
 	protected void UpdateBulletLine()
 	{
-		if (!((Object)bulletLineRenderer == (Object)null) && bulletLineRenderer.enabled)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0207: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0211: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0226: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0239: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0257: Unknown result type (might be due to invalid IL or missing references)
+		if (!(bulletLineRenderer == null) && bulletLineRenderer.get_enabled())
 		{
 			Vector3 bulletAppearPos = GetBulletAppearPos();
 			Vector3 bulletShotVec = GetBulletShotVec(bulletAppearPos);
@@ -1213,8 +1481,8 @@ public class Self : Player
 			{
 				bulletLineRenderer.SetVertexCount(2);
 				bulletLineRenderer.SetPosition(0, bulletAppearPos);
-				Vector3 position = bulletAppearPos + bulletShotVec * 30f;
-				bulletLineRenderer.SetPosition(1, position);
+				Vector3 val = bulletAppearPos + bulletShotVec * 30f;
+				bulletLineRenderer.SetPosition(1, val);
 				CheckMultiLock(bulletAppearPos, bulletShotVec);
 			}
 			else
@@ -1229,18 +1497,18 @@ public class Self : Player
 						attackInfo = attackInfo.GetRateAttackInfo(rate_info, chargingRate);
 					}
 					BulletData bulletData = attackInfo.bulletData;
-					if (!((Object)bulletData == (Object)null))
+					if (!(bulletData == null))
 					{
 						if (bulletData.dataFall == null || (CheckAttackModeAndSpType(ATTACK_MODE.ARROW, SP_ATTACK_TYPE.HEAT) && base.attackID == 1 && chargingRate >= 1f))
 						{
 							bulletLineRenderer.SetVertexCount(2);
 							bulletLineRenderer.SetPosition(0, bulletAppearPos);
-							Vector3 position2 = bulletAppearPos + bulletShotVec * 30f;
-							bulletLineRenderer.SetPosition(1, position2);
+							Vector3 val2 = bulletAppearPos + bulletShotVec * 30f;
+							bulletLineRenderer.SetPosition(1, val2);
 						}
 						else if (bulletData.dataFall != null)
 						{
-							Vector3 a = Physics.gravity * bulletData.dataFall.gravityRate;
+							Vector3 val3 = Physics.get_gravity() * bulletData.dataFall.gravityRate;
 							float gravityStartTime = bulletData.dataFall.gravityStartTime;
 							float speed = bulletData.data.speed;
 							bulletLineRenderer.SetVertexCount(30);
@@ -1250,12 +1518,12 @@ public class Self : Player
 							for (int i = 1; i < 30; i++)
 							{
 								num2 = ((!(num2 <= gravityStartTime)) ? (num2 + num) : (num2 + num * 0.1f));
-								Vector3 vector = bulletAppearPos + bulletShotVec * speed * num2;
+								Vector3 val4 = bulletAppearPos + bulletShotVec * speed * num2;
 								if (num2 >= gravityStartTime)
 								{
-									vector += a * (num2 - gravityStartTime) * (num2 - gravityStartTime) / 2f;
+									val4 += val3 * (num2 - gravityStartTime) * (num2 - gravityStartTime) / 2f;
 								}
-								bulletLineRenderer.SetPosition(i, vector);
+								bulletLineRenderer.SetPosition(i, val4);
 							}
 						}
 					}
@@ -1266,7 +1534,7 @@ public class Self : Player
 
 	public void OnGetRareDrop(REWARD_TYPE type, int item_id)
 	{
-		if ((Object)base.playerSender != (Object)null)
+		if (base.playerSender != null)
 		{
 			base.playerSender.OnGetRareDrop(type, item_id);
 		}
@@ -1320,7 +1588,7 @@ public class Self : Player
 	public override void OnPrayerEnd(int prayer_id)
 	{
 		Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(prayer_id) as Player;
-		if ((Object)player != (Object)null && !player.isDead)
+		if (player != null && !player.isDead)
 		{
 			taskChecker.OnRevival();
 		}
@@ -1329,15 +1597,17 @@ public class Self : Player
 
 	public override void ActGrabbedStart(int enemyId, GrabInfo grabInfo)
 	{
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		base.ActGrabbedStart(enemyId, grabInfo);
 		StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.FindEnemy(enemyId);
-		if (!((Object)stageObject == (Object)null))
+		if (!(stageObject == null))
 		{
 			MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_GRAB, true);
 			InGameCameraManager.GrabInfo grabInfo2 = MonoBehaviourSingleton<InGameCameraManager>.I.grabInfo;
 			grabInfo2.enabled = true;
 			grabInfo2.enemyRoot = stageObject._transform;
-			grabInfo2.dir = grabInfo.toCameraDir.normalized;
+			grabInfo2.dir = grabInfo.toCameraDir.get_normalized();
 			grabInfo2.distance = grabInfo.cameraDistance;
 			MonoBehaviourSingleton<InGameCameraManager>.I.target = stageObject.FindNode(grabInfo.cameraLookAt);
 			MonoBehaviourSingleton<InGameCameraManager>.I.SetCameraMode(InGameCameraManager.CAMERA_MODE.GRABBED);
@@ -1362,42 +1632,53 @@ public class Self : Player
 
 	public void CreateInkSplashEffect(Vector3 flickIconPos)
 	{
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Expected O, but got Unknown
+		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Expected O, but got Unknown
+		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
 		int num = 10;
 		Transform effect = EffectManager.GetEffect("ef_btl_pl_blind_01", MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform);
-		if ((Object)null != (Object)effect)
+		if (null != effect)
 		{
-			effect.localPosition = new Vector3(0f, 0f, 1f);
+			effect.set_localPosition(new Vector3(0f, 0f, 1f));
 			inkSplashCtrl_ = effect.GetComponent<EffectCtrl>();
-			inkSplashEffect_ = effect.gameObject;
+			inkSplashEffect_ = effect.get_gameObject();
 			Renderer[] componentsInChildren = inkSplashEffect_.GetComponentsInChildren<Renderer>();
 			for (int i = 0; i < componentsInChildren.Length; i++)
 			{
-				componentsInChildren[i].sortingOrder = num;
+				componentsInChildren[i].set_sortingOrder(num);
 			}
 		}
 		effect = EffectManager.GetEffect("ef_btl_target_flick", MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform);
-		if ((Object)null != (Object)effect)
+		if (null != effect)
 		{
-			effect.localPosition = flickIconPos;
-			effect.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-			effectFlickWarning_ = effect.gameObject;
+			effect.set_localPosition(flickIconPos);
+			effect.set_localScale(new Vector3(0.2f, 0.2f, 0.2f));
+			effectFlickWarning_ = effect.get_gameObject();
 			Renderer[] componentsInChildren2 = effectFlickWarning_.GetComponentsInChildren<Renderer>();
 			for (int j = 0; j < componentsInChildren2.Length; j++)
 			{
-				if (num >= componentsInChildren2[j].sortingOrder)
+				if (num >= componentsInChildren2[j].get_sortingOrder())
 				{
-					componentsInChildren2[j].sortingOrder = num + 1;
+					componentsInChildren2[j].set_sortingOrder(num + 1);
 				}
 			}
 			if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid() && !MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
 			{
-				effect.localPosition += INKSPLASH_LANDSCAPE_OFFSET;
+				effect.set_localPosition(effect.get_localPosition() + INKSPLASH_LANDSCAPE_OFFSET);
 			}
 		}
 	}
 
 	public void InkSplashStart(InkSplashInfo info)
 	{
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsInkSplash())
 		{
 			inkSplashTimerMax_ = info.duration;
@@ -1412,12 +1693,12 @@ public class Self : Player
 	{
 		if (IsInkSplash())
 		{
-			if ((Object)null != (Object)inkSplashEffect_)
+			if (null != inkSplashEffect_)
 			{
 				EffectManager.ReleaseEffect(inkSplashEffect_, true, false);
 				inkSplashEffect_ = null;
 			}
-			if ((Object)null != (Object)effectFlickWarning_)
+			if (null != effectFlickWarning_)
 			{
 				EffectManager.ReleaseEffect(effectFlickWarning_, true, false);
 				effectFlickWarning_ = null;
@@ -1427,8 +1708,8 @@ public class Self : Player
 
 	public void UpdateInkSplash()
 	{
-		inkSplashTimer_ -= Time.deltaTime;
-		if (!((Object)null == (Object)inkSplashCtrl_))
+		inkSplashTimer_ -= Time.get_deltaTime();
+		if (!(null == inkSplashCtrl_))
 		{
 			if (inkSplashState_ == 0)
 			{
@@ -1458,46 +1739,56 @@ public class Self : Player
 
 	public void ReduceInkSplashTime()
 	{
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		inkSplashTimer_ -= reduceTimeByFlick_;
 		buffParam.ReduceInkSplashTime(reduceTimeByFlick_);
 		Transform effect = EffectManager.GetEffect("ef_btl_pl_blind_02", MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform);
-		if ((Object)null != (Object)effect)
+		if (null != effect)
 		{
-			effect.localPosition = new Vector3(0f, 0f, 1f);
+			effect.set_localPosition(new Vector3(0f, 0f, 1f));
 		}
 	}
 
 	public override bool IsInkSplash()
 	{
-		return (Object)null != (Object)inkSplashEffect_;
+		return null != inkSplashEffect_;
 	}
 
 	private void RotateInkSplash(bool is_portrait)
 	{
-		Transform transform = effectFlickWarning_.transform;
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Expected O, but got Unknown
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		Transform val = effectFlickWarning_.get_transform();
 		if (is_portrait)
 		{
-			transform.localPosition -= INKSPLASH_LANDSCAPE_OFFSET;
+			val.set_localPosition(val.get_localPosition() - INKSPLASH_LANDSCAPE_OFFSET);
 		}
 		else
 		{
-			transform.localPosition += INKSPLASH_LANDSCAPE_OFFSET;
+			val.set_localPosition(val.get_localPosition() + INKSPLASH_LANDSCAPE_OFFSET);
 		}
 	}
 
 	private void CreateBlindEffect(float sec)
 	{
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 		_blindTimer = sec;
-		if (!((Object)_blindEffect != (Object)null))
+		if (!(_blindEffect != null))
 		{
 			_blindEffect = EffectManager.GetEffect("ef_btl_pl_darkness_02", MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform);
-			if (!((Object)_blindEffect == (Object)null))
+			if (!(_blindEffect == null))
 			{
-				_blindEffect.localPosition = new Vector3(0f, 0f, 1f);
+				_blindEffect.set_localPosition(new Vector3(0f, 0f, 1f));
 				Renderer[] componentsInChildren = _blindEffect.GetComponentsInChildren<Renderer>();
 				for (int i = 0; i < componentsInChildren.Length; i++)
 				{
-					componentsInChildren[i].sortingOrder = 10;
+					componentsInChildren[i].set_sortingOrder(10);
 				}
 			}
 		}
@@ -1505,18 +1796,20 @@ public class Self : Player
 
 	public void DestroyBlindEffect()
 	{
-		if ((Object)_blindEffect != (Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001e: Expected O, but got Unknown
+		if (_blindEffect != null)
 		{
-			EffectManager.ReleaseEffect(_blindEffect.gameObject, true, false);
+			EffectManager.ReleaseEffect(_blindEffect.get_gameObject(), true, false);
 			_blindEffect = null;
 		}
 	}
 
 	public void UpdateBlind()
 	{
-		if (!((Object)_blindEffect == (Object)null))
+		if (!(_blindEffect == null))
 		{
-			_blindTimer -= Time.deltaTime;
+			_blindTimer -= Time.get_deltaTime();
 			if (_blindTimer <= 0f)
 			{
 				DestroyBlindEffect();
@@ -1570,6 +1863,8 @@ public class Self : Player
 
 	public override void CancelCannonMode()
 	{
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0065: Expected O, but got Unknown
 		if (IsOnCannonMode())
 		{
 			if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
@@ -1580,27 +1875,44 @@ public class Self : Player
 			{
 				base.targetFieldGimmickCannon.OnLeave();
 			}
-			if ((Object)effectTapTrans != (Object)null)
+			if (effectTapTrans != null)
 			{
-				EffectManager.ReleaseEffect(effectTapTrans.gameObject, true, false);
+				EffectManager.ReleaseEffect(effectTapTrans.get_gameObject(), true, false);
 				effectTapTrans = null;
 			}
 			SetCannonState(CANNON_STATE.NONE);
 			base.targetFieldGimmickCannon = null;
-			base._rigidbody.isKinematic = false;
+			base._rigidbody.set_isKinematic(false);
 		}
 	}
 
 	public override void SetCannonAimMode()
 	{
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (Object)MonoBehaviourSingleton<StageObjectManager>.I.boss != (Object)null)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
 		{
 			LookAt(MonoBehaviourSingleton<StageObjectManager>.I.boss._position, true);
 		}
 		if (base.targetFieldGimmickCannon != null)
 		{
 			FieldGimmickCannonField fieldGimmickCannonField = base.targetFieldGimmickCannon as FieldGimmickCannonField;
-			if ((Object)fieldGimmickCannonField != (Object)null)
+			if (fieldGimmickCannonField != null)
 			{
 				cannonAimForward = fieldGimmickCannonField.GetBaseTransformForward();
 			}
@@ -1609,16 +1921,18 @@ public class Self : Player
 				cannonAimForward = _forward;
 			}
 			Transform cannonTransform = base.targetFieldGimmickCannon.GetCannonTransform();
-			if ((Object)cannonTransform != (Object)null)
+			if (cannonTransform != null)
 			{
-				Vector3 eulerAngles = cannonTransform.localRotation.eulerAngles;
+				Quaternion localRotation = cannonTransform.get_localRotation();
+				Vector3 eulerAngles = localRotation.get_eulerAngles();
 				float x = eulerAngles.x;
 				cannonAimEuler = new Vector3(baseEulerX = GetNegativeEuler(x), 0f, 0f);
 			}
-			Vector3 eulerAngles2 = base._transform.rotation.eulerAngles;
+			Quaternion rotation = base._transform.get_rotation();
+			Vector3 eulerAngles2 = rotation.get_eulerAngles();
 			float y = eulerAngles2.y;
 			y = GetNegativeEuler(y);
-			baseInputVec = Vector2.zero;
+			baseInputVec = Vector2.get_zero();
 			isBaseInputVec = false;
 			dragRateX = MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.cannonDragRateX;
 			if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && base.targetFieldGimmickCannon.IsAimCamera())
@@ -1636,10 +1950,20 @@ public class Self : Player
 
 	public override void SetCannonBeamMode()
 	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		if (base.targetFieldGimmickCannon != null)
 		{
-			Vector3 normalized = base.targetFieldGimmickCannon.GetPosition().normalized;
-			_rotation = Quaternion.LookRotation(normalized, Vector3.up);
+			Vector3 position = base.targetFieldGimmickCannon.GetPosition();
+			Vector3 normalized = position.get_normalized();
+			_rotation = Quaternion.LookRotation(normalized, Vector3.get_up());
 			cannonAimForward = _forward;
 			if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 			{
@@ -1652,14 +1976,26 @@ public class Self : Player
 	private void CreateCannonTapEffect()
 	{
 		Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-		if (!((Object)cameraTransform == (Object)null))
+		if (!(cameraTransform == null))
 		{
-			Transform transform = effectTapTrans = EffectManager.GetEffect("ef_btl_cannon_tap", cameraTransform);
+			Transform val = effectTapTrans = EffectManager.GetEffect("ef_btl_cannon_tap", cameraTransform);
 		}
 	}
 
 	public override void UpdateCannonAimMode(Vector2 input_vec, Vector2 input_pos)
 	{
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
 		if (!isBaseInputVec)
 		{
 			baseInputVec = input_vec;
@@ -1690,31 +2026,34 @@ public class Self : Player
 			isPlayingRotateSE = false;
 		}
 		cannonAimForward = Quaternion.Euler(new Vector3(0f, num, 0f)) * cannonAimForward;
-		float f = input_vec.y - baseInputVec.y;
-		float num2 = 15f * (0f - Mathf.Sign(f)) * Mathf.Abs(f);
-		num2 += baseEulerX;
-		if (num2 < -30f)
+		float num2 = input_vec.y - baseInputVec.y;
+		float num3 = 15f * (0f - Mathf.Sign(num2)) * Mathf.Abs(num2);
+		num3 += baseEulerX;
+		if (num3 < -30f)
 		{
-			num2 = -30f;
+			num3 = -30f;
 		}
-		if (num2 > 10f)
+		if (num3 > 10f)
 		{
-			num2 = 10f;
+			num3 = 10f;
 		}
-		cannonAimEuler = new Vector3(num2, 0f, 0f);
+		cannonAimEuler = new Vector3(num3, 0f, 0f);
 		_rotation = Quaternion.LookRotation(cannonAimForward);
-		base._transform.rotation = _rotation;
+		base._transform.set_rotation(_rotation);
 	}
 
 	public Vector3 GetCannonShotEuler()
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		return cannonAimEuler;
 	}
 
 	public void ResetCannonShotAimEuler()
 	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		baseEulerX = cannonAimEuler.x;
-		baseInputVec = Vector2.zero;
+		baseInputVec = Vector2.get_zero();
 		isBaseInputVec = false;
 		if (MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
@@ -1869,6 +2208,7 @@ public class Self : Player
 
 	protected override void _JumpRize()
 	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		UseSpGauge();
 		OnJumpRize(arrowAimLesserCursorPos, useGaugeLevel);
 		if (!base.isArrowAimKeep && base.isArrowAimLesserMode)
@@ -1969,8 +2309,12 @@ public class Self : Player
 
 	protected override bool GetTargetPos(out Vector3 pos)
 	{
-		pos = Vector3.zero;
-		if (CheckAttackModeAndSpType(ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.SOUL) && (Object)base.targetPointWithSpWeak != (Object)null)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		pos = Vector3.get_zero();
+		if (CheckAttackModeAndSpType(ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.SOUL) && base.targetPointWithSpWeak != null)
 		{
 			pos = base.targetPointWithSpWeak.param.markerPos;
 			return true;
@@ -2005,14 +2349,21 @@ public class Self : Player
 
 	private void CheckMultiLock(Vector3 start, Vector3 dir)
 	{
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
 		{
 			int multiLockMax = GetMultiLockMax();
 			int multiLockNum = MonoBehaviourSingleton<TargetMarkerManager>.I.GetMultiLockNum();
-			if (multiLockNum < multiLockMax && Physics.Raycast(start, dir, out RaycastHit hitInfo, base.playerParameter.arrowActionInfo.soulRaycastDistance, 16))
+			RaycastHit val = default(RaycastHit);
+			if (multiLockNum < multiLockMax && Physics.Raycast(start, dir, ref val, base.playerParameter.arrowActionInfo.soulRaycastDistance, 16))
 			{
-				MultiLockMarker component = hitInfo.transform.GetComponent<MultiLockMarker>();
-				if (!((Object)component == (Object)null) && component.Lock(multiLockNum, base.isBoostMode))
+				MultiLockMarker component = val.get_transform().GetComponent<MultiLockMarker>();
+				if (!(component == null) && component.Lock(multiLockNum, base.isBoostMode))
 				{
 					multiLockNum++;
 					SoundManager.PlayOneShotSE(base.playerParameter.arrowActionInfo.soulLockSeId, this, FindNode(string.Empty));
@@ -2020,7 +2371,7 @@ public class Self : Player
 					if (multiLockNum >= multiLockMax || multiLockNum >= targetMarkerNum)
 					{
 						MonoBehaviourSingleton<TargetMarkerManager>.I.HideMultiLock();
-						EffectManager.OneShot("ef_btl_wsk_charge_end_01", FindNode("R_Wep").transform.position, Quaternion.identity, false);
+						EffectManager.OneShot("ef_btl_wsk_charge_end_01", FindNode("R_Wep").get_transform().get_position(), Quaternion.get_identity(), false);
 						SoundManager.PlayOneShotSE(base.playerParameter.arrowActionInfo.soulLockMaxSeId, this, FindNode(string.Empty));
 						SetBulletLineColor(true);
 					}
@@ -2031,7 +2382,10 @@ public class Self : Player
 
 	public void CheckMultiLock(MultiLockMarker m)
 	{
-		if (!((Object)m == (Object)null) && MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+		if (!(m == null) && MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
 		{
 			int multiLockMax = GetMultiLockMax();
 			int multiLockNum = MonoBehaviourSingleton<TargetMarkerManager>.I.GetMultiLockNum();
@@ -2043,7 +2397,7 @@ public class Self : Player
 				if (multiLockNum >= multiLockMax || multiLockNum >= targetMarkerNum)
 				{
 					MonoBehaviourSingleton<TargetMarkerManager>.I.HideMultiLock();
-					EffectManager.OneShot("ef_btl_wsk_charge_end_01", FindNode("R_Wep").transform.position, Quaternion.identity, false);
+					EffectManager.OneShot("ef_btl_wsk_charge_end_01", FindNode("R_Wep").get_transform().get_position(), Quaternion.get_identity(), false);
 					SoundManager.PlayOneShotSE(base.playerParameter.arrowActionInfo.soulLockMaxSeId, this, FindNode(string.Empty));
 					SetBulletLineColor(true);
 				}
@@ -2053,8 +2407,15 @@ public class Self : Player
 
 	public void SetBulletLineColor(bool isMax)
 	{
-		Color color = (!isMax) ? ((base.spAttackType != SP_ATTACK_TYPE.SOUL) ? base.playerParameter.arrowActionInfo.bulletLineColor : base.playerParameter.arrowActionInfo.bulletLineColorSoul) : base.playerParameter.arrowActionInfo.bulletLineColorSoulFull;
-		bulletLineRenderer.SetColors(color, color);
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		Color val = (!isMax) ? ((base.spAttackType != SP_ATTACK_TYPE.SOUL) ? base.playerParameter.arrowActionInfo.bulletLineColor : base.playerParameter.arrowActionInfo.bulletLineColorSoul) : base.playerParameter.arrowActionInfo.bulletLineColorSoulFull;
+		bulletLineRenderer.SetColors(val, val);
 	}
 
 	public void CheckWaveMatchAutoRevive()
@@ -2074,20 +2435,23 @@ public class Self : Player
 
 	public void SetSpearCursorPos(Vector3 vec)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		arrowAimLesserCursorPos = vec;
 	}
 
 	public void SwitchAutoBattle(bool isTurnOn)
 	{
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 		if (isTurnOn && !isAutoMode)
 		{
 			Object.DestroyImmediate(base.controller);
-			base.controller = base.gameObject.AddComponent<AutoSelfController>();
+			base.controller = this.get_gameObject().AddComponent<AutoSelfController>();
 		}
 		else if (!isTurnOn && isAutoMode)
 		{
 			Object.DestroyImmediate(base.controller);
-			base.controller = base.gameObject.AddComponent<SelfController>();
+			base.controller = this.get_gameObject().AddComponent<SelfController>();
 		}
 	}
 }

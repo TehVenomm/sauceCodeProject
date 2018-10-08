@@ -66,12 +66,12 @@ namespace BestHTTP.Caching
 		{
 			if (string.IsNullOrEmpty(CacheFolder))
 			{
-				CacheFolder = Path.Combine(Application.persistentDataPath, "HTTPCache");
+				CacheFolder = Path.Combine(Application.get_persistentDataPath(), "HTTPCache");
 				if (!Directory.Exists(CacheFolder))
 				{
 					Directory.CreateDirectory(CacheFolder);
 				}
-				LibraryPath = Path.Combine(Application.persistentDataPath, "Library");
+				LibraryPath = Path.Combine(Application.get_persistentDataPath(), "Library");
 			}
 		}
 

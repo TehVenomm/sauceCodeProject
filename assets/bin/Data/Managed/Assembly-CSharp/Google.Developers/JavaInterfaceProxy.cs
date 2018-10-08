@@ -1,11 +1,9 @@
-using UnityEngine;
-
 namespace Google.Developers
 {
-	public abstract class JavaInterfaceProxy : AndroidJavaProxy
+	public abstract class JavaInterfaceProxy
 	{
 		public JavaInterfaceProxy(string interfaceName)
-			: base(interfaceName)
+			: this(interfaceName)
 		{
 		}
 	}

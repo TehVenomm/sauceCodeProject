@@ -57,28 +57,18 @@ public class HomePointShop : GameSection
 
 	public override void Initialize()
 	{
-		StartCoroutine(DoInitialize());
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoInitialize());
 	}
 
-	public IEnumerator DoInitialize()
+	public unsafe IEnumerator DoInitialize()
 	{
 		currentType = VIEW_TYPE.NORMAL;
 		currentPage = 1;
 		bool hasList = false;
 		LoadingQueue loadingQueue = new LoadingQueue(this);
 		loadingQueue.Load(RESOURCE_CATEGORY.UI, "PointShopListItem", false);
-		MonoBehaviourSingleton<UserInfoManager>.I.PointShopManager.SendGetPointShops(delegate(bool isSuccess, List<PointShop> resultList)
-		{
-			if (isSuccess)
-			{
-				((_003CDoInitialize_003Ec__IteratorA4)/*Error near IL_0073: stateMachine*/)._003C_003Ef__this.pointShop = resultList;
-				foreach (PointShop item in ((_003CDoInitialize_003Ec__IteratorA4)/*Error near IL_0073: stateMachine*/)._003C_003Ef__this.pointShop)
-				{
-					((_003CDoInitialize_003Ec__IteratorA4)/*Error near IL_0073: stateMachine*/)._003CloadingQueue_003E__1.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName(item.pointShopId), false);
-				}
-				((_003CDoInitialize_003Ec__IteratorA4)/*Error near IL_0073: stateMachine*/)._003ChasList_003E__0 = true;
-			}
-		});
+		MonoBehaviourSingleton<UserInfoManager>.I.PointShopManager.SendGetPointShops(new Action<bool, List<PointShop>>((object)/*Error near IL_0073: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		while (!hasList)
 		{
 			yield return (object)null;
@@ -98,6 +88,8 @@ public class HomePointShop : GameSection
 
 	protected void UpdateNPC()
 	{
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 		string empty = string.Empty;
 		NPCMessageTable.Section section = Singleton<NPCMessageTable>.I.GetSection(base.sectionData.sectionName + "_TEXT");
 		if (section != null)
@@ -106,11 +98,11 @@ public class HomePointShop : GameSection
 			if (message != null)
 			{
 				empty = message.message;
-				SetRenderNPCModel(UI.TEX_NPCMODEL, message.npc, message.pos, message.rot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.questCenterNPCFOV, delegate(NPCLoader loader)
+				SetRenderNPCModel((Enum)UI.TEX_NPCMODEL, message.npc, message.pos, message.rot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.questCenterNPCFOV, (Action<NPCLoader>)delegate(NPCLoader loader)
 				{
 					loader.GetAnimator().Play(message.animationStateName);
 				});
-				SetLabelText(UI.LBL_NPC_MESSAGE, empty);
+				SetLabelText((Enum)UI.LBL_NPC_MESSAGE, empty);
 			}
 		}
 	}
@@ -128,20 +120,25 @@ public class HomePointShop : GameSection
 		}
 	}
 
-	private void ViewNormalTab()
+	private unsafe void ViewNormalTab()
 	{
-		SetActive(UI.OBJ_NORMAL, true);
-		SetActive(UI.OBJ_TAB_ROOT, true);
-		SetActive(UI.OBJ_ON_TAB_NORMAL, true);
-		SetActive(UI.OBJ_ON_TAB_EVENT, false);
-		SetActive(UI.OBJ_EVENT_LIST, false);
-		PointShop shop = pointShop.First((PointShop x) => !x.isEvent);
+		SetActive((Enum)UI.OBJ_NORMAL, true);
+		SetActive((Enum)UI.OBJ_TAB_ROOT, true);
+		SetActive((Enum)UI.OBJ_ON_TAB_NORMAL, true);
+		SetActive((Enum)UI.OBJ_ON_TAB_EVENT, false);
+		SetActive((Enum)UI.OBJ_EVENT_LIST, false);
+		List<PointShop> source = pointShop;
+		if (_003C_003Ef__am_0024cache7 == null)
+		{
+			_003C_003Ef__am_0024cache7 = new Func<PointShop, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		PointShop shop = source.First(_003C_003Ef__am_0024cache7);
 		currentPointShopItem = GetBuyableItemList();
 		if (filter != null)
 		{
 			filter.DoFiltering(ref currentPointShopItem);
 		}
-		SetLabelText(UI.LBL_NORMAL_POINT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), shop.userPoint));
+		SetLabelText((Enum)UI.LBL_NORMAL_POINT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), shop.userPoint));
 		UITexture component = GetCtrl(UI.TEX_NORMAL_POINT_ICON).GetComponent<UITexture>();
 		ResourceLoad.LoadPointIconImageTexture(component, (uint)shop.pointShopId);
 		maxPage = currentPointShopItem.Count / GameDefine.POINT_SHOP_LIST_COUNT;
@@ -149,66 +146,36 @@ public class HomePointShop : GameSection
 		{
 			maxPage++;
 		}
-		SetLabelText(UI.LBL_ARROW_NOW, (maxPage <= 0) ? "0" : currentPage.ToString());
-		SetLabelText(UI.LBL_ARROW_MAX, maxPage.ToString());
+		SetLabelText((Enum)UI.LBL_ARROW_NOW, (maxPage <= 0) ? "0" : currentPage.ToString());
+		SetLabelText((Enum)UI.LBL_ARROW_MAX, maxPage.ToString());
 		int item_num = Mathf.Min(GameDefine.POINT_SHOP_LIST_COUNT, currentPointShopItem.Count - (currentPage - 1) * GameDefine.POINT_SHOP_LIST_COUNT);
-		SetGrid(UI.GRD_NORMAL, "PointShopListItem", item_num, true, delegate(int i, Transform t, bool b)
+		_003CViewNormalTab_003Ec__AnonStorey381 _003CViewNormalTab_003Ec__AnonStorey;
+		SetGrid(UI.GRD_NORMAL, "PointShopListItem", item_num, true, new Action<int, Transform, bool>((object)_003CViewNormalTab_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		List<PointShop> source2 = pointShop;
+		if (_003C_003Ef__am_0024cache8 == null)
 		{
-			int index = i + (currentPage - 1) * GameDefine.POINT_SHOP_LIST_COUNT;
-			PointShopItem pointShopItem = currentPointShopItem[index];
-			object event_data = new object[3]
-			{
-				pointShopItem,
-				shop,
-				new Action<PointShopItem, int>(OnBuy)
-			};
-			SetEvent(t, "CONFIRM_BUY", event_data);
-			PointShopItemList component2 = t.GetComponent<PointShopItemList>();
-			component2.SetUp(pointShopItem, (uint)shop.pointShopId, pointShopItem.needPoint <= shop.userPoint);
-			int num = -1;
-			REWARD_TYPE type = (REWARD_TYPE)pointShopItem.type;
-			if (type == REWARD_TYPE.ITEM)
-			{
-				num = MonoBehaviourSingleton<InventoryManager>.I.GetHaveingItemNum((uint)pointShopItem.itemId);
-			}
-			SetLabelText(t, UI.LBL_HAVE, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 6u), num.ToString()));
-			SetActive(t, UI.LBL_HAVE, num >= 0);
-		});
-		bool flag = pointShop.Any((PointShop x) => x.isEvent);
-		SetActive(UI.OBJ_EVENT_NON_ACTIVE, !flag);
-		SetActive(UI.BTN_EVENT, flag);
+			_003C_003Ef__am_0024cache8 = new Func<PointShop, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		bool flag = source2.Any(_003C_003Ef__am_0024cache8);
+		SetActive((Enum)UI.OBJ_EVENT_NON_ACTIVE, !flag);
+		SetActive((Enum)UI.BTN_EVENT, flag);
 	}
 
-	private void ViewEventTab()
+	private unsafe void ViewEventTab()
 	{
-		SetActive(UI.OBJ_NORMAL, false);
-		SetActive(UI.OBJ_TAB_ROOT, true);
-		SetActive(UI.OBJ_ON_TAB_NORMAL, false);
-		SetActive(UI.OBJ_ON_TAB_EVENT, true);
-		SetActive(UI.OBJ_EVENT_LIST, true);
-		List<PointShop> current = (from x in pointShop
-		where x.isEvent
-		select x).ToList();
-		SetGrid(UI.GRD_EVENT_LIST, "PointShopEventList", current.Count, true, delegate(int i, Transform t, bool b)
+		SetActive((Enum)UI.OBJ_NORMAL, false);
+		SetActive((Enum)UI.OBJ_TAB_ROOT, true);
+		SetActive((Enum)UI.OBJ_ON_TAB_NORMAL, false);
+		SetActive((Enum)UI.OBJ_ON_TAB_EVENT, true);
+		SetActive((Enum)UI.OBJ_EVENT_LIST, true);
+		List<PointShop> source = pointShop;
+		if (_003C_003Ef__am_0024cache9 == null)
 		{
-			PointShop pointShop = current[i];
-			UITexture component = FindCtrl(t, UI.TEX_EVENT_LIST_BANNER).GetComponent<UITexture>();
-			UITexture component2 = FindCtrl(t, UI.TXT_EVENT_LIST_POINT_ICON).GetComponent<UITexture>();
-			SetLabelText(t, UI.LBL_EVENT_LIST_POINT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShop.userPoint));
-			ResourceLoad.LoadPointIconImageTexture(component2, (uint)pointShop.pointShopId);
-			ResourceLoad.LoadPointShopBannerTexture(component, (uint)pointShop.pointShopId);
-			SetEvent(FindCtrl(t, UI.TEX_EVENT_LIST_BANNER), "EVENT_SHOP", pointShop);
-			int num = (from x in pointShop.items
-			where x.isBuyable
-			where x.type != 8 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedStamp(x.itemId)
-			where x.type != 9 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedDegree(x.itemId)
-			where x.type != 7 || !MonoBehaviourSingleton<GlobalSettingsManager>.I.IsUnlockedAvatar(x.itemId)
-			select x).Count();
-			bool flag = num == 0;
-			SetActive(t, UI.LBL_EVENT_LIST_SOLD_OUT, flag);
-			SetButtonEnabled(t, UI.TEX_EVENT_LIST_BANNER, !flag);
-			SetLabelText(t, UI.LBL_EVENT_LIST_REMAINING_TIME, pointShop.expire);
-		});
+			_003C_003Ef__am_0024cache9 = new Func<PointShop, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		List<PointShop> current = source.Where(_003C_003Ef__am_0024cache9).ToList();
+		_003CViewEventTab_003Ec__AnonStorey382 _003CViewEventTab_003Ec__AnonStorey;
+		SetGrid(UI.GRD_EVENT_LIST, "PointShopEventList", current.Count, true, new Action<int, Transform, bool>((object)_003CViewEventTab_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnQuery_CONFIRM_BUY()
@@ -239,12 +206,13 @@ public class HomePointShop : GameSection
 		GameSection.SetEventData(WebViewManager.PointShop);
 	}
 
-	private void OnBuy(PointShopItem item, int num)
+	private unsafe void OnBuy(PointShopItem item, int num)
 	{
 		string boughtMessage = PointShopManager.GetBoughtMessage(item, num);
 		GameSection.SetEventData(boughtMessage);
 		GameSection.StayEvent();
-		PointShop pointShop = this.pointShop.First((PointShop x) => x.items.Contains(item));
+		_003COnBuy_003Ec__AnonStorey383 _003COnBuy_003Ec__AnonStorey;
+		PointShop pointShop = this.pointShop.First(new Func<PointShop, bool>((object)_003COnBuy_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		MonoBehaviourSingleton<UserInfoManager>.I.PointShopManager.SendPointShopBuy(item, pointShop, num, delegate(bool isSuccess)
 		{
 			if (isSuccess)
@@ -296,15 +264,38 @@ public class HomePointShop : GameSection
 		}
 	}
 
-	private List<PointShopItem> GetBuyableItemList()
+	private unsafe List<PointShopItem> GetBuyableItemList()
 	{
-		return (from x in (from x in pointShop
-		where !x.isEvent
-		select x).SelectMany((PointShop x) => x.items)
-		where x.isBuyable
-		where x.type != 8 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedStamp(x.itemId)
-		where x.type != 9 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedDegree(x.itemId)
-		where x.type != 7 || !MonoBehaviourSingleton<GlobalSettingsManager>.I.IsUnlockedAvatar(x.itemId)
-		select x).ToList();
+		List<PointShop> source = pointShop;
+		if (_003C_003Ef__am_0024cacheA == null)
+		{
+			_003C_003Ef__am_0024cacheA = new Func<PointShop, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		IEnumerable<PointShop> source2 = source.Where(_003C_003Ef__am_0024cacheA);
+		if (_003C_003Ef__am_0024cacheB == null)
+		{
+			_003C_003Ef__am_0024cacheB = new Func<PointShop, IEnumerable<PointShopItem>>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		IEnumerable<PointShopItem> source3 = source2.SelectMany<PointShop, PointShopItem>(_003C_003Ef__am_0024cacheB);
+		if (_003C_003Ef__am_0024cacheC == null)
+		{
+			_003C_003Ef__am_0024cacheC = new Func<PointShopItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		IEnumerable<PointShopItem> source4 = source3.Where(_003C_003Ef__am_0024cacheC);
+		if (_003C_003Ef__am_0024cacheD == null)
+		{
+			_003C_003Ef__am_0024cacheD = new Func<PointShopItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		IEnumerable<PointShopItem> source5 = source4.Where(_003C_003Ef__am_0024cacheD);
+		if (_003C_003Ef__am_0024cacheE == null)
+		{
+			_003C_003Ef__am_0024cacheE = new Func<PointShopItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		IEnumerable<PointShopItem> source6 = source5.Where(_003C_003Ef__am_0024cacheE);
+		if (_003C_003Ef__am_0024cacheF == null)
+		{
+			_003C_003Ef__am_0024cacheF = new Func<PointShopItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		return source6.Where(_003C_003Ef__am_0024cacheF).ToList();
 	}
 }

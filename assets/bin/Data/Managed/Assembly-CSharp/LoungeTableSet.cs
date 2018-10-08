@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LoungeTableSet : MonoBehaviour
+public class LoungeTableSet
 {
 	public bool isInitialized
 	{
@@ -22,14 +22,25 @@ public class LoungeTableSet : MonoBehaviour
 		private set;
 	}
 
+	public LoungeTableSet()
+		: this()
+	{
+	}
+
 	public ChairPoint GetNearSitPoint(HomePlayerCharacterBase character)
 	{
+		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 		float num = 3.40282347E+38f;
 		ChairPoint result = null;
-		Vector3 position = character.transform.position;
+		Vector3 position = character.get_transform().get_position();
 		for (int i = 0; i < chairSitPoints.Count; i++)
 		{
-			float num2 = Vector3.Distance(position, chairSitPoints[i].transform.position);
+			float num2 = Vector3.Distance(position, chairSitPoints[i].get_transform().get_position());
 			if (num > num2)
 			{
 				result = chairSitPoints[i];
@@ -41,12 +52,18 @@ public class LoungeTableSet : MonoBehaviour
 
 	public TablePoint GetNearTablePoint()
 	{
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		float num = 3.40282347E+38f;
 		TablePoint result = null;
-		Vector3 position = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara.transform.position;
+		Vector3 position = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara.get_transform().get_position();
 		for (int i = 0; i < tablePoints.Count; i++)
 		{
-			float num2 = Vector3.Distance(position, tablePoints[i].transform.position);
+			float num2 = Vector3.Distance(position, tablePoints[i].get_transform().get_position());
 			if (num > num2)
 			{
 				result = tablePoints[i];
@@ -58,8 +75,8 @@ public class LoungeTableSet : MonoBehaviour
 
 	private IEnumerator Start()
 	{
-		yield return (object)StartCoroutine(CreateTable());
-		yield return (object)StartCoroutine(CreateChair());
+		yield return (object)this.StartCoroutine(CreateTable());
+		yield return (object)this.StartCoroutine(CreateChair());
 		isInitialized = true;
 	}
 
@@ -74,13 +91,13 @@ public class LoungeTableSet : MonoBehaviour
 		{
 			yield return (object)loadQueue.Wait();
 		}
-		Transform tablePoint = ResourceUtility.Realizes(loadTablePoints.loadedObject, base.transform, -1);
+		Transform tablePoint = ResourceUtility.Realizes(loadTablePoints.loadedObject, this.get_transform(), -1);
 		tablePoints = new List<TablePoint>(2);
 		Utility.ForEach(tablePoint, delegate(Transform o)
 		{
-			if ((Object)o.GetComponent<TablePoint>() != (Object)null)
+			if (o.GetComponent<TablePoint>() != null)
 			{
-				((_003CCreateTable_003Ec__IteratorF8)/*Error near IL_00bf: stateMachine*/)._003C_003Ef__this.tablePoints.Add(o.GetComponent<TablePoint>());
+				((_003CCreateTable_003Ec__IteratorFF)/*Error near IL_00bf: stateMachine*/)._003C_003Ef__this.tablePoints.Add(o.GetComponent<TablePoint>());
 			}
 			return false;
 		});
@@ -97,13 +114,13 @@ public class LoungeTableSet : MonoBehaviour
 		{
 			yield return (object)loadQueue.Wait();
 		}
-		Transform chairPoint = ResourceUtility.Realizes(loadChairPoints.loadedObject, base.transform, -1);
+		Transform chairPoint = ResourceUtility.Realizes(loadChairPoints.loadedObject, this.get_transform(), -1);
 		chairSitPoints = new List<ChairPoint>(8);
 		Utility.ForEach(chairPoint, delegate(Transform o)
 		{
-			if (o.name.StartsWith("SIT"))
+			if (o.get_name().StartsWith("SIT"))
 			{
-				((_003CCreateChair_003Ec__IteratorF9)/*Error near IL_00bf: stateMachine*/)._003C_003Ef__this.chairSitPoints.Add(o.GetComponent<ChairPoint>());
+				((_003CCreateChair_003Ec__Iterator100)/*Error near IL_00bf: stateMachine*/)._003C_003Ef__this.chairSitPoints.Add(o.GetComponent<ChairPoint>());
 			}
 			return false;
 		});

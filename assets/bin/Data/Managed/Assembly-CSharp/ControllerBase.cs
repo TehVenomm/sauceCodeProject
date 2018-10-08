@@ -1,7 +1,6 @@
 using System;
-using UnityEngine;
 
-public abstract class ControllerBase : MonoBehaviour
+public abstract class ControllerBase
 {
 	[Flags]
 	public enum DISABLE_FLAG
@@ -29,6 +28,7 @@ public abstract class ControllerBase : MonoBehaviour
 	}
 
 	public ControllerBase()
+		: this()
 	{
 		disableFlag = DISABLE_FLAG.NONE;
 	}
@@ -40,13 +40,13 @@ public abstract class ControllerBase : MonoBehaviour
 
 	protected virtual void Awake()
 	{
-		character = GetComponentInParent<Character>();
-		if ((UnityEngine.Object)character != (UnityEngine.Object)null)
+		character = this.GetComponentInParent<Character>();
+		if (character != null)
 		{
 			character.controller = this;
 			if (character.isLoading)
 			{
-				base.enabled = false;
+				this.set_enabled(false);
 			}
 		}
 	}
@@ -61,10 +61,12 @@ public abstract class ControllerBase : MonoBehaviour
 
 	protected virtual T AttachBrain<T>() where T : Brain
 	{
-		brain = base.gameObject.GetComponent<T>();
-		if ((UnityEngine.Object)brain == (UnityEngine.Object)null)
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		brain = this.get_gameObject().GetComponent<T>();
+		if (brain == null)
 		{
-			brain = base.gameObject.AddComponent<T>();
+			brain = this.get_gameObject().AddComponent<T>();
 		}
 		return brain as T;
 	}
@@ -101,9 +103,9 @@ public abstract class ControllerBase : MonoBehaviour
 
 	protected virtual void OnEnable()
 	{
-		if ((UnityEngine.Object)brain != (UnityEngine.Object)null)
+		if (brain != null)
 		{
-			brain.enabled = true;
+			brain.set_enabled(true);
 		}
 		if (IsEnableControll())
 		{
@@ -113,9 +115,9 @@ public abstract class ControllerBase : MonoBehaviour
 
 	protected virtual void OnDisable()
 	{
-		if ((UnityEngine.Object)brain != (UnityEngine.Object)null)
+		if (brain != null)
 		{
-			brain.enabled = false;
+			brain.set_enabled(false);
 		}
 		if (IsEnableControll())
 		{
@@ -125,7 +127,7 @@ public abstract class ControllerBase : MonoBehaviour
 
 	public virtual void OnDetachedObject(StageObject stage_object)
 	{
-		if ((UnityEngine.Object)brain != (UnityEngine.Object)null)
+		if (brain != null)
 		{
 			brain.HandleEvent(BRAIN_EVENT.DESTROY_OBJECT, stage_object);
 		}
@@ -133,7 +135,7 @@ public abstract class ControllerBase : MonoBehaviour
 
 	public virtual void OnCharacterInitialized()
 	{
-		if ((UnityEngine.Object)brain != (UnityEngine.Object)null)
+		if (brain != null)
 		{
 			brain.Initialize();
 		}
@@ -141,7 +143,7 @@ public abstract class ControllerBase : MonoBehaviour
 
 	public virtual void OnCharacterPlayMotion(int motion_id)
 	{
-		if ((UnityEngine.Object)brain != (UnityEngine.Object)null)
+		if (brain != null)
 		{
 			brain.HandleEvent(BRAIN_EVENT.PLAY_MOTION, motion_id);
 		}
@@ -149,7 +151,7 @@ public abstract class ControllerBase : MonoBehaviour
 
 	public virtual void OnCharacterEndAction(int action_id)
 	{
-		if ((UnityEngine.Object)brain != (UnityEngine.Object)null)
+		if (brain != null)
 		{
 			brain.HandleEvent(BRAIN_EVENT.END_ACTION, action_id);
 		}
@@ -157,7 +159,7 @@ public abstract class ControllerBase : MonoBehaviour
 
 	public virtual void OnCharacterAttackedHitOwner(AttackedHitStatusOwner status)
 	{
-		if ((UnityEngine.Object)brain != (UnityEngine.Object)null)
+		if (brain != null)
 		{
 			if (status.downAddWeak > 0f)
 			{

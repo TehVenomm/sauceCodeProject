@@ -4,9 +4,9 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Tween/Tween Color")]
 public class TweenColor : UITweener
 {
-	public Color from = Color.white;
+	public Color from = Color.get_white();
 
-	public Color to = Color.white;
+	public Color to = Color.get_white();
 
 	private bool mCached;
 
@@ -23,10 +23,12 @@ public class TweenColor : UITweener
 	{
 		get
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			return value;
 		}
 		set
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			this.value = value;
 		}
 	}
@@ -35,74 +37,85 @@ public class TweenColor : UITweener
 	{
 		get
 		{
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 			if (!mCached)
 			{
 				Cache();
 			}
-			if ((UnityEngine.Object)mWidget != (UnityEngine.Object)null)
+			if (mWidget != null)
 			{
 				return mWidget.color;
 			}
-			if ((UnityEngine.Object)mMat != (UnityEngine.Object)null)
+			if (mMat != null)
 			{
-				return mMat.color;
+				return mMat.get_color();
 			}
-			if ((UnityEngine.Object)mSr != (UnityEngine.Object)null)
+			if (mSr != null)
 			{
-				return mSr.color;
+				return mSr.get_color();
 			}
-			if ((UnityEngine.Object)mLight != (UnityEngine.Object)null)
+			if (mLight != null)
 			{
-				return mLight.color;
+				return mLight.get_color();
 			}
-			return Color.black;
+			return Color.get_black();
 		}
 		set
 		{
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 			if (!mCached)
 			{
 				Cache();
 			}
-			if ((UnityEngine.Object)mWidget != (UnityEngine.Object)null)
+			if (mWidget != null)
 			{
 				mWidget.color = value;
 			}
-			else if ((UnityEngine.Object)mMat != (UnityEngine.Object)null)
+			else if (mMat != null)
 			{
-				mMat.color = value;
+				mMat.set_color(value);
 			}
-			else if ((UnityEngine.Object)mSr != (UnityEngine.Object)null)
+			else if (mSr != null)
 			{
-				mSr.color = value;
+				mSr.set_color(value);
 			}
-			else if ((UnityEngine.Object)mLight != (UnityEngine.Object)null)
+			else if (mLight != null)
 			{
-				mLight.color = value;
-				mLight.enabled = (value.r + value.g + value.b > 0.01f);
+				mLight.set_color(value);
+				mLight.set_enabled(value.r + value.g + value.b > 0.01f);
 			}
 		}
 	}
 
 	private void Cache()
 	{
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Expected O, but got Unknown
 		mCached = true;
-		mWidget = GetComponent<UIWidget>();
-		if (!((UnityEngine.Object)mWidget != (UnityEngine.Object)null))
+		mWidget = this.GetComponent<UIWidget>();
+		if (!(mWidget != null))
 		{
-			mSr = GetComponent<SpriteRenderer>();
-			if (!((UnityEngine.Object)mSr != (UnityEngine.Object)null))
+			mSr = this.GetComponent<SpriteRenderer>();
+			if (!(mSr != null))
 			{
-				Renderer component = GetComponent<Renderer>();
-				if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+				Renderer component = this.GetComponent<Renderer>();
+				if (component != null)
 				{
-					mMat = component.material;
+					mMat = component.get_material();
 				}
 				else
 				{
-					mLight = GetComponent<Light>();
-					if ((UnityEngine.Object)mLight == (UnityEngine.Object)null)
+					mLight = this.GetComponent<Light>();
+					if (mLight == null)
 					{
-						mWidget = GetComponentInChildren<UIWidget>();
+						mWidget = this.GetComponentInChildren<UIWidget>();
 					}
 				}
 			}
@@ -111,18 +124,25 @@ public class TweenColor : UITweener
 
 	protected override void OnUpdate(float factor, bool isFinished)
 	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		value = Color.Lerp(from, to, factor);
 	}
 
 	public static TweenColor Begin(GameObject go, float duration, Color color)
 	{
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		TweenColor tweenColor = UITweener.Begin<TweenColor>(go, duration, true);
 		tweenColor.from = tweenColor.value;
 		tweenColor.to = color;
 		if (duration <= 0f)
 		{
 			tweenColor.Sample(1f, true);
-			tweenColor.enabled = false;
+			tweenColor.set_enabled(false);
 		}
 		return tweenColor;
 	}
@@ -130,24 +150,30 @@ public class TweenColor : UITweener
 	[ContextMenu("Set 'From' to current value")]
 	public override void SetStartToCurrentValue()
 	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		from = value;
 	}
 
 	[ContextMenu("Set 'To' to current value")]
 	public override void SetEndToCurrentValue()
 	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		to = value;
 	}
 
 	[ContextMenu("Assume value of 'From'")]
 	private void SetCurrentValueToStart()
 	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		value = from;
 	}
 
 	[ContextMenu("Assume value of 'To'")]
 	private void SetCurrentValueToEnd()
 	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		value = to;
 	}
 }

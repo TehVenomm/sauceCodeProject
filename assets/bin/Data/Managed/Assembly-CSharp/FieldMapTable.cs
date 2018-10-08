@@ -44,13 +44,13 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		public uint fieldBuffId;
 
-		public Vector3 camOffsetPortraitPos = Vector3.zero;
+		public Vector3 camOffsetPortraitPos = Vector3.get_zero();
 
-		public Vector3 camOffsetPortraitRot = Vector3.zero;
+		public Vector3 camOffsetPortraitRot = Vector3.get_zero();
 
-		public Vector3 camOffsetLandscapePos = Vector3.zero;
+		public Vector3 camOffsetLandscapePos = Vector3.get_zero();
 
-		public Vector3 camOffsetLandscapeRot = Vector3.zero;
+		public Vector3 camOffsetLandscapeRot = Vector3.get_zero();
 
 		public bool IsEventData => eventId != 0;
 
@@ -88,7 +88,9 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		private static bool TryParseNonSplitStrToVector3(string str, out Vector3 vec)
 		{
-			vec = Vector3.zero;
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			vec = Vector3.get_zero();
 			if (string.IsNullOrEmpty(str))
 			{
 				return false;
@@ -98,7 +100,7 @@ public class FieldMapTable : Singleton<FieldMapTable>
 			{
 				return false;
 			}
-			vec = new Vector3(array[0].ToFloatOrDefault(0f), array[1].ToFloatOrDefault(0f), array[2].ToFloatOrDefault(0f));
+			vec._002Ector(array[0].ToFloatOrDefault(0f), array[1].ToFloatOrDefault(0f), array[2].ToFloatOrDefault(0f));
 			return true;
 		}
 
@@ -304,7 +306,7 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		public float GeneratePopTime()
 		{
-			return UnityEngine.Random.Range(popTimeMin, popTimeMax);
+			return Random.Range(popTimeMin, popTimeMax);
 		}
 
 		public float GenerateWalkSpeed()
@@ -315,11 +317,11 @@ public class FieldMapTable : Singleton<FieldMapTable>
 			}
 			if (walkSpeedMin < walkSpeedMax)
 			{
-				return UnityEngine.Random.Range(walkSpeedMin, walkSpeedMax);
+				return Random.Range(walkSpeedMin, walkSpeedMax);
 			}
 			if (walkSpeedMin > walkSpeedMax)
 			{
-				return UnityEngine.Random.Range(walkSpeedMax, walkSpeedMin);
+				return Random.Range(walkSpeedMax, walkSpeedMin);
 			}
 			return walkSpeedMin;
 		}

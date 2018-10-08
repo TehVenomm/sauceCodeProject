@@ -181,13 +181,17 @@ namespace Network
 
 				public Color toColor()
 				{
-					ColorUtility.TryParseHtmlString(color, out Color result);
+					//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+					Color result = default(Color);
+					ColorUtility.TryParseHtmlString(color, ref result);
 					return result;
 				}
 
 				public Color toOutColor()
 				{
-					ColorUtility.TryParseHtmlString(outColor, out Color result);
+					//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+					Color result = default(Color);
+					ColorUtility.TryParseHtmlString(outColor, ref result);
 					return result;
 				}
 			}

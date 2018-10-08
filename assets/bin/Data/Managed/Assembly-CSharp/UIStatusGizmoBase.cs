@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIStatusGizmoBase : MonoBehaviour
+public class UIStatusGizmoBase
 {
 	protected static List<UIStatusGizmoBase> uiList = new List<UIStatusGizmoBase>();
 
@@ -13,17 +13,24 @@ public class UIStatusGizmoBase : MonoBehaviour
 
 	public int depthOffset;
 
-	protected new Transform transform;
+	protected Transform transform;
 
 	[HideInInspector]
 	public bool isHostPlayer;
 
-	public UIPanel BasePanel => basePanel ?? (basePanel = GetComponent<UIPanel>());
+	public UIPanel BasePanel => basePanel ?? (basePanel = this.GetComponent<UIPanel>());
 
 	public float ScreenZ => screenZ;
 
+	public UIStatusGizmoBase()
+		: this()
+	{
+	}
+
 	protected virtual void SortAll()
 	{
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0064: Expected O, but got Unknown
 		uiList.Sort(delegate(UIStatusGizmoBase a, UIStatusGizmoBase b)
 		{
 			if (a.screenZ == b.screenZ)
@@ -39,7 +46,7 @@ public class UIStatusGizmoBase : MonoBehaviour
 			int num = i * 10;
 			if (uIStatusGizmoBase.depthOffset != num)
 			{
-				AdjustDepth(uIStatusGizmoBase.gameObject, num - uIStatusGizmoBase.depthOffset);
+				AdjustDepth(uIStatusGizmoBase.get_gameObject(), num - uIStatusGizmoBase.depthOffset);
 				uIStatusGizmoBase.depthOffset = num;
 			}
 		}
@@ -47,9 +54,9 @@ public class UIStatusGizmoBase : MonoBehaviour
 
 	protected static void AdjustDepth(GameObject set_object, int depth)
 	{
-		if (depth != 0 && !((Object)set_object == (Object)null))
+		if (depth != 0 && !(set_object == null))
 		{
-			set_object.GetComponentsInChildren(true, Temporary.uiWidgetList);
+			set_object.GetComponentsInChildren<UIWidget>(true, Temporary.uiWidgetList);
 			int i = 0;
 			for (int count = Temporary.uiWidgetList.Count; i < count; i++)
 			{
@@ -62,8 +69,11 @@ public class UIStatusGizmoBase : MonoBehaviour
 
 	protected virtual void OnEnable()
 	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Expected O, but got Unknown
 		uiList.Add(this);
-		transform = base.gameObject.transform;
+		transform = this.get_gameObject().get_transform();
 	}
 
 	protected virtual void OnDisable()
@@ -92,7 +102,7 @@ public class UIStatusGizmoBase : MonoBehaviour
 
 	protected void SetActiveSafe(GameObject target, bool active)
 	{
-		if (!((Object)target == (Object)null) && target.activeSelf != active)
+		if (!(target == null) && target.get_activeSelf() != active)
 		{
 			target.SetActive(active);
 		}

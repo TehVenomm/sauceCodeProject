@@ -27,11 +27,12 @@ public class UIKnockDownRaidBossAnnounce : UIInGameSelfAnnounce
 
 	private void StoreAudioClip()
 	{
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		string sE = ResourceName.GetSE(40000067);
 		if (!string.IsNullOrEmpty(sE))
 		{
-			ResourceLink component = base.gameObject.GetComponent<ResourceLink>();
-			if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
+			ResourceLink component = this.get_gameObject().GetComponent<ResourceLink>();
+			if (!(component == null))
 			{
 				m_audioClip = component.Get<AudioClip>(sE);
 			}
@@ -40,7 +41,7 @@ public class UIKnockDownRaidBossAnnounce : UIInGameSelfAnnounce
 
 	private void PlayAudioKnockDown()
 	{
-		if (!((UnityEngine.Object)m_audioClip == (UnityEngine.Object)null))
+		if (!(m_audioClip == null))
 		{
 			SoundManager.PlayOneshotJingle(m_audioClip, 40000067, null, null);
 		}
@@ -161,20 +162,22 @@ public class UIKnockDownRaidBossAnnounce : UIInGameSelfAnnounce
 
 	public void PlayKnockDown(bool isForcePlay = false, Action callback = null)
 	{
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Expected O, but got Unknown
 		if (TutorialStep.HasQuestSpecialUnlocked() && PlayerPrefs.GetInt("IS_SHOWED_RAID_BOSS_DIRECTION", 0) == 0 && (!MonoBehaviourSingleton<InGameManager>.IsValid() || !MonoBehaviourSingleton<InGameManager>.I.IsRush()) && !QuestManager.IsValidInGame())
 		{
 			if (!isForcePlay && !IsAbleToPlay())
 			{
 				if (m_coroutine == null)
 				{
-					m_coroutine = StartCoroutine(DelayPlay());
+					m_coroutine = this.StartCoroutine(DelayPlay());
 				}
 			}
 			else
 			{
 				if (isForcePlay && m_coroutine != null)
 				{
-					StopCoroutine(m_coroutine);
+					this.StopCoroutine(m_coroutine);
 					m_coroutine = null;
 				}
 				Play(callback);
@@ -204,7 +207,7 @@ public class UIKnockDownRaidBossAnnounce : UIInGameSelfAnnounce
 	{
 		if (m_coroutine != null)
 		{
-			StopCoroutine(m_coroutine);
+			this.StopCoroutine(m_coroutine);
 			m_coroutine = null;
 		}
 	}

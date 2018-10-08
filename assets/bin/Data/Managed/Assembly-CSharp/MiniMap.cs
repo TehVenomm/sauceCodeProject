@@ -33,26 +33,37 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 
 	protected override void Awake()
 	{
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		base.gameObject.SetActive((FieldManager.IsValidInGameNoQuest() && !MonoBehaviourSingleton<FieldManager>.I.isTutorialField) || QuestManager.IsValidInGameWaveMatch(false));
+		this.get_gameObject().SetActive((FieldManager.IsValidInGameNoQuest() && !MonoBehaviourSingleton<FieldManager>.I.isTutorialField) || QuestManager.IsValidInGameWaveMatch(false));
 	}
 
 	private void LateUpdate()
 	{
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if (!((Object)self == (Object)null))
+			if (!(self == null))
 			{
-				Vector3 position = self.transform.position;
+				Vector3 position = self.get_transform().get_position();
 				float x = position.x;
 				float z = position.z;
-				Transform transform = iconRoot.transform;
-				Vector3 eulerAngles = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.eulerAngles;
-				transform.localEulerAngles = new Vector3(0f, 0f, eulerAngles.y);
-				Transform transform2 = selfIcon;
-				Vector3 localEulerAngles = self._transform.localEulerAngles;
-				transform2.localEulerAngles = new Vector3(0f, 0f, 0f - localEulerAngles.y);
+				Transform transform = iconRoot.get_transform();
+				Vector3 eulerAngles = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_eulerAngles();
+				transform.set_localEulerAngles(new Vector3(0f, 0f, eulerAngles.y));
+				Transform obj = selfIcon;
+				Vector3 localEulerAngles = self._transform.get_localEulerAngles();
+				obj.set_localEulerAngles(new Vector3(0f, 0f, 0f - localEulerAngles.y));
 				updateCount--;
 				if (updateCount <= 0)
 				{
@@ -69,13 +80,15 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 
 	public void Attach(MonoBehaviour root_object)
 	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Expected O, but got Unknown
 		if (!(root_object is Self))
 		{
-			Transform transform = root_object.transform;
+			Transform val = root_object.get_transform();
 			int i = 0;
 			for (int count = icons.Count; i < count; i++)
 			{
-				if ((Object)icons[i].target == (Object)transform)
+				if (icons[i].target == val)
 				{
 					return;
 				}
@@ -138,22 +151,22 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 					text = "dp_radar_" + raderIconName;
 				}
 			}
-			if ((Object)miniMapIcon == (Object)null && num >= 0 && num < iconPrefabs.Length)
+			if (miniMapIcon == null && num >= 0 && num < iconPrefabs.Length)
 			{
-				GameObject gameObject = ResourceUtility.Instantiate(iconPrefabs[num]);
-				if ((Object)gameObject != (Object)null)
+				GameObject val2 = ResourceUtility.Instantiate<GameObject>(iconPrefabs[num]);
+				if (val2 != null)
 				{
-					miniMapIcon = gameObject.GetComponent<MiniMapIcon>();
+					miniMapIcon = val2.GetComponent<MiniMapIcon>();
 				}
 			}
-			if ((Object)miniMapIcon != (Object)null)
+			if (miniMapIcon != null)
 			{
 				miniMapIcon.Initialize(root_object);
 				if (!text.IsNullOrWhiteSpace())
 				{
 					miniMapIcon.SetIconSprite(text);
 				}
-				miniMapIcon.target = transform;
+				miniMapIcon.target = val;
 				Utility.Attach(iconRoot, miniMapIcon._trasform);
 				icons.Add(miniMapIcon);
 				updateCount = 0;
@@ -163,7 +176,13 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 
 	public void Detach(MonoBehaviour root_object)
 	{
-		Transform transform = root_object.transform;
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Expected O, but got Unknown
+		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+		Transform val = root_object.get_transform();
 		int num = 0;
 		int count = icons.Count;
 		while (true)
@@ -172,7 +191,7 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 			{
 				return;
 			}
-			if ((Object)icons[num].target == (Object)transform)
+			if (icons[num].target == val)
 			{
 				break;
 			}
@@ -181,21 +200,21 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 		if (root_object is Player)
 		{
 			playerIconStock.Add(icons[num]);
-			icons[num].gameObject.SetActive(false);
+			icons[num].get_gameObject().SetActive(false);
 		}
 		else if (root_object is Enemy)
 		{
 			enemyIconStock.Add(icons[num]);
-			icons[num].gameObject.SetActive(false);
+			icons[num].get_gameObject().SetActive(false);
 		}
 		else if (root_object is FieldWaveTargetObject)
 		{
 			waveTargetIconStock.Add(icons[num]);
-			icons[num].gameObject.SetActive(false);
+			icons[num].get_gameObject().SetActive(false);
 		}
 		else
 		{
-			Object.Destroy(icons[num].gameObject);
+			Object.Destroy(icons[num].get_gameObject());
 		}
 		icons.Remove(icons[num]);
 	}

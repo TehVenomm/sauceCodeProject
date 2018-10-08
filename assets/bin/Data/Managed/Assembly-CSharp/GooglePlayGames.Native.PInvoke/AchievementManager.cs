@@ -74,9 +74,9 @@ namespace GooglePlayGames.Native.PInvoke
 				return new NativeAchievement(GooglePlayGames.Native.Cwrapper.AchievementManager.AchievementManager_FetchAllResponse_GetData_GetElement(SelfPtr(), index));
 			}
 
-			public IEnumerator<NativeAchievement> GetEnumerator()
+			public unsafe IEnumerator<NativeAchievement> GetEnumerator()
 			{
-				return PInvokeUtilities.ToEnumerator(GooglePlayGames.Native.Cwrapper.AchievementManager.AchievementManager_FetchAllResponse_GetData_Length(SelfPtr()), (UIntPtr index) => GetElement(index));
+				return PInvokeUtilities.ToEnumerator<NativeAchievement>(GooglePlayGames.Native.Cwrapper.AchievementManager.AchievementManager_FetchAllResponse_GetData_Length(SelfPtr()), new Func<UIntPtr, NativeAchievement>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 
 			protected override void CallDispose(HandleRef selfPointer)
@@ -107,10 +107,10 @@ namespace GooglePlayGames.Native.PInvoke
 			GooglePlayGames.Native.Cwrapper.AchievementManager.AchievementManager_ShowAllUI(mServices.AsHandle(), Callbacks.InternalShowUICallback, Callbacks.ToIntPtr(callback));
 		}
 
-		internal void FetchAll(Action<FetchAllResponse> callback)
+		internal unsafe void FetchAll(Action<FetchAllResponse> callback)
 		{
 			Misc.CheckNotNull(callback);
-			GooglePlayGames.Native.Cwrapper.AchievementManager.AchievementManager_FetchAll(mServices.AsHandle(), Types.DataSource.CACHE_OR_NETWORK, InternalFetchAllCallback, Callbacks.ToIntPtr(callback, FetchAllResponse.FromPointer));
+			GooglePlayGames.Native.Cwrapper.AchievementManager.AchievementManager_FetchAll(mServices.AsHandle(), Types.DataSource.CACHE_OR_NETWORK, InternalFetchAllCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, FetchAllResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.AchievementManager.FetchAllCallback))]
@@ -119,11 +119,11 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("AchievementManager#InternalFetchAllCallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal void Fetch(string achId, Action<FetchResponse> callback)
+		internal unsafe void Fetch(string achId, Action<FetchResponse> callback)
 		{
 			Misc.CheckNotNull(achId);
 			Misc.CheckNotNull(callback);
-			GooglePlayGames.Native.Cwrapper.AchievementManager.AchievementManager_Fetch(mServices.AsHandle(), Types.DataSource.CACHE_OR_NETWORK, achId, InternalFetchCallback, Callbacks.ToIntPtr(callback, FetchResponse.FromPointer));
+			GooglePlayGames.Native.Cwrapper.AchievementManager.AchievementManager_Fetch(mServices.AsHandle(), Types.DataSource.CACHE_OR_NETWORK, achId, InternalFetchCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, FetchResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.AchievementManager.FetchCallback))]

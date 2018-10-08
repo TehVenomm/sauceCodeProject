@@ -125,14 +125,14 @@ public class FriendArenaRanking : FriendArenaRankingBase
 	{
 		if (eventData == null)
 		{
-			SetLabelText(UI.LBL_ARENA_NAME, string.Empty);
-			SetLabelText(UI.LBL_END_DATE, string.Empty);
+			SetLabelText((Enum)UI.LBL_ARENA_NAME, string.Empty);
+			SetLabelText((Enum)UI.LBL_END_DATE, string.Empty);
 		}
 		else
 		{
-			SetLabelText(UI.LBL_ARENA_NAME, eventData.name);
+			SetLabelText((Enum)UI.LBL_ARENA_NAME, eventData.name);
 			string endDateString = QuestUtility.GetEndDateString(eventData);
-			SetLabelText(UI.LBL_END_DATE, endDateString);
+			SetLabelText((Enum)UI.LBL_END_DATE, endDateString);
 		}
 	}
 
@@ -162,20 +162,11 @@ public class FriendArenaRanking : FriendArenaRankingBase
 		SendGetNormalRanking(group, callback);
 	}
 
-	private void SendGetNormalRanking(int sendGroup, Action<bool> callback)
+	private unsafe void SendGetNormalRanking(int sendGroup, Action<bool> callback)
 	{
 		int isContaionSelf = isOwn ? 1 : 0;
-		MonoBehaviourSingleton<FriendManager>.I.SendGetArenaRanking(sendGroup, isContaionSelf, delegate(bool is_success, List<ArenaRankingData> recv_data)
-		{
-			if (is_success)
-			{
-				recvList = ChangeData(CreateFriendCharaInfoList(recv_data));
-				base.rankingDataList = recv_data;
-				CacheLists(recvList, recv_data);
-				List<ArenaRankingData> rankingDataList = base.rankingDataList;
-			}
-			callback(is_success);
-		});
+		_003CSendGetNormalRanking_003Ec__AnonStorey2FA _003CSendGetNormalRanking_003Ec__AnonStorey2FA;
+		MonoBehaviourSingleton<FriendManager>.I.SendGetArenaRanking(sendGroup, isContaionSelf, new Action<bool, List<ArenaRankingData>>((object)_003CSendGetNormalRanking_003Ec__AnonStorey2FA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnQuery_TAB()

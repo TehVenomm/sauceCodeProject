@@ -23,7 +23,7 @@ public class CrystalShopBundleNotice : GameSection
 	{
 		if (purchaseData != null)
 		{
-			SetLabelText(UI.LBL_BONUS_NAME, purchaseData.productName);
+			SetLabelText((Enum)UI.LBL_BONUS_NAME, purchaseData.productName);
 			StringBuilder sb = new StringBuilder();
 			int count = purchaseData.bundle.Length;
 			int index = 0;
@@ -39,7 +39,7 @@ public class CrystalShopBundleNotice : GameSection
 					sb.Append(o.name);
 				}
 			});
-			SetLabelText(UI.ProvisionalLabel, sb.ToString());
+			SetLabelText((Enum)UI.ProvisionalLabel, sb.ToString());
 			UpdateAnchors();
 		}
 	}

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Wrap Content")]
-public class UIWrapContent : MonoBehaviour
+public class UIWrapContent
 {
 	public delegate void OnInitializeItem(GameObject go, int wrapIndex, int realIndex);
 
@@ -28,11 +28,16 @@ public class UIWrapContent : MonoBehaviour
 
 	private List<Transform> mChildren = new List<Transform>();
 
+	public UIWrapContent()
+		: this()
+	{
+	}
+
 	protected virtual void Start()
 	{
 		SortBasedOnScrollMovement();
 		WrapContent();
-		if ((Object)mScroll != (Object)null)
+		if (mScroll != null)
 		{
 			mScroll.GetComponent<UIPanel>().onClipMove = OnMove;
 		}
@@ -47,10 +52,12 @@ public class UIWrapContent : MonoBehaviour
 	[ContextMenu("Sort Based on Scroll Movement")]
 	public void SortBasedOnScrollMovement()
 	{
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Expected O, but got Unknown
 		if (CacheScrollView())
 		{
 			mChildren.Clear();
-			for (int i = 0; i < mTrans.childCount; i++)
+			for (int i = 0; i < mTrans.get_childCount(); i++)
 			{
 				mChildren.Add(mTrans.GetChild(i));
 			}
@@ -69,10 +76,12 @@ public class UIWrapContent : MonoBehaviour
 	[ContextMenu("Sort Alphabetically")]
 	public void SortAlphabetically()
 	{
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Expected O, but got Unknown
 		if (CacheScrollView())
 		{
 			mChildren.Clear();
-			for (int i = 0; i < mTrans.childCount; i++)
+			for (int i = 0; i < mTrans.get_childCount(); i++)
 			{
 				mChildren.Add(mTrans.GetChild(i));
 			}
@@ -83,10 +92,14 @@ public class UIWrapContent : MonoBehaviour
 
 	protected bool CacheScrollView()
 	{
-		mTrans = base.transform;
-		mPanel = NGUITools.FindInParents<UIPanel>(base.gameObject);
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Expected O, but got Unknown
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Expected O, but got Unknown
+		mTrans = this.get_transform();
+		mPanel = NGUITools.FindInParents<UIPanel>(this.get_gameObject());
 		mScroll = mPanel.GetComponent<UIScrollView>();
-		if ((Object)mScroll == (Object)null)
+		if (mScroll == null)
 		{
 			return false;
 		}
@@ -107,26 +120,71 @@ public class UIWrapContent : MonoBehaviour
 
 	private void ResetChildPositions()
 	{
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int count = mChildren.Count; i < count; i++)
 		{
-			Transform transform = mChildren[i];
-			transform.localPosition = ((!mHorizontal) ? new Vector3(0f, (float)(-i * itemSize), 0f) : new Vector3((float)(i * itemSize), 0f, 0f));
-			UpdateItem(transform, i);
+			Transform val = mChildren[i];
+			val.set_localPosition((!mHorizontal) ? new Vector3(0f, (float)(-i * itemSize), 0f) : new Vector3((float)(i * itemSize), 0f, 0f));
+			UpdateItem(val, i);
 		}
 	}
 
 	public void WrapContent()
 	{
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0253: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0258: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0267: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0280: Expected O, but got Unknown
+		//IL_028c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a4: Expected O, but got Unknown
+		//IL_030f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0314: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0332: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0337: Unknown result type (might be due to invalid IL or missing references)
+		//IL_039d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0430: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0476: Unknown result type (might be due to invalid IL or missing references)
+		//IL_047b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_048a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_048f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_049e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04a3: Expected O, but got Unknown
+		//IL_04af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04c7: Expected O, but got Unknown
 		float num = (float)(itemSize * mChildren.Count) * 0.5f;
 		Vector3[] worldCorners = mPanel.worldCorners;
 		for (int i = 0; i < 4; i++)
 		{
-			Vector3 position = worldCorners[i];
-			position = mTrans.InverseTransformPoint(position);
-			worldCorners[i] = position;
+			Vector3 val = worldCorners[i];
+			val = mTrans.InverseTransformPoint(val);
+			worldCorners[i] = val;
 		}
-		Vector3 vector = Vector3.Lerp(worldCorners[0], worldCorners[2], 0.5f);
+		Vector3 val2 = Vector3.Lerp(worldCorners[0], worldCorners[2], 0.5f);
 		bool flag = true;
 		float num2 = num * 2f;
 		if (mHorizontal)
@@ -136,19 +194,19 @@ public class UIWrapContent : MonoBehaviour
 			int j = 0;
 			for (int count = mChildren.Count; j < count; j++)
 			{
-				Transform transform = mChildren[j];
-				Vector3 localPosition = transform.localPosition;
-				float num5 = localPosition.x - vector.x;
+				Transform val3 = mChildren[j];
+				Vector3 localPosition = val3.get_localPosition();
+				float num5 = localPosition.x - val2.x;
 				if (num5 < 0f - num)
 				{
-					Vector3 localPosition2 = transform.localPosition;
+					Vector3 localPosition2 = val3.get_localPosition();
 					localPosition2.x += num2;
-					num5 = localPosition2.x - vector.x;
+					num5 = localPosition2.x - val2.x;
 					int num6 = Mathf.RoundToInt(localPosition2.x / (float)itemSize);
 					if (minIndex == maxIndex || (minIndex <= num6 && num6 <= maxIndex))
 					{
-						transform.localPosition = localPosition2;
-						UpdateItem(transform, j);
+						val3.set_localPosition(localPosition2);
+						UpdateItem(val3, j);
 					}
 					else
 					{
@@ -157,14 +215,14 @@ public class UIWrapContent : MonoBehaviour
 				}
 				else if (num5 > num)
 				{
-					Vector3 localPosition3 = transform.localPosition;
+					Vector3 localPosition3 = val3.get_localPosition();
 					localPosition3.x -= num2;
-					num5 = localPosition3.x - vector.x;
+					num5 = localPosition3.x - val2.x;
 					int num7 = Mathf.RoundToInt(localPosition3.x / (float)itemSize);
 					if (minIndex == maxIndex || (minIndex <= num7 && num7 <= maxIndex))
 					{
-						transform.localPosition = localPosition3;
-						UpdateItem(transform, j);
+						val3.set_localPosition(localPosition3);
+						UpdateItem(val3, j);
 					}
 					else
 					{
@@ -173,18 +231,18 @@ public class UIWrapContent : MonoBehaviour
 				}
 				else if (mFirstTime)
 				{
-					UpdateItem(transform, j);
+					UpdateItem(val3, j);
 				}
 				if (cullContent)
 				{
 					float num8 = num5;
 					Vector2 clipOffset = mPanel.clipOffset;
 					float x = clipOffset.x;
-					Vector3 localPosition4 = mTrans.localPosition;
+					Vector3 localPosition4 = mTrans.get_localPosition();
 					num5 = num8 + (x - localPosition4.x);
-					if (!UICamera.IsPressed(transform.gameObject))
+					if (!UICamera.IsPressed(val3.get_gameObject()))
 					{
-						NGUITools.SetActive(transform.gameObject, num5 > num3 && num5 < num4, false);
+						NGUITools.SetActive(val3.get_gameObject(), num5 > num3 && num5 < num4, false);
 					}
 				}
 			}
@@ -196,19 +254,19 @@ public class UIWrapContent : MonoBehaviour
 			int k = 0;
 			for (int count2 = mChildren.Count; k < count2; k++)
 			{
-				Transform transform2 = mChildren[k];
-				Vector3 localPosition5 = transform2.localPosition;
-				float num11 = localPosition5.y - vector.y;
+				Transform val4 = mChildren[k];
+				Vector3 localPosition5 = val4.get_localPosition();
+				float num11 = localPosition5.y - val2.y;
 				if (num11 < 0f - num)
 				{
-					Vector3 localPosition6 = transform2.localPosition;
+					Vector3 localPosition6 = val4.get_localPosition();
 					localPosition6.y += num2;
-					num11 = localPosition6.y - vector.y;
+					num11 = localPosition6.y - val2.y;
 					int num12 = Mathf.RoundToInt(localPosition6.y / (float)itemSize);
 					if (minIndex == maxIndex || (minIndex <= num12 && num12 <= maxIndex))
 					{
-						transform2.localPosition = localPosition6;
-						UpdateItem(transform2, k);
+						val4.set_localPosition(localPosition6);
+						UpdateItem(val4, k);
 					}
 					else
 					{
@@ -217,14 +275,14 @@ public class UIWrapContent : MonoBehaviour
 				}
 				else if (num11 > num)
 				{
-					Vector3 localPosition7 = transform2.localPosition;
+					Vector3 localPosition7 = val4.get_localPosition();
 					localPosition7.y -= num2;
-					num11 = localPosition7.y - vector.y;
+					num11 = localPosition7.y - val2.y;
 					int num13 = Mathf.RoundToInt(localPosition7.y / (float)itemSize);
 					if (minIndex == maxIndex || (minIndex <= num13 && num13 <= maxIndex))
 					{
-						transform2.localPosition = localPosition7;
-						UpdateItem(transform2, k);
+						val4.set_localPosition(localPosition7);
+						UpdateItem(val4, k);
 					}
 					else
 					{
@@ -233,18 +291,18 @@ public class UIWrapContent : MonoBehaviour
 				}
 				else if (mFirstTime)
 				{
-					UpdateItem(transform2, k);
+					UpdateItem(val4, k);
 				}
 				if (cullContent)
 				{
 					float num14 = num11;
 					Vector2 clipOffset2 = mPanel.clipOffset;
 					float y = clipOffset2.y;
-					Vector3 localPosition8 = mTrans.localPosition;
+					Vector3 localPosition8 = mTrans.get_localPosition();
 					num11 = num14 + (y - localPosition8.y);
-					if (!UICamera.IsPressed(transform2.gameObject))
+					if (!UICamera.IsPressed(val4.get_gameObject()))
 					{
-						NGUITools.SetActive(transform2.gameObject, num11 > num9 && num11 < num10, false);
+						NGUITools.SetActive(val4.get_gameObject(), num11 > num9 && num11 < num10, false);
 					}
 				}
 			}
@@ -266,21 +324,27 @@ public class UIWrapContent : MonoBehaviour
 
 	protected virtual void UpdateItem(Transform item, int index)
 	{
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Expected O, but got Unknown
 		if (onInitializeItem != null)
 		{
 			int num;
 			if (mScroll.movement == UIScrollView.Movement.Vertical)
 			{
-				Vector3 localPosition = item.localPosition;
+				Vector3 localPosition = item.get_localPosition();
 				num = Mathf.RoundToInt(localPosition.y / (float)itemSize);
 			}
 			else
 			{
-				Vector3 localPosition2 = item.localPosition;
+				Vector3 localPosition2 = item.get_localPosition();
 				num = Mathf.RoundToInt(localPosition2.x / (float)itemSize);
 			}
 			int realIndex = num;
-			onInitializeItem(item.gameObject, index, realIndex);
+			onInitializeItem(item.get_gameObject(), index, realIndex);
 		}
 	}
 }

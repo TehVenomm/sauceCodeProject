@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Collections.Generic;
 
 public class FriendTestFollow : GameSection
@@ -14,7 +15,7 @@ public class FriendTestFollow : GameSection
 		base.Initialize();
 	}
 
-	private void OnQuery_SEND()
+	private unsafe void OnQuery_SEND()
 	{
 		if (!string.IsNullOrEmpty(follow_user_id) || !string.IsNullOrEmpty(follow_user_id_2) || !string.IsNullOrEmpty(follow_user_id_3))
 		{
@@ -33,26 +34,7 @@ public class FriendTestFollow : GameSection
 			}
 			if (list.Count != 0)
 			{
-				MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(list, delegate(Error err, List<int> follow_list)
-				{
-					if (err == Error.None)
-					{
-						if (follow_list.Count > 0)
-						{
-							string names = string.Empty;
-							follow_list.ForEach(delegate(int user_id)
-							{
-								string text = names;
-								names = text + "「" + user_id + "」\n";
-							});
-							DispatchEvent("SUCCESS", names + "をフォロ\u30fcしました");
-						}
-					}
-					else
-					{
-						DispatchEvent("SUCCESS", "エラ\u30fcが発生しました");
-					}
-				});
+				MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(list, new Action<Error, List<int>>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}

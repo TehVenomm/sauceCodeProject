@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{A2EE6F66-EFFA-426B-B68B-90E2E27DA511}</ProjectGuid>
+    <ProjectGuid>{0CAC84DC-307D-4AE5-9D37-A45133608223}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Library</OutputType>
@@ -26,36 +26,22 @@
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="UnityEngine">
-      <HintPath>C:\Users\Braz\Desktop\global sauce\assets\bin\Data\Managed\UnityEngine.dll</HintPath>
-    </Reference>
+    <Reference Include="UnityEngine" />
     <Reference Include="System.Core">
-      <HintPath>C:\Users\Braz\Desktop\global sauce\assets\bin\Data\Managed\System.Core.dll</HintPath>
+      <HintPath>C:\Windows\Microsoft.NET\Framework64\v4.0.30319\System.Core.dll</HintPath>
     </Reference>
     <Reference Include="System">
-      <HintPath>C:\Users\Braz\Desktop\global sauce\assets\bin\Data\Managed\System.dll</HintPath>
-    </Reference>
-    <Reference Include="rym_fx_unity5">
-      <HintPath>C:\Users\Braz\Desktop\global sauce\assets\bin\Data\Managed\rym_fx_unity5.dll</HintPath>
-    </Reference>
-    <Reference Include="Firebase.Messaging">
-      <HintPath>C:\Users\Braz\Desktop\global sauce\assets\bin\Data\Managed\Firebase.Messaging.dll</HintPath>
+      <HintPath>C:\Windows\Microsoft.NET\Framework64\v4.0.30319\System.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>C:\Users\Braz\Desktop\global sauce\assets\bin\Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>C:\Users\Braz\Desktop\github source proj\1.3.2\assets\bin\Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="Ionic.Zlib.CF">
-      <HintPath>C:\Users\Braz\Desktop\global sauce\assets\bin\Data\Managed\Ionic.Zlib.CF.dll</HintPath>
-    </Reference>
-    <Reference Include="MsgPack">
-      <HintPath>C:\Users\Braz\Desktop\global sauce\assets\bin\Data\Managed\MsgPack.dll</HintPath>
-    </Reference>
-    <Reference Include="TcpClientImplementation">
-      <HintPath>C:\Users\Braz\Desktop\global sauce\assets\bin\Data\Managed\TcpClientImplementation.dll</HintPath>
-    </Reference>
-    <Reference Include="Facebook.Unity">
-      <HintPath>C:\Users\Braz\Desktop\global sauce\assets\bin\Data\Managed\Facebook.Unity.dll</HintPath>
-    </Reference>
+    <Reference Include="rym_fx_unity5" />
+    <Reference Include="Firebase.Messaging" />
+    <Reference Include="Ionic.Zlib.CF" />
+    <Reference Include="MsgPack" />
+    <Reference Include="TcpClientImplementation" />
+    <Reference Include="Facebook.Unity" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbilityAtkArrowSp.cs" />
@@ -321,6 +307,7 @@
     <Compile Include="BulletControllerSnatch.cs" />
     <Compile Include="BulletData.cs" />
     <Compile Include="BulletObject.cs" />
+    <Compile Include="BuyJackpotTicketDialog.cs" />
     <Compile Include="ByteReader.cs" />
     <Compile Include="CALCULATE_TYPE.cs" />
     <Compile Include="CameraPosLink.cs" />
@@ -380,6 +367,7 @@
     <Compile Include="Chat_Model_BroadcastClanStatus_Response.cs" />
     <Compile Include="Chat_Model_BroadcastMessage_Request.cs" />
     <Compile Include="Chat_Model_BroadcastMessage_Response.cs" />
+    <Compile Include="Chat_Model_JackpotWin.cs" />
     <Compile Include="Chat_Model_JoinClanRoom.cs" />
     <Compile Include="Chat_Model_JoinRoom.cs" />
     <Compile Include="Chat_Model_LeaveClanRoom.cs" />
@@ -949,9 +937,14 @@
     <Compile Include="FOCUS_PATTERN.cs" />
     <Compile Include="FollowListBase.cs" />
     <Compile Include="FORCE_RESEND_DIALOG_FLAG.cs" />
+    <Compile Include="FortuneRequestForm.cs" />
     <Compile Include="FortuneWheelButton.cs" />
+    <Compile Include="FortuneWheelBuyModel.cs" />
     <Compile Include="FortuneWheelHistoryModel.cs" />
     <Compile Include="FortuneWheelHomeModel.cs" />
+    <Compile Include="FortuneWheelManager.cs" />
+    <Compile Include="FortuneWheelMotionBlur.cs" />
+    <Compile Include="FortuneWheelRewardLogItem.cs" />
     <Compile Include="FortuneWheelServerLogItem.cs" />
     <Compile Include="FortuneWheelSpinHandle.cs" />
     <Compile Include="FortuneWheelSpinItem.cs" />
@@ -1410,6 +1403,7 @@
     <Compile Include="HomeCountdown.cs" />
     <Compile Include="HomeDragonRandomMove.cs" />
     <Compile Include="HomeFeatureBanner.cs" />
+    <Compile Include="HomeFortuneWheelBanner.cs" />
     <Compile Include="HomeFriendDetail.cs" />
     <Compile Include="HomeFriendPromotionDialog.cs" />
     <Compile Include="HomeGetCharaModel.cs" />
@@ -1812,12 +1806,15 @@
     <Compile Include="Network\FieldPortal.cs" />
     <Compile Include="Network\FollowLoungeMember.cs" />
     <Compile Include="Network\FollowPartyMember.cs" />
+    <Compile Include="Network\FortuneHistoryData.cs" />
+    <Compile Include="Network\FortuneWheelBuyData.cs" />
     <Compile Include="Network\FortuneWheelData.cs" />
     <Compile Include="Network\FortuneWheelHistory.cs" />
     <Compile Include="Network\FortuneWheelInfo.cs" />
     <Compile Include="Network\FortuneWheelItem.cs" />
-    <Compile Include="Network\FortuneWheelRewardLog.cs" />
+    <Compile Include="Network\FortuneWheelReward.cs" />
     <Compile Include="Network\FortuneWheelServerLog.cs" />
+    <Compile Include="Network\FortuneWheelUserLog.cs" />
     <Compile Include="Network\FriendCharaInfo.cs" />
     <Compile Include="Network\FriendFollowLinkResult.cs" />
     <Compile Include="Network\FriendMessageData.cs" />

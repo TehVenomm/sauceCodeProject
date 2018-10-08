@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -46,8 +47,8 @@ public class QuestResultMissionClearRewardDialog : ItemSellConfirm
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetActive(UI.OBJ_NORMAL_ROOT, !isComplete);
-		SetActive(UI.OBJ_COMPLETE_ROOT, isComplete);
+		SetActive((Enum)UI.OBJ_NORMAL_ROOT, !isComplete);
+		SetActive((Enum)UI.OBJ_COMPLETE_ROOT, isComplete);
 	}
 
 	private void OnQuery_OK()
@@ -55,7 +56,7 @@ public class QuestResultMissionClearRewardDialog : ItemSellConfirm
 		GameSection.BackSection();
 	}
 
-	protected override void DrawIcon()
+	protected unsafe override void DrawIcon()
 	{
 		SortCompareData[] sell_data_ary = sellData.ToArray();
 		int reward_num = sell_data_ary.Length;
@@ -74,54 +75,8 @@ public class QuestResultMissionClearRewardDialog : ItemSellConfirm
 		bool shouldAddGold = totalGold > 0;
 		bool shouldAddMissionPoint = missionPointData != null && missionPointData.missionPoint > 0;
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, delegate(int i, Transform t, bool is_recycle)
-		{
-			if (i < reward_num)
-			{
-				if (i < sell_data_ary.Length)
-				{
-					int enemy_icon_id = 0;
-					int enemy_icon_id2 = 0;
-					object itemData = sell_data_ary[i].GetItemData();
-					if (itemData is ItemSortData)
-					{
-						ItemSortData itemSortData = itemData as ItemSortData;
-						enemy_icon_id = itemSortData.itemData.tableData.enemyIconID;
-						enemy_icon_id2 = itemSortData.itemData.tableData.enemyIconID2;
-					}
-					GET_TYPE getType = sell_data_ary[i].GetGetType();
-					ItemIcon itemIcon = ItemIcon.Create(sell_data_ary[i].GetIconType(), sell_data_ary[i].GetIconID(), sell_data_ary[i].GetRarity(), t, sell_data_ary[i].GetIconElement(), sell_data_ary[i].GetIconMagiEnableType(), sell_data_ary[i].GetNum(), null, 0, false, -1, false, null, false, enemy_icon_id, enemy_icon_id2, false, getType, ELEMENT_TYPE.MAX);
-					itemIcon.SetRewardBG(true);
-					SetMaterialInfo(itemIcon.transform, sell_data_ary[i].GetMaterialType(), sell_data_ary[i].GetTableID(), null);
-				}
-				else if (shouldAddGold)
-				{
-					ItemIcon itemIcon2 = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.MONEY, 1u, t, totalGold, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-					itemIcon2.SetRewardBG(true);
-					SetMaterialInfo(itemIcon2.transform, REWARD_TYPE.MONEY, 0u, null);
-					shouldAddGold = false;
-				}
-				else if (shouldAddMissionPoint)
-				{
-					ItemIcon.GetIconShowData(REWARD_TYPE.POINT_SHOP_POINT, (uint)missionPointData.pointShopId, out int icon_id, out ITEM_ICON_TYPE icon_type, out RARITY_TYPE? rarity, out ELEMENT_TYPE element, out ELEMENT_TYPE _, out EQUIPMENT_TYPE? _, out int _, out int _, out GET_TYPE _, 0);
-					ItemIcon itemIcon3 = ItemIcon.Create(icon_type, icon_id, rarity, t, element, null, missionPointData.missionPoint, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY, ELEMENT_TYPE.MAX);
-					itemIcon3.SetRewardBG(true);
-					int id = (!missionPointData.isEvent) ? 1 : 0;
-					SetMaterialInfo(itemIcon3.transform, REWARD_TYPE.POINT_SHOP_POINT, (uint)id, null);
-					shouldAddMissionPoint = false;
-				}
-				else
-				{
-					ItemIcon itemIcon4 = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.CRYSTAL, 1u, t, crystalNum, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-					itemIcon4.SetRewardBG(true);
-					SetMaterialInfo(itemIcon4.transform, REWARD_TYPE.CRYSTAL, 0u, null);
-				}
-			}
-			else
-			{
-				SetActive(t, false);
-			}
-		});
+		_003CDrawIcon_003Ec__AnonStorey425 _003CDrawIcon_003Ec__AnonStorey;
+		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override int GetSellGold()

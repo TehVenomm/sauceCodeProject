@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class RenderTargetSetter : MonoBehaviour
+public class RenderTargetSetter
 {
 	[Serializable]
 	public class TextureSetInfo
@@ -17,18 +17,26 @@ public class RenderTargetSetter : MonoBehaviour
 	private TextureSetInfo[] infos;
 
 	[SerializeField]
-	private CameraEvent cameraEvent = CameraEvent.AfterForwardOpaque;
+	private CameraEvent cameraEvent = 11;
 
 	private RenderTexture renderTexture;
 
 	private GrabCommand grabCommand;
 
+	public RenderTargetSetter()
+		: this()
+	{
+	}//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+
+
 	private void OnDestroy()
 	{
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0024: Expected O, but got Unknown
 		renderTexture = null;
-		if ((UnityEngine.Object)grabCommand != (UnityEngine.Object)null)
+		if (grabCommand != null)
 		{
-			grabCommand.releaseRenderTexture(base.gameObject);
+			grabCommand.releaseRenderTexture(this.get_gameObject());
 		}
 	}
 
@@ -36,28 +44,28 @@ public class RenderTargetSetter : MonoBehaviour
 	{
 		if (infos != null)
 		{
-			while (!MonoBehaviourSingleton<AppMain>.IsValid() || (UnityEngine.Object)MonoBehaviourSingleton<AppMain>.I.mainCamera == (UnityEngine.Object)null)
+			while (!MonoBehaviourSingleton<AppMain>.IsValid() || MonoBehaviourSingleton<AppMain>.I.mainCamera == null)
 			{
 				yield return (object)null;
 			}
-			grabCommand = MonoBehaviourSingleton<AppMain>.I.mainCamera.gameObject.GetComponent<GrabCommand>();
-			if ((UnityEngine.Object)grabCommand == (UnityEngine.Object)null)
+			grabCommand = MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().GetComponent<GrabCommand>();
+			if (grabCommand == null)
 			{
-				grabCommand = MonoBehaviourSingleton<AppMain>.I.mainCamera.gameObject.AddComponent<GrabCommand>();
+				grabCommand = MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().AddComponent<GrabCommand>();
 				grabCommand.ApplyCommandBuffer(cameraEvent);
 			}
-			renderTexture = grabCommand.useRenderTexture(base.gameObject);
+			renderTexture = grabCommand.useRenderTexture(this.get_gameObject());
 			for (int j = 0; j < infos.Length; j++)
 			{
-				if (!((UnityEngine.Object)infos[j].targetRenderer == (UnityEngine.Object)null) && !string.IsNullOrEmpty(infos[j].texturePropertyName))
+				if (!(infos[j].targetRenderer == null) && !string.IsNullOrEmpty(infos[j].texturePropertyName))
 				{
 					TextureSetInfo info = infos[j];
 					Renderer renderer = info.targetRenderer;
-					for (int i = 0; i < renderer.sharedMaterials.Length; i++)
+					for (int i = 0; i < renderer.get_sharedMaterials().Length; i++)
 					{
-						if (renderer.sharedMaterials[i].HasProperty(info.texturePropertyName))
+						if (renderer.get_sharedMaterials()[i].HasProperty(info.texturePropertyName))
 						{
-							renderer.sharedMaterials[i].SetTexture(info.texturePropertyName, renderTexture);
+							renderer.get_sharedMaterials()[i].SetTexture(info.texturePropertyName, renderTexture);
 						}
 					}
 				}

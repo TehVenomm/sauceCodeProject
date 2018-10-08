@@ -28,14 +28,14 @@ public class ConfigTop : GameSection
 		base.UpdateUI();
 		bool flag = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isStopperSet != 0;
 		bool flag2 = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isParentPassSet != 0;
-		SetToggle(UI.TGL_STOPPER_ON, flag);
-		SetToggle(UI.TGL_STOPPER_OFF, !flag);
-		SetToggle(UI.TGL_PP_ON, flag2);
-		SetToggle(UI.TGL_PP_OFF, !flag2);
-		SetButtonEnabled(UI.BTN_STOPPER_ON, !flag);
-		SetButtonEnabled(UI.BTN_STOPPER_OFF, flag);
-		SetButtonEnabled(UI.BTN_PP_ON, !flag2);
-		SetButtonEnabled(UI.BTN_PP_OFF, flag2);
+		SetToggle((Enum)UI.TGL_STOPPER_ON, flag);
+		SetToggle((Enum)UI.TGL_STOPPER_OFF, !flag);
+		SetToggle((Enum)UI.TGL_PP_ON, flag2);
+		SetToggle((Enum)UI.TGL_PP_OFF, !flag2);
+		SetButtonEnabled((Enum)UI.BTN_STOPPER_ON, !flag);
+		SetButtonEnabled((Enum)UI.BTN_STOPPER_OFF, flag);
+		SetButtonEnabled((Enum)UI.BTN_PP_ON, !flag2);
+		SetButtonEnabled((Enum)UI.BTN_PP_OFF, flag2);
 	}
 
 	private void OnQuery_STOPPER_ON()

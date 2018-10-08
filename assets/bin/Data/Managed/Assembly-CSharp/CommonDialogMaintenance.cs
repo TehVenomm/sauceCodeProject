@@ -17,11 +17,11 @@ public class CommonDialogMaintenance : CommonDialog
 			{
 				double unixTimeStamp = (double)long.Parse(desc.data.ToString());
 				DateTime dateTime = UnixTimeStampToDateTime(unixTimeStamp);
-				SetLabelText(UI.MESSAGE, string.Format(desc.text, GetFormartedText(dateTime.Day) + "/" + GetFormartedText(dateTime.Month) + ", " + GetFormartedText(dateTime.Hour) + ":" + GetFormartedText(dateTime.Minute)));
+				SetLabelText((Enum)UI.MESSAGE, string.Format(desc.text, GetFormartedText(dateTime.Day) + "/" + GetFormartedText(dateTime.Month) + ", " + GetFormartedText(dateTime.Hour) + ":" + GetFormartedText(dateTime.Minute)));
 			}
 			catch
 			{
-				SetLabelText(UI.MESSAGE, desc.text);
+				SetLabelText((Enum)UI.MESSAGE, desc.text);
 			}
 		}
 	}

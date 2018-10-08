@@ -68,12 +68,12 @@ public class PresentManager : MonoBehaviourSingleton<PresentManager>
 		requestSendForm.page = page;
 		Protocol.Send(PresentReceiveModel.URL, requestSendForm, delegate(PresentReceiveModel ret)
 		{
-			bool arg = false;
-			int arg2 = 0;
+			bool flag = false;
+			int num = 0;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
-				arg2 = ret.result.receivePresentNum;
+				flag = true;
+				num = ret.result.receivePresentNum;
 				if (ret.result.list != null)
 				{
 					presentData = ret.result.list;
@@ -87,7 +87,7 @@ public class PresentManager : MonoBehaviourSingleton<PresentManager>
 					DirtyPresentNum();
 				}
 			}
-			call_back(arg, ret.Error, arg2);
+			call_back.Invoke(flag, ret.Error, num);
 		}, string.Empty);
 	}
 
@@ -114,7 +114,7 @@ public class PresentManager : MonoBehaviourSingleton<PresentManager>
 		}, string.Empty);
 	}
 
-	public void SendDebugAddCrystal(int num, Action<bool> call_back)
+	public unsafe void SendDebugAddCrystal(int num, Action<bool> call_back)
 	{
 		DebugAddPresentModel.RequestSendForm requestSendForm = new DebugAddPresentModel.RequestSendForm();
 		requestSendForm.type = 1;
@@ -124,16 +124,14 @@ public class PresentManager : MonoBehaviourSingleton<PresentManager>
 		requestSendForm.id = 0;
 		requestSendForm.p0 = 0;
 		requestSendForm.p1 = 0;
+		_003CSendDebugAddCrystal_003Ec__AnonStorey675 _003CSendDebugAddCrystal_003Ec__AnonStorey;
 		Protocol.Send(DebugAddPresentModel.URL, requestSendForm, delegate(DebugAddPresentModel ret)
 		{
 			List<string> list = new List<string>();
 			if (ret.Error == Error.None)
 			{
 				list.Add(ret.result.uniqId);
-				SendReceivePresent(list, delegate(bool is_success, Error network_err, int recv_num)
-				{
-					call_back(is_success);
-				});
+				SendReceivePresent(list, new Action<bool, Error, int>((object)_003CSendDebugAddCrystal_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			else
 			{

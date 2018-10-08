@@ -134,11 +134,16 @@ public class CrystalShopTop : GameSection
 
 	private bool isHighlightBundle;
 
-	public override void Initialize()
+	public unsafe override void Initialize()
 	{
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Expected O, but got Unknown
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Expected O, but got Unknown
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
 		_objBundle = GetCtrl(UI.OBJ_BUNDLE);
 		ShopReceiver i = MonoBehaviourSingleton<ShopReceiver>.I;
-		i.onBillingUnavailable = (Action)Delegate.Combine(i.onBillingUnavailable, new Action(onBillingUnavailable));
+		i.onBillingUnavailable = Delegate.Combine((Delegate)i.onBillingUnavailable, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		ShopReceiver i2 = MonoBehaviourSingleton<ShopReceiver>.I;
 		i2.onBuyItem = (Action<string>)Delegate.Combine(i2.onBuyItem, new Action<string>(OnBuyItem));
 		ShopReceiver i3 = MonoBehaviourSingleton<ShopReceiver>.I;
@@ -147,11 +152,11 @@ public class CrystalShopTop : GameSection
 		i4.onBuyMaterialItem = (Action<ShopReceiver.PaymentPurchaseData>)Delegate.Combine(i4.onBuyMaterialItem, new Action<ShopReceiver.PaymentPurchaseData>(OnBuyMaterial));
 		ShopReceiver i5 = MonoBehaviourSingleton<ShopReceiver>.I;
 		i5.onGetProductDatas = (Action<StoreDataList>)Delegate.Combine(i5.onGetProductDatas, new Action<StoreDataList>(OnGetProductDatas));
-		StartCoroutine(DoInitialize());
+		this.StartCoroutine(DoInitialize());
 		isPurchase = false;
 	}
 
-	private IEnumerator DoInitialize()
+	private unsafe IEnumerator DoInitialize()
 	{
 		bool wait = true;
 		MonoBehaviourSingleton<ShopManager>.I.SendGetGoldPurchaseItemList(delegate
@@ -168,23 +173,36 @@ public class CrystalShopTop : GameSection
 		}
 		else
 		{
-			List<string> item_ids = (from o in MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList
-			select o.productId).ToList();
+			List<ProductData> shopList = MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList;
+			if (_003CDoInitialize_003Ec__Iterator39._003C_003Ef__am_0024cache6 == null)
+			{
+				_003CDoInitialize_003Ec__Iterator39._003C_003Ef__am_0024cache6 = new Func<ProductData, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			List<string> item_ids = shopList.Select<ProductData, string>(_003CDoInitialize_003Ec__Iterator39._003C_003Ef__am_0024cache6).ToList();
 			Native.GetProductDatas(string.Join("----", item_ids.ToArray()));
 		}
 		while (!_isFinishGetNativeProductlist)
 		{
 			yield return (object)null;
 		}
-		_purchaseGemList = (from o in MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList
-		where o.productType == 1
-		select o).ToList();
-		_purchaseBundleList = (from o in MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList
-		where o.productType == 2
-		select o).ToList();
-		_purchaseMaterialList = (from o in MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList
-		where o.productType == 3
-		select o).ToList();
+		List<ProductData> shopList2 = MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList;
+		if (_003CDoInitialize_003Ec__Iterator39._003C_003Ef__am_0024cache7 == null)
+		{
+			_003CDoInitialize_003Ec__Iterator39._003C_003Ef__am_0024cache7 = new Func<ProductData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		_purchaseGemList = shopList2.Where(_003CDoInitialize_003Ec__Iterator39._003C_003Ef__am_0024cache7).ToList();
+		List<ProductData> shopList3 = MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList;
+		if (_003CDoInitialize_003Ec__Iterator39._003C_003Ef__am_0024cache8 == null)
+		{
+			_003CDoInitialize_003Ec__Iterator39._003C_003Ef__am_0024cache8 = new Func<ProductData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		_purchaseBundleList = shopList3.Where(_003CDoInitialize_003Ec__Iterator39._003C_003Ef__am_0024cache8).ToList();
+		List<ProductData> shopList4 = MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList;
+		if (_003CDoInitialize_003Ec__Iterator39._003C_003Ef__am_0024cache9 == null)
+		{
+			_003CDoInitialize_003Ec__Iterator39._003C_003Ef__am_0024cache9 = new Func<ProductData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		_purchaseMaterialList = shopList4.Where(_003CDoInitialize_003Ec__Iterator39._003C_003Ef__am_0024cache9).ToList();
 		gemTab = GetCtrl(UI.OBJ_GEM_TAB);
 		bundleTab = GetCtrl(UI.OBJ_BUNDLE_TAB);
 		materialTab = GetCtrl(UI.OBJ_MATERIAL_TAB);
@@ -198,12 +216,16 @@ public class CrystalShopTop : GameSection
 		base.Initialize();
 	}
 
-	protected override void OnDestroy()
+	protected unsafe override void OnDestroy()
 	{
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Expected O, but got Unknown
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002b: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<ShopReceiver>.IsValid())
 		{
 			ShopReceiver i = MonoBehaviourSingleton<ShopReceiver>.I;
-			i.onBillingUnavailable = (Action)Delegate.Remove(i.onBillingUnavailable, new Action(onBillingUnavailable));
+			i.onBillingUnavailable = Delegate.Remove((Delegate)i.onBillingUnavailable, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			ShopReceiver i2 = MonoBehaviourSingleton<ShopReceiver>.I;
 			i2.onBuyItem = (Action<string>)Delegate.Remove(i2.onBuyItem, new Action<string>(OnBuyItem));
 			ShopReceiver i3 = MonoBehaviourSingleton<ShopReceiver>.I;
@@ -241,80 +263,39 @@ public class CrystalShopTop : GameSection
 		}
 	}
 
-	private void _viewGemTab()
+	private unsafe void _viewGemTab()
 	{
 		SetActive(gemTab, true);
 		SetActive(bundleTab, false);
 		SetActive(materialTab, false);
 		CheckOpenedGemTab();
-		int j = 0;
-		SetTable(gemTab, UI.TBL_LIST, "CrystalShopListItem", _purchaseGemList.Count, false, delegate(int i, Transform p)
-		{
-			ProductData productData2 = _purchaseGemList[j];
-			if (MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.HasSpecial(productData2.productId))
-			{
-				return Realizes("CrystalShopListItem2", p, true);
-			}
-			return null;
-		}, delegate(int i, Transform t, bool b)
-		{
-			ProductData productData = _purchaseGemList[++j];
-			SetSprite(t, UI.SPR_THUMB, productData.iconImg);
-			SetLabelText(t, UI.LBL_NAME, productData.name);
-			SetLabelText(t, UI.LBL_PRICE, string.Format(base.sectionData.GetText("PRICE"), productData.priceIncludeTax));
-			SetSupportEncoding(t, UI.LBL_PROMO, true);
-			SetLabelText(t, UI.LBL_PROMO, productData.promo.Replace("\\n", "\n"));
-			if (productData.remainingDay > 0)
-			{
-				SetActive(t, UI.SPR_SOLD, true);
-				SetActive(t, UI.SPR_SOLD_MASK, true);
-			}
-			else
-			{
-				SetActive(t, UI.SPR_SOLD, false);
-				SetActive(t, UI.SPR_SOLD_MASK, false);
-				if (productData.offerType > 0)
-				{
-					UITexture spro = FindCtrl(t, UI.OBJ_OFFER).GetComponent<UITexture>();
-					ResourceLoad.LoadShopImageGemOfferTexture(spro, (uint)productData.offerType, delegate(Texture tex)
-					{
-						if ((UnityEngine.Object)spro != (UnityEngine.Object)null)
-						{
-							spro.mainTexture = tex;
-						}
-					});
-				}
-			}
-			if (_nativeStoreList != null)
-			{
-				StoreData product = _nativeStoreList.getProduct(productData.productId);
-				if (product != null)
-				{
-					SetLabelText(t, UI.LBL_PRICE, product.price.ToString());
-				}
-			}
-			SetEvent(t, "BUY", i);
-		});
+		int i = 0;
+		_003C_viewGemTab_003Ec__AnonStorey2DE _003C_viewGemTab_003Ec__AnonStorey2DE;
+		SetTable(gemTab, UI.TBL_LIST, "CrystalShopListItem", _purchaseGemList.Count, false, new Func<int, Transform, Transform>((object)_003C_viewGemTab_003Ec__AnonStorey2DE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003C_viewGemTab_003Ec__AnonStorey2DE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void _viewBundleTab()
 	{
+		//IL_03b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(gemTab, false);
 		SetActive(materialTab, false);
 		SetActive(bundleTab, true);
 		CheckOpenedBundleTab();
 		if (_purchaseBundleList.Count == 0)
 		{
-			SetActive(UI.OBJ_AIM, false);
-			SetActive(UI.TEX_NPCMODEL, false);
-			SetActive(UI.SPR_FRAME_DRAGON, false);
-			SetActive(UI.LBL_NONE, true);
+			SetActive((Enum)UI.OBJ_AIM, false);
+			SetActive((Enum)UI.TEX_NPCMODEL, false);
+			SetActive((Enum)UI.SPR_FRAME_DRAGON, false);
+			SetActive((Enum)UI.LBL_NONE, true);
 		}
 		else
 		{
-			SetActive(UI.OBJ_AIM, true);
-			SetActive(UI.TEX_NPCMODEL, true);
-			SetActive(UI.SPR_FRAME_DRAGON, true);
+			SetActive((Enum)UI.OBJ_AIM, true);
+			SetActive((Enum)UI.TEX_NPCMODEL, true);
+			SetActive((Enum)UI.SPR_FRAME_DRAGON, true);
 			if (_currentPageIndex < _purchaseBundleList.Count)
 			{
 				ProductData productData = _purchaseBundleList[_currentPageIndex];
@@ -324,7 +305,7 @@ public class CrystalShopTop : GameSection
 				UITexture sprw = FindCtrl(root, UI.SPR_WINDOW).GetComponent<UITexture>();
 				ResourceLoad.LoadShopImageTexture(sprw, pack.bundleImageId, delegate(Texture tex)
 				{
-					if ((UnityEngine.Object)sprw != (UnityEngine.Object)null)
+					if (sprw != null)
 					{
 						sprw.mainTexture = tex;
 					}
@@ -335,10 +316,10 @@ public class CrystalShopTop : GameSection
 					UITexture spro = FindCtrl(root, UI.SPR_OFFER).GetComponent<UITexture>();
 					ResourceLoad.LoadShopImageOfferTexture(sprw, (uint)productData.offerType, delegate(Texture tex)
 					{
-						if ((UnityEngine.Object)sprw != (UnityEngine.Object)null)
+						if (sprw != null)
 						{
-							spro.width = tex.width;
-							spro.height = tex.height;
+							spro.width = tex.get_width();
+							spro.height = tex.get_height();
 							spro.mainTexture = tex;
 						}
 					});
@@ -376,77 +357,27 @@ public class CrystalShopTop : GameSection
 			SetLabelText(UI.LBL_TOTAL, _purchaseBundleList.Count);
 			bool flag = _currentPageIndex > 0;
 			bool flag2 = _currentPageIndex < _purchaseBundleList.Count - 1;
-			SetColor(UI.SPR_AIM_L, (!flag) ? Color.clear : Color.white);
-			SetColor(UI.SPR_AIM_R, (!flag2) ? Color.clear : Color.white);
-			SetButtonEnabled(UI.BTN_AIM_L, flag);
-			SetButtonEnabled(UI.BTN_AIM_R, flag2);
-			SetActive(UI.BTN_AIM_L_INACTIVE, !flag);
-			SetActive(UI.BTN_AIM_R_INACTIVE, !flag2);
-			SetRepeatButton(UI.BTN_AIM_L, "AIM_L", null);
-			SetRepeatButton(UI.BTN_AIM_R, "AIM_R", null);
+			SetColor((Enum)UI.SPR_AIM_L, (!flag) ? Color.get_clear() : Color.get_white());
+			SetColor((Enum)UI.SPR_AIM_R, (!flag2) ? Color.get_clear() : Color.get_white());
+			SetButtonEnabled((Enum)UI.BTN_AIM_L, flag);
+			SetButtonEnabled((Enum)UI.BTN_AIM_R, flag2);
+			SetActive((Enum)UI.BTN_AIM_L_INACTIVE, !flag);
+			SetActive((Enum)UI.BTN_AIM_R_INACTIVE, !flag2);
+			SetRepeatButton((Enum)UI.BTN_AIM_L, "AIM_L", (object)null);
+			SetRepeatButton((Enum)UI.BTN_AIM_R, "AIM_R", (object)null);
 			_updateNPC();
 		}
 	}
 
-	private void _viewMaterialTab()
+	private unsafe void _viewMaterialTab()
 	{
 		SetActive(gemTab, false);
 		SetActive(bundleTab, false);
 		SetActive(materialTab, true);
 		CheckOpenedMaterialTab();
-		int j = 0;
-		SetTable(materialTab, UI.TBL_LIST, "CrystalShopListItemMaterial", _purchaseMaterialList.Count, false, delegate(int i, Transform t, bool b)
-		{
-			ProductData productData = _purchaseMaterialList[j];
-			string text = string.Format(base.sectionData.GetText("PRICE"), productData.priceIncludeTax);
-			UITexture spro = FindCtrl(t, UI.SPR_THUMB).GetComponent<UITexture>();
-			ResourceLoad.LoadShopImageMaterialTexture(spro, productData.iconImg, delegate(Texture tex)
-			{
-				if ((UnityEngine.Object)spro != (UnityEngine.Object)null)
-				{
-					spro.mainTexture = tex;
-				}
-			});
-			SetLabelText(t, UI.LBL_NAME, productData.name);
-			SetLabelText(t, UI.LBL_PRICE, text);
-			SetLabelText(t, UI.LBL_PRICE_OLD, (!(productData.oldPrice > 0.0)) ? string.Empty : string.Format(base.sectionData.GetText("PRICE_STRETCH"), productData.oldPrice));
-			SetSupportEncoding(t, UI.LBL_PRICE_OLD, true);
-			SetSupportEncoding(t, UI.LBL_PROMO, true);
-			SetLabelText(t, UI.LBL_PROMO, productData.promo.Replace("\\n", "\n"));
-			if (productData.remainingDay > 0)
-			{
-				string empty = string.Empty;
-				TimeSpan timeSpan = TimeSpan.FromSeconds((double)productData.remainingDay);
-				empty = ((timeSpan.Days <= 1) ? string.Format(base.sectionData.GetText("TIME_REMAIN"), $"{timeSpan.Hours:d2}:{timeSpan.Minutes:d2}:{timeSpan.Seconds:d2}") : string.Format(base.sectionData.GetText("DAY_REMAIN"), timeSpan.Days));
-				SetLabelText(t, UI.LBL_REMAIN, empty);
-			}
-			else
-			{
-				SetActive(t, UI.LBL_REMAIN, false);
-			}
-			SetActive(GetChildSafe(t, UI.OBJ_OFFER, productData.offerType - 1), true);
-			if (_nativeStoreList != null)
-			{
-				StoreData product = _nativeStoreList.getProduct(productData.productId);
-				if (product != null)
-				{
-					text = product.price.ToString();
-					SetLabelText(t, UI.LBL_PRICE, text);
-				}
-				product = _nativeStoreList.getProduct(productData.skipId);
-				if (product != null)
-				{
-					SetLabelText(t, UI.LBL_PRICE_OLD, product.price.ToString());
-				}
-			}
-			SetEvent(t, "MATERIAL_DETAIL", new object[3]
-			{
-				productData,
-				text,
-				j
-			});
-			j++;
-		});
+		int i = 0;
+		_003C_viewMaterialTab_003Ec__AnonStorey2E2 _003C_viewMaterialTab_003Ec__AnonStorey2E;
+		SetTable(materialTab, UI.TBL_LIST, "CrystalShopListItemMaterial", _purchaseMaterialList.Count, false, new Action<int, Transform, bool>((object)_003C_viewMaterialTab_003Ec__AnonStorey2E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnGetProductDatas(StoreDataList list)
@@ -457,13 +388,15 @@ public class CrystalShopTop : GameSection
 
 	private void _updateNPC()
 	{
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 		NPCMessageTable.Section section = Singleton<NPCMessageTable>.I.GetSection(base.sectionData.sectionName + "_TEXT");
 		if (section != null)
 		{
 			NPCMessageTable.Message message = section.GetNPCMessage();
 			if (message != null)
 			{
-				SetRenderNPCModel(UI.TEX_NPCMODEL, message.npc, message.pos, message.rot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.questCenterNPCFOV, delegate(NPCLoader loader)
+				SetRenderNPCModel((Enum)UI.TEX_NPCMODEL, message.npc, message.pos, message.rot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.questCenterNPCFOV, (Action<NPCLoader>)delegate(NPCLoader loader)
 				{
 					loader.GetAnimator().Play(message.animationStateName);
 				});
@@ -473,22 +406,28 @@ public class CrystalShopTop : GameSection
 
 	private void _disableChest()
 	{
-		if (!((UnityEngine.Object)_objBundle == (UnityEngine.Object)null))
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Expected O, but got Unknown
+		if (!(_objBundle == null))
 		{
 			foreach (Transform item in _objBundle)
 			{
-				SetActiveModel(item, UI.OBJ_MODEL, false);
+				Transform root = item;
+				SetActiveModel(root, UI.OBJ_MODEL, false);
 			}
 		}
 	}
 
 	private void _enableChest()
 	{
-		if (!((UnityEngine.Object)_objBundle == (UnityEngine.Object)null) && _viewType != 0 && _viewType != VIEW_TYPE.MATERIAL)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Expected O, but got Unknown
+		if (!(_objBundle == null) && _viewType != 0 && _viewType != VIEW_TYPE.MATERIAL)
 		{
 			foreach (Transform item in _objBundle)
 			{
-				SetActiveModel(item, UI.OBJ_MODEL, true);
+				Transform root = item;
+				SetActiveModel(root, UI.OBJ_MODEL, true);
 			}
 		}
 	}
@@ -770,7 +709,7 @@ public class CrystalShopTop : GameSection
 			Action onFinish = GetFinishAction(index, data);
 			MonoBehaviourSingleton<PresentManager>.I.SendGetPresent(0, delegate
 			{
-				onFinish();
+				onFinish.Invoke();
 			});
 		}
 		if (isPurchase)
@@ -779,43 +718,28 @@ public class CrystalShopTop : GameSection
 		}
 	}
 
-	private Action GetFinishAction(int index, ProductData product_data)
+	private unsafe Action GetFinishAction(int index, ProductData product_data)
 	{
-		return delegate
-		{
-			_disableChest();
-			GameSection.ChangeStayEvent("BUY", new object[7]
-			{
-				index,
-				product_data,
-				product_data.name,
-				product_data.discount,
-				product_data.price,
-				10,
-				5
-			});
-			GameSection.ResumeEvent(true, null);
-		};
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Expected O, but got Unknown
+		_003CGetFinishAction_003Ec__AnonStorey2E7 _003CGetFinishAction_003Ec__AnonStorey2E;
+		return new Action((object)_003CGetFinishAction_003Ec__AnonStorey2E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 	}
 
-	private Action GetFinishActionBundle(ShopReceiver.PaymentPurchaseData purchaseData)
+	private unsafe Action GetFinishActionBundle(ShopReceiver.PaymentPurchaseData purchaseData)
 	{
-		return delegate
-		{
-			_disableChest();
-			GlobalSettingsManager.PackParam.PackInfo pack = MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.GetPack(purchaseData.productId);
-			GameSection.ChangeStayEvent(string.IsNullOrEmpty(pack.eventName) ? "BUNDLE_NOTICE" : pack.eventName, purchaseData);
-			GameSection.ResumeEvent(true, null);
-		};
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Expected O, but got Unknown
+		_003CGetFinishActionBundle_003Ec__AnonStorey2E8 _003CGetFinishActionBundle_003Ec__AnonStorey2E;
+		return new Action((object)_003CGetFinishActionBundle_003Ec__AnonStorey2E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 	}
 
-	private Action GetFinishActionMaterial(ShopReceiver.PaymentPurchaseData purchaseData)
+	private unsafe Action GetFinishActionMaterial(ShopReceiver.PaymentPurchaseData purchaseData)
 	{
-		return delegate
-		{
-			GameSection.ChangeStayEvent("BUNDLE_NOTICE", purchaseData);
-			GameSection.ResumeEvent(true, null);
-		};
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Expected O, but got Unknown
+		_003CGetFinishActionMaterial_003Ec__AnonStorey2E9 _003CGetFinishActionMaterial_003Ec__AnonStorey2E;
+		return new Action((object)_003CGetFinishActionMaterial_003Ec__AnonStorey2E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 	}
 
 	private void SendRequestCurrentCrystal(Action onFinish)
@@ -826,15 +750,12 @@ public class CrystalShopTop : GameSection
 		}, string.Empty);
 	}
 
-	private void SendRequestCurrentPresentAndShopList(Action onFinish)
+	private unsafe void SendRequestCurrentPresentAndShopList(Action onFinish)
 	{
-		SendRequestCurrentCrystal(delegate
-		{
-			MonoBehaviourSingleton<PresentManager>.I.SendGetPresent(0, delegate
-			{
-				onFinish();
-			});
-		});
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Expected O, but got Unknown
+		_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2EB _003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2EB;
+		SendRequestCurrentCrystal(new Action((object)_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2EB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void CheckCrystalNum(OnceStatusInfoModel ret, Action onFinish)
@@ -843,7 +764,7 @@ public class CrystalShopTop : GameSection
 		{
 			MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal = ret.result.userStatus.crystal;
 			MonoBehaviourSingleton<UserInfoManager>.I.DirtyUserStatus();
-			onFinish();
+			onFinish.Invoke();
 		}
 	}
 
@@ -888,19 +809,19 @@ public class CrystalShopTop : GameSection
 		Transform t2 = FindCtrl(root, UI.BTN_BUNDLE_TAB);
 		if (isHighlightMaterial)
 		{
-			SetBadge(t, -1, SpriteAlignment.TopRight, -8, -8, false);
+			SetBadge(t, -1, 3, -8, -8, false);
 		}
 		else
 		{
-			SetBadge(t, 0, SpriteAlignment.TopRight, -8, -8, false);
+			SetBadge(t, 0, 3, -8, -8, false);
 		}
 		if (isHighlightBundle)
 		{
-			SetBadge(t2, -1, SpriteAlignment.TopRight, -8, -8, false);
+			SetBadge(t2, -1, 3, -8, -8, false);
 		}
 		else
 		{
-			SetBadge(t2, 0, SpriteAlignment.TopRight, -8, -8, false);
+			SetBadge(t2, 0, 3, -8, -8, false);
 		}
 		string text = PlayerPrefs.GetString("Purchase_Item_List_Tab_Gem", string.Empty);
 		int count = _purchaseGemList.Count;
@@ -921,14 +842,14 @@ public class CrystalShopTop : GameSection
 		Transform root = FindCtrl(materialTab, UI.SPR_BTN_BORDER);
 		Transform t = FindCtrl(root, UI.BTN_MATERIAL_TAB);
 		Transform t2 = FindCtrl(root, UI.BTN_BUNDLE_TAB);
-		SetBadge(t, 0, SpriteAlignment.TopRight, -8, -8, false);
+		SetBadge(t, 0, 3, -8, -8, false);
 		if (isHighlightBundle)
 		{
-			SetBadge(t2, -1, SpriteAlignment.TopRight, -8, -8, false);
+			SetBadge(t2, -1, 3, -8, -8, false);
 		}
 		else
 		{
-			SetBadge(t2, 0, SpriteAlignment.TopRight, -8, -8, false);
+			SetBadge(t2, 0, 3, -8, -8, false);
 		}
 		string text = PlayerPrefs.GetString("Purchase_Item_List_Tab_Material", string.Empty);
 		int count = _purchaseMaterialList.Count;
@@ -951,13 +872,13 @@ public class CrystalShopTop : GameSection
 		Transform t2 = FindCtrl(root, UI.BTN_BUNDLE_TAB);
 		if (isHighlightMaterial)
 		{
-			SetBadge(t, -1, SpriteAlignment.TopRight, -8, -8, false);
+			SetBadge(t, -1, 3, -8, -8, false);
 		}
 		else
 		{
-			SetBadge(t, 0, SpriteAlignment.TopRight, -8, -8, false);
+			SetBadge(t, 0, 3, -8, -8, false);
 		}
-		SetBadge(t2, 0, SpriteAlignment.TopRight, -8, -8, false);
+		SetBadge(t2, 0, 3, -8, -8, false);
 		string text = PlayerPrefs.GetString("Purchase_Item_List_Tab_Bundle", string.Empty);
 		int count = _purchaseBundleList.Count;
 		for (int i = 0; i < count; i++)

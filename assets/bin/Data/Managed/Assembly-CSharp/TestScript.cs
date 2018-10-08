@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TestScript : MonoBehaviour
+public class TestScript
 {
 	public GameObject ref1;
 
@@ -15,4 +15,9 @@ public class TestScript : MonoBehaviour
 	public Bounds bounds;
 
 	public Quaternion quat;
+
+	public TestScript()
+		: this()
+	{
+	}
 }

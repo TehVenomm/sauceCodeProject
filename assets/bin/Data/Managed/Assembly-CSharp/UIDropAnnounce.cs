@@ -145,7 +145,7 @@ public class UIDropAnnounce : MonoBehaviourSingleton<UIDropAnnounce>
 	protected int announceMax = 1;
 
 	[SerializeField]
-	protected Color[] announceColor = new Color[8]
+	protected Color[] announceColor = (Color[])new Color[8]
 	{
 		new Color(1f, 1f, 1f),
 		new Color(1f, 0.5f, 0f),
@@ -165,23 +165,36 @@ public class UIDropAnnounce : MonoBehaviourSingleton<UIDropAnnounce>
 
 	protected override void OnDisable()
 	{
+		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 		base.OnDisable();
 		announceQueue.Clear();
 		int i = 0;
 		for (int count = announceDispItems.Count; i < count; i++)
 		{
-			if ((Object)panelChange != (Object)null)
+			if (panelChange != null)
 			{
 				panelChange.Lock();
 			}
-			announceDispItems[i].gameObject.SetActive(false);
+			announceDispItems[i].get_gameObject().SetActive(false);
 		}
 		announceDispItems.Clear();
 	}
 
 	public void Announce(DropAnnounceInfo info)
 	{
-		if (base.gameObject.activeInHierarchy)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+		if (this.get_gameObject().get_activeInHierarchy())
 		{
 			if (announceDispItems.Count == announceMax)
 			{
@@ -193,28 +206,28 @@ public class UIDropAnnounce : MonoBehaviourSingleton<UIDropAnnounce>
 				int i = 0;
 				for (int count = announceItems.Count; i < count; i++)
 				{
-					if (!announceItems[i].gameObject.activeSelf)
+					if (!announceItems[i].get_gameObject().get_activeSelf())
 					{
 						uIDropAnnounceItem = announceItems[i];
 						break;
 					}
 				}
-				if ((Object)uIDropAnnounceItem == (Object)null)
+				if (uIDropAnnounceItem == null)
 				{
-					GameObject gameObject = ResourceUtility.Instantiate(announceItem);
-					gameObject.transform.parent = base.gameObject.transform;
-					gameObject.transform.localScale = Vector3.one;
-					uIDropAnnounceItem = gameObject.GetComponent<UIDropAnnounceItem>();
+					GameObject val = ResourceUtility.Instantiate<GameObject>(announceItem);
+					val.get_transform().set_parent(this.get_gameObject().get_transform());
+					val.get_transform().set_localScale(Vector3.get_one());
+					uIDropAnnounceItem = val.GetComponent<UIDropAnnounceItem>();
 					announceItems.Add(uIDropAnnounceItem);
 				}
-				if ((Object)panelChange != (Object)null)
+				if (panelChange != null)
 				{
 					panelChange.UnLock();
 				}
 				uIDropAnnounceItem.StartAnnounce(info.text, announceColor[(int)info.color], announceDispItems.Count > 0, OnEnd);
-				Vector3 zero = Vector3.zero;
+				Vector3 zero = Vector3.get_zero();
 				zero.y = (0f - announceItemSize) * (float)announceDispItems.Count;
-				uIDropAnnounceItem.transform.localPosition = zero;
+				uIDropAnnounceItem.get_transform().set_localPosition(zero);
 				announceDispItems.Add(uIDropAnnounceItem);
 			}
 		}
@@ -222,13 +235,14 @@ public class UIDropAnnounce : MonoBehaviourSingleton<UIDropAnnounce>
 
 	protected void OnEnd(UIDropAnnounceItem item)
 	{
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		announceDispItems.Remove(item);
 		int i = 0;
 		for (int count = announceDispItems.Count; i < count; i++)
 		{
 			announceDispItems[i].MovePos(i != 0, new Vector3(0f, (0f - announceItemSize) * (float)i, 0f), 0.1f);
 		}
-		if ((Object)panelChange != (Object)null)
+		if (panelChange != null)
 		{
 			panelChange.Lock();
 		}

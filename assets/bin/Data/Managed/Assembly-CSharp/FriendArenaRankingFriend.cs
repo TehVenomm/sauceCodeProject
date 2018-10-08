@@ -75,8 +75,8 @@ public class FriendArenaRankingFriend : FriendArenaRanking
 		base.UpdateOwnButton();
 		if (eventData != null && (recvList == null || recvList.Count <= 4))
 		{
-			SetActive(UI.BTN_OWN, false);
-			SetActive(UI.OBJ_OWN_OFF, false);
+			SetActive((Enum)UI.BTN_OWN, false);
+			SetActive((Enum)UI.OBJ_OWN_OFF, false);
 		}
 	}
 
@@ -85,18 +85,10 @@ public class FriendArenaRankingFriend : FriendArenaRanking
 		SendGetFriendRanking(group, callback);
 	}
 
-	private void SendGetFriendRanking(int sendGroup, Action<bool> callback)
+	private unsafe void SendGetFriendRanking(int sendGroup, Action<bool> callback)
 	{
-		MonoBehaviourSingleton<FriendManager>.I.SendGetFriendRanking(sendGroup, 0, delegate(bool is_success, List<ArenaRankingData> recv_data)
-		{
-			if (is_success)
-			{
-				recvList = ChangeData(CreateFriendCharaInfoList(recv_data));
-				CacheLists(recvList, recv_data);
-				rankingDataList = recv_data;
-			}
-			callback(is_success);
-		});
+		_003CSendGetFriendRanking_003Ec__AnonStorey2FB _003CSendGetFriendRanking_003Ec__AnonStorey2FB;
+		MonoBehaviourSingleton<FriendManager>.I.SendGetFriendRanking(sendGroup, 0, new Action<bool, List<ArenaRankingData>>((object)_003CSendGetFriendRanking_003Ec__AnonStorey2FB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void CacheLists(List<FriendCharaInfo> charaList, List<ArenaRankingData> rankingDataList)

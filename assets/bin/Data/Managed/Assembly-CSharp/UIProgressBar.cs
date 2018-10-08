@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/NGUI Progress Bar")]
+[ExecuteInEditMode]
 public class UIProgressBar : UIWidgetContainer
 {
 	public enum FillDirection
@@ -25,12 +25,12 @@ public class UIProgressBar : UIWidgetContainer
 	[HideInInspector]
 	protected UIWidget mBG;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected UIWidget mFG;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected float mValue = 1f;
 
 	[SerializeField]
@@ -53,9 +53,11 @@ public class UIProgressBar : UIWidgetContainer
 	{
 		get
 		{
-			if ((Object)mTrans == (Object)null)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Expected O, but got Unknown
+			if (mTrans == null)
 			{
-				mTrans = base.transform;
+				mTrans = this.get_transform();
 			}
 			return mTrans;
 		}
@@ -65,9 +67,10 @@ public class UIProgressBar : UIWidgetContainer
 	{
 		get
 		{
-			if ((Object)mCam == (Object)null)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			if (mCam == null)
 			{
-				mCam = NGUITools.FindCameraForLayer(base.gameObject.layer);
+				mCam = NGUITools.FindCameraForLayer(this.get_gameObject().get_layer());
 			}
 			return mCam;
 		}
@@ -81,7 +84,7 @@ public class UIProgressBar : UIWidgetContainer
 		}
 		set
 		{
-			if ((Object)mFG != (Object)value)
+			if (mFG != value)
 			{
 				mFG = value;
 				mIsDirty = true;
@@ -97,7 +100,7 @@ public class UIProgressBar : UIWidgetContainer
 		}
 		set
 		{
-			if ((Object)mBG != (Object)value)
+			if (mBG != value)
 			{
 				mBG = value;
 				mIsDirty = true;
@@ -156,11 +159,11 @@ public class UIProgressBar : UIWidgetContainer
 	{
 		get
 		{
-			if ((Object)mFG != (Object)null)
+			if (mFG != null)
 			{
 				return mFG.alpha;
 			}
-			if ((Object)mBG != (Object)null)
+			if (mBG != null)
 			{
 				return mBG.alpha;
 			}
@@ -168,43 +171,43 @@ public class UIProgressBar : UIWidgetContainer
 		}
 		set
 		{
-			if ((Object)mFG != (Object)null)
+			if (mFG != null)
 			{
 				mFG.alpha = value;
-				if ((Object)mFG.GetComponent<Collider>() != (Object)null)
+				if (mFG.GetComponent<Collider>() != null)
 				{
-					mFG.GetComponent<Collider>().enabled = (mFG.alpha > 0.001f);
+					mFG.GetComponent<Collider>().set_enabled(mFG.alpha > 0.001f);
 				}
-				else if ((Object)mFG.GetComponent<Collider2D>() != (Object)null)
+				else if (mFG.GetComponent<Collider2D>() != null)
 				{
-					mFG.GetComponent<Collider2D>().enabled = (mFG.alpha > 0.001f);
+					mFG.GetComponent<Collider2D>().set_enabled(mFG.alpha > 0.001f);
 				}
 			}
-			if ((Object)mBG != (Object)null)
+			if (mBG != null)
 			{
 				mBG.alpha = value;
-				if ((Object)mBG.GetComponent<Collider>() != (Object)null)
+				if (mBG.GetComponent<Collider>() != null)
 				{
-					mBG.GetComponent<Collider>().enabled = (mBG.alpha > 0.001f);
+					mBG.GetComponent<Collider>().set_enabled(mBG.alpha > 0.001f);
 				}
-				else if ((Object)mBG.GetComponent<Collider2D>() != (Object)null)
+				else if (mBG.GetComponent<Collider2D>() != null)
 				{
-					mBG.GetComponent<Collider2D>().enabled = (mBG.alpha > 0.001f);
+					mBG.GetComponent<Collider2D>().set_enabled(mBG.alpha > 0.001f);
 				}
 			}
-			if ((Object)thumb != (Object)null)
+			if (thumb != null)
 			{
 				UIWidget component = thumb.GetComponent<UIWidget>();
-				if ((Object)component != (Object)null)
+				if (component != null)
 				{
 					component.alpha = value;
-					if ((Object)component.GetComponent<Collider>() != (Object)null)
+					if (component.GetComponent<Collider>() != null)
 					{
-						component.GetComponent<Collider>().enabled = (component.alpha > 0.001f);
+						component.GetComponent<Collider>().set_enabled(component.alpha > 0.001f);
 					}
-					else if ((Object)component.GetComponent<Collider2D>() != (Object)null)
+					else if (component.GetComponent<Collider2D>() != null)
 					{
-						component.GetComponent<Collider2D>().enabled = (component.alpha > 0.001f);
+						component.GetComponent<Collider2D>().set_enabled(component.alpha > 0.001f);
 					}
 				}
 			}
@@ -218,14 +221,14 @@ public class UIProgressBar : UIWidgetContainer
 	protected void Start()
 	{
 		Upgrade();
-		if (Application.isPlaying)
+		if (Application.get_isPlaying())
 		{
-			if ((Object)mBG != (Object)null)
+			if (mBG != null)
 			{
 				mBG.autoResizeBoxCollider = true;
 			}
 			OnStart();
-			if ((Object)current == (Object)null && onChange != null)
+			if (current == null && onChange != null)
 			{
 				current = this;
 				EventDelegate.Execute(onChange);
@@ -292,28 +295,46 @@ public class UIProgressBar : UIWidgetContainer
 
 	protected float ScreenToValue(Vector2 screenPos)
 	{
+		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		Transform cachedTransform = this.cachedTransform;
-		Plane plane = new Plane(cachedTransform.rotation * Vector3.back, cachedTransform.position);
-		Ray ray = cachedCamera.ScreenPointToRay(screenPos);
-		if (!plane.Raycast(ray, out float enter))
+		Plane val = default(Plane);
+		val._002Ector(cachedTransform.get_rotation() * Vector3.get_back(), cachedTransform.get_position());
+		Ray val2 = cachedCamera.ScreenPointToRay(Vector2.op_Implicit(screenPos));
+		float num = default(float);
+		if (!val.Raycast(val2, ref num))
 		{
 			return value;
 		}
-		return LocalToValue(cachedTransform.InverseTransformPoint(ray.GetPoint(enter)));
+		return LocalToValue(Vector2.op_Implicit(cachedTransform.InverseTransformPoint(val2.GetPoint(num))));
 	}
 
 	protected virtual float LocalToValue(Vector2 localPos)
 	{
-		if ((Object)mFG != (Object)null)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		if (mFG != null)
 		{
 			Vector3[] localCorners = mFG.localCorners;
-			Vector3 vector = localCorners[2] - localCorners[0];
+			Vector3 val = localCorners[2] - localCorners[0];
 			if (isHorizontal)
 			{
-				float num = (localPos.x - localCorners[0].x) / vector.x;
+				float num = (localPos.x - localCorners[0].x) / val.x;
 				return (!isInverted) ? num : (1f - num);
 			}
-			float num2 = (localPos.y - localCorners[0].y) / vector.y;
+			float num2 = (localPos.y - localCorners[0].y) / val.y;
 			return (!isInverted) ? num2 : (1f - num2);
 		}
 		return value;
@@ -321,14 +342,46 @@ public class UIProgressBar : UIWidgetContainer
 
 	public virtual void ForceUpdate()
 	{
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0231: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0241: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0246: Unknown result type (might be due to invalid IL or missing references)
+		//IL_035f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0364: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0369: Unknown result type (might be due to invalid IL or missing references)
+		//IL_038e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_039a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_040c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0418: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0422: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0427: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0430: Unknown result type (might be due to invalid IL or missing references)
+		//IL_043c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0446: Unknown result type (might be due to invalid IL or missing references)
+		//IL_044b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_044e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0450: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0474: Unknown result type (might be due to invalid IL or missing references)
 		mIsDirty = false;
 		bool flag = false;
-		if ((Object)mFG != (Object)null)
+		if (mFG != null)
 		{
 			UIBasicSprite uIBasicSprite = mFG as UIBasicSprite;
 			if (isHorizontal)
 			{
-				if ((Object)uIBasicSprite != (Object)null && uIBasicSprite.type == UIBasicSprite.Type.Filled)
+				if (uIBasicSprite != null && uIBasicSprite.type == UIBasicSprite.Type.Filled)
 				{
 					if (uIBasicSprite.fillDirection == UIBasicSprite.FillDirection.Horizontal || uIBasicSprite.fillDirection == UIBasicSprite.FillDirection.Vertical)
 					{
@@ -340,11 +393,11 @@ public class UIProgressBar : UIWidgetContainer
 				else
 				{
 					mFG.drawRegion = ((!isInverted) ? new Vector4(0f, 0f, value, 1f) : new Vector4(1f - value, 0f, 1f, 1f));
-					mFG.enabled = true;
+					mFG.set_enabled(true);
 					flag = (value < 0.001f);
 				}
 			}
-			else if ((Object)uIBasicSprite != (Object)null && uIBasicSprite.type == UIBasicSprite.Type.Filled)
+			else if (uIBasicSprite != null && uIBasicSprite.type == UIBasicSprite.Type.Filled)
 			{
 				if (uIBasicSprite.fillDirection == UIBasicSprite.FillDirection.Horizontal || uIBasicSprite.fillDirection == UIBasicSprite.FillDirection.Vertical)
 				{
@@ -356,69 +409,80 @@ public class UIProgressBar : UIWidgetContainer
 			else
 			{
 				mFG.drawRegion = ((!isInverted) ? new Vector4(0f, 0f, 1f, value) : new Vector4(0f, 1f - value, 1f, 1f));
-				mFG.enabled = true;
+				mFG.set_enabled(true);
 				flag = (value < 0.001f);
 			}
 		}
-		if ((Object)thumb != (Object)null && ((Object)mFG != (Object)null || (Object)mBG != (Object)null))
+		if (thumb != null && (mFG != null || mBG != null))
 		{
-			Vector3[] array = (!((Object)mFG != (Object)null)) ? mBG.localCorners : mFG.localCorners;
-			Vector4 vector = (!((Object)mFG != (Object)null)) ? mBG.border : mFG.border;
-			array[0].x += vector.x;
-			array[1].x += vector.x;
-			array[2].x -= vector.z;
-			array[3].x -= vector.z;
-			array[0].y += vector.y;
-			array[1].y -= vector.w;
-			array[2].y -= vector.w;
-			array[3].y += vector.y;
-			Transform transform = (!((Object)mFG != (Object)null)) ? mBG.cachedTransform : mFG.cachedTransform;
+			Vector3[] array = (!(mFG != null)) ? mBG.localCorners : mFG.localCorners;
+			Vector4 val = (!(mFG != null)) ? mBG.border : mFG.border;
+			array[0].x += val.x;
+			array[1].x += val.x;
+			array[2].x -= val.z;
+			array[3].x -= val.z;
+			array[0].y += val.y;
+			array[1].y -= val.w;
+			array[2].y -= val.w;
+			array[3].y += val.y;
+			Transform val2 = (!(mFG != null)) ? mBG.cachedTransform : mFG.cachedTransform;
 			for (int i = 0; i < 4; i++)
 			{
-				array[i] = transform.TransformPoint(array[i]);
+				array[i] = val2.TransformPoint(array[i]);
 			}
 			if (isHorizontal)
 			{
-				Vector3 a = Vector3.Lerp(array[0], array[1], 0.5f);
-				Vector3 b = Vector3.Lerp(array[2], array[3], 0.5f);
-				SetThumbPosition(Vector3.Lerp(a, b, (!isInverted) ? value : (1f - value)));
+				Vector3 val3 = Vector3.Lerp(array[0], array[1], 0.5f);
+				Vector3 val4 = Vector3.Lerp(array[2], array[3], 0.5f);
+				SetThumbPosition(Vector3.Lerp(val3, val4, (!isInverted) ? value : (1f - value)));
 			}
 			else
 			{
-				Vector3 a2 = Vector3.Lerp(array[0], array[3], 0.5f);
-				Vector3 b2 = Vector3.Lerp(array[1], array[2], 0.5f);
-				SetThumbPosition(Vector3.Lerp(a2, b2, (!isInverted) ? value : (1f - value)));
+				Vector3 val5 = Vector3.Lerp(array[0], array[3], 0.5f);
+				Vector3 val6 = Vector3.Lerp(array[1], array[2], 0.5f);
+				SetThumbPosition(Vector3.Lerp(val5, val6, (!isInverted) ? value : (1f - value)));
 			}
 		}
 		if (flag)
 		{
-			mFG.enabled = false;
+			mFG.set_enabled(false);
 		}
 	}
 
 	protected void SetThumbPosition(Vector3 worldPos)
 	{
-		Transform parent = thumb.parent;
-		if ((Object)parent != (Object)null)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Expected O, but got Unknown
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		Transform val = thumb.get_parent();
+		if (val != null)
 		{
-			worldPos = parent.InverseTransformPoint(worldPos);
+			worldPos = val.InverseTransformPoint(worldPos);
 			worldPos.x = Mathf.Round(worldPos.x);
 			worldPos.y = Mathf.Round(worldPos.y);
 			worldPos.z = 0f;
-			if (Vector3.Distance(thumb.localPosition, worldPos) > 0.001f)
+			if (Vector3.Distance(thumb.get_localPosition(), worldPos) > 0.001f)
 			{
-				thumb.localPosition = worldPos;
+				thumb.set_localPosition(worldPos);
 			}
 		}
-		else if (Vector3.Distance(thumb.position, worldPos) > 1E-05f)
+		else if (Vector3.Distance(thumb.get_position(), worldPos) > 1E-05f)
 		{
-			thumb.position = worldPos;
+			thumb.set_position(worldPos);
 		}
 	}
 
 	public virtual void OnPan(Vector2 delta)
 	{
-		if (base.enabled)
+		if (this.get_enabled())
 		{
 			switch (mFill)
 			{

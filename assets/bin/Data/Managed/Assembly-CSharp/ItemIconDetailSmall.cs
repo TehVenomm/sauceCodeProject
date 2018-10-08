@@ -118,6 +118,7 @@ public class ItemIconDetailSmall : ItemIcon
 
 	private static ItemIcon _CreateSmallSkillDetailIcon(ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity, SkillItemSortData item_data, Transform parent = null, string event_name = null, int event_data = 0, bool is_new = false, int toggle_group = -1, int select_number = -1, bool is_equipping = false, ItemIconDetail.ICON_STATUS icon_status = ItemIconDetail.ICON_STATUS.NONE)
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		string format = (!item_data.skillData.IsExceeded()) ? "Lv. {0}/{1}" : ("Lv. {0}/" + UIUtility.GetColorText("{1}", ExceedSkillItemTable.color));
 		string icon_under_text = string.Format(format, item_data.GetLevel(), item_data.skillData.GetMaxLevel());
 		ItemIconDetailSmall itemIconDetailSmall = ItemIcon.CreateIcon<ItemIconDetailSmall>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailSmallPrefab, icon_type, icon_id, rarity, parent, item_data.GetIconElement(), item_data.skillData.tableData.GetEnableEquipType(), -1, event_name, event_data, is_new, toggle_group, select_number > -1, icon_under_text, is_equipping, 0, 0, false, QUEST_ICON_SIZE_TYPE.DEFAULT, GET_TYPE.PAY, ELEMENT_TYPE.MAX);
@@ -159,25 +160,29 @@ public class ItemIconDetailSmall : ItemIcon
 	{
 		if (equip_table == null)
 		{
-			spriteValueType.enabled = false;
+			spriteValueType.set_enabled(false);
 		}
 		else
 		{
-			spriteValueType.enabled = true;
+			spriteValueType.set_enabled(true);
 			spriteValueType.spriteName = ((!equip_table.IsWeapon()) ? ItemIcon.SPR_TYPE_DEF : ItemIcon.SPR_TYPE_ATK);
 		}
 	}
 
 	private void SetIconStatusSprite(ItemIconDetail.ICON_STATUS icon_status = ItemIconDetail.ICON_STATUS.NONE)
 	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 		SetRegistedIcon(false);
-		spriteValidEvolve.gameObject.SetActive(icon_status == ItemIconDetail.ICON_STATUS.VALID_EVOLVE);
-		spGrowMax.enabled = (icon_status == ItemIconDetail.ICON_STATUS.GROW_MAX);
-		spriteGrayOut.enabled = (icon_status == ItemIconDetail.ICON_STATUS.GRAYOUT || icon_status == ItemIconDetail.ICON_STATUS.NOT_ENOUGH_MATERIAL);
-		spriteEnableExceed.gameObject.SetActive(icon_status == ItemIconDetail.ICON_STATUS.VALID_EXCEED_0);
+		spriteValidEvolve.get_gameObject().SetActive(icon_status == ItemIconDetail.ICON_STATUS.VALID_EVOLVE);
+		spGrowMax.set_enabled(icon_status == ItemIconDetail.ICON_STATUS.GROW_MAX);
+		spriteGrayOut.set_enabled(icon_status == ItemIconDetail.ICON_STATUS.GRAYOUT || icon_status == ItemIconDetail.ICON_STATUS.NOT_ENOUGH_MATERIAL);
+		spriteEnableExceed.get_gameObject().SetActive(icon_status == ItemIconDetail.ICON_STATUS.VALID_EXCEED_0);
 		bool flag = icon_status == ItemIconDetail.ICON_STATUS.VALID_EXCEED || icon_status == ItemIconDetail.ICON_STATUS.VALID_EXCEED_0;
-		spriteBgSmall[0].gameObject.SetActive(!flag);
-		spriteBgSmall[1].gameObject.SetActive(flag);
+		spriteBgSmall[0].get_gameObject().SetActive(!flag);
+		spriteBgSmall[1].get_gameObject().SetActive(flag);
 	}
 
 	public void SetEquipIndexSprite(int index)
@@ -194,31 +199,31 @@ public class ItemIconDetailSmall : ItemIcon
 
 	public void SetupSelectNumberSprite(int select_number = -1)
 	{
-		if (!((Object)spriteSelectNumber == (Object)null))
+		if (!(spriteSelectNumber == null))
 		{
 			int num = select_number - 1;
 			if (num >= 0 && num < ItemIconDetailSetuperBase.SPR_SKILL_MATERIAL_NUMBER.Length)
 			{
-				spriteSelectNumber.enabled = true;
+				spriteSelectNumber.set_enabled(true);
 				spriteSelectNumber.spriteName = ItemIconDetailSetuperBase.SPR_SKILL_MATERIAL_NUMBER[num];
 			}
 			else
 			{
-				spriteSelectNumber.enabled = false;
+				spriteSelectNumber.set_enabled(false);
 			}
 		}
 	}
 
 	public void SetRegistedIcon(bool is_visible)
 	{
-		spRegistedAchievement.enabled = is_visible;
+		spRegistedAchievement.set_enabled(is_visible);
 	}
 
 	public override void SetGrayout(bool isActive)
 	{
-		if ((Object)spriteGrayOut != (Object)null)
+		if (spriteGrayOut != null)
 		{
-			spriteGrayOut.enabled = isActive;
+			spriteGrayOut.set_enabled(isActive);
 		}
 	}
 }

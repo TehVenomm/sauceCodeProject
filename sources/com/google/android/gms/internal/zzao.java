@@ -86,8 +86,8 @@ public final class zzao implements zzan {
         httpURLConnection.setUseCaches(false);
         httpURLConnection.setDoInput(true);
         "https".equals(url2.getProtocol());
-        for (String url3 : hashMap.keySet()) {
-            httpURLConnection.addRequestProperty(url3, (String) hashMap.get(url3));
+        for (String str : hashMap.keySet()) {
+            httpURLConnection.addRequestProperty(str, (String) hashMap.get(str));
         }
         switch (zzp.getMethod()) {
             case -1:

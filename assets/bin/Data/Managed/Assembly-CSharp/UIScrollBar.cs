@@ -52,7 +52,7 @@ public class UIScrollBar : UISlider
 				mIsDirty = true;
 				if (NGUITools.GetActive(this))
 				{
-					if ((UnityEngine.Object)UIProgressBar.current == (UnityEngine.Object)null && onChange != null)
+					if (UIProgressBar.current == null && onChange != null)
 					{
 						UIProgressBar.current = this;
 						EventDelegate.Execute(onChange);
@@ -83,10 +83,14 @@ public class UIScrollBar : UISlider
 
 	protected override void OnStart()
 	{
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Expected O, but got Unknown
 		base.OnStart();
-		if ((UnityEngine.Object)mFG != (UnityEngine.Object)null && (UnityEngine.Object)mFG.gameObject != (UnityEngine.Object)base.gameObject && ((UnityEngine.Object)mFG.GetComponent<Collider>() != (UnityEngine.Object)null || (UnityEngine.Object)mFG.GetComponent<Collider2D>() != (UnityEngine.Object)null))
+		if (mFG != null && mFG.get_gameObject() != this.get_gameObject() && (mFG.GetComponent<Collider>() != null || mFG.GetComponent<Collider2D>() != null))
 		{
-			UIEventListener uIEventListener = UIEventListener.Get(mFG.gameObject);
+			UIEventListener uIEventListener = UIEventListener.Get(mFG.get_gameObject());
 			UIEventListener uIEventListener2 = uIEventListener;
 			uIEventListener2.onPress = (UIEventListener.BoolDelegate)Delegate.Combine(uIEventListener2.onPress, new UIEventListener.BoolDelegate(base.OnPressForeground));
 			UIEventListener uIEventListener3 = uIEventListener;
@@ -97,38 +101,47 @@ public class UIScrollBar : UISlider
 
 	protected override float LocalToValue(Vector2 localPos)
 	{
-		if ((UnityEngine.Object)mFG != (UnityEngine.Object)null)
+		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+		if (mFG != null)
 		{
 			float num = Mathf.Clamp01(mSize) * 0.5f;
-			float t = num;
-			float t2 = 1f - num;
+			float num2 = num;
+			float num3 = 1f - num;
 			Vector3[] localCorners = mFG.localCorners;
 			if (base.isHorizontal)
 			{
-				t = Mathf.Lerp(localCorners[0].x, localCorners[2].x, t);
-				t2 = Mathf.Lerp(localCorners[0].x, localCorners[2].x, t2);
-				float num2 = t2 - t;
-				if (num2 == 0f)
+				num2 = Mathf.Lerp(localCorners[0].x, localCorners[2].x, num2);
+				num3 = Mathf.Lerp(localCorners[0].x, localCorners[2].x, num3);
+				float num4 = num3 - num2;
+				if (num4 == 0f)
 				{
 					return base.value;
 				}
-				return (!base.isInverted) ? ((localPos.x - t) / num2) : ((t2 - localPos.x) / num2);
+				return (!base.isInverted) ? ((localPos.x - num2) / num4) : ((num3 - localPos.x) / num4);
 			}
-			t = Mathf.Lerp(localCorners[0].y, localCorners[1].y, t);
-			t2 = Mathf.Lerp(localCorners[3].y, localCorners[2].y, t2);
-			float num3 = t2 - t;
-			if (num3 == 0f)
+			num2 = Mathf.Lerp(localCorners[0].y, localCorners[1].y, num2);
+			num3 = Mathf.Lerp(localCorners[3].y, localCorners[2].y, num3);
+			float num5 = num3 - num2;
+			if (num5 == 0f)
 			{
 				return base.value;
 			}
-			return (!base.isInverted) ? ((localPos.y - t) / num3) : ((t2 - localPos.y) / num3);
+			return (!base.isInverted) ? ((localPos.y - num2) / num5) : ((num3 - localPos.y) / num5);
 		}
 		return base.LocalToValue(localPos);
 	}
 
 	public override void ForceUpdate()
 	{
-		if ((UnityEngine.Object)mFG != (UnityEngine.Object)null)
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+		if (mFG != null)
 		{
 			mIsDirty = false;
 			float num = Mathf.Clamp01(mSize) * 0.5f;
@@ -143,11 +156,12 @@ public class UIScrollBar : UISlider
 			{
 				mFG.drawRegion = ((!base.isInverted) ? new Vector4(0f, num3, 1f, num4) : new Vector4(0f, 1f - num4, 1f, 1f - num3));
 			}
-			if ((UnityEngine.Object)thumb != (UnityEngine.Object)null)
+			if (thumb != null)
 			{
 				Vector4 drawingDimensions = mFG.drawingDimensions;
-				Vector3 position = new Vector3(Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, 0.5f), Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, 0.5f));
-				SetThumbPosition(mFG.cachedTransform.TransformPoint(position));
+				Vector3 val = default(Vector3);
+				val._002Ector(Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, 0.5f), Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, 0.5f));
+				SetThumbPosition(mFG.cachedTransform.TransformPoint(val));
 			}
 		}
 		else

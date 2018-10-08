@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class ItemDetailEquipAttachSkill : SkillInfoBase
@@ -64,15 +65,16 @@ public class ItemDetailEquipAttachSkill : SkillInfoBase
 		base.Initialize();
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
+		//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
 		if (callSection == ItemDetailEquip.CURRENT_SECTION.SMITH_CREATE || callSection == ItemDetailEquip.CURRENT_SECTION.EQUIP_LIST)
 		{
 			equipData = (eventData as EquipItemTable.EquipItemData);
 			slotData = GetSkillSlotData(eventData as EquipItemTable.EquipItemData, 0);
-			SetActive(UI.BTN_ATTACH, false);
-			SetActive(UI.BTN_DETACH, false);
-			SetActive(UI.BTN_GROW, false);
+			SetActive((Enum)UI.BTN_ATTACH, false);
+			SetActive((Enum)UI.BTN_DETACH, false);
+			SetActive((Enum)UI.BTN_GROW, false);
 		}
 		else if (callSection == ItemDetailEquip.CURRENT_SECTION.SMITH_EVOLVE)
 		{
@@ -80,18 +82,18 @@ public class ItemDetailEquipAttachSkill : SkillInfoBase
 			equipData = equipItemAndSkillData.equipItemInfo.tableData;
 			slotData = equipItemAndSkillData.skillSlotUIData;
 			isSkillUniqItem = true;
-			SetActive(UI.BTN_ATTACH, false);
-			SetActive(UI.BTN_DETACH, false);
-			SetActive(UI.BTN_GROW, false);
+			SetActive((Enum)UI.BTN_ATTACH, false);
+			SetActive((Enum)UI.BTN_DETACH, false);
+			SetActive((Enum)UI.BTN_GROW, false);
 		}
 		else if (callSection == ItemDetailEquip.CURRENT_SECTION.QUEST_ROOM)
 		{
 			equipData = (eventData as EquipItemInfo);
 			slotData = GetSkillSlotData(eventData as EquipItemInfo);
 			isSkillUniqItem = true;
-			SetActive(UI.BTN_ATTACH, false);
-			SetActive(UI.BTN_DETACH, false);
-			SetActive(UI.BTN_GROW, false);
+			SetActive((Enum)UI.BTN_ATTACH, false);
+			SetActive((Enum)UI.BTN_DETACH, false);
+			SetActive((Enum)UI.BTN_GROW, false);
 		}
 		else if (callSection == ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT)
 		{
@@ -99,105 +101,32 @@ public class ItemDetailEquipAttachSkill : SkillInfoBase
 			equipData = equipItemAndSkillData2.equipItemInfo;
 			slotData = equipItemAndSkillData2.skillSlotUIData;
 			isSkillUniqItem = true;
-			SetActive(UI.BTN_ATTACH, false);
-			SetActive(UI.BTN_DETACH, false);
-			SetActive(UI.BTN_GROW, false);
+			SetActive((Enum)UI.BTN_ATTACH, false);
+			SetActive((Enum)UI.BTN_DETACH, false);
+			SetActive((Enum)UI.BTN_GROW, false);
 		}
 		else
 		{
 			equipData = (eventData as EquipItemInfo);
 			slotData = GetSkillSlotData(eventData as EquipItemInfo);
 			isSkillUniqItem = true;
-			SetActive(UI.BTN_ATTACH, true);
-			SetActive(UI.BTN_DETACH, true);
-			SetActive(UI.BTN_GROW, true);
+			SetActive((Enum)UI.BTN_ATTACH, true);
+			SetActive((Enum)UI.BTN_DETACH, true);
+			SetActive((Enum)UI.BTN_GROW, true);
 			lookOnly = false;
 		}
-		SetToggle(UI.TGL_WINDOW_TITLE, lookOnly);
+		SetToggle((Enum)UI.TGL_WINDOW_TITLE, lookOnly);
 		if (slotData != null)
 		{
 			Transform table_item = null;
-			SetTable(UI.TBL_SKILL_LIST, "EquipSetDetailTopItem", 1, false, delegate(int i, Transform t, bool is_recycle)
-			{
-				table_item = t;
-				EquipItemTable.EquipItemData table = null;
-				int num = 1;
-				int num2 = 0;
-				if (callSection == ItemDetailEquip.CURRENT_SECTION.SMITH_CREATE || callSection == ItemDetailEquip.CURRENT_SECTION.SMITH_EVOLVE || callSection == ItemDetailEquip.CURRENT_SECTION.EQUIP_LIST)
-				{
-					table = (equipData as EquipItemTable.EquipItemData);
-				}
-				else
-				{
-					EquipItemInfo equipItemInfo = equipData as EquipItemInfo;
-					table = equipItemInfo.tableData;
-					num = equipItemInfo.level;
-					num2 = equipItemInfo.exceed;
-				}
-				ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemTable(table, sex, FindCtrl(t, UI.OBJ_ICON_ROOT), null, -1, null, 0, false, -1, false, null, false, false);
-				itemIcon.SetEnableCollider(false);
-				SetActive(t, UI.SPR_EQUIP_INDEX_ICON, false);
-				string name = table.name;
-				name = Utility.TrimText(name, GetCtrl(UI.LBL_EQUIP_NAME).GetComponent<UILabel>());
-				SetLabelText(t, UI.LBL_EQUIP_NAME, name);
-				SetLabelText(t, UI.LBL_EQUIP_NOW_LV, num.ToString());
-				SetLabelText(t, UI.LBL_EQUIP_MAX_LV, table.maxLv.ToString());
-				SetGrid(t, UI.GRD_ATTACH_SKILL, "EquipSetDetailTopItem2", slotData.Length, true, delegate(int i2, Transform t2, bool is_recycle2)
-				{
-					SkillItemInfo skillItemInfo = slotData[i2].itemData;
-					bool flag = skillItemInfo != null && skillItemInfo.tableData.type == slotData[i2].slotData.slotType;
-					SetSkillIcon(t2, UI.TEX_SKILL_ICON, slotData[i2].slotData.slotType, flag, false);
-					SetEvent(t2, (!flag) ? "SLOT" : "SLOT_DETAIL", i2);
-					SetLongTouch(t2, "SLOT_DETAIL", i2);
-					if (!flag)
-					{
-						skillItemInfo = null;
-					}
-					SetToggle(t2, UI.TGL_ACTIVE_OBJ, skillItemInfo != null);
-					SetActive(t2, UI.LBL_NAME, true);
-					SetActive(t2, UI.LBL_NAME_NOT_ENABLE_TYPE, false);
-					if (skillItemInfo == null)
-					{
-						SetLabelText(t2, UI.LBL_NAME, base.sectionData.GetText("EMPTY_SLOT"));
-						SetActive(t2, UI.SPR_ENABLE_WEAPON_TYPE, false);
-					}
-					else
-					{
-						SkillItemTable.SkillItemData tableData = skillItemInfo.tableData;
-						SetLabelText(t2, UI.LBL_NAME, tableData.name);
-						SetLabelText(t2, UI.LBL_NAME_NOT_ENABLE_TYPE, tableData.name);
-						SetLabelText(t2, UI.LBL_NOW_LV, skillItemInfo.level.ToString());
-						SetLabelText(t2, UI.LBL_MAX_LV, skillItemInfo.tableData.GetMaxLv(skillItemInfo.exceedCnt).ToString());
-						SetActive(t2, UI.LBL_EX_LV, skillItemInfo.IsExceeded());
-						SetLabelText(t2, UI.LBL_EX_LV, StringTable.Format(STRING_CATEGORY.SMITH, 9u, skillItemInfo.exceedCnt));
-						EQUIPMENT_TYPE? enableEquipType = skillItemInfo.tableData.GetEnableEquipType();
-						SetActive(t2, UI.SPR_ENABLE_WEAPON_TYPE, enableEquipType.HasValue);
-						if (enableEquipType.HasValue)
-						{
-							bool flag2 = enableEquipType.Value == table.type;
-							SetSkillEquipIconKind(t2, UI.SPR_ENABLE_WEAPON_TYPE, enableEquipType.Value, flag2);
-							SetActive(t2, UI.LBL_NAME, flag2);
-							SetActive(t2, UI.LBL_NAME_NOT_ENABLE_TYPE, !flag2);
-						}
-					}
-				});
-				GetComponent<UITable>(t, UI.TBL_SPACE).Reposition();
-				Vector3 localPosition = t.localPosition;
-				float y = localPosition.y;
-				Vector3 localPosition2 = FindCtrl(t, UI.OBJ_SPACE).localPosition;
-				float y2 = localPosition2.y;
-				Vector3 localPosition3 = FindCtrl(t, UI.TBL_SPACE).localPosition;
-				float num3 = y2 + localPosition3.y;
-				Vector3 localPosition4 = FindCtrl(t, UI.SPR_EQUIP_INDEX_ICON).localPosition;
-				localPosition4.y = (num3 - y) * 0.5f;
-				FindCtrl(t, UI.SPR_EQUIP_INDEX_ICON).localPosition = localPosition4;
-			});
-			Transform transform = FindCtrl(table_item, UI.OBJ_SPACE_COLLISION);
+			_003CUpdateUI_003Ec__AnonStorey3CA _003CUpdateUI_003Ec__AnonStorey3CA;
+			SetTable(UI.TBL_SKILL_LIST, "EquipSetDetailTopItem", 1, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3CA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			Transform val = FindCtrl(table_item, UI.OBJ_SPACE_COLLISION);
 			Transform ctrl = GetCtrl(UI.OBJ_ANCHOR_BOTTOM);
-			if ((Object)transform != (Object)null && (Object)ctrl != (Object)null)
+			if (val != null && ctrl != null)
 			{
 				UpdateAnchors();
-				ctrl.position = transform.position;
+				ctrl.set_position(val.get_position());
 				UpdateAnchors();
 			}
 		}

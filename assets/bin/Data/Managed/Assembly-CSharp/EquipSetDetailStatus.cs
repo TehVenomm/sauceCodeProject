@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class EquipSetDetailStatus : EquipSetDetailStatusAndAbilityTable
@@ -104,16 +105,16 @@ public class EquipSetDetailStatus : EquipSetDetailStatusAndAbilityTable
 		ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, sex, GetCtrl(UI.ICON_WEAPON), null, -1, "DETAIL", 0, false, -1, false, null, false, false);
 		if (equipItemInfo != null && equipItemInfo.tableID != 0)
 		{
-			itemIcon.SetEquipExt(equipItemInfo, GetComponent<UILabel>(UI.LBL_LV_NOW));
+			itemIcon.SetEquipExt(equipItemInfo, base.GetComponent<UILabel>((Enum)UI.LBL_LV_NOW));
 		}
-		SetLabelText(UI.LBL_NAME, equipItemInfo.tableData.name);
-		SetLabelText(UI.LBL_LV_NOW, equipItemInfo.level.ToString());
-		SetLabelText(UI.LBL_LV_MAX, equipItemInfo.tableData.maxLv.ToString());
+		SetLabelText((Enum)UI.LBL_NAME, equipItemInfo.tableData.name);
+		SetLabelText((Enum)UI.LBL_LV_NOW, equipItemInfo.level.ToString());
+		SetLabelText((Enum)UI.LBL_LV_MAX, equipItemInfo.tableData.maxLv.ToString());
 		Transform ctrl = GetCtrl(UI.SPR_TYPE_ICON_BG);
 		Transform t_icon = FindCtrl(ctrl, UI.SPR_TYPE_ICON);
-		Transform transform = FindCtrl(ctrl, UI.SPR_TYPE_ICON_RARITY);
-		SetEquipmentTypeIcon(t_icon, ctrl, transform, equipItemInfo.tableData);
-		SetActive(transform, false);
+		Transform val = FindCtrl(ctrl, UI.SPR_TYPE_ICON_RARITY);
+		SetEquipmentTypeIcon(t_icon, ctrl, val, equipItemInfo.tableData);
+		SetActive(val, false);
 		SetEvent(GetCtrl(UI.ICON_WEAPON), "DETAIL", selectEquipIndex);
 	}
 
@@ -134,11 +135,12 @@ public class EquipSetDetailStatus : EquipSetDetailStatusAndAbilityTable
 
 	private void InitializeCaption()
 	{
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
-		UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
-		if ((Object)component != (Object)null)
+		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
+		if (component != null)
 		{
 			component.Reset();
 			int i = 0;

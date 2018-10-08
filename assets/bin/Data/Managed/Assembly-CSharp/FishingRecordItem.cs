@@ -35,6 +35,7 @@ public class FishingRecordItem : UIBehaviour
 
 	public void Setup(Transform t, GatherItemRecord rec)
 	{
+		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
 		record = rec;
 		prefsKey = "gik_" + record.listId.ToString();
 		valueState = eValueState.None;

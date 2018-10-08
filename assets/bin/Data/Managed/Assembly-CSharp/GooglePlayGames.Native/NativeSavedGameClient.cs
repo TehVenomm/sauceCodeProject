@@ -32,8 +32,8 @@ namespace GooglePlayGames.Native
 				mConflictId = Misc.CheckNotNull(conflictId);
 				mOriginal = Misc.CheckNotNull(original);
 				mUnmerged = Misc.CheckNotNull(unmerged);
-				mCompleteCallback = Misc.CheckNotNull(completeCallback);
-				mRetryFileOpen = Misc.CheckNotNull(retryOpen);
+				mCompleteCallback = Misc.CheckNotNull<Action<SavedGameRequestStatus, ISavedGameMetadata>>(completeCallback);
+				mRetryFileOpen = Misc.CheckNotNull<Action>(retryOpen);
 			}
 
 			public void ChooseMetadata(ISavedGameMetadata chosenMetadata)
@@ -42,7 +42,7 @@ namespace GooglePlayGames.Native
 				if (nativeSnapshotMetadata != mOriginal && nativeSnapshotMetadata != mUnmerged)
 				{
 					Logger.e("Caller attempted to choose a version of the metadata that was not part of the conflict");
-					mCompleteCallback(SavedGameRequestStatus.BadInputError, null);
+					mCompleteCallback.Invoke(SavedGameRequestStatus.BadInputError, (ISavedGameMetadata)null);
 				}
 				else
 				{
@@ -50,11 +50,11 @@ namespace GooglePlayGames.Native
 					{
 						if (!response.RequestSucceeded())
 						{
-							mCompleteCallback(AsRequestStatus(response.ResponseStatus()), null);
+							mCompleteCallback.Invoke(AsRequestStatus(response.ResponseStatus()), (ISavedGameMetadata)null);
 						}
 						else
 						{
-							mRetryFileOpen();
+							mRetryFileOpen.Invoke();
 						}
 					});
 				}
@@ -79,21 +79,23 @@ namespace GooglePlayGames.Native
 
 			internal Prefetcher(Action<byte[], byte[]> dataFetchedCallback, Action<SavedGameRequestStatus, ISavedGameMetadata> completedCallback)
 			{
-				mDataFetchedCallback = Misc.CheckNotNull(dataFetchedCallback);
-				this.completedCallback = Misc.CheckNotNull(completedCallback);
+				mDataFetchedCallback = Misc.CheckNotNull<Action<byte[], byte[]>>(dataFetchedCallback);
+				this.completedCallback = Misc.CheckNotNull<Action<SavedGameRequestStatus, ISavedGameMetadata>>(completedCallback);
 			}
 
-			internal void OnOriginalDataRead(GooglePlayGames.Native.PInvoke.SnapshotManager.ReadResponse readResponse)
+			internal unsafe void OnOriginalDataRead(GooglePlayGames.Native.PInvoke.SnapshotManager.ReadResponse readResponse)
 			{
 				lock (mLock)
 				{
 					if (!readResponse.RequestSucceeded())
 					{
 						Logger.e("Encountered error while prefetching original data.");
-						completedCallback(AsRequestStatus(readResponse.ResponseStatus()), null);
-						completedCallback = delegate
+						completedCallback.Invoke(AsRequestStatus(readResponse.ResponseStatus()), (ISavedGameMetadata)null);
+						if (_003C_003Ef__am_0024cache7 == null)
 						{
-						};
+							_003C_003Ef__am_0024cache7 = new Action<SavedGameRequestStatus, ISavedGameMetadata>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+						}
+						completedCallback = _003C_003Ef__am_0024cache7;
 					}
 					else
 					{
@@ -105,17 +107,19 @@ namespace GooglePlayGames.Native
 				}
 			}
 
-			internal void OnUnmergedDataRead(GooglePlayGames.Native.PInvoke.SnapshotManager.ReadResponse readResponse)
+			internal unsafe void OnUnmergedDataRead(GooglePlayGames.Native.PInvoke.SnapshotManager.ReadResponse readResponse)
 			{
 				lock (mLock)
 				{
 					if (!readResponse.RequestSucceeded())
 					{
 						Logger.e("Encountered error while prefetching unmerged data.");
-						completedCallback(AsRequestStatus(readResponse.ResponseStatus()), null);
-						completedCallback = delegate
+						completedCallback.Invoke(AsRequestStatus(readResponse.ResponseStatus()), (ISavedGameMetadata)null);
+						if (_003C_003Ef__am_0024cache8 == null)
 						{
-						};
+							_003C_003Ef__am_0024cache8 = new Action<SavedGameRequestStatus, ISavedGameMetadata>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+						}
+						completedCallback = _003C_003Ef__am_0024cache8;
 					}
 					else
 					{
@@ -132,7 +136,7 @@ namespace GooglePlayGames.Native
 				if (mOriginalDataFetched && mUnmergedDataFetched)
 				{
 					Logger.d("Fetched data for original and unmerged, proceeding");
-					mDataFetchedCallback(mOriginalData, mUnmergedData);
+					mDataFetchedCallback.Invoke(mOriginalData, mUnmergedData);
 				}
 				else
 				{
@@ -153,12 +157,12 @@ namespace GooglePlayGames.Native
 		public void OpenWithAutomaticConflictResolution(string filename, DataSource source, ConflictResolutionStrategy resolutionStrategy, Action<SavedGameRequestStatus, ISavedGameMetadata> callback)
 		{
 			Misc.CheckNotNull(filename);
-			Misc.CheckNotNull(callback);
-			callback = ToOnGameThread(callback);
+			Misc.CheckNotNull<Action<SavedGameRequestStatus, ISavedGameMetadata>>(callback);
+			callback = ToOnGameThread<SavedGameRequestStatus, ISavedGameMetadata>(callback);
 			if (!IsValidFilename(filename))
 			{
 				Logger.e("Received invalid filename: " + filename);
-				callback(SavedGameRequestStatus.BadInputError, null);
+				callback.Invoke(SavedGameRequestStatus.BadInputError, (ISavedGameMetadata)null);
 			}
 			else
 			{
@@ -184,22 +188,22 @@ namespace GooglePlayGames.Native
 						break;
 					default:
 						Logger.e("Unhandled strategy " + resolutionStrategy);
-						callback(SavedGameRequestStatus.InternalError, null);
+						callback.Invoke(SavedGameRequestStatus.InternalError, (ISavedGameMetadata)null);
 						break;
 					}
 				}, callback);
 			}
 		}
 
-		private ConflictCallback ToOnGameThread(ConflictCallback conflictCallback)
+		private unsafe ConflictCallback ToOnGameThread(ConflictCallback conflictCallback)
 		{
-			return delegate(IConflictResolver resolver, ISavedGameMetadata original, byte[] originalData, ISavedGameMetadata unmerged, byte[] unmergedData)
+			return delegate
 			{
+				//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0048: Expected O, but got Unknown
 				Logger.d("Invoking conflict callback");
-				PlayGamesHelperObject.RunOnGameThread(delegate
-				{
-					conflictCallback(resolver, original, originalData, unmerged, unmergedData);
-				});
+				_003CToOnGameThread_003Ec__AnonStorey81B._003CToOnGameThread_003Ec__AnonStorey81C _003CToOnGameThread_003Ec__AnonStorey81C;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CToOnGameThread_003Ec__AnonStorey81C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			};
 		}
 
@@ -207,13 +211,13 @@ namespace GooglePlayGames.Native
 		{
 			Misc.CheckNotNull(filename);
 			Misc.CheckNotNull(conflictCallback);
-			Misc.CheckNotNull(completedCallback);
+			Misc.CheckNotNull<Action<SavedGameRequestStatus, ISavedGameMetadata>>(completedCallback);
 			conflictCallback = ToOnGameThread(conflictCallback);
-			completedCallback = ToOnGameThread(completedCallback);
+			completedCallback = ToOnGameThread<SavedGameRequestStatus, ISavedGameMetadata>(completedCallback);
 			if (!IsValidFilename(filename))
 			{
 				Logger.e("Received invalid filename: " + filename);
-				completedCallback(SavedGameRequestStatus.BadInputError, null);
+				completedCallback.Invoke(SavedGameRequestStatus.BadInputError, (ISavedGameMetadata)null);
 			}
 			else
 			{
@@ -221,36 +225,33 @@ namespace GooglePlayGames.Native
 			}
 		}
 
-		private void InternalManualOpen(string filename, DataSource source, bool prefetchDataOnConflict, ConflictCallback conflictCallback, Action<SavedGameRequestStatus, ISavedGameMetadata> completedCallback)
+		private unsafe void InternalManualOpen(string filename, DataSource source, bool prefetchDataOnConflict, ConflictCallback conflictCallback, Action<SavedGameRequestStatus, ISavedGameMetadata> completedCallback)
 		{
 			mSnapshotManager.Open(filename, AsDataSource(source), Types.SnapshotConflictPolicy.MANUAL, delegate(GooglePlayGames.Native.PInvoke.SnapshotManager.OpenResponse response)
 			{
+				//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00ab: Expected O, but got Unknown
 				if (!response.RequestSucceeded())
 				{
-					completedCallback(AsRequestStatus(response.ResponseStatus()), null);
+					completedCallback.Invoke(AsRequestStatus(response.ResponseStatus()), (ISavedGameMetadata)null);
 				}
 				else if (response.ResponseStatus() == CommonErrorStatus.SnapshotOpenStatus.VALID)
 				{
-					completedCallback(SavedGameRequestStatus.Success, response.Data());
+					completedCallback.Invoke(SavedGameRequestStatus.Success, (ISavedGameMetadata)response.Data());
 				}
 				else if (response.ResponseStatus() == CommonErrorStatus.SnapshotOpenStatus.VALID_WITH_CONFLICT)
 				{
 					NativeSnapshotMetadata original = response.ConflictOriginal();
 					NativeSnapshotMetadata unmerged = response.ConflictUnmerged();
-					NativeConflictResolver resolver = new NativeConflictResolver(mSnapshotManager, response.ConflictId(), original, unmerged, completedCallback, delegate
-					{
-						InternalManualOpen(filename, source, prefetchDataOnConflict, conflictCallback, completedCallback);
-					});
+					_003CInternalManualOpen_003Ec__AnonStorey81D._003CInternalManualOpen_003Ec__AnonStorey81E _003CInternalManualOpen_003Ec__AnonStorey81E;
+					NativeConflictResolver resolver = new NativeConflictResolver(mSnapshotManager, response.ConflictId(), original, unmerged, completedCallback, new Action((object)_003CInternalManualOpen_003Ec__AnonStorey81E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					if (!prefetchDataOnConflict)
 					{
 						conflictCallback(resolver, original, null, unmerged, null);
 					}
 					else
 					{
-						Prefetcher @object = new Prefetcher(delegate(byte[] originalData, byte[] unmergedData)
-						{
-							conflictCallback(resolver, original, originalData, unmerged, unmergedData);
-						}, completedCallback);
+						Prefetcher @object = new Prefetcher(new Action<byte[], byte[]>((object)_003CInternalManualOpen_003Ec__AnonStorey81E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), completedCallback);
 						mSnapshotManager.Read(original, @object.OnOriginalDataRead);
 						mSnapshotManager.Read(unmerged, @object.OnUnmergedDataRead);
 					}
@@ -258,7 +259,7 @@ namespace GooglePlayGames.Native
 				else
 				{
 					Logger.e("Unhandled response status");
-					completedCallback(SavedGameRequestStatus.InternalError, null);
+					completedCallback.Invoke(SavedGameRequestStatus.InternalError, (ISavedGameMetadata)null);
 				}
 			});
 		}
@@ -266,18 +267,18 @@ namespace GooglePlayGames.Native
 		public void ReadBinaryData(ISavedGameMetadata metadata, Action<SavedGameRequestStatus, byte[]> completedCallback)
 		{
 			Misc.CheckNotNull(metadata);
-			Misc.CheckNotNull(completedCallback);
-			completedCallback = ToOnGameThread(completedCallback);
+			Misc.CheckNotNull<Action<SavedGameRequestStatus, byte[]>>(completedCallback);
+			completedCallback = ToOnGameThread<SavedGameRequestStatus, byte[]>(completedCallback);
 			NativeSnapshotMetadata nativeSnapshotMetadata = metadata as NativeSnapshotMetadata;
 			if (nativeSnapshotMetadata == null)
 			{
 				Logger.e("Encountered metadata that was not generated by this ISavedGameClient");
-				completedCallback(SavedGameRequestStatus.BadInputError, null);
+				completedCallback.Invoke(SavedGameRequestStatus.BadInputError, (byte[])null);
 			}
 			else if (!nativeSnapshotMetadata.IsOpen)
 			{
 				Logger.e("This method requires an open ISavedGameMetadata.");
-				completedCallback(SavedGameRequestStatus.BadInputError, null);
+				completedCallback.Invoke(SavedGameRequestStatus.BadInputError, (byte[])null);
 			}
 			else
 			{
@@ -285,11 +286,11 @@ namespace GooglePlayGames.Native
 				{
 					if (!response.RequestSucceeded())
 					{
-						completedCallback(AsRequestStatus(response.ResponseStatus()), null);
+						completedCallback.Invoke(AsRequestStatus(response.ResponseStatus()), (byte[])null);
 					}
 					else
 					{
-						completedCallback(SavedGameRequestStatus.Success, response.Data());
+						completedCallback.Invoke(SavedGameRequestStatus.Success, response.Data());
 					}
 				});
 			}
@@ -298,18 +299,18 @@ namespace GooglePlayGames.Native
 		public void ShowSelectSavedGameUI(string uiTitle, uint maxDisplayedSavedGames, bool showCreateSaveUI, bool showDeleteSaveUI, Action<SelectUIStatus, ISavedGameMetadata> callback)
 		{
 			Misc.CheckNotNull(uiTitle);
-			Misc.CheckNotNull(callback);
-			callback = ToOnGameThread(callback);
+			Misc.CheckNotNull<Action<SelectUIStatus, ISavedGameMetadata>>(callback);
+			callback = ToOnGameThread<SelectUIStatus, ISavedGameMetadata>(callback);
 			if (maxDisplayedSavedGames == 0)
 			{
 				Logger.e("maxDisplayedSavedGames must be greater than 0");
-				callback(SelectUIStatus.BadInputError, null);
+				callback.Invoke(SelectUIStatus.BadInputError, (ISavedGameMetadata)null);
 			}
 			else
 			{
 				mSnapshotManager.SnapshotSelectUI(showCreateSaveUI, showDeleteSaveUI, maxDisplayedSavedGames, uiTitle, delegate(GooglePlayGames.Native.PInvoke.SnapshotManager.SnapshotSelectUIResponse response)
 				{
-					callback(AsUIStatus(response.RequestStatus()), (!response.RequestSucceeded()) ? null : response.Data());
+					callback.Invoke(AsUIStatus(response.RequestStatus()), (ISavedGameMetadata)((!response.RequestSucceeded()) ? null : response.Data()));
 				});
 			}
 		}
@@ -318,18 +319,18 @@ namespace GooglePlayGames.Native
 		{
 			Misc.CheckNotNull(metadata);
 			Misc.CheckNotNull(updatedBinaryData);
-			Misc.CheckNotNull(callback);
-			callback = ToOnGameThread(callback);
+			Misc.CheckNotNull<Action<SavedGameRequestStatus, ISavedGameMetadata>>(callback);
+			callback = ToOnGameThread<SavedGameRequestStatus, ISavedGameMetadata>(callback);
 			NativeSnapshotMetadata nativeSnapshotMetadata = metadata as NativeSnapshotMetadata;
 			if (nativeSnapshotMetadata == null)
 			{
 				Logger.e("Encountered metadata that was not generated by this ISavedGameClient");
-				callback(SavedGameRequestStatus.BadInputError, null);
+				callback.Invoke(SavedGameRequestStatus.BadInputError, (ISavedGameMetadata)null);
 			}
 			else if (!nativeSnapshotMetadata.IsOpen)
 			{
 				Logger.e("This method requires an open ISavedGameMetadata.");
-				callback(SavedGameRequestStatus.BadInputError, null);
+				callback.Invoke(SavedGameRequestStatus.BadInputError, (ISavedGameMetadata)null);
 			}
 			else
 			{
@@ -337,11 +338,11 @@ namespace GooglePlayGames.Native
 				{
 					if (!response.RequestSucceeded())
 					{
-						callback(AsRequestStatus(response.ResponseStatus()), null);
+						callback.Invoke(AsRequestStatus(response.ResponseStatus()), (ISavedGameMetadata)null);
 					}
 					else
 					{
-						callback(SavedGameRequestStatus.Success, response.Data());
+						callback.Invoke(SavedGameRequestStatus.Success, (ISavedGameMetadata)response.Data());
 					}
 				});
 			}
@@ -349,17 +350,17 @@ namespace GooglePlayGames.Native
 
 		public void FetchAllSavedGames(DataSource source, Action<SavedGameRequestStatus, List<ISavedGameMetadata>> callback)
 		{
-			Misc.CheckNotNull(callback);
-			callback = ToOnGameThread(callback);
+			Misc.CheckNotNull<Action<SavedGameRequestStatus, List<ISavedGameMetadata>>>(callback);
+			callback = ToOnGameThread<SavedGameRequestStatus, List<ISavedGameMetadata>>(callback);
 			mSnapshotManager.FetchAll(AsDataSource(source), delegate(GooglePlayGames.Native.PInvoke.SnapshotManager.FetchAllResponse response)
 			{
 				if (!response.RequestSucceeded())
 				{
-					callback(AsRequestStatus(response.ResponseStatus()), new List<ISavedGameMetadata>());
+					callback.Invoke(AsRequestStatus(response.ResponseStatus()), new List<ISavedGameMetadata>());
 				}
 				else
 				{
-					callback(SavedGameRequestStatus.Success, response.Data().Cast<ISavedGameMetadata>().ToList());
+					callback.Invoke(SavedGameRequestStatus.Success, response.Data().Cast<ISavedGameMetadata>().ToList());
 				}
 			});
 		}
@@ -484,15 +485,10 @@ namespace GooglePlayGames.Native
 			return builder.Build();
 		}
 
-		private static Action<T1, T2> ToOnGameThread<T1, T2>(Action<T1, T2> toConvert)
+		private unsafe static Action<T1, T2> ToOnGameThread<T1, T2>(Action<T1, T2> toConvert)
 		{
-			return delegate(T1 val1, T2 val2)
-			{
-				PlayGamesHelperObject.RunOnGameThread(delegate
-				{
-					toConvert(val1, val2);
-				});
-			};
+			_003CToOnGameThread_003Ec__AnonStorey823<T1, T2> _003CToOnGameThread_003Ec__AnonStorey;
+			return new Action<_003F, _003F>((object)_003CToOnGameThread_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 	}
 }

@@ -1,5 +1,7 @@
-using UnityEngine;
-
-public class UINoAuto : MonoBehaviour
+public class UINoAuto
 {
+	public UINoAuto()
+		: this()
+	{
+	}
 }

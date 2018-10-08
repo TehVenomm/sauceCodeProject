@@ -220,8 +220,8 @@ public class SkillInfo
 		{
 			return 1f;
 		}
-		float value = skillParam.useGaugeCounter / (float)(int)skillParam.useGauge;
-		return Mathf.Clamp01(value);
+		float num = skillParam.useGaugeCounter / (float)(int)skillParam.useGauge;
+		return Mathf.Clamp01(num);
 	}
 
 	public float GetPercentUseGauge2nd(int skill_index)
@@ -235,15 +235,15 @@ public class SkillInfo
 		{
 			return 0f;
 		}
-		float value = (skillParam.useGaugeCounter - (float)(int)skillParam.useGauge) / (float)(int)skillParam.useGauge2;
-		return Mathf.Clamp01(value);
+		float num = (skillParam.useGaugeCounter - (float)(int)skillParam.useGauge) / (float)(int)skillParam.useGauge2;
+		return Mathf.Clamp01(num);
 	}
 
 	public void OnUpdate()
 	{
 		if (!player.isDead && !player.isProgressStop())
 		{
-			float num = MonoBehaviourSingleton<InGameSettingsManager>.I.player.healSkillGaugePerSecond * Time.deltaTime;
+			float num = MonoBehaviourSingleton<InGameSettingsManager>.I.player.healSkillGaugePerSecond * Time.get_deltaTime();
 			num *= player.buffParam.GetSkillHealSpeedUp();
 			AddUseGauge(num, true, false);
 		}
@@ -590,7 +590,7 @@ public class SkillInfo
 							{
 								for (int num4 = 0; num4 < list.Count; num4++)
 								{
-									if (list[num4] != null && list[num4].tableData != null && list[num4].tableData.name == skillParam.tableData.name && (UnityEngine.Object)list[num4].bullet != (UnityEngine.Object)null)
+									if (list[num4] != null && list[num4].tableData != null && list[num4].tableData.name == skillParam.tableData.name && list[num4].bullet != null)
 									{
 										skillParam.bullet = list[j].bullet;
 									}

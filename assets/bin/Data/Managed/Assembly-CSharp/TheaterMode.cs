@@ -75,6 +75,8 @@ public class TheaterMode : GameSection
 
 	public override void Initialize()
 	{
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		object[] array = GameSection.GetEventData() as object[];
 		if (array != null)
 		{
@@ -84,18 +86,18 @@ public class TheaterMode : GameSection
 		isRenewalFlag = (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal);
 		if (isRenewalFlag)
 		{
-			StartCoroutine(DoInitialize2());
+			this.StartCoroutine(DoInitialize2());
 		}
 		else
 		{
-			StartCoroutine("DoInitialize");
+			this.StartCoroutine("DoInitialize");
 		}
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		Utility.CreateGameObjectAndComponent("TheaterModeTable", base.gameObject.transform, -1);
-		Utility.CreateGameObjectAndComponent("TheaterModeChapterTable", base.gameObject.transform, -1);
+		Utility.CreateGameObjectAndComponent("TheaterModeTable", this.get_gameObject().get_transform(), -1);
+		Utility.CreateGameObjectAndComponent("TheaterModeChapterTable", this.get_gameObject().get_transform(), -1);
 		while (MonoBehaviourSingleton<TheaterModeChapterTable>.I.isLoading || MonoBehaviourSingleton<TheaterModeTable>.I.isLoading)
 		{
 			yield return (object)null;
@@ -107,11 +109,11 @@ public class TheaterMode : GameSection
 		Dictionary<uint, List<int>> deliveryList = new Dictionary<uint, List<int>>();
 		MonoBehaviourSingleton<TheaterModeTable>.I.AllTheaterData(delegate(TheaterModeTable.TheaterModeData data)
 		{
-			if (!((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_00d8: stateMachine*/)._003CcheckList_003E__0.ContainsKey(data.script_id) && !((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_00d8: stateMachine*/)._003CidList_003E__1.ContainsKey(data.script_id))
+			if (!((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_00d8: stateMachine*/)._003CcheckList_003E__0.ContainsKey(data.script_id) && !((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_00d8: stateMachine*/)._003CidList_003E__1.ContainsKey(data.script_id))
 			{
-				((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_00d8: stateMachine*/)._003CcheckList_003E__0.Add(data.script_id, 0);
-				((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_00d8: stateMachine*/)._003CidList_003E__1.Add(data.script_id, data.story_id);
-				((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_00d8: stateMachine*/)._003CrevIdList_003E__2.Add(data.story_id, data.script_id);
+				((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_00d8: stateMachine*/)._003CcheckList_003E__0.Add(data.script_id, 0);
+				((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_00d8: stateMachine*/)._003CidList_003E__1.Add(data.script_id, data.story_id);
+				((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_00d8: stateMachine*/)._003CrevIdList_003E__2.Add(data.story_id, data.script_id);
 			}
 		});
 		if (checkList.ContainsKey(11000001))
@@ -126,17 +128,17 @@ public class TheaterMode : GameSection
 		{
 			Singleton<QuestTable>.I.AllQuestData(delegate(QuestTable.QuestTableData data)
 			{
-				if (data.storyId != 0 && ((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0.ContainsKey(data.storyId))
+				if (data.storyId != 0 && ((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0.ContainsKey(data.storyId))
 				{
-					if (((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0[data.storyId] == 0)
+					if (((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0[data.storyId] == 0)
 					{
-						((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0[data.storyId] = -1;
+						((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0[data.storyId] = -1;
 					}
-					((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_014e: stateMachine*/)._003CquestList_003E__3.Add(data.questID, data.storyId);
+					((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_014e: stateMachine*/)._003CquestList_003E__3.Add(data.questID, data.storyId);
 					ClearStatusQuest clearStatusQuestData = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(data.questID);
 					if (clearStatusQuestData != null && (clearStatusQuestData.questStatus == 3 || clearStatusQuestData.questStatus == 4))
 					{
-						((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0[data.storyId] = 1;
+						((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_014e: stateMachine*/)._003CcheckList_003E__0[data.storyId] = 1;
 					}
 				}
 			});
@@ -146,34 +148,34 @@ public class TheaterMode : GameSection
 			if (data.clearEventID != 0)
 			{
 				int clearEventID = (int)data.clearEventID;
-				if (((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0.ContainsKey(clearEventID))
+				if (((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0.ContainsKey(clearEventID))
 				{
-					if (((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[clearEventID] == 0)
+					if (((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[clearEventID] == 0)
 					{
-						((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[clearEventID] = -1;
+						((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[clearEventID] = -1;
 					}
-					((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_0164: stateMachine*/)._003C_003Ef__this.AddDeliveryList(((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_0164: stateMachine*/)._003CdeliveryList_003E__4, data.id, clearEventID);
+					((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003C_003Ef__this.AddDeliveryList(((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CdeliveryList_003E__4, data.id, clearEventID);
 					CLEAR_STATUS clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.GetClearStatusDelivery(data.id);
 					if (clearStatusDelivery == CLEAR_STATUS.CLEAR || clearStatusDelivery == CLEAR_STATUS.ALL_CLEAR)
 					{
-						((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[clearEventID] = 1;
+						((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[clearEventID] = 1;
 					}
 				}
 			}
 			if (data.readScriptId != 0)
 			{
 				int readScriptId = (int)data.readScriptId;
-				if (((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0.ContainsKey(readScriptId))
+				if (((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0.ContainsKey(readScriptId))
 				{
-					if (((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[readScriptId] == 0)
+					if (((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[readScriptId] == 0)
 					{
-						((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[readScriptId] = -1;
+						((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[readScriptId] = -1;
 					}
-					((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_0164: stateMachine*/)._003C_003Ef__this.AddDeliveryList(((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_0164: stateMachine*/)._003CdeliveryList_003E__4, data.id, readScriptId);
+					((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003C_003Ef__this.AddDeliveryList(((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CdeliveryList_003E__4, data.id, readScriptId);
 					CLEAR_STATUS clearStatusDelivery2 = MonoBehaviourSingleton<DeliveryManager>.I.GetClearStatusDelivery(data.id);
 					if (clearStatusDelivery2 == CLEAR_STATUS.CLEAR || clearStatusDelivery2 == CLEAR_STATUS.ALL_CLEAR)
 					{
-						((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[readScriptId] = 1;
+						((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0164: stateMachine*/)._003CcheckList_003E__0[readScriptId] = 1;
 					}
 				}
 			}
@@ -216,7 +218,7 @@ public class TheaterMode : GameSection
 					}
 					s_connectCache = ret.result;
 				}
-				((_003CDoInitialize_003Ec__IteratorFD)/*Error near IL_0362: stateMachine*/)._003CisEndConnection_003E__15 = true;
+				((_003CDoInitialize_003Ec__Iterator104)/*Error near IL_0362: stateMachine*/)._003CisEndConnection_003E__15 = true;
 			}, string.Empty);
 			while (!isEndConnection)
 			{
@@ -270,7 +272,7 @@ public class TheaterMode : GameSection
 			if (!bannerTable.ContainsKey(table.banner_id))
 			{
 				string bannerImg = ResourceName.GetEventBanner(table.banner_id);
-				LoadObject obj = loadingQueue.Load(RESOURCE_CATEGORY.EVENT_ICON, bannerImg, false);
+				LoadObject obj = loadingQueue.Load(true, RESOURCE_CATEGORY.EVENT_ICON, bannerImg, false);
 				bannerTable.Add(table.banner_id, obj);
 			}
 		}
@@ -302,7 +304,7 @@ public class TheaterMode : GameSection
 		}
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
 		List<TheaterModeChapterTable.TheaterModeChapterData> dispList;
 		if (m_isSelectMain)
@@ -316,67 +318,28 @@ public class TheaterMode : GameSection
 		if (m_pageMax > 1)
 		{
 			List<TheaterModeChapterTable.TheaterModeChapterData> list = new List<TheaterModeChapterTable.TheaterModeChapterData>();
-			int j = 0;
-			for (int count = dispList.Count; j < count; j++)
+			int i = 0;
+			for (int count = dispList.Count; i < count; i++)
 			{
-				if (j >= (m_nowPage - 1) * 10 && j < m_nowPage * 10)
+				if (i >= (m_nowPage - 1) * 10 && i < m_nowPage * 10)
 				{
-					list.Add(dispList[j]);
+					list.Add(dispList[i]);
 				}
 			}
 			dispList = list;
 		}
 		if (dispList == null || dispList.Count == 0)
 		{
-			SetActive(UI.STR_EVENT_NON_LIST, true);
+			SetActive((Enum)UI.STR_EVENT_NON_LIST, true);
 		}
 		else
 		{
-			SetActive(UI.STR_EVENT_NON_LIST, false);
+			SetActive((Enum)UI.STR_EVENT_NON_LIST, false);
 		}
-		SetLabelText(UI.LBL_MAX, m_pageMax.ToString());
-		SetLabelText(UI.LBL_NOW, m_nowPage.ToString());
-		SetDynamicList(UI.GRD_EVENT_QUEST, "TheaterModeListItem", dispList.Count, true, null, null, delegate(int i, Transform t, bool is_recycle)
-		{
-			if (m_isSelectMain)
-			{
-				SetActive(t, UI.MAIN_BG, true);
-				SetActive(t, UI.LBL_CHAPTER_NAME, true);
-				SetActive(t, UI.TEX_EVENT_BANNER, false);
-				SetLabelText(t, UI.LBL_CHAPTER_NAME, dispList[i].chapter_name);
-			}
-			else
-			{
-				bool flag = false;
-				Texture2D texture2D = null;
-				Dictionary<int, LoadObject> dictionary = IsDownloadingBanner ? prevBannerTable : bannerTable;
-				if (dictionary.TryGetValue(dispList[i].banner_id, out LoadObject value))
-				{
-					texture2D = (value.loadedObject as Texture2D);
-					if ((UnityEngine.Object)texture2D != (UnityEngine.Object)null)
-					{
-						Transform t2 = FindCtrl(t, UI.TEX_EVENT_BANNER);
-						SetActive(t2, true);
-						SetTexture(t2, texture2D);
-						SetActive(t, UI.LBL_CHAPTER_NAME, false);
-						SetActive(t, UI.MAIN_BG, false);
-						flag = true;
-					}
-				}
-				if (!flag)
-				{
-					SetActive(t, UI.MAIN_BG, true);
-					SetActive(t, UI.LBL_CHAPTER_NAME, true);
-					SetActive(t, UI.TEX_EVENT_BANNER, false);
-					SetLabelText(t, UI.LBL_CHAPTER_NAME, dispList[i].chapter_name);
-				}
-			}
-			SetEvent(t, "STORY", new object[2]
-			{
-				GetCanViewChapterList((int)dispList[i].chapter_id),
-				dispList[i].chapter_name
-			});
-		});
+		SetLabelText((Enum)UI.LBL_MAX, m_pageMax.ToString());
+		SetLabelText((Enum)UI.LBL_NOW, m_nowPage.ToString());
+		_003CUpdateUI_003Ec__AnonStorey3E5 _003CUpdateUI_003Ec__AnonStorey3E;
+		SetDynamicList((Enum)UI.GRD_EVENT_QUEST, "TheaterModeListItem", dispList.Count, true, null, null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnApplicationPause(bool pause)
@@ -406,38 +369,37 @@ public class TheaterMode : GameSection
 		if (!m_isSelectMain)
 		{
 			m_isSelectMain = true;
-			SetActive(UI.BTN_TAB_MAIN_OFF, false);
-			SetActive(UI.BTN_TAB_MAIN_ON, true);
-			SetActive(UI.BTN_TAB_EVENT_OFF, true);
-			SetActive(UI.BTN_TAB_EVENT_ON, false);
-			SetActive(UI.SPR_TAB_EVENT, false);
-			SetActive(UI.SPR_TAB_MAIN, true);
+			SetActive((Enum)UI.BTN_TAB_MAIN_OFF, false);
+			SetActive((Enum)UI.BTN_TAB_MAIN_ON, true);
+			SetActive((Enum)UI.BTN_TAB_EVENT_OFF, true);
+			SetActive((Enum)UI.BTN_TAB_EVENT_ON, false);
+			SetActive((Enum)UI.SPR_TAB_EVENT, false);
+			SetActive((Enum)UI.SPR_TAB_MAIN, true);
 			SetPaging();
 			RefreshUI();
 		}
 	}
 
-	private void OnQuery_SELECT_EVENT()
+	private unsafe void OnQuery_SELECT_EVENT()
 	{
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Expected O, but got Unknown
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 		if (m_isSelectMain)
 		{
 			m_isSelectMain = false;
-			SetActive(UI.BTN_TAB_MAIN_OFF, true);
-			SetActive(UI.BTN_TAB_MAIN_ON, false);
-			SetActive(UI.BTN_TAB_EVENT_OFF, false);
-			SetActive(UI.BTN_TAB_EVENT_ON, true);
-			SetActive(UI.SPR_TAB_EVENT, true);
-			SetActive(UI.SPR_TAB_MAIN, false);
+			SetActive((Enum)UI.BTN_TAB_MAIN_OFF, true);
+			SetActive((Enum)UI.BTN_TAB_MAIN_ON, false);
+			SetActive((Enum)UI.BTN_TAB_EVENT_OFF, false);
+			SetActive((Enum)UI.BTN_TAB_EVENT_ON, true);
+			SetActive((Enum)UI.SPR_TAB_EVENT, true);
+			SetActive((Enum)UI.SPR_TAB_MAIN, false);
 			SetPaging();
 			if (isRenewalFlag)
 			{
 				if (!IsDownloadingBanner)
 				{
-					StartCoroutine(LoadBannerImage(m_nowPage, delegate
-					{
-						RefreshUI();
-						ReleasePrevBannerImage();
-					}));
+					this.StartCoroutine(LoadBannerImage(m_nowPage, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 				}
 			}
 			else
@@ -447,18 +409,17 @@ public class TheaterMode : GameSection
 		}
 	}
 
-	private void OnQuery_PAGE_PREV()
+	private unsafe void OnQuery_PAGE_PREV()
 	{
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Expected O, but got Unknown
+		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		if (isRenewalFlag)
 		{
 			if (!IsDownloadingBanner)
 			{
 				m_nowPage = ((m_nowPage <= 1) ? m_pageMax : (m_nowPage - 1));
-				StartCoroutine(LoadBannerImage(m_nowPage, delegate
-				{
-					RefreshUI();
-					ReleasePrevBannerImage();
-				}));
+				this.StartCoroutine(LoadBannerImage(m_nowPage, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 			}
 		}
 		else
@@ -468,18 +429,17 @@ public class TheaterMode : GameSection
 		}
 	}
 
-	private void OnQuery_PAGE_NEXT()
+	private unsafe void OnQuery_PAGE_NEXT()
 	{
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Expected O, but got Unknown
+		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		if (isRenewalFlag)
 		{
 			if (!IsDownloadingBanner)
 			{
 				m_nowPage = ((m_nowPage >= m_pageMax) ? 1 : (m_nowPage + 1));
-				StartCoroutine(LoadBannerImage(m_nowPage, delegate
-				{
-					RefreshUI();
-					ReleasePrevBannerImage();
-				}));
+				this.StartCoroutine(LoadBannerImage(m_nowPage, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 			}
 		}
 		else
@@ -495,18 +455,18 @@ public class TheaterMode : GameSection
 		List<TheaterModeChapterTable.TheaterModeChapterData> list = (!m_isSelectMain) ? m_eventChapterList : m_mainChapterList;
 		if (list.Count <= 10)
 		{
-			SetActive(UI.OBJ_ACTIVE_ROOT, false);
-			SetActive(UI.OBJ_INACTIVE_ROOT, true);
+			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, false);
+			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, true);
 			m_pageMax = 1;
 		}
 		else
 		{
-			SetActive(UI.OBJ_ACTIVE_ROOT, true);
-			SetActive(UI.OBJ_INACTIVE_ROOT, false);
+			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, true);
+			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, false);
 			m_pageMax = Mathf.CeilToInt((float)list.Count / 10f);
 		}
-		SetLabelText(UI.LBL_MAX, m_pageMax.ToString());
-		SetLabelText(UI.LBL_NOW, m_nowPage.ToString());
+		SetLabelText((Enum)UI.LBL_MAX, m_pageMax.ToString());
+		SetLabelText((Enum)UI.LBL_NOW, m_nowPage.ToString());
 	}
 
 	private void OnQuery_STORY()
@@ -516,7 +476,7 @@ public class TheaterMode : GameSection
 	private void OnQuery_BUTTONBACK()
 	{
 		s_connectCache = null;
-		Debug.Log("CLEAR CACHE!!");
+		Debug.Log((object)"CLEAR CACHE!!");
 		GameSection.ChangeEvent("[BACK]", null);
 	}
 
@@ -524,7 +484,7 @@ public class TheaterMode : GameSection
 	{
 		yield return (object)InitTables();
 		InitChapterTables();
-		yield return (object)StartCoroutine(LoadBannerImage(1, null));
+		yield return (object)this.StartCoroutine(LoadBannerImage(1, null));
 		SetPaging();
 		m_isSelectMain = false;
 		OnQuery_SELECT_MAIN();
@@ -537,8 +497,8 @@ public class TheaterMode : GameSection
 
 	private IEnumerator InitTables()
 	{
-		Utility.CreateGameObjectAndComponent("TheaterModeTable", base.gameObject.transform, -1);
-		Utility.CreateGameObjectAndComponent("TheaterModeChapterTable", base.gameObject.transform, -1);
+		Utility.CreateGameObjectAndComponent("TheaterModeTable", this.get_gameObject().get_transform(), -1);
+		Utility.CreateGameObjectAndComponent("TheaterModeChapterTable", this.get_gameObject().get_transform(), -1);
 		while (MonoBehaviourSingleton<TheaterModeChapterTable>.I.isLoading || MonoBehaviourSingleton<TheaterModeTable>.I.isLoading)
 		{
 			yield return (object)null;
@@ -551,18 +511,18 @@ public class TheaterMode : GameSection
 		Dictionary<int, int> stateList = new Dictionary<int, int>();
 		MonoBehaviourSingleton<TheaterModeTable>.I.AllTheaterDataDesc(delegate(TheaterModeTable.TheaterModeData data)
 		{
-			if (!((_003CInitTables_003Ec__IteratorFF)/*Error near IL_00df: stateMachine*/)._003CcheckList_003E__0.ContainsKey(data.script_id) && !((_003CInitTables_003Ec__IteratorFF)/*Error near IL_00df: stateMachine*/)._003CidList_003E__1.ContainsKey(data.script_id))
+			if (!((_003CInitTables_003Ec__Iterator106)/*Error near IL_00df: stateMachine*/)._003CcheckList_003E__0.ContainsKey(data.script_id) && !((_003CInitTables_003Ec__Iterator106)/*Error near IL_00df: stateMachine*/)._003CidList_003E__1.ContainsKey(data.script_id))
 			{
-				((_003CInitTables_003Ec__IteratorFF)/*Error near IL_00df: stateMachine*/)._003CcheckList_003E__0.Add(data.script_id, 0);
-				((_003CInitTables_003Ec__IteratorFF)/*Error near IL_00df: stateMachine*/)._003CstateList_003E__5.Add(data.script_id, data.state_id);
-				((_003CInitTables_003Ec__IteratorFF)/*Error near IL_00df: stateMachine*/)._003CidList_003E__1.Add(data.script_id, data.story_id);
-				((_003CInitTables_003Ec__IteratorFF)/*Error near IL_00df: stateMachine*/)._003CrevIdList_003E__2.Add(data.story_id, data.script_id);
+				((_003CInitTables_003Ec__Iterator106)/*Error near IL_00df: stateMachine*/)._003CcheckList_003E__0.Add(data.script_id, 0);
+				((_003CInitTables_003Ec__Iterator106)/*Error near IL_00df: stateMachine*/)._003CstateList_003E__5.Add(data.script_id, data.state_id);
+				((_003CInitTables_003Ec__Iterator106)/*Error near IL_00df: stateMachine*/)._003CidList_003E__1.Add(data.script_id, data.story_id);
+				((_003CInitTables_003Ec__Iterator106)/*Error near IL_00df: stateMachine*/)._003CrevIdList_003E__2.Add(data.story_id, data.script_id);
 			}
 		});
 		SetTutorialStoryForceEnableView(checkList);
 		SetQuestStorySetting(checkList, stateList, questList);
 		SetDeliveryStorySetting(checkList, stateList, deliveryList);
-		yield return (object)StartCoroutine(RequestPrologueStoryStatusAPI(checkList, deliveryList, idList));
+		yield return (object)this.StartCoroutine(RequestPrologueStoryStatusAPI(checkList, deliveryList, idList));
 		CheckPrologueStorySettings(checkList, revIdList);
 		m_canViewStoryList = MonoBehaviourSingleton<TheaterModeTable>.I.GetTableFromOKDic(checkList);
 	}
@@ -781,7 +741,7 @@ public class TheaterMode : GameSection
 					}
 					s_connectCache = ret.result;
 				}
-				((_003CRequestPrologueStoryStatusAPI_003Ec__Iterator100)/*Error near IL_0212: stateMachine*/)._003CisEndConnection_003E__10 = true;
+				((_003CRequestPrologueStoryStatusAPI_003Ec__Iterator107)/*Error near IL_0212: stateMachine*/)._003CisEndConnection_003E__10 = true;
 			}, string.Empty);
 			while (!isEndConnection)
 			{
@@ -843,7 +803,10 @@ public class TheaterMode : GameSection
 		if (m_canViewChapterList == null || _nextVisiblePageNum < 1)
 		{
 			m_isDownloadingBanner = false;
-			_onCompleteCallback?.Invoke();
+			if (_onCompleteCallback != null)
+			{
+				_onCompleteCallback.Invoke();
+			}
 		}
 		else
 		{
@@ -858,7 +821,7 @@ public class TheaterMode : GameSection
 				if (!bannerTable.ContainsKey(table.banner_id))
 				{
 					string bannerImg = ResourceName.GetEventBanner(table.banner_id);
-					LoadObject obj = loadingQueue.Load(RESOURCE_CATEGORY.EVENT_ICON, bannerImg, false);
+					LoadObject obj = loadingQueue.Load(true, RESOURCE_CATEGORY.EVENT_ICON, bannerImg, false);
 					bannerTable.Add(table.banner_id, obj);
 				}
 			}
@@ -867,7 +830,10 @@ public class TheaterMode : GameSection
 				yield return (object)loadingQueue.Wait();
 			}
 			m_isDownloadingBanner = false;
-			_onCompleteCallback?.Invoke();
+			if (_onCompleteCallback != null)
+			{
+				_onCompleteCallback.Invoke();
+			}
 		}
 	}
 

@@ -110,7 +110,7 @@ public class ShopReceiver : MonoBehaviourSingleton<ShopReceiver>
 			}
 			else
 			{
-				onBillingUnavailable();
+				onBillingUnavailable.Invoke();
 			}
 		}
 	}

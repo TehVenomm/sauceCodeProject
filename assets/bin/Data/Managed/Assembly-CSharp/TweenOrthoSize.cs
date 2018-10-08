@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
 [AddComponentMenu("NGUI/Tween/Tween Orthographic Size")]
+[RequireComponent(typeof(Camera))]
 public class TweenOrthoSize : UITweener
 {
 	public float from = 1f;
@@ -15,9 +15,9 @@ public class TweenOrthoSize : UITweener
 	{
 		get
 		{
-			if ((UnityEngine.Object)mCam == (UnityEngine.Object)null)
+			if (mCam == null)
 			{
-				mCam = GetComponent<Camera>();
+				mCam = this.GetComponent<Camera>();
 			}
 			return mCam;
 		}
@@ -40,11 +40,11 @@ public class TweenOrthoSize : UITweener
 	{
 		get
 		{
-			return cachedCamera.orthographicSize;
+			return cachedCamera.get_orthographicSize();
 		}
 		set
 		{
-			cachedCamera.orthographicSize = value;
+			cachedCamera.set_orthographicSize(value);
 		}
 	}
 
@@ -61,7 +61,7 @@ public class TweenOrthoSize : UITweener
 		if (duration <= 0f)
 		{
 			tweenOrthoSize.Sample(1f, true);
-			tweenOrthoSize.enabled = false;
+			tweenOrthoSize.set_enabled(false);
 		}
 		return tweenOrthoSize;
 	}

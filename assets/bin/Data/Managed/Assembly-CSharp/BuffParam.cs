@@ -1464,13 +1464,13 @@ public class BuffParam
 			{
 				if (data[i].endless.HasValue && !data[i].endless.Value)
 				{
-					data[i].time -= Time.deltaTime;
+					data[i].time -= Time.get_deltaTime();
 				}
 				if (flag && !flag2)
 				{
 					if (data[i].interval > 0f)
 					{
-						data[i].progress += Time.deltaTime;
+						data[i].progress += Time.get_deltaTime();
 						if (data[i].interval < data[i].progress)
 						{
 							chara.OnBuffRoutine(data[i], false);
@@ -1484,7 +1484,7 @@ public class BuffParam
 						{
 						case BUFFTYPE.SHIELD:
 						case BUFFTYPE.SHIELD_SUPER_ARMOR:
-							if ((UnityEngine.Object)player != (UnityEngine.Object)null && (int)player.ShieldHp <= 0)
+							if (player != null && (int)player.ShieldHp <= 0)
 							{
 								flag4 = true;
 							}
@@ -1559,7 +1559,7 @@ public class BuffParam
 			{
 				buffData.interval = MonoBehaviourSingleton<InGameSettingsManager>.I.buff.invincibleInterval;
 			}
-			if ((UnityEngine.Object)invincibleCountAnimator != (UnityEngine.Object)null)
+			if (invincibleCountAnimator != null)
 			{
 				invincibleCountAnimator.SetTrigger("Hit");
 			}
@@ -1581,7 +1581,7 @@ public class BuffParam
 			{
 				buffData.interval = MonoBehaviourSingleton<InGameSettingsManager>.I.buff.invincibleInterval;
 			}
-			if ((UnityEngine.Object)invincibleBadStatusAnimator != (UnityEngine.Object)null)
+			if (invincibleBadStatusAnimator != null)
 			{
 				invincibleBadStatusAnimator.SetTrigger("Hit");
 			}
@@ -2051,7 +2051,7 @@ public class BuffParam
 	{
 		int num = GetValue(BUFFTYPE.DAMAGE_UP, true);
 		int value = GetValue(BUFFTYPE.BOOST_DAMAGE_UP, true);
-		if (value > 0 && (UnityEngine.Object)player != (UnityEngine.Object)null && player.isBoostMode)
+		if (value > 0 && player != null && player.isBoostMode)
 		{
 			num += value;
 		}
@@ -2257,7 +2257,7 @@ public class BuffParam
 		}
 		if (num > 0)
 		{
-			int num2 = UnityEngine.Random.Range(0, 100);
+			int num2 = Random.Range(0, 100);
 			if (num2 <= num)
 			{
 				return true;
@@ -2456,12 +2456,12 @@ public class BuffParam
 			buffData2.value = 1;
 			break;
 		case BUFFTYPE.SHIELD:
-			if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+			if (player != null)
 			{
-				int b = (int)((float)player.hpMax * ((float)buffData.value / 100f));
-				b = Mathf.Max(0, b);
-				player.ShieldHp = b;
-				player.ShieldHpMax = b;
+				int num = (int)((float)player.hpMax * ((float)buffData.value / 100f));
+				num = Mathf.Max(0, num);
+				player.ShieldHp = num;
+				player.ShieldHpMax = num;
 				buffData2.fromEquipIndex = buffData.fromEquipIndex;
 				buffData2.fromSkillIndex = buffData.fromSkillIndex;
 			}
@@ -2525,6 +2525,7 @@ public class BuffParam
 
 	public void OnDetachServant(DisableNotifyMonoBehaviour servant)
 	{
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		int num = 0;
 		int count = loopEffect.Count;
 		while (true)
@@ -2533,13 +2534,13 @@ public class BuffParam
 			{
 				return;
 			}
-			if ((UnityEngine.Object)loopEffect[num].effect == (UnityEngine.Object)servant.gameObject)
+			if (loopEffect[num].effect == servant.get_gameObject())
 			{
 				break;
 			}
 			num++;
 		}
-		if ((UnityEngine.Object)loopEffect[num].effect != (UnityEngine.Object)null)
+		if (loopEffect[num].effect != null)
 		{
 			EffectManager.ReleaseEffect(loopEffect[num].effect, true, false);
 		}
@@ -2553,13 +2554,17 @@ public class BuffParam
 
 	private void PlayBuffEffect(BuffData data, string type_key, bool loop)
 	{
-		if (data != null && !((UnityEngine.Object)chara.effectPlayProcessor == (UnityEngine.Object)null))
+		//IL_0398: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03c1: Expected O, but got Unknown
+		//IL_03f8: Unknown result type (might be due to invalid IL or missing references)
+		if (data != null && !(chara.effectPlayProcessor == null))
 		{
 			List<EffectPlayProcessor.EffectSetting> list = null;
 			string text = null;
 			string str = null;
 			text = "BUFF_" + type_key + "_" + data.type.ToString();
-			if ((UnityEngine.Object)player != (UnityEngine.Object)null && (UnityEngine.Object)player.loader != (UnityEngine.Object)null && player.loader.loadInfo != null)
+			if (player != null && player.loader != null && player.loader.loadInfo != null)
 			{
 				str = "_PLC" + (player.loader.loadInfo.weaponModelID / 1000).ToString("D2");
 				list = chara.effectPlayProcessor.GetSettings(text + str);
@@ -2593,7 +2598,7 @@ public class BuffParam
 					break;
 				}
 				text = "BUFF_" + type_key + "_" + text2 + "_DEFAULT";
-				if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+				if (player != null)
 				{
 					list = chara.effectPlayProcessor.GetSettings(text + str);
 				}
@@ -2646,28 +2651,28 @@ public class BuffParam
 							continue;
 						}
 					}
-					Transform transform = chara.effectPlayProcessor.PlayEffect(effectSetting, null);
-					if ((UnityEngine.Object)transform != (UnityEngine.Object)null && loop)
+					Transform val = chara.effectPlayProcessor.PlayEffect(effectSetting, null);
+					if (val != null && loop)
 					{
-						DisableNotifyMonoBehaviour disableNotifyMonoBehaviour = transform.gameObject.AddComponent<DisableNotifyMonoBehaviour>();
+						DisableNotifyMonoBehaviour disableNotifyMonoBehaviour = val.get_gameObject().AddComponent<DisableNotifyMonoBehaviour>();
 						disableNotifyMonoBehaviour.SetNotifyMaster(chara);
 						EffectInfo effectInfo = new EffectInfo();
-						effectInfo.effect = transform.gameObject;
+						effectInfo.effect = val.get_gameObject();
 						effectInfo.setting = effectSetting;
 						effectInfo.linkData.Add(data);
 						loopEffect.Add(effectInfo);
 						if (data.type == BUFFTYPE.SLIDE)
 						{
-							BuffSlideEffectController buffSlideEffectController = transform.gameObject.AddComponent<BuffSlideEffectController>();
+							BuffSlideEffectController buffSlideEffectController = val.get_gameObject().AddComponent<BuffSlideEffectController>();
 							buffSlideEffectController.Initialize(player);
 						}
 						else if (data.type == BUFFTYPE.INVINCIBLECOUNT)
 						{
-							invincibleCountAnimator = transform.GetComponent<Animator>();
+							invincibleCountAnimator = val.GetComponent<Animator>();
 						}
 						else if (data.type == BUFFTYPE.INVINCIBLE_BADSTATUS)
 						{
-							invincibleBadStatusAnimator = transform.GetComponent<Animator>();
+							invincibleBadStatusAnimator = val.GetComponent<Animator>();
 						}
 					}
 				}
@@ -2688,12 +2693,12 @@ public class BuffParam
 			{
 				GameObject effect = loopEffect[num].effect;
 				loopEffect.RemoveAt(num);
-				if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
+				if (effect != null)
 				{
 					if (data.type == BUFFTYPE.SLIDE)
 					{
 						BuffSlideEffectController component = effect.GetComponent<BuffSlideEffectController>();
-						component.enabled = false;
+						component.set_enabled(false);
 					}
 					else if (data.type == BUFFTYPE.INVINCIBLECOUNT)
 					{
@@ -2750,7 +2755,7 @@ public class BuffParam
 				buffSyncParam.buffDatas.Add(buffSyncData);
 			}
 		}
-		if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+		if (player != null)
 		{
 			buffSyncParam.shieldHp = player.ShieldHp;
 		}
@@ -2803,7 +2808,7 @@ public class BuffParam
 				chara.OnBuffStart(buffData);
 			}
 		}
-		if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+		if (player != null)
 		{
 			player.ShieldHp = sync_param.shieldHp;
 		}
@@ -2848,7 +2853,7 @@ public class BuffParam
 				buffData.SetBuffData(array[j]);
 			}
 		}
-		if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+		if (player != null)
 		{
 			player.ShieldHp = sync_param.shieldHp;
 		}
@@ -3226,7 +3231,7 @@ public class BuffParam
 			passive.hpHealSpeedUp += (float)(int)info.value * 0.01f * (float)num;
 			break;
 		case ABILITY_TYPE.HEAL_UP_DEPENDS_WEAPON:
-			if (!((UnityEngine.Object)player == (UnityEngine.Object)null) && Enum.IsDefined(typeof(EQUIPMENT_TYPE), info.target))
+			if (!(player == null) && Enum.IsDefined(typeof(EQUIPMENT_TYPE), info.target))
 			{
 				EQUIPMENT_TYPE eQUIPMENT_TYPE = Player.ConvertAttackModeToEquipmentType(player.attackMode);
 				if (eQUIPMENT_TYPE == (EQUIPMENT_TYPE)(int)Enum.Parse(typeof(EQUIPMENT_TYPE), info.target))
@@ -3799,7 +3804,7 @@ public class BuffParam
 	public bool IsValidShieldBuff(int skillIndex)
 	{
 		BuffData buffData = data[60];
-		if ((UnityEngine.Object)player == (UnityEngine.Object)null)
+		if (player == null)
 		{
 			return false;
 		}
@@ -3822,7 +3827,7 @@ public class BuffParam
 
 	public int GetShieldFromSkillIndex()
 	{
-		if ((UnityEngine.Object)player == (UnityEngine.Object)null)
+		if (player == null)
 		{
 			return -1;
 		}
@@ -3832,7 +3837,7 @@ public class BuffParam
 	public string GetFromText()
 	{
 		BuffData buffData = data[60];
-		if ((UnityEngine.Object)player == (UnityEngine.Object)null)
+		if (player == null)
 		{
 			return "null";
 		}

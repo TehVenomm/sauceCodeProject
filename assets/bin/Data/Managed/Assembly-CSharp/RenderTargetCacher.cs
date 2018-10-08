@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
-public class RenderTargetCacher : MonoBehaviour
+public class RenderTargetCacher
 {
 	[SerializeField]
 	private RenderTexture renderTexture;
@@ -19,9 +19,14 @@ public class RenderTargetCacher : MonoBehaviour
 		set;
 	}
 
+	public RenderTargetCacher()
+		: this()
+	{
+	}
+
 	public RenderTexture GetTexture()
 	{
-		if ((UnityEngine.Object)renderTexture == (UnityEngine.Object)null)
+		if (renderTexture == null)
 		{
 			CreateTexture();
 		}
@@ -30,15 +35,17 @@ public class RenderTargetCacher : MonoBehaviour
 
 	private void Start()
 	{
-		cam = GetComponent<Camera>();
+		cam = this.GetComponent<Camera>();
 		CreateTexture();
 	}
 
 	private void CreateTexture()
 	{
-		if (!((UnityEngine.Object)renderTexture != (UnityEngine.Object)null))
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Expected O, but got Unknown
+		if (!(renderTexture != null))
 		{
-			renderTexture = RenderTexture.GetTemporary(Screen.width, Screen.height);
+			renderTexture = RenderTexture.GetTemporary(Screen.get_width(), Screen.get_height());
 			if (onUpdateTexture != null)
 			{
 				onUpdateTexture(renderTexture);
@@ -48,7 +55,7 @@ public class RenderTargetCacher : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		if ((UnityEngine.Object)renderTexture != (UnityEngine.Object)null)
+		if (renderTexture != null)
 		{
 			RenderTexture.ReleaseTemporary(renderTexture);
 			renderTexture = null;
@@ -57,21 +64,24 @@ public class RenderTargetCacher : MonoBehaviour
 
 	private void OnPreRender()
 	{
-		if (!((UnityEngine.Object)cam == (UnityEngine.Object)null))
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001e: Invalid comparison between Unknown and I4
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		if (!(cam == null))
 		{
-			if (cam.clearFlags == CameraClearFlags.Color)
+			if ((int)cam.get_clearFlags() == 2)
 			{
-				GL.Clear(true, true, Color.black);
+				GL.Clear(true, true, Color.get_black());
 			}
-			if (!((UnityEngine.Object)renderTexture == (UnityEngine.Object)null))
+			if (!(renderTexture == null))
 			{
-				if (renderTexture.width != Screen.width || renderTexture.height != Screen.height)
+				if (renderTexture.get_width() != Screen.get_width() || renderTexture.get_height() != Screen.get_height())
 				{
 					renderTexture.Release();
 					renderTexture = null;
 					CreateTexture();
 				}
-				if ((UnityEngine.Object)renderTexture != (UnityEngine.Object)null)
+				if (renderTexture != null)
 				{
 					renderTexture.DiscardContents();
 				}
@@ -87,7 +97,7 @@ public class RenderTargetCacher : MonoBehaviour
 		}
 		if (postEffectProc != null)
 		{
-			postEffectProc(src, dest);
+			postEffectProc.Invoke(src, dest);
 		}
 		else
 		{

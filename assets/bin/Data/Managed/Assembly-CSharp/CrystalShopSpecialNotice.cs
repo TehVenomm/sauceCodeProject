@@ -1,4 +1,5 @@
 using Network;
+using System;
 
 public class CrystalShopSpecialNotice : GameSection
 {
@@ -24,7 +25,7 @@ public class CrystalShopSpecialNotice : GameSection
 			GlobalSettingsManager.PackParam.SpecialInfo special = MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.GetSpecial(_productData.productId);
 			if (special != null)
 			{
-				SetLabelText(UI.LBL_TITLE, base.sectionData.GetText(special.specialEvent));
+				SetLabelText((Enum)UI.LBL_TITLE, base.sectionData.GetText(special.specialEvent));
 			}
 		}
 	}

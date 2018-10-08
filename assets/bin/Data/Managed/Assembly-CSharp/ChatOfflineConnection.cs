@@ -20,7 +20,10 @@ public class ChatOfflineConnection : IChatConnection
 
 	public void Disconnect(Action onFinished)
 	{
-		onFinished?.Invoke();
+		if (onFinished != null)
+		{
+			onFinished.Invoke();
+		}
 	}
 
 	public void Join(int roomNo, string userName)

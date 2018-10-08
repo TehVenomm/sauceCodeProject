@@ -61,14 +61,15 @@ public class UIInGameFieldQuestWarning : MonoBehaviourSingleton<UIInGameFieldQue
 
 	protected override void Awake()
 	{
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		base.gameObject.SetActive(false);
+		this.get_gameObject().SetActive(false);
 	}
 
 	protected override void OnDisable()
 	{
 		tweenCtrl.Skip(true);
-		if ((UnityEngine.Object)rareBossTweenCtrl != (UnityEngine.Object)null)
+		if (rareBossTweenCtrl != null)
 		{
 			rareBossTweenCtrl.Skip(true);
 		}
@@ -77,54 +78,73 @@ public class UIInGameFieldQuestWarning : MonoBehaviourSingleton<UIInGameFieldQue
 
 	public void Play(ENEMY_TYPE type, int rareBossType = 0, bool isFieldBoss = false)
 	{
-		base.gameObject.SetActive(true);
-		TweenAlpha.Begin(base.gameObject, 0f, 1f);
-		if ((UnityEngine.Object)fieldFishingTweenCtrl != (UnityEngine.Object)null)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Expected O, but got Unknown
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_023e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_029d: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().SetActive(true);
+		TweenAlpha.Begin(this.get_gameObject(), 0f, 1f);
+		if (fieldFishingTweenCtrl != null)
 		{
-			fieldFishingTweenCtrl.gameObject.SetActive(false);
+			fieldFishingTweenCtrl.get_gameObject().SetActive(false);
 		}
-		if ((UnityEngine.Object)fieldFishingRareTweenCtrl != (UnityEngine.Object)null)
+		if (fieldFishingRareTweenCtrl != null)
 		{
-			fieldFishingRareTweenCtrl.gameObject.SetActive(false);
+			fieldFishingRareTweenCtrl.get_gameObject().SetActive(false);
 		}
 		if (isFieldBoss)
 		{
-			if ((UnityEngine.Object)rareBossTweenCtrl != (UnityEngine.Object)null)
+			if (rareBossTweenCtrl != null)
 			{
-				rareBossTweenCtrl.gameObject.SetActive(false);
+				rareBossTweenCtrl.get_gameObject().SetActive(false);
 			}
-			if ((UnityEngine.Object)tweenCtrl != (UnityEngine.Object)null)
+			if (tweenCtrl != null)
 			{
-				tweenCtrl.gameObject.SetActive(false);
+				tweenCtrl.get_gameObject().SetActive(false);
 			}
-			if ((UnityEngine.Object)fieldEnemyRareTweenCtrl != (UnityEngine.Object)null)
+			if (fieldEnemyRareTweenCtrl != null)
 			{
-				fieldEnemyRareTweenCtrl.gameObject.SetActive(false);
+				fieldEnemyRareTweenCtrl.get_gameObject().SetActive(false);
 			}
-			fieldEnemyBossTweenCtrl.gameObject.SetActive(true);
+			fieldEnemyBossTweenCtrl.get_gameObject().SetActive(true);
 			fieldEnemyBossTweenCtrl.Reset();
 			fieldEnemyBossTweenCtrl.Play(true, null);
 			SoundManager.PlayOneshotJingle(40000031, null, null);
 			int i = 0;
 			for (int num = effect.Length; i < num; i++)
 			{
-				StartCoroutine(Direction(effect[i]));
+				this.StartCoroutine(Direction(effect[i]));
 			}
 		}
 		else if (rareBossType > 0)
 		{
-			tweenCtrl.gameObject.SetActive(false);
-			if ((UnityEngine.Object)fieldEnemyBossTweenCtrl != (UnityEngine.Object)null)
+			tweenCtrl.get_gameObject().SetActive(false);
+			if (fieldEnemyBossTweenCtrl != null)
 			{
-				fieldEnemyBossTweenCtrl.gameObject.SetActive(false);
+				fieldEnemyBossTweenCtrl.get_gameObject().SetActive(false);
 			}
-			if ((UnityEngine.Object)fieldEnemyRareTweenCtrl != (UnityEngine.Object)null)
+			if (fieldEnemyRareTweenCtrl != null)
 			{
-				fieldEnemyRareTweenCtrl.gameObject.SetActive(false);
+				fieldEnemyRareTweenCtrl.get_gameObject().SetActive(false);
 			}
-			if ((UnityEngine.Object)rareBossTweenCtrl != (UnityEngine.Object)null)
+			if (rareBossTweenCtrl != null)
 			{
-				rareBossTweenCtrl.gameObject.SetActive(true);
+				rareBossTweenCtrl.get_gameObject().SetActive(true);
 				rareBossTweenCtrl.Reset();
 				rareBossTweenCtrl.Play(true, null);
 			}
@@ -132,26 +152,26 @@ public class UIInGameFieldQuestWarning : MonoBehaviourSingleton<UIInGameFieldQue
 		}
 		else
 		{
-			if ((UnityEngine.Object)rareBossTweenCtrl != (UnityEngine.Object)null)
+			if (rareBossTweenCtrl != null)
 			{
-				rareBossTweenCtrl.gameObject.SetActive(false);
+				rareBossTweenCtrl.get_gameObject().SetActive(false);
 			}
-			if ((UnityEngine.Object)fieldEnemyBossTweenCtrl != (UnityEngine.Object)null)
+			if (fieldEnemyBossTweenCtrl != null)
 			{
-				fieldEnemyBossTweenCtrl.gameObject.SetActive(false);
+				fieldEnemyBossTweenCtrl.get_gameObject().SetActive(false);
 			}
-			if ((UnityEngine.Object)fieldEnemyRareTweenCtrl != (UnityEngine.Object)null)
+			if (fieldEnemyRareTweenCtrl != null)
 			{
-				fieldEnemyRareTweenCtrl.gameObject.SetActive(false);
+				fieldEnemyRareTweenCtrl.get_gameObject().SetActive(false);
 			}
-			tweenCtrl.gameObject.SetActive(true);
+			tweenCtrl.get_gameObject().SetActive(true);
 			tweenCtrl.Reset();
 			tweenCtrl.Play(true, null);
 			SoundManager.PlayOneshotJingle(40000031, null, null);
 			int j = 0;
 			for (int num2 = effect.Length; j < num2; j++)
 			{
-				StartCoroutine(Direction(effect[j]));
+				this.StartCoroutine(Direction(effect[j]));
 			}
 		}
 		SoundManager.RequestBGM(12, true);
@@ -159,76 +179,98 @@ public class UIInGameFieldQuestWarning : MonoBehaviourSingleton<UIInGameFieldQue
 
 	public void PlayRareFieldEnemy()
 	{
-		base.gameObject.SetActive(true);
-		TweenAlpha.Begin(base.gameObject, 0f, 1f);
-		if ((UnityEngine.Object)rareBossTweenCtrl != (UnityEngine.Object)null)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Expected O, but got Unknown
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().SetActive(true);
+		TweenAlpha.Begin(this.get_gameObject(), 0f, 1f);
+		if (rareBossTweenCtrl != null)
 		{
-			rareBossTweenCtrl.gameObject.SetActive(false);
+			rareBossTweenCtrl.get_gameObject().SetActive(false);
 		}
-		if ((UnityEngine.Object)fieldEnemyBossTweenCtrl != (UnityEngine.Object)null)
+		if (fieldEnemyBossTweenCtrl != null)
 		{
-			fieldEnemyBossTweenCtrl.gameObject.SetActive(false);
+			fieldEnemyBossTweenCtrl.get_gameObject().SetActive(false);
 		}
-		if ((UnityEngine.Object)fieldFishingTweenCtrl != (UnityEngine.Object)null)
+		if (fieldFishingTweenCtrl != null)
 		{
-			fieldFishingTweenCtrl.gameObject.SetActive(false);
+			fieldFishingTweenCtrl.get_gameObject().SetActive(false);
 		}
-		if ((UnityEngine.Object)fieldFishingRareTweenCtrl != (UnityEngine.Object)null)
+		if (fieldFishingRareTweenCtrl != null)
 		{
-			fieldFishingRareTweenCtrl.gameObject.SetActive(false);
+			fieldFishingRareTweenCtrl.get_gameObject().SetActive(false);
 		}
-		if ((UnityEngine.Object)tweenCtrl != (UnityEngine.Object)null)
+		if (tweenCtrl != null)
 		{
-			tweenCtrl.gameObject.SetActive(false);
+			tweenCtrl.get_gameObject().SetActive(false);
 		}
-		fieldEnemyRareTweenCtrl.gameObject.SetActive(true);
+		fieldEnemyRareTweenCtrl.get_gameObject().SetActive(true);
 		fieldEnemyRareTweenCtrl.Reset();
 		fieldEnemyRareTweenCtrl.Play(true, null);
 		SoundManager.PlayOneshotJingle(40000031, null, null);
 		int i = 0;
 		for (int num = effect.Length; i < num; i++)
 		{
-			StartCoroutine(Direction(effect[i]));
+			this.StartCoroutine(Direction(effect[i]));
 		}
 	}
 
 	public void PlayFieldFishingEnemy(bool isRare)
 	{
-		base.gameObject.SetActive(true);
-		TweenAlpha.Begin(base.gameObject, 0f, 1f);
-		if ((UnityEngine.Object)rareBossTweenCtrl != (UnityEngine.Object)null)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Expected O, but got Unknown
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().SetActive(true);
+		TweenAlpha.Begin(this.get_gameObject(), 0f, 1f);
+		if (rareBossTweenCtrl != null)
 		{
-			rareBossTweenCtrl.gameObject.SetActive(false);
+			rareBossTweenCtrl.get_gameObject().SetActive(false);
 		}
-		if ((UnityEngine.Object)fieldEnemyBossTweenCtrl != (UnityEngine.Object)null)
+		if (fieldEnemyBossTweenCtrl != null)
 		{
-			fieldEnemyBossTweenCtrl.gameObject.SetActive(false);
+			fieldEnemyBossTweenCtrl.get_gameObject().SetActive(false);
 		}
-		if ((UnityEngine.Object)fieldEnemyRareTweenCtrl != (UnityEngine.Object)null)
+		if (fieldEnemyRareTweenCtrl != null)
 		{
-			fieldEnemyRareTweenCtrl.gameObject.SetActive(false);
+			fieldEnemyRareTweenCtrl.get_gameObject().SetActive(false);
 		}
-		if ((UnityEngine.Object)tweenCtrl != (UnityEngine.Object)null)
+		if (tweenCtrl != null)
 		{
-			tweenCtrl.gameObject.SetActive(false);
+			tweenCtrl.get_gameObject().SetActive(false);
 		}
 		if (isRare)
 		{
-			fieldFishingTweenCtrl.gameObject.SetActive(false);
-			fieldFishingRareTweenCtrl.gameObject.SetActive(true);
+			fieldFishingTweenCtrl.get_gameObject().SetActive(false);
+			fieldFishingRareTweenCtrl.get_gameObject().SetActive(true);
 			fieldFishingRareTweenCtrl.Reset();
 			fieldFishingRareTweenCtrl.Play(true, null);
 		}
 		else
 		{
-			fieldFishingRareTweenCtrl.gameObject.SetActive(false);
-			fieldFishingTweenCtrl.gameObject.SetActive(true);
+			fieldFishingRareTweenCtrl.get_gameObject().SetActive(false);
+			fieldFishingTweenCtrl.get_gameObject().SetActive(true);
 			fieldFishingTweenCtrl.Reset();
 			fieldFishingTweenCtrl.Play(true, null);
 			int i = 0;
 			for (int num = fishingEffect.Length; i < num; i++)
 			{
-				StartCoroutine(Direction(fishingEffect[i]));
+				this.StartCoroutine(Direction(fishingEffect[i]));
 			}
 		}
 		SoundManager.PlayOneshotJingle(40000031, null, null);
@@ -242,18 +284,22 @@ public class UIInGameFieldQuestWarning : MonoBehaviourSingleton<UIInGameFieldQue
 
 	public void FadeOut(float delay, float duration, Action onComplete)
 	{
-		StartCoroutine(DoFadeOut(delay, duration, onComplete));
+		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoFadeOut(delay, duration, onComplete));
 	}
 
 	private IEnumerator DoFadeOut(float delay, float duration, Action onComplete)
 	{
 		yield return (object)new WaitForSeconds(delay);
-		TweenAlpha.Begin(base.gameObject, duration, 0f);
+		TweenAlpha.Begin(this.get_gameObject(), duration, 0f);
 		yield return (object)new WaitForSeconds(duration);
-		onComplete?.Invoke();
-		if ((UnityEngine.Object)base.gameObject != (UnityEngine.Object)null)
+		if (onComplete != null)
 		{
-			base.gameObject.SetActive(false);
+			onComplete.Invoke();
+		}
+		if (this.get_gameObject() != null)
+		{
+			this.get_gameObject().SetActive(false);
 		}
 	}
 }

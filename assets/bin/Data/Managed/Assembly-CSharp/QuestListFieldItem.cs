@@ -30,8 +30,8 @@ public class QuestListFieldItem : UIBehaviour
 		UITexture component = FindCtrl(transform, UI.TEX_FIELD).GetComponent<UITexture>();
 		ResourceLoad.LoadGatherPointIconTexture(component, point_data.pointViewTable.iconID);
 		SetActive(transform, UI.TEX_FIELD_SUB, true);
-		Transform transform2 = FindCtrl(transform, UI.TEX_FIELD_SUB);
-		UITexture component2 = transform2.GetComponent<UITexture>();
+		Transform val = FindCtrl(transform, UI.TEX_FIELD_SUB);
+		UITexture component2 = val.GetComponent<UITexture>();
 		ResourceLoad.LoadGatherPointIconTexture(component2, point_data.pointViewTable.iconID);
 	}
 
@@ -63,11 +63,13 @@ public class QuestListFieldItem : UIBehaviour
 
 	protected Transform GetTransform()
 	{
-		Transform transform = base._transform;
-		if ((Object)transform == (Object)null)
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Expected O, but got Unknown
+		Transform val = base._transform;
+		if (val == null)
 		{
-			transform = base.transform;
+			val = this.get_transform();
 		}
-		return transform;
+		return val;
 	}
 }

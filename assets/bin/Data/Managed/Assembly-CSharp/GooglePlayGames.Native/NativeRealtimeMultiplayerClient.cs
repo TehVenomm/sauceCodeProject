@@ -178,7 +178,7 @@ namespace GooglePlayGames.Native
 						mCurrentPlayerId = Misc.CheckNotNull(currentPlayerId);
 						mStillPreRoomCreation = false;
 						EnterState(new RoomCreationPendingState(this));
-						createRoom();
+						createRoom.Invoke();
 					}
 				}
 			}
@@ -270,60 +270,59 @@ namespace GooglePlayGames.Native
 				mListener = Misc.CheckNotNull(listener);
 			}
 
-			public void RoomSetupProgress(float percent)
+			public unsafe void RoomSetupProgress(float percent)
 			{
-				PlayGamesHelperObject.RunOnGameThread(delegate
-				{
-					mListener.OnRoomSetupProgress(percent);
-				});
+				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0020: Expected O, but got Unknown
+				_003CRoomSetupProgress_003Ec__AnonStorey813 _003CRoomSetupProgress_003Ec__AnonStorey;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CRoomSetupProgress_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 
-			public void RoomConnected(bool success)
+			public unsafe void RoomConnected(bool success)
 			{
-				PlayGamesHelperObject.RunOnGameThread(delegate
-				{
-					mListener.OnRoomConnected(success);
-				});
+				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0020: Expected O, but got Unknown
+				_003CRoomConnected_003Ec__AnonStorey814 _003CRoomConnected_003Ec__AnonStorey;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CRoomConnected_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 
-			public void LeftRoom()
+			public unsafe void LeftRoom()
 			{
-				PlayGamesHelperObject.RunOnGameThread(delegate
-				{
-					mListener.OnLeftRoom();
-				});
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000c: Expected O, but got Unknown
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 
-			public void PeersConnected(string[] participantIds)
+			public unsafe void PeersConnected(string[] participantIds)
 			{
-				PlayGamesHelperObject.RunOnGameThread(delegate
-				{
-					mListener.OnPeersConnected(participantIds);
-				});
+				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0020: Expected O, but got Unknown
+				_003CPeersConnected_003Ec__AnonStorey815 _003CPeersConnected_003Ec__AnonStorey;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CPeersConnected_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 
-			public void PeersDisconnected(string[] participantIds)
+			public unsafe void PeersDisconnected(string[] participantIds)
 			{
-				PlayGamesHelperObject.RunOnGameThread(delegate
-				{
-					mListener.OnPeersDisconnected(participantIds);
-				});
+				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0020: Expected O, but got Unknown
+				_003CPeersDisconnected_003Ec__AnonStorey816 _003CPeersDisconnected_003Ec__AnonStorey;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CPeersDisconnected_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 
-			public void RealTimeMessageReceived(bool isReliable, string senderId, byte[] data)
+			public unsafe void RealTimeMessageReceived(bool isReliable, string senderId, byte[] data)
 			{
-				PlayGamesHelperObject.RunOnGameThread(delegate
-				{
-					mListener.OnRealTimeMessageReceived(isReliable, senderId, data);
-				});
+				//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+				//IL_002e: Expected O, but got Unknown
+				_003CRealTimeMessageReceived_003Ec__AnonStorey817 _003CRealTimeMessageReceived_003Ec__AnonStorey;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CRealTimeMessageReceived_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 
-			public void ParticipantLeft(Participant participant)
+			public unsafe void ParticipantLeft(Participant participant)
 			{
-				PlayGamesHelperObject.RunOnGameThread(delegate
-				{
-					mListener.OnParticipantLeft(participant);
-				});
+				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0020: Expected O, but got Unknown
+				_003CParticipantLeft_003Ec__AnonStorey818 _003CParticipantLeft_003Ec__AnonStorey;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CParticipantLeft_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 
@@ -426,16 +425,30 @@ namespace GooglePlayGames.Native
 				UpdateCurrentRoom(room);
 			}
 
-			internal void UpdateCurrentRoom(NativeRealTimeRoom room)
+			internal unsafe void UpdateCurrentRoom(NativeRealTimeRoom room)
 			{
 				if (mRoom != null)
 				{
 					mRoom.Dispose();
 				}
 				mRoom = Misc.CheckNotNull(room);
-				mNativeParticipants = mRoom.Participants().ToDictionary((GooglePlayGames.Native.PInvoke.MultiplayerParticipant p) => p.Id());
-				mParticipants = (from p in mNativeParticipants.Values
-				select p.AsParticipant()).ToDictionary((Participant p) => p.ParticipantId);
+				IEnumerable<GooglePlayGames.Native.PInvoke.MultiplayerParticipant> source = mRoom.Participants();
+				if (_003C_003Ef__am_0024cache4 == null)
+				{
+					_003C_003Ef__am_0024cache4 = new Func<GooglePlayGames.Native.PInvoke.MultiplayerParticipant, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				mNativeParticipants = source.ToDictionary<GooglePlayGames.Native.PInvoke.MultiplayerParticipant, string>(_003C_003Ef__am_0024cache4);
+				Dictionary<string, GooglePlayGames.Native.PInvoke.MultiplayerParticipant>.ValueCollection values = mNativeParticipants.Values;
+				if (_003C_003Ef__am_0024cache5 == null)
+				{
+					_003C_003Ef__am_0024cache5 = new Func<GooglePlayGames.Native.PInvoke.MultiplayerParticipant, Participant>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				IEnumerable<Participant> source2 = values.Select<GooglePlayGames.Native.PInvoke.MultiplayerParticipant, Participant>(_003C_003Ef__am_0024cache5);
+				if (_003C_003Ef__am_0024cache6 == null)
+				{
+					_003C_003Ef__am_0024cache6 = new Func<Participant, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				mParticipants = source2.ToDictionary<Participant, string>(_003C_003Ef__am_0024cache6);
 			}
 
 			internal sealed override void OnRoomStatusChanged(NativeRealTimeRoom room)
@@ -468,11 +481,14 @@ namespace GooglePlayGames.Native
 			{
 			}
 
-			internal sealed override List<Participant> GetConnectedParticipants()
+			internal unsafe sealed override List<Participant> GetConnectedParticipants()
 			{
-				List<Participant> list = (from p in mParticipants.Values
-				where p.IsConnectedToRoom
-				select p).ToList();
+				Dictionary<string, Participant>.ValueCollection values = mParticipants.Values;
+				if (_003C_003Ef__am_0024cache7 == null)
+				{
+					_003C_003Ef__am_0024cache7 = new Func<Participant, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				List<Participant> list = values.Where(_003C_003Ef__am_0024cache7).ToList();
 				list.Sort();
 				return list;
 			}
@@ -659,12 +675,11 @@ namespace GooglePlayGames.Native
 				}
 			}
 
-			internal override void LeaveRoom()
+			internal unsafe override void LeaveRoom()
 			{
-				mSession.EnterState(new LeavingRoom(mSession, mRoom, delegate
-				{
-					mSession.OnGameThreadListener().RoomConnected(false);
-				}));
+				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001e: Expected O, but got Unknown
+				mSession.EnterState(new LeavingRoom(mSession, mRoom, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 			}
 
 			internal override void ShowWaitingRoomUI(uint minimumParticipantsBeforeStarting)
@@ -737,11 +752,16 @@ namespace GooglePlayGames.Native
 				return null;
 			}
 
-			internal override void HandleConnectedSetChanged(NativeRealTimeRoom room)
+			internal unsafe override void HandleConnectedSetChanged(NativeRealTimeRoom room)
 			{
 				List<string> list = new List<string>();
 				List<string> list2 = new List<string>();
-				Dictionary<string, GooglePlayGames.Native.PInvoke.MultiplayerParticipant> dictionary = room.Participants().ToDictionary((GooglePlayGames.Native.PInvoke.MultiplayerParticipant p) => p.Id());
+				IEnumerable<GooglePlayGames.Native.PInvoke.MultiplayerParticipant> source = room.Participants();
+				if (_003C_003Ef__am_0024cache0 == null)
+				{
+					_003C_003Ef__am_0024cache0 = new Func<GooglePlayGames.Native.PInvoke.MultiplayerParticipant, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				Dictionary<string, GooglePlayGames.Native.PInvoke.MultiplayerParticipant> dictionary = source.ToDictionary<GooglePlayGames.Native.PInvoke.MultiplayerParticipant, string>(_003C_003Ef__am_0024cache0);
 				foreach (string key in mNativeParticipants.Keys)
 				{
 					GooglePlayGames.Native.PInvoke.MultiplayerParticipant multiplayerParticipant = dictionary[key];
@@ -760,43 +780,48 @@ namespace GooglePlayGames.Native
 					value.Dispose();
 				}
 				mNativeParticipants = dictionary;
-				mParticipants = (from p in mNativeParticipants.Values
-				select p.AsParticipant()).ToDictionary((Participant p) => p.ParticipantId);
-				Logger.d("Updated participant statuses: " + string.Join(",", (from p in mParticipants.Values
-				select p.ToString()).ToArray()));
+				Dictionary<string, GooglePlayGames.Native.PInvoke.MultiplayerParticipant>.ValueCollection values = mNativeParticipants.Values;
+				if (_003C_003Ef__am_0024cache1 == null)
+				{
+					_003C_003Ef__am_0024cache1 = new Func<GooglePlayGames.Native.PInvoke.MultiplayerParticipant, Participant>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				IEnumerable<Participant> source2 = values.Select<GooglePlayGames.Native.PInvoke.MultiplayerParticipant, Participant>(_003C_003Ef__am_0024cache1);
+				if (_003C_003Ef__am_0024cache2 == null)
+				{
+					_003C_003Ef__am_0024cache2 = new Func<Participant, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				mParticipants = source2.ToDictionary<Participant, string>(_003C_003Ef__am_0024cache2);
+				Dictionary<string, Participant>.ValueCollection values2 = mParticipants.Values;
+				if (_003C_003Ef__am_0024cache3 == null)
+				{
+					_003C_003Ef__am_0024cache3 = new Func<Participant, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				Logger.d("Updated participant statuses: " + string.Join(",", values2.Select<Participant, string>(_003C_003Ef__am_0024cache3).ToArray()));
 				if (list2.Contains(GetSelf().ParticipantId))
 				{
 					Logger.w("Player was disconnected from the multiplayer session.");
 				}
 				string selfId = GetSelf().ParticipantId;
-				list = (from peerId in list
-				where !peerId.Equals(selfId)
-				select peerId).ToList();
-				list2 = (from peerId in list2
-				where !peerId.Equals(selfId)
-				select peerId).ToList();
+				_003CHandleConnectedSetChanged_003Ec__AnonStorey819 _003CHandleConnectedSetChanged_003Ec__AnonStorey;
+				list = list.Where(new Func<string, bool>((object)_003CHandleConnectedSetChanged_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList();
+				list2 = list2.Where(new Func<string, bool>((object)_003CHandleConnectedSetChanged_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList();
 				if (list.Count > 0)
 				{
 					list.Sort();
-					mSession.OnGameThreadListener().PeersConnected((from peer in list
-					where !peer.Equals(selfId)
-					select peer).ToArray());
+					mSession.OnGameThreadListener().PeersConnected(list.Where(new Func<string, bool>((object)_003CHandleConnectedSetChanged_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToArray());
 				}
 				if (list2.Count > 0)
 				{
 					list2.Sort();
-					mSession.OnGameThreadListener().PeersDisconnected((from peer in list2
-					where !peer.Equals(selfId)
-					select peer).ToArray());
+					mSession.OnGameThreadListener().PeersDisconnected(list2.Where(new Func<string, bool>((object)_003CHandleConnectedSetChanged_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToArray());
 				}
 			}
 
-			internal override void LeaveRoom()
+			internal unsafe override void LeaveRoom()
 			{
-				mSession.EnterState(new LeavingRoom(mSession, mRoom, delegate
-				{
-					mSession.OnGameThreadListener().LeftRoom();
-				}));
+				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001e: Expected O, but got Unknown
+				mSession.EnterState(new LeavingRoom(mSession, mRoom, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 			}
 		}
 
@@ -832,7 +857,7 @@ namespace GooglePlayGames.Native
 			{
 				mSession = Misc.CheckNotNull(session);
 				mRoomToLeave = Misc.CheckNotNull(room);
-				mLeavingCompleteCallback = Misc.CheckNotNull(leavingCompleteCallback);
+				mLeavingCompleteCallback = Misc.CheckNotNull<Action>(leavingCompleteCallback);
 			}
 
 			internal override bool IsActive()
@@ -844,7 +869,7 @@ namespace GooglePlayGames.Native
 			{
 				mSession.Manager().LeaveRoom(mRoomToLeave, delegate
 				{
-					mLeavingCompleteCallback();
+					mLeavingCompleteCallback.Invoke();
 					mSession.EnterState(new ShutdownState(mSession));
 				});
 			}
@@ -864,8 +889,10 @@ namespace GooglePlayGames.Native
 				return false;
 			}
 
-			internal override void HandleRoomResponse(RealtimeManager.RealTimeRoomResponse response)
+			internal unsafe override void HandleRoomResponse(RealtimeManager.RealTimeRoomResponse response)
 			{
+				//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0051: Expected O, but got Unknown
 				if (!response.RequestSucceeded())
 				{
 					mSession.EnterState(new ShutdownState(mSession));
@@ -873,10 +900,7 @@ namespace GooglePlayGames.Native
 				}
 				else
 				{
-					mSession.EnterState(new LeavingRoom(mSession, response.Room(), delegate
-					{
-						mSession.OnGameThreadListener().RoomConnected(false);
-					}));
+					mSession.EnterState(new LeavingRoom(mSession, response.Room(), new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 				}
 			}
 		}
@@ -909,8 +933,10 @@ namespace GooglePlayGames.Native
 			CreateQuickGame(minOpponents, maxOpponents, variant, 0uL, listener);
 		}
 
-		public void CreateQuickGame(uint minOpponents, uint maxOpponents, uint variant, ulong exclusiveBitMask, RealTimeMultiplayerListener listener)
+		public unsafe void CreateQuickGame(uint minOpponents, uint maxOpponents, uint variant, ulong exclusiveBitMask, RealTimeMultiplayerListener listener)
 		{
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Expected O, but got Unknown
 			lock (mSessionLock)
 			{
 				RoomSession newSession = new RoomSession(mRealtimeManager, listener);
@@ -934,10 +960,8 @@ namespace GooglePlayGames.Native
 							GooglePlayGames.Native.PInvoke.RealTimeEventListenerHelper helper = HelperForSession(newSession);
 							try
 							{
-								newSession.StartRoomCreation(mNativeClient.GetUserId(), delegate
-								{
-									mRealtimeManager.CreateRoom(config, helper, newSession.HandleRoomResponse);
-								});
+								_003CCreateQuickGame_003Ec__AnonStorey803 _003CCreateQuickGame_003Ec__AnonStorey;
+								newSession.StartRoomCreation(mNativeClient.GetUserId(), new Action((object)_003CCreateQuickGame_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 							}
 							finally
 							{
@@ -952,15 +976,10 @@ namespace GooglePlayGames.Native
 			}
 		}
 
-		private static GooglePlayGames.Native.PInvoke.RealTimeEventListenerHelper HelperForSession(RoomSession session)
+		private unsafe static GooglePlayGames.Native.PInvoke.RealTimeEventListenerHelper HelperForSession(RoomSession session)
 		{
-			return GooglePlayGames.Native.PInvoke.RealTimeEventListenerHelper.Create().SetOnDataReceivedCallback(delegate(NativeRealTimeRoom room, GooglePlayGames.Native.PInvoke.MultiplayerParticipant participant, byte[] data, bool isReliable)
-			{
-				session.OnDataReceived(room, participant, data, isReliable);
-			}).SetOnParticipantStatusChangedCallback(delegate(NativeRealTimeRoom room, GooglePlayGames.Native.PInvoke.MultiplayerParticipant participant)
-			{
-				session.OnParticipantStatusChanged(room, participant);
-			})
+			_003CHelperForSession_003Ec__AnonStorey805 _003CHelperForSession_003Ec__AnonStorey;
+			return GooglePlayGames.Native.PInvoke.RealTimeEventListenerHelper.Create().SetOnDataReceivedCallback(new Action<NativeRealTimeRoom, GooglePlayGames.Native.PInvoke.MultiplayerParticipant, byte[], bool>((object)_003CHelperForSession_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).SetOnParticipantStatusChangedCallback(new Action<NativeRealTimeRoom, GooglePlayGames.Native.PInvoke.MultiplayerParticipant>((object)_003CHelperForSession_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/))
 				.SetOnRoomConnectedSetChangedCallback(delegate(NativeRealTimeRoom room)
 				{
 					session.OnConnectedSetChanged(room);
@@ -980,7 +999,7 @@ namespace GooglePlayGames.Native
 			}
 		}
 
-		public void CreateWithInvitationScreen(uint minOpponents, uint maxOppponents, uint variant, RealTimeMultiplayerListener listener)
+		public unsafe void CreateWithInvitationScreen(uint minOpponents, uint maxOppponents, uint variant, RealTimeMultiplayerListener listener)
 		{
 			lock (mSessionLock)
 			{
@@ -996,8 +1015,11 @@ namespace GooglePlayGames.Native
 					mCurrentSession.ShowingUI = true;
 					RealtimeRoomConfig config;
 					GooglePlayGames.Native.PInvoke.RealTimeEventListenerHelper helper;
+					_003CCreateWithInvitationScreen_003Ec__AnonStorey806._003CCreateWithInvitationScreen_003Ec__AnonStorey809 _003CCreateWithInvitationScreen_003Ec__AnonStorey;
 					mRealtimeManager.ShowPlayerSelectUI(minOpponents, maxOppponents, true, delegate(PlayerSelectUIResponse response)
 					{
+						//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+						//IL_00d6: Expected O, but got Unknown
 						mCurrentSession.ShowingUI = false;
 						if (response.Status() != CommonErrorStatus.UIStatus.VALID)
 						{
@@ -1017,10 +1039,7 @@ namespace GooglePlayGames.Native
 									helper = HelperForSession(newRoom);
 									try
 									{
-										newRoom.StartRoomCreation(mNativeClient.GetUserId(), delegate
-										{
-											mRealtimeManager.CreateRoom(config, helper, newRoom.HandleRoomResponse);
-										});
+										newRoom.StartRoomCreation(mNativeClient.GetUserId(), new Action((object)_003CCreateWithInvitationScreen_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 									}
 									finally
 									{
@@ -1076,7 +1095,7 @@ namespace GooglePlayGames.Native
 			});
 		}
 
-		public void AcceptFromInbox(RealTimeMultiplayerListener listener)
+		public unsafe void AcceptFromInbox(RealTimeMultiplayerListener listener)
 		{
 			lock (mSessionLock)
 			{
@@ -1092,6 +1111,8 @@ namespace GooglePlayGames.Native
 					mCurrentSession.ShowingUI = true;
 					mRealtimeManager.ShowRoomInboxUI(delegate(RealtimeManager.RoomInboxUIResponse response)
 					{
+						//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+						//IL_00af: Expected O, but got Unknown
 						mCurrentSession.ShowingUI = false;
 						if (response.ResponseStatus() != CommonErrorStatus.UIStatus.VALID)
 						{
@@ -1105,17 +1126,8 @@ namespace GooglePlayGames.Native
 							try
 							{
 								Logger.d("About to accept invitation " + invitation.Id());
-								newRoom.StartRoomCreation(mNativeClient.GetUserId(), delegate
-								{
-									mRealtimeManager.AcceptInvitation(invitation, helper, delegate(RealtimeManager.RealTimeRoomResponse acceptResponse)
-									{
-										using (invitation)
-										{
-											newRoom.HandleRoomResponse(acceptResponse);
-											newRoom.SetInvitation(invitation.AsInvitation());
-										}
-									});
-								});
+								_003CAcceptFromInbox_003Ec__AnonStorey80B._003CAcceptFromInbox_003Ec__AnonStorey80D _003CAcceptFromInbox_003Ec__AnonStorey80D;
+								newRoom.StartRoomCreation(mNativeClient.GetUserId(), new Action((object)_003CAcceptFromInbox_003Ec__AnonStorey80D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 							}
 							finally
 							{
@@ -1130,7 +1142,7 @@ namespace GooglePlayGames.Native
 			}
 		}
 
-		public void AcceptInvitation(string invitationId, RealTimeMultiplayerListener listener)
+		public unsafe void AcceptInvitation(string invitationId, RealTimeMultiplayerListener listener)
 		{
 			lock (mSessionLock)
 			{
@@ -1144,8 +1156,11 @@ namespace GooglePlayGames.Native
 				{
 					mCurrentSession = newRoom;
 					GooglePlayGames.Native.PInvoke.RealTimeEventListenerHelper helper;
+					_003CAcceptInvitation_003Ec__AnonStorey80E._003CAcceptInvitation_003Ec__AnonStorey811 _003CAcceptInvitation_003Ec__AnonStorey;
 					mRealtimeManager.FetchInvitations(delegate(RealtimeManager.FetchInvitationsResponse response)
 					{
+						//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+						//IL_0114: Expected O, but got Unknown
 						if (!response.RequestSucceeded())
 						{
 							Logger.e("Couldn't load invitations.");
@@ -1168,10 +1183,7 @@ namespace GooglePlayGames.Native
 											helper = HelperForSession(newRoom);
 											try
 											{
-												newRoom.StartRoomCreation(mNativeClient.GetUserId(), delegate
-												{
-													mRealtimeManager.AcceptInvitation(invitation, helper, newRoom.HandleRoomResponse);
-												});
+												newRoom.StartRoomCreation(mNativeClient.GetUserId(), new Action((object)_003CAcceptInvitation_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 												return;
 												IL_011e:;
 											}

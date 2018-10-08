@@ -68,6 +68,12 @@ public class UIDeadAnnounce : UIAnnounceBase<UIDeadAnnounce>
 
 	private void SetupAnnounce(ANNOUNCE_TYPE type, string charaName)
 	{
+		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
 		if (type == ANNOUNCE_TYPE.DEAD || type == ANNOUNCE_TYPE.RETIRE)
 		{
 			deadBack.SetActive(true);

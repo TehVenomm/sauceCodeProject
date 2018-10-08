@@ -2,10 +2,12 @@ using UnityEngine;
 
 public class Coop_Model_CharacterMoveLookAt : Coop_Model_ObjectSyncPositionBase
 {
-	public Vector3 moveLookAtPos = Vector3.zero;
+	public Vector3 moveLookAtPos = Vector3.get_zero();
 
 	public Coop_Model_CharacterMoveLookAt()
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		base.packetType = PACKET_TYPE.CHARACTER_MOVE_LOOKAT;
 	}
 

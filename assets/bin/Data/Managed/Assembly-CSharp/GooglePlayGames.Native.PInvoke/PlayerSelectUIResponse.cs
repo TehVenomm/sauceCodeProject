@@ -28,9 +28,9 @@ namespace GooglePlayGames.Native.PInvoke
 			return PInvokeUtilities.OutParamsToString((byte[] out_string, UIntPtr size) => TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_PlayerSelectUIResponse_GetPlayerIds_GetElement(SelfPtr(), index, out_string, size));
 		}
 
-		public IEnumerator<string> GetEnumerator()
+		public unsafe IEnumerator<string> GetEnumerator()
 		{
-			return PInvokeUtilities.ToEnumerator(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_PlayerSelectUIResponse_GetPlayerIds_Length(SelfPtr()), PlayerIdAtIndex);
+			return PInvokeUtilities.ToEnumerator<string>(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_PlayerSelectUIResponse_GetPlayerIds_Length(SelfPtr()), new Func<UIntPtr, string>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
 		internal uint MinimumAutomatchingPlayers()

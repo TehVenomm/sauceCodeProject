@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RailAnimation : MonoBehaviour
+public class RailAnimation
 {
 	public const string DEFAULT_RAIL_ANIM_NAME = "DefaultRailAnim";
 
@@ -39,15 +39,15 @@ public class RailAnimation : MonoBehaviour
 			{
 				_rate = 1f;
 			}
-			if ((TrackedReference)currentAnimState == (TrackedReference)null)
+			if (currentAnimState == null)
 			{
-				if ((Object)railAnimClip == (Object)null)
+				if (railAnimClip == null)
 				{
 					return;
 				}
 				AddRailAnimClip(railAnimClip, "DefaultRailAnim");
 			}
-			currentAnimState.time = currentAnimState.length * _rate;
+			currentAnimState.set_time(currentAnimState.get_length() * _rate);
 		}
 	}
 
@@ -55,22 +55,28 @@ public class RailAnimation : MonoBehaviour
 	{
 		get
 		{
-			return base.enabled;
+			return this.get_enabled();
 		}
 		set
 		{
-			base.enabled = value;
-			_animation.enabled = value;
+			this.set_enabled(value);
+			_animation.set_enabled(value);
 		}
+	}
+
+	public RailAnimation()
+		: this()
+	{
 	}
 
 	private void Awake()
 	{
-		_animation = GetComponent<Animation>();
-		if ((Object)_animation == (Object)null)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		_animation = this.GetComponent<Animation>();
+		if (_animation == null)
 		{
-			_animation = base.gameObject.AddComponent<Animation>();
-			_animation.playAutomatically = false;
+			_animation = this.get_gameObject().AddComponent<Animation>();
+			_animation.set_playAutomatically(false);
 			addAnim = true;
 		}
 	}
@@ -87,63 +93,67 @@ public class RailAnimation : MonoBehaviour
 
 	private void Update()
 	{
-		if ((TrackedReference)nextAnimState == (TrackedReference)null)
+		if (nextAnimState == null)
 		{
-			if ((TrackedReference)currentAnimState != (TrackedReference)null)
+			if (currentAnimState != null)
 			{
-				currentAnimState.enabled = true;
-				currentAnimState.weight = 1f;
+				currentAnimState.set_enabled(true);
+				currentAnimState.set_weight(1f);
 			}
 		}
 		else
 		{
 			changeInterp.Update();
-			currentAnimState.weight = changeInterp.Get();
-			nextAnimState.weight = 1f - currentAnimState.weight;
+			currentAnimState.set_weight(changeInterp.Get());
+			nextAnimState.set_weight(1f - currentAnimState.get_weight());
 			if (!changeInterp.IsPlaying())
 			{
-				currentAnimState.enabled = false;
-				currentAnimState.weight = 0f;
+				currentAnimState.set_enabled(false);
+				currentAnimState.set_weight(0f);
 				currentAnimState = nextAnimState;
 				nextAnimState = null;
-				_rate = currentAnimState.time / currentAnimState.length;
+				_rate = currentAnimState.get_time() / currentAnimState.get_length();
 			}
 		}
 	}
 
 	public void AddRailAnimClip(AnimationClip anim_clip, string name)
 	{
-		if (!((Object)anim_clip == (Object)null))
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0026: Expected O, but got Unknown
+		if (!(anim_clip == null))
 		{
 			_animation.AddClip(anim_clip, name);
-			AnimationState animationState = _animation[name];
-			animationState.speed = 0f;
-			animationState.enabled = false;
-			animationState.blendMode = AnimationBlendMode.Blend;
-			animationState.wrapMode = WrapMode.Once;
-			animationState.enabled = false;
-			animationState.weight = 0f;
-			if ((TrackedReference)currentAnimState == (TrackedReference)null)
+			AnimationState val = _animation.get_Item(name);
+			val.set_speed(0f);
+			val.set_enabled(false);
+			val.set_blendMode(0);
+			val.set_wrapMode(1);
+			val.set_enabled(false);
+			val.set_weight(0f);
+			if (currentAnimState == null)
 			{
-				currentAnimState = animationState;
-				animationState.enabled = true;
-				animationState.weight = 1f;
+				currentAnimState = val;
+				val.set_enabled(true);
+				val.set_weight(1f);
 			}
 		}
 	}
 
 	public void ChangeRail(string anim_clip_name, float time, float rate = -1f)
 	{
-		nextAnimState = _animation[anim_clip_name];
-		if (!((TrackedReference)nextAnimState == (TrackedReference)null) && !((TrackedReference)nextAnimState == (TrackedReference)currentAnimState))
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Expected O, but got Unknown
+		nextAnimState = _animation.get_Item(anim_clip_name);
+		if (!(nextAnimState == null) && !(nextAnimState == currentAnimState))
 		{
-			nextAnimState.weight = 1f - currentAnimState.weight;
-			nextAnimState.enabled = true;
+			nextAnimState.set_weight(1f - currentAnimState.get_weight());
+			nextAnimState.set_enabled(true);
 			if (rate >= 0f)
 			{
-				nextAnimState.time = nextAnimState.length * rate;
+				nextAnimState.set_time(nextAnimState.get_length() * rate);
 			}
-			changeInterp.Set(time, currentAnimState.weight, 0f, null, 0f, null);
+			changeInterp.Set(time, currentAnimState.get_weight(), 0f, null, 0f, null);
 			changeInterp.Play();
 		}
 	}

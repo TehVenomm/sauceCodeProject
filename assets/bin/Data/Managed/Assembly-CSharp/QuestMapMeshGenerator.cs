@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class QuestMapMeshGenerator : MonoBehaviour
+public class QuestMapMeshGenerator
 {
 	public float heightMax = 10f;
 
@@ -31,4 +31,15 @@ public class QuestMapMeshGenerator : MonoBehaviour
 	public Texture2D blendMap3;
 
 	public string outPath = string.Empty;
+
+	public QuestMapMeshGenerator()
+		: this()
+	{
+	}//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+	//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+	//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+
 }

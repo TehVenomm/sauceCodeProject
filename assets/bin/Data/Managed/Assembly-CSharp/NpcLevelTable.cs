@@ -132,7 +132,7 @@ public class NpcLevelTable : Singleton<NpcLevelTable>, IDataTable
 		{
 			return null;
 		}
-		int index = (int)(UnityEngine.Random.value * (float)npcLevelList.Count);
+		int index = (int)(Random.get_value() * (float)npcLevelList.Count);
 		return npcLevelList[index];
 	}
 

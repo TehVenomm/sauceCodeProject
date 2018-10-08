@@ -53,6 +53,10 @@ public class WaveMatchDropResource
 
 	public void Create(Coop_Model_WaveMatchDrop model)
 	{
+		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0185: Unknown result type (might be due to invalid IL or missing references)
 		if (Singleton<WaveMatchDropTable>.IsValid() && dropModelList != null && model.fiIds != null && model.fiIds.Count != 0)
 		{
 			for (int i = 0; i < model.fiIds.Count; i++)
@@ -61,18 +65,18 @@ public class WaveMatchDropResource
 				WaveMatchDropTable.WaveMatchDropData data = Singleton<WaveMatchDropTable>.I.GetData(num);
 				if (data != null && dropModelList.ContainsKey(data.model))
 				{
-					Vector3 offset = Vector3.zero;
+					Vector3 zero = Vector3.get_zero();
 					if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
 					{
 						InGameSettingsManager.FieldDropItem fieldDrop = MonoBehaviourSingleton<InGameSettingsManager>.I.fieldDrop;
-						float value = Random.value;
-						float value2 = Random.value;
-						float value3 = Random.value;
-						float num2 = (!(Random.value > 0.5f)) ? 1f : (-1f);
-						float num3 = (!(Random.value > 0.5f)) ? 1f : (-1f);
-						offset = new Vector3(Mathf.Lerp(fieldDrop.offsetMin.x, fieldDrop.offsetMax.x, value) * num2, Mathf.Lerp(fieldDrop.offsetMin.y, fieldDrop.offsetMax.y, value2), Mathf.Lerp(fieldDrop.offsetMin.z, fieldDrop.offsetMax.z, value3) * num3);
+						float value = Random.get_value();
+						float value2 = Random.get_value();
+						float value3 = Random.get_value();
+						float num2 = (!(Random.get_value() > 0.5f)) ? 1f : (-1f);
+						float num3 = (!(Random.get_value() > 0.5f)) ? 1f : (-1f);
+						zero._002Ector(Mathf.Lerp(fieldDrop.offsetMin.x, fieldDrop.offsetMax.x, value) * num2, Mathf.Lerp(fieldDrop.offsetMin.y, fieldDrop.offsetMax.y, value2), Mathf.Lerp(fieldDrop.offsetMin.z, fieldDrop.offsetMax.z, value3) * num3);
 					}
-					OnCreate(MonoBehaviourSingleton<StageObjectManager>.I.waveMatchDropObjIndex++, num, new Vector3((float)model.x, 0f, (float)model.z), offset, model.sec, true);
+					OnCreate(MonoBehaviourSingleton<StageObjectManager>.I.waveMatchDropObjIndex++, num, new Vector3((float)model.x, 0f, (float)model.z), zero, model.sec, true);
 				}
 			}
 		}
@@ -80,34 +84,42 @@ public class WaveMatchDropResource
 
 	public void OnCreate(int manageId, uint dataId, Vector3 basePos, Vector3 offset, float sec, bool send = false)
 	{
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
 		WaveMatchDropTable.WaveMatchDropData data = Singleton<WaveMatchDropTable>.I.GetData(dataId);
 		if (data != null && dropModelList.ContainsKey(data.model))
 		{
 			LoadObject loadObject = dropModelList[data.model];
 			if (loadObject != null)
 			{
-				Transform transform = ResourceUtility.Realizes(loadObject.loadedObject, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-				if (!((Object)transform == (Object)null))
+				Transform val = ResourceUtility.Realizes(loadObject.loadedObject, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
+				if (!(val == null))
 				{
 					WaveMatchDropObject waveMatchDropObject = null;
 					switch (data.type)
 					{
 					case WAVEMATCH_ITEM_TYPE.HEAL_HP:
-						waveMatchDropObject = transform.gameObject.AddComponent<WaveMatchDropObjectHealHp>();
+						waveMatchDropObject = val.get_gameObject().AddComponent<WaveMatchDropObjectHealHp>();
 						break;
 					case WAVEMATCH_ITEM_TYPE.HEAL_SKILL:
-						waveMatchDropObject = transform.gameObject.AddComponent<WaveMatchDropObjectHealSkill>();
+						waveMatchDropObject = val.get_gameObject().AddComponent<WaveMatchDropObjectHealSkill>();
 						break;
 					case WAVEMATCH_ITEM_TYPE.CLOCK:
-						waveMatchDropObject = transform.gameObject.AddComponent<WaveMatchDropObjectClock>();
+						waveMatchDropObject = val.get_gameObject().AddComponent<WaveMatchDropObjectClock>();
 						break;
 					default:
-						waveMatchDropObject = transform.gameObject.AddComponent<WaveMatchDropObject>();
+						waveMatchDropObject = val.get_gameObject().AddComponent<WaveMatchDropObject>();
 						break;
 					}
-					if ((Object)waveMatchDropObject == (Object)null)
+					if (waveMatchDropObject == null)
 					{
-						transform = null;
+						val = null;
 					}
 					else
 					{

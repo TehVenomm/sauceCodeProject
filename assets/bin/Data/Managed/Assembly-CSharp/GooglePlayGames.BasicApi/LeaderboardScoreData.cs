@@ -83,7 +83,7 @@ namespace GooglePlayGames.BasicApi
 			}
 		}
 
-		public IScore[] Scores => mScores.ToArray();
+		public IScore[] Scores => (IScore[])mScores.ToArray();
 
 		public ScorePageToken PrevPageToken
 		{

@@ -35,27 +35,10 @@ public class QuestRushSearchListSelect : QuestSearchListSelectBase
 		base.Initialize();
 	}
 
-	protected override void SendSearchRequest(Action onFinish, Action<bool> cb)
+	protected unsafe override void SendSearchRequest(Action onFinish, Action<bool> cb)
 	{
-		MonoBehaviourSingleton<PartyManager>.I.SendRushSearch(delegate(bool is_success, Error err)
-		{
-			onFinish();
-			if (!is_success && base.isInitialized)
-			{
-				if (err == Error.WRN_PARTY_SEARCH_NOT_FOUND_QUEST)
-				{
-					GameSection.ChangeStayEvent("NOT_FOUND_QUEST", null);
-					if (cb != null)
-					{
-						cb(true);
-					}
-				}
-			}
-			else if (cb != null)
-			{
-				cb(is_success);
-			}
-		}, false);
+		_003CSendSearchRequest_003Ec__AnonStorey404 _003CSendSearchRequest_003Ec__AnonStorey;
+		MonoBehaviourSingleton<PartyManager>.I.SendRushSearch(new Action<bool, Error>((object)_003CSendSearchRequest_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
 	}
 
 	protected override void ResetSearchRequest()
@@ -75,35 +58,20 @@ public class QuestRushSearchListSelect : QuestSearchListSelectBase
 		MonoBehaviourSingleton<PartyManager>.I.SetRushSearchRequest(defaultParam);
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
 		if (!PartyManager.IsValidNotEmptyList())
 		{
-			SetActive(UI.GRD_QUEST, false);
-			SetActive(UI.STR_NON_LIST, true);
+			SetActive((Enum)UI.GRD_QUEST, false);
+			SetActive((Enum)UI.STR_NON_LIST, true);
 		}
 		else
 		{
 			PartyModel.Party[] partys = MonoBehaviourSingleton<PartyManager>.I.partys.ToArray();
-			SetActive(UI.GRD_QUEST, true);
-			SetActive(UI.STR_NON_LIST, false);
-			SetGrid(UI.GRD_QUEST, "QuestRushSearchListSelectItem", partys.Length, false, delegate(int i, Transform t, bool is_recycle)
-			{
-				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)partys[i].quest.questId);
-				if (questData == null)
-				{
-					SetActive(t, false);
-				}
-				else
-				{
-					SetEvent(t, "SELECT_ROOM", i);
-					SetQuestData(questData, t);
-					SetPartyData(partys[i], t);
-					SetDeliveryData(questData.questID, t);
-					SetStatusIconInfo(partys[i], t);
-					SetMemberIcon(t, questData);
-				}
-			});
+			SetActive((Enum)UI.GRD_QUEST, true);
+			SetActive((Enum)UI.STR_NON_LIST, false);
+			_003CUpdateUI_003Ec__AnonStorey405 _003CUpdateUI_003Ec__AnonStorey;
+			SetGrid(UI.GRD_QUEST, "QuestRushSearchListSelectItem", partys.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			base.UpdateUI();
 		}
 	}

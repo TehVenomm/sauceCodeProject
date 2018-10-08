@@ -154,12 +154,12 @@ public class StringTable : Singleton<StringTable>, IDataTable
 	public void CreateTable(TextAsset csv = null)
 	{
 		bool encrypted = false;
-		if ((Object)csv == (Object)null)
+		if (csv == null)
 		{
 			csv = Resources.Load<TextAsset>("Internal/internal__TABLE__StringTable");
 			encrypted = true;
 		}
-		CreateTable(csv.text, encrypted);
+		CreateTable(csv.get_text(), encrypted);
 	}
 
 	public void CreateTable(string csv_text)

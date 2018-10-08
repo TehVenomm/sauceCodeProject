@@ -340,20 +340,20 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				{
 					MonoBehaviourSingleton<ChatManager>.I.CreateClanChat(ret.result.chat, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId, delegate
 					{
-						call_back(is_success, ret.Error);
+						call_back.Invoke(is_success, ret.Error);
 					});
 				}
 				else
 				{
-					call_back(is_success, ret.Error);
+					call_back.Invoke(is_success, ret.Error);
 				}
 				break;
 			case Error.WRN_PARTY_TOO_MANY_PARTIES:
 				Log.Error("Guild create fall");
-				call_back(is_success, ret.Error);
+				call_back.Invoke(is_success, ret.Error);
 				break;
 			default:
-				call_back(is_success, ret.Error);
+				call_back.Invoke(is_success, ret.Error);
 				break;
 			}
 		}, string.Empty);
@@ -369,15 +369,15 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		requestCreateVerify.description = clanDescription;
 		Protocol.Send(GuildModel.RequestCreateVerify.verifyPath, requestCreateVerify, delegate(BaseModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
-				call_back(arg, ret.Error);
+				flag = true;
+				call_back.Invoke(flag, ret.Error);
 			}
 			else
 			{
-				call_back(arg, ret.Error);
+				call_back.Invoke(flag, ret.Error);
 			}
 		}, string.Empty);
 	}
@@ -388,13 +388,13 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		requestDelete.token = GenerateToken();
 		Protocol.Send(GuildModel.RequestDelete.path, requestDelete, delegate(BaseModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
+				flag = true;
 				UpdateGuild(null);
 			}
-			call_back(arg, ret.Error);
+			call_back.Invoke(flag, ret.Error);
 		}, string.Empty);
 	}
 
@@ -405,13 +405,13 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		requestSearchWithKeyword.keyword = mSearchKeywork;
 		Protocol.Send(GuildSearchModel.RequestSearchWithKeyword.path, requestSearchWithKeyword, delegate(GuildSearchModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
+				flag = true;
 				guilds = ret.result.clanList;
 			}
-			call_back(arg, ret.Error);
+			call_back.Invoke(flag, ret.Error);
 		}, string.Empty);
 	}
 
@@ -422,17 +422,17 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		requestSearchWithID.clanId = clanId;
 		Protocol.Send(GuildSearchModelWithID.RequestSearchWithID.path, requestSearchWithID, delegate(GuildSearchModelWithID ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
+				flag = true;
 				guilds.Clear();
 				if (ret.result.guildInfo != null)
 				{
 					guilds.Add(ret.result.guildInfo);
 				}
 			}
-			call_back(arg, ret.Error);
+			call_back.Invoke(flag, ret.Error);
 		}, string.Empty);
 	}
 
@@ -442,8 +442,8 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		form.clanId = clan_id;
 		Protocol.Send(GuildStatisticModel.URL, form, delegate(GuildStatisticModel ret)
 		{
-			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
-			callback(arg, ret.result);
+			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+			callback.Invoke(flag, ret.result);
 		}, string.Empty);
 	}
 
@@ -465,17 +465,17 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				{
 					MonoBehaviourSingleton<ChatManager>.I.CreateClanChat(guildInfos.chat, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId, delegate
 					{
-						call_back(is_success, ret.Error);
+						call_back.Invoke(is_success, ret.Error);
 					});
 				}
 				else
 				{
-					call_back(is_success, ret.Error);
+					call_back.Invoke(is_success, ret.Error);
 				}
 			}
 			else
 			{
-				call_back(is_success, ret.Error);
+				call_back.Invoke(is_success, ret.Error);
 			}
 		}, string.Empty);
 	}
@@ -488,12 +488,12 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		requestKick.reason = banReason.Replace("\n", "\\n");
 		Protocol.Send(GuildModel.RequestKick.path, requestKick, delegate(BaseModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
+				flag = true;
 			}
-			call_back(arg, ret.Error);
+			call_back.Invoke(flag, ret.Error);
 		}, string.Empty);
 	}
 
@@ -505,12 +505,12 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		requestAdminJoin.decision = decision;
 		Protocol.Send(GuildModel.RequestAdminJoin.path, requestAdminJoin, delegate(BaseModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
+				flag = true;
 			}
-			call_back(arg, ret.Error);
+			call_back.Invoke(flag, ret.Error);
 		}, string.Empty);
 	}
 
@@ -522,12 +522,12 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		requestJoin.recommendId = recommentId;
 		Protocol.Send(GuildRequestJoinModel.URL, requestJoin, delegate(GuildRequestJoinModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
+				flag = true;
 			}
-			call_back(arg, ret.Error);
+			call_back.Invoke(flag, ret.Error);
 		}, string.Empty);
 	}
 
@@ -543,13 +543,13 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		guildChangeSetting.location = requestParam.GuildLocation;
 		Protocol.Send(GuildChangeSettingModel.URL, guildChangeSetting, delegate(GuildChangeSettingModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
+				flag = true;
 				UpdateGuildData(ret);
 			}
-			call_back(arg, ret.Error);
+			call_back.Invoke(flag, ret.Error);
 		}, string.Empty);
 	}
 
@@ -559,13 +559,13 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		requestLeave.token = GenerateToken();
 		Protocol.Send(GuildModel.RequestLeave.path, requestLeave, delegate(BaseModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
+				flag = true;
 				UpdateGuild(null);
 			}
-			call_back(arg, ret.Error);
+			call_back.Invoke(flag, ret.Error);
 		}, string.Empty);
 	}
 
@@ -656,25 +656,12 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		}, string.Empty);
 	}
 
-	public void GetClanStat(Action<bool> call_back = null)
+	public unsafe void GetClanStat(Action<bool> call_back = null)
 	{
 		if (guildData != null && guildData.clanId != -1)
 		{
-			SendRequestStatistic(guildData.clanId, delegate(bool success, GuildStatisticInfo info)
-			{
-				if (success)
-				{
-					guildStatData = info;
-				}
-				else
-				{
-					guildStatData = null;
-				}
-				if (call_back != null)
-				{
-					call_back(success);
-				}
-			});
+			_003CGetClanStat_003Ec__AnonStorey5EB _003CGetClanStat_003Ec__AnonStorey5EB;
+			SendRequestStatistic(guildData.clanId, new Action<bool, GuildStatisticInfo>((object)_003CGetClanStat_003Ec__AnonStorey5EB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -684,16 +671,17 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		requestSendForm.clanId = clan_id;
 		Protocol.Send(GuildMemberListModel.URL, requestSendForm, delegate(GuildMemberListModel ret)
 		{
-			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
+			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
 			members = ret.result.list;
 			guilMemberList = ret;
-			callback(arg, ret);
+			callback.Invoke(flag, ret);
 		}, string.Empty);
 	}
 
-	public void SetTalkUser(FriendCharaInfo message_user)
+	public unsafe void SetTalkUser(FriendCharaInfo message_user)
 	{
-		FriendCharaInfo friendCharaInfo = talkUsers.FirstOrDefault((FriendCharaInfo o) => o.userId == message_user.userId);
+		_003CSetTalkUser_003Ec__AnonStorey5ED _003CSetTalkUser_003Ec__AnonStorey5ED;
+		FriendCharaInfo friendCharaInfo = talkUsers.FirstOrDefault(new Func<FriendCharaInfo, bool>((object)_003CSetTalkUser_003Ec__AnonStorey5ED, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (friendCharaInfo == null)
 		{
 			talkUsers.Insert(0, message_user);
@@ -701,14 +689,15 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		talkUser = message_user;
 	}
 
-	public bool AddTalkUser(int userId)
+	public unsafe bool AddTalkUser(int userId)
 	{
-		FriendCharaInfo friendCharaInfo = talkUsers.FirstOrDefault((FriendCharaInfo o) => o.userId == userId);
+		_003CAddTalkUser_003Ec__AnonStorey5EE _003CAddTalkUser_003Ec__AnonStorey5EE;
+		FriendCharaInfo friendCharaInfo = talkUsers.FirstOrDefault(new Func<FriendCharaInfo, bool>((object)_003CAddTalkUser_003Ec__AnonStorey5EE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (friendCharaInfo != null)
 		{
 			return false;
 		}
-		friendCharaInfo = members.FirstOrDefault((FriendCharaInfo o) => o.userId == userId);
+		friendCharaInfo = members.FirstOrDefault(new Func<FriendCharaInfo, bool>((object)_003CAddTalkUser_003Ec__AnonStorey5EE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (friendCharaInfo != null)
 		{
 			talkUsers.Add(friendCharaInfo);
@@ -717,9 +706,10 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		return false;
 	}
 
-	public void RemoveTalkUser(FriendCharaInfo message_user)
+	public unsafe void RemoveTalkUser(FriendCharaInfo message_user)
 	{
-		FriendCharaInfo friendCharaInfo = talkUsers.FirstOrDefault((FriendCharaInfo o) => o.userId == message_user.userId);
+		_003CRemoveTalkUser_003Ec__AnonStorey5EF _003CRemoveTalkUser_003Ec__AnonStorey5EF;
+		FriendCharaInfo friendCharaInfo = talkUsers.FirstOrDefault(new Func<FriendCharaInfo, bool>((object)_003CRemoveTalkUser_003Ec__AnonStorey5EF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (friendCharaInfo != null)
 		{
 			talkUsers.Remove(friendCharaInfo);
@@ -743,8 +733,8 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 	{
 		Protocol.Send(GuildChatModel.URL, delegate(GuildChatModel ret)
 		{
-			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
-			callback(arg, ret);
+			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+			callback.Invoke(flag, ret);
 		}, string.Empty);
 	}
 
@@ -755,8 +745,8 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		GuildPrivateChatModel.SendForm post_data = sendForm;
 		Protocol.Send(GuildPrivateChatModel.URL, post_data, delegate(GuildPrivateChatModel ret)
 		{
-			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
-			callback(arg, ret);
+			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+			callback.Invoke(flag, ret);
 		}, string.Empty);
 	}
 
@@ -770,8 +760,8 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		sendForm.fromUserId = fromUserId;
 		Protocol.Send(GuildChatPinModel.URL, sendForm, delegate(GuildChatPinModel ret)
 		{
-			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
-			callback(arg, ret);
+			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+			callback.Invoke(flag, ret);
 		}, string.Empty);
 	}
 
@@ -780,8 +770,8 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		Protocol.Send(GuildChatUnPinModel.URL, delegate(GuildChatUnPinModel ret)
 		{
 			pinDonate = null;
-			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
-			callback(arg, ret);
+			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+			callback.Invoke(flag, ret);
 		}, string.Empty);
 	}
 
@@ -789,8 +779,8 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 	{
 		Protocol.Send(GuildChatOnlineStatusModel.URL, delegate(GuildChatOnlineStatusModel ret)
 		{
-			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
-			callback(arg, ret.result.online);
+			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+			callback.Invoke(flag, ret.result.online);
 		}, string.Empty);
 	}
 
@@ -798,8 +788,8 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 	{
 		Protocol.Send(GuildGetPinModel.URL, delegate(GuildGetPinModel ret)
 		{
-			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
-			callback(arg, ret);
+			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+			callback.Invoke(flag, ret);
 		}, string.Empty);
 	}
 
@@ -828,8 +818,8 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 	{
 		Protocol.Send(GuildDonate.GuildDonateFobbidenModel.URL, delegate(GuildDonate.GuildDonateFobbidenModel ret)
 		{
-			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
-			callback(arg, ret.result.array);
+			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+			callback.Invoke(flag, ret.result.array);
 		}, string.Empty);
 	}
 
@@ -879,8 +869,8 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		form.id = donate_id;
 		Protocol.Send(GuildDonate.GuildDonateInviteListModel.URL, form, delegate(GuildDonate.GuildDonateInviteListModel ret)
 		{
-			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
-			callback(arg, ret);
+			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+			callback.Invoke(flag, ret);
 		}, string.Empty);
 	}
 
@@ -989,7 +979,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 	{
 		if (guildData == null)
 		{
-			call_back(false, null);
+			call_back.Invoke(false, (GuildInviteCharaInfo[])null);
 		}
 		else
 		{
@@ -997,14 +987,14 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 			requestSendForm.id = guildData.clanId.ToString();
 			Protocol.Send(GuildInviteListModel.URL, requestSendForm, delegate(GuildInviteListModel ret)
 			{
-				bool arg = false;
-				GuildInviteCharaInfo[] arg2 = null;
+				bool flag = false;
+				GuildInviteCharaInfo[] array = null;
 				if (ret.Error == Error.None)
 				{
-					arg = true;
-					arg2 = ret.result.list.ToArray();
+					flag = true;
+					array = ret.result.list.ToArray();
 				}
-				call_back(arg, arg2);
+				call_back.Invoke(flag, array);
 			}, string.Empty);
 		}
 	}
@@ -1013,7 +1003,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 	{
 		if (guildData == null)
 		{
-			call_back(false, null);
+			call_back.Invoke(false, (int[])null);
 		}
 		else
 		{
@@ -1026,15 +1016,15 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 			}
 			Protocol.Send(GuildInviteModel.URL, requestSendForm, delegate(GuildInviteModel ret)
 			{
-				bool arg = false;
+				bool flag = false;
 				if (ret.Error == Error.None)
 				{
-					arg = true;
-					call_back(arg, userIds);
+					flag = true;
+					call_back.Invoke(flag, userIds);
 				}
 				else
 				{
-					call_back(arg, null);
+					call_back.Invoke(flag, (int[])null);
 				}
 			}, string.Empty);
 		}
@@ -1095,7 +1085,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 	{
 		Protocol.Send(GuildSearchFollowerRoomModel.URL, delegate(GuildSearchFollowerRoomModel ret)
 		{
-			call_back(ret.Error == Error.None, ret.result.list);
+			call_back.Invoke(ret.Error == Error.None, ret.result.list);
 		}, string.Empty);
 	}
 }

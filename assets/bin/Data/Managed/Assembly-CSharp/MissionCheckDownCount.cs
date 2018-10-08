@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class MissionCheckDownCount : MissionCheckBase
 {
 	private int downCount;
@@ -11,7 +9,7 @@ public class MissionCheckDownCount : MissionCheckBase
 
 	public override void OnDamage(AttackedHitStatusFix status, Character to_obj)
 	{
-		if (!((Object)(to_obj as Enemy) == (Object)null) && status.reactionType == 7)
+		if (!(to_obj as Enemy == null) && status.reactionType == 7)
 		{
 			downCount++;
 		}

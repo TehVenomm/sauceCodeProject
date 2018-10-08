@@ -31,62 +31,30 @@ public class QuestWaveSearchListSelect : QuestSearchListSelectBase
 		base.Initialize();
 	}
 
-	protected override void SendSearchRequest(Action onFinish, Action<bool> cb)
+	protected unsafe override void SendSearchRequest(Action onFinish, Action<bool> cb)
 	{
-		MonoBehaviourSingleton<PartyManager>.I.SendEventSearch(eventId, delegate(bool is_success, Error err)
-		{
-			onFinish();
-			if (!is_success && base.isInitialized)
-			{
-				if (err == Error.WRN_PARTY_SEARCH_NOT_FOUND_QUEST)
-				{
-					GameSection.ChangeStayEvent("NOT_FOUND_QUEST", null);
-					if (cb != null)
-					{
-						cb(true);
-					}
-				}
-			}
-			else if (cb != null)
-			{
-				cb(is_success);
-			}
-		});
+		_003CSendSearchRequest_003Ec__AnonStorey40A _003CSendSearchRequest_003Ec__AnonStorey40A;
+		MonoBehaviourSingleton<PartyManager>.I.SendEventSearch(eventId, new Action<bool, Error>((object)_003CSendSearchRequest_003Ec__AnonStorey40A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void ResetSearchRequest()
 	{
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
 		if (!PartyManager.IsValidNotEmptyList())
 		{
-			SetActive(UI.GRD_QUEST, false);
-			SetActive(UI.STR_NON_LIST, true);
+			SetActive((Enum)UI.GRD_QUEST, false);
+			SetActive((Enum)UI.STR_NON_LIST, true);
 		}
 		else
 		{
 			PartyModel.Party[] partys = MonoBehaviourSingleton<PartyManager>.I.partys.ToArray();
-			SetActive(UI.GRD_QUEST, true);
-			SetActive(UI.STR_NON_LIST, false);
-			SetGrid(UI.GRD_QUEST, "QuestWaveSearchListSelectItem", partys.Length, false, delegate(int i, Transform t, bool is_recycle)
-			{
-				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)partys[i].quest.questId);
-				if (questData == null)
-				{
-					SetActive(t, false);
-				}
-				else
-				{
-					SetEvent(t, "SELECT_ROOM", i);
-					SetQuestData(questData, t);
-					SetPartyData(partys[i], t);
-					SetDeliveryData(questData.questID, t);
-					SetStatusIconInfo(partys[i], t);
-					SetMemberIcon(t, questData);
-				}
-			});
+			SetActive((Enum)UI.GRD_QUEST, true);
+			SetActive((Enum)UI.STR_NON_LIST, false);
+			_003CUpdateUI_003Ec__AnonStorey40B _003CUpdateUI_003Ec__AnonStorey40B;
+			SetGrid(UI.GRD_QUEST, "QuestWaveSearchListSelectItem", partys.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey40B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			base.UpdateUI();
 		}
 	}

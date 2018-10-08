@@ -1,12 +1,14 @@
+using System;
+
 namespace Facebook.Unity.Example
 {
 	internal class AccessTokenMenu : MenuBase
 	{
-		protected override void GetGui()
+		protected unsafe override void GetGui()
 		{
 			if (Button("Refresh Access Token"))
 			{
-				FB.Mobile.RefreshCurrentAccessToken(base.HandleResult);
+				Mobile.RefreshCurrentAccessToken(new FacebookDelegate<IAccessTokenRefreshResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StatusBoostAnimator : MonoBehaviour
+public class StatusBoostAnimator
 {
 	private const int ANIM_TIME = 3;
 
@@ -25,14 +25,19 @@ public class StatusBoostAnimator : MonoBehaviour
 
 	private Action<BoostStatus> changeCallback;
 
-	private static readonly Color[] TEXT_RATE_COLOR = new Color[5]
+	private static readonly Color[] TEXT_RATE_COLOR = (Color[])new Color[5]
 	{
-		Color.white,
-		new Color32(0, byte.MaxValue, 244, byte.MaxValue),
-		new Color32(byte.MaxValue, byte.MaxValue, 0, byte.MaxValue),
-		new Color32(251, 210, 0, byte.MaxValue),
-		new Color32(225, 23, 23, byte.MaxValue)
+		Color.get_white(),
+		Color32.op_Implicit(new Color32((byte)0, byte.MaxValue, (byte)244, byte.MaxValue)),
+		Color32.op_Implicit(new Color32(byte.MaxValue, byte.MaxValue, (byte)0, byte.MaxValue)),
+		Color32.op_Implicit(new Color32((byte)251, (byte)210, (byte)0, byte.MaxValue)),
+		Color32.op_Implicit(new Color32((byte)225, (byte)23, (byte)23, byte.MaxValue))
 	};
+
+	public StatusBoostAnimator()
+		: this()
+	{
+	}
 
 	public void SetupUI(Action<BoostStatus> update_callback, Action<BoostStatus> change_callback)
 	{
@@ -217,6 +222,7 @@ public class StatusBoostAnimator : MonoBehaviour
 
 	public Color GetRateColor(int boost_rate)
 	{
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		int num = 100 + boost_rate;
 		int num2 = (num >= 500) ? 4 : ((num >= 300) ? 3 : ((num >= 200) ? 2 : ((num > 100) ? 1 : 0)));
 		return TEXT_RATE_COLOR[num2];

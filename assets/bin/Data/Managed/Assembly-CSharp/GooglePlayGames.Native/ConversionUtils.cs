@@ -49,7 +49,7 @@ namespace GooglePlayGames.Native
 			case CommonErrorStatus.ResponseStatus.ERROR_VERSION_UPDATE_REQUIRED:
 				return CommonStatusCodes.ServiceVersionUpdateRequired;
 			default:
-				Debug.LogWarning("Unknown ResponseStatus: " + status + ", defaulting to CommonStatusCodes.Error");
+				Debug.LogWarning((object)("Unknown ResponseStatus: " + status + ", defaulting to CommonStatusCodes.Error"));
 				return CommonStatusCodes.Error;
 			}
 		}
@@ -77,87 +77,87 @@ namespace GooglePlayGames.Native
 			}
 		}
 
-		internal static GooglePlayGames.Native.Cwrapper.Types.DataSource AsDataSource(DataSource source)
+		internal static Types.DataSource AsDataSource(DataSource source)
 		{
 			switch (source)
 			{
 			case DataSource.ReadCacheOrNetwork:
-				return GooglePlayGames.Native.Cwrapper.Types.DataSource.CACHE_OR_NETWORK;
+				return Types.DataSource.CACHE_OR_NETWORK;
 			case DataSource.ReadNetworkOnly:
-				return GooglePlayGames.Native.Cwrapper.Types.DataSource.NETWORK_ONLY;
+				return Types.DataSource.NETWORK_ONLY;
 			default:
 				throw new InvalidOperationException("Found unhandled DataSource: " + source);
 			}
 		}
 
-		internal static GooglePlayGames.Native.Cwrapper.Types.VideoCaptureMode ConvertVideoCaptureMode(VideoCaptureMode captureMode)
+		internal static Types.VideoCaptureMode ConvertVideoCaptureMode(VideoCaptureMode captureMode)
 		{
 			switch (captureMode)
 			{
 			case VideoCaptureMode.File:
-				return GooglePlayGames.Native.Cwrapper.Types.VideoCaptureMode.FILE;
+				return Types.VideoCaptureMode.FILE;
 			case VideoCaptureMode.Stream:
-				return GooglePlayGames.Native.Cwrapper.Types.VideoCaptureMode.STREAM;
+				return Types.VideoCaptureMode.STREAM;
 			case VideoCaptureMode.Unknown:
-				return GooglePlayGames.Native.Cwrapper.Types.VideoCaptureMode.UNKNOWN;
+				return Types.VideoCaptureMode.UNKNOWN;
 			default:
-				Debug.LogWarning("Unknown VideoCaptureMode: " + captureMode + ", defaulting to Types.VideoCaptureMode.UNKNOWN.");
-				return GooglePlayGames.Native.Cwrapper.Types.VideoCaptureMode.UNKNOWN;
+				Debug.LogWarning((object)("Unknown VideoCaptureMode: " + captureMode + ", defaulting to Types.VideoCaptureMode.UNKNOWN."));
+				return Types.VideoCaptureMode.UNKNOWN;
 			}
 		}
 
-		internal static VideoCaptureMode ConvertNativeVideoCaptureMode(GooglePlayGames.Native.Cwrapper.Types.VideoCaptureMode nativeCaptureMode)
+		internal static VideoCaptureMode ConvertNativeVideoCaptureMode(Types.VideoCaptureMode nativeCaptureMode)
 		{
 			switch (nativeCaptureMode)
 			{
-			case GooglePlayGames.Native.Cwrapper.Types.VideoCaptureMode.FILE:
+			case Types.VideoCaptureMode.FILE:
 				return VideoCaptureMode.File;
-			case GooglePlayGames.Native.Cwrapper.Types.VideoCaptureMode.STREAM:
+			case Types.VideoCaptureMode.STREAM:
 				return VideoCaptureMode.Stream;
-			case GooglePlayGames.Native.Cwrapper.Types.VideoCaptureMode.UNKNOWN:
+			case Types.VideoCaptureMode.UNKNOWN:
 				return VideoCaptureMode.Unknown;
 			default:
-				Debug.LogWarning("Unknown Types.VideoCaptureMode: " + nativeCaptureMode + ", defaulting to VideoCaptureMode.Unknown.");
+				Debug.LogWarning((object)("Unknown Types.VideoCaptureMode: " + nativeCaptureMode + ", defaulting to VideoCaptureMode.Unknown."));
 				return VideoCaptureMode.Unknown;
 			}
 		}
 
-		internal static VideoQualityLevel ConvertNativeVideoQualityLevel(GooglePlayGames.Native.Cwrapper.Types.VideoQualityLevel nativeQualityLevel)
+		internal static VideoQualityLevel ConvertNativeVideoQualityLevel(Types.VideoQualityLevel nativeQualityLevel)
 		{
 			switch (nativeQualityLevel)
 			{
-			case GooglePlayGames.Native.Cwrapper.Types.VideoQualityLevel.SD:
+			case Types.VideoQualityLevel.SD:
 				return VideoQualityLevel.SD;
-			case GooglePlayGames.Native.Cwrapper.Types.VideoQualityLevel.HD:
+			case Types.VideoQualityLevel.HD:
 				return VideoQualityLevel.HD;
-			case GooglePlayGames.Native.Cwrapper.Types.VideoQualityLevel.XHD:
+			case Types.VideoQualityLevel.XHD:
 				return VideoQualityLevel.XHD;
-			case GooglePlayGames.Native.Cwrapper.Types.VideoQualityLevel.FULLHD:
+			case Types.VideoQualityLevel.FULLHD:
 				return VideoQualityLevel.FullHD;
-			case GooglePlayGames.Native.Cwrapper.Types.VideoQualityLevel.UNKNOWN:
+			case Types.VideoQualityLevel.UNKNOWN:
 				return VideoQualityLevel.Unknown;
 			default:
-				Debug.LogWarning("Unknown Types.VideoQualityLevel: " + nativeQualityLevel + ", defaulting to VideoQualityLevel.Unknown.");
+				Debug.LogWarning((object)("Unknown Types.VideoQualityLevel: " + nativeQualityLevel + ", defaulting to VideoQualityLevel.Unknown."));
 				return VideoQualityLevel.Unknown;
 			}
 		}
 
-		internal static VideoCaptureOverlayState ConvertNativeVideoCaptureOverlayState(GooglePlayGames.Native.Cwrapper.Types.VideoCaptureOverlayState nativeOverlayState)
+		internal static VideoCaptureOverlayState ConvertNativeVideoCaptureOverlayState(Types.VideoCaptureOverlayState nativeOverlayState)
 		{
 			switch (nativeOverlayState)
 			{
-			case GooglePlayGames.Native.Cwrapper.Types.VideoCaptureOverlayState.DISMISSED:
+			case Types.VideoCaptureOverlayState.DISMISSED:
 				return VideoCaptureOverlayState.Dismissed;
-			case GooglePlayGames.Native.Cwrapper.Types.VideoCaptureOverlayState.SHOWN:
+			case Types.VideoCaptureOverlayState.SHOWN:
 				return VideoCaptureOverlayState.Shown;
-			case GooglePlayGames.Native.Cwrapper.Types.VideoCaptureOverlayState.STARTED:
+			case Types.VideoCaptureOverlayState.STARTED:
 				return VideoCaptureOverlayState.Started;
-			case GooglePlayGames.Native.Cwrapper.Types.VideoCaptureOverlayState.STOPPED:
+			case Types.VideoCaptureOverlayState.STOPPED:
 				return VideoCaptureOverlayState.Stopped;
-			case GooglePlayGames.Native.Cwrapper.Types.VideoCaptureOverlayState.UNKNOWN:
+			case Types.VideoCaptureOverlayState.UNKNOWN:
 				return VideoCaptureOverlayState.Unknown;
 			default:
-				Debug.LogWarning("Unknown Types.VideoCaptureOverlayState: " + nativeOverlayState + ", defaulting to VideoCaptureOverlayState.Unknown.");
+				Debug.LogWarning((object)("Unknown Types.VideoCaptureOverlayState: " + nativeOverlayState + ", defaulting to VideoCaptureOverlayState.Unknown."));
 				return VideoCaptureOverlayState.Unknown;
 			}
 		}

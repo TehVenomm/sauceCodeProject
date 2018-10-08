@@ -28,7 +28,10 @@ public class ChatPartyConnection : IChatConnection
 			MonoBehaviourSingleton<PartyNetworkManager>.I.Close(1000, "Bye!", null);
 		}
 		established = false;
-		onFinished?.Invoke();
+		if (onFinished != null)
+		{
+			onFinished.Invoke();
+		}
 	}
 
 	public void Join(int roomNo, string userName)

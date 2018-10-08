@@ -1,6 +1,7 @@
 using Network;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -64,31 +65,17 @@ public class HomeTop : HomeBase
 
 	protected override IEnumerator WaitInitializeManager()
 	{
-		yield return (object)StartCoroutine(WaitForCheckpikeShop());
+		yield return (object)this.StartCoroutine(WaitForCheckpikeShop());
 		while (!MonoBehaviourSingleton<HomeManager>.I.IsInitialized)
 		{
 			yield return (object)null;
 		}
 	}
 
-	protected override IEnumerator SendHomeInfo()
+	protected unsafe override IEnumerator SendHomeInfo()
 	{
 		bool wait = true;
-		MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(delegate(bool is_success, bool acquire_login_bonus, int taskBadgeNum)
-		{
-			if (acquire_login_bonus && MonoBehaviourSingleton<AccountManager>.IsValid())
-			{
-				MonoBehaviourSingleton<AccountManager>.I.SendLogInBonus(delegate
-				{
-					((_003CSendHomeInfo_003Ec__Iterator9A)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
-				});
-			}
-			else
-			{
-				((_003CSendHomeInfo_003Ec__Iterator9A)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
-			}
-			((_003CSendHomeInfo_003Ec__Iterator9A)/*Error near IL_002d: stateMachine*/)._003C_003Ef__this.SetBadge(((_003CSendHomeInfo_003Ec__Iterator9A)/*Error near IL_002d: stateMachine*/)._003C_003Ef__this.GetCtrl(UI.BTN_MISSION), taskBadgeNum, SpriteAlignment.TopLeft, 8, -8, false);
-		});
+		MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(new Action<bool, bool, int>((object)/*Error near IL_002d: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		while (wait)
 		{
 			yield return (object)null;
@@ -121,25 +108,25 @@ public class HomeTop : HomeBase
 		bool flag3 = !flag && flag2;
 		bool flag4 = MonoBehaviourSingleton<LoungeMatchingManager>.IsValid() && MonoBehaviourSingleton<LoungeMatchingManager>.I.isOpenLounge;
 		bool flag5 = (int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level >= 15;
-		SetActive(UI.BTN_LOUNGE, flag5);
-		SetActive(UI.SPR_LOCK_LOUNGE, !flag5);
+		SetActive((Enum)UI.BTN_LOUNGE, flag5);
+		SetActive((Enum)UI.SPR_LOCK_LOUNGE, !flag5);
 		bool is_visible = flag3 && flag4;
 		bool is_visible2 = flag3 && !flag4;
-		SetActive(UI.OBJ_LOUNGE, is_visible);
-		SetActive(UI.BTN_EXPLORE, is_visible2);
+		SetActive((Enum)UI.OBJ_LOUNGE, is_visible);
+		SetActive((Enum)UI.BTN_EXPLORE, is_visible2);
 		bool flag6 = !HomeTutorialManager.ShouldRunGachaTutorial();
-		bool flag7 = (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null && TutorialStep.HasAllTutorialCompleted() && flag6;
-		SetActive(UI.OBJ_MENU_GG, flag7);
+		bool flag7 = MonoBehaviourSingleton<UIManager>.I.mainChat != null && TutorialStep.HasAllTutorialCompleted() && flag6;
+		SetActive((Enum)UI.OBJ_MENU_GG, flag7);
 		if (flag7)
 		{
 			CheckHighlightPurchase();
 			if (isHighlightPurchase || GameSaveData.instance.IsShowNewsNotification() || isHighlightPikeShop)
 			{
-				SetBadge(UI.BTN_MENU_GG_ON, -1, SpriteAlignment.TopRight, 5, -25, false);
+				SetBadge((Enum)UI.BTN_MENU_GG_ON, -1, 3, 5, -25, false);
 			}
 			else
 			{
-				SetBadge(UI.BTN_MENU_GG_ON, 0, SpriteAlignment.TopRight, 0, 0, false);
+				SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
 			}
 		}
 		base.UpdateUIOfTutorial();
@@ -209,6 +196,7 @@ public class HomeTop : HomeBase
 
 	protected override void SetupLoginBonus()
 	{
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		if (validLoginBonus)
 		{
 			shouldFrameInNPC006 = true;
@@ -218,7 +206,7 @@ public class HomeTop : HomeBase
 		{
 			HomeNPCCharacter homeNPCCharacter = MonoBehaviourSingleton<HomeManager>.I.HomePeople.GetHomeNPCCharacter(6);
 			homeNPCCharacter.HideShadow();
-			HomeDragonRandomMove homeDragonRandomMove = homeNPCCharacter.loader.GetAnimator().gameObject.AddComponent<HomeDragonRandomMove>();
+			HomeDragonRandomMove homeDragonRandomMove = homeNPCCharacter.loader.GetAnimator().get_gameObject().AddComponent<HomeDragonRandomMove>();
 			homeDragonRandomMove.Reset();
 		}
 	}
@@ -239,19 +227,22 @@ public class HomeTop : HomeBase
 
 	protected override void CheckEventLock()
 	{
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<HomeManager>.IsValid() && !isEventLockLoading)
 		{
-			if ((UnityEngine.Object)eventLockMesh == (UnityEngine.Object)null)
+			if (eventLockMesh == null)
 			{
-				StartCoroutine(LoadEventLock());
+				this.StartCoroutine(LoadEventLock());
 			}
 			else if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level < MonoBehaviourSingleton<GlobalSettingsManager>.I.unlockEventLevel)
 			{
-				eventLockMesh.gameObject.SetActive(true);
+				eventLockMesh.get_gameObject().SetActive(true);
 			}
 			else
 			{
-				eventLockMesh.gameObject.SetActive(false);
+				eventLockMesh.get_gameObject().SetActive(false);
 			}
 		}
 	}
@@ -273,19 +264,19 @@ public class HomeTop : HomeBase
 			yield return (object)null;
 		}
 		HomeNPCCharacter eventNPC = MonoBehaviourSingleton<HomeManager>.I.HomePeople.GetHomeNPCCharacter(6);
-		if ((UnityEngine.Object)eventNPC != (UnityEngine.Object)null)
+		if (eventNPC != null)
 		{
 			Vector3 MODEL_OFFSET = new Vector3(0f, 1.79f, 0.504f);
 			Transform banner = Utility.CreateGameObject("EventLockBanner", eventNPC._transform, -1);
 			ResourceUtility.Realizes(loadedArrow.loadedObject, banner, -1);
-			banner.localPosition = MODEL_OFFSET;
+			banner.set_localPosition(MODEL_OFFSET);
 			if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level < MonoBehaviourSingleton<GlobalSettingsManager>.I.unlockEventLevel)
 			{
-				banner.gameObject.SetActive(true);
+				banner.get_gameObject().SetActive(true);
 			}
 			else
 			{
-				banner.gameObject.SetActive(false);
+				banner.get_gameObject().SetActive(false);
 			}
 			eventLockMesh = banner;
 		}
@@ -356,50 +347,50 @@ public class HomeTop : HomeBase
 	private void OnQuery_GOWRAP()
 	{
 		GameSaveData.instance.dayShowNewsNotification = DateTime.UtcNow.AddSeconds(-10800.0).Day;
-		SetBadge(UI.BTN_GOWRAP_GG, 0, SpriteAlignment.Custom, 0, 0, false);
+		SetBadge((Enum)UI.BTN_GOWRAP_GG, 0, 9, 0, 0, false);
 		MonoBehaviourSingleton<GoWrapManager>.I.ShowMenu();
 	}
 
 	private void OnQuery_MENU_ACTION()
 	{
 		bool flag = !IsActive(UI.SPR_MENU_GG);
-		SetActive(UI.SPR_MENU_GG, flag);
-		SetActive(UI.BTN_MENU_GG_ON, !flag);
-		SetActive(UI.BTN_MENU_GG_OFF, flag);
+		SetActive((Enum)UI.SPR_MENU_GG, flag);
+		SetActive((Enum)UI.BTN_MENU_GG_ON, !flag);
+		SetActive((Enum)UI.BTN_MENU_GG_OFF, flag);
 		if (flag)
 		{
 			if (GameSaveData.instance.IsShowNewsNotification())
 			{
-				SetBadge(UI.BTN_GOWRAP_GG, -1, SpriteAlignment.TopRight, 0, -8, false);
+				SetBadge((Enum)UI.BTN_GOWRAP_GG, -1, 3, 0, -8, false);
 			}
 			else
 			{
-				SetBadge(UI.BTN_GOWRAP_GG, 0, SpriteAlignment.TopRight, 0, 0, false);
+				SetBadge((Enum)UI.BTN_GOWRAP_GG, 0, 3, 0, 0, false);
 			}
 			if (isHighlightPurchase)
 			{
-				SetBadge(UI.BTN_CRYSTAL_SHOP_GG, -1, SpriteAlignment.TopRight, 0, -8, false);
+				SetBadge((Enum)UI.BTN_CRYSTAL_SHOP_GG, -1, 3, 0, -8, false);
 			}
 			else
 			{
-				SetBadge(UI.BTN_CRYSTAL_SHOP_GG, 0, SpriteAlignment.TopRight, 0, -8, false);
+				SetBadge((Enum)UI.BTN_CRYSTAL_SHOP_GG, 0, 3, 0, -8, false);
 			}
 			if (isHighlightPikeShop)
 			{
-				SetBadge(UI.BTN_POINT_SHOP_GG, -1, SpriteAlignment.TopRight, 0, -8, false);
+				SetBadge((Enum)UI.BTN_POINT_SHOP_GG, -1, 3, 0, -8, false);
 			}
 			else
 			{
-				SetBadge(UI.BTN_POINT_SHOP_GG, 0, SpriteAlignment.TopRight, 0, -8, false);
+				SetBadge((Enum)UI.BTN_POINT_SHOP_GG, 0, 3, 0, -8, false);
 			}
 		}
 		else if (isHighlightPurchase || GameSaveData.instance.IsShowNewsNotification() || isHighlightPikeShop)
 		{
-			SetBadge(UI.BTN_MENU_GG_ON, -1, SpriteAlignment.TopRight, 5, -25, false);
+			SetBadge((Enum)UI.BTN_MENU_GG_ON, -1, 3, 5, -25, false);
 		}
 		else
 		{
-			SetBadge(UI.BTN_MENU_GG_ON, 0, SpriteAlignment.TopRight, 0, 0, false);
+			SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
 		}
 	}
 
@@ -458,16 +449,16 @@ public class HomeTop : HomeBase
 		{
 			if (GameSaveData.instance.IsShowNewsNotification())
 			{
-				SetBadge(UI.BTN_GOWRAP_GG, -1, SpriteAlignment.TopRight, 0, -8, false);
+				SetBadge((Enum)UI.BTN_GOWRAP_GG, -1, 3, 0, -8, false);
 			}
 			else
 			{
-				SetBadge(UI.BTN_GOWRAP_GG, 0, SpriteAlignment.TopRight, 0, -8, false);
+				SetBadge((Enum)UI.BTN_GOWRAP_GG, 0, 3, 0, -8, false);
 			}
 		}
 		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification() && !isHighlightPikeShop)
 		{
-			SetBadge(UI.BTN_MENU_GG_ON, 0, SpriteAlignment.TopRight, 0, 0, false);
+			SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
 		}
 	}
 
@@ -478,16 +469,16 @@ public class HomeTop : HomeBase
 		{
 			if (isHighlightPurchase)
 			{
-				SetBadge(UI.BTN_CRYSTAL_SHOP_GG, -1, SpriteAlignment.TopRight, 0, -8, false);
+				SetBadge((Enum)UI.BTN_CRYSTAL_SHOP_GG, -1, 3, 0, -8, false);
 			}
 			else
 			{
-				SetBadge(UI.BTN_CRYSTAL_SHOP_GG, 0, SpriteAlignment.TopRight, 0, -8, false);
+				SetBadge((Enum)UI.BTN_CRYSTAL_SHOP_GG, 0, 3, 0, -8, false);
 			}
 		}
 		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification() && !isHighlightPikeShop)
 		{
-			SetBadge(UI.BTN_MENU_GG_ON, 0, SpriteAlignment.TopRight, 0, 0, false);
+			SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
 		}
 	}
 
@@ -495,16 +486,16 @@ public class HomeTop : HomeBase
 	{
 		if (IsActive(UI.SPR_MENU_GG))
 		{
-			SetBadge(UI.BTN_POINT_SHOP_GG, 0, SpriteAlignment.TopRight, 0, -8, false);
+			SetBadge((Enum)UI.BTN_POINT_SHOP_GG, 0, 3, 0, -8, false);
 		}
 		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification())
 		{
-			SetBadge(UI.BTN_MENU_GG_ON, 0, SpriteAlignment.TopRight, 0, 0, false);
+			SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
 		}
 		isHighlightPikeShop = false;
 	}
 
-	private IEnumerator WaitForCheckpikeShop()
+	private unsafe IEnumerator WaitForCheckpikeShop()
 	{
 		isHighlightPikeShop = false;
 		bool isWait = true;
@@ -513,12 +504,18 @@ public class HomeTop : HomeBase
 			if (ret.Error == Error.None)
 			{
 				bool flag = PlayerPrefs.GetInt("Pike_Shop_Event", 0) == 1;
-				((_003CWaitForCheckpikeShop_003Ec__Iterator9D)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop = ret.result.Any((PointShop x) => x.isEvent);
-				if (((_003CWaitForCheckpikeShop_003Ec__Iterator9D)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop)
+				HomeTop _003C_003Ef__this = ((_003CWaitForCheckpikeShop_003Ec__IteratorA4)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this;
+				List<PointShop> result = ret.result;
+				if (_003CWaitForCheckpikeShop_003Ec__IteratorA4._003C_003Ef__am_0024cache4 == null)
+				{
+					_003CWaitForCheckpikeShop_003Ec__IteratorA4._003C_003Ef__am_0024cache4 = new Func<PointShop, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				_003C_003Ef__this.isHighlightPikeShop = result.Any(_003CWaitForCheckpikeShop_003Ec__IteratorA4._003C_003Ef__am_0024cache4);
+				if (((_003CWaitForCheckpikeShop_003Ec__IteratorA4)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop)
 				{
 					if (flag)
 					{
-						((_003CWaitForCheckpikeShop_003Ec__Iterator9D)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop = false;
+						((_003CWaitForCheckpikeShop_003Ec__IteratorA4)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop = false;
 					}
 				}
 				else
@@ -526,7 +523,7 @@ public class HomeTop : HomeBase
 					PlayerPrefs.SetInt("Pike_Shop_Event", 0);
 				}
 			}
-			((_003CWaitForCheckpikeShop_003Ec__Iterator9D)/*Error near IL_003a: stateMachine*/)._003CisWait_003E__0 = false;
+			((_003CWaitForCheckpikeShop_003Ec__IteratorA4)/*Error near IL_003a: stateMachine*/)._003CisWait_003E__0 = false;
 		}, string.Empty);
 		while (isWait)
 		{

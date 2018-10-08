@@ -1,4 +1,5 @@
 using rhyme;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -35,17 +36,18 @@ public class TitleTop : GameSection
 
 	public override void Initialize()
 	{
-		StartCoroutine(DoInitialize());
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoInitialize());
 	}
 
-	private IEnumerator DoInitialize()
+	private unsafe IEnumerator DoInitialize()
 	{
 		if (isFirstBoot && CheckTitleSkip())
 		{
 			bool wait = true;
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator171)/*Error near IL_004b: stateMachine*/)._003Cwait_003E__0 = false;
+				((_003CDoInitialize_003Ec__Iterator178)/*Error near IL_004b: stateMachine*/)._003Cwait_003E__0 = false;
 			}, false);
 			while (wait)
 			{
@@ -65,14 +67,11 @@ public class TitleTop : GameSection
 				yield return (object)null;
 			}
 			Transform director_t = ResourceUtility.Realizes(lo_director.loadedObject, -1);
-			if ((Object)director_t != (Object)null)
+			if (director_t != null)
 			{
 				director = director_t.GetComponent<TutorialBossDirector>();
-				director.StartLogoAnimation(false, null, delegate
-				{
-					((_003CDoInitialize_003Ec__Iterator171)/*Error near IL_0163: stateMachine*/)._003C_003Ef__this.SetActiveUI(true);
-				});
-				MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>().enabled = false;
+				director.StartLogoAnimation(false, null, new Action((object)/*Error near IL_0163: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>().set_enabled(false);
 			}
 			else
 			{
@@ -85,7 +84,8 @@ public class TitleTop : GameSection
 
 	private void SetActiveUI(bool enable)
 	{
-		GetCtrl(UI.Container).gameObject.SetActive(enable);
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		GetCtrl(UI.Container).get_gameObject().SetActive(enable);
 	}
 
 	public override void UpdateUI()
@@ -94,27 +94,32 @@ public class TitleTop : GameSection
 		SetVisibleWidgetEffect(UI.TEX_BG, "ef_ui_title_01");
 		if (MonoBehaviourSingleton<GlobalSettingsManager>.I.submissionVersion)
 		{
-			SetActive(UI.BTN_ADVANCED_LOGIN, false);
+			SetActive((Enum)UI.BTN_ADVANCED_LOGIN, false);
 		}
 		else
 		{
-			SetActive(UI.BTN_ADVANCED_LOGIN, !MonoBehaviourSingleton<AccountManager>.I.account.IsRegist());
+			SetActive((Enum)UI.BTN_ADVANCED_LOGIN, !MonoBehaviourSingleton<AccountManager>.I.account.IsRegist());
 		}
 	}
 
 	public override void Exit()
 	{
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		base.Exit();
-		if ((Object)director != (Object)null)
+		if (director != null)
 		{
-			Object.Destroy(director.gameObject);
-			MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>().enabled = true;
+			Object.Destroy(director.get_gameObject());
+			MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>().set_enabled(true);
 		}
 	}
 
 	private void OnQuery_PUSH_START()
 	{
-		if (!((Object)null != (Object)tapEffect))
+		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+		if (!(null != tapEffect))
 		{
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate(bool is_success)
@@ -122,29 +127,29 @@ public class TitleTop : GameSection
 				GameSection.ResumeEvent(is_success, null);
 			}, false);
 			tapEffect = ResourceUtility.Realizes(tapPrefab, -1);
-			if ((Object)null != (Object)tapEffect)
+			if (null != tapEffect)
 			{
 				rymFX component = tapEffect.GetComponent<rymFX>();
-				if ((Object)null != (Object)component && (Object)null != (Object)director)
+				if (null != component && null != director)
 				{
-					component.Cameras = new Camera[1]
+					component.Cameras = (Camera[])new Camera[1]
 					{
 						director.logoCamera
 					};
 				}
-				tapEffect.localPosition = new Vector3(0f, 1000f, 0.1f);
-				tapEffect.localScale = new Vector3(11f, 11f, 1f);
-				tapEffect.gameObject.SetActive(true);
+				tapEffect.set_localPosition(new Vector3(0f, 1000f, 0.1f));
+				tapEffect.set_localScale(new Vector3(11f, 11f, 1f));
+				tapEffect.get_gameObject().SetActive(true);
 			}
-			SetActive(UI.BTN_CLEARCACHE, false);
-			StartCoroutine(DelayStart());
+			SetActive((Enum)UI.BTN_CLEARCACHE, false);
+			this.StartCoroutine(DelayStart());
 		}
 	}
 
 	private IEnumerator DelayStart()
 	{
 		yield return (object)new WaitForSeconds(0.5f);
-		SetActive(UI.BTN_START, false);
+		SetActive((Enum)UI.BTN_START, false);
 		yield return (object)new WaitForSeconds(1.5f);
 		DispatchEvent("START", null);
 	}

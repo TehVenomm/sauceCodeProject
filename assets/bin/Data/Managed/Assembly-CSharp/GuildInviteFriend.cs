@@ -46,22 +46,10 @@ public class GuildInviteFriend : QuestAcceptRoomInviteFriend
 		LBL_SORT
 	}
 
-	protected override void SendGetList(int page, Action<bool> callback)
+	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		MonoBehaviourSingleton<GuildManager>.I.SendInviteList(delegate(bool is_success, GuildInviteCharaInfo[] recv_data)
-		{
-			if (is_success)
-			{
-				nowPage = 1;
-				pageNumMax = 1;
-				inviteUsers = recv_data;
-				Sort(GetCurrentUserList());
-			}
-			if (callback != null)
-			{
-				callback(is_success);
-			}
-		});
+		_003CSendGetList_003Ec__AnonStorey32D _003CSendGetList_003Ec__AnonStorey32D;
+		MonoBehaviourSingleton<GuildManager>.I.SendInviteList(new Action<bool, GuildInviteCharaInfo[]>((object)_003CSendGetList_003Ec__AnonStorey32D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override NOTIFY_FLAG GetUpdateUINotifyFlags()
@@ -69,12 +57,15 @@ public class GuildInviteFriend : QuestAcceptRoomInviteFriend
 		return base.GetUpdateUINotifyFlags() | NOTIFY_FLAG.RECEIVE_COOP_ROOM_UPDATE;
 	}
 
-	private void OnQuery_OK()
+	private unsafe void OnQuery_OK()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildManager>.I.SendInvite(selectedUserIdList.ToArray(), delegate(bool is_success, int[] invited_users)
+		GuildManager i = MonoBehaviourSingleton<GuildManager>.I;
+		int[] userIds = selectedUserIdList.ToArray();
+		if (_003C_003Ef__am_0024cache0 == null)
 		{
-			GameSection.ResumeEvent(is_success, null);
-		});
+			_003C_003Ef__am_0024cache0 = new Action<bool, int[]>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		i.SendInvite(userIds, _003C_003Ef__am_0024cache0);
 	}
 }

@@ -55,103 +55,40 @@ public class EquipSetDetailTop : SkillInfoBase
 		base.Initialize();
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
-		SetToggle(UI.TGL_WINDOW_TITLE, lookOnly);
-		SetActive(UI.BTN_ATTACH, !lookOnly);
-		SetActive(UI.BTN_DETACH, !lookOnly);
-		SetActive(UI.BTN_GROW, !lookOnly);
+		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Expected O, but got Unknown
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+		SetToggle((Enum)UI.TGL_WINDOW_TITLE, lookOnly);
+		SetActive((Enum)UI.BTN_ATTACH, !lookOnly);
+		SetActive((Enum)UI.BTN_DETACH, !lookOnly);
+		SetActive((Enum)UI.BTN_GROW, !lookOnly);
 		int num = equipAndSkill.Length;
 		Transform ctrl = GetCtrl(UI.TBL_SKILL_LIST);
-		for (int j = 0; j < num; j++)
+		for (int i = 0; i < num; i++)
 		{
-			if (j < ctrl.childCount)
+			if (i < ctrl.get_childCount())
 			{
-				Transform child = ctrl.GetChild(j);
-				Transform transform = FindCtrl(child, UI.SPR_EQUIP_INDEX_ICON);
-				Vector3 localPosition = transform.localPosition;
+				Transform val = ctrl.GetChild(i);
+				Transform val2 = FindCtrl(val, UI.SPR_EQUIP_INDEX_ICON);
+				Vector3 localPosition = val2.get_localPosition();
 				localPosition.y = 0f;
-				Vector3 vector3 = child.localPosition = (transform.localPosition = localPosition);
-				Transform t3 = FindCtrl(child, UI.GRD_ATTACH_SKILL);
-				t3.DestroyChildren();
-				GetComponent<UITable>(child, UI.TBL_SPACE).Reposition();
+				Transform obj = val;
+				Vector3 localPosition2 = localPosition;
+				val2.set_localPosition(localPosition2);
+				obj.set_localPosition(localPosition2);
+				Transform t = FindCtrl(val, UI.GRD_ATTACH_SKILL);
+				t.DestroyChildren();
+				base.GetComponent<UITable>(val, (Enum)UI.TBL_SPACE).Reposition();
 			}
 		}
-		SetTable(UI.TBL_SKILL_LIST, "EquipSetDetailTopItem", num, false, delegate(int i, Transform t, bool is_recycle)
-		{
-			EquipSetDetailTop equipSetDetailTop = this;
-			EquipItemInfo item = equipAndSkill[i].equipItemInfo;
-			if (item == null || item.GetMaxSlot() == 0)
-			{
-				SetActive(t, false);
-			}
-			else
-			{
-				EquipSetDetailTop equipSetDetailTop2 = this;
-				ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(item, sex, FindCtrl(t, UI.OBJ_ICON_ROOT), null, -1, null, 0, false, -1, false, null, false, false);
-				itemIcon.SetEnableCollider(false);
-				SetEquipIndexIcon(t, UI.SPR_EQUIP_INDEX_ICON, i);
-				SetLabelText(t, UI.LBL_EQUIP_NAME, item.tableData.name);
-				SetLabelText(t, UI.LBL_EQUIP_NOW_LV, item.level.ToString());
-				SetLabelText(t, UI.LBL_EQUIP_MAX_LV, item.tableData.maxLv.ToString());
-				SkillSlotUIData[] slotData = equipAndSkill[i].skillSlotUIData;
-				SetGrid(t, UI.GRD_ATTACH_SKILL, "EquipSetDetailTopItem2", item.GetMaxSlot(), true, delegate(int i2, Transform t2, bool is_recycle2)
-				{
-					int num3 = (i << 16) + i2;
-					SkillItemInfo skillItemInfo = slotData[i2].itemData;
-					bool flag = skillItemInfo != null && slotData[i2].slotData.skill_id != 0 && skillItemInfo.tableData.type == slotData[i2].slotData.slotType;
-					equipSetDetailTop2.SetSkillIcon(t2, UI.TEX_SKILL_ICON, slotData[i2].slotData.slotType, flag, false);
-					if (!flag)
-					{
-						skillItemInfo = null;
-					}
-					equipSetDetailTop2.SetToggle(t2, UI.TGL_ACTIVE_OBJ, skillItemInfo != null);
-					equipSetDetailTop2.SetActive(t2, UI.LBL_NAME, true);
-					equipSetDetailTop2.SetActive(t2, UI.LBL_NAME_NOT_ENABLE_TYPE, false);
-					equipSetDetailTop2.SetEvent(t2, (!flag) ? "SLOT" : "SLOT_DETAIL", num3);
-					equipSetDetailTop2.SetLongTouch(t2, "SLOT_DETAIL", num3);
-					if (skillItemInfo == null)
-					{
-						equipSetDetailTop2.SetLabelText(t2, UI.LBL_NAME, equipSetDetailTop2.sectionData.GetText("EMPTY_SLOT"));
-						equipSetDetailTop2.SetActive(t2, UI.SPR_ENABLE_WEAPON_TYPE, false);
-					}
-					else
-					{
-						SkillItemTable.SkillItemData tableData = skillItemInfo.tableData;
-						equipSetDetailTop2.SetLabelText(t2, UI.LBL_NAME, tableData.name);
-						equipSetDetailTop2.SetLabelText(t2, UI.LBL_NAME_NOT_ENABLE_TYPE, tableData.name);
-						equipSetDetailTop2.SetLabelText(t2, UI.LBL_NOW_LV, skillItemInfo.level.ToString());
-						equipSetDetailTop2.SetLabelText(t2, UI.LBL_MAX_LV, skillItemInfo.tableData.GetMaxLv(skillItemInfo.exceedCnt).ToString());
-						bool flag2 = skillItemInfo.IsExceeded();
-						equipSetDetailTop2.SetActive(t2, UI.LBL_EX_LV, flag2);
-						if (flag2)
-						{
-							equipSetDetailTop2.SetSupportEncoding(t2, UI.LBL_EX_LV, true);
-							equipSetDetailTop2.SetLabelText(t2, UI.LBL_EX_LV, UIUtility.GetColorText(StringTable.Format(STRING_CATEGORY.SMITH, 9u, skillItemInfo.exceedCnt), ExceedSkillItemTable.color));
-						}
-						EQUIPMENT_TYPE? enableEquipType = skillItemInfo.tableData.GetEnableEquipType();
-						equipSetDetailTop2.SetActive(t2, UI.SPR_ENABLE_WEAPON_TYPE, enableEquipType.HasValue);
-						if (enableEquipType.HasValue)
-						{
-							bool flag3 = enableEquipType.Value == item.tableData.type;
-							equipSetDetailTop2.SetSkillEquipIconKind(t2, UI.SPR_ENABLE_WEAPON_TYPE, enableEquipType.Value, flag3);
-							equipSetDetailTop2.SetActive(t2, UI.LBL_NAME, flag3);
-							equipSetDetailTop2.SetActive(t2, UI.LBL_NAME_NOT_ENABLE_TYPE, !flag3);
-						}
-					}
-				});
-			}
-			GetComponent<UITable>(t, UI.TBL_SPACE).Reposition();
-			Vector3 localPosition2 = t.localPosition;
-			float y = localPosition2.y;
-			Vector3 localPosition3 = FindCtrl(t, UI.OBJ_SPACE).localPosition;
-			float y2 = localPosition3.y;
-			Vector3 localPosition4 = FindCtrl(t, UI.TBL_SPACE).localPosition;
-			float num2 = y2 + localPosition4.y;
-			Vector3 localPosition5 = FindCtrl(t, UI.SPR_EQUIP_INDEX_ICON).localPosition;
-			localPosition5.y = (num2 - y) * 0.5f;
-			FindCtrl(t, UI.SPR_EQUIP_INDEX_ICON).localPosition = localPosition5;
-		});
+		SetTable(UI.TBL_SKILL_LIST, "EquipSetDetailTopItem", num, false, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected virtual void OnQuery_SLOT()

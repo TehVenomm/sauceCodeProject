@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ChatNetworkManager : MonoBehaviourSingleton<ChatNetworkManager>
 {
-	private class Pool_List_ChatPacket : rymTPool<List<ChatPacket>>
+	private class Pool_List_ChatPacket
 	{
 	}
 
@@ -37,8 +37,9 @@ public class ChatNetworkManager : MonoBehaviourSingleton<ChatNetworkManager>
 
 	protected override void Awake()
 	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		packetReceiver = base.gameObject.AddComponent<ChatPacketReceiver>();
+		packetReceiver = this.get_gameObject().AddComponent<ChatPacketReceiver>();
 	}
 
 	private void Clear()
@@ -60,27 +61,27 @@ public class ChatNetworkManager : MonoBehaviourSingleton<ChatNetworkManager>
 
 	public void PacketUpdate()
 	{
-		List<ChatPacket> obj = rymTPool<List<ChatPacket>>.Get();
-		if (obj.Capacity < packetReceiver.packets.Count)
+		List<ChatPacket> list = rymTPool<List<ChatPacket>>.Get();
+		if (list.Capacity < packetReceiver.packets.Count)
 		{
-			obj.Capacity = packetReceiver.packets.Count;
+			list.Capacity = packetReceiver.packets.Count;
 		}
 		int i = 0;
-		for (int count = obj.Count; i < count; i++)
+		for (int count = list.Count; i < count; i++)
 		{
-			obj[i] = packetReceiver.packets[i];
+			list[i] = packetReceiver.packets[i];
 		}
 		int j = 0;
-		for (int count2 = obj.Count; j < count2; j++)
+		for (int count2 = list.Count; j < count2; j++)
 		{
-			ChatPacket packet = obj[j];
+			ChatPacket packet = list[j];
 			if (HandleChatPacket(packet))
 			{
 				packetReceiver.AddDeleteQueue(packet);
 			}
 		}
-		obj.Clear();
-		rymTPool<List<ChatPacket>>.Release(ref obj);
+		list.Clear();
+		rymTPool<List<ChatPacket>>.Release(ref list);
 		packetReceiver.EraseUsedPacket();
 	}
 

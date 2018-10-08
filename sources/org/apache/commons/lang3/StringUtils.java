@@ -1581,10 +1581,10 @@ public class StringUtils {
         if (i3 == -1) {
             return str;
         }
-        int length3;
         i2 = 0;
         indexOf = 0;
         while (i2 < strArr.length) {
+            int length3;
             if (!(strArr[i2] == null || strArr2[i2] == null)) {
                 length3 = strArr2[i2].length() - strArr[i2].length();
                 if (length3 > 0) {

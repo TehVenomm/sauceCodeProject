@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 namespace GooglePlayGames.OurUtils
 {
@@ -33,36 +32,36 @@ namespace GooglePlayGames.OurUtils
 			}
 		}
 
-		public static void d(string msg)
+		public unsafe static void d(string msg)
 		{
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Expected O, but got Unknown
 			if (debugLogEnabled)
 			{
-				PlayGamesHelperObject.RunOnGameThread(delegate
-				{
-					Debug.Log(ToLogMessage(string.Empty, "DEBUG", msg));
-				});
+				_003Cd_003Ec__AnonStorey7D3 _003Cd_003Ec__AnonStorey7D;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003Cd_003Ec__AnonStorey7D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 
-		public static void w(string msg)
+		public unsafe static void w(string msg)
 		{
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Expected O, but got Unknown
 			if (warningLogEnabled)
 			{
-				PlayGamesHelperObject.RunOnGameThread(delegate
-				{
-					Debug.LogWarning(ToLogMessage("!!!", "WARNING", msg));
-				});
+				_003Cw_003Ec__AnonStorey7D4 _003Cw_003Ec__AnonStorey7D;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003Cw_003Ec__AnonStorey7D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 
-		public static void e(string msg)
+		public unsafe static void e(string msg)
 		{
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Expected O, but got Unknown
 			if (warningLogEnabled)
 			{
-				PlayGamesHelperObject.RunOnGameThread(delegate
-				{
-					Debug.LogWarning(ToLogMessage("***", "ERROR", msg));
-				});
+				_003Ce_003Ec__AnonStorey7D5 _003Ce_003Ec__AnonStorey7D;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003Ce_003Ec__AnonStorey7D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 

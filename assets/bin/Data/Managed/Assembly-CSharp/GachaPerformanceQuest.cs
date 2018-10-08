@@ -1,4 +1,4 @@
-using UnityEngine;
+using System;
 
 public class GachaPerformanceQuest : GachaPerformanceBase, QuestGachaDirectorBase.ISectionCommand
 {
@@ -22,19 +22,19 @@ public class GachaPerformanceQuest : GachaPerformanceBase, QuestGachaDirectorBas
 
 	void QuestGachaDirectorBase.ISectionCommand.OnShowRarity(RARITY_TYPE rarity)
 	{
-		SetActive(UI.BTN_SKIPALL, false);
+		SetActive((Enum)UI.BTN_SKIPALL, false);
 		ShowRarity(rarity);
 	}
 
 	void QuestGachaDirectorBase.ISectionCommand.OnHideRarity()
 	{
-		SetActive(UI.BTN_SKIPALL, m_isReam ? true : false);
+		SetActive((Enum)UI.BTN_SKIPALL, m_isReam ? true : false);
 		HideRarity();
 	}
 
 	void QuestGachaDirectorBase.ISectionCommand.OnEnd()
 	{
-		SetActive(UI.BTN_SKIPALL, false);
+		SetActive((Enum)UI.BTN_SKIPALL, false);
 		End();
 	}
 
@@ -45,10 +45,10 @@ public class GachaPerformanceQuest : GachaPerformanceBase, QuestGachaDirectorBas
 
 	protected override void OnOpen()
 	{
-		SetActive(UI.BTN_SKIP, true);
+		SetActive((Enum)UI.BTN_SKIP, true);
 		m_isReam = (AnimationDirector.I is QuestReamGachaDirector);
-		SetActive(UI.BTN_SKIPALL, m_isReam);
-		if ((Object)AnimationDirector.I != (Object)null)
+		SetActive((Enum)UI.BTN_SKIPALL, m_isReam);
+		if (AnimationDirector.I != null)
 		{
 			(AnimationDirector.I as QuestGachaDirectorBase).StartDirection(this);
 		}

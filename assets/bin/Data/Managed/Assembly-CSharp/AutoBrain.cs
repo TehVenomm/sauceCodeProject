@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 public class AutoBrain : Brain
 {
@@ -32,9 +31,9 @@ public class AutoBrain : Brain
 		base.moveCtrl.ChangeStopRange(5f);
 		if (base.targetCtrl.IsArrivalAttackPosition())
 		{
-			if ((Object)self.targetingPoint != (Object)null)
+			if (self.targetingPoint != null)
 			{
-				if ((Object)self.targetingPoint.owner != (Object)null)
+				if (self.targetingPoint.owner != null)
 				{
 					return 1;
 				}

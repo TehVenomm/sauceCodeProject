@@ -13,7 +13,8 @@ public class QuestResultDirection : GameSection
 
 	public override void Initialize()
 	{
-		StartCoroutine(DoInitialize());
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -43,8 +44,8 @@ public class QuestResultDirection : GameSection
 			bool waitLoad = true;
 			MonoBehaviourSingleton<InGameRecorder>.I.CreatePlayerModelsAsync(delegate(PlayerLoader[] loaders)
 			{
-				((_003CDoInitialize_003Ec__Iterator136)/*Error near IL_016d: stateMachine*/)._003C_003Ef__this.players = loaders;
-				((_003CDoInitialize_003Ec__Iterator136)/*Error near IL_016d: stateMachine*/)._003CwaitLoad_003E__5 = false;
+				((_003CDoInitialize_003Ec__Iterator13D)/*Error near IL_016d: stateMachine*/)._003C_003Ef__this.players = loaders;
+				((_003CDoInitialize_003Ec__Iterator13D)/*Error near IL_016d: stateMachine*/)._003CwaitLoad_003E__5 = false;
 			});
 			while (waitLoad)
 			{
@@ -63,7 +64,7 @@ public class QuestResultDirection : GameSection
 			int j = 0;
 			for (int i = players.Length; j < i; j++)
 			{
-				players[j].animator.applyRootMotion = false;
+				players[j].animator.set_applyRootMotion(false);
 			}
 			director = ResourceUtility.Realizes(lo.loadedObject, MonoBehaviourSingleton<StageManager>.I._transform, -1).GetComponent<QuestResultDirector>();
 			director.players = players;
@@ -75,7 +76,7 @@ public class QuestResultDirection : GameSection
 		GC.Collect();
 		yield return (object)new WaitForEndOfFrame();
 		MonoBehaviourSingleton<UIManager>.I.loading.SetActiveDragon(false);
-		if (QuestManager.IsValidTrial() && MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null)
+		if (QuestManager.IsValidTrial() && MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.mainChat.HideOpenButton();
 			MonoBehaviourSingleton<UIManager>.I.mainChat.HideAll();
@@ -85,7 +86,7 @@ public class QuestResultDirection : GameSection
 
 	private void LateUpdate()
 	{
-		if ((UnityEngine.Object)director != (UnityEngine.Object)null && director.enabled && (UnityEngine.Object)director.targetAnim != (UnityEngine.Object)null && !director.targetAnim.isPlaying)
+		if (director != null && director.get_enabled() && director.targetAnim != null && !director.targetAnim.get_isPlaying())
 		{
 			OnDirectionFinished();
 		}
@@ -93,10 +94,11 @@ public class QuestResultDirection : GameSection
 
 	protected override void OnDestroy()
 	{
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		base.OnDestroy();
-		if ((UnityEngine.Object)director != (UnityEngine.Object)null)
+		if (director != null)
 		{
-			UnityEngine.Object.Destroy(director.gameObject);
+			Object.Destroy(director.get_gameObject());
 		}
 		if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
 		{
@@ -118,7 +120,7 @@ public class QuestResultDirection : GameSection
 		{
 			SoundManager.PlayActionVoice(winnder_voice_id, 1f, 0u, null, null);
 		}
-		director.enabled = false;
+		director.set_enabled(false);
 		if (QuestManager.IsValidTrial())
 		{
 			DispatchEvent("NEXT_TRIAL", null);
@@ -131,7 +133,7 @@ public class QuestResultDirection : GameSection
 
 	private void OnQuery_NEXT()
 	{
-		if (director.enabled)
+		if (director.get_enabled())
 		{
 			director.Skip();
 			GameSection.StopEvent();
@@ -140,7 +142,7 @@ public class QuestResultDirection : GameSection
 
 	private void OnQuery_NEXT_TRIAL()
 	{
-		if (director.enabled)
+		if (director.get_enabled())
 		{
 			director.Skip();
 			GameSection.StopEvent();

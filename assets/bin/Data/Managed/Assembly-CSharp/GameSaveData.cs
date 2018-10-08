@@ -27,6 +27,8 @@ public class GameSaveData
 
 	public bool headName = true;
 
+	public bool canShowWheelFortune;
+
 	public string resetMarketTime = string.Empty;
 
 	public bool canShowNoteDarkMarket;

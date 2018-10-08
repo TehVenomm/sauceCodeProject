@@ -101,46 +101,46 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 
 	public override void Initialize()
 	{
-		SetActive(UI.SPR_TITLE_FOLLOW_LIST, titleType == TITLE_TYPE.FOLLOW);
-		SetActive(UI.SPR_TITLE_FOLLOWER_LIST, titleType == TITLE_TYPE.FOLLOWER);
-		SetActive(UI.SPR_TITLE_MESSAGE, titleType == TITLE_TYPE.MESSAGE);
-		SetActive(UI.SPR_TITLE_BLACKLIST, titleType == TITLE_TYPE.BLACKLIST);
-		SetActive(UI.OBJ_FOLLOW_NUMBER_ROOT, false);
+		SetActive((Enum)UI.SPR_TITLE_FOLLOW_LIST, titleType == TITLE_TYPE.FOLLOW);
+		SetActive((Enum)UI.SPR_TITLE_FOLLOWER_LIST, titleType == TITLE_TYPE.FOLLOWER);
+		SetActive((Enum)UI.SPR_TITLE_MESSAGE, titleType == TITLE_TYPE.MESSAGE);
+		SetActive((Enum)UI.SPR_TITLE_BLACKLIST, titleType == TITLE_TYPE.BLACKLIST);
+		SetActive((Enum)UI.OBJ_FOLLOW_NUMBER_ROOT, false);
 		if (IsHideSwitchInfoButton())
 		{
-			SetActive(UI.OBJ_SWITCH_INFO, false);
+			SetActive((Enum)UI.OBJ_SWITCH_INFO, false);
 		}
 		base.Initialize();
 	}
 
 	public virtual void ListUI()
 	{
-		SetLabelText(UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText(UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText((Enum)UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText((Enum)UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
 		FriendCharaInfo[] currentUserArray = GetCurrentUserArray();
 		if (currentUserArray.IsNullOrEmpty())
 		{
-			SetActive(UI.STR_NON_LIST, true);
-			SetActive(UI.GRD_LIST, false);
-			SetActive(UI.OBJ_ACTIVE_ROOT, false);
-			SetActive(UI.OBJ_INACTIVE_ROOT, true);
-			SetLabelText(UI.LBL_NOW, "0");
-			SetLabelText(UI.LBL_MAX, "0");
+			SetActive((Enum)UI.STR_NON_LIST, true);
+			SetActive((Enum)UI.GRD_LIST, false);
+			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, false);
+			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, true);
+			SetLabelText((Enum)UI.LBL_NOW, "0");
+			SetLabelText((Enum)UI.LBL_MAX, "0");
 		}
 		else
 		{
-			SetLabelText(UI.LBL_SORT, StringTable.Get(STRING_CATEGORY.USER_SORT, (uint)m_currentSortType));
-			SetPageNumText(UI.LBL_NOW, nowPage + 1);
-			SetPageNumText(UI.LBL_MAX, pageNumMax);
-			SetActive(UI.STR_NON_LIST, false);
-			SetActive(UI.GRD_LIST, true);
-			SetActive(UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
-			SetActive(UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
+			SetLabelText((Enum)UI.LBL_SORT, StringTable.Get(STRING_CATEGORY.USER_SORT, (uint)m_currentSortType));
+			SetPageNumText((Enum)UI.LBL_NOW, nowPage + 1);
+			SetPageNumText((Enum)UI.LBL_MAX, pageNumMax);
+			SetActive((Enum)UI.STR_NON_LIST, false);
+			SetActive((Enum)UI.GRD_LIST, true);
+			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
+			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
 			UpdateDynamicList();
 		}
 	}
 
-	protected virtual void UpdateDynamicList()
+	protected unsafe virtual void UpdateDynamicList()
 	{
 		FriendCharaInfo[] info = GetCurrentUserArray();
 		int item_num = (!info.IsNullOrEmpty()) ? info.Length : 0;
@@ -149,10 +149,8 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 			ScrollGrid.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 		}
 		CleanItemList();
-		SetDynamicList(UI.GRD_LIST, GetListItemName, item_num, false, null, null, delegate(int i, Transform t, bool is_recycle)
-		{
-			SetListItem(i, t, is_recycle, info[i]);
-		});
+		_003CUpdateDynamicList_003Ec__AnonStorey2F8 _003CUpdateDynamicList_003Ec__AnonStorey2F;
+		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected virtual void SetListItem(int i, Transform t, bool is_recycle, FriendCharaInfo data)
@@ -170,6 +168,10 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 
 	protected void SetCharaInfo(FriendCharaInfo data, int i, Transform t, bool is_recycle, bool isGM)
 	{
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 		if (isGM)
 		{
 			SetEvent(t, "DIRECT_VIEW_MESSAGE", i);
@@ -306,7 +308,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 			int i = 0;
 			for (int count = m_generatedItemList.Count; i < count; i++)
 			{
-				if (!((UnityEngine.Object)m_generatedItemList[i] == (UnityEngine.Object)null))
+				if (!(m_generatedItemList[i] == null))
 				{
 					SwitchInfoRootObject(m_generatedItemList[i], m_isVisibleDefaultInfo);
 				}
@@ -316,7 +318,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 
 	protected void SetJoinInfo(Transform t, int _itemIndex, FriendCharaInfo.JoinInfo _joinStatus, string _lastLoginText)
 	{
-		if (!((UnityEngine.Object)t == (UnityEngine.Object)null))
+		if (!(t == null))
 		{
 			SwitchInfoRootObject(t, m_isVisibleDefaultInfo);
 			if (_joinStatus != null)
@@ -330,56 +332,66 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 
 	private void SetJoinTextInfo(Transform _target, FriendCharaInfo.JoinInfo _joinStatus)
 	{
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
 		UILabel component = FindCtrl(_target, UI.ONLINE_TEXT).GetComponent<UILabel>();
 		UILabel component2 = FindCtrl(_target, UI.DETAIL_TEXT).GetComponent<UILabel>();
-		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+		if (component != null)
 		{
 			component.text = StringTable.Get(STRING_CATEGORY.FRIEND_JOIN, (uint)_joinStatus.joinType);
 		}
-		if ((UnityEngine.Object)component2 != (UnityEngine.Object)null)
+		if (component2 != null)
 		{
 			component2.text = string.Empty;
 		}
 		switch (_joinStatus.joinType)
 		{
 		case 4:
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			if (component != null)
 			{
 				component.color = TEXT_BASE_COLOR_GO_FIELD;
 				component.effectColor = TEXT_OUTLINE_COLOR_GO_FIELD;
 			}
-			if ((UnityEngine.Object)component2 != (UnityEngine.Object)null)
+			if (component2 != null)
 			{
 				component2.text = GetMapFieldNameText(_joinStatus.targetParam);
 			}
 			break;
 		case 2:
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			if (component != null)
 			{
 				component.color = TEXT_BASE_COLOR_GO_LOUNGE;
 				component.effectColor = TEXT_OUTLINE_COLOR_GO_LOUNGE;
 			}
 			break;
 		case 3:
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			if (component != null)
 			{
 				component.color = TEXT_BASE_COLOR_GO_QUEST;
 				component.effectColor = TEXT_OUTLINE_COLOR_GO_QUEST;
 			}
-			if ((UnityEngine.Object)component2 != (UnityEngine.Object)null)
+			if (component2 != null)
 			{
 				component2.text = GetQuestName(_joinStatus.targetParam);
 			}
 			break;
 		case 1:
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			if (component != null)
 			{
 				component.color = TEXT_BASE_COLOR_ONLINE;
 				component.effectColor = TEXT_OUTLINE_COLOR_ONLINE;
 			}
 			break;
 		default:
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			if (component != null)
 			{
 				component.color = TEXT_BASE_COLOR_DEFAULT;
 				component.effectColor = TEXT_OUTLINE_COLOR_DEFAULT;
@@ -415,7 +427,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 
 	protected void SwitchInfoRootObject(Transform t, bool _activeFlag)
 	{
-		if (!((UnityEngine.Object)t == (UnityEngine.Object)null))
+		if (!(t == null))
 		{
 			SetActive(t, UI.DEFAULT_STATUS_ROOT, _activeFlag);
 			SetActive(t, UI.JOIN_STATUS_ROOT, !_activeFlag);
@@ -424,24 +436,26 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 
 	protected void SetJoinButtonSettings(Transform _t, ONLINE_STATUS _status, int _itemIndex)
 	{
-		if (!((UnityEngine.Object)_t == (UnityEngine.Object)null))
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		if (!(_t == null))
 		{
 			UIButton component = FindCtrl(_t, UI.BTN_JOIN_BUTTON).GetComponent<UIButton>();
-			if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
+			if (!(component == null))
 			{
 				switch (_status)
 				{
 				case ONLINE_STATUS.ONLINE_LOUNGE:
 				case ONLINE_STATUS.ONLINE_QUEST:
 				case ONLINE_STATUS.ONLINE_FIELD:
-					component.gameObject.SetActive(true);
+					component.get_gameObject().SetActive(true);
 					break;
 				default:
-					component.gameObject.SetActive(false);
+					component.get_gameObject().SetActive(false);
 					break;
 				}
 				UIGameSceneEventSender componentInChildren = component.GetComponentInChildren<UIGameSceneEventSender>(true);
-				if ((UnityEngine.Object)componentInChildren != (UnityEngine.Object)null)
+				if (componentInChildren != null)
 				{
 					componentInChildren.eventName = "JOIN_FRIEND";
 					componentInChildren.eventData = _itemIndex;
@@ -455,7 +469,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 		SwitchUserStatusInfo(!m_isVisibleDefaultInfo);
 	}
 
-	protected virtual void OnQuery_JOIN_FRIEND()
+	protected unsafe virtual void OnQuery_JOIN_FRIEND()
 	{
 		int num = (int)GameSection.GetEventData();
 		FriendCharaInfo[] currentUserArray = GetCurrentUserArray();
@@ -470,10 +484,13 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 				case 0:
 					if (MonoBehaviourSingleton<PartyManager>.IsValid())
 					{
-						MonoBehaviourSingleton<PartyManager>.I.SendApply(joinStatus.conditionParam, delegate
+						PartyManager i = MonoBehaviourSingleton<PartyManager>.I;
+						string conditionParam = joinStatus.conditionParam;
+						if (_003C_003Ef__am_0024cache10 == null)
 						{
-							GameSection.ResumeEvent(true, null);
-						}, joinStatus.targetParam);
+							_003C_003Ef__am_0024cache10 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+						}
+						i.SendApply(conditionParam, _003C_003Ef__am_0024cache10, joinStatus.targetParam);
 					}
 					break;
 				case 1:
@@ -482,29 +499,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 				case 2:
 				{
 					int toUserId = int.Parse(joinStatus.conditionParam);
-					JoinField(joinStatus.targetParam, toUserId, delegate(bool is_matching, bool is_connect, bool is_regist)
-					{
-						if (is_matching)
-						{
-							if (!is_connect)
-							{
-								GameSection.ResumeEvent(true, null);
-								AppMain i = MonoBehaviourSingleton<AppMain>.I;
-								i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-								{
-									DispatchEvent("CLOSE", null);
-								});
-							}
-							else
-							{
-								GameSection.ResumeEvent(is_regist, null);
-								if (is_regist)
-								{
-									MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("InGame", null, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
-								}
-							}
-						}
-					});
+					JoinField(joinStatus.targetParam, toUserId, new Action<bool, bool, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					break;
 				}
 				}
@@ -517,7 +512,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 		int num = m_generatedItemList.Count - 1;
 		while (0 <= num)
 		{
-			if ((UnityEngine.Object)m_generatedItemList[num] == (UnityEngine.Object)null)
+			if (m_generatedItemList[num] == null)
 			{
 				m_generatedItemList.RemoveAt(num);
 			}

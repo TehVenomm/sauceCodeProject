@@ -1,10 +1,15 @@
 using UnityEngine;
 
-public class ApplySceneSettings : MonoBehaviour
+public class ApplySceneSettings
 {
 	public bool applyFogParams = true;
 
 	public bool applyEffectColor = true;
+
+	public ApplySceneSettings()
+		: this()
+	{
+	}
 
 	private void Start()
 	{

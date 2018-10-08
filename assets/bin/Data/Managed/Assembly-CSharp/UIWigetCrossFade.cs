@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIWigetCrossFade : MonoBehaviour
+public class UIWigetCrossFade
 {
 	private enum eFadeState
 	{
@@ -23,6 +23,11 @@ public class UIWigetCrossFade : MonoBehaviour
 	private eFadeState fadeState;
 
 	private float processSec;
+
+	public UIWigetCrossFade()
+		: this()
+	{
+	}
 
 	public void Play()
 	{
@@ -60,7 +65,7 @@ public class UIWigetCrossFade : MonoBehaviour
 			{
 			case eFadeState.In:
 			{
-				processSec += Time.deltaTime;
+				processSec += Time.get_deltaTime();
 				float num2 = processSec / kFadeSec;
 				if (num2 > 1f)
 				{
@@ -75,7 +80,7 @@ public class UIWigetCrossFade : MonoBehaviour
 				break;
 			}
 			case eFadeState.Idle:
-				processSec += Time.deltaTime;
+				processSec += Time.get_deltaTime();
 				if (processSec >= kIdleSec)
 				{
 					processSec = 0f;
@@ -84,7 +89,7 @@ public class UIWigetCrossFade : MonoBehaviour
 				break;
 			case eFadeState.Out:
 			{
-				processSec += Time.deltaTime;
+				processSec += Time.get_deltaTime();
 				float num = 1f - processSec / kFadeSec;
 				if (num < 0f)
 				{

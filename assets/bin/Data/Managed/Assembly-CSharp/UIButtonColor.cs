@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Button Color")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/Interaction/Button Color")]
 public class UIButtonColor : UIWidgetContainer
 {
 	public enum State
@@ -19,7 +19,7 @@ public class UIButtonColor : UIWidgetContainer
 
 	public Color pressed = new Color(0.7176471f, 0.6392157f, 0.482352942f, 1f);
 
-	public Color disabledColor = Color.grey;
+	public Color disabledColor = Color.get_grey();
 
 	public float duration = 0.2f;
 
@@ -54,6 +54,7 @@ public class UIButtonColor : UIWidgetContainer
 	{
 		get
 		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			if (!mInitDone)
 			{
 				OnInit();
@@ -62,6 +63,8 @@ public class UIButtonColor : UIWidgetContainer
 		}
 		set
 		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			if (!mInitDone)
 			{
 				OnInit();
@@ -77,16 +80,17 @@ public class UIButtonColor : UIWidgetContainer
 	{
 		get
 		{
-			return base.enabled;
+			return this.get_enabled();
 		}
 		set
 		{
-			base.enabled = value;
+			this.set_enabled(value);
 		}
 	}
 
 	public void ResetDefaultColor()
 	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		defaultColor = mStartingColor;
 	}
 
@@ -112,34 +116,51 @@ public class UIButtonColor : UIWidgetContainer
 
 	protected virtual void OnInit()
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Expected O, but got Unknown
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
 		mInitDone = true;
-		if ((UnityEngine.Object)tweenTarget == (UnityEngine.Object)null)
+		if (tweenTarget == null)
 		{
-			tweenTarget = base.gameObject;
+			tweenTarget = this.get_gameObject();
 		}
-		if ((UnityEngine.Object)tweenTarget != (UnityEngine.Object)null)
+		if (tweenTarget != null)
 		{
 			mWidget = tweenTarget.GetComponent<UIWidget>();
 		}
-		if ((UnityEngine.Object)mWidget != (UnityEngine.Object)null)
+		if (mWidget != null)
 		{
 			mDefaultColor = mWidget.color;
 			mStartingColor = mDefaultColor;
 		}
-		else if ((UnityEngine.Object)tweenTarget != (UnityEngine.Object)null)
+		else if (tweenTarget != null)
 		{
 			Renderer component = tweenTarget.GetComponent<Renderer>();
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			if (component != null)
 			{
-				mDefaultColor = ((!Application.isPlaying) ? component.sharedMaterial.color : component.material.color);
+				mDefaultColor = ((!Application.get_isPlaying()) ? component.get_sharedMaterial().get_color() : component.get_material().get_color());
 				mStartingColor = mDefaultColor;
 			}
 			else
 			{
 				Light component2 = tweenTarget.GetComponent<Light>();
-				if ((UnityEngine.Object)component2 != (UnityEngine.Object)null)
+				if (component2 != null)
 				{
-					mDefaultColor = component2.color;
+					mDefaultColor = component2.get_color();
 					mStartingColor = mDefaultColor;
 				}
 				else
@@ -153,17 +174,21 @@ public class UIButtonColor : UIWidgetContainer
 
 	protected virtual void OnEnable()
 	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Expected O, but got Unknown
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		if (mInitDone)
 		{
-			OnHover(UICamera.IsHighlighted(base.gameObject));
+			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
 		}
 		if (UICamera.currentTouch != null)
 		{
-			if ((UnityEngine.Object)UICamera.currentTouch.pressed == (UnityEngine.Object)base.gameObject)
+			if (UICamera.currentTouch.pressed == this.get_gameObject())
 			{
 				OnPress(true);
 			}
-			else if ((UnityEngine.Object)UICamera.currentTouch.current == (UnityEngine.Object)base.gameObject)
+			else if (UICamera.currentTouch.current == this.get_gameObject())
 			{
 				OnHover(true);
 			}
@@ -172,14 +197,15 @@ public class UIButtonColor : UIWidgetContainer
 
 	protected virtual void OnDisable()
 	{
-		if (mInitDone && (UnityEngine.Object)tweenTarget != (UnityEngine.Object)null)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		if (mInitDone && tweenTarget != null)
 		{
 			SetState(State.Normal, true);
 			TweenColor component = tweenTarget.GetComponent<TweenColor>();
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			if (component != null)
 			{
 				component.value = mDefaultColor;
-				component.enabled = false;
+				component.set_enabled(false);
 			}
 		}
 	}
@@ -192,7 +218,7 @@ public class UIButtonColor : UIWidgetContainer
 			{
 				OnInit();
 			}
-			if ((UnityEngine.Object)tweenTarget != (UnityEngine.Object)null)
+			if (tweenTarget != null)
 			{
 				SetState(isOver ? State.Hover : State.Normal, false);
 			}
@@ -201,25 +227,27 @@ public class UIButtonColor : UIWidgetContainer
 
 	protected virtual void OnPress(bool isPressed)
 	{
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
 		if (isEnabled && UICamera.currentTouch != null)
 		{
 			if (!mInitDone)
 			{
 				OnInit();
 			}
-			if ((UnityEngine.Object)tweenTarget != (UnityEngine.Object)null)
+			if (tweenTarget != null)
 			{
 				if (isPressed)
 				{
 					SetState(State.Pressed, false);
 				}
-				else if ((UnityEngine.Object)UICamera.currentTouch.current == (UnityEngine.Object)base.gameObject)
+				else if (UICamera.currentTouch.current == this.get_gameObject())
 				{
 					if (UICamera.currentScheme == UICamera.ControlScheme.Controller)
 					{
 						SetState(State.Hover, false);
 					}
-					else if (UICamera.currentScheme == UICamera.ControlScheme.Mouse && (UnityEngine.Object)UICamera.hoveredObject == (UnityEngine.Object)base.gameObject)
+					else if (UICamera.currentScheme == UICamera.ControlScheme.Mouse && UICamera.hoveredObject == this.get_gameObject())
 					{
 						SetState(State.Hover, false);
 					}
@@ -244,7 +272,7 @@ public class UIButtonColor : UIWidgetContainer
 			{
 				OnInit();
 			}
-			if ((UnityEngine.Object)tweenTarget != (UnityEngine.Object)null)
+			if (tweenTarget != null)
 			{
 				SetState(State.Pressed, false);
 			}
@@ -259,7 +287,7 @@ public class UIButtonColor : UIWidgetContainer
 			{
 				OnInit();
 			}
-			if ((UnityEngine.Object)tweenTarget != (UnityEngine.Object)null)
+			if (tweenTarget != null)
 			{
 				SetState(State.Normal, false);
 			}
@@ -282,7 +310,12 @@ public class UIButtonColor : UIWidgetContainer
 
 	public void UpdateColor(bool instant)
 	{
-		if ((UnityEngine.Object)tweenTarget != (UnityEngine.Object)null)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+		if (tweenTarget != null)
 		{
 			TweenColor tweenColor;
 			switch (mState)
@@ -300,10 +333,10 @@ public class UIButtonColor : UIWidgetContainer
 				tweenColor = TweenColor.Begin(tweenTarget, duration, mDefaultColor);
 				break;
 			}
-			if (instant && (UnityEngine.Object)tweenColor != (UnityEngine.Object)null)
+			if (instant && tweenColor != null)
 			{
 				tweenColor.value = tweenColor.to;
-				tweenColor.enabled = false;
+				tweenColor.set_enabled(false);
 			}
 		}
 	}

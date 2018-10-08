@@ -56,7 +56,7 @@ public class SlimeAnimBase<T> where T : new()
 
 	private void updatePlayTime()
 	{
-		nowTime += Time.deltaTime;
+		nowTime += Time.get_deltaTime();
 		if (playTime <= nowTime)
 		{
 			AnimFinish();
@@ -70,7 +70,7 @@ public class SlimeAnimBase<T> where T : new()
 			isPlaying = false;
 			if (callback != null)
 			{
-				callback();
+				callback.Invoke();
 			}
 		}
 	}

@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -61,13 +62,13 @@ public class QuestRushSearchRoomCondition : QuestSearchRoomConditionBase
 	private void UpdateMinFloor()
 	{
 		int currentSelectMinFloorIndex = getCurrentSelectMinFloorIndex();
-		SetLabelText(UI.LBL_TARGET_MIN_FLOOR, minFloorList[currentSelectMinFloorIndex]);
+		SetLabelText((Enum)UI.LBL_TARGET_MIN_FLOOR, minFloorList[currentSelectMinFloorIndex]);
 	}
 
 	private void UpdateMaxFloor()
 	{
 		int currentSelectMaxFloorIndex = getCurrentSelectMaxFloorIndex();
-		SetLabelText(UI.LBL_TARGET_MAX_FLOOR, maxFloorList[currentSelectMaxFloorIndex]);
+		SetLabelText((Enum)UI.LBL_TARGET_MAX_FLOOR, maxFloorList[currentSelectMaxFloorIndex]);
 	}
 
 	protected override void LoadSearchRequestParam()
@@ -98,34 +99,20 @@ public class QuestRushSearchRoomCondition : QuestSearchRoomConditionBase
 		MonoBehaviourSingleton<PartyManager>.I.SetRushSearchRequest(searchParam);
 	}
 
-	protected override void SendSearch()
+	protected unsafe override void SendSearch()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<PartyManager>.I.SendRushSearch(delegate(bool is_success, Error err)
-		{
-			if (!is_success && err == Error.WRN_PARTY_SEARCH_NOT_FOUND_QUEST)
-			{
-				OnNotFoundQuest();
-			}
-			GameSection.ResumeEvent(true, null);
-		}, true);
+		MonoBehaviourSingleton<PartyManager>.I.SendRushSearch(new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), true);
 	}
 
-	protected override void SendRandomMatching()
+	protected unsafe override void SendRandomMatching()
 	{
 		GameSection.SetEventData(new object[1]
 		{
 			false
 		});
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<PartyManager>.I.SendRushSearchRandomMatching(delegate(bool is_success, Error err)
-		{
-			if (!is_success)
-			{
-				OnNotFoundMatchingParty();
-			}
-			GameSection.ResumeEvent(true, null);
-		});
+		MonoBehaviourSingleton<PartyManager>.I.SendRushSearchRandomMatching(new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void CreateFloorPopText()
@@ -157,11 +144,11 @@ public class QuestRushSearchRoomCondition : QuestSearchRoomConditionBase
 
 	private void ShowMinFloorPopup()
 	{
-		if ((Object)minFloorPopup == (Object)null)
+		if (minFloorPopup == null)
 		{
 			minFloorPopup = Realizes(PopUpPrefabName, GetCtrl(UI.POP_TARGET_MIN_FLOOR), false);
 		}
-		if (!((Object)minFloorPopup == (Object)null))
+		if (!(minFloorPopup == null))
 		{
 			int currentSelectMinFloorIndex = getCurrentSelectMinFloorIndex();
 			bool[] array = new bool[minFloorList.Length];
@@ -179,11 +166,11 @@ public class QuestRushSearchRoomCondition : QuestSearchRoomConditionBase
 
 	private void ShowMaxFloorPopup()
 	{
-		if ((Object)maxFloorPopup == (Object)null)
+		if (maxFloorPopup == null)
 		{
 			maxFloorPopup = Realizes(PopUpPrefabName, GetCtrl(UI.POP_TARGET_MAX_FLOOR), false);
 		}
-		if (!((Object)maxFloorPopup == (Object)null))
+		if (!(maxFloorPopup == null))
 		{
 			int currentSelectMaxFloorIndex = getCurrentSelectMaxFloorIndex();
 			bool[] array = new bool[maxFloorList.Length];

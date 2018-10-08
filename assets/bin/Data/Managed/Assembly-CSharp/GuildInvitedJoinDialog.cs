@@ -34,19 +34,16 @@ public class GuildInvitedJoinDialog : GameSection
 
 	public override void Initialize()
 	{
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		guildInviteInfo = (GameSection.GetEventData() as GuildInvitedModel.GuildInvitedInfo);
 		_clanId = guildInviteInfo.clanId;
-		StartCoroutine(DoInitialize());
+		this.StartCoroutine(DoInitialize());
 	}
 
-	private IEnumerator DoInitialize()
+	private unsafe IEnumerator DoInitialize()
 	{
 		bool finish_get_statistic = false;
-		MonoBehaviourSingleton<GuildManager>.I.SendRequestStatistic(_clanId, delegate(bool success, GuildStatisticInfo info)
-		{
-			((_003CDoInitialize_003Ec__Iterator5B)/*Error near IL_0038: stateMachine*/)._003Cfinish_get_statistic_003E__0 = true;
-			((_003CDoInitialize_003Ec__Iterator5B)/*Error near IL_0038: stateMachine*/)._003C_003Ef__this._info = info;
-		});
+		MonoBehaviourSingleton<GuildManager>.I.SendRequestStatistic(_clanId, new Action<bool, GuildStatisticInfo>((object)/*Error near IL_0038: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		while (!finish_get_statistic)
 		{
 			yield return (object)null;
@@ -72,64 +69,46 @@ public class GuildInvitedJoinDialog : GameSection
 	{
 		if (_info != null)
 		{
-			SetLabelText(UI.LBL_GUILD_NAME, _info.clanName);
+			SetLabelText((Enum)UI.LBL_GUILD_NAME, _info.clanName);
 			if (_info.emblem != null && _info.emblem.Length >= 3)
 			{
-				SetSprite(UI.SPR_EMBLEM_LAYER_1, GuildItemManager.I.GetItemSprite(_info.emblem[0]));
-				SetSprite(UI.SPR_EMBLEM_LAYER_2, GuildItemManager.I.GetItemSprite(_info.emblem[1]));
-				SetSprite(UI.SPR_EMBLEM_LAYER_3, GuildItemManager.I.GetItemSprite(_info.emblem[2]));
+				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_1, GuildItemManager.I.GetItemSprite(_info.emblem[0]));
+				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_2, GuildItemManager.I.GetItemSprite(_info.emblem[1]));
+				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_3, GuildItemManager.I.GetItemSprite(_info.emblem[2]));
 			}
 			else
 			{
-				SetSprite(UI.SPR_EMBLEM_LAYER_1, string.Empty);
-				SetSprite(UI.SPR_EMBLEM_LAYER_2, string.Empty);
-				SetSprite(UI.SPR_EMBLEM_LAYER_3, string.Empty);
+				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_1, string.Empty);
+				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_2, string.Empty);
+				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_3, string.Empty);
 			}
-			SetLabelText(UI.LBL_LEVEL, string.Format(base.sectionData.GetText("TEXT_LEVEL"), _info.level));
-			SetLabelText(UI.LBL_MEM, $"{_info.currentMem}/{_info.memCap}");
-			SetLabelText(UI.LBL_DESC, _info.description);
-			SetLabelText(UI.LBL_TAG, _info.tag);
+			SetLabelText((Enum)UI.LBL_LEVEL, string.Format(base.sectionData.GetText("TEXT_LEVEL"), _info.level));
+			SetLabelText((Enum)UI.LBL_MEM, $"{_info.currentMem}/{_info.memCap}");
+			SetLabelText((Enum)UI.LBL_DESC, _info.description);
+			SetLabelText((Enum)UI.LBL_TAG, _info.tag);
 			TimeSpan timeSpan = DateTime.UtcNow - DateTime.Parse(_info.createAt);
 			SetLabelText(UI.LBL_DAYS, timeSpan.Days);
 			SetLabelText(UI.LBL_DONATE, _info.donate);
-			SetLabelText(UI.LBL_HUNTER_NUM, $"{_info.currentMem}/{_info.memCap}");
+			SetLabelText((Enum)UI.LBL_HUNTER_NUM, $"{_info.currentMem}/{_info.memCap}");
 		}
 	}
 
-	private void OnQuery_JOIN()
+	private unsafe void OnQuery_JOIN()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildManager>.I.SendRequestJoin(_clanId, -1, delegate(bool isSuccess, Error error)
-		{
-			GuildInvitedJoinDialog guildInvitedJoinDialog = this;
-			DoWaitProtocolBusyFinish(delegate
-			{
-				if (!GuildManager.IsValidInGuild())
-				{
-					GameSection.ChangeStayEvent("REQUEST", null);
-				}
-				GameSection.ResumeEvent(isSuccess, null);
-				MonoBehaviourSingleton<GuildManager>.I.guildInviteList.Clear();
-				if (!PartyManager.IsValidNotEmptyList())
-				{
-					MonoBehaviourSingleton<UserInfoManager>.I.ClearPartyInvite();
-					MonoBehaviourSingleton<UIManager>.I.invitationButton.Close(UITransition.TYPE.CLOSE);
-				}
-			});
-		});
+		MonoBehaviourSingleton<GuildManager>.I.SendRequestJoin(_clanId, -1, new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
-	private void OnQuery_REJECT()
+	private unsafe void OnQuery_REJECT()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildManager>.I.SendRejectInviteClan(guildInviteInfo.requestId, delegate(bool isSuccess)
+		MonoBehaviourSingleton<GuildManager>.I.SendRejectInviteClan(guildInviteInfo.requestId, delegate
 		{
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Expected O, but got Unknown
 			GuildInvitedJoinDialog guildInvitedJoinDialog = this;
-			DoWaitProtocolBusyFinish(delegate
-			{
-				GameSection.ResumeEvent(isSuccess, null);
-				MonoBehaviourSingleton<GuildManager>.I.guildInviteList.Remove(guildInvitedJoinDialog.guildInviteInfo);
-			});
+			_003COnQuery_REJECT_003Ec__AnonStorey32F _003COnQuery_REJECT_003Ec__AnonStorey32F;
+			DoWaitProtocolBusyFinish(new Action((object)_003COnQuery_REJECT_003Ec__AnonStorey32F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		});
 	}
 

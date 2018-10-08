@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class HomeMutualFollowerListItem : MonoBehaviour
+public class HomeMutualFollowerListItem
 {
 	public class InitParam
 	{
@@ -138,6 +138,11 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 
 	protected uint LoadingBit => m_loadingBit;
 
+	public HomeMutualFollowerListItem()
+		: this()
+	{
+	}
+
 	private void StartInitialize()
 	{
 		m_isInitialized = false;
@@ -155,20 +160,22 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 
 	public void Initialize(InitParam _param)
 	{
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0026: Expected O, but got Unknown
 		if (_param != null)
 		{
 			if (m_initCoroutine != null)
 			{
 				ResetParams();
 			}
-			m_initCoroutine = StartCoroutine(InitCoroutine(_param));
+			m_initCoroutine = this.StartCoroutine(InitCoroutine(_param));
 		}
 	}
 
 	private void ResetParams()
 	{
 		m_loadingBit = 0u;
-		StopCoroutine(m_initCoroutine);
+		this.StopCoroutine(m_initCoroutine);
 		m_initCoroutine = null;
 		EndInitialize();
 	}
@@ -178,18 +185,18 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 		StartInitialize();
 		if (m_allUiArray == null)
 		{
-			m_allUiArray = GetComponentsInChildren<UIWidget>(true);
+			m_allUiArray = this.GetComponentsInChildren<UIWidget>(true);
 		}
 		SetInitParameter(_param);
 		SetUserBaseInfo(_param.CharacterInfo, _param.Index, _param.IsPermittedMessage, _param.IsUseRenderTextureCharaModel);
 		SetFollowState(_param);
-		if ((UnityEngine.Object)m_userJoinInfoRootObject != (UnityEngine.Object)null)
+		if (m_userJoinInfoRootObject != null)
 		{
-			m_userJoinInfoRootObject.gameObject.SetActive(false);
+			m_userJoinInfoRootObject.get_gameObject().SetActive(false);
 		}
-		if ((UnityEngine.Object)m_userCharacterInfoRootObject != (UnityEngine.Object)null)
+		if (m_userCharacterInfoRootObject != null)
 		{
-			m_userCharacterInfoRootObject.gameObject.SetActive(true);
+			m_userCharacterInfoRootObject.get_gameObject().SetActive(true);
 		}
 		InitButtonSettings();
 		bool isLoadingComplete = false;
@@ -207,7 +214,7 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 		}
 		if (_param.OnCompleteLoading != null)
 		{
-			_param.OnCompleteLoading();
+			_param.OnCompleteLoading.Invoke();
 		}
 		EndInitialize();
 	}
@@ -221,6 +228,16 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 
 	private void SetUserBaseInfo(FriendCharaInfo _info, int _index, bool _isPerMittedUser, bool _isUseRernderTexture)
 	{
+		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0168: Expected O, but got Unknown
+		//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a7: Expected O, but got Unknown
 		if (_info != null)
 		{
 			bool flag = _info.userId == 0;
@@ -228,27 +245,27 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 			SetLabelText(m_userLevelText, _info.level.ToString());
 			SetLabelText(m_userLastLoginTimeText, _info.lastLogin);
 			SetLabelText(m_userCommentText, _info.comment);
-			if ((UnityEngine.Object)m_disableMask != (UnityEngine.Object)null)
+			if (m_disableMask != null)
 			{
 				m_disableMask.SetActive(!_isPerMittedUser);
 			}
 			int width = (!_isUseRernderTexture) ? 137 : 274;
-			if ((UnityEngine.Object)m_userHPBgImg != (UnityEngine.Object)null)
+			if (m_userHPBgImg != null)
 			{
 				m_userHPBgImg.width = width;
 			}
-			if ((UnityEngine.Object)m_userAtkBgImg != (UnityEngine.Object)null)
+			if (m_userAtkBgImg != null)
 			{
 				m_userAtkBgImg.width = width;
 			}
-			if ((UnityEngine.Object)m_userDefBgImg != (UnityEngine.Object)null)
+			if (m_userDefBgImg != null)
 			{
 				m_userDefBgImg.width = width;
 			}
-			m_userCharaIconTex.enabled = false;
-			if (m_userCharaIconTex.gameObject.activeSelf != _isUseRernderTexture)
+			m_userCharaIconTex.set_enabled(false);
+			if (m_userCharaIconTex.get_gameObject().get_activeSelf() != _isUseRernderTexture)
 			{
-				m_userCharaIconTex.gameObject.SetActive(_isUseRernderTexture);
+				m_userCharaIconTex.get_gameObject().SetActive(_isUseRernderTexture);
 			}
 			if (!_isUseRernderTexture)
 			{
@@ -256,17 +273,17 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 			}
 			else if (flag)
 			{
-				SetRenderNPCModel(m_userCharaIconTex.transform, m_userCharaIconTex, 0, NPC_CHARA_ICON_POS, NPC_CHARA_ICON_ROT, 10f, delegate
+				SetRenderNPCModel(m_userCharaIconTex.get_transform(), m_userCharaIconTex, 0, NPC_CHARA_ICON_POS, NPC_CHARA_ICON_ROT, 10f, delegate
 				{
-					m_userCharaIconTex.enabled = true;
+					m_userCharaIconTex.set_enabled(true);
 					SetLoadComplete(LOADING_COMP_BIT.CHARA_RENDER_TEX);
 				});
 			}
 			else
 			{
-				ForceSetRenderPlayerModel(m_userCharaIconTex.transform, m_userCharaIconTex, PlayerLoadInfo.FromCharaInfo(_info, false, true, false, true), 99, PC_CHARA_ICON_POS, PC_CHARA_ICON_ROT, true, delegate
+				ForceSetRenderPlayerModel(m_userCharaIconTex.get_transform(), m_userCharaIconTex, PlayerLoadInfo.FromCharaInfo(_info, false, true, false, true), 99, PC_CHARA_ICON_POS, PC_CHARA_ICON_ROT, true, delegate
 				{
-					m_userCharaIconTex.enabled = true;
+					m_userCharaIconTex.set_enabled(true);
 					SetLoadComplete(LOADING_COMP_BIT.CHARA_RENDER_TEX);
 				});
 			}
@@ -276,7 +293,7 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 			SetLabelText(m_userATKText, finalStatus.GetAttacksSum().ToString());
 			SetLabelText(m_userDEFText, finalStatus.GetDefencesSum().ToString());
 			SetLabelText(m_userHPText, finalStatus.hp.ToString());
-			if ((UnityEngine.Object)m_userDegreePlate != (UnityEngine.Object)null)
+			if (m_userDegreePlate != null)
 			{
 				m_userDegreePlate.Initialize(_info.selectedDegrees, false, delegate
 				{
@@ -288,8 +305,8 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 
 	private void InitButtonSettings()
 	{
-		UIButton component = GetComponent<UIButton>();
-		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+		UIButton component = this.GetComponent<UIButton>();
+		if (component != null)
 		{
 			component.onClick.Clear();
 			component.onClick.Add(new EventDelegate(delegate
@@ -297,8 +314,8 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 				OnClickMe();
 			}));
 		}
-		UIGameSceneEventSender component2 = GetComponent<UIGameSceneEventSender>();
-		if ((UnityEngine.Object)component2 != (UnityEngine.Object)null)
+		UIGameSceneEventSender component2 = this.GetComponent<UIGameSceneEventSender>();
+		if (component2 != null)
 		{
 			component2.eventName = string.Empty;
 		}
@@ -311,15 +328,15 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 		{
 			flag = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(_param.CharacterInfo.userId);
 		}
-		if ((UnityEngine.Object)m_blackListIcon != (UnityEngine.Object)null)
+		if (m_blackListIcon != null)
 		{
 			m_blackListIcon.SetActive(flag);
 		}
-		if ((UnityEngine.Object)m_followIcon == (UnityEngine.Object)null)
+		if (m_followIcon == null)
 		{
 			m_followIcon.SetActive(_param.IsFollowing && !flag);
 		}
-		if ((UnityEngine.Object)m_followerIcon == (UnityEngine.Object)null)
+		if (m_followerIcon == null)
 		{
 			m_followerIcon.SetActive(_param.IsFollower && !flag);
 		}
@@ -341,14 +358,16 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 		{
 			for (int i = 0; i < m_allUiArray.Length; i++)
 			{
-				m_allUiArray[i].enabled = _isVisible;
+				m_allUiArray[i].set_enabled(_isVisible);
 			}
 		}
 	}
 
 	protected void SetRenderNPCModel(Transform targetTrans, UITexture _uiTex, int npc_id, Vector3 pos, Vector3 rot, float fov = -1, Action<NPCLoader> onload_callback = null)
 	{
-		if (!((UnityEngine.Object)targetTrans == (UnityEngine.Object)null))
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		if (!(targetTrans == null))
 		{
 			UIModelRenderTexture.Get(targetTrans).InitNPC(_uiTex, npc_id, pos, rot, fov, onload_callback);
 		}
@@ -356,7 +375,9 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 
 	protected void ForceSetRenderPlayerModel(Transform targetTrans, UITexture _uiTex, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback = null)
 	{
-		if ((UnityEngine.Object)targetTrans == (UnityEngine.Object)null)
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		if (targetTrans == null)
 		{
 			onload_callback?.Invoke(null);
 		}
@@ -368,7 +389,7 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 
 	private void SetLabelText(UILabel _target, string _text)
 	{
-		if (!((UnityEngine.Object)_target == (UnityEngine.Object)null))
+		if (!(_target == null))
 		{
 			_target.text = _text;
 		}
@@ -377,11 +398,11 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 	public void SwitchUserInfo()
 	{
 		m_isShowUserJoinInfo = !m_isShowUserJoinInfo;
-		if ((UnityEngine.Object)m_userCharacterInfoRootObject != (UnityEngine.Object)null)
+		if (m_userCharacterInfoRootObject != null)
 		{
 			m_userCharacterInfoRootObject.SetActive(!m_isShowUserJoinInfo);
 		}
-		if ((UnityEngine.Object)m_userJoinInfoRootObject != (UnityEngine.Object)null)
+		if (m_userJoinInfoRootObject != null)
 		{
 			m_userJoinInfoRootObject.SetActive(m_isShowUserJoinInfo);
 		}
@@ -397,7 +418,9 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 
 	public void CleanRenderTexture()
 	{
-		UIModelRenderTexture.Get(m_userCharaIconTex.transform).Clear();
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Expected O, but got Unknown
+		UIModelRenderTexture.Get(m_userCharaIconTex.get_transform()).Clear();
 	}
 
 	public void OnClickJoinButton()

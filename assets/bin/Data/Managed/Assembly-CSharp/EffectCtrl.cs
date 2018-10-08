@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EffectCtrl : MonoBehaviour
+public class EffectCtrl
 {
 	[Header("-- Effect Settings --")]
 	[Tooltip("ル\u30fcプエフェクトかどうか")]
@@ -35,8 +35,8 @@ public class EffectCtrl : MonoBehaviour
 	[Tooltip("アニメが最後まで再生されてから削除")]
 	public bool waitAnimationPlaying = true;
 
-	[Tooltip("同時に再生される可能性のあるAudioClip")]
 	[Header("-- Audio Destroy --")]
+	[Tooltip("同時に再生される可能性のあるAudioClip")]
 	public AudioClip attachedAudioClip;
 
 	[Tooltip("同時に再生される可能性のあるAudioClipのSE設定ID")]
@@ -60,17 +60,26 @@ public class EffectCtrl : MonoBehaviour
 
 	private int pauseStateHash;
 
+	public EffectCtrl()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
-		_transform = base.transform;
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Expected O, but got Unknown
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		_transform = this.get_transform();
 		if ((particles == null || particles.Length == 0) && autoCollectParticles)
 		{
-			particles = GetComponentsInChildren<ParticleSystem>();
+			particles = this.GetComponentsInChildren<ParticleSystem>();
 		}
-		if ((Object)animator == (Object)null)
+		if (animator == null)
 		{
-			Animator component = GetComponent<Animator>();
-			if ((Object)component != (Object)null)
+			Animator component = this.GetComponent<Animator>();
+			if (component != null)
 			{
 				animator = component;
 			}
@@ -79,13 +88,14 @@ public class EffectCtrl : MonoBehaviour
 				animator = null;
 			}
 		}
-		if ((Object)animator != (Object)null)
+		if (animator != null)
 		{
-			defaultStateHash = animator.GetCurrentAnimatorStateInfo(0).fullPathHash;
-			int stateID = Animator.StringToHash("END");
-			if (animator.HasState(0, stateID))
+			AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+			defaultStateHash = currentAnimatorStateInfo.get_fullPathHash();
+			int num = Animator.StringToHash("END");
+			if (animator.HasState(0, num))
 			{
-				endStateHash = stateID;
+				endStateHash = num;
 			}
 		}
 	}
@@ -100,11 +110,13 @@ public class EffectCtrl : MonoBehaviour
 
 	private void Update()
 	{
+		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
 		if (!loop || loopEnd)
 		{
 			if (waitTime > 0f)
 			{
-				timer += Time.deltaTime;
+				timer += Time.get_deltaTime();
 				if (timer < waitTime)
 				{
 					return;
@@ -115,22 +127,22 @@ public class EffectCtrl : MonoBehaviour
 				int i = 0;
 				for (int num = particles.Length; i < num; i++)
 				{
-					ParticleSystem particleSystem = particles[i];
-					if ((Object)particleSystem != (Object)null && particleSystem.isPlaying)
+					ParticleSystem val = particles[i];
+					if (val != null && val.get_isPlaying())
 					{
-						particleSystem.Stop(true);
+						val.Stop(true);
 						return;
 					}
 				}
 			}
-			if (waitAnimationPlaying && (Object)animator != (Object)null)
+			if (waitAnimationPlaying && animator != null)
 			{
 				if (animator.IsInTransition(0))
 				{
 					return;
 				}
 				AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-				if (!currentAnimatorStateInfo.loop && currentAnimatorStateInfo.normalizedTime < 1f)
+				if (!currentAnimatorStateInfo.get_loop() && currentAnimatorStateInfo.get_normalizedTime() < 1f)
 				{
 					return;
 				}
@@ -147,14 +159,14 @@ public class EffectCtrl : MonoBehaviour
 			int i = 0;
 			for (int num = particles.Length; i < num; i++)
 			{
-				ParticleSystem particleSystem = particles[i];
-				if ((Object)particleSystem != (Object)null)
+				ParticleSystem val = particles[i];
+				if (val != null)
 				{
-					particleSystem.Stop(true);
+					val.Stop(true);
 				}
 			}
 		}
-		if (changeStateToEND && (Object)animator != (Object)null && endStateHash != 0 && isPlayEndAnimation)
+		if (changeStateToEND && animator != null && endStateHash != 0 && isPlayEndAnimation)
 		{
 			if (crossFadeTimeToEND > 0f)
 			{
@@ -174,7 +186,7 @@ public class EffectCtrl : MonoBehaviour
 
 	public void Play(int stateNameHash)
 	{
-		if (!((Object)animator == (Object)null) && animator.HasState(0, stateNameHash))
+		if (!(animator == null) && animator.HasState(0, stateNameHash))
 		{
 			animator.Play(stateNameHash);
 		}
@@ -182,7 +194,7 @@ public class EffectCtrl : MonoBehaviour
 
 	public void CrossFade(int stateNameHash, float transitionDuration)
 	{
-		if (!((Object)animator == (Object)null) && animator.HasState(0, stateNameHash))
+		if (!(animator == null) && animator.HasState(0, stateNameHash))
 		{
 			animator.CrossFade(stateNameHash, transitionDuration);
 		}
@@ -190,24 +202,33 @@ public class EffectCtrl : MonoBehaviour
 
 	public bool IsCurrentState(int stateNameHash)
 	{
-		if ((Object)animator == (Object)null)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		if (animator == null)
 		{
 			return false;
 		}
-		return animator.GetCurrentAnimatorStateInfo(0).shortNameHash == stateNameHash;
+		AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+		return currentAnimatorStateInfo.get_shortNameHash() == stateNameHash;
 	}
 
 	public void Pause(bool pause)
 	{
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 		if (isPause != pause)
 		{
 			if (pause)
 			{
-				if (base.gameObject.activeInHierarchy)
+				if (this.get_gameObject().get_activeInHierarchy())
 				{
 					if (!object.ReferenceEquals(animator, null))
 					{
-						int shortNameHash = animator.GetCurrentAnimatorStateInfo(0).shortNameHash;
+						AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+						int shortNameHash = currentAnimatorStateInfo.get_shortNameHash();
 						if (shortNameHash == 0)
 						{
 							return;
@@ -215,13 +236,13 @@ public class EffectCtrl : MonoBehaviour
 						pauseStateHash = shortNameHash;
 						animator.Stop();
 					}
-					base.gameObject.SetActive(false);
+					this.get_gameObject().SetActive(false);
 					isPause = true;
 				}
 			}
 			else
 			{
-				base.gameObject.SetActive(true);
+				this.get_gameObject().SetActive(true);
 				if (!object.ReferenceEquals(animator, null))
 				{
 					animator.Play(pauseStateHash);
@@ -234,15 +255,16 @@ public class EffectCtrl : MonoBehaviour
 
 	public void SetRenderQueue(int renderQueue)
 	{
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		if (particles != null)
 		{
 			if (particles.Length == 0)
 			{
-				particles = GetComponentsInChildren<ParticleSystem>(true);
+				particles = this.GetComponentsInChildren<ParticleSystem>(true);
 			}
 			for (int i = 0; i < particles.Length; i++)
 			{
-				particles[i].GetComponent<ParticleSystemRenderer>().sharedMaterial.renderQueue = renderQueue;
+				particles[i].GetComponent<ParticleSystemRenderer>().get_sharedMaterial().set_renderQueue(renderQueue);
 			}
 		}
 	}
@@ -256,15 +278,15 @@ public class EffectCtrl : MonoBehaviour
 			int i = 0;
 			for (int num = particles.Length; i < num; i++)
 			{
-				ParticleSystem particleSystem = particles[i];
-				if ((Object)particleSystem != (Object)null)
+				ParticleSystem val = particles[i];
+				if (val != null)
 				{
-					particleSystem.Clear(true);
-					particleSystem.Play(true);
+					val.Clear(true);
+					val.Play(true);
 				}
 			}
 		}
-		if ((Object)animator != (Object)null && defaultStateHash != 0)
+		if (animator != null && defaultStateHash != 0)
 		{
 			animator.Rebind();
 			animator.Play(defaultStateHash, 0, 0f);
@@ -275,9 +297,13 @@ public class EffectCtrl : MonoBehaviour
 
 	public void DestroyGameObject()
 	{
-		if (!((Object)base.gameObject == (Object)null) && (!MonoBehaviourSingleton<EffectManager>.IsValid() || !MonoBehaviourSingleton<EffectManager>.I.StockOrDestroy(base.gameObject, false)))
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Expected O, but got Unknown
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		if (!(this.get_gameObject() == null) && (!MonoBehaviourSingleton<EffectManager>.IsValid() || !MonoBehaviourSingleton<EffectManager>.I.StockOrDestroy(this.get_gameObject(), false)))
 		{
-			Object.Destroy(base.gameObject);
+			Object.Destroy(this.get_gameObject());
 		}
 	}
 
@@ -296,14 +322,14 @@ public class EffectCtrl : MonoBehaviour
 
 	private void __FUNCTION__PlayLoopSE(AudioClip clip)
 	{
-		if (!((Object)loopAudioClip == (Object)clip))
+		if (!(loopAudioClip == clip))
 		{
-			if ((Object)loopAudioObject != (Object)null)
+			if (loopAudioObject != null)
 			{
 				loopAudioObject.Stop(0);
 			}
 			loopAudioObject = SoundManager.PlaySE(clip, true, _transform);
-			if ((Object)loopAudioObject != (Object)null)
+			if (loopAudioObject != null)
 			{
 				loopAudioClip = clip;
 			}
@@ -312,7 +338,7 @@ public class EffectCtrl : MonoBehaviour
 
 	private void __FUNCTION__StopLoopSE()
 	{
-		if ((Object)loopAudioObject != (Object)null)
+		if (loopAudioObject != null)
 		{
 			loopAudioObject.Stop(0);
 		}

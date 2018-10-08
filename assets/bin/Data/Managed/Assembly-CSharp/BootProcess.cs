@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class BootProcess : MonoBehaviour
+public class BootProcess
 {
 	public const string STORAGE_PERMISSION = "android.permission.WRITE_EXTERNAL_STORAGE";
 
@@ -15,9 +15,16 @@ public class BootProcess : MonoBehaviour
 
 	private static string analyticsString;
 
+	public BootProcess()
+		: this()
+	{
+	}
+
 	private bool CheckPermissions()
 	{
-		if (Application.platform != RuntimePlatform.Android)
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Invalid comparison between Unknown and I4
+		if ((int)Application.get_platform() != 11)
 		{
 			return true;
 		}
@@ -57,8 +64,8 @@ public class BootProcess : MonoBehaviour
 			if (NetworkNative.isRunOnRazerPhone())
 			{
 				GameSaveData.instance.graphicOptionKey = "highest";
-				Application.targetFrameRate = 120;
-				Time.fixedDeltaTime = 0.008333335f;
+				Application.set_targetFrameRate(120);
+				Time.set_fixedDeltaTime(0.008333335f);
 			}
 			else
 			{
@@ -69,12 +76,12 @@ public class BootProcess : MonoBehaviour
 		{
 			if (GameSaveData.instance.graphicOptionKey == "highest")
 			{
-				Application.targetFrameRate = 120;
-				Time.fixedDeltaTime = 0.008333335f;
+				Application.set_targetFrameRate(120);
+				Time.set_fixedDeltaTime(0.008333335f);
 			}
 			else
 			{
-				Application.targetFrameRate = 30;
+				Application.set_targetFrameRate(30);
 			}
 		}
 		NetworkNative.setHost(NetworkManager.APP_HOST);
@@ -91,15 +98,15 @@ public class BootProcess : MonoBehaviour
 			MonoBehaviourSingleton<InputManager>.I.UpdateConfigInput();
 		}
 		Transform ui_root = ResourceUtility.Realizes(Resources.Load("UI/UI_Root"), MonoBehaviourSingleton<AppMain>.I._transform, -1);
-		ui_root.gameObject.AddComponent<UIManager>();
+		ui_root.get_gameObject().AddComponent<UIManager>();
 		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.INITIALIZE, true);
-		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<GameSceneManager>();
-		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<UserInfoManager>();
-		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<TransitionManager>();
-		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<FBManager>();
-		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<NativeGameService>();
+		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<GameSceneManager>();
+		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<UserInfoManager>();
+		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<TransitionManager>();
+		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<FBManager>();
+		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<NativeGameService>();
 		Singleton<StringTable>.Create();
-		Singleton<StringTable>.I.CreateTable((TextAsset)null);
+		Singleton<StringTable>.I.CreateTable(null);
 		MonoBehaviourSingleton<GameSceneManager>.I.Initialize();
 		LoadingQueue load_queue = new LoadingQueue(this);
 		LoadObject lo_sound_se_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, "SETable", false);
@@ -109,9 +116,9 @@ public class BootProcess : MonoBehaviour
 			yield return (object)null;
 		}
 		Singleton<SETable>.Create();
-		Singleton<SETable>.I.CreateTableFromInternal((lo_sound_se_table.loadedObject as TextAsset).text);
+		Singleton<SETable>.I.CreateTableFromInternal((lo_sound_se_table.loadedObject as TextAsset).get_text());
 		Singleton<AudioSettingTable>.Create();
-		Singleton<AudioSettingTable>.I.CreateTableFromInternal((lo_audio_setting_table.loadedObject as TextAsset).text);
+		Singleton<AudioSettingTable>.I.CreateTableFromInternal((lo_audio_setting_table.loadedObject as TextAsset).get_text());
 		if (MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
 			MonoBehaviourSingleton<SoundManager>.I.LoadParmanentAudioClip();
@@ -124,7 +131,7 @@ public class BootProcess : MonoBehaviour
 		MonoBehaviourSingleton<GoGameResourceManager>.I.LoadVariantManifest();
 		while (MonoBehaviourSingleton<GoGameResourceManager>.I.isLoadingVariantManifest)
 		{
-			Debug.Log("Waiting LoadingVariantManifest ");
+			Debug.Log((object)"Waiting LoadingVariantManifest ");
 			yield return (object)null;
 		}
 		int reset = PlayerPrefs.GetInt("AppMain.Reset", 0);
@@ -138,7 +145,7 @@ public class BootProcess : MonoBehaviour
 			float analyticTimeCount = 5f;
 			while (isAnalytics)
 			{
-				analyticTimeCount -= Time.deltaTime;
+				analyticTimeCount -= Time.get_deltaTime();
 				if (analyticTimeCount < 0f)
 				{
 					int err_code = 200000;
@@ -245,16 +252,16 @@ public class BootProcess : MonoBehaviour
 				Native.CheckReferrerSendToAppBrowser();
 				ResourceManager.internalMode = true;
 				ResourceManager.internalMode = false;
-				if ((Object)MonoBehaviourSingleton<ResourceManager>.I.manifest != (Object)null)
+				if (MonoBehaviourSingleton<ResourceManager>.I.manifest != null)
 				{
 					ResourceManager.internalMode = true;
 				}
-				MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<OpeningStartProcess>();
+				MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<OpeningStartProcess>();
 			}
 			else
 			{
 				ResourceManager.internalMode = false;
-				MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<LoadingProcess>();
+				MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<LoadingProcess>();
 			}
 			Object.Destroy(this);
 		}

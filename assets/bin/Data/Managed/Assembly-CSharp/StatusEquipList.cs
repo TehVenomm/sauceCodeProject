@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,8 +30,9 @@ public class StatusEquipList : GameSection
 
 	public override void Initialize()
 	{
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		currentPageIndex = 0;
-		StartCoroutine(DoInitialize());
+		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -42,11 +44,11 @@ public class StatusEquipList : GameSection
 			yield return (object)loadQueue.Wait();
 		}
 		obtainedNum = MonoBehaviourSingleton<AchievementManager>.I.GetEquipItemCollectionNum();
-		SetLabelText(UI.LBL_CURRENT_NUM, obtainedNum.ToString());
+		SetLabelText((Enum)UI.LBL_CURRENT_NUM, obtainedNum.ToString());
 		int totalEquipNum = Singleton<EquipItemTable>.I.GetEquipListCount();
-		SetLabelText(UI.LBL_MAX_NUM, totalEquipNum.ToString());
+		SetLabelText((Enum)UI.LBL_MAX_NUM, totalEquipNum.ToString());
 		SetPageNumText(page_num: totalEquipNum, enum_lbl: UI.LBL_PAGE_MAX);
-		SetActive(UI.BTN_ENEMY_COLLECTION_LIST, true);
+		SetActive((Enum)UI.BTN_ENEMY_COLLECTION_LIST, true);
 		InitializeCaption();
 		base.Initialize();
 	}
@@ -70,9 +72,9 @@ public class StatusEquipList : GameSection
 			return false;
 		}
 		currentPageIndex = pageIndex;
-		SkipTween(UI.SPR_SELECT_WEAPON, true, 0);
-		SkipTween(UI.SPR_SELECT_DEF, true, 0);
-		SetPageNumText(UI.LBL_PAGE_MAX, maxPageNum);
+		SkipTween((Enum)UI.SPR_SELECT_WEAPON, true, 0);
+		SkipTween((Enum)UI.SPR_SELECT_DEF, true, 0);
+		SetPageNumText((Enum)UI.LBL_PAGE_MAX, maxPageNum);
 		UpdateInventory();
 		UpdateAnchors();
 		return true;
@@ -99,7 +101,7 @@ public class StatusEquipList : GameSection
 		UpdateInventory();
 	}
 
-	private void UpdateInventory()
+	private unsafe void UpdateInventory()
 	{
 		EquipItemTable.EquipItemData[] items = null;
 		int start = currentPageIndex * ONE_PAGE_EQUIP_NUM;
@@ -107,44 +109,9 @@ public class StatusEquipList : GameSection
 		items = GetEquips(start, last);
 		if (items != null)
 		{
-			SetPageNumText(UI.LBL_PAGE_NOW, currentPageIndex + 1);
-			SetDynamicList(UI.GRD_INVENTORY, string.Empty, items.Length, false, null, null, delegate(int i, Transform t, bool isRecycle)
-			{
-				SetActive(t, true);
-				EquipItemTable.EquipItemData equipItemData = items[i];
-				EquipItemSortData equipItemSortData = new EquipItemSortData();
-				EquipItemInfo equipItemInfo = new EquipItemInfo();
-				equipItemInfo.tableData = equipItemData;
-				equipItemInfo.SetDefaultData();
-				equipItemSortData.SetItem(equipItemInfo);
-				ITEM_ICON_TYPE iconType = ItemIcon.GetItemIconType(equipItemData.type);
-				bool flag = !MonoBehaviourSingleton<AchievementManager>.I.CheckEquipItemCollection(equipItemData);
-				if (flag)
-				{
-					iconType = ITEM_ICON_TYPE.UNKNOWN;
-				}
-				bool isNew = false;
-				GET_TYPE getType = GET_TYPE.PAY;
-				if (equipItemData != null)
-				{
-					getType = equipItemData.getType;
-				}
-				ItemIcon itemIcon = ItemIconDetailSmall.CreateSmallListItemIcon(iconType, equipItemSortData, t, isNew, start + i + 1, getType);
-				if (!flag)
-				{
-					itemIcon.button.enabled = true;
-					SetEvent(itemIcon._transform, "DETAIL", new object[2]
-					{
-						ItemDetailEquip.CURRENT_SECTION.EQUIP_LIST,
-						equipItemData
-					});
-				}
-				else
-				{
-					itemIcon.button.enabled = false;
-					SetEvent(itemIcon._transform, string.Empty, 0);
-				}
-			});
+			SetPageNumText((Enum)UI.LBL_PAGE_NOW, currentPageIndex + 1);
+			_003CUpdateInventory_003Ec__AnonStorey480 _003CUpdateInventory_003Ec__AnonStorey;
+			SetDynamicList((Enum)UI.GRD_INVENTORY, string.Empty, items.Length, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -170,11 +137,12 @@ public class StatusEquipList : GameSection
 
 	private void InitializeCaption()
 	{
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_2);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
-		UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
-		if ((Object)component != (Object)null)
+		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
+		if (component != null)
 		{
 			component.Reset();
 			int i = 0;

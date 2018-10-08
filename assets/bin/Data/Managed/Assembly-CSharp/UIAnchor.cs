@@ -3,7 +3,7 @@ using UnityEngine;
 
 [AddComponentMenu("NGUI/UI/Anchor")]
 [ExecuteInEditMode]
-public class UIAnchor : MonoBehaviour
+public class UIAnchor
 {
 	public enum Side
 	{
@@ -26,12 +26,12 @@ public class UIAnchor : MonoBehaviour
 
 	public bool runOnlyOnce = true;
 
-	public Vector2 relativeOffset = Vector2.zero;
+	public Vector2 relativeOffset = Vector2.get_zero();
 
-	public Vector2 pixelOffset = Vector2.zero;
+	public Vector2 pixelOffset = Vector2.get_zero();
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private UIWidget widgetContainer;
 
 	private Transform mTrans;
@@ -44,10 +44,24 @@ public class UIAnchor : MonoBehaviour
 
 	private bool mStarted;
 
+	public UIAnchor()
+		: this()
+	{
+	}//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+	//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+	//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+	//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+	//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+
+
 	private void Awake()
 	{
-		mTrans = base.transform;
-		mAnim = GetComponent<Animation>();
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Expected O, but got Unknown
+		mTrans = this.get_transform();
+		mAnim = this.GetComponent<Animation>();
 		UICamera.onScreenResize = (UICamera.OnScreenResize)Delegate.Combine(UICamera.onScreenResize, new UICamera.OnScreenResize(ScreenSizeChanged));
 	}
 
@@ -66,15 +80,20 @@ public class UIAnchor : MonoBehaviour
 
 	private void Start()
 	{
-		if ((UnityEngine.Object)container == (UnityEngine.Object)null && (UnityEngine.Object)widgetContainer != (UnityEngine.Object)null)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Expected O, but got Unknown
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Expected O, but got Unknown
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		if (container == null && widgetContainer != null)
 		{
-			container = widgetContainer.gameObject;
+			container = widgetContainer.get_gameObject();
 			widgetContainer = null;
 		}
-		mRoot = NGUITools.FindInParents<UIRoot>(base.gameObject);
-		if ((UnityEngine.Object)uiCamera == (UnityEngine.Object)null)
+		mRoot = NGUITools.FindInParents<UIRoot>(this.get_gameObject());
+		if (uiCamera == null)
 		{
-			uiCamera = NGUITools.FindCameraForLayer(base.gameObject.layer);
+			uiCamera = NGUITools.FindCameraForLayer(this.get_gameObject().get_layer());
 		}
 		Update();
 		mStarted = true;
@@ -82,153 +101,217 @@ public class UIAnchor : MonoBehaviour
 
 	private void Update()
 	{
-		if (!((UnityEngine.Object)mAnim != (UnityEngine.Object)null) || !mAnim.enabled || !mAnim.isPlaying)
+		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a3: Expected O, but got Unknown
+		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0251: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0256: Expected O, but got Unknown
+		//IL_026d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0272: Expected O, but got Unknown
+		//IL_0272: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0282: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0287: Expected O, but got Unknown
+		//IL_0287: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0296: Unknown result type (might be due to invalid IL or missing references)
+		//IL_029b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0319: Unknown result type (might be due to invalid IL or missing references)
+		//IL_031e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0535: Unknown result type (might be due to invalid IL or missing references)
+		//IL_053a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_053f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0553: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0555: Unknown result type (might be due to invalid IL or missing references)
+		//IL_055a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0599: Unknown result type (might be due to invalid IL or missing references)
+		//IL_059b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05c8: Expected O, but got Unknown
+		//IL_05d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05ea: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0619: Unknown result type (might be due to invalid IL or missing references)
+		//IL_062f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0634: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0636: Unknown result type (might be due to invalid IL or missing references)
+		//IL_063b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_066b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0670: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0682: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0694: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0699: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06ab: Unknown result type (might be due to invalid IL or missing references)
+		if (!(mAnim != null) || !mAnim.get_enabled() || !mAnim.get_isPlaying())
 		{
 			bool flag = false;
-			UIWidget uIWidget = (!((UnityEngine.Object)container == (UnityEngine.Object)null)) ? container.GetComponent<UIWidget>() : null;
-			UIPanel uIPanel = (!((UnityEngine.Object)container == (UnityEngine.Object)null) || !((UnityEngine.Object)uIWidget == (UnityEngine.Object)null)) ? container.GetComponent<UIPanel>() : null;
-			if ((UnityEngine.Object)uIWidget != (UnityEngine.Object)null)
+			UIWidget uIWidget = (!(container == null)) ? container.GetComponent<UIWidget>() : null;
+			UIPanel uIPanel = (!(container == null) || !(uIWidget == null)) ? container.GetComponent<UIPanel>() : null;
+			if (uIWidget != null)
 			{
-				Bounds bounds = uIWidget.CalculateBounds(container.transform.parent);
+				Bounds val = uIWidget.CalculateBounds(container.get_transform().get_parent());
 				ref Rect reference = ref mRect;
-				Vector3 min = bounds.min;
-				reference.x = min.x;
+				Vector3 min = val.get_min();
+				reference.set_x(min.x);
 				ref Rect reference2 = ref mRect;
-				Vector3 min2 = bounds.min;
-				reference2.y = min2.y;
+				Vector3 min2 = val.get_min();
+				reference2.set_y(min2.y);
 				ref Rect reference3 = ref mRect;
-				Vector3 size = bounds.size;
-				reference3.width = size.x;
+				Vector3 size = val.get_size();
+				reference3.set_width(size.x);
 				ref Rect reference4 = ref mRect;
-				Vector3 size2 = bounds.size;
-				reference4.height = size2.y;
+				Vector3 size2 = val.get_size();
+				reference4.set_height(size2.y);
 			}
-			else if ((UnityEngine.Object)uIPanel != (UnityEngine.Object)null)
+			else if (uIPanel != null)
 			{
 				if (uIPanel.clipping == UIDrawCall.Clipping.None)
 				{
-					float num = (!((UnityEngine.Object)mRoot != (UnityEngine.Object)null)) ? 0.5f : ((float)mRoot.activeHeight / (float)Screen.height * 0.5f);
-					mRect.xMin = (float)(-Screen.width) * num;
-					mRect.yMin = (float)(-Screen.height) * num;
-					mRect.xMax = 0f - mRect.xMin;
-					mRect.yMax = 0f - mRect.yMin;
+					float num = (!(mRoot != null)) ? 0.5f : ((float)mRoot.activeHeight / (float)Screen.get_height() * 0.5f);
+					mRect.set_xMin((float)(-Screen.get_width()) * num);
+					mRect.set_yMin((float)(-Screen.get_height()) * num);
+					mRect.set_xMax(0f - mRect.get_xMin());
+					mRect.set_yMax(0f - mRect.get_yMin());
 				}
 				else
 				{
 					Vector4 finalClipRegion = uIPanel.finalClipRegion;
-					mRect.x = finalClipRegion.x - finalClipRegion.z * 0.5f;
-					mRect.y = finalClipRegion.y - finalClipRegion.w * 0.5f;
-					mRect.width = finalClipRegion.z;
-					mRect.height = finalClipRegion.w;
+					mRect.set_x(finalClipRegion.x - finalClipRegion.z * 0.5f);
+					mRect.set_y(finalClipRegion.y - finalClipRegion.w * 0.5f);
+					mRect.set_width(finalClipRegion.z);
+					mRect.set_height(finalClipRegion.w);
 				}
 			}
-			else if ((UnityEngine.Object)container != (UnityEngine.Object)null)
+			else if (container != null)
 			{
-				Transform parent = container.transform.parent;
-				Bounds bounds2 = (!((UnityEngine.Object)parent != (UnityEngine.Object)null)) ? NGUIMath.CalculateRelativeWidgetBounds(container.transform) : NGUIMath.CalculateRelativeWidgetBounds(parent, container.transform);
+				Transform val2 = container.get_transform().get_parent();
+				Bounds val3 = (!(val2 != null)) ? NGUIMath.CalculateRelativeWidgetBounds(container.get_transform()) : NGUIMath.CalculateRelativeWidgetBounds(val2, container.get_transform());
 				ref Rect reference5 = ref mRect;
-				Vector3 min3 = bounds2.min;
-				reference5.x = min3.x;
+				Vector3 min3 = val3.get_min();
+				reference5.set_x(min3.x);
 				ref Rect reference6 = ref mRect;
-				Vector3 min4 = bounds2.min;
-				reference6.y = min4.y;
+				Vector3 min4 = val3.get_min();
+				reference6.set_y(min4.y);
 				ref Rect reference7 = ref mRect;
-				Vector3 size3 = bounds2.size;
-				reference7.width = size3.x;
+				Vector3 size3 = val3.get_size();
+				reference7.set_width(size3.x);
 				ref Rect reference8 = ref mRect;
-				Vector3 size4 = bounds2.size;
-				reference8.height = size4.y;
+				Vector3 size4 = val3.get_size();
+				reference8.set_height(size4.y);
 			}
 			else
 			{
-				if (!((UnityEngine.Object)uiCamera != (UnityEngine.Object)null))
+				if (!(uiCamera != null))
 				{
 					return;
 				}
 				flag = true;
-				mRect = uiCamera.pixelRect;
+				mRect = uiCamera.get_pixelRect();
 			}
-			float x = (mRect.xMin + mRect.xMax) * 0.5f;
-			float y = (mRect.yMin + mRect.yMax) * 0.5f;
-			Vector3 vector = new Vector3(x, y, 0f);
+			float num2 = (mRect.get_xMin() + mRect.get_xMax()) * 0.5f;
+			float num3 = (mRect.get_yMin() + mRect.get_yMax()) * 0.5f;
+			Vector3 val4 = default(Vector3);
+			val4._002Ector(num2, num3, 0f);
 			if (side != Side.Center)
 			{
 				if (side == Side.Right || side == Side.TopRight || side == Side.BottomRight)
 				{
-					vector.x = mRect.xMax;
+					val4.x = mRect.get_xMax();
 				}
 				else if (side == Side.Top || side == Side.Center || side == Side.Bottom)
 				{
-					vector.x = x;
+					val4.x = num2;
 				}
 				else
 				{
-					vector.x = mRect.xMin;
+					val4.x = mRect.get_xMin();
 				}
 				if (side == Side.Top || side == Side.TopRight || side == Side.TopLeft)
 				{
-					vector.y = mRect.yMax;
+					val4.y = mRect.get_yMax();
 				}
 				else if (side == Side.Left || side == Side.Center || side == Side.Right)
 				{
-					vector.y = y;
+					val4.y = num3;
 				}
 				else
 				{
-					vector.y = mRect.yMin;
+					val4.y = mRect.get_yMin();
 				}
 			}
-			float width = mRect.width;
-			float height = mRect.height;
-			vector.x += pixelOffset.x + relativeOffset.x * width;
-			vector.y += pixelOffset.y + relativeOffset.y * height;
+			float width = mRect.get_width();
+			float height = mRect.get_height();
+			val4.x += pixelOffset.x + relativeOffset.x * width;
+			val4.y += pixelOffset.y + relativeOffset.y * height;
 			if (flag)
 			{
-				if (uiCamera.orthographic)
+				if (uiCamera.get_orthographic())
 				{
-					vector.x = Mathf.Round(vector.x);
-					vector.y = Mathf.Round(vector.y);
+					val4.x = Mathf.Round(val4.x);
+					val4.y = Mathf.Round(val4.y);
 				}
-				Vector3 vector2 = uiCamera.WorldToScreenPoint(mTrans.position);
-				vector.z = vector2.z;
-				vector = uiCamera.ScreenToWorldPoint(vector);
+				Vector3 val5 = uiCamera.WorldToScreenPoint(mTrans.get_position());
+				val4.z = val5.z;
+				val4 = uiCamera.ScreenToWorldPoint(val4);
 			}
 			else
 			{
-				vector.x = Mathf.Round(vector.x);
-				vector.y = Mathf.Round(vector.y);
-				if ((UnityEngine.Object)uIPanel != (UnityEngine.Object)null)
+				val4.x = Mathf.Round(val4.x);
+				val4.y = Mathf.Round(val4.y);
+				if (uIPanel != null)
 				{
-					vector = uIPanel.cachedTransform.TransformPoint(vector);
+					val4 = uIPanel.cachedTransform.TransformPoint(val4);
 				}
-				else if ((UnityEngine.Object)container != (UnityEngine.Object)null)
+				else if (container != null)
 				{
-					Transform parent2 = container.transform.parent;
-					if ((UnityEngine.Object)parent2 != (UnityEngine.Object)null)
+					Transform val6 = container.get_transform().get_parent();
+					if (val6 != null)
 					{
-						vector = parent2.TransformPoint(vector);
+						val4 = val6.TransformPoint(val4);
 					}
 				}
-				Vector3 position = mTrans.position;
-				vector.z = position.z;
+				Vector3 position = mTrans.get_position();
+				val4.z = position.z;
 			}
-			if (flag && uiCamera.orthographic && (UnityEngine.Object)mTrans.parent != (UnityEngine.Object)null)
+			if (flag && uiCamera.get_orthographic() && mTrans.get_parent() != null)
 			{
-				vector = mTrans.parent.InverseTransformPoint(vector);
-				vector.x = (float)Mathf.RoundToInt(vector.x);
-				vector.y = (float)Mathf.RoundToInt(vector.y);
-				if (mTrans.localPosition != vector)
+				val4 = mTrans.get_parent().InverseTransformPoint(val4);
+				val4.x = (float)Mathf.RoundToInt(val4.x);
+				val4.y = (float)Mathf.RoundToInt(val4.y);
+				if (mTrans.get_localPosition() != val4)
 				{
-					mTrans.localPosition = vector;
+					mTrans.set_localPosition(val4);
 				}
 			}
-			else if (mTrans.position != vector)
+			else if (mTrans.get_position() != val4)
 			{
-				mTrans.position = vector;
+				mTrans.set_position(val4);
 			}
-			if (runOnlyOnce && Application.isPlaying)
+			if (runOnlyOnce && Application.get_isPlaying())
 			{
-				base.enabled = false;
+				this.set_enabled(false);
 			}
 		}
 	}

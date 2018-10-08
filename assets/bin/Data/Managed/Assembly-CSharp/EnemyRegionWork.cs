@@ -62,7 +62,7 @@ public class EnemyRegionWork
 	{
 		if (!(displayTimer <= 0f))
 		{
-			displayTimer -= Time.deltaTime;
+			displayTimer -= Time.get_deltaTime();
 			if (displayTimer <= 0f)
 			{
 				ResetWeakState();

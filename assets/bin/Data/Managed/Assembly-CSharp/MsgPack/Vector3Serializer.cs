@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MsgPack
 {
-	public class Vector3Serializer : MessagePackSerializer<Vector3>
+	public class Vector3Serializer
 	{
 		public Vector3Serializer(SerializationContext ownerContext)
 			: base(ownerContext)
@@ -12,6 +12,10 @@ namespace MsgPack
 
 		protected override void PackToCore(Packer packer, Vector3 objectTree)
 		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			packer.PackArrayHeader(3);
 			packer.Pack(objectTree.x);
 			packer.Pack(objectTree.y);
@@ -20,7 +24,8 @@ namespace MsgPack
 
 		protected override Vector3 UnpackFromCore(Unpacker unpacker)
 		{
-			if (!unpacker.IsArrayHeader)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			if (!unpacker.get_IsArrayHeader())
 			{
 				throw SerializationExceptions.NewIsNotArrayHeader();
 			}
@@ -29,23 +34,26 @@ namespace MsgPack
 			{
 				throw SerializationExceptions.NewIsNotArrayHeader();
 			}
-			if (!unpacker.IsArrayHeader)
+			if (!unpacker.get_IsArrayHeader())
 			{
 				throw SerializationExceptions.NewIsNotArrayHeader();
 			}
-			if (!unpacker.ReadSingle(out float result))
+			float num = default(float);
+			if (!unpacker.ReadSingle(ref num))
 			{
 				throw SerializationExceptions.NewMissingItem(0);
 			}
-			if (!unpacker.ReadSingle(out float result2))
+			float num2 = default(float);
+			if (!unpacker.ReadSingle(ref num2))
 			{
 				throw SerializationExceptions.NewMissingItem(1);
 			}
-			if (!unpacker.ReadSingle(out float result3))
+			float num3 = default(float);
+			if (!unpacker.ReadSingle(ref num3))
 			{
 				throw SerializationExceptions.NewMissingItem(2);
 			}
-			return new Vector3(result, result2, result3);
+			return new Vector3(num, num2, num3);
 		}
 	}
 }

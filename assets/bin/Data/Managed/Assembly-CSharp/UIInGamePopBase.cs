@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIInGamePopBase : MonoBehaviour
+public class UIInGamePopBase
 {
 	[SerializeField]
 	protected UITweenCtrl tweenCtrl;
@@ -28,15 +28,20 @@ public class UIInGamePopBase : MonoBehaviour
 
 	private float lockTimer;
 
+	public UIInGamePopBase()
+		: this()
+	{
+	}
+
 	protected virtual void Awake()
 	{
 		if (isPopMenu)
 		{
-			if ((Object)button != (Object)null)
+			if (button != null)
 			{
 				button.normalSprite = buttonSpriteName[0];
 			}
-			else if ((Object)buttonSprite != (Object)null)
+			else if (buttonSprite != null)
 			{
 				buttonSprite.spriteName = buttonSpriteName[0];
 			}
@@ -45,11 +50,11 @@ public class UIInGamePopBase : MonoBehaviour
 		}
 		else
 		{
-			if ((Object)button != (Object)null)
+			if (button != null)
 			{
 				button.normalSprite = buttonSpriteName[1];
 			}
-			else if ((Object)buttonSprite != (Object)null)
+			else if (buttonSprite != null)
 			{
 				buttonSprite.spriteName = buttonSpriteName[1];
 			}
@@ -76,11 +81,11 @@ public class UIInGamePopBase : MonoBehaviour
 		isLockReq = false;
 		if (isPopMenu)
 		{
-			if ((Object)button != (Object)null)
+			if (button != null)
 			{
 				button.normalSprite = buttonSpriteName[0];
 			}
-			else if ((Object)buttonSprite != (Object)null)
+			else if (buttonSprite != null)
 			{
 				buttonSprite.spriteName = buttonSpriteName[0];
 			}
@@ -90,11 +95,11 @@ public class UIInGamePopBase : MonoBehaviour
 		}
 		else
 		{
-			if ((Object)button != (Object)null)
+			if (button != null)
 			{
 				button.normalSprite = buttonSpriteName[1];
 			}
-			else if ((Object)buttonSprite != (Object)null)
+			else if (buttonSprite != null)
 			{
 				buttonSprite.spriteName = buttonSpriteName[1];
 			}
@@ -108,7 +113,7 @@ public class UIInGamePopBase : MonoBehaviour
 	{
 		if (isLockReq)
 		{
-			lockTimer -= Time.deltaTime;
+			lockTimer -= Time.get_deltaTime();
 			if (!(lockTimer > 0f))
 			{
 				panelChange.Lock();

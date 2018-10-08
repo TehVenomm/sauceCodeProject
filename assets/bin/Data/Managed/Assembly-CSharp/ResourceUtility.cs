@@ -4,52 +4,57 @@ public static class ResourceUtility
 {
 	public static Shader FindShader(string shader_name)
 	{
-		Shader shader = Shader.Find(shader_name);
-		if ((Object)shader == (Object)null && MonoBehaviourSingleton<ResourceManager>.IsValid())
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Expected O, but got Unknown
+		Shader val = Shader.Find(shader_name);
+		if (val == null && MonoBehaviourSingleton<ResourceManager>.IsValid())
 		{
-			shader = MonoBehaviourSingleton<ResourceManager>.I.cache.shaderCaches.Get(shader_name);
+			val = MonoBehaviourSingleton<ResourceManager>.I.cache.shaderCaches.Get(shader_name);
 		}
-		return shader;
+		return val;
 	}
 
 	public static T Instantiate<T>(T obj) where T : Object
 	{
-		Object @object = Object.Instantiate(obj);
-		return @object as T;
+		Object val = (object)Object.Instantiate<T>(obj);
+		return val as T;
 	}
 
 	public static Transform Realizes(Object obj, int layer = -1)
 	{
-		GameObject gameObject = obj as GameObject;
-		if ((Object)gameObject == (Object)null)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Expected O, but got Unknown
+		GameObject val = obj as GameObject;
+		if (val == null)
 		{
 			return null;
 		}
-		GameObject gameObject2 = Instantiate(gameObject);
-		string name = gameObject2.name;
+		GameObject val2 = ResourceUtility.Instantiate<GameObject>(val);
+		string name = val2.get_name();
 		name = ResourceName.Normalize(name);
-		name = (gameObject2.name = name.Replace("(Clone)", string.Empty));
-		Transform transform = gameObject2.transform;
+		name = name.Replace("(Clone)", string.Empty);
+		val2.set_name(name);
+		Transform val3 = val2.get_transform();
 		if (layer != -1)
 		{
-			Utility.SetLayerWithChildren(transform, layer);
+			Utility.SetLayerWithChildren(val3, layer);
 		}
-		return transform;
+		return val3;
 	}
 
 	public static Transform Realizes(Object obj, Transform parent, int layer = -1)
 	{
-		if (obj == (Object)null)
+		if (obj == null)
 		{
 			Log.Error("ResourceUtility.Realizes : obj == null");
 			return null;
 		}
-		Transform transform = Realizes(obj, layer);
-		if ((Object)transform == (Object)null)
+		Transform val = Realizes(obj, layer);
+		if (val == null)
 		{
 			return null;
 		}
-		Utility.Attach(parent, transform);
-		return transform;
+		Utility.Attach(parent, val);
+		return val;
 	}
 }

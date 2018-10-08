@@ -1,7 +1,6 @@
 using System;
-using UnityEngine;
 
-public class QuestRoomObserver : MonoBehaviour
+public class QuestRoomObserver
 {
 	public bool fromSearchSection;
 
@@ -29,6 +28,11 @@ public class QuestRoomObserver : MonoBehaviour
 
 	private SpanTimer sendInfoSpan = new SpanTimer(5f);
 
+	public QuestRoomObserver()
+		: this()
+	{
+	}
+
 	public static void OffObserve()
 	{
 		isObserve = false;
@@ -36,6 +40,7 @@ public class QuestRoomObserver : MonoBehaviour
 
 	public QuestRoomObserver Initialize(bool from_search_section, bool is_entry_pass, Action<string> _dispatch_callback, Action<string> _change_event_callback, Action _stay_event_callback, Action<bool> _resume_event_callback, bool? is_update_observe = default(bool?))
 	{
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 		fromSearchSection = from_search_section;
 		isEntryPass = is_entry_pass;
 		dispatchCallBack = _dispatch_callback;
@@ -43,7 +48,7 @@ public class QuestRoomObserver : MonoBehaviour
 		stayEventCallBack = _stay_event_callback;
 		resumeEventCallBack = _resume_event_callback;
 		isObserve = ((!is_update_observe.HasValue) ? isObserve : is_update_observe.Value);
-		section = base.gameObject.GetComponent<GameSection>();
+		section = this.get_gameObject().GetComponent<GameSection>();
 		return this;
 	}
 
@@ -62,8 +67,10 @@ public class QuestRoomObserver : MonoBehaviour
 		return queryInvalidRoom;
 	}
 
-	private void Update()
+	private unsafe void Update()
 	{
+		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0142: Expected O, but got Unknown
 		if (isObserve)
 		{
 			if ((!IsValidParty() || !IsConnect()) && !queryInvalidRoom)
@@ -98,7 +105,7 @@ public class QuestRoomObserver : MonoBehaviour
 				else
 				{
 					string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-					if ((UnityEngine.Object)section != (UnityEngine.Object)null && section.sectionData != (GameSceneTables.SectionData)null && section.sectionData.sectionName == currentSectionName && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+					if (section != null && section.sectionData != (GameSceneTables.SectionData)null && section.sectionData.sectionName == currentSectionName && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 					{
 						queryInvalidRoom = true;
 						if (dispatchCallBack != null)
@@ -111,12 +118,11 @@ public class QuestRoomObserver : MonoBehaviour
 			}
 			else if (sendInfoSpan.IsReady())
 			{
-				Protocol.Try(delegate
+				if (_003C_003Ef__am_0024cacheD == null)
 				{
-					MonoBehaviourSingleton<PartyManager>.I.SendInfo(delegate
-					{
-					});
-				});
+					_003C_003Ef__am_0024cacheD = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				Protocol.Try(_003C_003Ef__am_0024cacheD);
 			}
 		}
 	}
@@ -128,7 +134,7 @@ public class QuestRoomObserver : MonoBehaviour
 			changeEventCallBack((!isEntryPass) ? "BACK_ROOM_SEARCH" : "BACK_INPUT_PASS");
 			if (!isEntryPass)
 			{
-				stayEventCallBack();
+				stayEventCallBack.Invoke();
 				resumeEventCallBack(true);
 			}
 		}

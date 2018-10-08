@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class StatusSmithCharacter : MonoBehaviour
+public class StatusSmithCharacter
 {
 	private const int SMITH_NPC_ID = 4;
 
@@ -21,9 +21,16 @@ public class StatusSmithCharacter : MonoBehaviour
 		protected set;
 	}
 
+	public StatusSmithCharacter()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
-		_transform = base.transform;
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Expected O, but got Unknown
+		_transform = this.get_transform();
 	}
 
 	private IEnumerator Start()
@@ -34,20 +41,22 @@ public class StatusSmithCharacter : MonoBehaviour
 			yield return (object)null;
 		}
 		animator = loader.GetAnimator();
-		if (!((Object)animator == (Object)null))
+		if (!(animator == null))
 		{
-			animator.gameObject.AddComponent<RootMotionProxy>();
+			animator.get_gameObject().AddComponent<RootMotionProxy>();
 			InitAnim();
 			OutGameSettingsManager.StatusScene param = MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene;
-			_transform.position = param.smithNPCPos;
-			_transform.eulerAngles = param.smithNPCRot;
-			_transform.localScale = Vector3.one * param.smithSize;
+			_transform.set_position(param.smithNPCPos);
+			_transform.set_eulerAngles(param.smithNPCRot);
+			_transform.set_localScale(Vector3.get_one() * param.smithSize);
 		}
 	}
 
 	protected ModelLoaderBase LoadModel()
 	{
-		return Singleton<NPCTable>.I.GetNPCData(4).LoadModel(base.gameObject, true, true, null, false);
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0015: Expected O, but got Unknown
+		return Singleton<NPCTable>.I.GetNPCData(4).LoadModel(this.get_gameObject(), true, true, null, false);
 	}
 
 	protected void InitAnim()

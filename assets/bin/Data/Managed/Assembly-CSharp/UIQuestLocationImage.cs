@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class UIQuestLocationImage : MonoBehaviour
+public class UIQuestLocationImage
 {
 	private UITexture uiTexture;
 
@@ -16,31 +16,38 @@ public class UIQuestLocationImage : MonoBehaviour
 
 	private Action onLoadComplete;
 
+	public UIQuestLocationImage()
+		: this()
+	{
+	}
+
 	public static void Set(UITexture ui_texture, int qli_id, Action on_load_start, Action on_load_complete)
 	{
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		UIQuestLocationImage uIQuestLocationImage = ui_texture.GetComponent<UIQuestLocationImage>();
-		if ((UnityEngine.Object)uIQuestLocationImage == (UnityEngine.Object)null)
+		if (uIQuestLocationImage == null)
 		{
-			uIQuestLocationImage = ui_texture.gameObject.AddComponent<UIQuestLocationImage>();
+			uIQuestLocationImage = ui_texture.get_gameObject().AddComponent<UIQuestLocationImage>();
 		}
 		uIQuestLocationImage.Load(ui_texture, qli_id, on_load_start, on_load_complete);
 	}
 
 	private void Load(UITexture ui_texture, int qli_id, Action on_load_start, Action on_load_complete)
 	{
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		uiTexture = ui_texture;
 		id = qli_id;
 		onLoadStart = on_load_start;
 		onLoadComplete = on_load_complete;
 		DeleteImage();
-		StartCoroutine(coroutine = DoLoad());
+		this.StartCoroutine(coroutine = DoLoad());
 	}
 
 	private IEnumerator DoLoad()
 	{
 		if (onLoadStart != null)
 		{
-			onLoadStart();
+			onLoadStart.Invoke();
 		}
 		LoadingQueue load_queue = new LoadingQueue(this);
 		LoadObject lo_image = load_queue.Load(RESOURCE_CATEGORY.QUEST_LOCATION_IMAGE, ResourceName.GetQuestLocationImage(id), false);
@@ -50,17 +57,17 @@ public class UIQuestLocationImage : MonoBehaviour
 		}
 		image = ResourceUtility.Realizes(lo_image.loadedObject, MonoBehaviourSingleton<StageManager>.I._transform, 5);
 		QuestLocationImage c = image.GetComponent<QuestLocationImage>();
-		if (!((UnityEngine.Object)c == (UnityEngine.Object)null))
+		if (!(c == null))
 		{
 			int w = uiTexture.width;
 			int h = uiTexture.height;
 			UIRenderTexture.ToRealSize(ref w, ref h);
 			c.Init(w, h);
 			Camera cam = image.GetComponent<Camera>();
-			if (!((UnityEngine.Object)cam == (UnityEngine.Object)null))
+			if (!(cam == null))
 			{
-				RenderTexture tex = cam.targetTexture;
-				if (!((UnityEngine.Object)tex == (UnityEngine.Object)null))
+				RenderTexture tex = cam.get_targetTexture();
+				if (!(tex == null))
 				{
 					uiTexture.mainTexture = tex;
 					FloatInterpolator anim = new FloatInterpolator();
@@ -73,7 +80,7 @@ public class UIQuestLocationImage : MonoBehaviour
 					}
 					if (onLoadComplete != null)
 					{
-						onLoadComplete();
+						onLoadComplete.Invoke();
 					}
 					coroutine = null;
 				}
@@ -83,28 +90,30 @@ public class UIQuestLocationImage : MonoBehaviour
 
 	private void DeleteImage()
 	{
+		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 		if (coroutine != null)
 		{
-			StopCoroutine(coroutine);
+			this.StopCoroutine(coroutine);
 			coroutine = null;
 		}
-		if ((UnityEngine.Object)uiTexture != (UnityEngine.Object)null)
+		if (uiTexture != null)
 		{
 			uiTexture.alpha = 0f;
 			uiTexture.mainTexture = null;
 		}
-		if ((UnityEngine.Object)image != (UnityEngine.Object)null)
+		if (image != null)
 		{
-			UnityEngine.Object.DestroyImmediate(image.gameObject);
+			Object.DestroyImmediate(image.get_gameObject());
 			image = null;
 		}
 	}
 
 	private void OnEnable()
 	{
-		if (coroutine == null && (UnityEngine.Object)image == (UnityEngine.Object)null && (UnityEngine.Object)uiTexture != (UnityEngine.Object)null && id > -1)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		if (coroutine == null && image == null && uiTexture != null && id > -1)
 		{
-			StartCoroutine(coroutine = DoLoad());
+			this.StartCoroutine(coroutine = DoLoad());
 		}
 	}
 

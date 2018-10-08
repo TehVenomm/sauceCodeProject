@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RegionRoot : MonoBehaviour
+public class RegionRoot
 {
 	[Tooltip("部位ID")]
 	public int regionID = 1;
@@ -15,6 +15,11 @@ public class RegionRoot : MonoBehaviour
 	{
 		get;
 		protected set;
+	}
+
+	public RegionRoot()
+		: this()
+	{
 	}
 
 	private void Awake()

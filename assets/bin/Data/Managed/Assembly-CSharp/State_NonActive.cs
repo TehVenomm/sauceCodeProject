@@ -11,7 +11,7 @@ public class State_NonActive : State
 	public override void Process(StateMachine fsm, Brain brain)
 	{
 		StageObject targetObjectOfScountingParam = brain.targetCtrl.GetTargetObjectOfScountingParam();
-		if ((Object)targetObjectOfScountingParam != (Object)null)
+		if (targetObjectOfScountingParam != null)
 		{
 			if (brain.opponentMem != null)
 			{
@@ -32,7 +32,7 @@ public class State_NonActive : State
 
 	private void ChangeActiveState(StateMachine fsm, Brain brain)
 	{
-		if ((Object)brain.owner != (Object)null)
+		if (brain.owner != null)
 		{
 			brain.owner.SafeActIdle();
 		}
@@ -41,6 +41,12 @@ public class State_NonActive : State
 
 	public override void HandleEvent(StateMachine fsm, Brain brain, BRAIN_EVENT ev, object param = null)
 	{
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 		if (ev == BRAIN_EVENT.ATTACKED_HIT)
 		{
 			ChangeActiveState(fsm, brain);
@@ -50,18 +56,22 @@ public class State_NonActive : State
 				List<StageObject> allyObjectList = brain.GetAllyObjectList();
 				for (int i = 0; i < allyObjectList.Count; i++)
 				{
-					if (!((Object)allyObjectList[i].controller == (Object)null))
+					if (!(allyObjectList[i].controller == null))
 					{
 						Brain brain2 = allyObjectList[i].controller.brain;
-						if (!((Object)brain2 == (Object)null) && (allyObjectList[i]._position - position).sqrMagnitude < brain.param.scoutParam.scoutingAudibilitySqr)
+						if (!(brain2 == null))
 						{
-							if ((Object)brain2.owner != (Object)null)
+							Vector3 val = allyObjectList[i]._position - position;
+							if (val.get_sqrMagnitude() < brain.param.scoutParam.scoutingAudibilitySqr)
 							{
-								brain2.owner.SafeActIdle();
-							}
-							if (brain2.fsm != null)
-							{
-								brain2.fsm.ChangeState(STATE_TYPE.ACTIVE);
+								if (brain2.owner != null)
+								{
+									brain2.owner.SafeActIdle();
+								}
+								if (brain2.fsm != null)
+								{
+									brain2.fsm.ChangeState(STATE_TYPE.ACTIVE);
+								}
 							}
 						}
 					}

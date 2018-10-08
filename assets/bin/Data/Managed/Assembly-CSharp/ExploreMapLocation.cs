@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ExploreMapLocation : MonoBehaviour
+public class ExploreMapLocation
 {
 	[SerializeField]
 	private int _mapId;
@@ -29,5 +29,10 @@ public class ExploreMapLocation : MonoBehaviour
 		{
 			_icon = value;
 		}
+	}
+
+	public ExploreMapLocation()
+		: this()
+	{
 	}
 }

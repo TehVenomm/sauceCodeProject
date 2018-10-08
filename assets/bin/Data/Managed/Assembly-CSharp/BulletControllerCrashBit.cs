@@ -8,12 +8,14 @@ public class BulletControllerCrashBit : BulletControllerBase
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam skillParam, Vector3 pos, Quaternion rot)
 	{
+		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(bullet, skillParam, pos, rot);
 	}
 
 	public override void RegisterFromObject(StageObject obj)
 	{
-		if (!((Object)obj == (Object)null))
+		if (!(obj == null))
 		{
 			character = (obj as Character);
 		}
@@ -21,31 +23,34 @@ public class BulletControllerCrashBit : BulletControllerBase
 
 	public override void Update()
 	{
-		if (!((Object)bulletObject == (Object)null))
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+		if (!(bulletObject == null))
 		{
-			if ((Object)bulletObject.stageObject == (Object)null)
+			if (bulletObject.stageObject == null)
 			{
 				bulletObject.OnDestroy();
 			}
 			else
 			{
-				base.timeCount += Time.deltaTime;
-				if ((Object)character != (Object)null)
+				base.timeCount += Time.get_deltaTime();
+				if (character != null)
 				{
 					if (character.actionID == (Character.ACTION_ID)35 && !isWarping)
 					{
-						bulletObject.bulletEffect.gameObject.SetActive(false);
-						bulletObject._collider.enabled = false;
+						bulletObject.bulletEffect.get_gameObject().SetActive(false);
+						bulletObject._collider.set_enabled(false);
 						isWarping = true;
 					}
 					if (character.actionID != (Character.ACTION_ID)35 && isWarping)
 					{
-						bulletObject.bulletEffect.gameObject.SetActive(true);
-						bulletObject._collider.enabled = true;
+						bulletObject.bulletEffect.get_gameObject().SetActive(true);
+						bulletObject._collider.set_enabled(true);
 						isWarping = false;
 					}
 				}
-				base._transform.position = bulletObject.stageObject._transform.position;
+				base._transform.set_position(bulletObject.stageObject._transform.get_position());
 			}
 		}
 	}

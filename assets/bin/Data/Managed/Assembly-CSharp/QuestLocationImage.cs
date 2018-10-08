@@ -1,8 +1,8 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
 [ExecuteInEditMode]
-public class QuestLocationImage : MonoBehaviour
+[RequireComponent(typeof(Camera))]
+public class QuestLocationImage
 {
 	public const int WIDTH = 480;
 
@@ -26,15 +26,22 @@ public class QuestLocationImage : MonoBehaviour
 		private set;
 	}
 
+	public QuestLocationImage()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<GameSceneManager>.IsValid() && MonoBehaviourSingleton<GameSceneManager>.I.isInitialized)
 		{
-			Camera component = GetComponent<Camera>();
-			if ((Object)component.targetTexture != (Object)null)
+			Camera component = this.GetComponent<Camera>();
+			if (component.get_targetTexture() != null)
 			{
-				component.targetTexture.DiscardContents();
-				component.targetTexture = null;
+				component.get_targetTexture().DiscardContents();
+				component.set_targetTexture(null);
 			}
 		}
 		else
@@ -45,7 +52,7 @@ public class QuestLocationImage : MonoBehaviour
 
 	private void OnEnable()
 	{
-		if (!Application.isPlaying)
+		if (!Application.get_isPlaying())
 		{
 			Init(0, 0);
 		}
@@ -53,7 +60,7 @@ public class QuestLocationImage : MonoBehaviour
 
 	private void OnValidate()
 	{
-		if (!Application.isPlaying)
+		if (!Application.get_isPlaying())
 		{
 			Init(0, 0);
 		}
@@ -61,6 +68,23 @@ public class QuestLocationImage : MonoBehaviour
 
 	public void Init(int w = 0, int h = 0)
 	{
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009c: Expected O, but got Unknown
+		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a7: Expected O, but got Unknown
+		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Expected O, but got Unknown
+		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018d: Expected O, but got Unknown
+		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01db: Unknown result type (might be due to invalid IL or missing references)
 		if (w == 0)
 		{
 			w = 480;
@@ -71,18 +95,18 @@ public class QuestLocationImage : MonoBehaviour
 			h = (int)((float)w / 1024f * 734f);
 			w = 1024;
 		}
-		if ((Object)spritesNode != (Object)null)
+		if (spritesNode != null)
 		{
 			float num = 46.8664856f;
-			spritesNode.transform.localScale = new Vector3(num, num, 1f);
+			spritesNode.get_transform().set_localScale(new Vector3(num, num, 1f));
 		}
-		Camera component = GetComponent<Camera>();
-		base.transform.position = new Vector3(0f, 500f, 0f);
-		Utility.SetLayerWithChildren(base.transform, 5);
-		RenderTexture targetTexture = component.targetTexture;
-		if ((Object)targetTexture == (Object)null)
+		Camera component = this.GetComponent<Camera>();
+		this.get_transform().set_position(new Vector3(0f, 500f, 0f));
+		Utility.SetLayerWithChildren(this.get_transform(), 5);
+		RenderTexture val = component.get_targetTexture();
+		if (val == null)
 		{
-			if (!Application.isPlaying)
+			if (!Application.get_isPlaying())
 			{
 				goto IL_00be;
 			}
@@ -90,31 +114,31 @@ public class QuestLocationImage : MonoBehaviour
 		}
 		goto IL_00fb;
 		IL_00fb:
-		component.cullingMask = 32;
-		component.nearClipPlane = 0f;
-		component.farClipPlane = 100f;
-		component.clearFlags = CameraClearFlags.Color;
-		component.backgroundColor = Color.black;
-		component.orthographic = true;
-		component.orthographicSize = (float)((int)(480f / (float)w * (float)h) / 2 - 1);
-		if (Application.isPlaying && (Object)sky == (Object)null && (Object)skyPrefab != (Object)null)
+		component.set_cullingMask(32);
+		component.set_nearClipPlane(0f);
+		component.set_farClipPlane(100f);
+		component.set_clearFlags(2);
+		component.set_backgroundColor(Color.get_black());
+		component.set_orthographic(true);
+		component.set_orthographicSize((float)((int)(480f / (float)w * (float)h) / 2 - 1));
+		if (Application.get_isPlaying() && sky == null && skyPrefab != null)
 		{
-			sky = ResourceUtility.Realizes(skyPrefab, base.transform, base.gameObject.layer);
-			sky.localPosition = new Vector3(0f, 0f, 50f);
-			sky.localRotation = Quaternion.identity;
-			sky.localScale = new Vector3(480f, 344f, 1f);
+			sky = ResourceUtility.Realizes(skyPrefab, this.get_transform(), this.get_gameObject().get_layer());
+			sky.set_localPosition(new Vector3(0f, 0f, 50f));
+			sky.set_localRotation(Quaternion.get_identity());
+			sky.set_localScale(new Vector3(480f, 344f, 1f));
 		}
 		return;
 		IL_00be:
-		targetTexture = new RenderTexture(w, h, 24, RenderTextureFormat.Default);
-		if (!Application.isPlaying)
+		val = new RenderTexture(w, h, 24, 7);
+		if (!Application.get_isPlaying())
 		{
-			targetTexture.hideFlags = HideFlags.HideAndDontSave;
+			val.set_hideFlags(61);
 		}
-		targetTexture.name = "(QuestLocationImage)";
-		targetTexture.filterMode = FilterMode.Point;
-		component.targetTexture = targetTexture;
-		renderTexture = targetTexture;
+		val.set_name("(QuestLocationImage)");
+		val.set_filterMode(0);
+		component.set_targetTexture(val);
+		renderTexture = val;
 		goto IL_00fb;
 	}
 }

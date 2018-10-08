@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HomeTutorialManager : MonoBehaviour
+public class HomeTutorialManager
 {
 	private enum DialogType
 	{
@@ -29,7 +29,7 @@ public class HomeTutorialManager : MonoBehaviour
 	{
 		get
 		{
-			if ((Object)ui_tutorial_dialog == (Object)null && prefab_dialog != (Object)null)
+			if (ui_tutorial_dialog == null && prefab_dialog != null)
 			{
 				ui_tutorial_dialog = ResourceUtility.Realizes(prefab_dialog, -1).GetComponent<UITutorialHomeDialog>();
 				ui_tutorial_dialog.Close(0, null);
@@ -38,11 +38,17 @@ public class HomeTutorialManager : MonoBehaviour
 		}
 	}
 
+	public HomeTutorialManager()
+		: this()
+	{
+	}
+
 	public void OnDestroy()
 	{
-		if ((Object)dialog != (Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		if (dialog != null)
 		{
-			Object.Destroy(dialog.gameObject);
+			Object.Destroy(dialog.get_gameObject());
 		}
 	}
 
@@ -75,10 +81,11 @@ public class HomeTutorialManager : MonoBehaviour
 
 	public void Setup()
 	{
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		is_loading = true;
 		if (DoesTutorial())
 		{
-			StartCoroutine(DoSetupFirstHome());
+			this.StartCoroutine(DoSetupFirstHome());
 		}
 		else
 		{
@@ -88,14 +95,15 @@ public class HomeTutorialManager : MonoBehaviour
 
 	public void ExcuteDoSetupTutorialAfterGacha2()
 	{
-		StartCoroutine(DoSetupTutorialAfterGacha2());
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoSetupTutorialAfterGacha2());
 	}
 
 	private IEnumerator DoSetupFirstHome()
 	{
-		if ((Object)m_home_top == (Object)null)
+		if (m_home_top == null)
 		{
-			m_home_top = GetComponent<HomeTop>();
+			m_home_top = this.GetComponent<HomeTop>();
 		}
 		LoadingQueue lo_queue = new LoadingQueue(this);
 		LoadObject obj_target_area = lo_queue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01", false);
@@ -114,9 +122,9 @@ public class HomeTutorialManager : MonoBehaviour
 
 	private IEnumerator DoSetupTutorialAfterGacha2()
 	{
-		if ((Object)m_home_top == (Object)null)
+		if (m_home_top == null)
 		{
-			m_home_top = GetComponent<HomeTop>();
+			m_home_top = this.GetComponent<HomeTop>();
 		}
 		LoadingQueue lo_queue = new LoadingQueue(this);
 		LoadObject obj_target_area = lo_queue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01", false);
@@ -134,15 +142,16 @@ public class HomeTutorialManager : MonoBehaviour
 
 	public void SetupGachaQuestTutorial()
 	{
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		is_loading = true;
-		StartCoroutine(DoSetupGachaQuestTutorial());
+		this.StartCoroutine(DoSetupGachaQuestTutorial());
 	}
 
 	private IEnumerator DoSetupGachaQuestTutorial()
 	{
-		if ((Object)m_home_top == (Object)null)
+		if (m_home_top == null)
 		{
-			m_home_top = GetComponent<HomeTop>();
+			m_home_top = this.GetComponent<HomeTop>();
 		}
 		LoadingQueue lo_queue = new LoadingQueue(this);
 		LoadObject obj_target_area = lo_queue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01", false);
@@ -158,18 +167,20 @@ public class HomeTutorialManager : MonoBehaviour
 
 	private void HidePassengers()
 	{
-		if (MonoBehaviourSingleton<HomeManager>.IsValid() && !((Object)MonoBehaviourSingleton<HomeManager>.I.HomePeople == (Object)null))
+		if (MonoBehaviourSingleton<HomeManager>.IsValid() && !(MonoBehaviourSingleton<HomeManager>.I.HomePeople == null))
 		{
 			List<HomeCharacterBase> charas = MonoBehaviourSingleton<HomeManager>.I.HomePeople.charas;
 			charas.ForEach(delegate(HomeCharacterBase o)
 			{
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 				if (o is HomePlayerCharacter)
 				{
-					o.gameObject.SetActive(false);
+					o.get_gameObject().SetActive(false);
 					Transform namePlate = o.GetNamePlate();
-					if ((Object)null != (Object)namePlate)
+					if (null != namePlate)
 					{
-						o.GetNamePlate().gameObject.SetActive(false);
+						o.GetNamePlate().get_gameObject().SetActive(false);
 					}
 				}
 			});
@@ -178,13 +189,17 @@ public class HomeTutorialManager : MonoBehaviour
 
 	private void SetTargetAreaNPC(int npc_id)
 	{
-		if (!(prefab_target_area == (Object)null) && MonoBehaviourSingleton<HomeManager>.IsValid() && !((Object)MonoBehaviourSingleton<HomeManager>.I.HomePeople == (Object)null))
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Expected O, but got Unknown
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		if (!(prefab_target_area == null) && MonoBehaviourSingleton<HomeManager>.IsValid() && !(MonoBehaviourSingleton<HomeManager>.I.HomePeople == null))
 		{
 			HomeNPCCharacter homeNPCCharacter = MonoBehaviourSingleton<HomeManager>.I.HomePeople.GetHomeNPCCharacter(npc_id);
-			if (!((Object)homeNPCCharacter == (Object)null))
+			if (!(homeNPCCharacter == null))
 			{
-				t_target_area = ResourceUtility.Realizes(prefab_target_area, homeNPCCharacter.transform, -1);
-				t_target_area.position = homeNPCCharacter.transform.position;
+				t_target_area = ResourceUtility.Realizes(prefab_target_area, homeNPCCharacter.get_transform(), -1);
+				t_target_area.set_position(homeNPCCharacter.get_transform().get_position());
 			}
 		}
 	}
@@ -194,19 +209,19 @@ public class HomeTutorialManager : MonoBehaviour
 		switch (type)
 		{
 		case DialogType.TALK_WITH_PAMERA:
-			if ((Object)dialog != (Object)null)
+			if (dialog != null)
 			{
 				dialog.Open(0, "Tutorial_Request_Text_0701");
 			}
 			break;
 		case DialogType.LAST_TUTORIAL:
-			if ((Object)last_tutorial != (Object)null)
+			if (last_tutorial != null)
 			{
 				last_tutorial.OpenLastTutorial();
 			}
 			break;
 		case DialogType.AFTER_GACHA2:
-			if ((Object)dialog != (Object)null)
+			if (dialog != null)
 			{
 				dialog.OpenAfterGacha2();
 			}
@@ -220,7 +235,7 @@ public class HomeTutorialManager : MonoBehaviour
 
 	public void CloseDialog()
 	{
-		if ((Object)dialog != (Object)null)
+		if (dialog != null)
 		{
 			dialog.Close(0, null);
 		}
@@ -233,9 +248,10 @@ public class HomeTutorialManager : MonoBehaviour
 
 	public void DisableTargetArea()
 	{
-		if ((Object)t_target_area != (Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		if (t_target_area != null)
 		{
-			t_target_area.gameObject.SetActive(false);
+			t_target_area.get_gameObject().SetActive(false);
 		}
 	}
 }

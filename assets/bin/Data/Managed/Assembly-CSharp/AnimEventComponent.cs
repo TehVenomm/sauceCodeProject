@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AnimEventComponent : MonoBehaviour
+public class AnimEventComponent
 {
 	public AnimEventData animEventData;
 
@@ -10,11 +10,17 @@ public class AnimEventComponent : MonoBehaviour
 
 	private AnimEventProcessor processer;
 
+	public AnimEventComponent()
+		: this()
+	{
+	}
+
 	private void Start()
 	{
-		if ((Object)animator == (Object)null)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		if (animator == null)
 		{
-			animator = base.gameObject.GetComponent<Animator>();
+			animator = this.get_gameObject().GetComponent<Animator>();
 		}
 		Run();
 	}
@@ -29,7 +35,7 @@ public class AnimEventComponent : MonoBehaviour
 
 	public void Run()
 	{
-		if ((Object)animator != (Object)null && (Object)animEventData != (Object)null && listener != null)
+		if (animator != null && animEventData != null && listener != null)
 		{
 			processer = new AnimEventProcessor(animEventData, animator, listener);
 		}

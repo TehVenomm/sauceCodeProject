@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Key Binding")]
-public class UIKeyBinding : MonoBehaviour
+public class UIKeyBinding
 {
 	public enum Action
 	{
@@ -38,13 +38,20 @@ public class UIKeyBinding : MonoBehaviour
 	[NonSerialized]
 	private bool mPress;
 
+	public UIKeyBinding()
+		: this()
+	{
+	}
+
 	public static bool IsBound(KeyCode key)
 	{
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int count = mList.Count; i < count; i++)
 		{
 			UIKeyBinding uIKeyBinding = mList[i];
-			if ((UnityEngine.Object)uIKeyBinding != (UnityEngine.Object)null && uIKeyBinding.keyCode == key)
+			if (uIKeyBinding != null && uIKeyBinding.keyCode == key)
 			{
 				return true;
 			}
@@ -64,9 +71,9 @@ public class UIKeyBinding : MonoBehaviour
 
 	protected virtual void Start()
 	{
-		UIInput component = GetComponent<UIInput>();
-		mIsInput = ((UnityEngine.Object)component != (UnityEngine.Object)null);
-		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+		UIInput component = this.GetComponent<UIInput>();
+		mIsInput = (component != null);
+		if (component != null)
 		{
 			EventDelegate.Add(component.onSubmit, OnSubmit);
 		}
@@ -74,6 +81,8 @@ public class UIKeyBinding : MonoBehaviour
 
 	protected virtual void OnSubmit()
 	{
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		if (UICamera.currentKey == keyCode && IsModifierActive())
 		{
 			mIgnoreUp = true;
@@ -88,35 +97,44 @@ public class UIKeyBinding : MonoBehaviour
 		}
 		if (modifier == Modifier.Alt)
 		{
-			if (UICamera.GetKey(KeyCode.LeftAlt) || UICamera.GetKey(KeyCode.RightAlt))
+			if (UICamera.GetKey(308) || UICamera.GetKey(307))
 			{
 				return true;
 			}
 		}
 		else if (modifier == Modifier.Control)
 		{
-			if (UICamera.GetKey(KeyCode.LeftControl) || UICamera.GetKey(KeyCode.RightControl))
+			if (UICamera.GetKey(306) || UICamera.GetKey(305))
 			{
 				return true;
 			}
 		}
 		else if (modifier == Modifier.Shift)
 		{
-			if (UICamera.GetKey(KeyCode.LeftShift) || UICamera.GetKey(KeyCode.RightShift))
+			if (UICamera.GetKey(304) || UICamera.GetKey(303))
 			{
 				return true;
 			}
 		}
 		else if (modifier == Modifier.None)
 		{
-			return !UICamera.GetKey(KeyCode.LeftAlt) && !UICamera.GetKey(KeyCode.RightAlt) && !UICamera.GetKey(KeyCode.LeftControl) && !UICamera.GetKey(KeyCode.RightControl) && !UICamera.GetKey(KeyCode.LeftShift) && !UICamera.GetKey(KeyCode.RightShift);
+			return !UICamera.GetKey(308) && !UICamera.GetKey(307) && !UICamera.GetKey(306) && !UICamera.GetKey(305) && !UICamera.GetKey(304) && !UICamera.GetKey(303);
 		}
 		return false;
 	}
 
 	protected virtual void Update()
 	{
-		if (!UICamera.inputHasFocus && keyCode != 0 && IsModifierActive())
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f8: Expected O, but got Unknown
+		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011a: Expected O, but got Unknown
+		if (!UICamera.inputHasFocus && (int)keyCode != 0 && IsModifierActive())
 		{
 			bool flag = UICamera.GetKeyDown(keyCode);
 			bool flag2 = UICamera.GetKeyUp(keyCode);
@@ -144,13 +162,13 @@ public class UIKeyBinding : MonoBehaviour
 				{
 					if (!mIgnoreUp && !UICamera.inputHasFocus && mPress)
 					{
-						UICamera.selectedObject = base.gameObject;
+						UICamera.selectedObject = this.get_gameObject();
 					}
 					mIgnoreUp = false;
 				}
 				else if (mPress)
 				{
-					UICamera.hoveredObject = base.gameObject;
+					UICamera.hoveredObject = this.get_gameObject();
 				}
 			}
 			if (flag2)
@@ -162,11 +180,15 @@ public class UIKeyBinding : MonoBehaviour
 
 	protected virtual void OnBindingPress(bool pressed)
 	{
-		UICamera.Notify(base.gameObject, "OnPress", pressed);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Expected O, but got Unknown
+		UICamera.Notify(this.get_gameObject(), "OnPress", pressed);
 	}
 
 	protected virtual void OnBindingClick()
 	{
-		UICamera.Notify(base.gameObject, "OnClick", null);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Expected O, but got Unknown
+		UICamera.Notify(this.get_gameObject(), "OnClick", null);
 	}
 }

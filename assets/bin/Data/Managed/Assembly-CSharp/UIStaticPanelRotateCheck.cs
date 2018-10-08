@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIStaticPanelRotateCheck : MonoBehaviour
+public class UIStaticPanelRotateCheck
 {
 	[SerializeField]
 	protected UIPanel panel;
@@ -11,13 +11,18 @@ public class UIStaticPanelRotateCheck : MonoBehaviour
 
 	protected UIAnchor[] anchors;
 
+	public UIStaticPanelRotateCheck()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
 		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 		{
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
 		}
-		anchors = GetComponentsInChildren<UIAnchor>();
+		anchors = this.GetComponentsInChildren<UIAnchor>();
 		updateCount = 0;
 		updateAnchors = true;
 		panel.widgetsAreStatic = false;
@@ -50,9 +55,9 @@ public class UIStaticPanelRotateCheck : MonoBehaviour
 					int i = 0;
 					for (int num = anchors.Length; i < num; i++)
 					{
-						anchors[i].enabled = true;
+						anchors[i].set_enabled(true);
 					}
-					GetComponentsInChildren(true, Temporary.uiRectList);
+					this.GetComponentsInChildren<UIRect>(true, Temporary.uiRectList);
 					int j = 0;
 					for (int count = Temporary.uiRectList.Count; j < count; j++)
 					{

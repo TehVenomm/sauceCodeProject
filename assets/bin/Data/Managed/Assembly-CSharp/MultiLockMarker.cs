@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MultiLockMarker : MonoBehaviour
+public class MultiLockMarker
 {
 	public const int kLayerMask = 16;
 
@@ -18,17 +18,24 @@ public class MultiLockMarker : MonoBehaviour
 
 	public List<int> lockOrder => _lockOrder;
 
+	public MultiLockMarker()
+		: this()
+	{
+	}
+
 	private void Update()
 	{
 		if (_lockInterval >= 0f)
 		{
-			_lockInterval -= Time.deltaTime;
+			_lockInterval -= Time.get_deltaTime();
 		}
 	}
 
 	public void Init()
 	{
-		_transform = base.transform;
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Expected O, but got Unknown
+		_transform = this.get_transform();
 		_lockOrder.Clear();
 		_lockInterval = 0f;
 		info = ((!MonoBehaviourSingleton<InGameSettingsManager>.IsValid()) ? null : MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo);

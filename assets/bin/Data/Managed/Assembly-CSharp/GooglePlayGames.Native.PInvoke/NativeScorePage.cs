@@ -36,9 +36,9 @@ namespace GooglePlayGames.Native.PInvoke
 			return new NativeScoreEntry(ScorePage.ScorePage_Entries_GetElement(SelfPtr(), index));
 		}
 
-		public IEnumerator<NativeScoreEntry> GetEnumerator()
+		public unsafe IEnumerator<NativeScoreEntry> GetEnumerator()
 		{
-			return PInvokeUtilities.ToEnumerator(ScorePage.ScorePage_Entries_Length(SelfPtr()), (UIntPtr index) => GetElement(index));
+			return PInvokeUtilities.ToEnumerator<NativeScoreEntry>(ScorePage.ScorePage_Entries_Length(SelfPtr()), new Func<UIntPtr, NativeScoreEntry>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
 		internal bool HasNextScorePage()

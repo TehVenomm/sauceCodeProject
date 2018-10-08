@@ -306,7 +306,7 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 			{
 				return ret;
 			}
-			int rnd = UnityEngine.Random.Range(0, Mathf.Max(100, total));
+			int rnd = Random.Range(0, Mathf.Max(100, total));
 			int index = -1;
 			int cnt = 0;
 			total = 0;
@@ -326,7 +326,7 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 			{
 				return priority[index];
 			}
-			return non_priority[UnityEngine.Random.Range(0, non_priority.Count)];
+			return non_priority[Random.Range(0, non_priority.Count)];
 		}
 
 		private int GetSelectPriority(NPC_MESSAGE_TYPE type)
@@ -347,6 +347,10 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 
 	public void CreateTable(string csv_text)
 	{
+		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
 		sections = new List<Section>();
 		CSVReader cSVReader = new CSVReader(csv_text, "section,type,prm,priority,npcid,anim,posX,posY,posZ,rotX,rotY,rotZ,jp,voiceId", false);
 		Section section = null;
@@ -423,6 +427,6 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 		{
 			return section.GetNPCMessage()?.message;
 		}
-		return sectionData.GetText("NPC_MESSAGE_" + UnityEngine.Random.Range(0, 3));
+		return sectionData.GetText("NPC_MESSAGE_" + Random.Range(0, 3));
 	}
 }

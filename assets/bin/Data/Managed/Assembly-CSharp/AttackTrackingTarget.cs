@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class AttackTrackingTarget : MonoBehaviour
+public class AttackTrackingTarget
 {
 	public enum Function
 	{
@@ -60,7 +60,7 @@ public class AttackTrackingTarget : MonoBehaviour
 
 	private bool m_isTargetDead;
 
-	private Vector3 m_targetingPoint = Vector3.zero;
+	private Vector3 m_targetingPoint = Vector3.get_zero();
 
 	private AtkAttribute[] m_exAtkList;
 
@@ -86,9 +86,45 @@ public class AttackTrackingTarget : MonoBehaviour
 		private set;
 	}
 
+	public AttackTrackingTarget()
+		: this()
+	{
+	}//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+
+
 	public void Initialize(StageObject attacker, StageObject target, AttackInfo atkInfo)
 	{
-		if ((Object)attacker == (Object)null)
+		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0210: Expected O, but got Unknown
+		//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0273: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0278: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0294: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0299: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0308: Unknown result type (might be due to invalid IL or missing references)
+		//IL_031e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0323: Expected O, but got Unknown
+		//IL_0332: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0344: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0349: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0355: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0362: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0367: Expected O, but got Unknown
+		if (attacker == null)
 		{
 			RequestDestroy();
 		}
@@ -100,7 +136,7 @@ public class AttackTrackingTarget : MonoBehaviour
 			if (m_attacker is Player)
 			{
 				Player player = m_attacker as Player;
-				if ((Object)player != (Object)null)
+				if (player != null)
 				{
 					m_attackerPlayer = player;
 					m_attackMode = player.attackMode;
@@ -109,7 +145,7 @@ public class AttackTrackingTarget : MonoBehaviour
 			if (m_attacker is Enemy)
 			{
 				Enemy enemy = m_attacker as Enemy;
-				if ((Object)enemy != (Object)null)
+				if (enemy != null)
 				{
 					m_attackerEnemy = enemy;
 				}
@@ -122,7 +158,7 @@ public class AttackTrackingTarget : MonoBehaviour
 			else
 			{
 				Player player2 = attacker as Player;
-				if ((Object)player2 != (Object)null)
+				if (player2 != null)
 				{
 					AtkAttribute atk = new AtkAttribute();
 					player2.GetAtk(null, ref atk);
@@ -134,13 +170,13 @@ public class AttackTrackingTarget : MonoBehaviour
 						m_atkInfoNames = actSkillParam.tableData.attackInfoNames;
 						SkillParamForBullet = actSkillParam;
 					}
-					if ((Object)player2.targetingPoint != (Object)null)
+					if (player2.targetingPoint != null)
 					{
 						m_targetingPoint = player2.targetingPoint.param.targetPos;
 					}
 				}
 			}
-			if ((Object)bulletData == (Object)null)
+			if (bulletData == null)
 			{
 				RequestDestroy();
 			}
@@ -166,23 +202,23 @@ public class AttackTrackingTarget : MonoBehaviour
 					{
 						m_exAtkList = new AtkAttribute[m_emissionNum];
 						m_moveSpeed = bulletData.data.speed;
-						m_cachedTransform = base.transform;
-						m_cachedTransform.parent = ((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
-						Vector3 position = Vector3.zero;
-						if ((Object)m_attackerPlayer != (Object)null && m_attackerPlayer.IsValidBuffBlind())
+						m_cachedTransform = this.get_transform();
+						m_cachedTransform.set_parent((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
+						Vector3 position = Vector3.get_zero();
+						if (m_attackerPlayer != null && m_attackerPlayer.IsValidBuffBlind())
 						{
 							m_target = null;
-							m_targetingPoint = Vector3.zero;
+							m_targetingPoint = Vector3.get_zero();
 						}
-						position = (((Object)m_target != (Object)null) ? m_target._position : ((!(m_targetingPoint != Vector3.zero)) ? (m_attacker._position + m_attacker._forward * 2f) : m_targetingPoint));
+						position = ((m_target != null) ? m_target._position : ((!(m_targetingPoint != Vector3.get_zero())) ? (m_attacker._position + m_attacker._forward * 2f) : m_targetingPoint));
 						position.y = 0f;
-						m_cachedTransform.position = position;
-						m_cachedTransform.rotation = Quaternion.identity;
-						Transform effect = EffectManager.GetEffect(bulletData.data.effectName, base.transform);
-						effect.localPosition = bulletData.data.dispOffset;
-						effect.localRotation = Quaternion.Euler(bulletData.data.dispRotation);
-						effect.localScale = Vector3.one;
-						m_effectObj = effect.gameObject;
+						m_cachedTransform.set_position(position);
+						m_cachedTransform.set_rotation(Quaternion.get_identity());
+						Transform effect = EffectManager.GetEffect(bulletData.data.effectName, this.get_transform());
+						effect.set_localPosition(bulletData.data.dispOffset);
+						effect.set_localRotation(Quaternion.Euler(bulletData.data.dispRotation));
+						effect.set_localScale(Vector3.get_one());
+						m_effectObj = effect.get_gameObject();
 						m_effectAnimator = m_effectObj.GetComponent<Animator>();
 						m_isTracking = true;
 						RequestMain();
@@ -217,7 +253,7 @@ public class AttackTrackingTarget : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		if ((Object)m_effectObj != (Object)null)
+		if (m_effectObj != null)
 		{
 			EffectManager.ReleaseEffect(m_effectObj, true, false);
 			m_effectObj = null;
@@ -236,55 +272,92 @@ public class AttackTrackingTarget : MonoBehaviour
 
 	private void FuncMain()
 	{
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
 		if (!m_isDeleted)
 		{
-			m_aliveTimer -= Time.deltaTime;
+			m_aliveTimer -= Time.get_deltaTime();
 			if (m_aliveTimer <= 0f)
 			{
 				RequestDestroy();
 			}
 			else
 			{
-				Vector3 vector = Vector3.zero;
-				if ((Object)m_target != (Object)null)
+				Vector3 val = Vector3.get_zero();
+				if (m_target != null)
 				{
 					Character character = m_target as Character;
-					if ((Object)character != (Object)null && character.isDead)
+					if (character != null && character.isDead)
 					{
 						m_isTargetDead = true;
 					}
-					vector = m_target.transform.position;
+					val = m_target.get_transform().get_position();
 					if (m_isTargetDead)
 					{
-						vector = m_cachedTransform.position;
+						val = m_cachedTransform.get_position();
 					}
 				}
-				else if (m_targetingPoint != Vector3.zero)
+				else if (m_targetingPoint != Vector3.get_zero())
 				{
-					vector = m_targetingPoint;
+					val = m_targetingPoint;
 				}
-				vector.y = 0f;
-				Vector3 position = m_cachedTransform.position;
-				Vector3 vector2 = vector - position;
-				vector2.Normalize();
-				if (vector2 != Vector3.zero)
+				val.y = 0f;
+				Vector3 position = m_cachedTransform.get_position();
+				Vector3 val2 = val - position;
+				val2.Normalize();
+				if (val2 != Vector3.get_zero())
 				{
-					Quaternion rotation = Quaternion.LookRotation(vector2);
-					m_cachedTransform.rotation = rotation;
+					Quaternion rotation = Quaternion.LookRotation(val2);
+					m_cachedTransform.set_rotation(rotation);
 				}
-				if (((Object)m_target != (Object)null || m_targetingPoint != Vector3.zero) && m_isTracking)
+				if ((m_target != null || m_targetingPoint != Vector3.get_zero()) && m_isTracking)
 				{
 					if (m_isPerfectTrack)
 					{
-						m_cachedTransform.position = vector;
+						m_cachedTransform.set_position(val);
 					}
 					else
 					{
-						Vector3 forward = m_cachedTransform.forward;
-						Vector3 vector3 = m_cachedTransform.position + forward * (m_moveSpeed * Time.deltaTime);
-						if (Vector3.Distance(vector, vector3) >= m_moveThreshold)
+						Vector3 forward = m_cachedTransform.get_forward();
+						Vector3 val3 = m_cachedTransform.get_position() + forward * (m_moveSpeed * Time.get_deltaTime());
+						if (Vector3.Distance(val, val3) >= m_moveThreshold)
 						{
-							m_cachedTransform.position = vector3;
+							m_cachedTransform.set_position(val3);
 						}
 					}
 				}
@@ -292,13 +365,13 @@ public class AttackTrackingTarget : MonoBehaviour
 				{
 					if (!m_isShooting)
 					{
-						StartCoroutine(ShotBullets());
+						this.StartCoroutine(ShotBullets());
 						m_isShooting = true;
 					}
 				}
 				else
 				{
-					m_attackIntervalTimer -= Time.deltaTime;
+					m_attackIntervalTimer -= Time.get_deltaTime();
 					if (m_attackIntervalTimer <= 0f)
 					{
 						m_attackIntervalTimer = m_trackingData.attackInterval;
@@ -314,7 +387,7 @@ public class AttackTrackingTarget : MonoBehaviour
 		if (m_func != Function.DELETE && !m_isDeleted)
 		{
 			RequestFunction(Function.DELETE);
-			if ((Object)m_effectAnimator == (Object)null)
+			if (m_effectAnimator == null)
 			{
 				Destroy();
 			}
@@ -336,11 +409,14 @@ public class AttackTrackingTarget : MonoBehaviour
 
 	private void FuncDelete()
 	{
-		if ((Object)m_effectAnimator == (Object)null)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		if (m_effectAnimator == null)
 		{
 			Destroy();
 		}
-		if (m_effectAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+		AnimatorStateInfo currentAnimatorStateInfo = m_effectAnimator.GetCurrentAnimatorStateInfo(0);
+		if (currentAnimatorStateInfo.get_normalizedTime() >= 1f)
 		{
 			Destroy();
 		}
@@ -348,18 +424,19 @@ public class AttackTrackingTarget : MonoBehaviour
 
 	private void Destroy()
 	{
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 		if (!m_isDeleted)
 		{
 			m_isDeleted = true;
-			if ((Object)m_attacker != (Object)null)
+			if (m_attacker != null)
 			{
-				if ((Object)m_attackerPlayer != (Object)null)
+				if (m_attackerPlayer != null)
 				{
 					m_attackerPlayer.TrackingTargetBullet = null;
 				}
 				m_attacker = null;
 			}
-			Object.Destroy(base.gameObject);
+			Object.Destroy(this.get_gameObject());
 		}
 	}
 
@@ -376,11 +453,17 @@ public class AttackTrackingTarget : MonoBehaviour
 
 	private AnimEventShot CreateBullet(int index)
 	{
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
 		if (m_trackingData == null)
 		{
 			return null;
 		}
-		if ((Object)m_attacker == (Object)null)
+		if (m_attacker == null)
 		{
 			return null;
 		}
@@ -397,9 +480,9 @@ public class AttackTrackingTarget : MonoBehaviour
 		{
 			return null;
 		}
-		Quaternion rotation = m_cachedTransform.rotation;
-		Vector3 position = m_cachedTransform.position;
-		if ((Object)m_attackerPlayer != (Object)null)
+		Quaternion rotation = m_cachedTransform.get_rotation();
+		Vector3 position = m_cachedTransform.get_position();
+		if (m_attackerPlayer != null)
 		{
 			IsReplaceSkill = true;
 		}
@@ -411,12 +494,12 @@ public class AttackTrackingTarget : MonoBehaviour
 			m_exAtkList[index] = atk;
 		}
 		AnimEventShot animEventShot = AnimEventShot.CreateByExternalBulletData(m_trackingData.emissionBullet, m_attacker, attackInfo, position, rotation, atk, m_attackMode, null);
-		if ((Object)animEventShot == (Object)null)
+		if (animEventShot == null)
 		{
 			Log.Error("Failed to create AnimEventShot for tracking bullet!");
 			return null;
 		}
-		if ((Object)m_attackerPlayer != (Object)null)
+		if (m_attackerPlayer != null)
 		{
 			IsReplaceSkill = false;
 		}

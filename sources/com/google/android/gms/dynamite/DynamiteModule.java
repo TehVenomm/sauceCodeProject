@@ -90,50 +90,50 @@ public final class DynamiteModule {
     }
 
     public static DynamiteModule zza(Context context, zzd zzd, String str) throws zzc {
-        zza zza = (zza) zzgpd.get();
-        zza zza2 = new zza();
-        zzgpd.set(zza2);
-        zzj zza3;
+        zzj zza;
+        zza zza2 = (zza) zzgpd.get();
+        zza zza3 = new zza();
+        zzgpd.set(zza3);
         DynamiteModule zzag;
         try {
-            zza3 = zzd.zza(context, str, zzgpe);
-            Log.i("DynamiteModule", new StringBuilder((String.valueOf(str).length() + 68) + String.valueOf(str).length()).append("Considering local module ").append(str).append(":").append(zza3.zzgpp).append(" and remote module ").append(str).append(":").append(zza3.zzgpq).toString());
-            if (zza3.zzgpr == 0 || ((zza3.zzgpr == -1 && zza3.zzgpp == 0) || (zza3.zzgpr == 1 && zza3.zzgpq == 0))) {
-                throw new zzc("No acceptable module found. Local version is " + zza3.zzgpp + " and remote version is " + zza3.zzgpq + AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER);
-            } else if (zza3.zzgpr == -1) {
+            zza = zzd.zza(context, str, zzgpe);
+            Log.i("DynamiteModule", new StringBuilder((String.valueOf(str).length() + 68) + String.valueOf(str).length()).append("Considering local module ").append(str).append(":").append(zza.zzgpp).append(" and remote module ").append(str).append(":").append(zza.zzgpq).toString());
+            if (zza.zzgpr == 0 || ((zza.zzgpr == -1 && zza.zzgpp == 0) || (zza.zzgpr == 1 && zza.zzgpq == 0))) {
+                throw new zzc("No acceptable module found. Local version is " + zza.zzgpp + " and remote version is " + zza.zzgpq + AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER);
+            } else if (zza.zzgpr == -1) {
                 zzag = zzag(context, str);
-                if (zza2.zzgpm != null) {
-                    zza2.zzgpm.close();
+                if (zza3.zzgpm != null) {
+                    zza3.zzgpm.close();
                 }
-                zzgpd.set(zza);
+                zzgpd.set(zza2);
                 return zzag;
-            } else if (zza3.zzgpr == 1) {
-                zzag = zza(context, str, zza3.zzgpq);
-                if (zza2.zzgpm != null) {
-                    zza2.zzgpm.close();
+            } else if (zza.zzgpr == 1) {
+                zzag = zza(context, str, zza.zzgpq);
+                if (zza3.zzgpm != null) {
+                    zza3.zzgpm.close();
                 }
-                zzgpd.set(zza);
+                zzgpd.set(zza2);
                 return zzag;
             } else {
-                throw new zzc("VersionPolicy returned invalid code:" + zza3.zzgpr);
+                throw new zzc("VersionPolicy returned invalid code:" + zza.zzgpr);
             }
         } catch (Throwable e) {
             String valueOf = String.valueOf(e.getMessage());
             Log.w("DynamiteModule", valueOf.length() != 0 ? "Failed to load remote module: ".concat(valueOf) : new String("Failed to load remote module: "));
-            if (zza3.zzgpp == 0 || zzd.zza(context, str, new zzb(zza3.zzgpp, 0)).zzgpr != -1) {
+            if (zza.zzgpp == 0 || zzd.zza(context, str, new zzb(zza.zzgpp, 0)).zzgpr != -1) {
                 throw new zzc("Remote load failed. No local fallback found.", e);
             }
             zzag = zzag(context, str);
-            if (zza2.zzgpm != null) {
-                zza2.zzgpm.close();
+            if (zza3.zzgpm != null) {
+                zza3.zzgpm.close();
             }
-            zzgpd.set(zza);
+            zzgpd.set(zza2);
             return zzag;
         } catch (Throwable th) {
-            if (zza2.zzgpm != null) {
-                zza2.zzgpm.close();
+            if (zza3.zzgpm != null) {
+                zza3.zzgpm.close();
             }
-            zzgpd.set(zza);
+            zzgpd.set(zza2);
         }
     }
 

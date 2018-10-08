@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -47,13 +48,13 @@ public class SmithRevertLithographDetail : ItemSellConfirm
 		if (sellData != null)
 		{
 			DrawIcon();
-			SetActive(UI.BTN_CENTER, false);
-			SetActive(UI.BTN_0, true);
-			SetActive(UI.BTN_1, true);
+			SetActive((Enum)UI.BTN_CENTER, false);
+			SetActive((Enum)UI.BTN_0, true);
+			SetActive((Enum)UI.BTN_1, true);
 		}
 	}
 
-	protected override void DrawIcon()
+	protected unsafe override void DrawIcon()
 	{
 		base.DrawIcon();
 		EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(equipData.GetTableID());
@@ -62,22 +63,8 @@ public class SmithRevertLithographDetail : ItemSellConfirm
 			equipItemData.GetRootLithograph()
 		};
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		SetGrid(UI.GRD_REWARD_ICON, null, sELL_SELECT_MAX, false, delegate(int i, Transform t, bool is_recycle)
-		{
-			if (i < lithographArr.Length)
-			{
-				ItemTable.ItemData itemData = lithographArr[i];
-				ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.ITEM, itemData.id, t, 1, "NONE", 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-				itemIcon.SetRewardBG(true);
-				Transform ctrl = GetCtrl(UI.GRD_REWARD_ICON);
-				SetMaterialInfo(itemIcon.transform, REWARD_TYPE.ITEM, itemData.id, ctrl);
-			}
-			else
-			{
-				SetActive(t, false);
-			}
-		});
-		SetActive(UI.STR_NON_REWARD, lithographArr.Length == 0);
+		SetGrid(UI.GRD_REWARD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetActive((Enum)UI.STR_NON_REWARD, lithographArr.Length == 0);
 	}
 
 	public void OnQuery_YES()

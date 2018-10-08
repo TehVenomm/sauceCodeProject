@@ -1,3 +1,5 @@
+using System;
+
 public class ConfigLanguage : GameSection
 {
 	private enum UI
@@ -25,14 +27,14 @@ public class ConfigLanguage : GameSection
 
 	public override void UpdateUI()
 	{
-		SetToggle(UI.TGL_EN, GameSaveData.instance.languageOption == 0);
-		SetToggle(UI.TGL_FR, GameSaveData.instance.languageOption == 1);
-		SetToggle(UI.TGL_GE, GameSaveData.instance.languageOption == 2);
-		SetToggle(UI.TGL_IT, GameSaveData.instance.languageOption == 3);
-		SetToggle(UI.TGL_PO, GameSaveData.instance.languageOption == 4);
-		SetToggle(UI.TGL_TH, GameSaveData.instance.languageOption == 5);
-		SetToggle(UI.TGL_VN, GameSaveData.instance.languageOption == 6);
-		SetToggle(UI.TGL_ES, GameSaveData.instance.languageOption == 7);
+		SetToggle((Enum)UI.TGL_EN, GameSaveData.instance.languageOption == 0);
+		SetToggle((Enum)UI.TGL_FR, GameSaveData.instance.languageOption == 1);
+		SetToggle((Enum)UI.TGL_GE, GameSaveData.instance.languageOption == 2);
+		SetToggle((Enum)UI.TGL_IT, GameSaveData.instance.languageOption == 3);
+		SetToggle((Enum)UI.TGL_PO, GameSaveData.instance.languageOption == 4);
+		SetToggle((Enum)UI.TGL_TH, GameSaveData.instance.languageOption == 5);
+		SetToggle((Enum)UI.TGL_VN, GameSaveData.instance.languageOption == 6);
+		SetToggle((Enum)UI.TGL_ES, GameSaveData.instance.languageOption == 7);
 	}
 
 	private void OnQuery_LANG_EN()

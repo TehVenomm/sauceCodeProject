@@ -1,8 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIModel : MonoBehaviour
+public class UIModel
 {
 	private const float OffSetX = 5000f;
 
@@ -26,72 +27,88 @@ public class UIModel : MonoBehaviour
 		}
 	}
 
+	public UIModel()
+		: this()
+	{
+	}
+
 	public static UIModel Get(Transform t)
 	{
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		UIModel uIModel = t.GetComponent<UIModel>();
-		if ((Object)uIModel == (Object)null)
+		if (uIModel == null)
 		{
-			uIModel = t.gameObject.AddComponent<UIModel>();
+			uIModel = t.get_gameObject().AddComponent<UIModel>();
 		}
 		return uIModel;
 	}
 
 	private void OnDisable()
 	{
-		if ((Object)model != (Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		if (model != null)
 		{
-			model.gameObject.SetActive(false);
+			model.get_gameObject().SetActive(false);
 		}
 	}
 
 	private void OnEnable()
 	{
-		if ((Object)model != (Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		if (model != null)
 		{
-			model.gameObject.SetActive(true);
+			model.get_gameObject().SetActive(true);
 		}
 	}
 
-	public static void UpdateModelOffset()
+	public unsafe static void UpdateModelOffset()
 	{
-		models.DoAction(delegate(Transform t, int i)
+		List<Transform> models = UIModel.models;
+		if (_003C_003Ef__am_0024cache4 == null)
 		{
-			t.position = new Vector3((float)(i + 1) * 5000f, 0f, 0f);
-		});
+			_003C_003Ef__am_0024cache4 = new Action<Transform, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		models.DoAction(_003C_003Ef__am_0024cache4);
 	}
 
 	private void Awake()
 	{
-		_transform = base.transform;
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Expected O, but got Unknown
+		_transform = this.get_transform();
 	}
 
 	public void Init(string resource_name)
 	{
-		if ((Object)model != (Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		if (model != null)
 		{
-			model.gameObject.SetActive(true);
+			model.get_gameObject().SetActive(true);
 		}
 		else if (!isLoading)
 		{
-			StartCoroutine(DoInit(resource_name));
+			this.StartCoroutine(DoInit(resource_name));
 		}
 	}
 
 	public void Remove()
 	{
-		if ((Object)model != (Object)null)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		if (model != null)
 		{
 			models.Remove(model);
-			Object.Destroy(model.gameObject);
+			Object.Destroy(model.get_gameObject());
 			model = null;
 		}
 	}
 
 	public void SetActive(bool active)
 	{
-		if ((Object)model != (Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		if (model != null)
 		{
-			model.gameObject.SetActive(active);
+			model.get_gameObject().SetActive(active);
 		}
 	}
 
@@ -102,7 +119,7 @@ public class UIModel : MonoBehaviour
 		LoadObject load_object = load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.COMMON, resource_name);
 		yield return (object)load_queue.Wait();
 		model = load_object.Realizes(MonoBehaviourSingleton<AppMain>.I._transform, -1);
-		if ((Object)model != (Object)null)
+		if (model != null)
 		{
 			models.Add(model);
 			UpdateModelOffset();
@@ -112,10 +129,11 @@ public class UIModel : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		if ((Object)model != (Object)null)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		if (model != null)
 		{
 			models.Remove(model);
-			Object.DestroyImmediate(model.gameObject);
+			Object.DestroyImmediate(model.get_gameObject());
 		}
 		UpdateModelOffset();
 	}

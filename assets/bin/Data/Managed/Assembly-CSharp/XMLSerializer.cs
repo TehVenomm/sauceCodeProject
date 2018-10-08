@@ -23,6 +23,11 @@ public static class XMLSerializer
 
 	private static void SerializeObject(XMLOutStream stream, Type type, object message)
 	{
+		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
 		FieldInfo[] fields = type.GetFields();
 		FieldInfo[] array = fields;
 		foreach (FieldInfo fieldInfo in array)
@@ -115,6 +120,11 @@ public static class XMLSerializer
 
 	private static void SerializeListElement(XMLOutStream stream, Type type, object message, int i)
 	{
+		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0191: Unknown result type (might be due to invalid IL or missing references)
 		switch (type.ToString())
 		{
 		case "System.String":
@@ -154,6 +164,11 @@ public static class XMLSerializer
 
 	private static object DeserializeObject(XMLInStream stream, Type type)
 	{
+		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0285: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
 		object obj = Activator.CreateInstance(type);
 		FieldInfo[] fields = type.GetFields();
 		FieldInfo[] array = fields;
@@ -290,6 +305,11 @@ public static class XMLSerializer
 
 	private static object DeserializeListElement(XMLInStream stream, Type type)
 	{
+		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0169: Unknown result type (might be due to invalid IL or missing references)
 		switch (type.ToString())
 		{
 		case "System.String":

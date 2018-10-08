@@ -58,7 +58,7 @@ public class UserLevelTable : Singleton<UserLevelTable>, IDataTable
 		}
 		userLevelTable.ForEach(delegate(UserLevelData data)
 		{
-			maxLevel = Mathf.Max(maxLevel, data.lv);
+			maxLevel = Mathf.Max(maxLevel, (int)data.lv);
 		});
 		return maxLevel;
 	}

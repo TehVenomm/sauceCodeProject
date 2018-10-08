@@ -60,40 +60,43 @@ public class UIScrollablePopupList : UILabel
 
 	public static void CreatePopupItem(Transform popup_transform, Transform parent_ctrl, int max_num, ATTACH_DIRECTION direction, bool adjust_size, Transform item_prefab, string[] texts, bool[] button_enable, int select_index, Action<int> callback = null)
 	{
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		firstItemIsTextOnly = true;
 		_CreatePopup(popup_transform, parent_ctrl, max_num, direction, adjust_size, item_prefab, texts, button_enable, select_index, callback);
-		if ((UnityEngine.Object)item_prefab != (UnityEngine.Object)null)
+		if (item_prefab != null)
 		{
-			UnityEngine.Object.DestroyImmediate(item_prefab.gameObject);
+			Object.DestroyImmediate(item_prefab.get_gameObject());
 		}
 	}
 
 	private static void _CreatePopup(Transform popup_transform, Transform parent_ctrl, int max_num, ATTACH_DIRECTION direction, bool adjust_size, Transform item_prefab, string[] texts, bool[] button_enable, int select_index, Action<int> callback = null)
 	{
-		if (!((UnityEngine.Object)popup_transform == (UnityEngine.Object)null) && !((UnityEngine.Object)parent_ctrl == (UnityEngine.Object)null))
+		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+		if (!(popup_transform == null) && !(parent_ctrl == null))
 		{
 			UIWidget component = parent_ctrl.GetComponent<UIWidget>();
-			if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
+			if (!(component == null))
 			{
-				float x = 0f;
-				float y = 0f;
+				float num = 0f;
+				float num2 = 0f;
 				switch (direction)
 				{
 				case ATTACH_DIRECTION.BOTTOM:
-					y = (float)(-component.height / 2);
+					num2 = (float)(-component.height / 2);
 					break;
 				case ATTACH_DIRECTION.LEFT:
-					x = (float)(-component.width);
-					y = (float)(component.height / 2);
+					num = (float)(-component.width);
+					num2 = (float)(component.height / 2);
 					break;
 				case ATTACH_DIRECTION.RIGHT:
-					x = (float)component.width;
-					y = (float)(component.height / 2);
+					num = (float)component.width;
+					num2 = (float)(component.height / 2);
 					break;
 				}
-				popup_transform.parent = parent_ctrl;
-				popup_transform.localPosition = new Vector3(x, y, 0f);
-				popup_transform.localScale = Vector3.one;
+				popup_transform.set_parent(parent_ctrl);
+				popup_transform.set_localPosition(new Vector3(num, num2, 0f));
+				popup_transform.set_localScale(Vector3.get_one());
 				UIScrollablePopupList component2 = popup_transform.GetComponent<UIScrollablePopupList>();
 				if (adjust_size)
 				{
@@ -110,8 +113,8 @@ public class UIScrollablePopupList : UILabel
 		isFinished = false;
 		isUpdateTween = false;
 		selectIndex = -1;
-		twCtrl = GetComponentInChildren<UITweenCtrl>();
-		twAlpha = GetComponent<TweenAlpha>();
+		twCtrl = this.GetComponentInChildren<UITweenCtrl>();
+		twAlpha = this.GetComponent<TweenAlpha>();
 		del = new EventDelegate(delegate
 		{
 			CloseCallback();
@@ -127,7 +130,8 @@ public class UIScrollablePopupList : UILabel
 
 	private void LateUpdate()
 	{
-		if (isUpdateTween && (UnityEngine.Object)scroll != (UnityEngine.Object)null && (UnityEngine.Object)grid != (UnityEngine.Object)null && (UnityEngine.Object)tw != (UnityEngine.Object)null && !isFinished)
+		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+		if (isUpdateTween && scroll != null && grid != null && tw != null && !isFinished)
 		{
 			if (tw.tweenFactor < 1f)
 			{
@@ -145,7 +149,7 @@ public class UIScrollablePopupList : UILabel
 			grid.Reposition();
 			if (isFinished)
 			{
-				grid.GetComponent<UIWidget>().SetAnchor((Transform)null);
+				((UIRect)grid.GetComponent<UIWidget>()).SetAnchor(null);
 			}
 		}
 	}
@@ -185,6 +189,28 @@ public class UIScrollablePopupList : UILabel
 
 	public void SetItemText(Transform item_prefab, string[] texts, bool[] button_enable)
 	{
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
 		if (isFinished || isUpdateTween)
 		{
 			ClosePopupCallBack();
@@ -197,25 +223,25 @@ public class UIScrollablePopupList : UILabel
 			int num2 = (int)(((float)Mathf.Min(textItem.Length, maxItemNum) + 0.5f) * (float)itemHeight);
 			Vector4 baseClipRegion = scroll.panel.baseClipRegion;
 			scroll.panel.SetRect(baseClipRegion.x, baseClipRegion.y, (float)num, (float)num2);
-			Vector3 localPosition = scroll.transform.localPosition;
+			Vector3 localPosition = scroll.get_transform().get_localPosition();
 			localPosition.y = 0f - (float)num2 * 0.5f;
-			scroll.transform.localPosition = localPosition;
+			scroll.get_transform().set_localPosition(localPosition);
 			Vector2 clipOffset = scroll.panel.clipOffset;
 			clipOffset.y = 0f;
 			scroll.panel.clipOffset = clipOffset;
 			selectFrameSprite.width = num - 10;
 			selectFrameSprite.height = itemHeight;
-			selectFrameSprite.transform.localScale = Vector3.one;
+			selectFrameSprite.get_transform().set_localScale(Vector3.get_one());
 			tw.to = num2;
 			UIWidget component = tw.GetComponent<UIWidget>();
 			component.width = num;
 			expandTarget_A.height = num2;
 			expandTarget_B.height = num2;
-			Vector2 v = expandTarget_A.transform.localPosition;
-			v.x = (float)num * 0.5f;
-			v.y = (float)(-num2) * 0.5f;
-			expandTarget_A.transform.localPosition = v;
-			expandTarget_B.transform.localPosition = v;
+			Vector2 val = Vector2.op_Implicit(expandTarget_A.get_transform().get_localPosition());
+			val.x = (float)num * 0.5f;
+			val.y = (float)(-num2) * 0.5f;
+			expandTarget_A.get_transform().set_localPosition(Vector2.op_Implicit(val));
+			expandTarget_B.get_transform().set_localPosition(Vector2.op_Implicit(val));
 			twAlpha.RemoveOnFinished(del);
 			objRoot.SetActive(true);
 			scroll.ResetPosition();
@@ -227,6 +253,31 @@ public class UIScrollablePopupList : UILabel
 
 	private int SetGridItem(Transform item_prefab)
 	{
+		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0077: Expected O, but got Unknown
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a5: Expected O, but got Unknown
+		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018b: Expected O, but got Unknown
+		//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01df: Expected O, but got Unknown
+		//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025a: Unknown result type (might be due to invalid IL or missing references)
 		int num = minPopFrameWidth;
 		if (textItem != null && textItem.Length > 0)
 		{
@@ -235,63 +286,65 @@ public class UIScrollablePopupList : UILabel
 			int i = 0;
 			for (int num2 = textItem.Length; i < num2; i++)
 			{
-				GameObject gameObject = null;
-				if ((UnityEngine.Object)item_prefab == (UnityEngine.Object)null || firstItemIsTextOnly)
+				GameObject val = null;
+				if (item_prefab == null || firstItemIsTextOnly)
 				{
 					firstItemIsTextOnly = false;
-					gameObject = new GameObject();
-					gameObject.layer = 5;
-					gameObject.name = i.ToString();
-					num = CreateItem(gameObject, i, num);
+					val = new GameObject();
+					val.set_layer(5);
+					val.set_name(i.ToString());
+					num = CreateItem(val, i, num);
 				}
 				else
 				{
-					gameObject = ResourceUtility.Instantiate(item_prefab.gameObject);
-					gameObject.layer = 5;
-					gameObject.name = i.ToString();
-					num = CreatePrefabItem(gameObject, i, num);
+					val = ResourceUtility.Instantiate<GameObject>(item_prefab.get_gameObject());
+					val.set_layer(5);
+					val.set_name(i.ToString());
+					num = CreatePrefabItem(val, i, num);
 				}
-				UIWidget uIWidget = array[i] = gameObject.GetComponent<UIWidget>();
-				gameObject.AddComponent<BoxCollider>();
-				gameObject.AddComponent<UIDragScrollView>();
-				gameObject.AddComponent<UIGameSceneEventSender>();
-				UIButton btn = gameObject.AddComponent<UIButton>();
+				UIWidget uIWidget = array[i] = val.GetComponent<UIWidget>();
+				val.AddComponent<BoxCollider>();
+				val.AddComponent<UIDragScrollView>();
+				val.AddComponent<UIGameSceneEventSender>();
+				UIButton btn = val.AddComponent<UIButton>();
 				btn.hover = uIWidget.color;
 				btn.pressed = uIWidget.color;
 				btn.onClick.Add(new EventDelegate(delegate
 				{
+					//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0048: Expected O, but got Unknown
 					int result = -1;
-					if (int.TryParse(btn.name, out result))
+					if (int.TryParse(btn.get_name(), out result))
 					{
 						selectIndex = result;
 						if (result >= 0)
 						{
-							ClickItem(selectIndex, btn.transform);
+							ClickItem(selectIndex, btn.get_transform());
 							CloseCallback();
 						}
 					}
 				}));
-				btn.enabled = buttonEnable[i];
-				UIButtonScale component = gameObject.GetComponent<UIButtonScale>();
-				if ((UnityEngine.Object)component == (UnityEngine.Object)null)
+				btn.set_enabled(buttonEnable[i]);
+				UIButtonScale component = val.GetComponent<UIButtonScale>();
+				if (component == null)
 				{
-					component = gameObject.gameObject.AddComponent<UIButtonScale>();
-					component.tweenTarget = gameObject.transform;
+					component = val.get_gameObject().AddComponent<UIButtonScale>();
+					component.tweenTarget = val.get_transform();
 					component.hover = new Vector3(1f, 1f, 1f);
 					component.pressed = new Vector3(1.3f, 1.3f, 1.3f);
 					component.duration = 0.05f;
 				}
-				grid.AddChild(gameObject.transform);
-				gameObject.transform.localPosition = Vector3.zero;
-				gameObject.transform.localEulerAngles = Vector3.zero;
-				gameObject.transform.localScale = Vector3.one;
+				grid.AddChild(val.get_transform());
+				val.get_transform().set_localPosition(Vector3.get_zero());
+				val.get_transform().set_localEulerAngles(Vector3.get_zero());
+				val.get_transform().set_localScale(Vector3.get_one());
 			}
 			int j = 0;
 			for (int num3 = textItem.Length; j < num3; j++)
 			{
-				BoxCollider component2 = array[j].transform.GetComponent<BoxCollider>();
+				BoxCollider component2 = array[j].get_transform().GetComponent<BoxCollider>();
 				UIWidget uIWidget2 = array[j];
-				component2.size = new Vector3((float)num, (float)itemHeight, 1f);
+				component2.set_size(new Vector3((float)num, (float)itemHeight, 1f));
 				uIWidget2.width = num;
 				uIWidget2.height = itemHeight;
 				uIWidget2.autoResizeBoxCollider = true;
@@ -304,8 +357,12 @@ public class UIScrollablePopupList : UILabel
 
 	public int CreateItem(GameObject go, int index, int base_max_width)
 	{
-		UILabel component = GetComponent<UILabel>();
-		UIWidget component2 = GetComponent<UIWidget>();
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+		UILabel component = this.GetComponent<UILabel>();
+		UIWidget component2 = this.GetComponent<UIWidget>();
 		UILabel uILabel = go.AddComponent<UILabel>();
 		uILabel.pivot = component2.pivot;
 		uILabel.bitmapFont = component.bitmapFont;
@@ -313,10 +370,10 @@ public class UIScrollablePopupList : UILabel
 		uILabel.fontSize = component.fontSize;
 		uILabel.fontStyle = component.fontStyle;
 		uILabel.text = textItem[index];
-		uILabel.color = ((!buttonEnable[index]) ? Color.gray : component.color);
+		uILabel.color = ((!buttonEnable[index]) ? Color.get_gray() : component.color);
 		uILabel.alpha = 1f;
 		uILabel.alignment = component.alignment;
-		uILabel.cachedTransform.localPosition = component.cachedTransform.localPosition;
+		uILabel.cachedTransform.set_localPosition(component.cachedTransform.get_localPosition());
 		uILabel.AssumeNaturalSize();
 		int result = Mathf.Max(base_max_width, uILabel.width);
 		uILabel.overflowMethod = Overflow.ShrinkContent;
@@ -325,13 +382,16 @@ public class UIScrollablePopupList : UILabel
 
 	public int CreatePrefabItem(GameObject go, int index, int base_max_width)
 	{
-		UILabel component = GetComponent<UILabel>();
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+		UILabel component = this.GetComponent<UILabel>();
 		UISprite componentInChildren = go.GetComponentInChildren<UISprite>();
 		UILabel componentInChildren2 = componentInChildren.GetComponentInChildren<UILabel>();
 		componentInChildren2.text = textItem[index];
-		componentInChildren2.color = ((!buttonEnable[index]) ? Color.gray : component.color);
+		componentInChildren2.color = ((!buttonEnable[index]) ? Color.get_gray() : component.color);
 		componentInChildren2.alpha = 1f;
-		componentInChildren2.cachedTransform.localPosition = component.cachedTransform.localPosition;
+		componentInChildren2.cachedTransform.set_localPosition(component.cachedTransform.get_localPosition());
 		return Mathf.Max(base_max_width, componentInChildren2.width + componentInChildren.width);
 	}
 
@@ -344,11 +404,16 @@ public class UIScrollablePopupList : UILabel
 
 	private void CloseCallback()
 	{
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 		scroll.ResetPosition();
 		Vector2 clipOffset = scroll.panel.clipOffset;
 		clipOffset.y = 0f;
 		scroll.panel.clipOffset = clipOffset;
-		scroll.transform.localPosition = Vector3.zero;
+		scroll.get_transform().set_localPosition(Vector3.get_zero());
 		twCtrl.Reset();
 		twAlpha.RemoveOnFinished(del);
 		DeleteGridChildren();
@@ -364,10 +429,12 @@ public class UIScrollablePopupList : UILabel
 		List<Transform> childList = grid.GetChildList();
 		childList.ForEach(delegate(Transform t)
 		{
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			if (grid.RemoveChild(t))
 			{
-				t.transform.parent = null;
-				UnityEngine.Object.Destroy(t.gameObject);
+				t.get_transform().set_parent(null);
+				Object.Destroy(t.get_gameObject());
 			}
 		});
 		grid.Reposition();
@@ -375,20 +442,27 @@ public class UIScrollablePopupList : UILabel
 
 	private void ClickItem(int index, Transform parent)
 	{
-		if ((UnityEngine.Object)selectFrameSprite != (UnityEngine.Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Expected O, but got Unknown
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		if (selectFrameSprite != null)
 		{
-			Transform transform = selectFrameSprite.transform;
+			Transform val = selectFrameSprite.get_transform();
 			if (index >= 0)
 			{
-				transform.parent = parent;
-				transform.localPosition = Vector3.zero;
-				selectFrameSprite.gameObject.SetActive(true);
+				val.set_parent(parent);
+				val.set_localPosition(Vector3.get_zero());
+				selectFrameSprite.get_gameObject().SetActive(true);
 			}
 			else
 			{
-				selectFrameSprite.gameObject.SetActive(false);
-				transform.parent = base.transform;
-				transform.localPosition = Vector3.zero;
+				selectFrameSprite.get_gameObject().SetActive(false);
+				val.set_parent(this.get_transform());
+				val.set_localPosition(Vector3.get_zero());
 			}
 		}
 	}
@@ -400,10 +474,13 @@ public class UIScrollablePopupList : UILabel
 
 	private Transform GetGridChild(int index)
 	{
-		if ((UnityEngine.Object)grid == (UnityEngine.Object)null)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Expected O, but got Unknown
+		if (grid == null)
 		{
 			return null;
 		}
-		return grid.transform.FindChild(index.ToString());
+		return grid.get_transform().FindChild(index.ToString());
 	}
 }

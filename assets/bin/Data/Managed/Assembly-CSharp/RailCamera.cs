@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class RailCamera : MonoBehaviour
+public class RailCamera
 {
 	public float moveCoef = -0.3f;
 
@@ -33,11 +33,17 @@ public class RailCamera : MonoBehaviour
 		private set;
 	}
 
+	public RailCamera()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		targetCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
 		targetCameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
-		railAnim = targetCameraTransform.gameObject.AddComponent<RailAnimation>();
+		railAnim = targetCameraTransform.get_gameObject().AddComponent<RailAnimation>();
 		enableInput = true;
 	}
 
@@ -71,7 +77,7 @@ public class RailCamera : MonoBehaviour
 	{
 		if (!AppMain.isApplicationQuit)
 		{
-			UnityEngine.Object.DestroyImmediate(railAnim);
+			Object.DestroyImmediate(railAnim);
 		}
 	}
 
@@ -101,17 +107,37 @@ public class RailCamera : MonoBehaviour
 
 	protected virtual float GetMove(InputManager.TouchInfo info)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 		Vector2 vector = info.position - info.move;
 		Vector2 position = info.position;
 		vector.y = 0f;
 		position.y = 0f;
-		Vector3 position2 = targetCameraTransform.position;
+		Vector3 position2 = targetCameraTransform.get_position();
 		float y = position2.y;
-		Vector3 b = targetCamera.ScreenToWorldPoint(vector.ToVector3XY(y));
-		Vector3 a = targetCamera.ScreenToWorldPoint(position.ToVector3XY(y));
-		Vector3 vector2 = a - b;
-		vector2.y = 0f;
-		float num = vector2.magnitude;
+		Vector3 val = targetCamera.ScreenToWorldPoint(vector.ToVector3XY(y));
+		Vector3 val2 = targetCamera.ScreenToWorldPoint(position.ToVector3XY(y));
+		Vector3 val3 = val2 - val;
+		val3.y = 0f;
+		float num = val3.get_magnitude();
 		if (info.move.x < 0f)
 		{
 			num = 0f - num;

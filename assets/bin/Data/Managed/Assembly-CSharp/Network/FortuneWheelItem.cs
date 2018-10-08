@@ -19,6 +19,8 @@ namespace Network
 
 		public string imgId;
 
+		public string itemName;
+
 		public int tier;
 	}
 }

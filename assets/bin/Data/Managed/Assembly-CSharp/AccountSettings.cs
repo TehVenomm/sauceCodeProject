@@ -1,3 +1,5 @@
+using System;
+
 public class AccountSettings : GameSection
 {
 	private enum UI
@@ -20,20 +22,20 @@ public class AccountSettings : GameSection
 	{
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUser | MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUserGoogle)
 		{
-			SetActive(UI.BTN_MAIL, false);
-			SetActive(UI.BTN_GOOGLE, false);
-			SetActive(UI.LBL_REGISTED_TEXT, true);
-			SetLabelText(UI.LBL_REGISTED, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.advancedUserMail);
-			SetLabelText(UI.LBL_REGISTED_TEXT, base.sectionData.GetText((!MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUser) ? "REGISTED_GOOGLE" : "REGISTED_MAIL"));
-			SetActive(UI.BTN_MAIL_CHANGE_PASSWORD, true);
+			SetActive((Enum)UI.BTN_MAIL, false);
+			SetActive((Enum)UI.BTN_GOOGLE, false);
+			SetActive((Enum)UI.LBL_REGISTED_TEXT, true);
+			SetLabelText((Enum)UI.LBL_REGISTED, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.advancedUserMail);
+			SetLabelText((Enum)UI.LBL_REGISTED_TEXT, base.sectionData.GetText((!MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUser) ? "REGISTED_GOOGLE" : "REGISTED_MAIL"));
+			SetActive((Enum)UI.BTN_MAIL_CHANGE_PASSWORD, true);
 		}
 		else
 		{
 			bool is_visible = false;
-			SetActive(UI.BTN_MAIL, true);
-			SetActive(UI.BTN_GOOGLE, is_visible);
-			SetActive(UI.LBL_REGISTED_TEXT, false);
-			GetComponent<UIGrid>(UI.GRD_BTN).Reposition();
+			SetActive((Enum)UI.BTN_MAIL, true);
+			SetActive((Enum)UI.BTN_GOOGLE, is_visible);
+			SetActive((Enum)UI.LBL_REGISTED_TEXT, false);
+			base.GetComponent<UIGrid>((Enum)UI.GRD_BTN).Reposition();
 		}
 	}
 }

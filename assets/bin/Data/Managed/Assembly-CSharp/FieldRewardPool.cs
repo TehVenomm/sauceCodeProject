@@ -502,9 +502,9 @@ public class FieldRewardPool
 			{
 				savedata.rewardList.Add(new SaveData_1_0.SaveReward(r));
 			});
-			string value = JsonUtility.ToJson(savedata);
+			string text = JsonUtility.ToJson((object)savedata);
 			PlayerPrefs.SetString("FieldRewardPool.ver", "1.0");
-			PlayerPrefs.SetString("FieldRewardPool", value);
+			PlayerPrefs.SetString("FieldRewardPool", text);
 		}
 	}
 

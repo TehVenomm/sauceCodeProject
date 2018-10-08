@@ -30,16 +30,16 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 			public float targetingDistance = 4f;
 
 			[Tooltip("狙い中(右側) オフセット")]
-			public Vector3 targetingOffset = Vector3.zero;
+			public Vector3 targetingOffset = Vector3.get_zero();
 
 			[Tooltip("狙い中(左側) オフセット")]
-			public Vector3 targetingLeftOffset = Vector3.zero;
+			public Vector3 targetingLeftOffset = Vector3.get_zero();
 
 			[Tooltip("狙い中しゃがみ(右側) オフセット")]
-			public Vector3 targetingAvoidShotRightOffset = Vector3.zero;
+			public Vector3 targetingAvoidShotRightOffset = Vector3.get_zero();
 
 			[Tooltip("狙い中しゃがみ(左側) オフセット")]
-			public Vector3 targetingAvoidShotLeftOffset = Vector3.zero;
+			public Vector3 targetingAvoidShotLeftOffset = Vector3.get_zero();
 
 			[Tooltip("狙い中 画角（0で変化無し")]
 			public float fieldOfView;
@@ -52,10 +52,10 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 		public class CameraTargetOffsetSettings
 		{
 			[Tooltip("カメラオフセット補正位置")]
-			public Vector3 targetOffsetPos = Vector3.zero;
+			public Vector3 targetOffsetPos = Vector3.get_zero();
 
 			[Tooltip("カメラオフセット補正回転")]
-			public Vector3 targetOffsetRot = Vector3.zero;
+			public Vector3 targetOffsetRot = Vector3.get_zero();
 		}
 
 		[Serializable]
@@ -71,7 +71,7 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 			public float aimDistanceToSelf = 2.6f;
 
 			[Tooltip("波動砲のカメラオフセット")]
-			public Vector3 beamChargeCameraOffset = Vector3.zero;
+			public Vector3 beamChargeCameraOffset = Vector3.get_zero();
 
 			[Tooltip("波動砲のカメラ見下ろし角度")]
 			public float beamChargeCameraLookDownAngle;
@@ -80,10 +80,10 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 			public float beamChargeCameraDistanceToSelf;
 
 			[Tooltip("波動砲発射時のカメラ位置")]
-			public Vector3 beamCameraPosition = Vector3.zero;
+			public Vector3 beamCameraPosition = Vector3.get_zero();
 
 			[Tooltip("波動砲発射時のカメラ")]
-			public Vector3 beamCameraRotationEular = Vector3.zero;
+			public Vector3 beamCameraRotationEular = Vector3.get_zero();
 		}
 
 		[Tooltip("タ\u30fcゲットカメラ ピッチ")]
@@ -108,7 +108,7 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 		public float targetingDistance = 4f;
 
 		[Tooltip("タ\u30fcゲットカメラ オフセット")]
-		public Vector3 targetingOffset = Vector3.zero;
+		public Vector3 targetingOffset = Vector3.get_zero();
 
 		[Tooltip("タ\u30fcゲットカメラ カメラ移動最大速度")]
 		public float targetingMaxSpeed = 999f;
@@ -120,7 +120,7 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 		public float freeDistance = 10f;
 
 		[Tooltip("フリ\u30fcカメラ オフセット")]
-		public Vector3 freeOffset = Vector3.zero;
+		public Vector3 freeOffset = Vector3.get_zero();
 
 		[Tooltip("フリ\u30fcカメラ カメラ移動最大速度")]
 		public float freeMaxSpeed = 999f;
@@ -199,9 +199,9 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	public class TargetOffset
 	{
-		public Vector3 pos = Vector3.zero;
+		public Vector3 pos = Vector3.get_zero();
 
-		public Vector3 rot = Vector3.zero;
+		public Vector3 rot = Vector3.get_zero();
 	}
 
 	private Camera ctrlCamera;
@@ -222,11 +222,11 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 	[Tooltip("横画面設定")]
 	public Settings landscapeSettings = new Settings();
 
-	private Vector3 requestPos = Vector3.zero;
+	private Vector3 requestPos = Vector3.get_zero();
 
-	private Quaternion requestRot = Quaternion.identity;
+	private Quaternion requestRot = Quaternion.get_identity();
 
-	private Vector3 normalForward = Vector3.back;
+	private Vector3 normalForward = Vector3.get_back();
 
 	private bool isBossExistsPast;
 
@@ -234,9 +234,9 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	private float switchTimer;
 
-	private Vector3 posVelocity = Vector3.zero;
+	private Vector3 posVelocity = Vector3.get_zero();
 
-	private Vector3 rotVelocity = Vector3.zero;
+	private Vector3 rotVelocity = Vector3.get_zero();
 
 	private float distanceElapsedTime;
 
@@ -246,13 +246,13 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	private float fieldOfViewVelocity;
 
-	private Vector3 stopPos = Vector3.zero;
+	private Vector3 stopPos = Vector3.get_zero();
 
-	private Vector3 stopRotEular = Vector3.zero;
+	private Vector3 stopRotEular = Vector3.get_zero();
 
-	private Vector3 cutPos = Vector3.zero;
+	private Vector3 cutPos = Vector3.get_zero();
 
-	private Quaternion cutRot = Quaternion.identity;
+	private Quaternion cutRot = Quaternion.get_identity();
 
 	protected bool adjustCamera;
 
@@ -284,9 +284,9 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	private Transform radialBlurCenterTransform;
 
-	private Vector3 radialBlurCenterPos = Vector3.zero;
+	private Vector3 radialBlurCenterPos = Vector3.get_zero();
 
-	private Vector3 beforeFollowVec = Vector3.zero;
+	private Vector3 beforeFollowVec = Vector3.get_zero();
 
 	private GrabInfo _grabInfo = new GrabInfo();
 
@@ -360,6 +360,28 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	public InGameCameraManager()
 	{
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 		isMotionCameraMode = false;
 		motionCameraTransforms = null;
 		motionCameraParent = null;
@@ -384,21 +406,29 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	public void SetStopPos(Vector3 pos)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		stopPos = pos;
 	}
 
 	public void SetStopRotEular(Vector3 rotEular)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		stopRotEular = rotEular;
 	}
 
 	public void SetCutPos(Vector3 cutPos)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		this.cutPos = cutPos;
 	}
 
 	public void SetCutRot(Quaternion cutRot)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		this.cutRot = cutRot;
 	}
 
@@ -472,9 +502,9 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
 		}
 		RenderTargetCacher component = MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>();
-		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+		if (component != null)
 		{
-			component.enabled = false;
+			component.set_enabled(false);
 		}
 	}
 
@@ -488,40 +518,55 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 		EndRadialBlurFilter(0f);
 		MonoBehaviourSingleton<GameSceneManager>.I.SetMainCameraCullingMask(GameSceneGlobalSettings.GetDefaultMainCameraCullingMask());
 		RenderTargetCacher component = MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>();
-		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+		if (component != null)
 		{
-			component.enabled = true;
+			component.set_enabled(true);
 		}
 	}
 
 	private void Start()
 	{
-		if ((UnityEngine.Object)ctrlCamera == (UnityEngine.Object)null)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Expected O, but got Unknown
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		if (ctrlCamera == null)
 		{
 			ctrlCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
 		}
-		cameraTransform = ctrlCamera.transform;
-		movePosition = cameraTransform.position;
-		moveRotation = cameraTransform.rotation;
+		cameraTransform = ctrlCamera.get_transform();
+		movePosition = cameraTransform.get_position();
+		moveRotation = cameraTransform.get_rotation();
 		radialBlurFilter = ctrlCamera.GetComponent<RadialBlurFilter>();
-		if ((UnityEngine.Object)radialBlurFilter != (UnityEngine.Object)null)
+		if (radialBlurFilter != null)
 		{
-			radialBlurFilter.enabled = false;
+			radialBlurFilter.set_enabled(false);
 		}
 	}
 
 	private void UpdateRadialBlur()
 	{
-		Vector3 zero = Vector3.zero;
-		zero = ((!((UnityEngine.Object)radialBlurCenterTransform != (UnityEngine.Object)null)) ? radialBlurCenterPos : radialBlurCenterTransform.position);
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		Vector3 zero = Vector3.get_zero();
+		zero = ((!(radialBlurCenterTransform != null)) ? radialBlurCenterPos : radialBlurCenterTransform.get_position());
 		Vector2 center = WorldToScreenPoint(zero).ToVector2XY();
-		center.x /= (float)Screen.width;
-		center.y /= (float)Screen.height;
+		center.x /= (float)Screen.get_width();
+		center.y /= (float)Screen.get_height();
 		radialBlurFilter.SetCenter(center);
 		if (radialBlurStrengthPerTime != 0f)
 		{
 			float strength = radialBlurFilter.strength;
-			strength += radialBlurStrengthPerTime * Time.deltaTime;
+			strength += radialBlurStrengthPerTime * Time.get_deltaTime();
 			if (radialBlurStrengthPerTime > 0f)
 			{
 				if (strength >= radialBlurStrengthValue)
@@ -548,21 +593,263 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	private void UpdatePlayerCamera()
 	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0211: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0219: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0230: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0235: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0237: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0257: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0261: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0266: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0272: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0274: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0279: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02fc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0301: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0303: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0308: Unknown result type (might be due to invalid IL or missing references)
+		//IL_030a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_030c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_030e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0310: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0312: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0317: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0319: Unknown result type (might be due to invalid IL or missing references)
+		//IL_031e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0320: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0322: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0331: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0333: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0338: Unknown result type (might be due to invalid IL or missing references)
+		//IL_033d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_033f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0341: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0343: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0348: Unknown result type (might be due to invalid IL or missing references)
+		//IL_034a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_034c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_034e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0353: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0383: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0385: Unknown result type (might be due to invalid IL or missing references)
+		//IL_038a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_038f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0391: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0393: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0398: Unknown result type (might be due to invalid IL or missing references)
+		//IL_039d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0407: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0409: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0418: Unknown result type (might be due to invalid IL or missing references)
+		//IL_041a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_041f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0421: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0426: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0429: Unknown result type (might be due to invalid IL or missing references)
+		//IL_042e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0436: Unknown result type (might be due to invalid IL or missing references)
+		//IL_043b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_043e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0440: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0446: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0448: Unknown result type (might be due to invalid IL or missing references)
+		//IL_044a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_044f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0451: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0456: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0458: Unknown result type (might be due to invalid IL or missing references)
+		//IL_045d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0465: Unknown result type (might be due to invalid IL or missing references)
+		//IL_046a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_046f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0476: Unknown result type (might be due to invalid IL or missing references)
+		//IL_047c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0481: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0491: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0496: Unknown result type (might be due to invalid IL or missing references)
+		//IL_049b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04c6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0502: Unknown result type (might be due to invalid IL or missing references)
+		//IL_050c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0511: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0516: Unknown result type (might be due to invalid IL or missing references)
+		//IL_053a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_053f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0540: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0542: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0547: Unknown result type (might be due to invalid IL or missing references)
+		//IL_054c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0561: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0564: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0569: Unknown result type (might be due to invalid IL or missing references)
+		//IL_056e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_058b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_058c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_058e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0593: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05ba: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_060a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_060f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0614: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0616: Unknown result type (might be due to invalid IL or missing references)
+		//IL_061b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0621: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0626: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0636: Unknown result type (might be due to invalid IL or missing references)
+		//IL_063b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0668: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0669: Unknown result type (might be due to invalid IL or missing references)
+		//IL_066b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0670: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06c4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06c9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06e5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0701: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0706: Unknown result type (might be due to invalid IL or missing references)
+		//IL_070c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0711: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0716: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0719: Unknown result type (might be due to invalid IL or missing references)
+		//IL_071b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_071d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0722: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0724: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0729: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0731: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0736: Unknown result type (might be due to invalid IL or missing references)
+		//IL_073b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0742: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0748: Unknown result type (might be due to invalid IL or missing references)
+		//IL_074d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_075d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0762: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0767: Unknown result type (might be due to invalid IL or missing references)
+		//IL_076c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0773: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0783: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0788: Unknown result type (might be due to invalid IL or missing references)
+		//IL_078d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0792: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0833: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0839: Unknown result type (might be due to invalid IL or missing references)
+		//IL_083e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0849: Unknown result type (might be due to invalid IL or missing references)
+		//IL_084e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0853: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0858: Unknown result type (might be due to invalid IL or missing references)
+		//IL_085f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_086a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_086f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0874: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0879: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0895: Unknown result type (might be due to invalid IL or missing references)
+		//IL_089a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_089c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_098b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_098f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_09a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_09a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_09ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a81: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a8d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a9c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a9e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ab2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ab7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ab9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0abe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ac2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ac7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0acf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ad4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b69: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b6e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b72: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b7a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b82: Unknown result type (might be due to invalid IL or missing references)
 		Settings validSettings = this.validSettings;
 		Vector3 movePosition = this.movePosition;
 		Quaternion moveRotation = this.moveRotation;
-		float fieldOfView = ctrlCamera.fieldOfView;
+		float fieldOfView = ctrlCamera.get_fieldOfView();
 		Vector3 cameraTargetPos = targetObject.GetCameraTargetPos();
-		if (!((UnityEngine.Object)targetPlayer == (UnityEngine.Object)null))
+		if (!(targetPlayer == null))
 		{
 			StageObject stageObject = null;
 			if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 			{
 				stageObject = MonoBehaviourSingleton<StageObjectManager>.I.boss;
 			}
-			bool flag = (UnityEngine.Object)stageObject != (UnityEngine.Object)null;
+			bool flag = stageObject != null;
 			float num = 0f;
-			float maxSpeed = 999f;
+			float num2 = 999f;
 			bool flag2 = false;
 			if (isBossExistsPast != flag)
 			{
@@ -571,18 +858,18 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 				switchTimer = validSettings.modeSwitchTime;
 				flag2 = true;
 			}
-			distanceElapsedTime += Time.deltaTime;
+			distanceElapsedTime += Time.get_deltaTime();
 			if (distanceElapsedTime > validSettings.distanceLerpTime)
 			{
 				distanceElapsedTime = validSettings.distanceLerpTime;
 			}
-			modeChangeTime -= Time.deltaTime;
+			modeChangeTime -= Time.get_deltaTime();
 			if (modeChangeTime < 0f)
 			{
 				modeChangeTime = 0f;
 			}
-			float num2 = distanceElapsedTime / validSettings.distanceLerpTime;
-			float num3 = 0f;
+			float num3 = distanceElapsedTime / validSettings.distanceLerpTime;
+			float num4 = 0f;
 			fieldOfView = ingameFieldOfView;
 			if (!isFixedCameraMode)
 			{
@@ -591,70 +878,70 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 					num = 0f;
 					if (motionCameraTransforms != null)
 					{
-						int num4 = 0;
+						int num5 = 0;
 						if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 						{
-							num4 = ((!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait) ? 1 : 0);
+							num5 = ((!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait) ? 1 : 0);
 						}
-						requestPos = motionCameraTransforms[num4].position;
-						requestRot = motionCameraTransforms[num4].rotation;
-						Vector3 localScale = motionCameraTransforms[num4].localScale;
-						float num5 = localScale.x;
-						if (num5 > 0f)
+						requestPos = motionCameraTransforms[num5].get_position();
+						requestRot = motionCameraTransforms[num5].get_rotation();
+						Vector3 localScale = motionCameraTransforms[num5].get_localScale();
+						float num6 = localScale.x;
+						if (num6 > 0f)
 						{
-							num5 = Utility.HorizontalToVerticalFOV(num5);
+							num6 = Utility.HorizontalToVerticalFOV(num6);
 						}
-						fieldOfView = num5;
+						fieldOfView = num6;
 					}
 				}
 				else if (!flag || !validSettings.targetEnable)
 				{
 					num = validSettings.smoothFreeRate;
-					num3 = validSettings.freeDistance;
-					maxSpeed = validSettings.freeMaxSpeed;
-					Vector3 back = Vector3.back;
+					num4 = validSettings.freeDistance;
+					num2 = validSettings.freeMaxSpeed;
+					Vector3 back = Vector3.get_back();
 					if (validSettings.normalEnable)
 					{
 						back = normalForward;
 					}
-					Vector3 vector = cameraTargetPos;
-					float num6 = 1f;
-					Vector3 axis = Vector3.Cross(back, Vector3.up);
-					Vector3 vector2 = Quaternion.AngleAxis(0f - validSettings.freePitch, axis) * back * Mathf.Lerp(validSettings.distanceLimit, num3, num2) * num6;
-					Vector3 b = Quaternion.LookRotation(back) * validSettings.freeOffset * num6;
-					Vector3 b2 = Vector3.zero;
-					if (targetPlayer.actionID == Character.ACTION_ID.ATTACK && !targetPlayer.isArrowAimLesserMode && (UnityEngine.Object)targetPlayer.attackStartTarget != (UnityEngine.Object)null && (UnityEngine.Object)targetPlayer.attackStartTarget == (UnityEngine.Object)targetPlayer.actionTarget && MonoBehaviourSingleton<TargetMarkerManager>.I.isTargetLock)
+					Vector3 val = cameraTargetPos;
+					float num7 = 1f;
+					Vector3 val2 = Vector3.Cross(back, Vector3.get_up());
+					Vector3 val3 = Quaternion.AngleAxis(0f - validSettings.freePitch, val2) * back * Mathf.Lerp(validSettings.distanceLimit, num4, num3) * num7;
+					Vector3 val4 = Quaternion.LookRotation(back) * validSettings.freeOffset * num7;
+					Vector3 val5 = Vector3.get_zero();
+					if (targetPlayer.actionID == Character.ACTION_ID.ATTACK && !targetPlayer.isArrowAimLesserMode && targetPlayer.attackStartTarget != null && targetPlayer.attackStartTarget == targetPlayer.actionTarget && MonoBehaviourSingleton<TargetMarkerManager>.I.isTargetLock)
 					{
-						Vector3 a = targetPlayer.attackStartTarget._position - targetPlayer._position;
-						Quaternion rotation = Quaternion.identity;
-						Vector3 vector3 = vector2;
-						Vector3 vector4 = a - b;
-						Vector3 zero = Vector3.zero;
-						if (back != Vector3.forward)
+						Vector3 val6 = targetPlayer.attackStartTarget._position - targetPlayer._position;
+						Quaternion val7 = Quaternion.get_identity();
+						Vector3 val8 = val3;
+						Vector3 val9 = val6 - val4;
+						Vector3 zero = Vector3.get_zero();
+						if (back != Vector3.get_forward())
 						{
-							rotation = Quaternion.FromToRotation(back, Vector3.forward);
-							vector3 = rotation * vector3;
-							vector4 = rotation * vector4;
+							val7 = Quaternion.FromToRotation(back, Vector3.get_forward());
+							val8 = val7 * val8;
+							val9 = val7 * val9;
 						}
-						if (vector4.z < (0f - validSettings.followBackOffset) * num6)
+						if (val9.z < (0f - validSettings.followBackOffset) * num7)
 						{
-							zero.z = vector4.z + validSettings.followBackOffset * num6;
+							zero.z = val9.z + validSettings.followBackOffset * num7;
 						}
-						Vector3 vector5 = Quaternion.FromToRotation(vector3, Vector3.forward) * (vector3 + vector4);
-						float num7 = Mathf.Tan(0.0174532924f * fieldOfView * 0.5f) * ((float)Screen.width / (float)Screen.height);
-						float num8 = Mathf.Abs(vector5.x / vector5.z);
-						float num9 = num8 / num7;
-						if (num9 > validSettings.followSidePercent)
+						Vector3 val10 = Quaternion.FromToRotation(val8, Vector3.get_forward()) * (val8 + val9);
+						float num8 = Mathf.Tan(0.0174532924f * fieldOfView * 0.5f) * ((float)Screen.get_width() / (float)Screen.get_height());
+						float num9 = Mathf.Abs(val10.x / val10.z);
+						float num10 = num9 / num8;
+						if (num10 > validSettings.followSidePercent)
 						{
-							zero.x = vector4.x * (num9 - validSettings.followSidePercent) / num9;
+							zero.x = val9.x * (num10 - validSettings.followSidePercent) / num10;
 						}
-						if (back != Vector3.forward)
+						if (back != Vector3.get_forward())
 						{
-							b2 = Quaternion.Inverse(rotation) * zero;
+							val5 = Quaternion.Inverse(val7) * zero;
 						}
 					}
-					requestPos = cameraTargetPos + (beforeFollowVec = Vector3.Lerp(beforeFollowVec, b2, validSettings.followRate)) - vector2 + b;
-					requestRot = Quaternion.LookRotation(vector2.normalized);
+					requestPos = cameraTargetPos + (beforeFollowVec = Vector3.Lerp(beforeFollowVec, val5, validSettings.followRate)) - val3 + val4;
+					requestRot = Quaternion.LookRotation(val3.get_normalized());
 					requestPos += Quaternion.LookRotation(normalForward) * this.validSettings.cameraFieldOffsetSettings.targetOffsetPos;
 					requestRot *= Quaternion.Euler(this.validSettings.cameraFieldOffsetSettings.targetOffsetRot);
 					if (MonoBehaviourSingleton<FieldManager>.IsValid())
@@ -666,48 +953,49 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 				else
 				{
 					num = validSettings.smoothTargetingRate;
-					num3 = validSettings.targetingDistance;
-					maxSpeed = validSettings.targetingMaxSpeed;
-					Vector3 vector = stageObject.GetCameraTargetPos();
-					Vector3 vector6 = vector - requestPos;
-					vector6.y = 0f;
-					vector6.Normalize();
-					Vector3 vector7 = cameraTargetPos - requestPos;
-					vector7.y = 0f;
-					vector7.Normalize();
+					num4 = validSettings.targetingDistance;
+					num2 = validSettings.targetingMaxSpeed;
+					Vector3 val = stageObject.GetCameraTargetPos();
+					Vector3 val11 = val - requestPos;
+					val11.y = 0f;
+					val11.Normalize();
+					Vector3 val12 = cameraTargetPos - requestPos;
+					val12.y = 0f;
+					val12.Normalize();
 					if (flag2)
 					{
-						normalForward = vector - cameraTargetPos;
+						normalForward = val - cameraTargetPos;
 						normalForward.y = 0f;
 						normalForward.Normalize();
 					}
 					else
 					{
-						float num10 = Vector3.Angle(vector6, vector7);
-						if (num10 > validSettings.moveableTargetAngle)
+						float num11 = Vector3.Angle(val11, val12);
+						if (num11 > validSettings.moveableTargetAngle)
 						{
-							Vector3 vector8 = Vector3.Cross(vector7, vector6);
-							float num11 = (!(vector8.y >= 0f)) ? (-1f) : 1f;
-							normalForward = Quaternion.AngleAxis((num10 - validSettings.moveableTargetAngle) * num11, Vector3.up) * vector7;
+							Vector3 val13 = Vector3.Cross(val12, val11);
+							float num12 = (!(val13.y >= 0f)) ? (-1f) : 1f;
+							normalForward = Quaternion.AngleAxis((num11 - validSettings.moveableTargetAngle) * num12, Vector3.get_up()) * val12;
 						}
 					}
-					if (normalForward == Vector3.zero)
+					if (normalForward == Vector3.get_zero())
 					{
-						normalForward = Vector3.back;
+						normalForward = Vector3.get_back();
 					}
-					float num12 = validSettings.targetingPitch;
+					float num13 = validSettings.targetingPitch;
 					if (validSettings.targetingPitchNearDistance != 0f || validSettings.targetingPitchFarDistance != 0f)
 					{
-						float magnitude = (vector - cameraTargetPos).magnitude;
-						float time = Mathf.Clamp01((magnitude - validSettings.targetingPitchNearDistance) / (validSettings.targetingPitchFarDistance - validSettings.targetingPitchNearDistance));
-						time = validSettings.targetingPitchCurve.Evaluate(time);
-						num12 = validSettings.targetingPitchMinAngle * (1f - time) + validSettings.targetingPitchMaxAngle * time;
+						Vector3 val14 = val - cameraTargetPos;
+						float magnitude = val14.get_magnitude();
+						float num14 = Mathf.Clamp01((magnitude - validSettings.targetingPitchNearDistance) / (validSettings.targetingPitchFarDistance - validSettings.targetingPitchNearDistance));
+						num14 = validSettings.targetingPitchCurve.Evaluate(num14);
+						num13 = validSettings.targetingPitchMinAngle * (1f - num14) + validSettings.targetingPitchMaxAngle * num14;
 					}
-					Vector3 axis2 = Vector3.Cross(normalForward, Vector3.up);
-					Vector3 b3 = Quaternion.AngleAxis(0f - num12, axis2) * normalForward * Mathf.Lerp(validSettings.distanceLimit, num3, num2);
-					Vector3 b4 = Quaternion.LookRotation(normalForward) * validSettings.targetingOffset;
-					requestPos = cameraTargetPos - b3 + b4;
-					requestRot = Quaternion.LookRotation(b3.normalized);
+					Vector3 val15 = Vector3.Cross(normalForward, Vector3.get_up());
+					Vector3 val16 = Quaternion.AngleAxis(0f - num13, val15) * normalForward * Mathf.Lerp(validSettings.distanceLimit, num4, num3);
+					Vector3 val17 = Quaternion.LookRotation(normalForward) * validSettings.targetingOffset;
+					requestPos = cameraTargetPos - val16 + val17;
+					requestRot = Quaternion.LookRotation(val16.get_normalized());
 					requestPos += Quaternion.LookRotation(normalForward) * this.validSettings.cameraTargetOffsetSettings.targetOffsetPos;
 					requestRot *= Quaternion.Euler(this.validSettings.cameraTargetOffsetSettings.targetOffsetRot);
 					if (MonoBehaviourSingleton<FieldManager>.IsValid())
@@ -736,46 +1024,47 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 			}
 			if (hitObjectType != 0 && !isMotionCameraMode)
 			{
-				Vector3 vector9 = requestPos - cameraTargetPos;
-				RaycastHit hitInfo = default(RaycastHit);
-				Ray ray = new Ray(cameraTargetPos, vector9.normalized);
-				if (Physics.Raycast(ray, out hitInfo, num3, 2359808) && hitObjectType == CAM_HIT_OBJ_TYPE.ZOOM)
+				Vector3 val18 = requestPos - cameraTargetPos;
+				RaycastHit val19 = default(RaycastHit);
+				Ray val20 = default(Ray);
+				val20._002Ector(cameraTargetPos, val18.get_normalized());
+				if (Physics.Raycast(val20, ref val19, num4, 2359808) && hitObjectType == CAM_HIT_OBJ_TYPE.ZOOM)
 				{
-					float num13 = hitInfo.distance;
-					if (num13 < validSettings.distanceLimit)
+					float num15 = val19.get_distance();
+					if (num15 < validSettings.distanceLimit)
 					{
-						num13 = validSettings.distanceLimit;
+						num15 = validSettings.distanceLimit;
 					}
-					num13 -= validSettings.distanceLimit;
-					float num14 = num3 - validSettings.distanceLimit;
-					float num15 = 0f;
-					if (num14 > 0f)
+					num15 -= validSettings.distanceLimit;
+					float num16 = num4 - validSettings.distanceLimit;
+					float num17 = 0f;
+					if (num16 > 0f)
 					{
-						num15 = validSettings.distanceLerpTime * (num13 / num14);
+						num17 = validSettings.distanceLerpTime * (num15 / num16);
 					}
 					if (modeChangeTime <= 0f)
 					{
-						distanceElapsedTime -= Time.deltaTime * 5f;
-						if (distanceElapsedTime < num15)
+						distanceElapsedTime -= Time.get_deltaTime() * 5f;
+						if (distanceElapsedTime < num17)
 						{
-							distanceElapsedTime = num15;
+							distanceElapsedTime = num17;
 						}
 					}
 					else
 					{
-						distanceElapsedTime = num15;
+						distanceElapsedTime = num17;
 					}
-					num2 = distanceElapsedTime / validSettings.distanceLerpTime;
-					requestPos = cameraTargetPos + ray.direction * Mathf.Lerp(validSettings.distanceLimit, num3, num2);
+					num3 = distanceElapsedTime / validSettings.distanceLerpTime;
+					requestPos = cameraTargetPos + val20.get_direction() * Mathf.Lerp(validSettings.distanceLimit, num4, num3);
 				}
 			}
 			if (num != 0f && modeChangeTime <= 0f)
 			{
-				num *= ((!(num2 < 0.1f)) ? num2 : 0.1f);
+				num *= ((!(num3 < 0.1f)) ? num3 : 0.1f);
 			}
 			if (switching)
 			{
-				switchTimer -= Time.deltaTime;
+				switchTimer -= Time.get_deltaTime();
 				if (switchTimer <= 0f)
 				{
 					switching = false;
@@ -794,68 +1083,139 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 			}
 			else
 			{
-				Vector3 movePosition2 = Vector3.SmoothDamp(movePosition, requestPos, ref posVelocity, num, maxSpeed, Time.deltaTime);
-				Vector3 zero2 = Vector3.zero;
-				Vector3 eulerAngles = moveRotation.eulerAngles;
-				Vector3 eulerAngles2 = requestRot.eulerAngles;
-				zero2.x = Mathf.SmoothDampAngle(eulerAngles.x, eulerAngles2.x, ref rotVelocity.x, num, 1000f, Time.deltaTime);
-				zero2.y = Mathf.SmoothDampAngle(eulerAngles.y, eulerAngles2.y, ref rotVelocity.y, num, 1000f, Time.deltaTime);
-				zero2.z = Mathf.SmoothDampAngle(eulerAngles.z, eulerAngles2.z, ref rotVelocity.z, num, 1000f, Time.deltaTime);
-				Quaternion identity = Quaternion.identity;
-				identity.eulerAngles = zero2;
+				Vector3 movePosition2 = Vector3.SmoothDamp(movePosition, requestPos, ref posVelocity, num, num2, Time.get_deltaTime());
+				Vector3 zero2 = Vector3.get_zero();
+				Vector3 eulerAngles = moveRotation.get_eulerAngles();
+				Vector3 eulerAngles2 = requestRot.get_eulerAngles();
+				zero2.x = Mathf.SmoothDampAngle(eulerAngles.x, eulerAngles2.x, ref rotVelocity.x, num, 1000f, Time.get_deltaTime());
+				zero2.y = Mathf.SmoothDampAngle(eulerAngles.y, eulerAngles2.y, ref rotVelocity.y, num, 1000f, Time.get_deltaTime());
+				zero2.z = Mathf.SmoothDampAngle(eulerAngles.z, eulerAngles2.z, ref rotVelocity.z, num, 1000f, Time.get_deltaTime());
+				Quaternion identity = Quaternion.get_identity();
+				identity.set_eulerAngles(zero2);
 				this.movePosition = movePosition2;
 				this.moveRotation = identity;
-				fieldOfView = Mathf.SmoothDamp(ctrlCamera.fieldOfView, fieldOfView, ref fieldOfViewVelocity, num, 1000f, Time.deltaTime);
+				fieldOfView = Mathf.SmoothDamp(ctrlCamera.get_fieldOfView(), fieldOfView, ref fieldOfViewVelocity, num, 1000f, Time.get_deltaTime());
 			}
-			ctrlCamera.fieldOfView = fieldOfView;
+			ctrlCamera.set_fieldOfView(fieldOfView);
 		}
 	}
 
 	private void UpdateArrowAimBossModeCamera()
 	{
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0215: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0290: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0295: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0299: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_039c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_039f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_046b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_046d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0481: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0486: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0488: Unknown result type (might be due to invalid IL or missing references)
+		//IL_048d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0491: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0496: Unknown result type (might be due to invalid IL or missing references)
+		//IL_049e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0538: Unknown result type (might be due to invalid IL or missing references)
+		//IL_053d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0541: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0549: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0551: Unknown result type (might be due to invalid IL or missing references)
 		Vector3 cameraTargetPos = targetSelf.GetCameraTargetPos();
-		float target = ingameFieldOfView;
+		float num = ingameFieldOfView;
 		Vector3 movePosition = this.movePosition;
 		Quaternion moveRotation = this.moveRotation;
-		StageObject x = null;
+		StageObject stageObject = null;
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			x = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+			stageObject = MonoBehaviourSingleton<StageObjectManager>.I.boss;
 		}
-		bool flag = (UnityEngine.Object)x != (UnityEngine.Object)null;
+		bool flag = stageObject != null;
 		if (isBossExistsPast != flag)
 		{
 			isBossExistsPast = flag;
 			switching = true;
 			switchTimer = validSettings.modeSwitchTime;
 		}
-		distanceElapsedTime += Time.deltaTime;
+		distanceElapsedTime += Time.get_deltaTime();
 		if (distanceElapsedTime > validSettings.distanceLerpTime)
 		{
 			distanceElapsedTime = validSettings.distanceLerpTime;
 		}
-		modeChangeTime -= Time.deltaTime;
+		modeChangeTime -= Time.get_deltaTime();
 		if (modeChangeTime < 0f)
 		{
 			modeChangeTime = 0f;
 		}
 		Settings.ArrowAimSettings arrowAimSettings = validSettings.arrowAimSettings;
-		float num = arrowAimSettings.smoothTargetingRate;
+		float num2 = arrowAimSettings.smoothTargetingRate;
 		float targetingMaxSpeed = validSettings.targetingMaxSpeed;
-		float num2 = distanceElapsedTime / validSettings.distanceLerpTime;
+		float num3 = distanceElapsedTime / validSettings.distanceLerpTime;
 		float targetingDistance = arrowAimSettings.targetingDistance;
-		normalForward = targetSelf.arrowAimForward.normalized;
+		Vector3 arrowAimForward = targetSelf.arrowAimForward;
+		normalForward = arrowAimForward.get_normalized();
 		int arrowAimStartSign = targetSelf.arrowAimStartSign;
-		Vector3 axis = Vector3.Cross(normalForward, Vector3.up);
-		Vector3 b = Quaternion.AngleAxis(0f - arrowAimSettings.targetingPitch, axis) * normalForward * Mathf.Lerp(validSettings.distanceLimit, targetingDistance, num2);
-		Vector3 point = arrowAimSettings.targetingOffset;
+		Vector3 val = Vector3.Cross(normalForward, Vector3.get_up());
+		Vector3 val2 = Quaternion.AngleAxis(0f - arrowAimSettings.targetingPitch, val) * normalForward * Mathf.Lerp(validSettings.distanceLimit, targetingDistance, num3);
+		Vector3 val3 = arrowAimSettings.targetingOffset;
 		if (arrowCameraMode == 1)
 		{
-			point = ((!targetSelf.IsAbleArrowSitShot()) ? ((arrowAimStartSign > 0) ? arrowAimSettings.targetingLeftOffset : arrowAimSettings.targetingOffset) : ((arrowAimStartSign > 0) ? arrowAimSettings.targetingAvoidShotLeftOffset : arrowAimSettings.targetingAvoidShotRightOffset));
+			val3 = ((!targetSelf.IsAbleArrowSitShot()) ? ((arrowAimStartSign > 0) ? arrowAimSettings.targetingLeftOffset : arrowAimSettings.targetingOffset) : ((arrowAimStartSign > 0) ? arrowAimSettings.targetingAvoidShotLeftOffset : arrowAimSettings.targetingAvoidShotRightOffset));
 		}
-		Vector3 b2 = Quaternion.LookRotation(normalForward) * point;
-		requestPos = cameraTargetPos - b + b2;
-		requestRot = Quaternion.LookRotation(b.normalized);
+		Vector3 val4 = Quaternion.LookRotation(normalForward) * val3;
+		requestPos = cameraTargetPos - val2 + val4;
+		requestRot = Quaternion.LookRotation(val2.get_normalized());
 		if (!flag || !validSettings.targetEnable)
 		{
 			modeChangeTime = validSettings.smoothFreeRate;
@@ -867,118 +1227,210 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 		distanceElapsedTime = validSettings.distanceLerpTime;
 		if (hitObjectType != 0 && !isMotionCameraMode)
 		{
-			Vector3 vector = requestPos - cameraTargetPos;
-			RaycastHit hitInfo = default(RaycastHit);
-			Ray ray = new Ray(cameraTargetPos, vector.normalized);
-			if (Physics.Raycast(ray, out hitInfo, targetingDistance, 2359808) && hitObjectType == CAM_HIT_OBJ_TYPE.ZOOM)
+			Vector3 val5 = requestPos - cameraTargetPos;
+			RaycastHit val6 = default(RaycastHit);
+			Ray val7 = default(Ray);
+			val7._002Ector(cameraTargetPos, val5.get_normalized());
+			if (Physics.Raycast(val7, ref val6, targetingDistance, 2359808) && hitObjectType == CAM_HIT_OBJ_TYPE.ZOOM)
 			{
-				float num3 = hitInfo.distance;
-				if (num3 < validSettings.distanceLimit)
+				float num4 = val6.get_distance();
+				if (num4 < validSettings.distanceLimit)
 				{
-					num3 = validSettings.distanceLimit;
+					num4 = validSettings.distanceLimit;
 				}
-				num3 -= validSettings.distanceLimit;
-				float num4 = targetingDistance - validSettings.distanceLimit;
-				float num5 = 0f;
-				if (num4 > 0f)
+				num4 -= validSettings.distanceLimit;
+				float num5 = targetingDistance - validSettings.distanceLimit;
+				float num6 = 0f;
+				if (num5 > 0f)
 				{
-					num5 = validSettings.distanceLerpTime * (num3 / num4);
+					num6 = validSettings.distanceLerpTime * (num4 / num5);
 				}
 				if (modeChangeTime <= 0f)
 				{
-					distanceElapsedTime -= Time.deltaTime * 5f;
-					if (distanceElapsedTime < num5)
+					distanceElapsedTime -= Time.get_deltaTime() * 5f;
+					if (distanceElapsedTime < num6)
 					{
-						distanceElapsedTime = num5;
+						distanceElapsedTime = num6;
 					}
 				}
 				else
 				{
-					distanceElapsedTime = num5;
+					distanceElapsedTime = num6;
 				}
-				num2 = distanceElapsedTime / validSettings.distanceLerpTime;
-				requestPos = cameraTargetPos + ray.direction * Mathf.Lerp(validSettings.distanceLimit, targetingDistance, num2);
+				num3 = distanceElapsedTime / validSettings.distanceLerpTime;
+				requestPos = cameraTargetPos + val7.get_direction() * Mathf.Lerp(validSettings.distanceLimit, targetingDistance, num3);
 			}
 		}
-		if (num != 0f && modeChangeTime <= 0f)
+		if (num2 != 0f && modeChangeTime <= 0f)
 		{
-			num *= ((!(num2 < 0.1f)) ? num2 : 0.1f);
+			num2 *= ((!(num3 < 0.1f)) ? num3 : 0.1f);
 		}
 		if (switching)
 		{
-			switchTimer -= Time.deltaTime;
+			switchTimer -= Time.get_deltaTime();
 			if (switchTimer <= 0f)
 			{
 				switching = false;
 				switchTimer = 0f;
 			}
-			num = Mathf.Lerp(validSettings.modeSwitchTime, num, 1f - switchTimer / validSettings.modeSwitchTime);
+			num2 = Mathf.Lerp(validSettings.modeSwitchTime, num2, 1f - switchTimer / validSettings.modeSwitchTime);
 		}
-		Vector3 movePosition2 = Vector3.SmoothDamp(movePosition, requestPos, ref posVelocity, num, targetingMaxSpeed, Time.deltaTime);
-		Vector3 zero = Vector3.zero;
-		Vector3 eulerAngles = moveRotation.eulerAngles;
-		Vector3 eulerAngles2 = requestRot.eulerAngles;
-		zero.x = Mathf.SmoothDampAngle(eulerAngles.x, eulerAngles2.x, ref rotVelocity.x, num, 1000f, Time.deltaTime);
-		zero.y = Mathf.SmoothDampAngle(eulerAngles.y, eulerAngles2.y, ref rotVelocity.y, num, 1000f, Time.deltaTime);
-		zero.z = Mathf.SmoothDampAngle(eulerAngles.z, eulerAngles2.z, ref rotVelocity.z, num, 1000f, Time.deltaTime);
-		Quaternion identity = Quaternion.identity;
-		identity.eulerAngles = zero;
+		Vector3 movePosition2 = Vector3.SmoothDamp(movePosition, requestPos, ref posVelocity, num2, targetingMaxSpeed, Time.get_deltaTime());
+		Vector3 zero = Vector3.get_zero();
+		Vector3 eulerAngles = moveRotation.get_eulerAngles();
+		Vector3 eulerAngles2 = requestRot.get_eulerAngles();
+		zero.x = Mathf.SmoothDampAngle(eulerAngles.x, eulerAngles2.x, ref rotVelocity.x, num2, 1000f, Time.get_deltaTime());
+		zero.y = Mathf.SmoothDampAngle(eulerAngles.y, eulerAngles2.y, ref rotVelocity.y, num2, 1000f, Time.get_deltaTime());
+		zero.z = Mathf.SmoothDampAngle(eulerAngles.z, eulerAngles2.z, ref rotVelocity.z, num2, 1000f, Time.get_deltaTime());
+		Quaternion identity = Quaternion.get_identity();
+		identity.set_eulerAngles(zero);
 		this.movePosition = movePosition2;
 		this.moveRotation = identity;
-		target = Mathf.SmoothDamp(ctrlCamera.fieldOfView, target, ref fieldOfViewVelocity, num, 1000f, Time.deltaTime);
-		ctrlCamera.fieldOfView = target;
+		num = Mathf.SmoothDamp(ctrlCamera.get_fieldOfView(), num, ref fieldOfViewVelocity, num2, 1000f, Time.get_deltaTime());
+		ctrlCamera.set_fieldOfView(num);
 	}
 
 	private void UpdateGrabCamera()
 	{
-		Vector3 position = target.position;
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+		Vector3 position = target.get_position();
 		Vector3 movePosition = this.movePosition;
 		Quaternion moveRotation = this.moveRotation;
 		normalForward = grabInfo.dir;
-		Vector3 b = grabInfo.enemyRoot.rotation * normalForward * grabInfo.distance;
-		requestPos = position + b;
-		requestRot = Quaternion.LookRotation(-b.normalized);
+		Vector3 val = grabInfo.enemyRoot.get_rotation() * normalForward * grabInfo.distance;
+		requestPos = position + val;
+		requestRot = Quaternion.LookRotation(-val.get_normalized());
 		float smoothTargetingRate = validSettings.smoothTargetingRate;
 		float targetingDistance = validSettings.targetingDistance;
-		Vector3 movePosition2 = Vector3.SmoothDamp(movePosition, requestPos, ref posVelocity, smoothTargetingRate, targetingDistance, Time.deltaTime);
-		Vector3 zero = Vector3.zero;
-		Vector3 eulerAngles = moveRotation.eulerAngles;
-		Vector3 eulerAngles2 = requestRot.eulerAngles;
-		zero.x = Mathf.SmoothDampAngle(eulerAngles.x, eulerAngles2.x, ref rotVelocity.x, smoothTargetingRate, 1000f, Time.deltaTime);
-		zero.y = Mathf.SmoothDampAngle(eulerAngles.y, eulerAngles2.y, ref rotVelocity.y, smoothTargetingRate, 1000f, Time.deltaTime);
-		zero.z = Mathf.SmoothDampAngle(eulerAngles.z, eulerAngles2.z, ref rotVelocity.z, smoothTargetingRate, 1000f, Time.deltaTime);
-		Quaternion identity = Quaternion.identity;
-		identity.eulerAngles = zero;
+		Vector3 movePosition2 = Vector3.SmoothDamp(movePosition, requestPos, ref posVelocity, smoothTargetingRate, targetingDistance, Time.get_deltaTime());
+		Vector3 zero = Vector3.get_zero();
+		Vector3 eulerAngles = moveRotation.get_eulerAngles();
+		Vector3 eulerAngles2 = requestRot.get_eulerAngles();
+		zero.x = Mathf.SmoothDampAngle(eulerAngles.x, eulerAngles2.x, ref rotVelocity.x, smoothTargetingRate, 1000f, Time.get_deltaTime());
+		zero.y = Mathf.SmoothDampAngle(eulerAngles.y, eulerAngles2.y, ref rotVelocity.y, smoothTargetingRate, 1000f, Time.get_deltaTime());
+		zero.z = Mathf.SmoothDampAngle(eulerAngles.z, eulerAngles2.z, ref rotVelocity.z, smoothTargetingRate, 1000f, Time.get_deltaTime());
+		Quaternion identity = Quaternion.get_identity();
+		identity.set_eulerAngles(zero);
 		this.movePosition = movePosition2;
 		this.moveRotation = identity;
 	}
 
 	private void UpdateCannonAimCamera()
 	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 		Settings validSettings = this.validSettings;
 		Vector3 cameraTargetPos = targetSelf.GetCameraTargetPos();
-		normalForward = targetSelf.cannonAimForward.normalized;
-		Vector3 axis = Vector3.Cross(normalForward, Vector3.up);
-		Vector3 b = Quaternion.AngleAxis(validSettings.cannonAimSettings.aimLookDownAngle, axis) * normalForward * validSettings.cannonAimSettings.aimDistanceToSelf;
-		Vector3 b2 = Quaternion.LookRotation(normalForward) * validSettings.cannonAimSettings.aimCameraOffset;
-		movePosition = cameraTargetPos - b + b2;
-		moveRotation = Quaternion.LookRotation(b.normalized);
+		normalForward = targetSelf.cannonAimForward.get_normalized();
+		Vector3 val = Vector3.Cross(normalForward, Vector3.get_up());
+		Vector3 val2 = Quaternion.AngleAxis(validSettings.cannonAimSettings.aimLookDownAngle, val) * normalForward * validSettings.cannonAimSettings.aimDistanceToSelf;
+		Vector3 val3 = Quaternion.LookRotation(normalForward) * validSettings.cannonAimSettings.aimCameraOffset;
+		movePosition = cameraTargetPos - val2 + val3;
+		moveRotation = Quaternion.LookRotation(val2.get_normalized());
 	}
 
 	private void UpdateCannonBeamChargeCamera()
 	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 		Settings validSettings = this.validSettings;
 		Vector3 cameraTargetPos = targetSelf.GetCameraTargetPos();
-		normalForward = targetSelf.cannonAimForward.normalized;
-		Vector3 axis = Vector3.Cross(normalForward, Vector3.up);
-		Vector3 b = Quaternion.AngleAxis(validSettings.cannonAimSettings.beamChargeCameraLookDownAngle, axis) * normalForward * validSettings.cannonAimSettings.beamChargeCameraDistanceToSelf;
-		Vector3 b2 = Quaternion.LookRotation(normalForward) * validSettings.cannonAimSettings.beamChargeCameraOffset;
-		movePosition = cameraTargetPos - b + b2;
-		moveRotation = Quaternion.LookRotation(b.normalized);
+		normalForward = targetSelf.cannonAimForward.get_normalized();
+		Vector3 val = Vector3.Cross(normalForward, Vector3.get_up());
+		Vector3 val2 = Quaternion.AngleAxis(validSettings.cannonAimSettings.beamChargeCameraLookDownAngle, val) * normalForward * validSettings.cannonAimSettings.beamChargeCameraDistanceToSelf;
+		Vector3 val3 = Quaternion.LookRotation(normalForward) * validSettings.cannonAimSettings.beamChargeCameraOffset;
+		movePosition = cameraTargetPos - val2 + val3;
+		moveRotation = Quaternion.LookRotation(val2.get_normalized());
 	}
 
 	private void UpdateCannonBeamCamera()
 	{
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 		Settings validSettings = this.validSettings;
 		movePosition = validSettings.cannonAimSettings.beamCameraPosition;
 		moveRotation = Quaternion.Euler(validSettings.cannonAimSettings.beamCameraRotationEular);
@@ -986,32 +1438,64 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	private void UpdateStopCamera()
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
 		Vector3 movePosition = this.movePosition;
 		Quaternion moveRotation = this.moveRotation;
 		float smoothTargetingRate = validSettings.smoothTargetingRate;
 		float targetingDistance = validSettings.targetingDistance;
-		Vector3 movePosition2 = Vector3.SmoothDamp(movePosition, stopPos, ref posVelocity, smoothTargetingRate, targetingDistance, Time.deltaTime);
-		Vector3 zero = Vector3.zero;
-		Vector3 eulerAngles = moveRotation.eulerAngles;
-		Vector3 vector = stopRotEular;
-		zero.x = Mathf.SmoothDampAngle(eulerAngles.x, vector.x, ref rotVelocity.x, smoothTargetingRate, 1000f, Time.deltaTime);
-		zero.y = Mathf.SmoothDampAngle(eulerAngles.y, vector.y, ref rotVelocity.y, smoothTargetingRate, 1000f, Time.deltaTime);
-		zero.z = Mathf.SmoothDampAngle(eulerAngles.z, vector.z, ref rotVelocity.z, smoothTargetingRate, 1000f, Time.deltaTime);
-		Quaternion identity = Quaternion.identity;
-		identity.eulerAngles = zero;
+		Vector3 movePosition2 = Vector3.SmoothDamp(movePosition, stopPos, ref posVelocity, smoothTargetingRate, targetingDistance, Time.get_deltaTime());
+		Vector3 zero = Vector3.get_zero();
+		Vector3 eulerAngles = moveRotation.get_eulerAngles();
+		Vector3 val = stopRotEular;
+		zero.x = Mathf.SmoothDampAngle(eulerAngles.x, val.x, ref rotVelocity.x, smoothTargetingRate, 1000f, Time.get_deltaTime());
+		zero.y = Mathf.SmoothDampAngle(eulerAngles.y, val.y, ref rotVelocity.y, smoothTargetingRate, 1000f, Time.get_deltaTime());
+		zero.z = Mathf.SmoothDampAngle(eulerAngles.z, val.z, ref rotVelocity.z, smoothTargetingRate, 1000f, Time.get_deltaTime());
+		Quaternion identity = Quaternion.get_identity();
+		identity.set_eulerAngles(zero);
 		this.movePosition = movePosition2;
 		this.moveRotation = identity;
 	}
 
 	private void UpdateCutCamera()
 	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		movePosition = cutPos;
 		moveRotation = cutRot;
 	}
 
 	private void UpdateShake()
 	{
-		Vector3 vector = Vector3.zero;
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+		Vector3 val = Vector3.get_zero();
 		int num = 0;
 		while (num < shakeParams.Count)
 		{
@@ -1025,7 +1509,7 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 			else
 			{
 				int num3 = (int)(shakeParam.shakeTime * 2f / num2);
-				shakeParam.shakeTime += Time.deltaTime;
+				shakeParam.shakeTime += Time.get_deltaTime();
 				int num4 = (int)(shakeParam.shakeTime * 2f / num2);
 				bool flag = false;
 				if (num3 != num4)
@@ -1042,24 +1526,24 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 				}
 				else
 				{
-					vector += Vector3.up * (shakeParam.shakeLength * Mathf.Sin(shakeParam.shakeTime * 3.14159274f * 2f / num2));
+					val += Vector3.get_up() * (shakeParam.shakeLength * Mathf.Sin(shakeParam.shakeTime * 3.14159274f * 2f / num2));
 					num++;
 				}
 			}
 		}
-		cameraTransform.position = movePosition + vector;
-		cameraTransform.rotation = moveRotation;
+		cameraTransform.set_position(movePosition + val);
+		cameraTransform.set_rotation(moveRotation);
 	}
 
 	private void LateUpdate()
 	{
-		if ((UnityEngine.Object)radialBlurFilter != (UnityEngine.Object)null && radialBlurFilter.enabled)
+		if (radialBlurFilter != null && radialBlurFilter.get_enabled())
 		{
 			UpdateRadialBlur();
 		}
-		if (!((UnityEngine.Object)target == (UnityEngine.Object)null))
+		if (!(target == null))
 		{
-			if ((UnityEngine.Object)targetObject == (UnityEngine.Object)null || (UnityEngine.Object)targetObject._transform != (UnityEngine.Object)target)
+			if (targetObject == null || targetObject._transform != target)
 			{
 				targetObject = target.GetComponent<StageObject>();
 				targetPlayer = (targetObject as Player);
@@ -1098,29 +1582,39 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	public Vector3 WorldToScreenPoint(Vector3 pos)
 	{
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		return ctrlCamera.WorldToScreenPoint(pos);
 	}
 
 	public Vector3 WorldToViewportPoint(Vector3 pos)
 	{
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		return ctrlCamera.WorldToViewportPoint(pos);
 	}
 
 	public Vector3 ScreenToWorldPoint(Vector3 pos)
 	{
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		return ctrlCamera.ScreenToWorldPoint(pos);
 	}
 
 	public float GetPixelHeight()
 	{
-		return (float)ctrlCamera.pixelHeight;
+		return (float)ctrlCamera.get_pixelHeight();
 	}
 
 	public void AdjustCameraPosition()
 	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		adjustCamera = true;
-		posVelocity = Vector3.zero;
-		rotVelocity = Vector3.zero;
+		posVelocity = Vector3.get_zero();
+		rotVelocity = Vector3.get_zero();
 		fieldOfViewVelocity = 0f;
 		switching = false;
 		switchTimer = 0f;
@@ -1129,7 +1623,12 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	public void SetShakeCamera(Vector3 pos, float percent, float cycle_time = 0f)
 	{
-		float magnitude = (pos - movePosition).magnitude;
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		Vector3 val = pos - movePosition;
+		float magnitude = val.get_magnitude();
 		float num = (shakeMaxFocusLength - magnitude) / shakeMaxFocusLength;
 		if (num < 0f)
 		{
@@ -1174,6 +1673,7 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	public bool IsEndMotionCamera()
 	{
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 		if (!isMotionCameraMode || motionCameraTransforms == null)
 		{
 			return true;
@@ -1183,22 +1683,22 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 		{
 			num = ((!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait) ? 1 : 0);
 		}
-		Animation component = motionCameraTransforms[num].gameObject.GetComponent<Animation>();
-		if ((UnityEngine.Object)component == (UnityEngine.Object)null)
+		Animation component = motionCameraTransforms[num].get_gameObject().GetComponent<Animation>();
+		if (component == null)
 		{
 			return true;
 		}
-		return !component.isPlaying;
+		return !component.get_isPlaying();
 	}
 
-	public void OnHappenQuestDirection(bool enable, Transform boss_transform = null, UnityEngine.Object[] cameras = null, Vector3[] camera_offsets = null)
+	public void OnHappenQuestDirection(bool enable, Transform boss_transform = null, Object[] cameras = null, Vector3[] camera_offsets = null)
 	{
 		if (enable)
 		{
 			EndRadialBlurFilter(0f);
 			int mainCameraCullingMask = 262144;
 			MonoBehaviourSingleton<GameSceneManager>.I.SetMainCameraCullingMask(mainCameraCullingMask);
-			if ((UnityEngine.Object)boss_transform != (UnityEngine.Object)null && cameras != null)
+			if (boss_transform != null && cameras != null)
 			{
 				SetMotionCamera(true, boss_transform, cameras, camera_offsets);
 			}
@@ -1223,58 +1723,84 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 		}
 	}
 
-	public void SetMotionCamera(bool enable, Transform target_transform = null, UnityEngine.Object[] cameras = null, Vector3[] camera_offsets = null)
+	public void SetMotionCamera(bool enable, Transform target_transform = null, Object[] cameras = null, Vector3[] camera_offsets = null)
 	{
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
 		if (enable)
 		{
-			motionCameraTransforms = new Transform[2];
-			Transform transform = Utility.CreateGameObject("FieldQuestCamera", base._transform, -1);
-			transform.position = target_transform.position;
-			transform.rotation = target_transform.rotation;
-			Vector3 one = Vector3.one;
-			Vector3 lossyScale = target_transform.lossyScale;
+			motionCameraTransforms = (Transform[])new Transform[2];
+			Transform val = Utility.CreateGameObject("FieldQuestCamera", base._transform, -1);
+			val.set_position(target_transform.get_position());
+			val.set_rotation(target_transform.get_rotation());
+			Vector3 one = Vector3.get_one();
+			Vector3 lossyScale = target_transform.get_lossyScale();
 			float x = lossyScale.x;
-			Vector3 lossyScale2 = base._transform.lossyScale;
+			Vector3 lossyScale2 = base._transform.get_lossyScale();
 			one.x = x / lossyScale2.x;
-			Vector3 lossyScale3 = target_transform.lossyScale;
+			Vector3 lossyScale3 = target_transform.get_lossyScale();
 			float y = lossyScale3.y;
-			Vector3 lossyScale4 = base._transform.lossyScale;
+			Vector3 lossyScale4 = base._transform.get_lossyScale();
 			one.y = y / lossyScale4.y;
-			Vector3 lossyScale5 = target_transform.lossyScale;
+			Vector3 lossyScale5 = target_transform.get_lossyScale();
 			float z = lossyScale5.z;
-			Vector3 lossyScale6 = base._transform.lossyScale;
+			Vector3 lossyScale6 = base._transform.get_lossyScale();
 			one.z = z / lossyScale6.z;
-			transform.localScale = one;
-			motionCameraParent = transform;
+			val.set_localScale(one);
+			motionCameraParent = val;
 			for (int i = 0; i < 2; i++)
 			{
-				Transform transform2 = Utility.CreateGameObject("offset_" + i.ToString(), transform, -1);
-				transform2.localPosition = Vector3.zero;
-				transform2.localRotation = Quaternion.identity;
-				transform2.localScale = Vector3.one;
+				Transform val2 = Utility.CreateGameObject("offset_" + i.ToString(), val, -1);
+				val2.set_localPosition(Vector3.get_zero());
+				val2.set_localRotation(Quaternion.get_identity());
+				val2.set_localScale(Vector3.get_one());
 				if (camera_offsets != null)
 				{
-					transform2.localPosition = camera_offsets[i];
+					val2.set_localPosition(camera_offsets[i]);
 				}
-				Transform transform3 = ResourceUtility.Realizes(cameras[i], transform2, -1);
-				if ((UnityEngine.Object)transform3 == (UnityEngine.Object)null)
+				Transform val3 = ResourceUtility.Realizes(cameras[i], val2, -1);
+				if (val3 == null)
 				{
-					UnityEngine.Object.Destroy(transform.gameObject);
+					Object.Destroy(val.get_gameObject());
 					return;
 				}
-				transform3.localPosition = Vector3.zero;
-				transform3.localRotation = Quaternion.identity;
-				transform3.localScale = Vector3.zero;
-				motionCameraTransforms[i] = transform3;
+				val3.set_localPosition(Vector3.get_zero());
+				val3.set_localRotation(Quaternion.get_identity());
+				val3.set_localScale(Vector3.get_zero());
+				motionCameraTransforms[i] = val3;
 			}
 			isMotionCameraMode = true;
 		}
 		else
 		{
 			isMotionCameraMode = false;
-			if ((UnityEngine.Object)motionCameraParent != (UnityEngine.Object)null)
+			if (motionCameraParent != null)
 			{
-				UnityEngine.Object.Destroy(motionCameraParent.gameObject);
+				Object.Destroy(motionCameraParent.get_gameObject());
 				motionCameraParent = null;
 			}
 			if (motionCameraTransforms != null)
@@ -1286,7 +1812,9 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	public void StartRadialBlurFilter(float time, float strength, Vector3 center_pos)
 	{
-		if (!((UnityEngine.Object)radialBlurFilter == (UnityEngine.Object)null))
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		if (!(radialBlurFilter == null))
 		{
 			_StartRadialBlurFilter(time, strength);
 			radialBlurCenterPos = center_pos;
@@ -1296,19 +1824,21 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	public void StartRadialBlurFilter(float time, float strength, Transform center_transform)
 	{
-		if (!((UnityEngine.Object)radialBlurFilter == (UnityEngine.Object)null))
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		if (!(radialBlurFilter == null))
 		{
 			_StartRadialBlurFilter(time, strength);
-			radialBlurCenterPos = Vector3.zero;
+			radialBlurCenterPos = Vector3.get_zero();
 			radialBlurCenterTransform = center_transform;
 		}
 	}
 
 	private void _StartRadialBlurFilter(float time, float strength)
 	{
-		if (!((UnityEngine.Object)radialBlurFilter == (UnityEngine.Object)null))
+		if (!(radialBlurFilter == null))
 		{
-			radialBlurFilter.enabled = true;
+			radialBlurFilter.set_enabled(true);
 			radialBlurFilter.StartFilter();
 			radialBlurStrengthValue = strength;
 			if (time <= 0f)
@@ -1324,7 +1854,7 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	public void ChangeRadialBlurFilter(float time, float strength)
 	{
-		if (!((UnityEngine.Object)radialBlurFilter == (UnityEngine.Object)null) && radialBlurFilter.enabled)
+		if (!(radialBlurFilter == null) && radialBlurFilter.get_enabled())
 		{
 			if (time <= 0f)
 			{
@@ -1333,7 +1863,7 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 				{
 					radialBlurFilter.strength = 0f;
 					radialBlurFilter.StopFilter();
-					radialBlurFilter.enabled = false;
+					radialBlurFilter.set_enabled(false);
 				}
 				else
 				{
@@ -1355,7 +1885,11 @@ public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 
 	public void ResetMovePositionAndRotaion()
 	{
-		movePosition = ctrlCamera.transform.position;
-		moveRotation = ctrlCamera.transform.rotation;
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		movePosition = ctrlCamera.get_transform().get_position();
+		moveRotation = ctrlCamera.get_transform().get_rotation();
 	}
 }

@@ -1,12 +1,17 @@
 using UnityEngine;
 
-public class UIPhaseNumber : MonoBehaviour
+public class UIPhaseNumber
 {
 	[SerializeField]
 	protected UILabel label;
 
 	[SerializeField]
 	protected UITweener[] anims;
+
+	public UIPhaseNumber()
+		: this()
+	{
+	}
 
 	protected void Awake()
 	{
@@ -15,14 +20,15 @@ public class UIPhaseNumber : MonoBehaviour
 
 	private void Update()
 	{
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int num = anims.Length; i < num; i++)
 		{
-			if (anims[i].enabled)
+			if (anims[i].get_enabled())
 			{
 				return;
 			}
 		}
-		Object.Destroy(base.gameObject);
+		Object.Destroy(this.get_gameObject());
 	}
 }

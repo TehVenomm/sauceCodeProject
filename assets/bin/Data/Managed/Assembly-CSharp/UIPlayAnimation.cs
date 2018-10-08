@@ -4,7 +4,7 @@ using UnityEngine;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Play Animation")]
-public class UIPlayAnimation : MonoBehaviour
+public class UIPlayAnimation
 {
 	public static UIPlayAnimation current;
 
@@ -32,8 +32,8 @@ public class UIPlayAnimation : MonoBehaviour
 	[SerializeField]
 	private GameObject eventReceiver;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private string callWhenFinished;
 
 	private bool mStarted;
@@ -44,14 +44,19 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private bool dualState => trigger == Trigger.OnPress || trigger == Trigger.OnHover;
 
+	public UIPlayAnimation()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
-		UIButton component = GetComponent<UIButton>();
-		if ((Object)component != (Object)null)
+		UIButton component = this.GetComponent<UIButton>();
+		if (component != null)
 		{
 			dragHighlight = component.dragHighlight;
 		}
-		if ((Object)eventReceiver != (Object)null && EventDelegate.IsValid(onFinished))
+		if (eventReceiver != null && EventDelegate.IsValid(onFinished))
 		{
 			eventReceiver = null;
 			callWhenFinished = null;
@@ -61,49 +66,53 @@ public class UIPlayAnimation : MonoBehaviour
 	private void Start()
 	{
 		mStarted = true;
-		if ((Object)target == (Object)null && (Object)animator == (Object)null)
+		if (target == null && animator == null)
 		{
-			animator = GetComponentInChildren<Animator>();
+			animator = this.GetComponentInChildren<Animator>();
 		}
-		if ((Object)animator != (Object)null)
+		if (animator != null)
 		{
-			if (animator.enabled)
+			if (animator.get_enabled())
 			{
-				animator.enabled = false;
+				animator.set_enabled(false);
 			}
 		}
 		else
 		{
-			if ((Object)target == (Object)null)
+			if (target == null)
 			{
-				target = GetComponentInChildren<Animation>();
+				target = this.GetComponentInChildren<Animation>();
 			}
-			if ((Object)target != (Object)null && target.enabled)
+			if (target != null && target.get_enabled())
 			{
-				target.enabled = false;
+				target.set_enabled(false);
 			}
 		}
 	}
 
 	private void OnEnable()
 	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Expected O, but got Unknown
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 		if (mStarted)
 		{
-			OnHover(UICamera.IsHighlighted(base.gameObject));
+			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
 		}
 		if (UICamera.currentTouch != null)
 		{
 			if (trigger == Trigger.OnPress || trigger == Trigger.OnPressTrue)
 			{
-				mActivated = ((Object)UICamera.currentTouch.pressed == (Object)base.gameObject);
+				mActivated = (UICamera.currentTouch.pressed == this.get_gameObject());
 			}
 			if (trigger == Trigger.OnHover || trigger == Trigger.OnHoverTrue)
 			{
-				mActivated = ((Object)UICamera.currentTouch.current == (Object)base.gameObject);
+				mActivated = (UICamera.currentTouch.current == this.get_gameObject());
 			}
 		}
-		UIToggle component = GetComponent<UIToggle>();
-		if ((Object)component != (Object)null)
+		UIToggle component = this.GetComponent<UIToggle>();
+		if (component != null)
 		{
 			EventDelegate.Add(component.onChange, OnToggle);
 		}
@@ -111,8 +120,8 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnDisable()
 	{
-		UIToggle component = GetComponent<UIToggle>();
-		if ((Object)component != (Object)null)
+		UIToggle component = this.GetComponent<UIToggle>();
+		if (component != null)
 		{
 			EventDelegate.Remove(component.onChange, OnToggle);
 		}
@@ -120,7 +129,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnHover(bool isOver)
 	{
-		if (base.enabled && (trigger == Trigger.OnHover || (trigger == Trigger.OnHoverTrue && isOver) || (trigger == Trigger.OnHoverFalse && !isOver)))
+		if (this.get_enabled() && (trigger == Trigger.OnHover || (trigger == Trigger.OnHoverTrue && isOver) || (trigger == Trigger.OnHoverFalse && !isOver)))
 		{
 			Play(isOver, dualState);
 		}
@@ -128,7 +137,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnPress(bool isPressed)
 	{
-		if (base.enabled && (UICamera.currentTouchID >= -1 || UICamera.currentScheme == UICamera.ControlScheme.Controller) && (trigger == Trigger.OnPress || (trigger == Trigger.OnPressTrue && isPressed) || (trigger == Trigger.OnPressFalse && !isPressed)))
+		if (this.get_enabled() && (UICamera.currentTouchID >= -1 || UICamera.currentScheme == UICamera.ControlScheme.Controller) && (trigger == Trigger.OnPress || (trigger == Trigger.OnPressTrue && isPressed) || (trigger == Trigger.OnPressFalse && !isPressed)))
 		{
 			Play(isPressed, dualState);
 		}
@@ -136,7 +145,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnClick()
 	{
-		if ((UICamera.currentTouchID >= -1 || UICamera.currentScheme == UICamera.ControlScheme.Controller) && base.enabled && trigger == Trigger.OnClick)
+		if ((UICamera.currentTouchID >= -1 || UICamera.currentScheme == UICamera.ControlScheme.Controller) && this.get_enabled() && trigger == Trigger.OnClick)
 		{
 			Play(true, false);
 		}
@@ -144,7 +153,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnDoubleClick()
 	{
-		if ((UICamera.currentTouchID >= -1 || UICamera.currentScheme == UICamera.ControlScheme.Controller) && base.enabled && trigger == Trigger.OnDoubleClick)
+		if ((UICamera.currentTouchID >= -1 || UICamera.currentScheme == UICamera.ControlScheme.Controller) && this.get_enabled() && trigger == Trigger.OnDoubleClick)
 		{
 			Play(true, false);
 		}
@@ -152,7 +161,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnSelect(bool isSelected)
 	{
-		if (base.enabled && (trigger == Trigger.OnSelect || (trigger == Trigger.OnSelectTrue && isSelected) || (trigger == Trigger.OnSelectFalse && !isSelected)))
+		if (this.get_enabled() && (trigger == Trigger.OnSelect || (trigger == Trigger.OnSelectTrue && isSelected) || (trigger == Trigger.OnSelectFalse && !isSelected)))
 		{
 			Play(isSelected, dualState);
 		}
@@ -160,7 +169,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnToggle()
 	{
-		if (base.enabled && !((Object)UIToggle.current == (Object)null) && (trigger == Trigger.OnActivate || (trigger == Trigger.OnActivateTrue && UIToggle.current.value) || (trigger == Trigger.OnActivateFalse && !UIToggle.current.value)))
+		if (this.get_enabled() && !(UIToggle.current == null) && (trigger == Trigger.OnActivate || (trigger == Trigger.OnActivateTrue && UIToggle.current.value) || (trigger == Trigger.OnActivateFalse && !UIToggle.current.value)))
 		{
 			Play(UIToggle.current.value, dualState);
 		}
@@ -168,9 +177,10 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnDragOver()
 	{
-		if (base.enabled && dualState)
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		if (this.get_enabled() && dualState)
 		{
-			if ((Object)UICamera.currentTouch.dragged == (Object)base.gameObject)
+			if (UICamera.currentTouch.dragged == this.get_gameObject())
 			{
 				Play(true, true);
 			}
@@ -183,7 +193,8 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnDragOut()
 	{
-		if (base.enabled && dualState && (Object)UICamera.hoveredObject != (Object)base.gameObject)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		if (this.get_enabled() && dualState && UICamera.hoveredObject != this.get_gameObject())
 		{
 			Play(false, true);
 		}
@@ -191,7 +202,8 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnDrop(GameObject go)
 	{
-		if (base.enabled && trigger == Trigger.OnPress && (Object)UICamera.currentTouch.dragged != (Object)base.gameObject)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		if (this.get_enabled() && trigger == Trigger.OnPress && UICamera.currentTouch.dragged != this.get_gameObject())
 		{
 			Play(false, true);
 		}
@@ -204,7 +216,8 @@ public class UIPlayAnimation : MonoBehaviour
 
 	public void Play(bool forward, bool onlyIfDifferent)
 	{
-		if ((bool)target || (bool)animator)
+		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+		if (Object.op_Implicit(target) || Object.op_Implicit(animator))
 		{
 			if (onlyIfDifferent)
 			{
@@ -214,14 +227,14 @@ public class UIPlayAnimation : MonoBehaviour
 				}
 				mActivated = forward;
 			}
-			if (clearSelection && (Object)UICamera.selectedObject == (Object)base.gameObject)
+			if (clearSelection && UICamera.selectedObject == this.get_gameObject())
 			{
 				UICamera.selectedObject = null;
 			}
 			int num = 0 - playDirection;
 			Direction direction = (Direction)((!forward) ? num : ((int)playDirection));
-			ActiveAnimation activeAnimation = (!(bool)target) ? ActiveAnimation.Play(animator, clipName, direction, ifDisabledOnPlay, disableWhenFinished) : ActiveAnimation.Play(target, clipName, direction, ifDisabledOnPlay, disableWhenFinished);
-			if ((Object)activeAnimation != (Object)null)
+			ActiveAnimation activeAnimation = (!Object.op_Implicit(target)) ? ActiveAnimation.Play(animator, clipName, direction, ifDisabledOnPlay, disableWhenFinished) : ActiveAnimation.Play(target, clipName, direction, ifDisabledOnPlay, disableWhenFinished);
+			if (activeAnimation != null)
 			{
 				if (resetOnPlay)
 				{
@@ -247,13 +260,13 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnFinished()
 	{
-		if ((Object)current == (Object)null)
+		if (current == null)
 		{
 			current = this;
 			EventDelegate.Execute(onFinished);
-			if ((Object)eventReceiver != (Object)null && !string.IsNullOrEmpty(callWhenFinished))
+			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
 			{
-				eventReceiver.SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
+				eventReceiver.SendMessage(callWhenFinished, 1);
 			}
 			eventReceiver = null;
 			current = null;

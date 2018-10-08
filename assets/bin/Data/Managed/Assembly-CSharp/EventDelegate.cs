@@ -9,7 +9,7 @@ public class EventDelegate
 	[Serializable]
 	public class Parameter
 	{
-		public UnityEngine.Object obj;
+		public Object obj;
 
 		public string field;
 
@@ -41,9 +41,9 @@ public class EventDelegate
 					cached = true;
 					fieldInfo = null;
 					propInfo = null;
-					if (obj != (UnityEngine.Object)null && !string.IsNullOrEmpty(field))
+					if (obj != null && !string.IsNullOrEmpty(field))
 					{
-						Type type = obj.GetType();
+						Type type = ((object)obj).GetType();
 						propInfo = type.GetProperty(field);
 						if (propInfo == null)
 						{
@@ -59,7 +59,7 @@ public class EventDelegate
 				{
 					return fieldInfo.GetValue(obj);
 				}
-				if (obj != (UnityEngine.Object)null)
+				if (obj != null)
 				{
 					return obj;
 				}
@@ -83,11 +83,11 @@ public class EventDelegate
 				{
 					return mValue.GetType();
 				}
-				if (obj == (UnityEngine.Object)null)
+				if (obj == null)
 				{
 					return typeof(void);
 				}
-				return obj.GetType();
+				return ((object)obj).GetType();
 			}
 		}
 
@@ -95,7 +95,7 @@ public class EventDelegate
 		{
 		}
 
-		public Parameter(UnityEngine.Object obj, string field)
+		public Parameter(Object obj, string field)
 		{
 			this.obj = obj;
 			this.field = field;
@@ -196,7 +196,7 @@ public class EventDelegate
 			{
 				Cache();
 			}
-			return (mRawDelegate && mCachedCallback != null) || ((UnityEngine.Object)mTarget != (UnityEngine.Object)null && !string.IsNullOrEmpty(mMethodName));
+			return (mRawDelegate && mCachedCallback != null) || (mTarget != null && !string.IsNullOrEmpty(mMethodName));
 		}
 	}
 
@@ -212,12 +212,12 @@ public class EventDelegate
 			{
 				return true;
 			}
-			if ((UnityEngine.Object)mTarget == (UnityEngine.Object)null)
+			if (mTarget == null)
 			{
 				return false;
 			}
-			MonoBehaviour monoBehaviour = mTarget;
-			return (UnityEngine.Object)monoBehaviour == (UnityEngine.Object)null || monoBehaviour.enabled;
+			MonoBehaviour val = mTarget;
+			return val == null || val.get_enabled();
 		}
 	}
 
@@ -258,13 +258,13 @@ public class EventDelegate
 			{
 				return true;
 			}
-			MonoBehaviour y = callback.Target as MonoBehaviour;
-			return (UnityEngine.Object)mTarget == (UnityEngine.Object)y && string.Equals(mMethodName, GetMethodName(callback));
+			MonoBehaviour val = callback.Target as MonoBehaviour;
+			return mTarget == val && string.Equals(mMethodName, GetMethodName(callback));
 		}
 		if (obj is EventDelegate)
 		{
 			EventDelegate eventDelegate = obj as EventDelegate;
-			return (UnityEngine.Object)mTarget == (UnityEngine.Object)eventDelegate.mTarget && string.Equals(mMethodName, eventDelegate.mMethodName);
+			return mTarget == eventDelegate.mTarget && string.Equals(mMethodName, eventDelegate.mMethodName);
 		}
 		return false;
 	}
@@ -280,7 +280,7 @@ public class EventDelegate
 		if (call != null && IsValid(call))
 		{
 			mTarget = (call.Target as MonoBehaviour);
-			if ((UnityEngine.Object)mTarget == (UnityEngine.Object)null)
+			if (mTarget == null)
 			{
 				mRawDelegate = true;
 				mCachedCallback = call;
@@ -304,9 +304,9 @@ public class EventDelegate
 	private void Cache()
 	{
 		mCached = true;
-		if (!mRawDelegate && (mCachedCallback == null || (UnityEngine.Object)(mCachedCallback.Target as MonoBehaviour) != (UnityEngine.Object)mTarget || GetMethodName(mCachedCallback) != mMethodName) && (UnityEngine.Object)mTarget != (UnityEngine.Object)null && !string.IsNullOrEmpty(mMethodName))
+		if (!mRawDelegate && (mCachedCallback == null || mCachedCallback.Target as MonoBehaviour != mTarget || GetMethodName(mCachedCallback) != mMethodName) && mTarget != null && !string.IsNullOrEmpty(mMethodName))
 		{
-			Type type = mTarget.GetType();
+			Type type = ((object)mTarget).GetType();
 			mMethod = null;
 			while (type != null)
 			{
@@ -325,11 +325,11 @@ public class EventDelegate
 			}
 			if (mMethod == null)
 			{
-				Debug.LogError("Could not find method '" + mMethodName + "' on " + mTarget.GetType(), mTarget);
+				Debug.LogError((object)("Could not find method '" + mMethodName + "' on " + ((object)mTarget).GetType()), mTarget);
 			}
 			else if (mMethod.ReturnType != typeof(void))
 			{
-				Debug.LogError(mTarget.GetType() + "." + mMethodName + " must have a 'void' return type.", mTarget);
+				Debug.LogError((object)(((object)mTarget).GetType() + "." + mMethodName + " must have a 'void' return type."), mTarget);
 			}
 			else
 			{
@@ -397,14 +397,14 @@ public class EventDelegate
 				catch (ArgumentException ex)
 				{
 					string text = "Error calling ";
-					if ((UnityEngine.Object)mTarget == (UnityEngine.Object)null)
+					if (mTarget == null)
 					{
 						text += mMethod.Name;
 					}
 					else
 					{
 						string text2 = text;
-						text = text2 + mTarget.GetType() + "." + mMethod.Name;
+						text = text2 + ((object)mTarget).GetType() + "." + mMethod.Name;
 					}
 					text = text + ": " + ex.Message;
 					text += "\n  Expected: ";
@@ -434,7 +434,7 @@ public class EventDelegate
 						}
 					}
 					text += "\n";
-					Debug.LogError(text);
+					Debug.LogError((object)text);
 				}
 				int l = 0;
 				for (int num2 = mArgs.Length; l < num2; l++)
@@ -466,9 +466,9 @@ public class EventDelegate
 
 	public override string ToString()
 	{
-		if ((UnityEngine.Object)mTarget != (UnityEngine.Object)null)
+		if (mTarget != null)
 		{
-			string text = mTarget.GetType().ToString();
+			string text = ((object)mTarget).GetType().ToString();
 			int num = text.LastIndexOf('.');
 			if (num > 0)
 			{
@@ -501,11 +501,11 @@ public class EventDelegate
 					{
 						if (ex.InnerException != null)
 						{
-							Debug.LogError(ex.InnerException.Message);
+							Debug.LogError((object)ex.InnerException.Message);
 						}
 						else
 						{
-							Debug.LogError(ex.Message);
+							Debug.LogError((object)ex.Message);
 						}
 					}
 					if (num >= list.Count)
@@ -588,7 +588,7 @@ public class EventDelegate
 			list.Add(eventDelegate2);
 			return eventDelegate2;
 		}
-		Debug.LogWarning("Attempting to add a callback to a list that's null");
+		Debug.LogWarning((object)"Attempting to add a callback to a list that's null");
 		return null;
 	}
 
@@ -599,7 +599,7 @@ public class EventDelegate
 
 	public static void Add(List<EventDelegate> list, EventDelegate ev, bool oneShot)
 	{
-		if (ev.mRawDelegate || (UnityEngine.Object)ev.target == (UnityEngine.Object)null || string.IsNullOrEmpty(ev.methodName))
+		if (ev.mRawDelegate || ev.target == null || string.IsNullOrEmpty(ev.methodName))
 		{
 			Add(list, ev.mCachedCallback, oneShot);
 		}
@@ -628,7 +628,7 @@ public class EventDelegate
 		}
 		else
 		{
-			Debug.LogWarning("Attempting to add a callback to a list that's null");
+			Debug.LogWarning((object)"Attempting to add a callback to a list that's null");
 		}
 	}
 

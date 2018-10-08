@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,6 +33,7 @@ public class CrystalShopMaterialDetail : GameSection
 
 	public override void Initialize()
 	{
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
 		object[] array = GameSection.GetEventData() as object[];
 		materialData = (array[0] as ProductData);
 		priceStr = (array[1] as string);
@@ -47,7 +49,7 @@ public class CrystalShopMaterialDetail : GameSection
 				datas.Add(itemSortData);
 			}
 		}
-		StartCoroutine(DoInitialize());
+		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -60,21 +62,17 @@ public class CrystalShopMaterialDetail : GameSection
 			yield return (object)loadQueue.Wait();
 		}
 		GameObject buttonObj = Object.Instantiate(lo_button.loadedObject) as GameObject;
-		buttonObj.transform.parent = FindCtrl(base._transform, UI.OBJ_BUY);
-		buttonObj.transform.localScale = new Vector3(1f, 1f, 1f);
-		buttonObj.transform.localPosition = new Vector3(0f, 0f, 0f);
+		buttonObj.get_transform().set_parent(FindCtrl(base._transform, UI.OBJ_BUY));
+		buttonObj.get_transform().set_localScale(new Vector3(1f, 1f, 1f));
+		buttonObj.get_transform().set_localPosition(new Vector3(0f, 0f, 0f));
 		base.Initialize();
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
 		SetLabelText(base._transform, UI.LBL_PRICE, priceStr);
-		SetActive(UI.SPR_SALE, materialData.offerType == 3);
-		SetGrid(UI.GRD_DETAIL, null, datas.Count, true, delegate(int i, Transform t, bool is_recycle)
-		{
-			ItemSortData data = datas[i];
-			SetItemIcon(t, data, i);
-		});
+		SetActive((Enum)UI.SPR_SALE, materialData.offerType == 3);
+		SetGrid(UI.GRD_DETAIL, null, datas.Count, true, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private bool IsRare(SortCompareData icon_base)

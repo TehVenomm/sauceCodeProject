@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 {
-	public class Pool_List_CoopPacket : rymTPool<List<CoopPacket>>
+	public class Pool_List_CoopPacket
 	{
 	}
 
@@ -68,8 +68,9 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 
 	protected override void Awake()
 	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		packetReceiver = base.gameObject.AddComponent<LoungePacketReceiver>();
+		packetReceiver = this.get_gameObject().AddComponent<LoungePacketReceiver>();
 	}
 
 	private void Update()
@@ -77,7 +78,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		packetReceiver.OnUpdate();
 		if (CoopWebSocketSingleton<LoungeWebSocket>.IsValidConnected())
 		{
-			float num = Time.time - MonoBehaviourSingleton<LoungeWebSocket>.I.packetSendTime;
+			float num = Time.get_time() - MonoBehaviourSingleton<LoungeWebSocket>.I.packetSendTime;
 			if (num >= 20f)
 			{
 				Alive();
@@ -114,12 +115,13 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 
 	public void Connect(ConnectData conn_data, Action<bool> call_back)
 	{
-		StartCoroutine(RequestCoroutineConnect(conn_data, call_back));
+		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(RequestCoroutineConnect(conn_data, call_back));
 	}
 
 	private IEnumerator RequestCoroutineConnect(ConnectData conn_data, Action<bool> call_back)
 	{
-		yield return (object)StartCoroutine(RequestCoroutineClose(1000, "Bye!", null));
+		yield return (object)this.StartCoroutine(RequestCoroutineClose(1000, "Bye!", null));
 		if (string.IsNullOrEmpty(conn_data.path))
 		{
 			Logd("Connect fail. nothing connection path...");
@@ -141,7 +143,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 				MonoBehaviourSingleton<LoungeWebSocket>.I.Connect(connectPath, conn_data.fromId, conn_data.ackPrefix);
 				while (!MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected() && 0f < timeoutTimer && MonoBehaviourSingleton<LoungeWebSocket>.I.CurrentConnectionStatus != CoopWebSocketSingleton<LoungeWebSocket>.CONNECTION_STATUS.ERROR)
 				{
-					timeoutTimer -= Time.deltaTime;
+					timeoutTimer -= Time.get_deltaTime();
 					yield return (object)new WaitForEndOfFrame();
 				}
 				if (MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected())
@@ -157,8 +159,9 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 
 	public void Close(ushort code = 1000, string msg = "Bye!", Action call_back = null)
 	{
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		Logd("Close.");
-		StartCoroutine(RequestCoroutineClose(code, msg, call_back));
+		this.StartCoroutine(RequestCoroutineClose(code, msg, call_back));
 	}
 
 	private IEnumerator RequestCoroutineClose(ushort code = 1000, string msg = "Bye!", Action call_back = null)
@@ -172,10 +175,13 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 			}
 		}
 		Clear();
-		call_back?.Invoke();
+		if (call_back != null)
+		{
+			call_back.Invoke();
+		}
 	}
 
-	public void Regist(ConnectData conn_data, Action<bool> call_back)
+	public unsafe void Regist(ConnectData conn_data, Action<bool> call_back)
 	{
 		Party_Model_Register party_Model_Register = new Party_Model_Register();
 		party_Model_Register.roomId = conn_data.roomId;
@@ -185,21 +191,8 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		party_Model_Register.signature = conn_data.signature;
 		Logd("Regist. roomId={0}", conn_data.roomId);
 		registerAck = null;
-		SendServer(party_Model_Register, true, delegate(Coop_Model_ACK ack)
-		{
-			bool obj = true;
-			registerAck = (ack as Party_Model_RegisterACK);
-			if (ack == null || !ack.positive)
-			{
-				obj = false;
-				MonoBehaviourSingleton<LoungeWebSocket>.I.Close(1000, "Bye!");
-			}
-			if (call_back != null)
-			{
-				call_back(obj);
-			}
-			return true;
-		}, null);
+		_003CRegist_003Ec__AnonStorey548 _003CRegist_003Ec__AnonStorey;
+		SendServer(party_Model_Register, true, new Func<Coop_Model_ACK, bool>((object)_003CRegist_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
 	}
 
 	public void ConnectAndRegist(ConnectData conn_data, Action<bool, bool> call_back)
@@ -211,7 +204,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 			{
 				if (call_back != null)
 				{
-					call_back(is_connect, false);
+					call_back.Invoke(is_connect, false);
 				}
 			}
 			else
@@ -221,7 +214,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 					Logd("Registed. valid={0}", is_regist);
 					if (call_back != null)
 					{
-						call_back(is_connect, is_regist);
+						call_back.Invoke(is_connect, is_regist);
 					}
 				});
 			}
@@ -269,6 +262,8 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 
 	public void RoomPosition(int targetUserId, Vector3 position, LOUNGE_ACTION_TYPE type)
 	{
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		Lounge_Model_RoomPosition lounge_Model_RoomPosition = new Lounge_Model_RoomPosition();
 		lounge_Model_RoomPosition.id = 1005;
 		lounge_Model_RoomPosition.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
@@ -287,9 +282,10 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 
 	public void SyncSend()
 	{
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		if (sendId > 0)
 		{
-			StartCoroutine(CoroutineSyncSend(sendId));
+			this.StartCoroutine(CoroutineSyncSend(sendId));
 		}
 	}
 
@@ -333,8 +329,12 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		return Send(-2000, model, typeof(T), promise, onReceiveAck, onPreResend);
 	}
 
-	private void RegisterPacketReceiveAction()
+	private unsafe void RegisterPacketReceiveAction()
 	{
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Expected O, but got Unknown
+		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b9: Expected O, but got Unknown
 		LoungeWebSocket i = MonoBehaviourSingleton<LoungeWebSocket>.I;
 		i.ReceivePacketAction = (Action<CoopPacket>)Delegate.Combine(i.ReceivePacketAction, (Action<CoopPacket>)delegate(CoopPacket packet)
 		{
@@ -344,17 +344,9 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 			}
 		});
 		LoungeWebSocket i2 = MonoBehaviourSingleton<LoungeWebSocket>.I;
-		i2.PrepareCloseOccurred = (Action<ushort, string>)Delegate.Combine(i2.PrepareCloseOccurred, (Action<ushort, string>)delegate(ushort code, string msg)
-		{
-			Logd("PrepareCloseOccurred. code={0}, msg={1}", code, msg);
-			Disconnect(code);
-		});
+		i2.PrepareCloseOccurred = Delegate.Combine((Delegate)i2.PrepareCloseOccurred, (Delegate)new Action<ushort, string>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		LoungeWebSocket i3 = MonoBehaviourSingleton<LoungeWebSocket>.I;
-		i3.CloseOccurred = (Action<ushort, string>)Delegate.Combine(i3.CloseOccurred, (Action<ushort, string>)delegate(ushort code, string msg)
-		{
-			Logd("CloseOccurred. code={0}, msg={1}", code, msg);
-			LoopBackRoomLeave();
-		});
+		i3.CloseOccurred = Delegate.Combine((Delegate)i3.CloseOccurred, (Delegate)new Action<ushort, string>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		LoungeWebSocket i4 = MonoBehaviourSingleton<LoungeWebSocket>.I;
 		i4.ErrorOccurred = (Action<Exception>)Delegate.Combine(i4.ErrorOccurred, (Action<Exception>)delegate(Exception ex)
 		{
@@ -362,11 +354,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 			LoopBackRoomLeave();
 		});
 		LoungeWebSocket i5 = MonoBehaviourSingleton<LoungeWebSocket>.I;
-		i5.HeartbeatDisconnected = (Action)Delegate.Combine(i5.HeartbeatDisconnected, (Action)delegate
-		{
-			Logd("HeartbeatDisconnected.");
-			LoopBackRoomLeave();
-		});
+		i5.HeartbeatDisconnected = Delegate.Combine((Delegate)i5.HeartbeatDisconnected, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public static CoopPacket CreateLoopBackRoomLeavedPacket()
@@ -392,8 +380,13 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		}
 	}
 
-	public bool OnRecvRoomJoined(Lounge_Model_RoomJoined model)
+	public unsafe bool OnRecvRoomJoined(Lounge_Model_RoomJoined model)
 	{
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f6: Expected O, but got Unknown
 		Logd("OnRecvRoomJoined. cid={0}", model.cid);
 		if (MonoBehaviourSingleton<LoungeManager>.IsValid())
 		{
@@ -405,26 +398,25 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 			{
 				return true;
 			}
-			if ((UnityEngine.Object)MonoBehaviourSingleton<LoungeManager>.I.HomePeople == (UnityEngine.Object)null)
+			if (MonoBehaviourSingleton<LoungeManager>.I.HomePeople == null)
 			{
 				return true;
 			}
-			if ((UnityEngine.Object)MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara == (UnityEngine.Object)null)
+			if (MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara == null)
 			{
 				return true;
 			}
-			Vector3 position = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara._transform.position;
+			Vector3 position = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara._transform.get_position();
 			LOUNGE_ACTION_TYPE actionType = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara.GetActionType();
 			RoomPosition(model.cid, position, actionType);
 		}
 		if (FieldManager.IsValidInGame())
 		{
-			Protocol.Try(delegate
+			if (_003C_003Ef__am_0024cache4 == null)
 			{
-				MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
-				{
-				}, false);
-			});
+				_003C_003Ef__am_0024cache4 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			Protocol.Try(_003C_003Ef__am_0024cache4);
 		}
 		string empty = string.Empty;
 		LoungeModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.cid);
@@ -443,8 +435,10 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		return true;
 	}
 
-	public bool OnRecvRoomLeaved(Lounge_Model_RoomLeaved model)
+	public unsafe bool OnRecvRoomLeaved(Lounge_Model_RoomLeaved model)
 	{
+		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e5: Expected O, but got Unknown
 		Logd("OnRecvRoomLeaved. cid={0}", model.cid);
 		if (model.cid != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
@@ -469,12 +463,11 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		}
 		if (FieldManager.IsValidInGame())
 		{
-			Protocol.Try(delegate
+			if (_003C_003Ef__am_0024cache5 == null)
 			{
-				MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
-				{
-				}, false);
-			});
+				_003C_003Ef__am_0024cache5 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			Protocol.Try(_003C_003Ef__am_0024cache5);
 		}
 		if (MonoBehaviourSingleton<LoungeManager>.IsValid())
 		{
@@ -485,13 +478,20 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 
 	public bool OnRecvRoomPoisition(Lounge_Model_RoomPosition model)
 	{
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		Logd("OnRecvRoomPosition. cid={0}, pos={1}", model.cid, model.pos);
-		StartCoroutine(LoungeManagerRecvRoomPosition(model.cid, model.pos, model.aid));
+		this.StartCoroutine(LoungeManagerRecvRoomPosition(model.cid, model.pos, model.aid));
 		return true;
 	}
 
 	private IEnumerator LoungeManagerRecvRoomPosition(int userId, Vector3 pos, int aid)
 	{
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 		while (!MonoBehaviourSingleton<LoungeManager>.IsValid())
 		{
 			yield return (object)null;
@@ -505,6 +505,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 
 	public bool OnRecvRoomMove(Lounge_Model_RoomMove model)
 	{
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 		Logd("OnRecvRoomMove. cid={0}", model.cid);
 		if (MonoBehaviourSingleton<LoungeManager>.IsValid())
 		{

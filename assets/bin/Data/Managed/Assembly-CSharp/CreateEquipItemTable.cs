@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -116,37 +117,15 @@ public class CreateEquipItemTable : Singleton<CreateEquipItemTable>, IDataTable
 		return list.ToArray();
 	}
 
-	public CreateEquipItemData[] GetSortedCreateEquipItemsByPart(uint materialId)
+	public unsafe CreateEquipItemData[] GetSortedCreateEquipItemsByPart(uint materialId)
 	{
-		CreateEquipItemData[] creatableEquipItem2 = Singleton<CreateEquipItemTable>.I.GetCreatableEquipItem(materialId);
-		return creatableEquipItem2.OrderBy(delegate(CreateEquipItemData creatableEquipItem)
+		CreateEquipItemData[] creatableEquipItem = Singleton<CreateEquipItemTable>.I.GetCreatableEquipItem(materialId);
+		CreateEquipItemData[] source = creatableEquipItem;
+		if (_003C_003Ef__am_0024cache2 == null)
 		{
-			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(creatableEquipItem.equipItemID);
-			switch (equipItemData.type)
-			{
-			case EQUIPMENT_TYPE.ONE_HAND_SWORD:
-			case EQUIPMENT_TYPE.TWO_HAND_SWORD:
-			case EQUIPMENT_TYPE.SPEAR:
-			case EQUIPMENT_TYPE.PAIR_SWORDS:
-			case EQUIPMENT_TYPE.ARROW:
-				return 1;
-			case EQUIPMENT_TYPE.HELM:
-			case EQUIPMENT_TYPE.HAIR:
-			case EQUIPMENT_TYPE.VISUAL_HELM:
-				return 2;
-			case EQUIPMENT_TYPE.ARMOR:
-			case EQUIPMENT_TYPE.VISUAL_ARMOR:
-				return 3;
-			case EQUIPMENT_TYPE.ARM:
-			case EQUIPMENT_TYPE.VISUAL_ARM:
-				return 4;
-			case EQUIPMENT_TYPE.LEG:
-			case EQUIPMENT_TYPE.VISUAL_LEG:
-				return 5;
-			default:
-				return 0;
-			}
-		}).ToArray();
+			_003C_003Ef__am_0024cache2 = new Func<CreateEquipItemData, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		return source.OrderBy<CreateEquipItemData, int>(_003C_003Ef__am_0024cache2).ToArray();
 	}
 
 	public CreateEquipItemData GetCreateEquipItemByPart(uint materialId, EQUIPMENT_TYPE type)

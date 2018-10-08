@@ -40,6 +40,11 @@ public class UIPlayerAnnounce : UIAnnounceBase<UIPlayerAnnounce>
 
 	public void Announce(ANNOUNCE_TYPE type, Player player)
 	{
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
 		if (AnnounceStart(player))
 		{
 			announceName.text = labelSettings[(int)type].text;
@@ -55,6 +60,11 @@ public class UIPlayerAnnounce : UIAnnounceBase<UIPlayerAnnounce>
 
 	public void StartSkill(string skill_name, Player player)
 	{
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 		if (AnnounceStart(player))
 		{
 			announceName.text = skill_name;

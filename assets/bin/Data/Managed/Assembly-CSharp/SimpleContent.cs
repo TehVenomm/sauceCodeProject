@@ -1,5 +1,7 @@
-using UnityEngine;
-
-public class SimpleContent : MonoBehaviour
+public class SimpleContent
 {
+	public SimpleContent()
+		: this()
+	{
+	}
 }

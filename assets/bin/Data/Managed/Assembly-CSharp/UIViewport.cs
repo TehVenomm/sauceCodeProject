@@ -3,7 +3,7 @@ using UnityEngine;
 [AddComponentMenu("NGUI/UI/Viewport Camera")]
 [RequireComponent(typeof(Camera))]
 [ExecuteInEditMode]
-public class UIViewport : MonoBehaviour
+public class UIViewport
 {
 	public Camera sourceCamera;
 
@@ -15,38 +15,56 @@ public class UIViewport : MonoBehaviour
 
 	private Camera mCam;
 
+	public UIViewport()
+		: this()
+	{
+	}
+
 	private void Start()
 	{
-		mCam = GetComponent<Camera>();
-		if ((Object)sourceCamera == (Object)null)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Expected O, but got Unknown
+		mCam = this.GetComponent<Camera>();
+		if (sourceCamera == null)
 		{
-			sourceCamera = Camera.main;
+			sourceCamera = Camera.get_main();
 		}
 	}
 
 	private void LateUpdate()
 	{
-		if ((Object)topLeft != (Object)null && (Object)bottomRight != (Object)null)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+		if (topLeft != null && bottomRight != null)
 		{
-			if (topLeft.gameObject.activeInHierarchy)
+			if (topLeft.get_gameObject().get_activeInHierarchy())
 			{
-				Vector3 vector = sourceCamera.WorldToScreenPoint(topLeft.position);
-				Vector3 vector2 = sourceCamera.WorldToScreenPoint(bottomRight.position);
-				Rect rect = new Rect(vector.x / (float)Screen.width, vector2.y / (float)Screen.height, (vector2.x - vector.x) / (float)Screen.width, (vector.y - vector2.y) / (float)Screen.height);
-				float num = fullSize * rect.height;
-				if (rect != mCam.rect)
+				Vector3 val = sourceCamera.WorldToScreenPoint(topLeft.get_position());
+				Vector3 val2 = sourceCamera.WorldToScreenPoint(bottomRight.get_position());
+				Rect val3 = default(Rect);
+				val3._002Ector(val.x / (float)Screen.get_width(), val2.y / (float)Screen.get_height(), (val2.x - val.x) / (float)Screen.get_width(), (val.y - val2.y) / (float)Screen.get_height());
+				float num = fullSize * val3.get_height();
+				if (val3 != mCam.get_rect())
 				{
-					mCam.rect = rect;
+					mCam.set_rect(val3);
 				}
-				if (mCam.orthographicSize != num)
+				if (mCam.get_orthographicSize() != num)
 				{
-					mCam.orthographicSize = num;
+					mCam.set_orthographicSize(num);
 				}
-				mCam.enabled = true;
+				mCam.set_enabled(true);
 			}
 			else
 			{
-				mCam.enabled = false;
+				mCam.set_enabled(false);
 			}
 		}
 	}

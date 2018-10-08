@@ -60,7 +60,7 @@ public class ArenaTable : Singleton<ArenaTable>, IDataTable
 					QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)num2);
 					if (questData == null)
 					{
-						Debug.LogError("ArenaTableに存在しないクエストId: " + questIds[i] + "が設定されています");
+						Debug.LogError((object)("ArenaTableに存在しないクエストId: " + questIds[i] + "が設定されています"));
 					}
 					else
 					{

@@ -82,7 +82,7 @@ public class ItemIconDetail : ItemIcon
 			select_number
 		});
 		itemIconDetail.SetFavoriteIcon(item_data.IsFavorite());
-		if ((bool)itemIconDetail.setupperEquip.lvRoot)
+		if (Object.op_Implicit(itemIconDetail.setupperEquip.lvRoot))
 		{
 			UILabel[] componentsInChildren = itemIconDetail.setupperEquip.lvRoot.GetComponentsInChildren<UILabel>();
 			itemIconDetail.SetEquipExt(item_data.equipData, componentsInChildren);
@@ -121,7 +121,7 @@ public class ItemIconDetail : ItemIcon
 			equipping_sp_index
 		});
 		itemIconDetail.SetFavoriteIcon(item_data.IsFavorite());
-		if ((bool)itemIconDetail.setupperEquip.lvRoot)
+		if (Object.op_Implicit(itemIconDetail.setupperEquip.lvRoot))
 		{
 			UILabel[] componentsInChildren = itemIconDetail.setupperEquipAbility.lvRoot.GetComponentsInChildren<UILabel>();
 			itemIconDetail.SetEquipExt(item_data.equipData, componentsInChildren);
@@ -143,7 +143,7 @@ public class ItemIconDetail : ItemIcon
 			equipping_sp_index
 		});
 		itemIconDetail.SetFavoriteIcon(item_data.IsFavorite());
-		if ((bool)itemIconDetail.setupperEquip.lvRoot)
+		if (Object.op_Implicit(itemIconDetail.setupperEquip.lvRoot))
 		{
 			UILabel[] componentsInChildren = itemIconDetail.setupperEquipAbility.lvRoot.GetComponentsInChildren<UILabel>();
 			itemIconDetail.SetEquipExt(item_data.equipData, componentsInChildren);
@@ -216,9 +216,9 @@ public class ItemIconDetail : ItemIcon
 
 	public override void SetGrayout(bool isActive)
 	{
-		if ((Object)spriteGrayout != (Object)null)
+		if (spriteGrayout != null)
 		{
-			spriteGrayout.enabled = isActive;
+			spriteGrayout.set_enabled(isActive);
 		}
 	}
 }

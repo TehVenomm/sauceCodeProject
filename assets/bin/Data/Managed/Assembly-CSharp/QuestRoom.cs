@@ -194,12 +194,12 @@ public class QuestRoom : GameSection
 		public void Init(UIPanel balloonPanel, UITweener chat_text_tween, UITweener chat_stamp_tween, UILabel chat_text_label, UISprite chat_text_bg, UITexture chat_stamp_texture)
 		{
 			this.balloonPanel = balloonPanel;
-			if ((UnityEngine.Object)chatTextTween != (UnityEngine.Object)null)
+			if (chatTextTween != null)
 			{
 				ResetText();
 				chatTextTween.RemoveOnFinished(onFinishText);
 			}
-			if ((UnityEngine.Object)chatStampTween != (UnityEngine.Object)null)
+			if (chatStampTween != null)
 			{
 				ResetStamp();
 				chatStampTween.RemoveOnFinished(onFinishStamp);
@@ -254,6 +254,7 @@ public class QuestRoom : GameSection
 
 		public void ShowStamp(int stampId)
 		{
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			ResetIfNeeded();
 			isStamp = true;
 			loading = LoadStamp(stampId);
@@ -282,6 +283,8 @@ public class QuestRoom : GameSection
 
 		private void FitTextBG()
 		{
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			UISprite uISprite = chatTextBG;
 			Vector2 printedSize = chatTextLabel.printedSize;
 			uISprite.width = Mathf.CeilToInt(printedSize.x) + 34;
@@ -289,15 +292,22 @@ public class QuestRoom : GameSection
 
 		private void MoveTextBG()
 		{
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
 			float num = -150f;
 			float num2 = -68f;
 			float num3 = 128f;
 			float num4 = 390f;
-			Vector3 localPosition = chatTextBG.transform.localPosition;
+			Vector3 localPosition = chatTextBG.get_transform().get_localPosition();
 			if ((float)chatTextBG.width < num3)
 			{
 				localPosition.x = 0f - (float)chatTextBG.width * 0.5f;
-				chatTextBG.transform.localPosition = localPosition;
+				chatTextBG.get_transform().set_localPosition(localPosition);
 			}
 			else
 			{
@@ -320,13 +330,14 @@ public class QuestRoom : GameSection
 				{
 					localPosition.x = (float)(-(chatTextBG.width - 68));
 				}
-				chatTextBG.transform.localPosition = localPosition;
+				chatTextBG.get_transform().set_localPosition(localPosition);
 			}
 		}
 
 		private void PlayTween(UITweener tween)
 		{
-			tween.gameObject.SetActive(true);
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			tween.get_gameObject().SetActive(true);
 			tween.ResetToBeginning();
 			tween.PlayForward();
 		}
@@ -350,8 +361,9 @@ public class QuestRoom : GameSection
 
 		private void Reset(UITweener balloonRoot)
 		{
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			balloonRoot.ResetToBeginning();
-			balloonRoot.gameObject.SetActive(false);
+			balloonRoot.get_gameObject().SetActive(false);
 		}
 	}
 
@@ -440,26 +452,37 @@ public class QuestRoom : GameSection
 		}
 	}
 
-	public override void Initialize()
+	public unsafe override void Initialize()
 	{
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Expected O, but got Unknown
+		//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03d8: Unknown result type (might be due to invalid IL or missing references)
 		selfUserId = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 		eventData = (GameSection.GetEventData() as object[]);
 		bool flag = eventData != null && eventData[0] is bool;
-		bool is_entry_pass = flag && (bool)eventData[0];
+		bool flag2 = flag && (bool)eventData[0];
 		if (MonoBehaviourSingleton<PartyManager>.I.randomMatchingInfo != null)
 		{
 			isRandomSearch = MonoBehaviourSingleton<PartyManager>.I.randomMatchingInfo.usedSearchRandomMatching;
 		}
-		observer = base.gameObject.AddComponent<QuestRoomObserver>().Initialize(flag, is_entry_pass, delegate(string dispatch_event_name)
+		QuestRoomObserver questRoomObserver = this.get_gameObject().AddComponent<QuestRoomObserver>();
+		bool from_search_section = flag;
+		bool is_entry_pass = flag2;
+		Action<string> dispatch_callback = delegate(string dispatch_event_name)
 		{
 			DispatchEvent(dispatch_event_name, null);
-		}, delegate(string change_event_name)
+		};
+		Action<string> change_event_callback = delegate(string change_event_name)
 		{
 			GameSection.ChangeEvent(change_event_name, null);
-		}, delegate
+		};
+		if (_003C_003Ef__am_0024cache1A == null)
 		{
-			GameSection.StayEvent();
-		}, delegate(bool is_success)
+			_003C_003Ef__am_0024cache1A = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		observer = questRoomObserver.Initialize(from_search_section, is_entry_pass, dispatch_callback, change_event_callback, _003C_003Ef__am_0024cache1A, delegate(bool is_success)
 		{
 			GameSection.ResumeEvent(is_success, null);
 		}, true);
@@ -477,16 +500,16 @@ public class QuestRoom : GameSection
 				canShowRepeatQuest = (questData.questType == QUEST_TYPE.ORDER);
 			}
 			preDownloadCoroutine = StartPredownload();
-			StartCoroutine(preDownloadCoroutine);
+			this.StartCoroutine(preDownloadCoroutine);
 		}
 		else
 		{
 			MonoBehaviourSingleton<StatusManager>.I.ClearEventEquipSet();
 		}
-		SetActive(UI.OBJ_QUEST_INFO, !isExplore && !isRush && !isWaveMatch && !isWaveMatchEvent);
-		SetActive(UI.OBJ_EXPLORE_INFO, isExplore);
-		SetActive(UI.OBJ_RUSH_INFO, isRush);
-		SetActive(UI.OBJ_WAVE_MATCH_INFO, isWaveMatch || isWaveMatchEvent);
+		SetActive((Enum)UI.OBJ_QUEST_INFO, !isExplore && !isRush && !isWaveMatch && !isWaveMatchEvent);
+		SetActive((Enum)UI.OBJ_EXPLORE_INFO, isExplore);
+		SetActive((Enum)UI.OBJ_RUSH_INFO, isRush);
+		SetActive((Enum)UI.OBJ_WAVE_MATCH_INFO, isWaveMatch || isWaveMatchEvent);
 		roomUserModelInfo = new RoomUserModelInfo[4];
 		for (int i = 0; i < 4; i++)
 		{
@@ -529,7 +552,7 @@ public class QuestRoom : GameSection
 		}
 		if (canShowRepeatQuest && selfUserId == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId())
 		{
-			StartCoroutine(SetDeaultRepeat());
+			this.StartCoroutine(SetDeaultRepeat());
 		}
 		else
 		{
@@ -543,9 +566,9 @@ public class QuestRoom : GameSection
 		bool wait = true;
 		MonoBehaviourSingleton<PartyManager>.I.SendRepeat(MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest, delegate
 		{
-			((_003CSetDeaultRepeat_003Ec__Iterator118)/*Error near IL_004b: stateMachine*/)._003C_003Ef__this.SetActive(UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-			((_003CSetDeaultRepeat_003Ec__Iterator118)/*Error near IL_004b: stateMachine*/)._003C_003Ef__this.SetActive(UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-			((_003CSetDeaultRepeat_003Ec__Iterator118)/*Error near IL_004b: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CSetDeaultRepeat_003Ec__Iterator11F)/*Error near IL_004b: stateMachine*/)._003C_003Ef__this.SetActive((Enum)UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			((_003CSetDeaultRepeat_003Ec__Iterator11F)/*Error near IL_004b: stateMachine*/)._003C_003Ef__this.SetActive((Enum)UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			((_003CSetDeaultRepeat_003Ec__Iterator11F)/*Error near IL_004b: stateMachine*/)._003Cwait_003E__0 = false;
 		});
 		while (wait)
 		{
@@ -556,6 +579,7 @@ public class QuestRoom : GameSection
 
 	public override void Exit()
 	{
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		if (goToInGame)
 		{
 			base.Exit();
@@ -563,7 +587,7 @@ public class QuestRoom : GameSection
 		else
 		{
 			MonoBehaviourSingleton<StatusManager>.I.ClearEventEquipSet();
-			StartCoroutine(DoExit());
+			this.StartCoroutine(DoExit());
 		}
 	}
 
@@ -574,7 +598,7 @@ public class QuestRoom : GameSection
 			bool wait = true;
 			MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate
 			{
-				((_003CDoExit_003Ec__Iterator119)/*Error near IL_0037: stateMachine*/)._003Cwait_003E__0 = false;
+				((_003CDoExit_003Ec__Iterator120)/*Error near IL_0037: stateMachine*/)._003Cwait_003E__0 = false;
 			});
 			while (wait)
 			{
@@ -605,14 +629,14 @@ public class QuestRoom : GameSection
 		}
 		if (preDownloadCoroutine != null)
 		{
-			StopCoroutine(preDownloadCoroutine);
+			this.StopCoroutine(preDownloadCoroutine);
 		}
 		base.OnDestroy();
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
-		SetActive(UI.BTN_BACK_2, false);
+		SetActive((Enum)UI.BTN_BACK_2, false);
 		if (PartyManager.IsValidInParty() && questData != null)
 		{
 			if (partyStatus == PARTY_STATUS.NONE)
@@ -621,7 +645,7 @@ public class QuestRoom : GameSection
 			}
 			if (partyStatus != PARTY_STATUS.WAITING || MonoBehaviourSingleton<PartyManager>.I.GetStatus() < PARTY_STATUS.PLAYING)
 			{
-				SetLabelText(UI.LBL_QUEST_NAME, questData.questText);
+				SetLabelText((Enum)UI.LBL_QUEST_NAME, questData.questText);
 				int num = 0;
 				QuestTable.QuestTableData questTableData = null;
 				if (isExplore)
@@ -640,84 +664,72 @@ public class QuestRoom : GameSection
 				{
 					num2 = (int)enemyData.weakElement;
 				}
-				SetElementSprite(UI.SPR_WEAK, num2);
-				SetActive(UI.LBL_NON_WEAK, num2 == 6);
+				SetElementSprite((Enum)UI.SPR_WEAK, num2);
+				SetActive((Enum)UI.LBL_NON_WEAK, num2 == 6);
 				if (isExplore)
 				{
-					SetLabelText(UI.LBL_EXPLORE_NAME, questTableData.questText);
-					SetElementSprite(UI.SPR_WEAK_EXPLORE, num2);
-					SetActive(UI.LBL_NON_WEAK_EXPLORE, num2 == 6);
+					SetLabelText((Enum)UI.LBL_EXPLORE_NAME, questTableData.questText);
+					SetElementSprite((Enum)UI.SPR_WEAK_EXPLORE, num2);
+					SetActive((Enum)UI.LBL_NON_WEAK_EXPLORE, num2 == 6);
 					ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY), ELEMENT_TYPE.MAX, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY, ELEMENT_TYPE.MAX);
 					itemIcon.SetDepth(7);
-					SetElementSprite(UI.SPR_ENM_ELEMENT, (int)enemyData.element);
+					SetElementSprite((Enum)UI.SPR_ENM_ELEMENT, (int)enemyData.element);
 					int num3 = (int)questTableData.limitTime;
-					SetLabelText(UI.LBL_LIMIT_TIME, $"{num3 / 60:D2}:{num3 % 60:D2}");
+					SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num3 / 60:D2}:{num3 % 60:D2}");
 				}
 				if (isRush)
 				{
 					Transform ctrl = GetCtrl(UI.TEX_RUSH_ICON);
-					if ((UnityEngine.Object)ctrl != (UnityEngine.Object)null)
+					if (ctrl != null)
 					{
 						UITexture component = ctrl.GetComponent<UITexture>();
-						if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+						if (component != null)
 						{
 							ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.RUSH_QUEST_ICON, ResourceName.GetRushQuestIconName((int)questData.rushIconId));
 						}
 					}
 					int num4 = (int)questData.limitTime;
-					SetLabelText(UI.LBL_RUSH_LIMIT_TIME, $"{num4 / 60:D2}:{num4 % 60:D2}");
-					SetLabelText(UI.LBL_RUSH_NAME, questData.questText);
-					SetActive(UI.LBL_RUSH_FLOORNUMBER, false);
+					SetLabelText((Enum)UI.LBL_RUSH_LIMIT_TIME, $"{num4 / 60:D2}:{num4 % 60:D2}");
+					SetLabelText((Enum)UI.LBL_RUSH_NAME, questData.questText);
+					SetActive((Enum)UI.LBL_RUSH_FLOORNUMBER, false);
 				}
 				if (isWaveMatch || isWaveMatchEvent)
 				{
 					int num5 = (int)questData.limitTime;
-					SetLabelText(UI.LBL_WM_TITLE, questData.questText);
-					SetLabelText(UI.LBL_WM_LIMIT_TIME, $"{num5 / 60:D2}:{num5 % 60:D2}");
-					SetActive(UI.LBL_WM_TYPE, isWaveMatch);
-					SetActive(UI.LBL_WM_EVENT_TYPE, isWaveMatchEvent);
+					SetLabelText((Enum)UI.LBL_WM_TITLE, questData.questText);
+					SetLabelText((Enum)UI.LBL_WM_LIMIT_TIME, $"{num5 / 60:D2}:{num5 % 60:D2}");
+					SetActive((Enum)UI.LBL_WM_TYPE, isWaveMatch);
+					SetActive((Enum)UI.LBL_WM_EVENT_TYPE, isWaveMatchEvent);
 				}
 				if (isExplore || isRush || isWaveMatch || isWaveMatchEvent)
 				{
 					DeliveryTable.DeliveryData deliveryTableDataFromQuestId = Singleton<DeliveryTable>.I.GetDeliveryTableDataFromQuestId(questData.questID);
-					SetActive(UI.SPR_TYPE_DIFFICULTY, (deliveryTableDataFromQuestId != null && deliveryTableDataFromQuestId.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
+					SetActive((Enum)UI.SPR_TYPE_DIFFICULTY, (deliveryTableDataFromQuestId != null && deliveryTableDataFromQuestId.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
 				}
-				SetLabelText(UI.LBL_ROOM_ID, MonoBehaviourSingleton<PartyManager>.I.GetPartyNumber());
-				SetGrid(UI.GRD_PLAYER_INFO, string.Empty, 4, false, delegate(int i, Transform t)
-				{
-					string prefab_name = (i != MonoBehaviourSingleton<PartyManager>.I.GetSlotIndex(selfUserId)) ? "QuestRoomUserInfo" : "QuestRoomUserInfoSelf";
-					Transform transform = Realizes(prefab_name, t, false);
-					SetupChatBalloon(transform, i);
-					return transform;
-				}, delegate(int i, Transform t, bool is_recycle)
-				{
-					UpdateRoomUserInfo(t, i);
-					SetEvent(t, UI.BTN_NAME_BG, "MEMBER_DETAIL", i);
-					SetEvent(t, UI.BTN_FRAME, "MEMBER_DETAIL", i);
-					UpdateChatBalloon(i);
-				});
+				SetLabelText((Enum)UI.LBL_ROOM_ID, MonoBehaviourSingleton<PartyManager>.I.GetPartyNumber());
+				SetGrid(UI.GRD_PLAYER_INFO, string.Empty, 4, false, new Func<int, Transform, Transform>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<PartyManager>.I.GetSlotInfoByUserId(selfUserId);
 				bool is_active2 = slotInfoByUserId.status == 21;
 				bool flag = selfUserId == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId();
 				bool flag2 = MonoBehaviourSingleton<PartyManager>.I.GetStatus() >= PARTY_STATUS.PLAYING;
 				if (flag)
 				{
-					SetActive(UI.BTN_READY, false);
-					SetActive(UI.BTN_READY_BACK, false);
-					SetActive(UI.BTN_OWNER_READY, true);
-					SetActive(UI.BTN_INVITE, true);
+					SetActive((Enum)UI.BTN_READY, false);
+					SetActive((Enum)UI.BTN_READY_BACK, false);
+					SetActive((Enum)UI.BTN_OWNER_READY, true);
+					SetActive((Enum)UI.BTN_INVITE, true);
 					bool flag3 = MonoBehaviourSingleton<PartyManager>.IsValid() && MonoBehaviourSingleton<PartyManager>.I.partySetting != null && MonoBehaviourSingleton<PartyManager>.I.partySetting.isLock;
-					SetActive(UI.BTN_CHANGE_PUBLIC, flag3);
-					SetActive(UI.BTN_CHANGE_PUBLIC_OFF, !flag3);
+					SetActive((Enum)UI.BTN_CHANGE_PUBLIC, flag3);
+					SetActive((Enum)UI.BTN_CHANGE_PUBLIC_OFF, !flag3);
 				}
 				else
 				{
-					SetActive(UI.BTN_READY, !flag2);
-					SetActive(UI.BTN_READY_BACK, !flag2);
-					SetActive(UI.BTN_OWNER_READY, flag2);
+					SetActive((Enum)UI.BTN_READY, !flag2);
+					SetActive((Enum)UI.BTN_READY_BACK, !flag2);
+					SetActive((Enum)UI.BTN_OWNER_READY, flag2);
 					if (!flag2)
 					{
-						SetToggleButton(UI.TGL_READY, is_active2, delegate(bool is_active)
+						SetToggleButton((Enum)UI.TGL_READY, is_active2, (Action<bool>)delegate(bool is_active)
 						{
 							if (is_active)
 							{
@@ -729,9 +741,9 @@ public class QuestRoom : GameSection
 							}
 						});
 					}
-					SetActive(UI.BTN_INVITE, false);
-					SetActive(UI.BTN_CHANGE_PUBLIC, false);
-					SetActive(UI.BTN_CHANGE_PUBLIC_OFF, false);
+					SetActive((Enum)UI.BTN_INVITE, false);
+					SetActive((Enum)UI.BTN_CHANGE_PUBLIC, false);
+					SetActive((Enum)UI.BTN_CHANGE_PUBLIC_OFF, false);
 				}
 				if (questData.questType == QUEST_TYPE.GATE)
 				{
@@ -741,18 +753,18 @@ public class QuestRoom : GameSection
 					{
 						text = string.Format(format, questData.GetMainEnemyLv(), enemyData.name);
 					}
-					SetLabelText(UI.LBL_QUEST_NAME, text);
+					SetLabelText((Enum)UI.LBL_QUEST_NAME, text);
 				}
 				openAfterUpdate = false;
 				if (canShowRepeatQuest)
 				{
-					SetActive(UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-					SetActive(UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+					SetActive((Enum)UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+					SetActive((Enum)UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
 				}
 				else
 				{
-					SetActive(UI.BTN_REPEAT_OFF, false);
-					SetActive(UI.BTN_REPEAT_ON, false);
+					SetActive((Enum)UI.BTN_REPEAT_OFF, false);
+					SetActive((Enum)UI.BTN_REPEAT_ON, false);
 				}
 			}
 		}
@@ -761,7 +773,7 @@ public class QuestRoom : GameSection
 	private void UpdateRoomUserInfo(Transform trans, int index)
 	{
 		QuestRoomUserInfo component = trans.GetComponent<QuestRoomUserInfo>();
-		if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
+		if (!(component == null))
 		{
 			RoomUserModelInfo.ROOM_USER_STATE rOOM_USER_STATE = RoomUserModelInfo.ROOM_USER_STATE.EMPTY;
 			PartyModel.SlotInfo slotInfoByIndex = MonoBehaviourSingleton<PartyManager>.I.GetSlotInfoByIndex(index);
@@ -941,8 +953,8 @@ public class QuestRoom : GameSection
 		partySetting.level = partySetting.reserveLimitLevel;
 		MonoBehaviourSingleton<PartyManager>.I.SendEdit(partySetting, delegate(bool isSuccess)
 		{
-			SetActive(UI.BTN_CHANGE_PUBLIC, false);
-			SetActive(UI.BTN_CHANGE_PUBLIC_OFF, true);
+			SetActive((Enum)UI.BTN_CHANGE_PUBLIC, false);
+			SetActive((Enum)UI.BTN_CHANGE_PUBLIC_OFF, true);
 			GameSection.ResumeEvent(isSuccess, null);
 		});
 	}
@@ -1175,8 +1187,8 @@ public class QuestRoom : GameSection
 		}
 		if ((notify_flags & NOTIFY_FLAG.RECEIVE_COOP_ROOM_UPDATE) != (NOTIFY_FLAG)0L && canShowRepeatQuest)
 		{
-			SetActive(UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-			SetActive(UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			SetActive((Enum)UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			SetActive((Enum)UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
 		}
 		base.OnNotify(notify_flags);
 	}
@@ -1214,7 +1226,7 @@ public class QuestRoom : GameSection
 
 	private void Update()
 	{
-		if (base.isOpen && !section_back_event && !((UnityEngine.Object)observer == (UnityEngine.Object)null) && observer.IsValidParty() && observer.IsConnect())
+		if (base.isOpen && !section_back_event && !(observer == null) && observer.IsValidParty() && observer.IsConnect())
 		{
 			bool flag = false;
 			for (int i = 0; i < 4; i++)
@@ -1247,6 +1259,8 @@ public class QuestRoom : GameSection
 
 	private void InitializeChatUI()
 	{
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
 		MonoBehaviourSingleton<ChatManager>.I.CreateRoomChatWithParty();
 		MonoBehaviourSingleton<ChatManager>.I.roomChat.JoinRoom(0);
 		if (MonoBehaviourSingleton<ChatManager>.I.roomChat != null)
@@ -1255,13 +1269,13 @@ public class QuestRoom : GameSection
 			MonoBehaviourSingleton<ChatManager>.I.roomChat.onReceiveStamp += OnReceiveChatStamp;
 		}
 		UIButton component = GetCtrl(UI.BTN_CHAT).GetComponent<UIButton>();
-		if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
+		if (!(component == null))
 		{
 			if (!TutorialStep.HasAllTutorialCompleted())
 			{
-				component.gameObject.SetActive(false);
+				component.get_gameObject().SetActive(false);
 			}
-			else if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null)
+			else if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
 			{
 				MonoBehaviourSingleton<UIManager>.I.mainChat.SetRoomChatNameType(false);
 				MonoBehaviourSingleton<UIManager>.I.mainChat.addObserver(this);
@@ -1270,30 +1284,33 @@ public class QuestRoom : GameSection
 			}
 			else
 			{
-				component.gameObject.SetActive(false);
+				component.get_gameObject().SetActive(false);
 			}
 		}
 	}
 
 	public override void OnModifyChat(MainChat.NOTIFY_FLAG flag)
 	{
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
 		{
 			if ((flag & MainChat.NOTIFY_FLAG.ARRIVED_MESSAGE) != 0)
 			{
-				SetBadge(UI.BTN_CHAT, MonoBehaviourSingleton<UIManager>.I.mainChat.GetPendingQueueNumWithoutRoom(), SpriteAlignment.TopLeft, 5, -10, false);
+				SetBadge((Enum)UI.BTN_CHAT, MonoBehaviourSingleton<UIManager>.I.mainChat.GetPendingQueueNumWithoutRoom(), 1, 5, -10, false);
 			}
 			if ((flag & MainChat.NOTIFY_FLAG.CLOSE_WINDOW) != 0)
 			{
-				GetCtrl(UI.BTN_CHAT).gameObject.SetActive(true);
+				GetCtrl(UI.BTN_CHAT).get_gameObject().SetActive(true);
 			}
 			if ((flag & MainChat.NOTIFY_FLAG.OPEN_WINDOW) != 0)
 			{
-				GetCtrl(UI.BTN_CHAT).gameObject.SetActive(false);
+				GetCtrl(UI.BTN_CHAT).get_gameObject().SetActive(false);
 			}
 			if ((flag & MainChat.NOTIFY_FLAG.OPEN_WINDOW_INPUT_ONLY) != 0)
 			{
-				GetCtrl(UI.BTN_CHAT).gameObject.SetActive(false);
+				GetCtrl(UI.BTN_CHAT).get_gameObject().SetActive(false);
 			}
 		}
 	}
@@ -1447,8 +1464,8 @@ public class QuestRoom : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<PartyManager>.I.SendRepeat(!MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest, delegate(bool is_success)
 			{
-				SetActive(UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-				SetActive(UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+				SetActive((Enum)UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+				SetActive((Enum)UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
 				GameSaveData.instance.defaultRepeatPartyOn = MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest;
 				GameSection.ResumeEvent(is_success, null);
 			});

@@ -1,10 +1,13 @@
-using UnityEngine;
-
-public class ResidentEffectObject : MonoBehaviour
+public class ResidentEffectObject
 {
 	public int GroupID;
 
 	public string UniqueName = string.Empty;
+
+	public ResidentEffectObject()
+		: this()
+	{
+	}
 
 	public void Initialize(SystemEffectSetting.Data effectData)
 	{

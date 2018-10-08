@@ -123,6 +123,12 @@ public class AccessoryTable : Singleton<AccessoryTable>, IDataTable
 
 		public static bool cb(CSVReader csv_reader, AccessoryInfoData data, ref uint key)
 		{
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
 			data.id = key;
 			csv_reader.Pop(ref data.accessoryId);
 			csv_reader.PopEnum(ref data.attachPlace, ACCESSORY_PART.NONE);

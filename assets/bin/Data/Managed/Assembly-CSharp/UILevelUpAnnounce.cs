@@ -116,11 +116,12 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 
 	private void StoreAudioClip()
 	{
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		string sE = ResourceName.GetSE(40000017);
 		if (!string.IsNullOrEmpty(sE))
 		{
-			ResourceLink component = base.gameObject.GetComponent<ResourceLink>();
-			if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
+			ResourceLink component = this.get_gameObject().GetComponent<ResourceLink>();
+			if (!(component == null))
 			{
 				m_AudioClip = component.Get<AudioClip>(sE);
 			}
@@ -129,7 +130,7 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 
 	private void PlayAudioLevelUp()
 	{
-		if ((UnityEngine.Object)m_AudioClip != (UnityEngine.Object)null)
+		if (m_AudioClip != null)
 		{
 			SoundManager.PlayOneshotJingle(m_AudioClip, 40000017, null, null);
 		}
@@ -220,20 +221,22 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 
 	private void PlayLevelUpInner(bool forcePlay = false, Action callback = null)
 	{
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0042: Expected O, but got Unknown
 		if (!MonoBehaviourSingleton<InGameManager>.IsValid() || !MonoBehaviourSingleton<InGameManager>.I.IsRush())
 		{
 			if (!forcePlay && !IsPlay())
 			{
 				if (m_coroutine == null)
 				{
-					m_coroutine = StartCoroutine("DelayPlay");
+					m_coroutine = this.StartCoroutine("DelayPlay");
 				}
 			}
 			else
 			{
 				if (forcePlay && m_coroutine != null)
 				{
-					StopCoroutine(m_coroutine);
+					this.StopCoroutine(m_coroutine);
 					m_coroutine = null;
 				}
 				Play(callback);
@@ -243,7 +246,7 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 		}
 	}
 
-	private IEnumerator DelayPlay()
+	private unsafe IEnumerator DelayPlay()
 	{
 		int waitCount = 0;
 		while (!IsPlay() || waitCount < 3)
@@ -252,10 +255,7 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 			yield return (object)null;
 		}
 		m_isPlaying = true;
-		Play(delegate
-		{
-			((_003CDelayPlay_003Ec__Iterator34)/*Error near IL_0098: stateMachine*/)._003C_003Ef__this.m_isPlaying = false;
-		});
+		Play(new Action((object)/*Error near IL_0098: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		PlayAudioLevelUp();
 		m_coroutine = null;
 		GetNowStatus();

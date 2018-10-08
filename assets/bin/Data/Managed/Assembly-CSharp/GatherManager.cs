@@ -76,12 +76,12 @@ public class GatherManager : MonoBehaviourSingleton<GatherManager>
 	{
 		Protocol.Send(GatherEnterModel.URL, delegate(GatherEnterModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
+				flag = true;
 			}
-			call_back(arg, ret.result);
+			call_back.Invoke(flag, ret.result);
 		}, string.Empty);
 	}
 
@@ -89,12 +89,12 @@ public class GatherManager : MonoBehaviourSingleton<GatherManager>
 	{
 		Protocol.Send(GatherUpdateModel.URL, delegate(GatherUpdateModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
+				flag = true;
 			}
-			call_back(arg, ret.result);
+			call_back.Invoke(flag, ret.result);
 		}, string.Empty);
 	}
 
@@ -104,19 +104,19 @@ public class GatherManager : MonoBehaviourSingleton<GatherManager>
 		requestSendForm.pid = pointId;
 		Protocol.Send(GatherStartModel.URL, requestSendForm, delegate(GatherStartModel ret)
 		{
-			bool arg = false;
-			bool arg2 = false;
-			int arg3 = 0;
+			bool flag = false;
+			bool flag2 = false;
+			int num = 0;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
+				flag = true;
 				if (ret.result.disappear.Count > 0)
 				{
-					arg2 = true;
-					arg3 = ret.result.fairy.lost;
+					flag2 = true;
+					num = ret.result.fairy.lost;
 				}
 			}
-			call_back(arg, arg2, arg3);
+			call_back.Invoke(flag, flag2, num);
 		}, string.Empty);
 	}
 
@@ -126,18 +126,18 @@ public class GatherManager : MonoBehaviourSingleton<GatherManager>
 		requestSendForm.pid = pointId;
 		Protocol.Send(GatherCompleteModel.URL, requestSendForm, delegate(GatherCompleteModel ret)
 		{
-			bool arg = false;
-			bool arg2 = false;
-			int arg3 = 0;
-			GatherRewardList arg4 = null;
+			bool flag = false;
+			bool flag2 = false;
+			int num = 0;
+			GatherRewardList gatherRewardList = null;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
-				arg2 = ret.result.isNewOpen;
-				arg3 = ret.result.fairy.lost;
-				arg4 = ret.result.reward;
+				flag = true;
+				flag2 = ret.result.isNewOpen;
+				num = ret.result.fairy.lost;
+				gatherRewardList = ret.result.reward;
 			}
-			call_back(arg, arg2, arg3, arg4);
+			call_back.Invoke(flag, flag2, num, gatherRewardList);
 		}, string.Empty);
 	}
 

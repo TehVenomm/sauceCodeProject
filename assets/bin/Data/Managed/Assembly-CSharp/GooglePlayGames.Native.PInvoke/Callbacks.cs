@@ -26,7 +26,7 @@ namespace GooglePlayGames.Native.PInvoke
 		{
 			Action<IntPtr> callback2 = delegate(IntPtr result)
 			{
-				using (T obj = conversionFunction(result))
+				using (T obj = conversionFunction.Invoke(result))
 				{
 					if (callback != null)
 					{
@@ -37,19 +37,11 @@ namespace GooglePlayGames.Native.PInvoke
 			return ToIntPtr(callback2);
 		}
 
-		internal static IntPtr ToIntPtr<T, P>(Action<T, P> callback, Func<IntPtr, P> conversionFunction) where P : BaseReferenceHolder
+		internal unsafe static IntPtr ToIntPtr<T, P>(Action<T, P> callback, Func<IntPtr, P> conversionFunction) where P : BaseReferenceHolder
 		{
-			Action<T, IntPtr> callback2 = delegate(T param1, IntPtr param2)
-			{
-				using (P arg = conversionFunction(param2))
-				{
-					if (callback != null)
-					{
-						callback(param1, arg);
-					}
-				}
-			};
-			return ToIntPtr(callback2);
+			_003CToIntPtr_003Ec__AnonStorey83E<T, P> _003CToIntPtr_003Ec__AnonStorey83E;
+			Action<T, IntPtr> callback2 = new Action<_003F, IntPtr>((object)_003CToIntPtr_003Ec__AnonStorey83E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			return ToIntPtr((Delegate)callback2);
 		}
 
 		internal static IntPtr ToIntPtr(Delegate callback)
@@ -138,10 +130,10 @@ namespace GooglePlayGames.Native.PInvoke
 		internal static void PerformInternalCallback<T>(string callbackName, Type callbackType, T param1, IntPtr param2, IntPtr userData)
 		{
 			Logger.d("Entering internal callback for " + callbackName);
-			Action<T, IntPtr> action = null;
+			Action<T, IntPtr> val = null;
 			try
 			{
-				action = ((callbackType != 0) ? IntPtrToTempCallback<Action<T, IntPtr>>(userData) : IntPtrToPermanentCallback<Action<T, IntPtr>>(userData));
+				val = ((callbackType != 0) ? IntPtrToTempCallback<Action<T, IntPtr>>(userData) : IntPtrToPermanentCallback<Action<T, IntPtr>>(userData));
 			}
 			catch (Exception ex)
 			{
@@ -150,11 +142,11 @@ namespace GooglePlayGames.Native.PInvoke
 				IL_005f:;
 			}
 			Logger.d("Internal Callback converted to action");
-			if (action != null)
+			if (val != null)
 			{
 				try
 				{
-					action(param1, param2);
+					val.Invoke(param1, param2);
 				}
 				catch (Exception ex2)
 				{
@@ -163,32 +155,24 @@ namespace GooglePlayGames.Native.PInvoke
 			}
 		}
 
-		internal static Action<T> AsOnGameThreadCallback<T>(Action<T> toInvokeOnGameThread)
+		internal unsafe static Action<T> AsOnGameThreadCallback<T>(Action<T> toInvokeOnGameThread)
 		{
-			return delegate(T result)
+			return delegate
 			{
+				//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+				//IL_002c: Expected O, but got Unknown
 				if (toInvokeOnGameThread != null)
 				{
-					PlayGamesHelperObject.RunOnGameThread(delegate
-					{
-						toInvokeOnGameThread(result);
-					});
+					_003CAsOnGameThreadCallback_003Ec__AnonStorey83F<T>._003CAsOnGameThreadCallback_003Ec__AnonStorey840 _003CAsOnGameThreadCallback_003Ec__AnonStorey;
+					PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CAsOnGameThreadCallback_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 			};
 		}
 
-		internal static Action<T1, T2> AsOnGameThreadCallback<T1, T2>(Action<T1, T2> toInvokeOnGameThread)
+		internal unsafe static Action<T1, T2> AsOnGameThreadCallback<T1, T2>(Action<T1, T2> toInvokeOnGameThread)
 		{
-			return delegate(T1 result1, T2 result2)
-			{
-				if (toInvokeOnGameThread != null)
-				{
-					PlayGamesHelperObject.RunOnGameThread(delegate
-					{
-						toInvokeOnGameThread(result1, result2);
-					});
-				}
-			};
+			_003CAsOnGameThreadCallback_003Ec__AnonStorey841<T1, T2> _003CAsOnGameThreadCallback_003Ec__AnonStorey;
+			return new Action<_003F, _003F>((object)_003CAsOnGameThreadCallback_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 
 		internal static void AsCoroutine(IEnumerator routine)

@@ -174,23 +174,23 @@ public class HomeBingo : GameSection
 
 	public override string overrideBackKeyEvent => "CLOSE";
 
-	public override void Initialize()
+	public unsafe override void Initialize()
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Expected O, but got Unknown
 		if (isLocalInitialized)
 		{
 			base.Initialize();
 		}
 		else
 		{
-			InitializeOnce(delegate
-			{
-				base.Initialize();
-			});
+			InitializeOnce(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
 	protected virtual void InitializeOnce(Action callback)
 	{
+		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 		isLocalInitialized = true;
 		itemNum = ColmunNum * ColmunNum;
 		centerIndex = itemNum / 2;
@@ -202,7 +202,7 @@ public class HomeBingo : GameSection
 		isFirstUpdate = true;
 		LoadingQueue load_queue = new LoadingQueue(this);
 		CacheAudio(load_queue);
-		StartCoroutine(DoInitialize(callback));
+		this.StartCoroutine(DoInitialize(callback));
 	}
 
 	protected virtual IEnumerator DoInitialize(Action callback)
@@ -219,8 +219,8 @@ public class HomeBingo : GameSection
 			SetCurrentIndex(0);
 			InitCardDataList(eventDataList);
 			int index = GetCurrentIndex();
-			yield return (object)StartCoroutine(LoadBanner(GetEventDataFromList(index), index, null));
-			callback();
+			yield return (object)this.StartCoroutine(LoadBanner(GetEventDataFromList(index), index, null));
+			callback.Invoke();
 		}
 	}
 
@@ -235,14 +235,14 @@ public class HomeBingo : GameSection
 			bool isSuccess = false;
 			string resourceName = ResourceName.GetEventBG(eventData.bannerId);
 			Hash128 hash = default(Hash128);
-			if ((UnityEngine.Object)MonoBehaviourSingleton<ResourceManager>.I.manifest != (UnityEngine.Object)null)
+			if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest != null)
 			{
-				hash = MonoBehaviourSingleton<ResourceManager>.I.manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(resourceName));
+				hash = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(resourceName));
 			}
-			if ((UnityEngine.Object)MonoBehaviourSingleton<ResourceManager>.I.manifest == (UnityEngine.Object)null || hash.isValid)
+			if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest == null || hash.get_isValid())
 			{
 				LoadingQueue load_queue = new LoadingQueue(this);
-				LoadObject lo_bg = load_queue.Load(RESOURCE_CATEGORY.EVENT_BG, resourceName, false);
+				LoadObject lo_bg = load_queue.Load(true, RESOURCE_CATEGORY.EVENT_BG, resourceName, false);
 				if (load_queue.IsLoading())
 				{
 					yield return (object)load_queue.Wait();
@@ -256,9 +256,9 @@ public class HomeBingo : GameSection
 
 	protected void HideAll()
 	{
-		SetActive(UI.OBJ_BTN_ROOT, false);
-		SetActive(UI.OBJ_ROOT_CARDS, false);
-		SetActive(UI.BTN_CLOSE, false);
+		SetActive((Enum)UI.OBJ_BTN_ROOT, false);
+		SetActive((Enum)UI.OBJ_ROOT_CARDS, false);
+		SetActive((Enum)UI.BTN_CLOSE, false);
 	}
 
 	protected void RequestNotExistBingo()
@@ -336,40 +336,43 @@ public class HomeBingo : GameSection
 
 	protected virtual void InitCard(int cardIndex)
 	{
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
 		CardData cardData = cardDataList[cardIndex];
-		Transform transform;
+		Transform val;
 		if (cardIndex == 0)
 		{
-			transform = GetCtrl(UI.OBJ_CARD);
+			val = GetCtrl(UI.OBJ_CARD);
 		}
 		else
 		{
-			transform = UnityEngine.Object.Instantiate(GetCtrl(UI.OBJ_CARD));
-			transform.SetParent(GetCtrl(UI.OBJ_ROOT_CARDS), false);
+			val = Object.Instantiate<Transform>(GetCtrl(UI.OBJ_CARD));
+			val.SetParent(GetCtrl(UI.OBJ_ROOT_CARDS), false);
 		}
-		cardData.cardTransform = transform;
-		cardData.cardTweenCtrl = FindCtrl(transform, UI.OBJ_CARD_TWEEN_CTRL).GetComponent<UITweenCtrl>();
-		Transform transform2 = FindCtrl(transform, UI.OBJ_TWEEN_CARD);
-		cardData.cardTween = transform2.GetComponent<TweenPosition>();
-		Transform transform3 = FindCtrl(GetCurrentCard().cardTransform, UI.OBJ_COMPLETE_TWEEN_ROOT);
-		if ((UnityEngine.Object)transform3 != (UnityEngine.Object)null)
+		cardData.cardTransform = val;
+		cardData.cardTweenCtrl = FindCtrl(val, UI.OBJ_CARD_TWEEN_CTRL).GetComponent<UITweenCtrl>();
+		Transform val2 = FindCtrl(val, UI.OBJ_TWEEN_CARD);
+		cardData.cardTween = val2.GetComponent<TweenPosition>();
+		Transform val3 = FindCtrl(GetCurrentCard().cardTransform, UI.OBJ_COMPLETE_TWEEN_ROOT);
+		if (val3 != null)
 		{
-			cardData.completeRewardTweenlRoot = transform3;
-			UITweenCtrl component = transform3.GetComponent<UITweenCtrl>();
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			cardData.completeRewardTweenlRoot = val3;
+			UITweenCtrl component = val3.GetComponent<UITweenCtrl>();
+			if (component != null)
 			{
 				cardData.completeRewardTweenlCtrl = component;
 			}
 		}
 		if (cardIndex != currentCardIndex)
 		{
-			Vector3 localPosition = transform2.localPosition;
+			Vector3 localPosition = val2.get_localPosition();
 			localPosition.x = StandByX;
-			transform2.localPosition = localPosition;
+			val2.set_localPosition(localPosition);
 		}
 	}
 
-	protected void RefreshMissionData(int eventIndex)
+	protected unsafe void RefreshMissionData(int eventIndex)
 	{
 		CardData cardData = cardDataList[eventIndex];
 		cardData.gridDataList.Clear();
@@ -384,9 +387,13 @@ public class HomeBingo : GameSection
 		}
 		else
 		{
-			cardData.gridDataList = (from g in cardData.gridDataList
-			orderby g.deliveryData.id
-			select g).ToList();
+			CardData cardData2 = cardData;
+			List<GridData> gridDataList = cardData.gridDataList;
+			if (_003C_003Ef__am_0024cache10 == null)
+			{
+				_003C_003Ef__am_0024cache10 = new Func<GridData, uint>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			cardData2.gridDataList = gridDataList.OrderBy<GridData, uint>(_003C_003Ef__am_0024cache10).ToList();
 		}
 	}
 
@@ -455,7 +462,7 @@ public class HomeBingo : GameSection
 		}
 	}
 
-	private void SetABingoChildrenData(CardData cardData, BingoData bingoData)
+	private unsafe void SetABingoChildrenData(CardData cardData, BingoData bingoData)
 	{
 		DeliveryTable.DeliveryData.NeedData[] needs = bingoData.deliveryData.needs;
 		int i = 0;
@@ -464,7 +471,8 @@ public class HomeBingo : GameSection
 			DeliveryTable.DeliveryData.NeedData need = needs[i];
 			if ((uint)need.needId != 0)
 			{
-				GridData gridData = cardData.gridDataList.FirstOrDefault((GridData grid) => grid.deliveryData.id == (uint)need.needId);
+				_003CSetABingoChildrenData_003Ec__AnonStorey36A _003CSetABingoChildrenData_003Ec__AnonStorey36A;
+				GridData gridData = cardData.gridDataList.FirstOrDefault(new Func<GridData, bool>((object)_003CSetABingoChildrenData_003Ec__AnonStorey36A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				if (gridData != null && gridData.deliveryData != null)
 				{
 					bingoData.childrenGridList.Add(gridData);
@@ -506,16 +514,18 @@ public class HomeBingo : GameSection
 
 	public override void OnNotify(NOTIFY_FLAG flags)
 	{
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		base.OnNotify(flags);
 		if ((flags & NOTIFY_FLAG.TRANSITION_END) != (NOTIFY_FLAG)0L)
 		{
 			if (!IsPlayableVersion(out Network.EventData notPlayableEventData))
 			{
-				StartCoroutine(WaitAndStartNotPlayable(notPlayableEventData));
+				this.StartCoroutine(WaitAndStartNotPlayable(notPlayableEventData));
 			}
 			else
 			{
-				StartCoroutine(WaitAndStartAutoComplete());
+				this.StartCoroutine(WaitAndStartAutoComplete());
 			}
 		}
 	}
@@ -672,13 +682,13 @@ public class HomeBingo : GameSection
 			if (cardDataList[currentCardIndex].gridDataList.Count > 0)
 			{
 				int count = cardDataList.Count;
-				SetActive(UI.OBJ_BTN_ROOT, false);
+				SetActive((Enum)UI.OBJ_BTN_ROOT, false);
 				if (isFirstUpdate)
 				{
 					isFirstUpdate = false;
-					SetActive(UI.OBJ_COMPLETE, false);
+					SetActive((Enum)UI.OBJ_COMPLETE, false);
 					bool isCompleted = GetCurrentCard().allBingoData.isCompleted;
-					SetActive(UI.OBJ_COMPLETE_STAY, isCompleted);
+					SetActive((Enum)UI.OBJ_COMPLETE_STAY, isCompleted);
 					if (isCompleted)
 					{
 						Transform ctrl = GetCtrl(UI.OBJ_COMPLETE_STAY);
@@ -687,7 +697,7 @@ public class HomeBingo : GameSection
 						component.Play(true, null);
 					}
 				}
-				SetActive(UI.OBJ_BINGO_ANIMATION, false);
+				SetActive((Enum)UI.OBJ_BINGO_ANIMATION, false);
 				for (int i = 0; i < count; i++)
 				{
 					UpdateCard(cardDataList[i], i);
@@ -697,22 +707,13 @@ public class HomeBingo : GameSection
 		}
 	}
 
-	protected virtual void UpdateCard(CardData cardData, int cardIndex)
+	protected unsafe virtual void UpdateCard(CardData cardData, int cardIndex)
 	{
 		Transform cardTransform = cardData.cardTransform;
 		UpdateBingoName(cardTransform, cardData.eventData);
 		UpdateEndData(cardTransform, cardData.eventData);
-		SetGrid(cardTransform, UI.GRD_BINGO_LIST, GridItemName, cardData.gridDataList.Count + 1, false, delegate(int i, Transform t, bool b)
-		{
-			if (i == centerIndex)
-			{
-				SetUpCenterItem(cardIndex, i, t, b);
-			}
-			else
-			{
-				SetUpGridItem(cardIndex, i, t, b);
-			}
-		});
+		_003CUpdateCard_003Ec__AnonStorey36B _003CUpdateCard_003Ec__AnonStorey36B;
+		SetGrid(cardTransform, UI.GRD_BINGO_LIST, GridItemName, cardData.gridDataList.Count + 1, false, new Action<int, Transform, bool>((object)_003CUpdateCard_003Ec__AnonStorey36B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		UpdateReachs(cardData);
 	}
 
@@ -773,9 +774,9 @@ public class HomeBingo : GameSection
 		GridData gridData = cardDataList[cardIndex].gridDataList[index];
 		gridData.SetEntity(t, GetGridSpriteName(index));
 		BoxCollider component = t.GetComponent<BoxCollider>();
-		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+		if (component != null)
 		{
-			component.enabled = true;
+			component.set_enabled(true);
 		}
 		SetActive(t, UI.SPR_GRID_ITEM, !gridData.isCompleted);
 		SetSprite(t, UI.SPR_GRID_ITEM, gridData.spriteName);
@@ -815,29 +816,14 @@ public class HomeBingo : GameSection
 		});
 	}
 
-	private void UpdateRewardIcon(Transform cardTransform, MissionData gridData)
+	private unsafe void UpdateRewardIcon(Transform cardTransform, MissionData gridData)
 	{
 		DeliveryRewardTable.DeliveryRewardData[] rewards = Singleton<DeliveryRewardTable>.I.GetDeliveryRewardTableData(gridData.deliveryData.id);
 		int exp = 0;
 		if (rewards != null && rewards.Length > 0)
 		{
-			SetGrid(cardTransform, UI.GRD_REWARD, string.Empty, rewards.Length, false, delegate(int index, Transform t, bool is_recycle)
-			{
-				DeliveryRewardTable.DeliveryRewardData.Reward reward = rewards[index].reward;
-				bool is_visible = false;
-				if (reward.type == REWARD_TYPE.EXP)
-				{
-					exp += reward.num;
-				}
-				else
-				{
-					is_visible = true;
-					ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(reward.type, reward.item_id, t, reward.num, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_DETAIL);
-					SetMaterialInfo(itemIcon.transform, reward.type, reward.item_id, null);
-					itemIcon.SetRewardBG(true);
-				}
-				SetActive(t, is_visible);
-			});
+			_003CUpdateRewardIcon_003Ec__AnonStorey36C _003CUpdateRewardIcon_003Ec__AnonStorey36C;
+			SetGrid(cardTransform, UI.GRD_REWARD, string.Empty, rewards.Length, false, new Action<int, Transform, bool>((object)_003CUpdateRewardIcon_003Ec__AnonStorey36C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -904,40 +890,18 @@ public class HomeBingo : GameSection
 	{
 	}
 
-	private void OnQuery_COMPLETE_GRID()
+	private unsafe void OnQuery_COMPLETE_GRID()
 	{
 		GridData gridData = GameSection.GetEventData() as GridData;
 		GameSection.StayEvent();
 		Delivery deliveryInfo = gridData.deliveryInfo;
 		CardData cardData = GetCurrentCard();
 		MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo.uId, false, delegate(bool is_success, DeliveryRewardList recv_reward)
-		{
-			if (is_success)
-			{
-				StartCoroutine(WaitAndDo(delegate
-				{
-					PlayGridCompleteAnimation(gridData, true, delegate
-					{
-						GameSection.ChangeStayEvent("GET_REWARD", new object[2]
-						{
-							gridData.deliveryData,
-							cardData.eventData
-						});
-						GameSection.ResumeEvent(true, null);
-						RefreshMissionData(currentCardIndex);
-						RefreshUI();
-					});
-				}, 0.2f));
-			}
-			else
-			{
-				GameSection.ResumeEvent(false, null);
-			}
-		});
+		_003COnQuery_COMPLETE_GRID_003Ec__AnonStorey36D _003COnQuery_COMPLETE_GRID_003Ec__AnonStorey36D;
+		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo.uId, false, new Action<bool, DeliveryRewardList>((object)_003COnQuery_COMPLETE_GRID_003Ec__AnonStorey36D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
-	private void OnQuery_COMPLETE_BINGO()
+	private unsafe void OnQuery_COMPLETE_BINGO()
 	{
 		BingoData bingoData = GameSection.GetEventData() as BingoData;
 		GameSection.StayEvent();
@@ -945,16 +909,11 @@ public class HomeBingo : GameSection
 		CardData cardData = GetCurrentCard();
 		DeliveryTable.DeliveryData.NeedData[] needs = bingoData.deliveryData.needs;
 		MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo.uId, false, delegate(bool is_success, DeliveryRewardList recv_reward)
-		{
-			StartCoroutine(WaitAndDo(delegate
-			{
-				OnEndSendBingoMission(is_success, cardData, bingoData, bingoData.childrenGridList);
-			}, 0.2f));
-		});
+		_003COnQuery_COMPLETE_BINGO_003Ec__AnonStorey36F _003COnQuery_COMPLETE_BINGO_003Ec__AnonStorey36F;
+		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo.uId, false, new Action<bool, DeliveryRewardList>((object)_003COnQuery_COMPLETE_BINGO_003Ec__AnonStorey36F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
-	private void OnQuery_COMPLETE_ALL_BINGO()
+	private unsafe void OnQuery_COMPLETE_ALL_BINGO()
 	{
 		AllBingoData allBingoData = GameSection.GetEventData() as AllBingoData;
 		GameSection.StayEvent();
@@ -962,17 +921,13 @@ public class HomeBingo : GameSection
 		CardData cardData = GetCurrentCard();
 		List<GridData> gridDatas = cardData.gridDataList;
 		MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo.uId, false, delegate(bool is_success, DeliveryRewardList recv_reward)
-		{
-			StartCoroutine(WaitAndDo(delegate
-			{
-				OnEndSendAllMission(is_success, cardData, allBingoData, gridDatas);
-			}, 0.2f));
-		});
+		_003COnQuery_COMPLETE_ALL_BINGO_003Ec__AnonStorey371 _003COnQuery_COMPLETE_ALL_BINGO_003Ec__AnonStorey;
+		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo.uId, false, new Action<bool, DeliveryRewardList>((object)_003COnQuery_COMPLETE_ALL_BINGO_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnEndSendBingoMission(bool is_success, CardData cardData, BingoData bingoData, List<GridData> gridDatas)
 	{
+		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
 		if (is_success)
 		{
 			if (gridDatas == null || gridDatas.Count <= 0)
@@ -992,7 +947,7 @@ public class HomeBingo : GameSection
 				{
 					PlayCenterAnimation();
 				}
-				StartCoroutine(WaitAndDo(delegate
+				this.StartCoroutine(WaitAndDo(delegate
 				{
 					PlayBingoAnimation(delegate
 					{
@@ -1009,6 +964,7 @@ public class HomeBingo : GameSection
 
 	private void OnEndSendAllMission(bool is_success, CardData cardData, AllBingoData allBingoData, List<GridData> gridDatas)
 	{
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
 		if (is_success)
 		{
 			if (gridDatas == null || gridDatas.Count <= 0)
@@ -1028,7 +984,7 @@ public class HomeBingo : GameSection
 				PlayCenterAnimation();
 				UpdateReward(GetCurrentCard(), allBingoData, true);
 				PlayTweenComplete();
-				StartCoroutine(WaitAndDo(delegate
+				this.StartCoroutine(WaitAndDo(delegate
 				{
 					PlayAllCompleteAnimation(delegate
 					{
@@ -1057,16 +1013,17 @@ public class HomeBingo : GameSection
 
 	private void PlayGridCompleteAnimation(GridData gridData, bool isPlayCompleteMarkAnimation, EventDelegate.Callback onFinished = null)
 	{
+		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
 		if (gridData != null)
 		{
 			UITweenCtrl tweenCtrl = gridData.tweenCtrl;
-			if (!((UnityEngine.Object)tweenCtrl == (UnityEngine.Object)null) && tweenCtrl.tweens != null && tweenCtrl.tweens.Length > 0)
+			if (!(tweenCtrl == null) && tweenCtrl.tweens != null && tweenCtrl.tweens.Length > 0)
 			{
 				SetActive(gridData.transform, UI.SPR_GRID_ITEM, true);
 				BoxCollider collider = gridData.transform.GetComponent<BoxCollider>();
-				if ((UnityEngine.Object)collider != (UnityEngine.Object)null)
+				if (collider != null)
 				{
-					collider.enabled = false;
+					collider.set_enabled(false);
 				}
 				if (isPlayCompleteMarkAnimation)
 				{
@@ -1076,15 +1033,15 @@ public class HomeBingo : GameSection
 				}
 				if (onFinished != null)
 				{
-					StartCoroutine(WaitAndDo(onFinished, GridAnimationTime));
+					this.StartCoroutine(WaitAndDo(onFinished, GridAnimationTime));
 				}
 				gridData.tweenCtrl.Reset();
 				gridData.tweenCtrl.Play(true, delegate
 				{
 					SetActive(gridData.transform, UI.SPR_GRID_REACH, false);
-					if ((UnityEngine.Object)collider != (UnityEngine.Object)null)
+					if (collider != null)
 					{
-						collider.enabled = true;
+						collider.set_enabled(true);
 					}
 					SetActive(gridData.transform, UI.SPR_GRID_ITEM, false);
 				});
@@ -1096,7 +1053,7 @@ public class HomeBingo : GameSection
 	{
 		CardData currentCard = GetCurrentCard();
 		UITweenCtrl completeRewardTweenlCtrl = currentCard.completeRewardTweenlCtrl;
-		if (!((UnityEngine.Object)completeRewardTweenlCtrl == (UnityEngine.Object)null))
+		if (!(completeRewardTweenlCtrl == null))
 		{
 			SetActive(currentCard.completeRewardTweenlRoot, true);
 			completeRewardTweenlCtrl.Reset();
@@ -1106,21 +1063,21 @@ public class HomeBingo : GameSection
 
 	private void PlayCenterAnimation()
 	{
-		if (centerGrid != null && !((UnityEngine.Object)centerGrid.transform == (UnityEngine.Object)null))
+		if (centerGrid != null && !(centerGrid.transform == null))
 		{
 			SetActive(centerGrid.transform, UI.SPR_GRID_ITEM, true);
 			BoxCollider collider = centerGrid.transform.GetComponent<BoxCollider>();
-			if ((UnityEngine.Object)collider != (UnityEngine.Object)null)
+			if (collider != null)
 			{
-				collider.enabled = false;
+				collider.set_enabled(false);
 			}
 			centerGrid.tweenCtrl.Reset();
 			centerGrid.tweenCtrl.Play(true, delegate
 			{
 				SetActive(centerGrid.transform, UI.SPR_GRID_REACH, false);
-				if ((UnityEngine.Object)collider != (UnityEngine.Object)null)
+				if (collider != null)
 				{
-					collider.enabled = true;
+					collider.set_enabled(true);
 				}
 				SetActive(centerGrid.transform, UI.SPR_GRID_ITEM, false);
 			});
@@ -1129,15 +1086,18 @@ public class HomeBingo : GameSection
 
 	private void PlayBingoAnimation(EventDelegate.Callback onFinished = null)
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		SoundManager.PlayOneshotJingle(40000391, null, null);
-		StartCoroutine(WaitAndDo(onFinished, BingoAnimationTime));
-		SetActive(UI.OBJ_BINGO_ANIMATION, true);
+		this.StartCoroutine(WaitAndDo(onFinished, BingoAnimationTime));
+		SetActive((Enum)UI.OBJ_BINGO_ANIMATION, true);
 	}
 
 	private void PlayAllCompleteAnimation(EventDelegate.Callback onFinished = null)
 	{
+		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_COMPLETE);
-		if ((UnityEngine.Object)ctrl == (UnityEngine.Object)null)
+		if (ctrl == null)
 		{
 			onFinished?.Invoke();
 		}
@@ -1145,7 +1105,7 @@ public class HomeBingo : GameSection
 		{
 			SetActive(ctrl, true);
 			UITweenCtrl component = ctrl.GetComponent<UITweenCtrl>();
-			if ((UnityEngine.Object)component == (UnityEngine.Object)null)
+			if (component == null)
 			{
 				onFinished?.Invoke();
 			}
@@ -1153,8 +1113,8 @@ public class HomeBingo : GameSection
 			{
 				SoundManager.PlayOneshotJingle(40000392, null, null);
 				ParticleSystem component2 = GetCtrl(UI.OBJ_PARTICLE_2).GetComponent<ParticleSystem>();
-				component2.GetComponent<ParticleSystemRenderer>().sharedMaterial.renderQueue = 4000;
-				StartCoroutine(WaitAndDo(onFinished, CompleteAnimationTime));
+				component2.GetComponent<ParticleSystemRenderer>().get_sharedMaterial().set_renderQueue(4000);
+				this.StartCoroutine(WaitAndDo(onFinished, CompleteAnimationTime));
 				component.Reset();
 				component.Play(true, null);
 			}
@@ -1234,9 +1194,15 @@ public class HomeBingo : GameSection
 
 	private void MoveToSide(bool toRight, int cardIndex, EventDelegate.Callback OnEndEvent = null)
 	{
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 		CardData cardData = cardDataList[cardIndex];
 		Transform cardTransform = cardData.cardTransform;
-		Vector3 localPosition = cardTransform.localPosition;
+		Vector3 localPosition = cardTransform.get_localPosition();
 		TweenPosition cardTween = cardData.cardTween;
 		UITweenCtrl cardTweenCtrl = cardData.cardTweenCtrl;
 		localPosition.x = 0f;
@@ -1249,14 +1215,20 @@ public class HomeBingo : GameSection
 
 	protected virtual void ChangeCard(int cardIndex, Action callback)
 	{
-		callback();
+		callback.Invoke();
 	}
 
 	private void MoveToCenter(bool fromLeft, int cardIndex, EventDelegate.Callback OnEndEvent = null)
 	{
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 		CardData cardData = cardDataList[cardIndex];
 		Transform cardTransform = cardData.cardTransform;
-		Vector3 localPosition = cardTransform.localPosition;
+		Vector3 localPosition = cardTransform.get_localPosition();
 		TweenPosition cardTween = cardData.cardTween;
 		UITweenCtrl cardTweenCtrl = cardData.cardTweenCtrl;
 		localPosition.x = ((!fromLeft) ? StandByX : (0f - StandByX));
@@ -1278,14 +1250,14 @@ public class HomeBingo : GameSection
 
 	protected void SetEndDateLabel()
 	{
-		SetActive(UI.LBL_EVENT_END, false);
+		SetActive((Enum)UI.LBL_EVENT_END, false);
 		Network.EventData eventDataFromList = GetEventDataFromList(GetCurrentIndex());
 		if (eventDataFromList != null && eventDataFromList.HasEndDate())
 		{
 			DateTime dateTime = eventDataFromList.endDate.ConvToDateTime();
 			dateTime = dateTime.AddMinutes(-1.0);
-			SetLabelText(UI.LBL_EVENT_END, dateTime.ToString("M/d(ddd)H:mmまで", new CultureInfo("ja-JP")));
-			SetActive(UI.LBL_EVENT_END, true);
+			SetLabelText((Enum)UI.LBL_EVENT_END, dateTime.ToString("M/d(ddd)H:mmまで", new CultureInfo("ja-JP")));
+			SetActive((Enum)UI.LBL_EVENT_END, true);
 		}
 	}
 }

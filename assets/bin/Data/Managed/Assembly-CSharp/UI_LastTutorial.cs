@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UI_LastTutorial : MonoBehaviour
+public class UI_LastTutorial
 {
 	[SerializeField]
 	private UIPanel lastTutorialPanel;
@@ -11,12 +11,20 @@ public class UI_LastTutorial : MonoBehaviour
 	[SerializeField]
 	private UIButton lastTutorialButton;
 
+	public UI_LastTutorial()
+		: this()
+	{
+	}
+
 	public void OpenLastTutorial()
 	{
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Expected O, but got Unknown
 		lastTutorialPanel.depth = 6500;
-		lastTutorialPanel.gameObject.SetActive(true);
+		lastTutorialPanel.get_gameObject().SetActive(true);
 		lastTutorialButton.onClick.Clear();
-		TweenAlpha tweenAlpha = TweenAlpha.Begin(lastTutorialSprite.gameObject, 0.3f, 1f);
+		TweenAlpha tweenAlpha = TweenAlpha.Begin(lastTutorialSprite.get_gameObject(), 0.3f, 1f);
 		tweenAlpha.AddOnFinished(delegate
 		{
 			lastTutorialButton.onClick.Add(new EventDelegate(CloseLastTutorial));
@@ -25,12 +33,15 @@ public class UI_LastTutorial : MonoBehaviour
 
 	public void CloseLastTutorial()
 	{
-		TweenAlpha tweenAlpha = TweenAlpha.Begin(lastTutorialSprite.gameObject, 0.3f, 0f);
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0015: Expected O, but got Unknown
+		TweenAlpha tweenAlpha = TweenAlpha.Begin(lastTutorialSprite.get_gameObject(), 0.3f, 0f);
 		tweenAlpha.AddOnFinished(delegate
 		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 			if (!AppMain.isApplicationQuit)
 			{
-				Object.Destroy(base.gameObject);
+				Object.Destroy(this.get_gameObject());
 			}
 		});
 	}

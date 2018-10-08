@@ -1,11 +1,16 @@
 using UnityEngine;
 
-public abstract class UIScreenRotationHandler : MonoBehaviour
+public abstract class UIScreenRotationHandler
 {
 	[SerializeField]
 	private bool autoInvoke;
 
 	private bool prevIsPortrait;
+
+	protected UIScreenRotationHandler()
+		: this()
+	{
+	}
 
 	protected abstract void OnScreenRotate(bool is_portrait);
 

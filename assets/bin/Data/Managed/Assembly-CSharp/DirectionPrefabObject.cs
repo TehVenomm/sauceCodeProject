@@ -1,6 +1,11 @@
 using UnityEngine;
 
-public class DirectionPrefabObject : MonoBehaviour
+public class DirectionPrefabObject
 {
 	public GameObject prefab;
+
+	public DirectionPrefabObject()
+		: this()
+	{
+	}
 }

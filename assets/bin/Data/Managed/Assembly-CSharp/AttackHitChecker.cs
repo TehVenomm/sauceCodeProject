@@ -24,7 +24,7 @@ public class AttackHitChecker
 		int i = 0;
 		for (int count = list.Count; i < count; i++)
 		{
-			if ((Object)list[i].target == (Object)hit_param.toObject)
+			if (list[i].target == hit_param.toObject)
 			{
 				hitRecord = list[i];
 				break;
@@ -36,7 +36,7 @@ public class AttackHitChecker
 			hitRecord.target = hit_param.toObject;
 			list.Add(hitRecord);
 		}
-		hitRecord.lastHitTime = Time.time;
+		hitRecord.lastHitTime = Time.get_time();
 	}
 
 	public bool CheckHitAttack(AttackHitInfo info, Collider to_collider, StageObject to_object)
@@ -48,13 +48,13 @@ public class AttackHitChecker
 			for (int count = list.Count; i < count; i++)
 			{
 				HitRecord hitRecord = list[i];
-				if ((Object)hitRecord.target == (Object)to_object)
+				if (hitRecord.target == to_object)
 				{
 					if (info.enableIdentityCheck)
 					{
 						return false;
 					}
-					if (Time.time - hitRecord.lastHitTime <= info.hitIntervalTime)
+					if (Time.get_time() - hitRecord.lastHitTime <= info.hitIntervalTime)
 					{
 						return false;
 					}
@@ -98,7 +98,7 @@ public class AttackHitChecker
 					return;
 				}
 				hitRecord = list[num];
-				if ((Object)hitRecord.target == (Object)target)
+				if (hitRecord.target == target)
 				{
 					break;
 				}

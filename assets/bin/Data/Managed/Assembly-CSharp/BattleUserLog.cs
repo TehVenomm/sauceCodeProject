@@ -66,7 +66,7 @@ public class BattleUserLog
 			if (to_chara is Enemy)
 			{
 				Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(from_objid) as Player;
-				if ((Object)player == (Object)null)
+				if (player == null)
 				{
 					return;
 				}
@@ -80,7 +80,7 @@ public class BattleUserLog
 				else
 				{
 					CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByPlayerId(from_objid);
-					if ((Object)coopClient != (Object)null)
+					if (coopClient != null)
 					{
 						num = coopClient.userId;
 					}
@@ -97,7 +97,7 @@ public class BattleUserLog
 					return;
 				}
 				Enemy enemy = MonoBehaviourSingleton<StageObjectManager>.I.FindEnemy(from_objid) as Enemy;
-				if ((Object)enemy == (Object)null)
+				if (enemy == null)
 				{
 					return;
 				}
@@ -154,10 +154,10 @@ public class BattleUserLog
 	{
 		list.ForEach(delegate(QuestCompleteModel.BattleUserLog user_log)
 		{
-			Debug.Log($"###### name : {user_log.name}, userId : {user_log.userId}, baseId : {user_log.baseId}, objId : {user_log.objId}, isNpc : {user_log.isNpc}");
+			Debug.Log((object)$"###### name : {user_log.name}, userId : {user_log.userId}, baseId : {user_log.baseId}, objId : {user_log.objId}, isNpc : {user_log.isNpc}");
 			user_log.atkInfos.ForEach(delegate(QuestCompleteModel.BattleUserLog.AtkInfo atk_info)
 			{
-				Debug.Log($"atkinfo : {atk_info.name}, skillId : {atk_info.skillId}, count : {atk_info.count}, damage : {atk_info.damage}");
+				Debug.Log((object)$"atkinfo : {atk_info.name}, skillId : {atk_info.skillId}, count : {atk_info.count}, damage : {atk_info.damage}");
 			});
 		});
 	}

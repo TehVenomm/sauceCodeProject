@@ -45,9 +45,9 @@ public final class zzcmq extends zza {
             stringBuilder.append("null");
             return;
         }
+        Object obj = 1;
         stringBuilder.append("(");
         int length = iArr.length;
-        Object obj = 1;
         int i = 0;
         while (i < length) {
             int i2 = iArr[i];
@@ -68,9 +68,9 @@ public final class zzcmq extends zza {
             stringBuilder.append("null");
             return;
         }
+        Object obj = 1;
         stringBuilder.append("(");
         int length = bArr.length;
-        Object obj = 1;
         int i = 0;
         while (i < length) {
             byte[] bArr2 = bArr[i];

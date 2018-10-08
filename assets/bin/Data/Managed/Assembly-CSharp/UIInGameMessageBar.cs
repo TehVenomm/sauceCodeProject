@@ -109,17 +109,20 @@ public class UIInGameMessageBar : MonoBehaviourSingleton<UIInGameMessageBar>
 
 	private void _AnnounceMesseage(string name, string messeage)
 	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		nameLabel.text = name;
-		messeageLabel.gameObject.SetActive(true);
+		messeageLabel.get_gameObject().SetActive(true);
 		messeageLabel.text = messeage;
-		texStamp.gameObject.SetActive(false);
+		texStamp.get_gameObject().SetActive(false);
 		_AnnounceStart();
 	}
 
 	private void _AnnounceStamp(string name, int stamp_id)
 	{
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		coroutineLoadStamp = CoroutineLoadStamp(name, stamp_id);
-		StartCoroutine(coroutineLoadStamp);
+		this.StartCoroutine(coroutineLoadStamp);
 	}
 
 	private IEnumerator CoroutineLoadStamp(string name, int stampId)
@@ -127,13 +130,13 @@ public class UIInGameMessageBar : MonoBehaviourSingleton<UIInGameMessageBar>
 		LoadingQueue load_queue = new LoadingQueue(this);
 		LoadObject lo_stamp = load_queue.LoadChatStamp(stampId, false);
 		yield return (object)load_queue.Wait();
-		if (!(lo_stamp.loadedObject == (Object)null))
+		if (!(lo_stamp.loadedObject == null))
 		{
 			Texture2D stamp = lo_stamp.loadedObject as Texture2D;
-			texStamp.gameObject.SetActive(true);
+			texStamp.get_gameObject().SetActive(true);
 			texStamp.mainTexture = stamp;
 			nameLabel.text = name;
-			messeageLabel.gameObject.SetActive(false);
+			messeageLabel.get_gameObject().SetActive(false);
 			coroutineLoadStamp = null;
 			_AnnounceStart();
 		}
@@ -155,7 +158,7 @@ public class UIInGameMessageBar : MonoBehaviourSingleton<UIInGameMessageBar>
 	{
 		if (coroutineLoadStamp == null && isLock)
 		{
-			lockTimer -= Time.deltaTime;
+			lockTimer -= Time.get_deltaTime();
 			if (!(lockTimer > 0f))
 			{
 				if (isOpen)

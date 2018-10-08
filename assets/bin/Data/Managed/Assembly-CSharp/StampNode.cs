@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class StampNode : MonoBehaviour
+public class StampNode
 {
 	[Serializable]
 	public class StampTrigger
@@ -33,14 +33,26 @@ public class StampNode : MonoBehaviour
 		private set;
 	}
 
+	public StampNode()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
-		_transform = base.transform;
-		scaledeOffset = offset.Mul(_transform.lossyScale);
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Expected O, but got Unknown
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		_transform = this.get_transform();
+		scaledeOffset = offset.Mul(_transform.get_lossyScale());
 		if (autoBaseY != -1f)
 		{
 			float num = autoBaseY;
-			Vector3 lossyScale = _transform.lossyScale;
+			Vector3 lossyScale = _transform.get_lossyScale();
 			autoBaseY = num * lossyScale.y;
 		}
 		up = false;
@@ -52,10 +64,18 @@ public class StampNode : MonoBehaviour
 
 	public bool UpdateStamp(float base_y)
 	{
-		Vector3 position = _transform.position;
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		Vector3 position = _transform.get_position();
 		float num = position.y - base_y;
-		Vector3 vector = _transform.localToWorldMatrix.MultiplyPoint(offset);
-		num = vector.y - base_y;
+		Matrix4x4 localToWorldMatrix = _transform.get_localToWorldMatrix();
+		Vector3 val = localToWorldMatrix.MultiplyPoint(offset);
+		num = val.y - base_y;
 		if (autoBaseY == -1f)
 		{
 			autoBaseY = num;

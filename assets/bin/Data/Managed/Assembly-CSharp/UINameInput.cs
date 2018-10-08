@@ -11,21 +11,26 @@ public class UINameInput : UIInput
 
 	protected override void Cleanup()
 	{
-		if ((bool)mHighlight)
+		if (Object.op_Implicit(mHighlight))
 		{
-			mHighlight.enabled = false;
+			mHighlight.set_enabled(false);
 		}
-		if ((bool)mCaret && !isCaretDirection)
+		if (Object.op_Implicit(mCaret) && !isCaretDirection)
 		{
-			mCaret.enabled = false;
+			mCaret.set_enabled(false);
 		}
 	}
 
 	private void SetColor(Color col)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		mDefaultColor = col;
 		activeTextColor = col;
-		GetComponent<UILabel>().color = col;
+		this.GetComponent<UILabel>().color = col;
 	}
 
 	public void SetName(string _name)
@@ -38,47 +43,53 @@ public class UINameInput : UIInput
 
 	public void CreateCaret(bool is_enable)
 	{
-		if ((Object)mBlankTex == (Object)null)
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001b: Expected O, but got Unknown
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		if (mBlankTex == null)
 		{
-			mBlankTex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
+			mBlankTex = new Texture2D(2, 2, 5, false);
 			for (int i = 0; i < 2; i++)
 			{
 				for (int j = 0; j < 2; j++)
 				{
-					mBlankTex.SetPixel(j, i, Color.white);
+					mBlankTex.SetPixel(j, i, Color.get_white());
 				}
 			}
 			mBlankTex.Apply();
 		}
-		if ((Object)mCaret == (Object)null)
+		if (mCaret == null)
 		{
 			mCaret = NGUITools.AddWidget<UITexture>(label.cachedGameObject);
-			mCaret.name = "Input Caret";
+			mCaret.set_name("Input Caret");
 			mCaret.mainTexture = mBlankTex;
 			mCaret.fillGeometry = false;
 			mCaret.pivot = label.pivot;
-			mCaret.SetAnchor(label.cachedTransform);
+			((UIRect)mCaret).SetAnchor(label.cachedTransform);
 		}
-		mCaret.enabled = is_enable;
+		mCaret.set_enabled(is_enable);
 		InActiveName();
 		Init();
 	}
 
 	public void ActiveName()
 	{
-		SetColor(Color.white);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		SetColor(Color.get_white());
 		isCaretDirection = false;
 		mNextBlink = RealTime.time;
 	}
 
 	public void InActiveName()
 	{
-		UILabel component = GetComponent<UILabel>();
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+		UILabel component = this.GetComponent<UILabel>();
 		string value = base.value;
 		component.text = base.defaultText;
 		base.value = string.Empty;
 		SetInActiveNameColor();
-		if ((Object)mCaret != (Object)null && string.IsNullOrEmpty(value))
+		if (mCaret != null && string.IsNullOrEmpty(value))
 		{
 			label.PrintOverlay(0, 0, mCaret.geometry, null, caretColor, selectionColor);
 		}
@@ -88,16 +99,17 @@ public class UINameInput : UIInput
 
 	public void SetInActiveNameColor()
 	{
-		SetColor(Color.gray);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		SetColor(Color.get_gray());
 	}
 
 	protected override void Update()
 	{
 		base.Update();
-		if (isCaretDirection && !base.isSelected && (Object)mCaret != (Object)null && mNextBlink < RealTime.time)
+		if (isCaretDirection && !base.isSelected && mCaret != null && mNextBlink < RealTime.time)
 		{
 			mNextBlink = RealTime.time + 0.5f;
-			mCaret.enabled = !mCaret.enabled;
+			mCaret.set_enabled(!mCaret.get_enabled());
 		}
 	}
 }

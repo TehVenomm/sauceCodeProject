@@ -208,7 +208,7 @@ public class Enemy : Character
 
 		public bool IsOwnerSelf()
 		{
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null && MonoBehaviourSingleton<StageObjectManager>.I.self.id == ownerID)
+			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null && MonoBehaviourSingleton<StageObjectManager>.I.self.id == ownerID)
 			{
 				return true;
 			}
@@ -270,7 +270,7 @@ public class Enemy : Character
 
 		public bool IsOwnerSelf()
 		{
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null && MonoBehaviourSingleton<StageObjectManager>.I.self.id == ownerID)
+			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null && MonoBehaviourSingleton<StageObjectManager>.I.self.id == ownerID)
 			{
 				return true;
 			}
@@ -316,6 +316,8 @@ public class Enemy : Character
 
 			public TargetInfo(Quaternion rot, int id)
 			{
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 				this.rot = rot;
 				targetId = id;
 			}
@@ -499,13 +501,13 @@ public class Enemy : Character
 
 	protected float hitShockOffsetTime;
 
-	protected Vector3 hitShockVec = Vector3.zero;
+	protected Vector3 hitShockVec = Vector3.get_zero();
 
-	protected Vector3 hitShockOffset = Vector3.zero;
+	protected Vector3 hitShockOffset = Vector3.get_zero();
 
 	private bool canHitShockEffect = true;
 
-	protected Vector3 dashBeforePos = Vector3.zero;
+	protected Vector3 dashBeforePos = Vector3.get_zero();
 
 	protected float dashNowDistance;
 
@@ -689,8 +691,9 @@ public class Enemy : Character
 		}
 		set
 		{
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 			base.id = value;
-			base.gameObject.name = "Enemy:" + value;
+			this.get_gameObject().set_name("Enemy:" + value);
 		}
 	}
 
@@ -764,17 +767,17 @@ public class Enemy : Character
 	{
 		get
 		{
-			if ((UnityEngine.Object)_head != (UnityEngine.Object)null)
+			if (_head != null)
 			{
 				return _head;
 			}
 			_head = Utility.Find(base._transform, headObjectName);
-			if ((UnityEngine.Object)_head == (UnityEngine.Object)null)
+			if (_head == null)
 			{
 				_head = base._transform;
 			}
 			_head = Utility.Find(base._transform, "Head");
-			if ((UnityEngine.Object)_head == (UnityEngine.Object)null)
+			if (_head == null)
 			{
 				_head = base._transform;
 			}
@@ -786,17 +789,17 @@ public class Enemy : Character
 	{
 		get
 		{
-			if ((UnityEngine.Object)_hip != (UnityEngine.Object)null)
+			if (_hip != null)
 			{
 				return _hip;
 			}
 			_hip = Utility.Find(base._transform, hipObjectName);
-			if ((UnityEngine.Object)_hip == (UnityEngine.Object)null)
+			if (_hip == null)
 			{
 				_hip = base._transform;
 			}
 			_hip = Utility.Find(base._transform, "Hip");
-			if ((UnityEngine.Object)_hip == (UnityEngine.Object)null)
+			if (_hip == null)
 			{
 				_hip = base._transform;
 			}
@@ -1010,6 +1013,12 @@ public class Enemy : Character
 
 	public Enemy()
 	{
+		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 		enemyPopIndex = -1;
 		enemyTableData = null;
 		base.objectType = OBJECT_TYPE.ENEMY;
@@ -1143,7 +1152,7 @@ public class Enemy : Character
 	protected override void OnEnable()
 	{
 		base.OnEnable();
-		if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid() && isBoss && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.boss == (UnityEngine.Object)this)
+		if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid() && isBoss && MonoBehaviourSingleton<StageObjectManager>.I.boss == this)
 		{
 			MonoBehaviourSingleton<UIEnemyStatus>.I.SetTarget(this);
 		}
@@ -1171,13 +1180,14 @@ public class Enemy : Character
 
 	protected override void OnDisable()
 	{
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		base.OnDisable();
 		if (forceEnemyOutCoroutine != null)
 		{
 			StopForceEnemyOut();
 			MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyOut(id, _position);
 		}
-		if (isBoss && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.boss == (UnityEngine.Object)this && MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+		if (isBoss && MonoBehaviourSingleton<StageObjectManager>.I.boss == this && MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
 		{
 			MonoBehaviourSingleton<UIEnemyStatus>.I.SetTarget(null);
 		}
@@ -1186,7 +1196,7 @@ public class Enemy : Character
 
 	public void CreateStatusGizmo()
 	{
-		if (!isBoss && !((UnityEngine.Object)uiEnemyStatusGizmo != (UnityEngine.Object)null) && !isHiding && MonoBehaviourSingleton<UIStatusGizmoManager>.IsValid())
+		if (!isBoss && !(uiEnemyStatusGizmo != null) && !isHiding && MonoBehaviourSingleton<UIStatusGizmoManager>.IsValid())
 		{
 			uiEnemyStatusGizmo = MonoBehaviourSingleton<UIStatusGizmoManager>.I.Create(this);
 		}
@@ -1194,7 +1204,7 @@ public class Enemy : Character
 
 	public void DeleteStatusGizmo()
 	{
-		if ((UnityEngine.Object)uiEnemyStatusGizmo != (UnityEngine.Object)null)
+		if (uiEnemyStatusGizmo != null)
 		{
 			uiEnemyStatusGizmo.targetEnemy = null;
 			uiEnemyStatusGizmo = null;
@@ -1203,28 +1213,32 @@ public class Enemy : Character
 
 	protected override void Awake()
 	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		loader = base.gameObject.AddComponent<EnemyLoader>();
+		loader = this.get_gameObject().AddComponent<EnemyLoader>();
 		enemyParameter = MonoBehaviourSingleton<InGameSettingsManager>.I.enemy;
 		downMaxRate = enemyParameter.downMaxRate;
 		isPierceAfterTarget = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.isPierceAfterTarget;
-		EnemyParam componentInChildren = base.gameObject.GetComponentInChildren<EnemyParam>();
-		if ((UnityEngine.Object)componentInChildren != (UnityEngine.Object)null)
+		EnemyParam componentInChildren = this.get_gameObject().GetComponentInChildren<EnemyParam>();
+		if (componentInChildren != null)
 		{
 			componentInChildren.SetParam(this);
-			UnityEngine.Object.DestroyImmediate(componentInChildren);
+			Object.DestroyImmediate(componentInChildren);
 			componentInChildren = null;
 		}
-		if ((UnityEngine.Object)base._rigidbody == (UnityEngine.Object)null)
+		if (base._rigidbody == null)
 		{
-			base._rigidbody = base.gameObject.AddComponent<Rigidbody>();
+			base._rigidbody = this.get_gameObject().AddComponent<Rigidbody>();
 		}
-		base._rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
-		base._rigidbody.mass = 1000f;
-		base._rigidbody.angularDrag = 100f;
-		base._rigidbody.isKinematic = false;
-		base._rigidbody.constraints = (RigidbodyConstraints)116;
-		base.gameObject.layer = 10;
+		base._rigidbody.set_collisionDetectionMode(1);
+		base._rigidbody.set_mass(1000f);
+		base._rigidbody.set_angularDrag(100f);
+		base._rigidbody.set_isKinematic(false);
+		base._rigidbody.set_constraints(116);
+		this.get_gameObject().set_layer(10);
 		stackBuffCtrl.Init();
 	}
 
@@ -1244,20 +1258,32 @@ public class Enemy : Character
 
 	public override void OnLoadComplete()
 	{
-		if ((UnityEngine.Object)base._collider == (UnityEngine.Object)null)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0573: Unknown result type (might be due to invalid IL or missing references)
+		//IL_058b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05ca: Unknown result type (might be due to invalid IL or missing references)
+		if (base._collider == null)
 		{
-			SphereCollider sphereCollider = base.gameObject.AddComponent<SphereCollider>();
-			sphereCollider.radius = bodyRadius;
-			sphereCollider.center = new Vector3(0f, bodyRadius, 0f);
-			base._collider = sphereCollider;
+			SphereCollider val = this.get_gameObject().AddComponent<SphereCollider>();
+			val.set_radius(bodyRadius);
+			val.set_center(new Vector3(0f, bodyRadius, 0f));
+			base._collider = val;
 		}
-		Rigidbody rigidbody = base.body.gameObject.GetComponentInChildren<Rigidbody>();
-		if ((UnityEngine.Object)rigidbody == (UnityEngine.Object)null)
+		Rigidbody val2 = base.body.get_gameObject().GetComponentInChildren<Rigidbody>();
+		if (val2 == null)
 		{
-			rigidbody = base.body.gameObject.AddComponent<Rigidbody>();
+			val2 = base.body.get_gameObject().AddComponent<Rigidbody>();
 		}
-		rigidbody.useGravity = false;
-		rigidbody.isKinematic = true;
+		val2.set_useGravity(false);
+		val2.set_isKinematic(true);
 		EnemyTable.EnemyData enemyTableData = this.enemyTableData;
 		if (enemyTableData != null)
 		{
@@ -1336,16 +1362,16 @@ public class Enemy : Character
 		int num10 = 0;
 		for (int num11 = componentsInChildren.Length; num10 < num11; num10++)
 		{
-			if (!((UnityEngine.Object)componentsInChildren[num10].targetCollider == (UnityEngine.Object)null) && componentsInChildren[num10].ignoreHitAttack)
+			if (!(componentsInChildren[num10].targetCollider == null) && componentsInChildren[num10].ignoreHitAttack)
 			{
 				base.ignoreHitAttackColliders.Add(componentsInChildren[num10].targetCollider);
 			}
 		}
 		Utility.SetLayerWithChildren(base._transform, 11);
-		base.gameObject.layer = 10;
-		colliders = base.gameObject.GetComponentsInChildren<Collider>();
-		targetPoints = base.gameObject.GetComponentsInChildren<TargetPoint>();
-		regionRoots = base.gameObject.GetComponentsInChildren<RegionRoot>();
+		this.get_gameObject().set_layer(10);
+		colliders = this.get_gameObject().GetComponentsInChildren<Collider>();
+		targetPoints = this.get_gameObject().GetComponentsInChildren<TargetPoint>();
+		regionRoots = this.get_gameObject().GetComponentsInChildren<RegionRoot>();
 		int num12 = 0;
 		for (int num13 = targetPoints.Length; num12 < num13; num12++)
 		{
@@ -1364,10 +1390,10 @@ public class Enemy : Character
 		{
 			if (regionRoots[num16].isDeactive)
 			{
-				regionRoots[num16].gameObject.SetActive(false);
+				regionRoots[num16].get_gameObject().SetActive(false);
 			}
 		}
-		if ((UnityEngine.Object)stepCtrl != (UnityEngine.Object)null)
+		if (stepCtrl != null)
 		{
 			stepCtrl.stampDistance = enemyParameter.stampDistance;
 		}
@@ -1393,21 +1419,21 @@ public class Enemy : Character
 			}
 		}
 		InitializeBarrierEffect();
-		tailController = base.gameObject.GetComponentInChildren<TailController>(true);
+		tailController = this.get_gameObject().GetComponentInChildren<TailController>(true);
 		willStock = false;
-		ColliderWeightCtl[] componentsInChildren2 = base.gameObject.GetComponentsInChildren<ColliderWeightCtl>();
+		ColliderWeightCtl[] componentsInChildren2 = this.get_gameObject().GetComponentsInChildren<ColliderWeightCtl>();
 		int num18 = 0;
 		for (int num19 = componentsInChildren2.Length; num18 < num19; num18++)
 		{
 			componentsInChildren2[num18].SetAnimator(loader.GetAnimator());
 		}
-		TargetPointWeightCtl[] componentsInChildren3 = base.gameObject.GetComponentsInChildren<TargetPointWeightCtl>();
+		TargetPointWeightCtl[] componentsInChildren3 = this.get_gameObject().GetComponentsInChildren<TargetPointWeightCtl>();
 		int num20 = 0;
 		for (int num21 = componentsInChildren3.Length; num20 < num21; num20++)
 		{
 			componentsInChildren3[num20].SetAnimator(loader.GetAnimator());
 		}
-		skinnedMeshRendererList = GetComponentsInChildren<SkinnedMeshRenderer>();
+		skinnedMeshRendererList = this.GetComponentsInChildren<SkinnedMeshRenderer>();
 		if (MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo())
 		{
 			arenaConditionList = MonoBehaviourSingleton<InGameManager>.I.GetArenaConditions();
@@ -1570,6 +1596,7 @@ public class Enemy : Character
 
 	public override bool DestroyObject()
 	{
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		if (base.isLoading)
 		{
 			base.isDestroyWaitFlag = true;
@@ -1580,11 +1607,11 @@ public class Enemy : Character
 		{
 			return base.DestroyObject();
 		}
-		if ((UnityEngine.Object)base.packetSender != (UnityEngine.Object)null)
+		if (base.packetSender != null)
 		{
 			base.packetSender.OnDestroyObject();
 		}
-		base.gameObject.SetActive(false);
+		this.get_gameObject().SetActive(false);
 		MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(this);
 		base.isDestroyWaitFlag = false;
 		return true;
@@ -1592,13 +1619,13 @@ public class Enemy : Character
 
 	public void ClearDead()
 	{
-		base._collider.enabled = true;
+		base._collider.set_enabled(true);
 		if (colliders != null)
 		{
 			int i = 0;
 			for (int num = colliders.Length; i < num; i++)
 			{
-				colliders[i].enabled = true;
+				colliders[i].set_enabled(true);
 			}
 		}
 		badStatusMax.Copy(badStatusBase);
@@ -1614,7 +1641,7 @@ public class Enemy : Character
 		isRequireGhostShaderParam = false;
 		isHiding = isHideSpawn;
 		EnemyController enemyController = base.controller as EnemyController;
-		if ((UnityEngine.Object)enemyController != (UnityEngine.Object)null)
+		if (enemyController != null)
 		{
 			enemyController.Reset();
 		}
@@ -1626,10 +1653,22 @@ public class Enemy : Character
 
 	protected override void Update()
 	{
+		//IL_0233: Unknown result type (might be due to invalid IL or missing references)
+		//IL_023e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0279: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0284: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0290: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
 		base.Update();
 		if (hitShockLightFlag)
 		{
-			hitShockLightTime += Time.deltaTime;
+			hitShockLightTime += Time.get_deltaTime();
 			if (hitShockLightTime >= enemyParameter.hitShockLightTime)
 			{
 				loader.ResetRimParams();
@@ -1646,20 +1685,20 @@ public class Enemy : Character
 				{
 					if (prm.hasRimPower)
 					{
-						float value = prm.defaultRimPower + (enemyParameter.hitShockLightRimPower - prm.defaultRimPower) * sin;
-						prm.material.SetFloat(ID_RIM_POWER, value);
+						float num5 = prm.defaultRimPower + (enemyParameter.hitShockLightRimPower - prm.defaultRimPower) * sin;
+						prm.material.SetFloat(ID_RIM_POWER, num5);
 					}
 					if (prm.hasRimWidth)
 					{
-						float value2 = prm.defaultRimWidth + (enemyParameter.hitShockLightRimWidth - prm.defaultRimWidth) * sin;
-						prm.material.SetFloat(ID_RIM_WIDTH, value2);
+						float num6 = prm.defaultRimWidth + (enemyParameter.hitShockLightRimWidth - prm.defaultRimWidth) * sin;
+						prm.material.SetFloat(ID_RIM_WIDTH, num6);
 					}
 				});
 			}
 		}
 		if (warpViewFlag)
 		{
-			warpViewRate += warpViewRatePerTime * Time.deltaTime;
+			warpViewRate += warpViewRatePerTime * Time.get_deltaTime();
 			if (warpViewRatePerTime >= 0f && warpViewRate >= 1f)
 			{
 				warpViewRate = 1f;
@@ -1676,11 +1715,11 @@ public class Enemy : Character
 		{
 			SetWarpVisible(warpViewRate);
 		}
-		downHealInterval -= Time.deltaTime;
+		downHealInterval -= Time.get_deltaTime();
 		if (downHealInterval <= 0f)
 		{
 			downHealInterval = 0f;
-			downTotal -= downHeal * Time.deltaTime;
+			downTotal -= downHeal * Time.get_deltaTime();
 			if (downTotal < 0f)
 			{
 				downTotal = 0f;
@@ -1688,20 +1727,22 @@ public class Enemy : Character
 		}
 		if (hitShockOffsetFlag)
 		{
-			hitShockOffsetTime += Time.deltaTime;
+			hitShockOffsetTime += Time.get_deltaTime();
 			if (hitShockOffsetTime >= enemyParameter.hitShockOffsetTime)
 			{
-				base.body.localPosition = Vector3.zero;
-				hitShockOffset = Vector3.zero;
+				base.body.set_localPosition(Vector3.get_zero());
+				hitShockOffset = Vector3.get_zero();
 				hitShockOffsetFlag = false;
 				hitShockOffsetTime = 0f;
 			}
 			else
 			{
 				float num2 = hitShockOffsetTime / enemyParameter.hitShockOffsetTime;
-				base.body.position -= hitShockOffset;
+				object body = (object)base.body;
+				body.set_position(body.get_position() - hitShockOffset);
 				hitShockOffset = hitShockVec * (enemyParameter.hitShockOffsetLength * Mathf.Sin(3.14159274f * num2));
-				base.body.position += hitShockOffset;
+				object body2 = (object)base.body;
+				body2.set_position(body2.get_position() + hitShockOffset);
 			}
 		}
 		UpdateRandomShot();
@@ -1728,7 +1769,7 @@ public class Enemy : Character
 				AnimationLayerWeightChangeInfo animationLayerWeightChangeInfo = animLayerWeightChangeInfo[j];
 				if (animationLayerWeightChangeInfo.aliveFlag)
 				{
-					float num4 = animationLayerWeightChangeInfo.spd * Time.deltaTime;
+					float num4 = animationLayerWeightChangeInfo.spd * Time.get_deltaTime();
 					if (num4 > 0f)
 					{
 						if (animationLayerWeightChangeInfo.weight + num4 >= animationLayerWeightChangeInfo.target)
@@ -1765,7 +1806,7 @@ public class Enemy : Character
 		if ((IsCoopNone() || IsOriginal()) && !object.ReferenceEquals(regionWorks, null))
 		{
 			float num = bleedCounter;
-			bleedCounter += Time.deltaTime;
+			bleedCounter += Time.get_deltaTime();
 			float arrowBleedTimeInterval = MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedTimeInterval;
 			if ((int)(num / arrowBleedTimeInterval) != (int)(bleedCounter / arrowBleedTimeInterval))
 			{
@@ -1849,7 +1890,7 @@ public class Enemy : Character
 				ShadowSealingData shadowSealingData = regionWorks[i].shadowSealingData;
 				if (shadowSealingData.ownerID != 0)
 				{
-					shadowSealingData.existSec -= Time.deltaTime;
+					shadowSealingData.existSec -= Time.get_deltaTime();
 					if (shadowSealingData.existSec <= 0f)
 					{
 						ShadowSealingSyncData shadowSealingSyncData = new ShadowSealingSyncData();
@@ -1866,7 +1907,7 @@ public class Enemy : Character
 		if (IsCoopNone() || IsOriginal())
 		{
 			EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-			if (!((UnityEngine.Object)enemyBrain == (UnityEngine.Object)null))
+			if (!(enemyBrain == null))
 			{
 				GrabController grabController = enemyBrain.actionCtrl.grabController;
 				if (grabController != null && grabController.IsGrabing())
@@ -1877,7 +1918,7 @@ public class Enemy : Character
 						int num = (int)((float)base.hpMax * (drainAtkInfo.recoverRate * 0.01f));
 						if (num > 0 && base.hp < base.hpMax)
 						{
-							grabDrainRecoverTimer -= Time.deltaTime;
+							grabDrainRecoverTimer -= Time.get_deltaTime();
 							if (grabDrainRecoverTimer <= 0f)
 							{
 								RecoverHp(num, true);
@@ -1892,6 +1933,8 @@ public class Enemy : Character
 
 	public void RecoverHp(int recoverValue, bool isSend)
 	{
+		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d7: Expected O, but got Unknown
 		base.hp += recoverValue;
 		if (base.hp > base.hpMax)
 		{
@@ -1901,19 +1944,19 @@ public class Enemy : Character
 		{
 			MonoBehaviourSingleton<UIDamageManager>.I.CreateEnemyRecoverHp(this, recoverValue, UIPlayerDamageNum.DAMAGE_COLOR.HEAL);
 		}
-		if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null && isSend)
+		if (enemySender != null && isSend)
 		{
 			enemySender.OnRecoverHp(recoverValue);
 		}
-		if ((UnityEngine.Object)base.effectPlayProcessor != (UnityEngine.Object)null && (UnityEngine.Object)effectDrainRecover == (UnityEngine.Object)null)
+		if (base.effectPlayProcessor != null && effectDrainRecover == null)
 		{
 			List<EffectPlayProcessor.EffectSetting> settings = base.effectPlayProcessor.GetSettings("RECOVER_HP");
 			if (settings != null && settings.Count > 0)
 			{
-				Transform transform = base.effectPlayProcessor.PlayEffect(settings[0], base._transform);
-				if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
+				Transform val = base.effectPlayProcessor.PlayEffect(settings[0], base._transform);
+				if (val != null)
 				{
-					effectDrainRecover = transform.gameObject;
+					effectDrainRecover = val.get_gameObject();
 				}
 			}
 		}
@@ -1921,6 +1964,20 @@ public class Enemy : Character
 
 	protected override void FixedUpdate()
 	{
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
 		ACTION_ID actionID = base.actionID;
 		if (actionID == ACTION_ID.ATTACK && enableDash)
 		{
@@ -1930,9 +1987,9 @@ public class Enemy : Character
 			}
 			else
 			{
-				Vector3 vector = _position - dashBeforePos;
-				vector.y = 0f;
-				dashNowDistance += vector.magnitude;
+				Vector3 val = _position - dashBeforePos;
+				val.y = 0f;
+				dashNowDistance += val.get_magnitude();
 				dashBeforePos = _position;
 				bool flag = dashNowDistance >= dashMinDistance;
 				if (!base.actionPositionFlag)
@@ -1952,12 +2009,12 @@ public class Enemy : Character
 					}
 					else
 					{
-						Vector3 to = base.actionPosition - _position;
-						to.y = 0f;
+						Vector3 val2 = base.actionPosition - _position;
+						val2.y = 0f;
 						Vector3 forward = _forward;
 						forward.y = 0f;
 						forward.Normalize();
-						float num = Vector3.Angle(forward, to);
+						float num = Vector3.Angle(forward, val2);
 						if (num > 90f)
 						{
 							dashOverFlag = true;
@@ -1979,15 +2036,15 @@ public class Enemy : Character
 	protected override void LateUpdate()
 	{
 		base.LateUpdate();
-		if (updateFrame != Time.frameCount)
+		if (updateFrame != Time.get_frameCount())
 		{
-			updateFrame = Time.frameCount;
-			selfHitEffectCool -= Time.deltaTime;
+			updateFrame = Time.get_frameCount();
+			selfHitEffectCool -= Time.get_deltaTime();
 			if (selfHitEffectCool < 0f)
 			{
 				selfHitEffectCool = 0f;
 			}
-			otherHitEffectCool -= Time.deltaTime;
+			otherHitEffectCool -= Time.get_deltaTime();
 			if (otherHitEffectCool < 0f)
 			{
 				otherHitEffectCool = 0f;
@@ -1998,12 +2055,12 @@ public class Enemy : Character
 	public override void SetActionTarget(StageObject target, bool send = true)
 	{
 		bool flag = false;
-		if ((UnityEngine.Object)base.actionTarget != (UnityEngine.Object)target)
+		if (base.actionTarget != target)
 		{
 			flag = true;
 		}
 		base.actionTarget = target;
-		if (send && flag && (UnityEngine.Object)base.characterSender != (UnityEngine.Object)null)
+		if (send && flag && base.characterSender != null)
 		{
 			base.characterSender.OnSetActionTarget(target);
 		}
@@ -2011,6 +2068,14 @@ public class Enemy : Character
 
 	public void OnUpdateBleedDamage(BleedSyncData sync_data)
 	{
+		//IL_0339: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0374: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0379: Expected O, but got Unknown
+		//IL_0396: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03ed: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03f4: Expected O, but got Unknown
 		int num = base.hp - sync_data.afterHP;
 		if (num < 0)
 		{
@@ -2105,23 +2170,23 @@ public class Enemy : Character
 							MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendExploreBossDamage(num5);
 						}
 						num -= num4;
-						if (bleedData.IsOwnerSelf() && bleedWork != null && (UnityEngine.Object)bleedWork.bleedEffect != (UnityEngine.Object)null)
+						if (bleedData.IsOwnerSelf() && bleedWork != null && bleedWork.bleedEffect != null)
 						{
 							if (enemyParameter.showDamageNum && MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedShowDamage)
 							{
 								AtkAttribute atkAttribute = new AtkAttribute();
 								atkAttribute.normal = (float)bleedDamageData.damage;
 								bool enabled = regionWorks[i].regionInfo.dragonArmorInfo.enabled;
-								CreateDamageNum(bleedWork.bleedEffect.position, atkAttribute, false, enabled, 0);
+								CreateDamageNum(bleedWork.bleedEffect.get_position(), atkAttribute, false, enabled, 0);
 							}
 							if (warpViewRate <= 0f)
 							{
-								Transform effect = EffectManager.GetEffect(MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedDamageEffectName, bleedWork.bleedEffect.parent);
-								if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
+								Transform effect = EffectManager.GetEffect(MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedDamageEffectName, bleedWork.bleedEffect.get_parent());
+								if (effect != null)
 								{
-									effect.localScale = bleedWork.bleedEffect.localScale;
-									effect.localPosition = bleedWork.bleedEffect.localPosition;
-									effect.localRotation = bleedWork.bleedEffect.localRotation;
+									effect.set_localScale(bleedWork.bleedEffect.get_localScale());
+									effect.set_localPosition(bleedWork.bleedEffect.get_localPosition());
+									effect.set_localRotation(bleedWork.bleedEffect.get_localRotation());
 								}
 							}
 						}
@@ -2130,9 +2195,9 @@ public class Enemy : Character
 					{
 						if (bleedWork != null)
 						{
-							if ((UnityEngine.Object)bleedWork.bleedEffect != (UnityEngine.Object)null)
+							if (bleedWork.bleedEffect != null)
 							{
-								EffectManager.ReleaseEffect(bleedWork.bleedEffect.gameObject, true, false);
+								EffectManager.ReleaseEffect(bleedWork.bleedEffect.get_gameObject(), true, false);
 								bleedWork.bleedEffect = null;
 							}
 							regionWorks[i].bleedWorkList.Remove(bleedWork);
@@ -2167,7 +2232,7 @@ public class Enemy : Character
 				}
 			}
 		}
-		if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+		if (enemySender != null)
 		{
 			enemySender.OnUpdateBleedDamage(sync_data);
 		}
@@ -2175,6 +2240,8 @@ public class Enemy : Character
 
 	public void ClearBleedDamageAll()
 	{
+		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007c: Expected O, but got Unknown
 		if (regionWorks != null)
 		{
 			int i = 0;
@@ -2185,9 +2252,9 @@ public class Enemy : Character
 				for (int count = regionWorks[i].bleedWorkList.Count; j < count; j++)
 				{
 					BleedWork bleedWork = regionWorks[i].bleedWorkList[j];
-					if ((UnityEngine.Object)bleedWork.bleedEffect != (UnityEngine.Object)null)
+					if (bleedWork.bleedEffect != null)
 					{
-						EffectManager.ReleaseEffect(bleedWork.bleedEffect.gameObject, true, false);
+						EffectManager.ReleaseEffect(bleedWork.bleedEffect.get_gameObject(), true, false);
 						bleedWork.bleedEffect = null;
 					}
 				}
@@ -2202,6 +2269,8 @@ public class Enemy : Character
 
 	public void OnUpdateShadowSealing(ShadowSealingSyncData syncData)
 	{
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Expected O, but got Unknown
 		if (!object.ReferenceEquals(regionWorks, null))
 		{
 			EnemyRegionWork enemyRegionWork = regionWorks[syncData.regionIndex];
@@ -2211,7 +2280,7 @@ public class Enemy : Character
 			shadowSealingData.extendRate = 1f;
 			if (!object.ReferenceEquals(enemyRegionWork.shadowSealingEffect, null))
 			{
-				EffectManager.ReleaseEffect(enemyRegionWork.shadowSealingEffect.gameObject, true, false);
+				EffectManager.ReleaseEffect(enemyRegionWork.shadowSealingEffect.get_gameObject(), true, false);
 				enemyRegionWork.shadowSealingEffect = null;
 			}
 		}
@@ -2219,7 +2288,7 @@ public class Enemy : Character
 		{
 			EndWaitingPacket(WAITING_PACKET.ENEMY_UPDATE_SHADOWSEALING);
 		}
-		if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+		if (enemySender != null)
 		{
 			enemySender.OnUpdateShadowSealing(syncData);
 		}
@@ -2227,6 +2296,8 @@ public class Enemy : Character
 
 	public void ClearShadowSealingAll(bool isClearOwnerID = true, bool isEndPacket = true)
 	{
+		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007e: Expected O, but got Unknown
 		if (!object.ReferenceEquals(regionWorks, null))
 		{
 			int i = 0;
@@ -2241,7 +2312,7 @@ public class Enemy : Character
 				shadowSealingData.extendRate = 1f;
 				if (!object.ReferenceEquals(regionWorks[i].shadowSealingEffect, null))
 				{
-					EffectManager.ReleaseEffect(regionWorks[i].shadowSealingEffect.gameObject, true, false);
+					EffectManager.ReleaseEffect(regionWorks[i].shadowSealingEffect.get_gameObject(), true, false);
 					regionWorks[i].shadowSealingEffect = null;
 				}
 			}
@@ -2254,11 +2325,13 @@ public class Enemy : Character
 
 	public void SetDashEnd()
 	{
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		if (enableDash)
 		{
 			SetChangeTrigger(dashEndTrigger);
 			enableDash = false;
-			dashBeforePos = Vector3.zero;
+			dashBeforePos = Vector3.get_zero();
 			dashNowDistance = 0f;
 			dashOverDistance = 0f;
 			dashMinDistance = 0f;
@@ -2272,6 +2345,7 @@ public class Enemy : Character
 
 	public override void ActDead(bool force_sync = false, bool recieve_direct = false)
 	{
+		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 		ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
 		base.badStatusTotal.Reset();
 		badStatusMax.Copy(badStatusBase);
@@ -2291,7 +2365,7 @@ public class Enemy : Character
 			}
 		}
 		bool flag = false;
-		if ((UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.boss == (UnityEngine.Object)this)
+		if (MonoBehaviourSingleton<StageObjectManager>.I.boss == this)
 		{
 			UpdateBreakIDLists();
 			if (QuestManager.IsValidInGame() && MonoBehaviourSingleton<InGameProgress>.IsValid())
@@ -2323,20 +2397,30 @@ public class Enemy : Character
 	public IEnumerator WaitForDeadMotionEnd()
 	{
 		yield return (object)null;
-		if (!((UnityEngine.Object)base.animator == (UnityEngine.Object)null))
+		if (!(base.animator == null))
 		{
-			while (base.animator.GetCurrentAnimatorStateInfo(0).fullPathHash != Animator.StringToHash("Base Layer.dead"))
+			while (true)
 			{
+				AnimatorStateInfo currentAnimatorStateInfo = base.animator.GetCurrentAnimatorStateInfo(0);
+				if (currentAnimatorStateInfo.get_fullPathHash() == Animator.StringToHash("Base Layer.dead"))
+				{
+					break;
+				}
 				yield return (object)null;
-				if ((UnityEngine.Object)base.animator == (UnityEngine.Object)null)
+				if (base.animator == null)
 				{
 					yield break;
 				}
 			}
-			while (base.animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
+			while (true)
 			{
+				AnimatorStateInfo currentAnimatorStateInfo2 = base.animator.GetCurrentAnimatorStateInfo(0);
+				if (!(currentAnimatorStateInfo2.get_normalizedTime() < 1f))
+				{
+					break;
+				}
 				yield return (object)null;
-				if ((UnityEngine.Object)base.animator == (UnityEngine.Object)null)
+				if (base.animator == null)
 				{
 					yield break;
 				}
@@ -2376,21 +2460,23 @@ public class Enemy : Character
 
 	private void PrepareEnemyOut()
 	{
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		DeleteStatusGizmo();
 		if (MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
 		{
 			MonoBehaviourSingleton<DropTargetMarkerManeger>.I.RemoveTarget(base._transform);
 		}
 		UpdateNextMotion();
-		SetVelocity(Vector3.zero, VELOCITY_TYPE.NONE);
-		base._rigidbody.velocity = Vector3.zero;
-		base._collider.enabled = false;
+		SetVelocity(Vector3.get_zero(), VELOCITY_TYPE.NONE);
+		base._rigidbody.set_velocity(Vector3.get_zero());
+		base._collider.set_enabled(false);
 		if (!isBoss && colliders != null)
 		{
 			int i = 0;
 			for (int num = colliders.Length; i < num; i++)
 			{
-				colliders[i].enabled = false;
+				colliders[i].set_enabled(false);
 			}
 		}
 		ClearBleedDamageAll();
@@ -2400,21 +2486,21 @@ public class Enemy : Character
 			AttackShotNodeLink attackShotNodeLink = m_activeAttackObstacleList[num2];
 			attackShotNodeLink.RequestDestroy();
 		}
-		if ((UnityEngine.Object)m_effectElectricShock != (UnityEngine.Object)null)
+		if (m_effectElectricShock != null)
 		{
-			UnityEngine.Object.Destroy(m_effectElectricShock);
+			Object.Destroy(m_effectElectricShock);
 		}
-		if ((UnityEngine.Object)m_effectBurning != (UnityEngine.Object)null)
+		if (m_effectBurning != null)
 		{
-			UnityEngine.Object.Destroy(m_effectBurning);
+			Object.Destroy(m_effectBurning);
 		}
-		if ((UnityEngine.Object)m_effectSpeedDown != (UnityEngine.Object)null)
+		if (m_effectSpeedDown != null)
 		{
-			UnityEngine.Object.Destroy(m_effectSpeedDown);
+			Object.Destroy(m_effectSpeedDown);
 		}
-		if ((UnityEngine.Object)effectLightRing != (UnityEngine.Object)null)
+		if (effectLightRing != null)
 		{
-			UnityEngine.Object.Destroy(effectLightRing);
+			Object.Destroy(effectLightRing);
 		}
 		m_effectElectricShock = null;
 		m_effectBurning = null;
@@ -2436,7 +2522,7 @@ public class Enemy : Character
 		base.PrepareVanishLocal();
 		PrepareEnemyOut();
 		bool flag = false;
-		if ((UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.boss == (UnityEngine.Object)this)
+		if (MonoBehaviourSingleton<StageObjectManager>.I.boss == this)
 		{
 			UpdateBreakIDLists();
 		}
@@ -2448,6 +2534,7 @@ public class Enemy : Character
 
 	public void OnEndEscape()
 	{
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<CoopNetworkManager>.IsValid())
 		{
 			MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyOutEscape(id, _position);
@@ -2456,8 +2543,10 @@ public class Enemy : Character
 
 	private void ForceEnemyOut()
 	{
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Expected O, but got Unknown
 		StopForceEnemyOut();
-		forceEnemyOutCoroutine = StartCoroutine(DoForceEnemyOut());
+		forceEnemyOutCoroutine = this.StartCoroutine(DoForceEnemyOut());
 	}
 
 	private IEnumerator DoForceEnemyOut()
@@ -2474,14 +2563,14 @@ public class Enemy : Character
 	{
 		if (forceEnemyOutCoroutine != null)
 		{
-			StopCoroutine(forceEnemyOutCoroutine);
+			this.StopCoroutine(forceEnemyOutCoroutine);
 			forceEnemyOutCoroutine = null;
 		}
 	}
 
 	public void UpdateBreakIDLists()
 	{
-		if ((UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.boss == (UnityEngine.Object)this && MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopStage.bossBreakIDLists != null)
+		if (MonoBehaviourSingleton<StageObjectManager>.I.boss == this && MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopStage.bossBreakIDLists != null)
 		{
 			int index = 0;
 			if (QuestManager.IsValidInGame())
@@ -2506,7 +2595,7 @@ public class Enemy : Character
 		EndAction();
 		base.actionID = ACTION_ID.MAX;
 		PlayMotion(motion_id, -1f);
-		if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+		if (enemySender != null)
 		{
 			enemySender.OnActStep(motion_id);
 		}
@@ -2518,7 +2607,7 @@ public class Enemy : Character
 		NowAngryID = angryId;
 		base.actionID = (ACTION_ID)14;
 		PlayMotion(125 + angryActionId, -1f);
-		if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+		if (enemySender != null)
 		{
 			enemySender.OnActAngry(angryActionId, angryId);
 		}
@@ -2556,8 +2645,8 @@ public class Enemy : Character
 		ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
 		if (flag2)
 		{
-			downTime = Time.time + downLoopStartTime + downLoopTime;
-			downGaugeDecreaseStartTime = Time.time + downLoopStartTime;
+			downTime = Time.get_time() + downLoopStartTime + downLoopTime;
+			downGaugeDecreaseStartTime = Time.get_time() + downLoopStartTime;
 			downDecreaseRates = MonoBehaviourSingleton<InGameSettingsManager>.I.player.ohsActionInfo.Soul_DownGaugeDecreaseRates;
 		}
 		if (flag)
@@ -2588,7 +2677,7 @@ public class Enemy : Character
 		{
 			return false;
 		}
-		if (downGaugeDecreaseStartTime - Time.time < 0f)
+		if (downGaugeDecreaseStartTime - Time.get_time() < 0f)
 		{
 			int stackCount = stackBuffCtrl.GetStackCount(StackBuffController.STACK_TYPE.SNATCH);
 			if (!downDecreaseRates.IsNullOrEmpty())
@@ -2596,12 +2685,12 @@ public class Enemy : Character
 				int num = Mathf.Min(stackCount, downDecreaseRates.Length - 1);
 				if (stackCount > 0)
 				{
-					float num2 = downDecreaseRates[num] * Time.deltaTime;
+					float num2 = downDecreaseRates[num] * Time.get_deltaTime();
 					downTime += num2;
 				}
 			}
 		}
-		if (downTime - Time.time > 0f)
+		if (downTime - Time.get_time() > 0f)
 		{
 			return false;
 		}
@@ -2650,7 +2739,7 @@ public class Enemy : Character
 		float result = 0f;
 		if (IsAbleToUseDownTime() && downLoopTime > 0f)
 		{
-			float num = downTime - Time.time;
+			float num = downTime - Time.get_time();
 			result = Mathf.Clamp(num / downLoopTime, 0f, 1f);
 		}
 		return result;
@@ -2662,9 +2751,9 @@ public class Enemy : Character
 		{
 			float num = downLoopTime * (down / (float)downMax);
 			float num2 = downTime + num;
-			if (num2 - Time.time > downLoopTime)
+			if (num2 - Time.get_time() > downLoopTime)
 			{
-				num2 = downLoopTime + Time.time;
+				num2 = downLoopTime + Time.get_time();
 			}
 			downTime = num2;
 		}
@@ -2674,7 +2763,7 @@ public class Enemy : Character
 	{
 		EndAction();
 		ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
-		m_dizzyTime = Time.time + DizzyReactionLoopTime;
+		m_dizzyTime = Time.get_time() + DizzyReactionLoopTime;
 		base.actionID = (ACTION_ID)17;
 		PlayMotion(122, -1f);
 		OnActReaction();
@@ -2682,6 +2771,7 @@ public class Enemy : Character
 
 	public void ActCounter(int targetId)
 	{
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
 		EndAction();
 		counterFlag = true;
 		base.actionID = (ACTION_ID)16;
@@ -2696,7 +2786,7 @@ public class Enemy : Character
 			if (enemyBrain.targetCtrl != null)
 			{
 				StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.FindObject(targetId);
-				if ((UnityEngine.Object)stageObject != (UnityEngine.Object)null)
+				if (stageObject != null)
 				{
 					enemyBrain.targetCtrl.SetCurrentTarget(stageObject);
 					SetActionTarget(stageObject, true);
@@ -2739,7 +2829,7 @@ public class Enemy : Character
 		{
 			ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
 			base.ActParalyze();
-			paralyzeTime = Time.time + paralyzeLoopTime;
+			paralyzeTime = Time.get_time() + paralyzeLoopTime;
 			if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
 			{
 				MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
@@ -2768,12 +2858,14 @@ public class Enemy : Character
 
 	public override void ActMovePoint(Vector3 targetPos)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsArrivalPosition(targetPos, 0f))
 		{
 			EndAction();
 			base.actionID = ACTION_ID.MOVE_POINT;
 			SetStateMovePoint(STATE_MOVE_POINT.INIT);
-			if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+			if (enemySender != null)
 			{
 				enemySender.OnActMovePoint(targetPos);
 			}
@@ -2782,6 +2874,30 @@ public class Enemy : Character
 
 	protected override void UpdateMovePointAction()
 	{
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
 		switch (base.stateMovePoint)
 		{
 		case STATE_MOVE_POINT.INIT:
@@ -2791,7 +2907,8 @@ public class Enemy : Character
 			}
 			else
 			{
-				Vector3 normalized = (base.movePointPos - _position).normalized;
+				Vector3 val = base.movePointPos - _position;
+				Vector3 normalized = val.get_normalized();
 				if (!IsNeedToRotate(normalized))
 				{
 					PlayMotion(13, -1f);
@@ -2800,11 +2917,11 @@ public class Enemy : Character
 				else
 				{
 					m_rotateForActTime = 0f;
-					m_rotateForActFinishTime = Mathf.Acos(Vector3.Dot(_forward, normalized)) / 0.0349065848f * (1f / (float)Application.targetFrameRate);
+					m_rotateForActFinishTime = Mathf.Acos(Vector3.Dot(_forward, normalized)) / 0.0349065848f * (1f / (float)Application.get_targetFrameRate());
 					m_rotateForActStart_Quat = Quaternion.LookRotation(_forward);
 					m_rotateForActEnd_Quat = Quaternion.LookRotation(normalized);
-					Vector3 vector = Vector3.Cross(_forward, normalized);
-					m_rotateForActMotionId = ((!(vector.y >= 0f)) ? 4 : 5);
+					Vector3 val2 = Vector3.Cross(_forward, normalized);
+					m_rotateForActMotionId = ((!(val2.y >= 0f)) ? 4 : 5);
 					PlayMotion(m_rotateForActMotionId, -1f);
 					SetStateMovePoint(STATE_MOVE_POINT.ROTATE);
 				}
@@ -2812,7 +2929,7 @@ public class Enemy : Character
 			break;
 		case STATE_MOVE_POINT.ROTATE:
 		{
-			m_rotateForActTime += Time.deltaTime;
+			m_rotateForActTime += Time.get_deltaTime();
 			float num = Mathf.Clamp(m_rotateForActTime / m_rotateForActFinishTime, 0f, 1f);
 			if (!IsPlayingMotion(1, true))
 			{
@@ -2844,6 +2961,8 @@ public class Enemy : Character
 
 	public override void ActMoveLookAt(Vector3 moveLookAtPos, bool isPacket = false)
 	{
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 		EndAction();
 		base.actionID = ACTION_ID.MOVE_LOOKAT;
 		SetStateMoveLookAt(STATE_MOVE_LOOKAT.INIT);
@@ -2851,7 +2970,7 @@ public class Enemy : Character
 		{
 			base.moveLookAtPos = moveLookAtPos;
 		}
-		if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+		if (enemySender != null)
 		{
 			enemySender.OnActMoveLookAt(moveLookAtPos);
 		}
@@ -2859,31 +2978,75 @@ public class Enemy : Character
 
 	protected override void UpdateMoveLookAtAction()
 	{
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
 		switch (base.stateMoveLookAt)
 		{
 		case STATE_MOVE_LOOKAT.INIT:
-			m_moveLookAtInitTargetDir = (base.moveLookAtPos - _position).normalized;
+		{
+			Vector3 val5 = base.moveLookAtPos - _position;
+			m_moveLookAtInitTargetDir = val5.get_normalized();
 			PlayMotion(14, -1f);
 			SetStateMoveLookAt(STATE_MOVE_LOOKAT.MOVE);
 			break;
+		}
 		case STATE_MOVE_LOOKAT.MOVE:
 		{
-			Vector3 point = _position - base.moveLookAtPos;
-			float angle = base.moveLookAtAngle * Time.deltaTime;
-			point = Quaternion.AngleAxis(angle, Vector3.up) * point;
-			Vector3 vector = base.moveLookAtPos + point - _position;
+			Vector3 val = _position - base.moveLookAtPos;
+			float num = base.moveLookAtAngle * Time.get_deltaTime();
+			val = Quaternion.AngleAxis(num, Vector3.get_up()) * val;
+			Vector3 val2 = base.moveLookAtPos + val - _position;
 			if (!IsPlayingMotion(1, true))
 			{
-				_rotation = Quaternion.LookRotation((base.moveLookAtPos - _position).normalized, Vector3.up);
-				_position += vector;
+				Vector3 val3 = base.moveLookAtPos - _position;
+				_rotation = Quaternion.LookRotation(val3.get_normalized(), Vector3.get_up());
+				_position += val2;
 			}
 			else
 			{
 				PlayMotion(14, -1f);
 			}
-			Vector3 normalized = (base.moveLookAtPos - _position).normalized;
-			float num = Vector3.Angle(m_moveLookAtInitTargetDir, normalized);
-			if (num >= base.moveLookAtAngle)
+			Vector3 val4 = base.moveLookAtPos - _position;
+			Vector3 normalized = val4.get_normalized();
+			float num2 = Vector3.Angle(m_moveLookAtInitTargetDir, normalized);
+			if (num2 >= base.moveLookAtAngle)
 			{
 				SetNextTrigger(0);
 				SetStateMoveLookAt(STATE_MOVE_LOOKAT.FINISH);
@@ -2911,20 +3074,26 @@ public class Enemy : Character
 
 	protected override void EndAction()
 	{
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01be: Unknown result type (might be due to invalid IL or missing references)
 		if (base.isInitialized)
 		{
 			ACTION_ID actionID = base.actionID;
 			base.EndAction();
 			_EndDebuffAction(actionID);
 			EndWaitingPacket(WAITING_PACKET.ENEMY_WARP);
-			if ((UnityEngine.Object)loader.shadow != (UnityEngine.Object)null && !loader.shadow.gameObject.activeSelf)
+			if (loader.shadow != null && !loader.shadow.get_gameObject().get_activeSelf())
 			{
-				loader.shadow.gameObject.SetActive(true);
+				loader.shadow.get_gameObject().SetActive(true);
 			}
 			enableTargetPoint = true;
 			reviveRegionWaitSync = false;
 			enableDash = false;
-			dashBeforePos = Vector3.zero;
+			dashBeforePos = Vector3.get_zero();
 			dashNowDistance = 0f;
 			dashOverDistance = 0f;
 			dashMinDistance = 0f;
@@ -2954,9 +3123,9 @@ public class Enemy : Character
 				MonoBehaviourSingleton<InGameCameraManager>.I.EndRadialBlurFilter(0.1f);
 			}
 			radialBlurEnable = false;
-			if ((UnityEngine.Object)loader.baseEffect != (UnityEngine.Object)null && !loader.baseEffect.gameObject.activeSelf)
+			if (loader.baseEffect != null && !loader.baseEffect.get_gameObject().get_activeSelf())
 			{
-				loader.baseEffect.gameObject.SetActive(true);
+				loader.baseEffect.get_gameObject().SetActive(true);
 			}
 			int count = animLayerWeightChangeInfo.Count;
 			if (count > 0)
@@ -3031,7 +3200,7 @@ public class Enemy : Character
 			if (motion_id == 119)
 			{
 				EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-				if ((UnityEngine.Object)enemyBrain != (UnityEngine.Object)null)
+				if (enemyBrain != null)
 				{
 					EnemyActionController actionCtrl = enemyBrain.actionCtrl;
 					if (actionCtrl != null)
@@ -3097,6 +3266,7 @@ public class Enemy : Character
 
 	public override bool OnBuffStart(BuffParam.BuffData buffData)
 	{
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
 		if (CheckDisableBuffTypeByShield(buffData.type))
 		{
 			return false;
@@ -3121,7 +3291,7 @@ public class Enemy : Character
 		switch (buffData.type)
 		{
 		case BuffParam.BUFFTYPE.GHOST_FORM:
-			if (base.gameObject.activeSelf)
+			if (this.get_gameObject().get_activeSelf())
 			{
 				ChangeGhostShaderParam(GhostFormShaderParam.disappearParam, GhostFormShaderParam.duration);
 			}
@@ -3154,6 +3324,12 @@ public class Enemy : Character
 
 	public override void OnBuffRoutine(BuffParam.BuffData buffData, bool packet = false)
 	{
+		//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
 		int hp = base.hp;
 		base.OnBuffRoutine(buffData, packet);
 		int num = hp - base.hp;
@@ -3196,9 +3372,9 @@ public class Enemy : Character
 			atkAttribute.normal = (float)buffData.value;
 			Vector3 position = _position;
 			GameObject loopEffect = buffParam.GetLoopEffect(buffData);
-			if ((UnityEngine.Object)loopEffect != (UnityEngine.Object)null)
+			if (loopEffect != null)
 			{
-				position = loopEffect.transform.position;
+				position = loopEffect.get_transform().get_position();
 			}
 			CreateDamageNum(position, atkAttribute, false, false, 0);
 		}
@@ -3210,6 +3386,7 @@ public class Enemy : Character
 
 	public override bool OnBuffEnd(BuffParam.BUFFTYPE type, bool sync, bool isPlayEndEffect = true)
 	{
+		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
 		if (!base.OnBuffEnd(type, sync, isPlayEndEffect))
 		{
 			return false;
@@ -3221,9 +3398,9 @@ public class Enemy : Character
 			break;
 		case BuffParam.BUFFTYPE.BURNING:
 			badStatusMax.burning *= 1.5f;
-			if ((UnityEngine.Object)m_effectBurning != (UnityEngine.Object)null)
+			if (m_effectBurning != null)
 			{
-				UnityEngine.Object.Destroy(m_effectBurning);
+				Object.Destroy(m_effectBurning);
 				m_effectBurning = null;
 			}
 			break;
@@ -3231,7 +3408,7 @@ public class Enemy : Character
 			badStatusMax.deadlyPoison *= 1.5f;
 			break;
 		case BuffParam.BUFFTYPE.GHOST_FORM:
-			if (base.gameObject.activeSelf)
+			if (this.get_gameObject().get_activeSelf())
 			{
 				ChangeGhostShaderParam(GhostFormShaderParam.appearParam, GhostFormShaderParam.duration);
 			}
@@ -3244,17 +3421,17 @@ public class Enemy : Character
 			break;
 		case BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN:
 			badStatusMax.attackSpeedDown *= 1.5f;
-			if ((UnityEngine.Object)m_effectSpeedDown != (UnityEngine.Object)null && !buffParam.IsValidBuff(BuffParam.BUFFTYPE.MOVE_SPEED_DOWN))
+			if (m_effectSpeedDown != null && !buffParam.IsValidBuff(BuffParam.BUFFTYPE.MOVE_SPEED_DOWN))
 			{
-				UnityEngine.Object.Destroy(m_effectSpeedDown);
+				Object.Destroy(m_effectSpeedDown);
 				m_effectSpeedDown = null;
 			}
 			break;
 		case BuffParam.BUFFTYPE.MOVE_SPEED_DOWN:
 			badStatusMax.speedDown *= 1.5f;
-			if ((UnityEngine.Object)m_effectSpeedDown != (UnityEngine.Object)null && !buffParam.IsValidBuff(BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN))
+			if (m_effectSpeedDown != null && !buffParam.IsValidBuff(BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN))
 			{
-				UnityEngine.Object.Destroy(m_effectSpeedDown);
+				Object.Destroy(m_effectSpeedDown);
 				m_effectSpeedDown = null;
 			}
 			break;
@@ -3303,7 +3480,7 @@ public class Enemy : Character
 				buffData.interval = electricShockInfo.damageInterval;
 				buffData.value = 1;
 				buffData.fromObjectID = player.id;
-				if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+				if (player != null)
 				{
 					BuffParam buffParam = player.buffParam;
 					InGameUtility.PlayerAtkCalcData playerAtkCalcData = new InGameUtility.PlayerAtkCalcData();
@@ -3326,10 +3503,18 @@ public class Enemy : Character
 
 	private void CreateBurningEffect()
 	{
+		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Expected O, but got Unknown
 		if (object.ReferenceEquals(m_effectBurning, null))
 		{
 			Transform effect = EffectManager.GetEffect("ef_btl_enm_fire_01", base._transform);
-			if (!((UnityEngine.Object)effect == (UnityEngine.Object)null))
+			if (!(effect == null))
 			{
 				ParticleSystem[] componentsInChildren = effect.GetComponentsInChildren<ParticleSystem>(true);
 				if (componentsInChildren != null)
@@ -3337,10 +3522,12 @@ public class Enemy : Character
 					CalcFreezeEffectEmissionRadius();
 					for (int i = 0; i < componentsInChildren.Length; i++)
 					{
-						componentsInChildren[i].shape.radius = GetEmittionRadius();
+						ShapeModule shape = componentsInChildren[i].get_shape();
+						shape.set_radius(GetEmittionRadius());
 					}
-					effect.localPosition += Vector3.up * GetEmittionRadius();
-					m_effectBurning = effect.gameObject;
+					Transform obj = effect;
+					obj.set_localPosition(obj.get_localPosition() + Vector3.get_up() * GetEmittionRadius());
+					m_effectBurning = effect.get_gameObject();
 				}
 			}
 		}
@@ -3348,21 +3535,68 @@ public class Enemy : Character
 
 	private void CreateSpeedDownEffect()
 	{
+		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Expected O, but got Unknown
 		if (object.ReferenceEquals(m_effectSpeedDown, null))
 		{
 			Transform effect = EffectManager.GetEffect("ef_btl_pl_movedown_01", base._transform);
-			if (!((UnityEngine.Object)effect == (UnityEngine.Object)null))
+			if (!(effect == null))
 			{
 				CalcFreezeEffectEmissionRadius();
 				float num = GetEmittionRadius() * MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.attackSpeedDownParam.enemyEffectSize;
-				effect.localScale *= num;
-				m_effectSpeedDown = effect.gameObject;
+				Transform obj = effect;
+				obj.set_localScale(obj.get_localScale() * num);
+				m_effectSpeedDown = effect.get_gameObject();
 			}
 		}
 	}
 
 	public override AttackHitColliderProcessor.HitParam SelectHitCollider(AttackHitColliderProcessor processor, List<AttackHitColliderProcessor.HitParam> hit_params)
 	{
+		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0302: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0304: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0306: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0308: Unknown result type (might be due to invalid IL or missing references)
+		//IL_030d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0312: Unknown result type (might be due to invalid IL or missing references)
+		//IL_031d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0327: Unknown result type (might be due to invalid IL or missing references)
+		//IL_032c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0331: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0478: Unknown result type (might be due to invalid IL or missing references)
+		//IL_047a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0491: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0496: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04f3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04f8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04fd: Unknown result type (might be due to invalid IL or missing references)
 		checkHitParam.Clear();
 		checkLength.Clear();
 		checkPriority.Clear();
@@ -3373,27 +3607,29 @@ public class Enemy : Character
 			for (int count = processor.targetPointList.Count; i < count; i++)
 			{
 				TargetPoint targetPoint = processor.targetPointList[i];
-				if (targetPoint.IsEneble() && targetPoint.regionID >= 0 && (UnityEngine.Object)targetPoint.owner == (UnityEngine.Object)this)
+				if (targetPoint.IsEneble() && targetPoint.regionID >= 0 && targetPoint.owner == this)
 				{
 					targetRegionIds.Add(targetPoint.regionID);
 				}
 			}
 		}
 		BulletObject bulletObject = null;
-		AnimEventCollider.AtkColliderHiter x = null;
+		AnimEventCollider.AtkColliderHiter atkColliderHiter = null;
 		bulletObject = (processor.colliderInterface as BulletObject);
-		if ((UnityEngine.Object)bulletObject == (UnityEngine.Object)null)
+		if (bulletObject == null)
 		{
-			x = (processor.colliderInterface as AnimEventCollider.AtkColliderHiter);
+			atkColliderHiter = (processor.colliderInterface as AnimEventCollider.AtkColliderHiter);
 		}
 		float num = 0f;
-		Vector3 vector = Vector3.zero;
-		Vector3 b = Vector3.zero;
-		if ((UnityEngine.Object)bulletObject != (UnityEngine.Object)null)
+		Vector3 val = Vector3.get_zero();
+		Vector3 val2 = Vector3.get_zero();
+		if (bulletObject != null)
 		{
-			num = bulletObject._rigidbody.velocity.magnitude;
-			vector = bulletObject._rigidbody.velocity.normalized;
-			b = bulletObject._transform.position;
+			Vector3 velocity = bulletObject._rigidbody.get_velocity();
+			num = velocity.get_magnitude();
+			Vector3 velocity2 = bulletObject._rigidbody.get_velocity();
+			val = velocity2.get_normalized();
+			val2 = bulletObject._transform.get_position();
 		}
 		float num2 = 3.40282347E+38f;
 		int j = 0;
@@ -3408,7 +3644,7 @@ public class Enemy : Character
 			{
 				item = 1;
 			}
-			if (IsWeakStateCheckAlreadyHit(wEAK_STATE) && (UnityEngine.Object)hit_params[j].fromObject != (UnityEngine.Object)null && enemyRegionWork.weakAttackIDs.Contains(hit_params[j].fromObject.id))
+			if (IsWeakStateCheckAlreadyHit(wEAK_STATE) && hit_params[j].fromObject != null && enemyRegionWork.weakAttackIDs.Contains(hit_params[j].fromObject.id))
 			{
 				wEAK_STATE = WEAK_STATE.NONE;
 			}
@@ -3416,7 +3652,7 @@ public class Enemy : Character
 			{
 				bool flag = false;
 				Player player = hit_params[j].fromObject as Player;
-				if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+				if (player != null)
 				{
 					flag = player.isSpecialActionHit((Player.ATTACK_MODE)enemyRegionWork.weakSubParam, processor.attackInfo as AttackHitInfo, hit_params[j]);
 				}
@@ -3426,7 +3662,7 @@ public class Enemy : Character
 					wEAK_STATE = WEAK_STATE.NONE;
 				}
 			}
-			if ((UnityEngine.Object)bulletObject != (UnityEngine.Object)null && bulletObject.isAimBossMode)
+			if (bulletObject != null && bulletObject.isAimBossMode)
 			{
 				bool flag2 = false;
 				if (processor.targetPointList != null)
@@ -3435,20 +3671,22 @@ public class Enemy : Character
 					for (int count3 = processor.targetPointList.Count; k < count3; k++)
 					{
 						TargetPoint targetPoint2 = processor.targetPointList[k];
-						if (targetPoint2.IsEneble() && targetPoint2.regionID == regionID && (UnityEngine.Object)targetPoint2.owner == (UnityEngine.Object)this)
+						if (targetPoint2.IsEneble() && targetPoint2.regionID == regionID && targetPoint2.owner == this)
 						{
 							Vector3 markerPos = targetPoint2.param.markerPos;
 							float num3 = 0f;
 							float num4 = 0f;
-							if (vector == Vector3.zero)
+							if (val == Vector3.get_zero())
 							{
-								num3 = (markerPos - hit_params[j].point).magnitude;
+								Vector3 val3 = markerPos - hit_params[j].point;
+								num3 = val3.get_magnitude();
 								num4 = num3;
 							}
 							else
 							{
-								num3 = Vector3.Cross(vector, markerPos - b).magnitude;
-								num4 = Vector3.Dot(markerPos - hit_params[j].point, vector);
+								Vector3 val4 = Vector3.Cross(val, markerPos - val2);
+								num3 = val4.get_magnitude();
+								num4 = Vector3.Dot(markerPos - hit_params[j].point, val);
 							}
 							float num5 = enemyParameter.aimMarkerHitRadius * targetPoint2.param.aimMarkerScale;
 							if (num3 <= num5 && (targetPoint2.isSkipDotCalc || Mathf.Abs(num4) <= enemyParameter.hitCompareAimDepthLimit))
@@ -3490,13 +3728,22 @@ public class Enemy : Character
 				item = 0;
 			}
 			float num6 = 0f;
-			if ((UnityEngine.Object)bulletObject != (UnityEngine.Object)null)
+			if (bulletObject != null)
 			{
-				num6 = ((!((UnityEngine.Object)bulletObject._rigidbody != (UnityEngine.Object)null) || !(vector != Vector3.zero)) ? (hit_params[j].point - bulletObject._transform.position).magnitude : Vector3.Dot(hit_params[j].point, vector));
+				if (bulletObject._rigidbody != null && val != Vector3.get_zero())
+				{
+					num6 = Vector3.Dot(hit_params[j].point, val);
+				}
+				else
+				{
+					Vector3 val5 = hit_params[j].point - bulletObject._transform.get_position();
+					num6 = val5.get_magnitude();
+				}
 			}
-			else if ((UnityEngine.Object)x != (UnityEngine.Object)null)
+			else if (atkColliderHiter != null)
 			{
-				num6 = (hit_params[j].point - hit_params[j].crossCheckPoint).magnitude;
+				Vector3 val6 = hit_params[j].point - hit_params[j].crossCheckPoint;
+				num6 = val6.get_magnitude();
 			}
 			checkHitParam.Add(hit_params[j]);
 			checkLength.Add(num6);
@@ -3512,7 +3759,7 @@ public class Enemy : Character
 		int l = 0;
 		for (int count4 = checkHitParam.Count; l < count4; l++)
 		{
-			if ((!((UnityEngine.Object)bulletObject != (UnityEngine.Object)null) || !(num >= enemyParameter.hitCompareSpeed) || !(checkLength[l] - num2 > enemyParameter.hitCompareLengthLimit)) && (checkPriority[l] > num8 || (checkPriority[l] == num8 && checkLength[l] < num7)))
+			if ((!(bulletObject != null) || !(num >= enemyParameter.hitCompareSpeed) || !(checkLength[l] - num2 > enemyParameter.hitCompareLengthLimit)) && (checkPriority[l] > num8 || (checkPriority[l] == num8 && checkLength[l] < num7)))
 			{
 				result = checkHitParam[l];
 				num7 = checkLength[l];
@@ -3554,7 +3801,7 @@ public class Enemy : Character
 			if (IsWeakStateSpAttack(status.weakState))
 			{
 				bool flag = false;
-				if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+				if (player != null)
 				{
 					flag = player.isSpecialActionHit((Player.ATTACK_MODE)enemyRegionWork.weakSubParam, status.attackInfo, status.hitParam);
 				}
@@ -3569,7 +3816,7 @@ public class Enemy : Character
 				if (status.hitParam.processor != null)
 				{
 					BulletObject bulletObject = status.hitParam.processor.colliderInterface as BulletObject;
-					if ((UnityEngine.Object)bulletObject != (UnityEngine.Object)null)
+					if (bulletObject != null)
 					{
 						atk = bulletObject.masterAtk;
 					}
@@ -3605,7 +3852,7 @@ public class Enemy : Character
 			if (IsWeakStateDisplaySign(status.weakState))
 			{
 				Self self = status.fromObject as Self;
-				if ((UnityEngine.Object)self != (UnityEngine.Object)null)
+				if (self != null)
 				{
 					self.taskChecker.OnWeakAttack(status.weakState, 0);
 				}
@@ -3626,8 +3873,39 @@ public class Enemy : Character
 		base.OnAttackedHitDirection(status);
 	}
 
-	protected override void OnPlayAttackedHitEffect(AttackedHitStatusDirection status)
+	protected unsafe override void OnPlayAttackedHitEffect(AttackedHitStatusDirection status)
 	{
+		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0274: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0285: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0303: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0353: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0364: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0421: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0432: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0711: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0716: Expected O, but got Unknown
+		//IL_072e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_073f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0746: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0792: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_081e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08e0: Unknown result type (might be due to invalid IL or missing references)
 		bool flag = true;
 		bool is_self = status.fromObject is Self;
 		if (is_self)
@@ -3750,7 +4028,7 @@ public class Enemy : Character
 					EFFECTIVE_TYPE effectiveType = GetEffectiveType(elementType, GetElementType());
 					string text = status.attackInfo.toEnemy.hitTypeName;
 					EnemyHitTypeTable.TypeData typeData = null;
-					Vector3 scale = Vector3.one;
+					Vector3 scale = Vector3.get_one();
 					float delay = 0f;
 					if (is_self)
 					{
@@ -3811,10 +4089,8 @@ public class Enemy : Character
 						{
 							if (delay > 0f)
 							{
-								AppMain.Delay(delay, delegate
-								{
-									EffectManager.OneShot(element_effect_name, status.hitPos, status.hitParam.rot, scale, is_self, null);
-								});
+								_003COnPlayAttackedHitEffect_003Ec__AnonStorey508 _003COnPlayAttackedHitEffect_003Ec__AnonStorey;
+								AppMain.Delay(delay, new Action((object)_003COnPlayAttackedHitEffect_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 							}
 							else
 							{
@@ -3862,9 +4138,9 @@ public class Enemy : Character
 							effect_name = "ef_btl_magibullet_landing_01";
 						}
 						Transform effect = EffectManager.GetEffect(effect_name, null);
-						effect.position = status.exHitPos;
-						effect.rotation = status.hitParam.rot;
-						effect.localScale = Vector3.one;
+						effect.set_position(status.exHitPos);
+						effect.set_rotation(status.hitParam.rot);
+						effect.set_localScale(Vector3.get_one());
 					}
 				}
 			}
@@ -3946,7 +4222,7 @@ public class Enemy : Character
 	public void ActDestroyActionMine(int objId, bool isExplode)
 	{
 		AttackActionMine attackActionMine = m_activeAttackActionMineList.Find((AttackActionMine x) => x.objId == objId);
-		if ((UnityEngine.Object)attackActionMine != (UnityEngine.Object)null)
+		if (attackActionMine != null)
 		{
 			attackActionMine.RequestDestroy(isExplode);
 		}
@@ -3987,7 +4263,7 @@ public class Enemy : Character
 			if (num2 > 0)
 			{
 				Player player = targetChar as Player;
-				if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+				if (player != null)
 				{
 					player.StartEffectDrain(this);
 				}
@@ -4050,6 +4326,8 @@ public class Enemy : Character
 
 	protected override void OnAttackedHitLocal(AttackedHitStatusLocal status)
 	{
+		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0159: Unknown result type (might be due to invalid IL or missing references)
 		base.OnAttackedHitLocal(status);
 		_CheckHitLocalArrow(status);
 		if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.BOMBROCK)
@@ -4072,7 +4350,7 @@ public class Enemy : Character
 			CreateDamageNum(status.hitPos, status.damageDetails, status.weakState != WEAK_STATE.NONE, status.isDamageRegionOnly, status.attackInfo.damageNumAddGroup);
 		}
 		Player player = status.fromObject as Player;
-		if ((UnityEngine.Object)player != (UnityEngine.Object)null && !status.attackInfo.isSkillReference)
+		if (player != null && !status.attackInfo.isSkillReference)
 		{
 			player.IncreaseSpActonGauge(status.attackInfo.attackType, status.hitPos, 0f, status.attackInfo.atkRate, status.attackInfo.toEnemy.isSpecialAttack, status.attackInfo.dontIncreaseGauge);
 			if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.NORMAL || status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.FROM_AVOID)
@@ -4090,7 +4368,7 @@ public class Enemy : Character
 		{
 			status.downAddBase = status.attackInfo.down;
 			status.isForceDown = status.attackInfo.isForceDown;
-			if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+			if (player != null)
 			{
 				int value = 0;
 				if (!player.GetOneHandSwordBoostDownValue(ref value, status.attackInfo.name))
@@ -4139,7 +4417,7 @@ public class Enemy : Character
 	private void RecordDeliveryBattleCheckerOnAttacked(AttackedHitStatusLocal status)
 	{
 		Self self = status.fromObject as Self;
-		if (!((UnityEngine.Object)self == (UnityEngine.Object)null) && MonoBehaviourSingleton<InGameManager>.IsValid())
+		if (!(self == null) && MonoBehaviourSingleton<InGameManager>.IsValid())
 		{
 			MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.SetMaxDamageSelf(status.damage);
 			BattleCheckerBase.JudgementParam judgementParam = BattleCheckerBase.JudgementParam.Create(status.attackInfo, self);
@@ -4172,7 +4450,7 @@ public class Enemy : Character
 					case SP_ATTACK_TYPE.NONE:
 					{
 						status.isArrowBleed = true;
-						float num = (!((UnityEngine.Object)character != (UnityEngine.Object)null)) ? 1f : character.buffParam.GetBleedUp();
+						float num = (!(character != null)) ? 1f : character.buffParam.GetBleedUp();
 						status.arrowBleedDamage = Mathf.CeilToInt((float)status.damage * MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedDamageRate * num);
 						if (status.arrowBleedDamage < 1)
 						{
@@ -4241,16 +4519,18 @@ public class Enemy : Character
 
 	protected override void OnIgnoreHitAttack()
 	{
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Expected O, but got Unknown
 		base.OnIgnoreHitAttack();
-		if (IsValidBuff(BuffParam.BUFFTYPE.GHOST_FORM) && (UnityEngine.Object)m_effectHitWhenGhost == (UnityEngine.Object)null && !((UnityEngine.Object)base.effectPlayProcessor == (UnityEngine.Object)null))
+		if (IsValidBuff(BuffParam.BUFFTYPE.GHOST_FORM) && m_effectHitWhenGhost == null && !(base.effectPlayProcessor == null))
 		{
 			List<EffectPlayProcessor.EffectSetting> settings = base.effectPlayProcessor.GetSettings("GHOST_EFFECT");
 			if (settings != null && settings[0] != null)
 			{
-				Transform transform = base.effectPlayProcessor.PlayEffect(settings[0], base._transform);
-				if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
+				Transform val = base.effectPlayProcessor.PlayEffect(settings[0], base._transform);
+				if (val != null)
 				{
-					m_effectHitWhenGhost = transform.gameObject;
+					m_effectHitWhenGhost = val.get_gameObject();
 				}
 			}
 		}
@@ -4261,7 +4541,7 @@ public class Enemy : Character
 		if (IsValidBuff(BuffParam.BUFFTYPE.GHOST_FORM))
 		{
 			Player player = status.fromObject as Player;
-			if ((UnityEngine.Object)player != (UnityEngine.Object)null && player.CheckIgnoreBuff(BuffParam.BUFFTYPE.GHOST_FORM))
+			if (player != null && player.CheckIgnoreBuff(BuffParam.BUFFTYPE.GHOST_FORM))
 			{
 				return true;
 			}
@@ -4331,7 +4611,7 @@ public class Enemy : Character
 		}
 		Player player = status.fromObject as Player;
 		RegionInfo regionInfo = regionInfos[status.regionID];
-		if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+		if (player != null)
 		{
 			if (!status.attackInfo.isSkillReference && !regionInfo.dragonArmorInfo.enabled)
 			{
@@ -4389,7 +4669,7 @@ public class Enemy : Character
 			damage_details.normal = 1f;
 			num2 = 1;
 		}
-		if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+		if (player != null)
 		{
 			if (!status.attackInfo.isSkillReference)
 			{
@@ -4481,7 +4761,7 @@ public class Enemy : Character
 		}
 		if (IsValidBuff(BuffParam.BUFFTYPE.GHOST_FORM))
 		{
-			if ((UnityEngine.Object)player != (UnityEngine.Object)null && player.CheckIgnoreBuff(BuffParam.BUFFTYPE.GHOST_FORM))
+			if (player != null && player.CheckIgnoreBuff(BuffParam.BUFFTYPE.GHOST_FORM))
 			{
 				return num2;
 			}
@@ -4546,7 +4826,7 @@ public class Enemy : Character
 	protected override AtkAttribute CalcAtk(AttackedHitStatusLocal status)
 	{
 		Player player = status.fromObject as Player;
-		if ((UnityEngine.Object)player == (UnityEngine.Object)null)
+		if (player == null)
 		{
 			return base.CalcAtk(status);
 		}
@@ -4763,12 +5043,12 @@ public class Enemy : Character
 		if (enabledCounterRegion != null)
 		{
 			EnemyController enemyController = base.controller as EnemyController;
-			if ((UnityEngine.Object)enemyController == (UnityEngine.Object)null)
+			if (enemyController == null)
 			{
 				return false;
 			}
 			EnemyBrain enemyBrain = enemyController.brain as EnemyBrain;
-			if ((UnityEngine.Object)enemyBrain == (UnityEngine.Object)null)
+			if (enemyBrain == null)
 			{
 				return false;
 			}
@@ -4816,7 +5096,7 @@ public class Enemy : Character
 				if (status.badStatusAdd.electricShock > 0f && GetElementType() == ELEMENT_TYPE.WATER)
 				{
 					Player player = status.fromObject as Player;
-					if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+					if (player != null)
 					{
 						OnElectricShockStart(status.attackInfo, player);
 					}
@@ -5118,7 +5398,7 @@ public class Enemy : Character
 		RegionInfo regionInfo = regionWork.regionInfo;
 		AtkAttribute atkBarrierDamage = regionInfo.atkBarrierDamage;
 		Player player = status.fromObject as Player;
-		if ((UnityEngine.Object)player != (UnityEngine.Object)null && player.buffParam.IsValidBuff(BuffParam.BUFFTYPE.LUNATIC_TEAR))
+		if (player != null && player.buffParam.IsValidBuff(BuffParam.BUFFTYPE.LUNATIC_TEAR))
 		{
 			num = regionWork.regionInfo.barrierDamageSp;
 		}
@@ -5156,7 +5436,7 @@ public class Enemy : Character
 
 	public override bool IsEnableAttackedHitOwner()
 	{
-		if (MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopRoom.isOwnerFirstClear && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.boss == (UnityEngine.Object)this && MonoBehaviourSingleton<InGameProgress>.I.isEnding)
+		if (MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopRoom.isOwnerFirstClear && MonoBehaviourSingleton<StageObjectManager>.I.boss == this && MonoBehaviourSingleton<InGameProgress>.I.isEnding)
 		{
 			return false;
 		}
@@ -5237,7 +5517,7 @@ public class Enemy : Character
 	public override void OnHitAttack(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
 	{
 		EnemyController enemyController = base.controller as EnemyController;
-		if ((UnityEngine.Object)enemyController != (UnityEngine.Object)null)
+		if (enemyController != null)
 		{
 			enemyController.OnHitAttack(hit_param.toObject);
 		}
@@ -5245,10 +5525,10 @@ public class Enemy : Character
 		if (grabInfo.enable)
 		{
 			Player player = hit_param.toObject as Player;
-			if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+			if (player != null)
 			{
 				EnemyBrain enemyBrain = enemyController.brain as EnemyBrain;
-				if ((UnityEngine.Object)enemyBrain != (UnityEngine.Object)null)
+				if (enemyBrain != null)
 				{
 					DrainAttackInfo drainAttackInfo = SearchDrainAttackInfo(grabInfo.drainAttackId);
 					enemyBrain.actionCtrl.grabController.Grab(player, grabInfo, drainAttackInfo);
@@ -5285,6 +5565,12 @@ public class Enemy : Character
 
 	public override void OnAttackedHitFix(AttackedHitStatusFix status)
 	{
+		//IL_0507: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05b5: Expected O, but got Unknown
+		//IL_0631: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0638: Expected O, but got Unknown
+		//IL_07e2: Unknown result type (might be due to invalid IL or missing references)
 		Player player = status.fromObject as Player;
 		bool isDead = base.isDead;
 		int hp = base.hp;
@@ -5319,7 +5605,7 @@ public class Enemy : Character
 				for (int i = 0; i < playerList.Count; i++)
 				{
 					Self self = playerList[i] as Self;
-					if ((UnityEngine.Object)self != (UnityEngine.Object)null)
+					if (self != null)
 					{
 						self.CancelCannonMode();
 						self.ActIdle(false, -1f);
@@ -5327,7 +5613,7 @@ public class Enemy : Character
 					else
 					{
 						Player player2 = playerList[i] as Player;
-						if ((UnityEngine.Object)player2 != (UnityEngine.Object)null)
+						if (player2 != null)
 						{
 							player2.CancelCannonMode();
 							player2.ActIdle(false, -1f);
@@ -5401,14 +5687,14 @@ public class Enemy : Character
 				ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
 				bool isBroke = enemyRegionWork.isBroke;
 				enemyRegionWork.isBroke = true;
-				enemyRegionWork.breakTime = Time.time;
+				enemyRegionWork.breakTime = Time.get_time();
 				string[] deactivateObjects = region_info.deactivateObjects;
 				foreach (string name in deactivateObjects)
 				{
-					Transform transform = FindNode(name);
-					if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
+					Transform val = FindNode(name);
+					if (val != null)
 					{
-						transform.gameObject.SetActive(false);
+						val.get_gameObject().SetActive(false);
 					}
 				}
 				int k = 0;
@@ -5422,9 +5708,9 @@ public class Enemy : Character
 					for (int count = enemyRegionWork.bleedWorkList.Count; l < count; l++)
 					{
 						BleedWork bleedWork = enemyRegionWork.bleedWorkList[l];
-						if ((UnityEngine.Object)bleedWork.bleedEffect != (UnityEngine.Object)null)
+						if (bleedWork.bleedEffect != null)
 						{
-							EffectManager.ReleaseEffect(bleedWork.bleedEffect.gameObject, true, false);
+							EffectManager.ReleaseEffect(bleedWork.bleedEffect.get_gameObject(), true, false);
 							bleedWork.bleedEffect = null;
 						}
 					}
@@ -5436,7 +5722,7 @@ public class Enemy : Character
 				enemyRegionWork.shadowSealingData.extendRate = 1f;
 				if (!object.ReferenceEquals(enemyRegionWork.shadowSealingEffect, null))
 				{
-					EffectManager.ReleaseEffect(enemyRegionWork.shadowSealingEffect.gameObject, false, true);
+					EffectManager.ReleaseEffect(enemyRegionWork.shadowSealingEffect.get_gameObject(), false, true);
 					enemyRegionWork.shadowSealingEffect = null;
 				}
 				if (MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
@@ -5460,7 +5746,7 @@ public class Enemy : Character
 						}
 					});
 				}
-				if ((UnityEngine.Object)player != (UnityEngine.Object)null && MonoBehaviourSingleton<UIPlayerAnnounce>.IsValid())
+				if (player != null && MonoBehaviourSingleton<UIPlayerAnnounce>.IsValid())
 				{
 					if (player is Self)
 					{
@@ -5534,7 +5820,7 @@ public class Enemy : Character
 				MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendExploreBossDamage(num5);
 			}
 		}
-		if (base.hp <= 0 && (UnityEngine.Object)player != (UnityEngine.Object)null)
+		if (base.hp <= 0 && player != null)
 		{
 			if (player is Self)
 			{
@@ -5549,6 +5835,8 @@ public class Enemy : Character
 
 	private void _CheckHitFixArrow(AttackedHitStatusFix status, EnemyRegionWork region_work)
 	{
+		//IL_0210: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0536: Unknown result type (might be due to invalid IL or missing references)
 		if (!base.isDead)
 		{
 			TargetPoint targetPoint = null;
@@ -5650,7 +5938,7 @@ public class Enemy : Character
 				{
 					flag = false;
 				}
-				if ((UnityEngine.Object)targetPoint != (UnityEngine.Object)null && flag)
+				if (targetPoint != null && flag)
 				{
 					BleedWork bleedWork = null;
 					int num3 = 1;
@@ -5684,7 +5972,7 @@ public class Enemy : Character
 						}
 						bleedWork.ownerID = status.fromObjectID;
 					}
-					if ((UnityEngine.Object)bleedWork.bleedEffect == (UnityEngine.Object)null)
+					if (bleedWork.bleedEffect == null)
 					{
 						string effect_name = specialActionInfo.arrowBleedEffectName;
 						if (bleedWork.showIndex != 0)
@@ -5696,7 +5984,7 @@ public class Enemy : Character
 					else if (bleedWork.showIndex == 0)
 					{
 						Animator component2 = bleedWork.bleedEffect.GetComponent<Animator>();
-						if ((UnityEngine.Object)null != (UnityEngine.Object)component2)
+						if (null != component2)
 						{
 							component2.Play("ACT" + (bleedData.lv - 1).ToString());
 						}
@@ -5807,11 +6095,12 @@ public class Enemy : Character
 
 	private int GetRegionID(Collider collider, List<int> target_region_ids)
 	{
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 		int result = 0;
-		if ((UnityEngine.Object)collider != (UnityEngine.Object)null)
+		if (collider != null)
 		{
-			RegionRoot componentInParent = collider.gameObject.GetComponentInParent<RegionRoot>();
-			if ((UnityEngine.Object)componentInParent != (UnityEngine.Object)null)
+			RegionRoot componentInParent = collider.get_gameObject().GetComponentInParent<RegionRoot>();
+			if (componentInParent != null)
 			{
 				for (int num = componentInParent.regionIDArray.Length - 1; num >= 0; num--)
 				{
@@ -5922,20 +6211,46 @@ public class Enemy : Character
 
 	protected void PlayRegionEffect(int region_id, string effect_name)
 	{
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 		if (targetPoints != null)
 		{
 			Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-			Quaternion rotation = cameraTransform.rotation;
-			Vector3 position = cameraTransform.position;
+			Quaternion rotation = cameraTransform.get_rotation();
+			Vector3 position = cameraTransform.get_position();
 			int i = 0;
 			for (int num = targetPoints.Length; i < num; i++)
 			{
 				TargetPoint targetPoint = targetPoints[i];
 				if (targetPoint.regionID == region_id && targetPoint.isTargetEnable)
 				{
-					Vector3 position2 = targetPoint._transform.position;
-					position2 += targetPoint._transform.rotation * targetPoint.scaledOffset;
-					Vector3 pos = (position - position2).normalized * targetPoint.scaledMarkerZShift + position2;
+					Vector3 position2 = targetPoint._transform.get_position();
+					position2 += targetPoint._transform.get_rotation() * targetPoint.scaledOffset;
+					Vector3 val = position - position2;
+					Vector3 pos = val.get_normalized() * targetPoint.scaledMarkerZShift + position2;
 					Quaternion rot = rotation;
 					EffectManager.OneShot(effect_name, pos, rot, true);
 				}
@@ -5945,6 +6260,7 @@ public class Enemy : Character
 
 	private void CreateDropItem(Vector3 pos, StageObject target, int rarity, bool is_region_break)
 	{
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 		if (target is Self)
 		{
 			DropObject.Create(rarity, is_region_break, pos);
@@ -5953,12 +6269,15 @@ public class Enemy : Character
 
 	private void CreateDropItemFromRegionBreak(RegionInfo region_info, StageObject target, int rarity)
 	{
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		if (region_info.breakDrop != null)
 		{
-			Transform transform = FindNode(region_info.breakDrop.dropNodeName);
-			if (!((UnityEngine.Object)transform == (UnityEngine.Object)null))
+			Transform val = FindNode(region_info.breakDrop.dropNodeName);
+			if (!(val == null))
 			{
-				Vector3 position = transform.position;
+				Vector3 position = val.get_position();
 				CreateDropItem(position, target, rarity, true);
 			}
 		}
@@ -5966,6 +6285,9 @@ public class Enemy : Character
 
 	private void CreateDamageNum(Vector3 pos, AtkAttribute damage, bool buff, bool isRegionOnly, int addGroup = 0)
 	{
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0169: Unknown result type (might be due to invalid IL or missing references)
 		int num = addGroup;
 		if (damage.normal != 0f)
 		{
@@ -6042,21 +6364,33 @@ public class Enemy : Character
 
 	private void PlayRegionBreakEffect(RegionInfo region_info)
 	{
-		Transform transform = FindNode(region_info.breakEffect.nodeName);
-		if (!((UnityEngine.Object)transform == (UnityEngine.Object)null))
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0044: Expected O, but got Unknown
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		Transform val = FindNode(region_info.breakEffect.nodeName);
+		if (!(val == null))
 		{
 			Transform effect = EffectManager.GetEffect(region_info.breakEffect.effectName, null);
-			if (!((UnityEngine.Object)effect == (UnityEngine.Object)null))
+			if (!(effect == null))
 			{
-				Transform transform2 = transform.transform;
-				effect.position = transform2.position;
-				effect.rotation = transform2.rotation * Quaternion.Euler(region_info.breakEffect.effectAngle);
+				Transform val2 = val.get_transform();
+				effect.set_position(val2.get_position());
+				effect.set_rotation(val2.get_rotation() * Quaternion.Euler(region_info.breakEffect.effectAngle));
 			}
 		}
 	}
 
 	public void UpdateRegionVisual()
 	{
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016d: Expected O, but got Unknown
+		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c7: Expected O, but got Unknown
 		int i = 0;
 		for (int num = regionWorks.Length; i < num; i++)
 		{
@@ -6067,10 +6401,10 @@ public class Enemy : Character
 				string[] deactivateObjects = regionInfo.deactivateObjects;
 				foreach (string name in deactivateObjects)
 				{
-					Transform transform = FindNode(name);
-					if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
+					Transform val = FindNode(name);
+					if (val != null)
 					{
-						transform.gameObject.SetActive(false);
+						val.get_gameObject().SetActive(false);
 					}
 				}
 				int k = 0;
@@ -6102,9 +6436,9 @@ public class Enemy : Character
 				}
 				else
 				{
-					if ((UnityEngine.Object)bleedWork.bleedEffect != (UnityEngine.Object)null)
+					if (bleedWork.bleedEffect != null)
 					{
-						EffectManager.ReleaseEffect(bleedWork.bleedEffect.gameObject, true, false);
+						EffectManager.ReleaseEffect(bleedWork.bleedEffect.get_gameObject(), true, false);
 						bleedWork.bleedEffect = null;
 					}
 					enemyRegionWork.bleedWorkList.RemoveAt(num3);
@@ -6112,7 +6446,7 @@ public class Enemy : Character
 			}
 			if (enemyRegionWork.shadowSealingData.ownerID == 0 && !object.ReferenceEquals(enemyRegionWork.shadowSealingEffect, null))
 			{
-				EffectManager.ReleaseEffect(enemyRegionWork.shadowSealingEffect.gameObject, false, true);
+				EffectManager.ReleaseEffect(enemyRegionWork.shadowSealingEffect.get_gameObject(), false, true);
 				enemyRegionWork.shadowSealingEffect = null;
 			}
 			TargetPoint targetPoint = null;
@@ -6125,7 +6459,7 @@ public class Enemy : Character
 					break;
 				}
 			}
-			if ((UnityEngine.Object)targetPoint != (UnityEngine.Object)null)
+			if (targetPoint != null)
 			{
 				int n = 0;
 				for (int count2 = enemyRegionWork.bleedList.Count; n < count2; n++)
@@ -6170,7 +6504,7 @@ public class Enemy : Character
 							}
 							bleedWork2.ownerID = bleedData.ownerID;
 						}
-						if ((UnityEngine.Object)bleedWork2.bleedEffect == (UnityEngine.Object)null)
+						if (bleedWork2.bleedEffect == null)
 						{
 							string effect_name = MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedEffectName;
 							if (bleedWork2.showIndex != 0)
@@ -6208,6 +6542,7 @@ public class Enemy : Character
 
 	public void ReviveRegion(int region_id)
 	{
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 		if (region_id >= 0 && region_id < regionInfos.Length)
 		{
 			EnemyRegionWork enemyRegionWork = regionWorks[region_id];
@@ -6218,10 +6553,10 @@ public class Enemy : Character
 				string[] deactivateObjects = regionInfo.deactivateObjects;
 				foreach (string name in deactivateObjects)
 				{
-					Transform transform = FindNode(name);
-					if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
+					Transform val = FindNode(name);
+					if (val != null)
 					{
-						transform.gameObject.SetActive(true);
+						val.get_gameObject().SetActive(true);
 					}
 				}
 				int j = 0;
@@ -6230,12 +6565,12 @@ public class Enemy : Character
 					regionWorks[j].OnReviveRegion(region_id);
 				}
 				EnemyController enemyController = base.controller as EnemyController;
-				if ((UnityEngine.Object)enemyController != (UnityEngine.Object)null)
+				if (enemyController != null)
 				{
 					enemyController.OnReviveRegion(region_id);
 				}
 				reviveRegionWaitSync = false;
-				if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+				if (enemySender != null)
 				{
 					enemySender.OnReviveRegion(region_id);
 				}
@@ -6268,7 +6603,7 @@ public class Enemy : Character
 		{
 			return false;
 		}
-		if (Time.time - enemyRegionWork.breakTime < regionInfo.reviveIntervalTime)
+		if (Time.get_time() - enemyRegionWork.breakTime < regionInfo.reviveIntervalTime)
 		{
 			return false;
 		}
@@ -6277,6 +6612,9 @@ public class Enemy : Character
 
 	public void ActivateRegionNode(int[] regionIDs, bool isRandom = false, int randomSelectedID = -1)
 	{
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
 		if (!regionIDs.IsNullOrEmpty() && !regionRoots.IsNullOrEmpty())
 		{
 			foreach (int num in regionIDs)
@@ -6287,20 +6625,20 @@ public class Enemy : Character
 					{
 						if (!isRandom)
 						{
-							regionRoots[j].gameObject.SetActive(true);
+							regionRoots[j].get_gameObject().SetActive(true);
 						}
 						else if (regionRoots[j].regionID != randomSelectedID)
 						{
-							regionRoots[j].gameObject.SetActive(false);
+							regionRoots[j].get_gameObject().SetActive(false);
 						}
 						else
 						{
-							regionRoots[j].gameObject.SetActive(true);
+							regionRoots[j].get_gameObject().SetActive(true);
 							RegionInfo regionInfo = regionInfos[randomSelectedID];
 							if (regionInfo != null && regionInfo.modeChangeInfo.enabled)
 							{
 								EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-								if (!((UnityEngine.Object)enemyBrain == (UnityEngine.Object)null))
+								if (!(enemyBrain == null))
 								{
 									EnemyActionController actionCtrl = enemyBrain.actionCtrl;
 									if (actionCtrl != null)
@@ -6313,7 +6651,7 @@ public class Enemy : Character
 					}
 				}
 			}
-			if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+			if (enemySender != null)
 			{
 				enemySender.OnEnemyRegionNodeActivate(regionIDs, isRandom, randomSelectedID);
 			}
@@ -6387,6 +6725,8 @@ public class Enemy : Character
 
 	public void SetHitShock(Vector3 vec)
 	{
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		if (canHitShockEffect)
 		{
 			hitShockOffsetFlag = true;
@@ -6434,6 +6774,12 @@ public class Enemy : Character
 
 	private void EventDashStart(AnimEventData.EventData data)
 	{
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
 		if (!enableDash)
 		{
 			string value = (data.stringArgs.Length <= 0) ? null : data.stringArgs[0];
@@ -6459,9 +6805,9 @@ public class Enemy : Character
 			dashMaxDistance = 0f;
 			if (base.actionPositionFlag)
 			{
-				Vector3 vector = base.actionPosition - _position;
-				vector.y = 0f;
-				dashMaxDistance = vector.magnitude;
+				Vector3 val = base.actionPosition - _position;
+				val.y = 0f;
+				dashMaxDistance = val.get_magnitude();
 			}
 			if (dashMaxDistance < dashMinDistance)
 			{
@@ -6526,12 +6872,13 @@ public class Enemy : Character
 
 	private void EventRadialBlurStart(AnimEventData.EventData data)
 	{
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
 		float time = data.floatArgs[0];
 		float strength = data.floatArgs[1];
 		string text = data.stringArgs[0];
 		bool flag = (data.intArgs[0] != 0) ? true : false;
-		Transform transform = FindNode(text);
-		if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
+		Transform val = FindNode(text);
+		if (val == null)
 		{
 			Log.Error("Not found node for RadialBlur!! " + text);
 		}
@@ -6539,11 +6886,11 @@ public class Enemy : Character
 		{
 			if (flag)
 			{
-				MonoBehaviourSingleton<InGameCameraManager>.I.StartRadialBlurFilter(time, strength, transform);
+				MonoBehaviourSingleton<InGameCameraManager>.I.StartRadialBlurFilter(time, strength, val);
 			}
 			else
 			{
-				MonoBehaviourSingleton<InGameCameraManager>.I.StartRadialBlurFilter(time, strength, transform.position);
+				MonoBehaviourSingleton<InGameCameraManager>.I.StartRadialBlurFilter(time, strength, val.get_position());
 			}
 			radialBlurEnable = true;
 		}
@@ -6573,6 +6920,39 @@ public class Enemy : Character
 
 	private void EventShotTarget(AnimEventData.EventData data)
 	{
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0211: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0214: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0219: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0306: Unknown result type (might be due to invalid IL or missing references)
 		AttackInfo attackInfo = FindAttackInfo(data.stringArgs[0], true, false);
 		if (attackInfo == null)
 		{
@@ -6580,15 +6960,17 @@ public class Enemy : Character
 		}
 		else
 		{
-			Transform transform = FindNode(data.stringArgs[1]);
-			if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
+			Transform val = FindNode(data.stringArgs[1]);
+			if (val == null)
 			{
 				Log.Error("Not found node for ShotTarget!! " + data.stringArgs[1]);
 			}
 			else
 			{
-				Vector3 v = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-				v = transform.localToWorldMatrix.MultiplyPoint3x4(v);
+				Vector3 val2 = default(Vector3);
+				val2._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+				Matrix4x4 localToWorldMatrix = val.get_localToWorldMatrix();
+				val2 = localToWorldMatrix.MultiplyPoint3x4(val2);
 				switch (data.intArgs[0])
 				{
 				case 0:
@@ -6600,12 +6982,12 @@ public class Enemy : Character
 						for (int count2 = playerList.Count; k < count2; k++)
 						{
 							Player player2 = playerList[k] as Player;
-							if (!((UnityEngine.Object)player2 == (UnityEngine.Object)null) && !player2.isDead)
+							if (!(player2 == null) && !player2.isDead)
 							{
 								Vector3 position2 = player2._position;
 								position2.y += 1f;
-								Quaternion rot2 = Quaternion.LookRotation(position2 - v);
-								AnimEventShot animEventShot = AnimEventShot.Create(this, attackInfo, v, rot2, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
+								Quaternion rot2 = Quaternion.LookRotation(position2 - val2);
+								AnimEventShot animEventShot = AnimEventShot.Create(this, attackInfo, val2, rot2, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
 								animEventShot.SetTarget(player2);
 							}
 						}
@@ -6614,31 +6996,31 @@ public class Enemy : Character
 				}
 				case 1:
 				{
-					int num4 = data.intArgs[1];
+					int num6 = data.intArgs[1];
 					if (IsOriginal() || IsCoopNone())
 					{
-						List<RandomShotInfo.TargetInfo> list2 = new List<RandomShotInfo.TargetInfo>(num4);
+						List<RandomShotInfo.TargetInfo> list2 = new List<RandomShotInfo.TargetInfo>(num6);
 						List<Player> alivePlayerList = MonoBehaviourSingleton<StageObjectManager>.I.GetAlivePlayerList();
 						int count = alivePlayerList.Count;
-						for (int j = 0; j < num4; j++)
+						for (int j = 0; j < num6; j++)
 						{
-							int index = UnityEngine.Random.Range(0, count);
+							int index = Random.Range(0, count);
 							Player player = alivePlayerList[index];
-							if ((UnityEngine.Object)player == (UnityEngine.Object)null)
+							if (player == null)
 							{
-								list2.Add(new RandomShotInfo.TargetInfo(transform.rotation, -1));
+								list2.Add(new RandomShotInfo.TargetInfo(val.get_rotation(), -1));
 							}
 							else
 							{
 								Vector3 position = player._position;
 								position.y += 1f;
-								Quaternion rot = Quaternion.LookRotation(position - v);
+								Quaternion rot = Quaternion.LookRotation(position - val2);
 								list2.Add(new RandomShotInfo.TargetInfo(rot, player.id));
 							}
 						}
 						TargetRandamShotEvent(list2);
 					}
-					SetRandomShotInfoForShotTarget(num4, v, attackInfo, data);
+					SetRandomShotInfoForShotTarget(num6, val2, attackInfo, data);
 					break;
 				}
 				case 2:
@@ -6651,15 +7033,15 @@ public class Enemy : Character
 						float num3 = data.floatArgs[5];
 						for (int i = 0; i < num; i++)
 						{
-							float x = UnityEngine.Random.Range(0f - num2, num2);
-							float y = UnityEngine.Random.Range(0f - num3, num3);
-							Quaternion lhs = Quaternion.Euler(new Vector3(x, y, 0f));
-							lhs *= transform.rotation;
-							list.Add(new RandomShotInfo.TargetInfo(lhs, -1));
+							float num4 = Random.Range(0f - num2, num2);
+							float num5 = Random.Range(0f - num3, num3);
+							Quaternion val3 = Quaternion.Euler(new Vector3(num4, num5, 0f));
+							val3 *= val.get_rotation();
+							list.Add(new RandomShotInfo.TargetInfo(val3, -1));
 						}
 						TargetRandamShotEvent(list);
 					}
-					SetRandomShotInfoForShotTarget(num, v, attackInfo, data);
+					SetRandomShotInfoForShotTarget(num, val2, attackInfo, data);
 					break;
 				}
 				}
@@ -6669,6 +7051,7 @@ public class Enemy : Character
 
 	private void SetRandomShotInfoForShotTarget(int numBullet, Vector3 pos, AttackInfo info, AnimEventData.EventData data)
 	{
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 		RandomShotInfo randomShotInfo = null;
 		bool flag = false;
 		if (shotNetworkInfoQueue.Count > 0)
@@ -6701,6 +7084,36 @@ public class Enemy : Character
 
 	private void EventShotPoint(AnimEventData.EventData data)
 	{
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0202: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0212: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0291: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0296: Unknown result type (might be due to invalid IL or missing references)
+		//IL_029a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_029b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
 		AttackInfo attackInfo = FindAttackInfo(data.stringArgs[0], true, false);
 		if (attackInfo == null)
 		{
@@ -6709,7 +7122,8 @@ public class Enemy : Character
 		else
 		{
 			bool flag = data.intArgs.Length > 2;
-			Vector3 v = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+			Vector3 val = default(Vector3);
+			val._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
 			switch (data.intArgs[0])
 			{
 			case 2:
@@ -6723,9 +7137,10 @@ public class Enemy : Character
 					for (int count2 = playerList.Count; k < count2; k++)
 					{
 						Player player2 = playerList[k] as Player;
-						if (!((UnityEngine.Object)player2 == (UnityEngine.Object)null) && !player2.isDead)
+						if (!(player2 == null) && !player2.isDead)
 						{
-							Vector3 pos3 = player2._transform.localToWorldMatrix.MultiplyPoint3x4(v);
+							Matrix4x4 localToWorldMatrix3 = player2._transform.get_localToWorldMatrix();
+							Vector3 pos3 = localToWorldMatrix3.MultiplyPoint3x4(val);
 							if (flag && data.intArgs[2] != 0)
 							{
 								pos3.y = data.floatArgs[1];
@@ -6748,11 +7163,12 @@ public class Enemy : Character
 					int count = alivePlayerList.Count;
 					for (int j = 0; j < num2; j++)
 					{
-						int index = UnityEngine.Random.Range(0, count);
+						int index = Random.Range(0, count);
 						Player player = alivePlayerList[index];
-						if (!((UnityEngine.Object)player == (UnityEngine.Object)null))
+						if (!(player == null))
 						{
-							Vector3 pos2 = player._transform.localToWorldMatrix.MultiplyPoint3x4(v);
+							Matrix4x4 localToWorldMatrix2 = player._transform.get_localToWorldMatrix();
+							Vector3 pos2 = localToWorldMatrix2.MultiplyPoint3x4(val);
 							pos2 = CreateShotPoint(pos2, player._transform, flag, data);
 							list2.Add(pos2);
 						}
@@ -6770,9 +7186,10 @@ public class Enemy : Character
 					List<Vector3> list = new List<Vector3>(num);
 					for (int i = 0; i < num; i++)
 					{
-						if (!((UnityEngine.Object)base.actionTarget == (UnityEngine.Object)null))
+						if (!(base.actionTarget == null))
 						{
-							Vector3 pos = base.actionTarget._transform.localToWorldMatrix.MultiplyPoint3x4(v);
+							Matrix4x4 localToWorldMatrix = base.actionTarget._transform.get_localToWorldMatrix();
+							Vector3 pos = localToWorldMatrix.MultiplyPoint3x4(val);
 							pos = CreateShotPoint(pos, base.actionTarget._transform, flag, data);
 							list.Add(pos);
 						}
@@ -6788,19 +7205,41 @@ public class Enemy : Character
 
 	private Vector3 CreateShotPoint(Vector3 pos, Transform targetTrans, bool isFixedY, AnimEventData.EventData data)
 	{
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
 		if (isFixedY && data.intArgs[2] != 0)
 		{
 			pos.y = data.floatArgs[1];
 		}
-		float y = (float)UnityEngine.Random.Range(-180, 180);
-		Quaternion rotation = Quaternion.Euler(new Vector3(0f, y, 0f));
-		pos += rotation * targetTrans.forward * UnityEngine.Random.Range(0f, data.floatArgs[8]);
-		pos += targetTrans.up * UnityEngine.Random.Range(0f - data.floatArgs[7], data.floatArgs[7]);
+		float num = (float)Random.Range(-180, 180);
+		Quaternion val = Quaternion.Euler(new Vector3(0f, num, 0f));
+		pos += val * targetTrans.get_forward() * Random.Range(0f, data.floatArgs[8]);
+		pos += targetTrans.get_up() * Random.Range(0f - data.floatArgs[7], data.floatArgs[7]);
 		return pos;
 	}
 
 	private void SetRandomShotInfo(int numBullet, AttackInfo info, AnimEventData.EventData data)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
 		Quaternion rot = _rotation * Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
 		RandomShotInfo randomShotInfo = null;
 		bool flag = false;
@@ -6835,10 +7274,15 @@ public class Enemy : Character
 
 	private void EventShotWorldPoint(AnimEventData.EventData data)
 	{
+		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 		AttackInfo attackInfo = FindAttackInfo(data.stringArgs[0], true, false);
 		if (attackInfo != null)
 		{
-			Vector3 pos = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+			Vector3 pos = default(Vector3);
+			pos._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
 			Quaternion rot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
 			AnimEventShot animEventShot = AnimEventShot.Create(this, attackInfo, pos, rot, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
 		}
@@ -6933,11 +7377,13 @@ public class Enemy : Character
 
 	protected override void EventNWayLaserAttack(AnimEventData.EventData data)
 	{
+		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b7: Expected O, but got Unknown
 		string text = data.stringArgs[0];
 		string text2 = data.stringArgs[1];
 		int numLaser = data.intArgs[0];
-		Transform transform = Utility.Find(base._transform, text2);
-		if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
+		Transform val = Utility.Find(base._transform, text2);
+		if (val == null)
 		{
 			Log.Error("Not found node!! name:" + text2);
 		}
@@ -6951,15 +7397,15 @@ public class Enemy : Character
 			else
 			{
 				BulletData bulletData = attackInfo.bulletData;
-				if ((UnityEngine.Object)bulletData == (UnityEngine.Object)null || bulletData.dataLaser == null)
+				if (bulletData == null || bulletData.dataLaser == null)
 				{
 					Log.Error("Not found BulletData!! atkInfoName:" + text);
 				}
 				else
 				{
-					GameObject gameObject = new GameObject("AttackNWayLaser");
-					AttackNWayLaser attackNWayLaser = gameObject.AddComponent<AttackNWayLaser>();
-					attackNWayLaser.Initialize(this, transform, attackInfo, numLaser);
+					GameObject val2 = new GameObject("AttackNWayLaser");
+					AttackNWayLaser attackNWayLaser = val2.AddComponent<AttackNWayLaser>();
+					attackNWayLaser.Initialize(this, val, attackInfo, numLaser);
 					m_activeAttackLaserList.Add(attackNWayLaser);
 				}
 			}
@@ -6968,14 +7414,32 @@ public class Enemy : Character
 
 	private void EventObstacleNodeLinkAttack(AnimEventData.EventData data)
 	{
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017e: Expected O, but got Unknown
 		string text = data.stringArgs[0];
 		string text2 = data.stringArgs[1];
-		Transform transform = Utility.Find(base._transform, text2);
-		if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
+		Transform val = Utility.Find(base._transform, text2);
+		if (val == null)
 		{
 			Log.Error("Not found node!! name:" + text2);
 		}
-		else if (transform.gameObject.activeSelf)
+		else if (val.get_gameObject().get_activeSelf())
 		{
 			AttackInfo attackInfo = FindAttackInfo(text, true, false);
 			if (attackInfo == null)
@@ -6985,29 +7449,32 @@ public class Enemy : Character
 			else
 			{
 				AnimEventShot animEventShot = null;
-				Vector3 offset = new Vector3(0f, 0f, 0f);
+				Vector3 offset = default(Vector3);
+				offset._002Ector(0f, 0f, 0f);
 				if (data.intArgs.Length > 1 && data.intArgs[1] != 0)
 				{
-					if ((UnityEngine.Object)base.actionTarget != (UnityEngine.Object)null)
+					if (base.actionTarget != null)
 					{
-						Vector3 v = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-						Quaternion rhs = Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
-						rhs = _rotation * rhs;
-						v = base.actionTarget._transform.localToWorldMatrix.MultiplyPoint3x4(v);
-						animEventShot = AnimEventShot.Create(this, attackInfo, v, rhs, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
+						Vector3 val2 = default(Vector3);
+						val2._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+						Quaternion val3 = Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
+						val3 = _rotation * val3;
+						Matrix4x4 localToWorldMatrix = base.actionTarget._transform.get_localToWorldMatrix();
+						val2 = localToWorldMatrix.MultiplyPoint3x4(val2);
+						animEventShot = AnimEventShot.Create(this, attackInfo, val2, val3, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
 					}
 					else
 					{
 						offset.z += 2f;
 					}
 				}
-				if ((UnityEngine.Object)animEventShot == (UnityEngine.Object)null)
+				if (animEventShot == null)
 				{
 					animEventShot = AnimEventShot.Create(this, data, attackInfo, offset);
 				}
-				GameObject gameObject = new GameObject("AttackObstacleNodeLink");
-				AttackShotNodeLink attackShotNodeLink = gameObject.AddComponent<AttackShotNodeLink>();
-				attackShotNodeLink.Initialize(this, transform, data, attackInfo, animEventShot);
+				GameObject val4 = new GameObject("AttackObstacleNodeLink");
+				AttackShotNodeLink attackShotNodeLink = val4.AddComponent<AttackShotNodeLink>();
+				attackShotNodeLink.Initialize(this, val, data, attackInfo, animEventShot);
 				m_activeAttackObstacleList.Add(attackShotNodeLink);
 			}
 		}
@@ -7015,10 +7482,14 @@ public class Enemy : Character
 
 	private void EventFunnelAttack(AnimEventData.EventData data)
 	{
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
 		string text = data.stringArgs[0];
 		string text2 = data.stringArgs[1];
 		Transform launchTrans = FindNode(text2);
-		if ((UnityEngine.Object)launchTrans == (UnityEngine.Object)null)
+		if (launchTrans == null)
 		{
 			Log.Error("Not found transform for launch!! name:" + text2);
 		}
@@ -7032,7 +7503,7 @@ public class Enemy : Character
 			else
 			{
 				BulletData bulletData = atkInfo.bulletData;
-				if ((UnityEngine.Object)bulletData == (UnityEngine.Object)null || bulletData.dataFunnel == null)
+				if (bulletData == null || bulletData.dataFunnel == null)
 				{
 					Log.Error("Not found BulletData!! atkInfoName:" + text);
 				}
@@ -7042,8 +7513,12 @@ public class Enemy : Character
 					Quaternion offsetRot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
 					MonoBehaviourSingleton<StageObjectManager>.I.GetAlivePlayerList().ForEach(delegate(Player targetChar)
 					{
-						GameObject gameObject = new GameObject("AttackFunnelBit");
-						AttackFunnelBit attackFunnelBit = gameObject.AddComponent<AttackFunnelBit>();
+						//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+						//IL_000a: Expected O, but got Unknown
+						//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+						//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+						GameObject val = new GameObject("AttackFunnelBit");
+						AttackFunnelBit attackFunnelBit = val.AddComponent<AttackFunnelBit>();
 						attackFunnelBit.Initialize(this, atkInfo, targetChar, launchTrans, offsetPos, offsetRot);
 						m_activeAttackFunnelList.Add(attackFunnelBit);
 					});
@@ -7054,10 +7529,14 @@ public class Enemy : Character
 
 	private void EventUndeadAttack(AnimEventData.EventData data)
 	{
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
 		string text = data.stringArgs[0];
 		string text2 = data.stringArgs[1];
 		Transform launchTrans = FindNode(text2);
-		if ((UnityEngine.Object)launchTrans == (UnityEngine.Object)null)
+		if (launchTrans == null)
 		{
 			Log.Error("Not found transform for launch!! name:" + text2);
 		}
@@ -7071,7 +7550,7 @@ public class Enemy : Character
 			else
 			{
 				BulletData bulletData = atkInfo.bulletData;
-				if ((UnityEngine.Object)bulletData == (UnityEngine.Object)null || bulletData.dataUndead == null)
+				if (bulletData == null || bulletData.dataUndead == null)
 				{
 					Log.Error("Not found BulletData!! atkInfoName:" + text);
 				}
@@ -7081,8 +7560,12 @@ public class Enemy : Character
 					Quaternion offsetRot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
 					MonoBehaviourSingleton<StageObjectManager>.I.GetAlivePlayerList().ForEach(delegate(Player targetChar)
 					{
-						GameObject gameObject = new GameObject("AttackUndead");
-						AttackUndead attackUndead = gameObject.AddComponent<AttackUndead>();
+						//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+						//IL_000a: Expected O, but got Unknown
+						//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+						//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+						GameObject val = new GameObject("AttackUndead");
+						AttackUndead attackUndead = val.AddComponent<AttackUndead>();
 						attackUndead.Initialize(this, atkInfo, targetChar, launchTrans, offsetPos, offsetRot);
 					});
 				}
@@ -7092,10 +7575,14 @@ public class Enemy : Character
 
 	private void EventDigAttack(AnimEventData.EventData data)
 	{
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
 		string text = data.stringArgs[0];
 		string text2 = data.stringArgs[1];
 		Transform launchTrans = FindNode(text2);
-		if ((UnityEngine.Object)launchTrans == (UnityEngine.Object)null)
+		if (launchTrans == null)
 		{
 			Log.Error("Not found transform for launch!! name:" + text2);
 		}
@@ -7109,7 +7596,7 @@ public class Enemy : Character
 			else
 			{
 				BulletData bulletData = atkInfo.bulletData;
-				if ((UnityEngine.Object)bulletData == (UnityEngine.Object)null || bulletData.dataDig == null)
+				if (bulletData == null || bulletData.dataDig == null)
 				{
 					Log.Error("Not found BulletData!! atkInfoName:" + text);
 				}
@@ -7119,8 +7606,12 @@ public class Enemy : Character
 					Quaternion offsetRot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
 					MonoBehaviourSingleton<StageObjectManager>.I.playerList.ForEach(delegate(StageObject targetChar)
 					{
-						GameObject gameObject = new GameObject("AttackDig");
-						AttackDig attackDig = gameObject.AddComponent<AttackDig>();
+						//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+						//IL_000a: Expected O, but got Unknown
+						//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+						//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+						GameObject val = new GameObject("AttackDig");
+						AttackDig attackDig = val.AddComponent<AttackDig>();
 						attackDig.Initialize(this, atkInfo, targetChar, launchTrans, offsetPos, offsetRot);
 						m_activeAttackDigList.Add(attackDig);
 					});
@@ -7142,7 +7633,7 @@ public class Enemy : Character
 				if (cANCEL_CONDITION2 == CANCEL_CONDITION.FAILED_GRAB)
 				{
 					EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-					if (!((UnityEngine.Object)enemyBrain == (UnityEngine.Object)null))
+					if (!(enemyBrain == null))
 					{
 						GrabController grabController = enemyBrain.actionCtrl.grabController;
 						if (grabController != null && !grabController.IsGrabing())
@@ -7166,10 +7657,18 @@ public class Enemy : Character
 
 	private void EventFloatingMineAttack(AnimEventData.EventData data)
 	{
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0115: Expected O, but got Unknown
 		string text = data.stringArgs[0];
 		string text2 = data.stringArgs[1];
-		Transform transform = FindNode(text2);
-		if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
+		Transform val = FindNode(text2);
+		if (val == null)
 		{
 			Log.Error("Not found transform for launch!! name: " + text2);
 		}
@@ -7183,22 +7682,23 @@ public class Enemy : Character
 			else
 			{
 				BulletData bulletData = attackInfo.bulletData;
-				if ((UnityEngine.Object)bulletData == (UnityEngine.Object)null || bulletData.dataMine == null)
+				if (bulletData == null || bulletData.dataMine == null)
 				{
 					Log.Error("Not found BulletData!! atkInfoName: " + text);
 				}
 				else
 				{
-					Vector3 offsetPos = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+					Vector3 offsetPos = default(Vector3);
+					offsetPos._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
 					Quaternion offsetRot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
 					AttackFloatingMine.InitParamFloatingMine initParamFloatingMine = new AttackFloatingMine.InitParamFloatingMine();
 					initParamFloatingMine.attacker = this;
 					initParamFloatingMine.atkInfo = attackInfo;
-					initParamFloatingMine.launchTrans = transform;
+					initParamFloatingMine.launchTrans = val;
 					initParamFloatingMine.offsetPos = offsetPos;
 					initParamFloatingMine.offsetRot = offsetRot;
-					GameObject gameObject = new GameObject("AttackFloatingMine");
-					AttackFloatingMine attackFloatingMine = gameObject.AddComponent<AttackFloatingMine>();
+					GameObject val2 = new GameObject("AttackFloatingMine");
+					AttackFloatingMine attackFloatingMine = val2.AddComponent<AttackFloatingMine>();
 					attackFloatingMine.Initialize(initParamFloatingMine);
 				}
 			}
@@ -7215,9 +7715,9 @@ public class Enemy : Character
 
 	private void ActCreateActionMine(string atkInfoName)
 	{
-		int randSeed = UnityEngine.Random.Range(-2147483648, 2147483647);
+		int randSeed = Random.Range(-2147483648, 2147483647);
 		ActCreateActionMine(atkInfoName, randSeed);
-		if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+		if (enemySender != null)
 		{
 			enemySender.OnCreateActionMine(atkInfoName, randSeed);
 		}
@@ -7225,6 +7725,18 @@ public class Enemy : Character
 
 	public void ActCreateActionMine(string atkInfoName, int randSeed)
 	{
+		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0199: Expected O, but got Unknown
 		AttackInfo attackInfo = FindAttackInfo(atkInfoName, true, false);
 		if (attackInfo == null)
 		{
@@ -7233,7 +7745,7 @@ public class Enemy : Character
 		else
 		{
 			BulletData bulletData = attackInfo.bulletData;
-			if ((UnityEngine.Object)bulletData == (UnityEngine.Object)null || bulletData.dataActionMine == null)
+			if (bulletData == null || bulletData.dataActionMine == null)
 			{
 				Log.Error("Not found BulletData!! atkInfoName:" + atkInfoName);
 			}
@@ -7244,15 +7756,15 @@ public class Enemy : Character
 				float centerConcentration = bulletData.dataActionMine.centerConcentration;
 				float settingHeight = bulletData.dataActionMine.settingHeight;
 				float settingNearLimit = bulletData.dataActionMine.settingNearLimit;
-				Vector3[] randomPosition = GetRandomPosition(settingNum, base.transform.position, settingRadius, centerConcentration, settingHeight, settingNearLimit, randSeed);
-				System.Random random = new System.Random(randSeed);
+				Vector3[] randomPosition = GetRandomPosition(settingNum, this.get_transform().get_position(), settingRadius, centerConcentration, settingHeight, settingNearLimit, randSeed);
+				Random random = new Random(randSeed);
 				for (int i = 0; i < randomPosition.Length; i++)
 				{
 					AttackActionMine.InitParamActionMine initParamActionMine = new AttackActionMine.InitParamActionMine();
 					initParamActionMine.attacker = this;
 					initParamActionMine.atkInfo = attackInfo;
 					initParamActionMine.position = randomPosition[i];
-					initParamActionMine.rotation = Quaternion.LookRotation(base.transform.position - randomPosition[i]);
+					initParamActionMine.rotation = Quaternion.LookRotation(this.get_transform().get_position() - randomPosition[i]);
 					initParamActionMine.randomSeed = randSeed;
 					int tmp_id = 0;
 					for (int j = 0; j < 10; j++)
@@ -7264,8 +7776,8 @@ public class Enemy : Character
 						}
 					}
 					initParamActionMine.id = tmp_id;
-					GameObject gameObject = new GameObject("AttackActionMine");
-					AttackActionMine attackActionMine = gameObject.AddComponent<AttackActionMine>();
+					GameObject val = new GameObject("AttackActionMine");
+					AttackActionMine attackActionMine = val.AddComponent<AttackActionMine>();
 					attackActionMine.Initialize(initParamActionMine);
 					m_activeAttackActionMineList.Add(attackActionMine);
 				}
@@ -7275,7 +7787,11 @@ public class Enemy : Character
 
 	private Vector3[] GetRandomPosition(int num, Vector3 center, float radius, float concentration, float height, float nearLimit, int randomSeed)
 	{
-		System.Random random = new System.Random(randomSeed);
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+		Random random = new Random(randomSeed);
 		int num2 = 50;
 		List<Vector3> list = new List<Vector3>();
 		for (int i = 0; i < num; i++)
@@ -7283,11 +7799,11 @@ public class Enemy : Character
 			for (int j = 0; j < num2; j++)
 			{
 				float num3 = radius * Mathf.Pow((float)random.NextDouble(), concentration);
-				float f = 6.28f * (float)random.NextDouble();
-				float num4 = num3 * Mathf.Cos(f);
-				float num5 = num3 * Mathf.Sin(f);
-				Vector3 pos = new Vector3(num4 + center.x, height, num5 + center.z);
-				if (MonoBehaviourSingleton<StageManager>.I.CheckPosInside(pos) && !list.Exists((Vector3 v) => Vector3.Distance(v, pos) < nearLimit) && !m_activeAttackActionMineList.Exists((AttackActionMine m) => Vector3.Distance(m.transform.position, pos) < nearLimit))
+				float num4 = 6.28f * (float)random.NextDouble();
+				float num5 = num3 * Mathf.Cos(num4);
+				float num6 = num3 * Mathf.Sin(num4);
+				Vector3 pos = new Vector3(num5 + center.x, height, num6 + center.z);
+				if (MonoBehaviourSingleton<StageManager>.I.CheckPosInside(pos) && !list.Exists((Vector3 v) => Vector3.Distance(v, pos) < nearLimit) && !m_activeAttackActionMineList.Exists((AttackActionMine m) => Vector3.Distance(m.get_transform().get_position(), pos) < nearLimit))
 				{
 					list.Add(pos);
 					break;
@@ -7303,9 +7819,9 @@ public class Enemy : Character
 		{
 			string atkInfoName = data.stringArgs[0];
 			string nodeName = data.stringArgs[1];
-			int num = UnityEngine.Random.Range(-2147483648, 2147483647);
+			int num = Random.Range(-2147483648, 2147483647);
 			ActCreateReflectBullet(atkInfoName, nodeName, -1, num);
-			if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+			if (enemySender != null)
 			{
 				enemySender.OnReflectBulletAttack(atkInfoName, nodeName, num);
 			}
@@ -7314,11 +7830,19 @@ public class Enemy : Character
 
 	public void ActCreateReflectBullet(string atkInfoName, string nodeName, int objId, int seed)
 	{
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
 		ActResetActionMineRandom(seed);
 		if (objId > 0)
 		{
 			AttackActionMine attackActionMine = m_activeAttackActionMineList.Find((AttackActionMine x) => x.objId == objId);
-			if ((UnityEngine.Object)attackActionMine != (UnityEngine.Object)null)
+			if (attackActionMine != null)
 			{
 				attackActionMine.CreateReflectBullet();
 			}
@@ -7332,17 +7856,17 @@ public class Enemy : Character
 			}
 			else
 			{
-				Transform transform = (!string.IsNullOrEmpty(nodeName)) ? FindNode(nodeName) : base._transform;
-				if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
+				Transform val = (!string.IsNullOrEmpty(nodeName)) ? ((object)FindNode(nodeName)) : ((object)base._transform);
+				if (val == null)
 				{
 					Log.Error("Not found transform for launch!! name:" + nodeName);
 				}
 				else
 				{
-					Vector3 position = transform.position;
+					Vector3 position = val.get_position();
 					Quaternion reflectBulletRotation = GetReflectBulletRotation(position, seed);
 					AnimEventShot animEventShot = AnimEventShot.Create(this, attackInfo, position, reflectBulletRotation, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
-					animEventShot.gameObject.AddComponent<AttackActionMine.ReflectBulletCondition>();
+					animEventShot.get_gameObject().AddComponent<AttackActionMine.ReflectBulletCondition>();
 				}
 			}
 		}
@@ -7350,19 +7874,33 @@ public class Enemy : Character
 
 	private Quaternion GetReflectBulletRotation(Vector3 nodePos, int randSeed)
 	{
-		m_activeAttackActionMineList.RemoveAll((AttackActionMine x) => (UnityEngine.Object)x == (UnityEngine.Object)null);
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+		m_activeAttackActionMineList.RemoveAll((AttackActionMine x) => x == null);
 		AttackActionMine[] array = m_activeAttackActionMineList.ToArray();
-		System.Random random = new System.Random(randSeed);
+		Random random = new Random(randSeed);
 		if (array.Length > 0)
 		{
-			Vector3 position = array[random.Next(0, m_activeAttackActionMineList.Count)].transform.position;
+			Vector3 position = array[random.Next(0, m_activeAttackActionMineList.Count)].get_transform().get_position();
 			return Quaternion.LookRotation(position - nodePos);
 		}
 		List<StageObject> list = new List<StageObject>(MonoBehaviourSingleton<StageObjectManager>.I.playerList);
 		list.RemoveAll(delegate(StageObject obj)
 		{
 			Player player = obj as Player;
-			if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+			if (player != null)
 			{
 				return player.hp <= 0;
 			}
@@ -7451,10 +7989,10 @@ public class Enemy : Character
 			int index = 0;
 			if (list.Count > 1)
 			{
-				int seed = UnityEngine.Random.seed;
-				UnityEngine.Random.seed = base.SyncRandomSeed;
-				index = UnityEngine.Random.Range(0, list.Count);
-				UnityEngine.Random.seed = seed;
+				int seed = Random.get_seed();
+				Random.set_seed(base.SyncRandomSeed);
+				index = Random.Range(0, list.Count);
+				Random.set_seed(seed);
 			}
 			if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
 			{
@@ -7467,15 +8005,18 @@ public class Enemy : Character
 
 	public void RequestShieldShaderEffect()
 	{
-		StartCoroutine(SetShieldShaderParam());
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(SetShieldShaderParam());
 	}
 
 	private void EventGenerateAegis(AnimEventData.EventData data)
 	{
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001b: Expected O, but got Unknown
 		if (object.ReferenceEquals(aegisCtrl, null))
 		{
-			GameObject gameObject = new GameObject("AegisParent");
-			aegisCtrl = gameObject.AddComponent<EnemyAegisController>();
+			GameObject val = new GameObject("AegisParent");
+			aegisCtrl = val.AddComponent<EnemyAegisController>();
 			aegisCtrl.Init(this);
 		}
 		aegisCtrl.Generate(data);
@@ -7501,12 +8042,14 @@ public class Enemy : Character
 
 	public void SetupAegis(EnemyAegisController.SetupParam param)
 	{
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Expected O, but got Unknown
 		if (!object.ReferenceEquals(param, null))
 		{
 			if (object.ReferenceEquals(aegisCtrl, null))
 			{
-				GameObject gameObject = new GameObject("AegisParent");
-				aegisCtrl = gameObject.AddComponent<EnemyAegisController>();
+				GameObject val = new GameObject("AegisParent");
+				aegisCtrl = val.AddComponent<EnemyAegisController>();
 				aegisCtrl.Init(this);
 			}
 			aegisCtrl.Setup(param, false);
@@ -7515,6 +8058,8 @@ public class Enemy : Character
 
 	private void EventEffectLoopCustom(AnimEventData.EventData data)
 	{
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c6: Expected O, but got Unknown
 		string str = data.stringArgs[0];
 		string str2 = data.stringArgs[1];
 		string text = str + str2;
@@ -7525,13 +8070,13 @@ public class Enemy : Character
 				return;
 			}
 		}
-		Transform transform = AnimEventFormat.EffectEventExec(data.id, data, base._transform, isBoss, ((Character)this).EffectNameAnalyzer, ((StageObject)this).FindNode, null);
-		if (!((UnityEngine.Object)transform == (UnityEngine.Object)null))
+		Transform val = AnimEventFormat.EffectEventExec(data.id, data, base._transform, isBoss, ((Character)this).EffectNameAnalyzer, ((StageObject)this).FindNode, null);
+		if (!(val == null))
 		{
 			int num = data.intArgs[0];
 			int deleteCondition = data.intArgs[1];
-			GameObject gameObject = transform.gameObject;
-			EnemyEffectObject enemyEffectObject = gameObject.AddComponent<EnemyEffectObject>();
+			GameObject val2 = val.get_gameObject();
+			EnemyEffectObject enemyEffectObject = val2.AddComponent<EnemyEffectObject>();
 			enemyEffectObject.Initialize(this, regionWorks[num], deleteCondition, text);
 			m_enemyEffectList.Add(enemyEffectObject);
 		}
@@ -7539,7 +8084,7 @@ public class Enemy : Character
 
 	public void OnNotifyDeleteEnemyEffect(EnemyEffectObject del)
 	{
-		if ((UnityEngine.Object)del != (UnityEngine.Object)null && m_enemyEffectList.Contains(del))
+		if (del != null && m_enemyEffectList.Contains(del))
 		{
 			m_enemyEffectList.Remove(del);
 		}
@@ -7552,6 +8097,30 @@ public class Enemy : Character
 
 	private void EventGroupEffectON(AnimEventData.EventData data)
 	{
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Expected O, but got Unknown
+		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009e: Expected O, but got Unknown
+		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ce: Expected O, but got Unknown
+		//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ed: Expected O, but got Unknown
+		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0237: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0245: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0253: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0258: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
 		int num = data.intArgs[0];
 		AnimEventData.ResidentEffectData[] residentEffectDataList = animEventData.residentEffectDataList;
 		if (residentEffectDataList != null && residentEffectDataList.Length > 0)
@@ -7561,21 +8130,21 @@ public class Enemy : Character
 			{
 				if (!string.IsNullOrEmpty(residentEffectData.effectName) && !string.IsNullOrEmpty(residentEffectData.linkNodeName) && residentEffectData.groupID == num)
 				{
-					Transform transform = Utility.Find(base.body.transform, residentEffectData.linkNodeName);
-					if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
+					Transform val = Utility.Find(base.body.get_transform(), residentEffectData.linkNodeName);
+					if (val == null)
 					{
-						transform = base.body.transform;
+						val = base.body.get_transform();
 					}
 					if (!IsExistResidentEffect(residentEffectData.UniqueName))
 					{
-						Transform effect = EffectManager.GetEffect(residentEffectData.effectName, transform);
-						if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
+						Transform effect = EffectManager.GetEffect(residentEffectData.effectName, val);
+						if (effect != null)
 						{
-							Vector3 localScale = effect.localScale;
-							effect.localScale = localScale * residentEffectData.scale;
-							effect.localPosition = residentEffectData.offsetPos;
-							effect.localRotation = Quaternion.Euler(residentEffectData.offsetRot);
-							ResidentEffectObject residentEffectObject = effect.gameObject.AddComponent<ResidentEffectObject>();
+							Vector3 localScale = effect.get_localScale();
+							effect.set_localScale(localScale * residentEffectData.scale);
+							effect.set_localPosition(residentEffectData.offsetPos);
+							effect.set_localRotation(Quaternion.Euler(residentEffectData.offsetRot));
+							ResidentEffectObject residentEffectObject = effect.get_gameObject().AddComponent<ResidentEffectObject>();
 							residentEffectObject.Initialize(residentEffectData);
 							RegisterResidentEffect(residentEffectObject);
 						}
@@ -7583,7 +8152,7 @@ public class Enemy : Character
 				}
 			}
 		}
-		if ((UnityEngine.Object)m_residentEffectSetting != (UnityEngine.Object)null)
+		if (m_residentEffectSetting != null)
 		{
 			SystemEffectSetting.Data[] effectDataList = m_residentEffectSetting.effectDataList;
 			if (effectDataList != null && effectDataList.Length > 0)
@@ -7593,21 +8162,21 @@ public class Enemy : Character
 				{
 					if (!string.IsNullOrEmpty(data2.effectName) && !string.IsNullOrEmpty(data2.linkNodeName) && data2.groupID == num)
 					{
-						Transform transform2 = Utility.Find(base.body.transform, data2.linkNodeName);
-						if ((UnityEngine.Object)transform2 == (UnityEngine.Object)null)
+						Transform val2 = Utility.Find(base.body.get_transform(), data2.linkNodeName);
+						if (val2 == null)
 						{
-							transform2 = base.body.transform;
+							val2 = base.body.get_transform();
 						}
 						if (!IsExistResidentEffect(data2.UniqueName))
 						{
-							Transform effect2 = EffectManager.GetEffect(data2.effectName, transform2);
-							if ((UnityEngine.Object)effect2 != (UnityEngine.Object)null)
+							Transform effect2 = EffectManager.GetEffect(data2.effectName, val2);
+							if (effect2 != null)
 							{
-								Vector3 localScale2 = effect2.localScale;
-								effect2.localScale = localScale2 * data2.scale;
-								effect2.localPosition = data2.offsetPos;
-								effect2.localRotation = Quaternion.Euler(data2.offsetRot);
-								ResidentEffectObject residentEffectObject2 = effect2.gameObject.AddComponent<ResidentEffectObject>();
+								Vector3 localScale2 = effect2.get_localScale();
+								effect2.set_localScale(localScale2 * data2.scale);
+								effect2.set_localPosition(data2.offsetPos);
+								effect2.set_localRotation(Quaternion.Euler(data2.offsetRot));
+								ResidentEffectObject residentEffectObject2 = effect2.get_gameObject().AddComponent<ResidentEffectObject>();
 								residentEffectObject2.Initialize(data2);
 								RegisterResidentEffect(residentEffectObject2);
 							}
@@ -7620,6 +8189,8 @@ public class Enemy : Character
 
 	private void EventGroupEffectOFF(AnimEventData.EventData data)
 	{
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0077: Expected O, but got Unknown
 		int num = data.intArgs[0];
 		List<ResidentEffectObject> list = new List<ResidentEffectObject>();
 		foreach (ResidentEffectObject residentEffect in m_residentEffectList)
@@ -7631,7 +8202,7 @@ public class Enemy : Character
 		}
 		foreach (ResidentEffectObject item in list)
 		{
-			EffectManager.ReleaseEffect(item.gameObject, true, false);
+			EffectManager.ReleaseEffect(item.get_gameObject(), true, false);
 			m_residentEffectList.Remove(item);
 		}
 	}
@@ -7656,9 +8227,9 @@ public class Enemy : Character
 	private void EventTailControllON(AnimEventData.EventData data)
 	{
 		int num = data.intArgs[0];
-		if ((UnityEngine.Object)tailController == (UnityEngine.Object)null)
+		if (tailController == null)
 		{
-			Debug.LogError("Not found TailController!! ID:" + num);
+			Debug.LogError((object)("Not found TailController!! ID:" + num));
 		}
 		else if (tailController.UniqueID == num)
 		{
@@ -7670,9 +8241,9 @@ public class Enemy : Character
 	{
 		int @int = data.GetInt(0, 0);
 		float @float = data.GetFloat(0, 0.8f);
-		if ((UnityEngine.Object)tailController == (UnityEngine.Object)null)
+		if (tailController == null)
 		{
-			Debug.LogError("Not found TailController!! ID:" + @int);
+			Debug.LogError((object)("Not found TailController!! ID:" + @int));
 		}
 		else if (tailController.UniqueID == @int)
 		{
@@ -7681,31 +8252,40 @@ public class Enemy : Character
 		}
 	}
 
-	private void EventRegionNodeActivate(AnimEventData.EventData data)
+	private unsafe void EventRegionNodeActivate(AnimEventData.EventData data)
 	{
 		if (data.intArgs.Length > 0 && data.stringArgs.Length > 0 && !string.IsNullOrEmpty(data.stringArgs[0]) && (IsCoopNone() || IsOriginal()))
 		{
 			bool flag = data.intArgs[0] == 1;
-			int[] array = (from a in data.stringArgs[0].Split(':')
-			select int.Parse(a)).ToArray();
-			int randomSelectedID = flag ? array[UnityEngine.Random.Range(0, array.Length)] : 0;
+			string[] source = data.stringArgs[0].Split(':');
+			if (_003C_003Ef__am_0024cacheA5 == null)
+			{
+				_003C_003Ef__am_0024cacheA5 = new Func<string, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			int[] array = source.Select<string, int>(_003C_003Ef__am_0024cacheA5).ToArray();
+			int randomSelectedID = flag ? array[Random.Range(0, array.Length)] : 0;
 			ActivateRegionNode(array, flag, randomSelectedID);
 		}
 	}
 
-	private void EventRegionNodeDeactivate(AnimEventData.EventData data)
+	private unsafe void EventRegionNodeDeactivate(AnimEventData.EventData data)
 	{
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 		if (data.stringArgs.Length > 0 && !string.IsNullOrEmpty(data.stringArgs[0]))
 		{
-			int[] array = (from a in data.stringArgs[0].Split(':')
-			select int.Parse(a)).ToArray();
+			string[] source = data.stringArgs[0].Split(':');
+			if (_003C_003Ef__am_0024cacheA6 == null)
+			{
+				_003C_003Ef__am_0024cacheA6 = new Func<string, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			int[] array = source.Select<string, int>(_003C_003Ef__am_0024cacheA6).ToArray();
 			foreach (int num in array)
 			{
 				for (int j = 0; j < regionRoots.Length; j++)
 				{
 					if (regionRoots[j].regionID == num)
 					{
-						regionRoots[j].gameObject.SetActive(false);
+						regionRoots[j].get_gameObject().SetActive(false);
 					}
 				}
 			}
@@ -7714,13 +8294,18 @@ public class Enemy : Character
 
 	protected override void EventCameraCutOn(AnimEventData.EventData data)
 	{
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && !FieldManager.IsValidInGameNoBoss() && data.floatArgs.Length >= 6)
 		{
-			Vector3 cutPos = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-			Vector3 euler = new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
+			Vector3 cutPos = default(Vector3);
+			cutPos._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+			Vector3 val = default(Vector3);
+			val._002Ector(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
 			InGameCameraManager i = MonoBehaviourSingleton<InGameCameraManager>.I;
 			i.SetCutPos(cutPos);
-			i.SetCutRot(Quaternion.Euler(euler));
+			i.SetCutRot(Quaternion.Euler(val));
 			i.SetCameraMode(InGameCameraManager.CAMERA_MODE.CUT);
 		}
 	}
@@ -7934,21 +8519,24 @@ public class Enemy : Character
 
 	private void SetBaseEffecActivateFlag(bool flag)
 	{
-		if (!((UnityEngine.Object)loader == (UnityEngine.Object)null))
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		if (!(loader == null))
 		{
-			if ((UnityEngine.Object)loader.baseEffect == (UnityEngine.Object)null)
+			if (loader.baseEffect == null)
 			{
 				Log.Warning("Not found baseEffect!!");
 			}
 			else
 			{
-				loader.baseEffect.gameObject.SetActive(flag);
+				loader.baseEffect.get_gameObject().SetActive(flag);
 			}
 		}
 	}
 
 	public void SetWarpVisible(float rate)
 	{
+		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
 		if (loader.materialParamsList != null)
 		{
 			rate = Mathf.Clamp(rate, 0f, 1f);
@@ -7958,24 +8546,24 @@ public class Enemy : Character
 			{
 				if (prm.hasVanishFlag)
 				{
-					float value = (!(rate <= 0f)) ? 1f : 0f;
-					prm.material.SetFloat(ID_VANISH_FLAG, value);
+					float num3 = (!(rate <= 0f)) ? 1f : 0f;
+					prm.material.SetFloat(ID_VANISH_FLAG, num3);
 				}
 				if (prm.hasVanishRate)
 				{
-					float value2 = 1f - rate;
-					prm.material.SetFloat(ID_VANISH_RATE, value2);
+					float num4 = 1f - rate;
+					prm.material.SetFloat(ID_VANISH_RATE, num4);
 				}
 			});
 			if (rate <= 0f)
 			{
 				hitOffFlag &= ~HIT_OFF_FLAG.INVICIBLE;
 				enableTargetPoint = true;
-				if ((UnityEngine.Object)loader.shadow != (UnityEngine.Object)null)
+				if (loader.shadow != null)
 				{
-					loader.shadow.gameObject.SetActive(true);
+					loader.shadow.get_gameObject().SetActive(true);
 				}
-				base._transform.GetComponentsInChildren(Temporary.fxList);
+				base._transform.GetComponentsInChildren<rymFX>(Temporary.fxList);
 				int i = 0;
 				for (int count = Temporary.fxList.Count; i < count; i++)
 				{
@@ -7989,7 +8577,7 @@ public class Enemy : Character
 					for (int count2 = regionWorks[j].bleedWorkList.Count; k < count2; k++)
 					{
 						BleedWork bleedWork = regionWorks[j].bleedWorkList[k];
-						if ((UnityEngine.Object)bleedWork.bleedEffect != (UnityEngine.Object)null)
+						if (bleedWork.bleedEffect != null)
 						{
 							EffectCtrl component = bleedWork.bleedEffect.GetComponent<EffectCtrl>();
 							if (!object.ReferenceEquals(component, null))
@@ -8012,11 +8600,11 @@ public class Enemy : Character
 			{
 				hitOffFlag |= HIT_OFF_FLAG.INVICIBLE;
 				enableTargetPoint = false;
-				if ((UnityEngine.Object)loader.shadow != (UnityEngine.Object)null)
+				if (loader.shadow != null)
 				{
-					loader.shadow.gameObject.SetActive(false);
+					loader.shadow.get_gameObject().SetActive(false);
 				}
-				base._transform.GetComponentsInChildren(Temporary.fxList);
+				base._transform.GetComponentsInChildren<rymFX>(Temporary.fxList);
 				int l = 0;
 				for (int count3 = Temporary.fxList.Count; l < count3; l++)
 				{
@@ -8030,7 +8618,7 @@ public class Enemy : Character
 					for (int count4 = regionWorks[m].bleedWorkList.Count; n < count4; n++)
 					{
 						BleedWork bleedWork2 = regionWorks[m].bleedWorkList[n];
-						if ((UnityEngine.Object)bleedWork2.bleedEffect != (UnityEngine.Object)null)
+						if (bleedWork2.bleedEffect != null)
 						{
 							EffectCtrl component3 = bleedWork2.bleedEffect.GetComponent<EffectCtrl>();
 							if (!object.ReferenceEquals(component3, null))
@@ -8054,17 +8642,18 @@ public class Enemy : Character
 
 	private void SetWarpInvisibleEffect(rymFX rym_fx, bool invisible)
 	{
-		if (!((UnityEngine.Object)rym_fx == (UnityEngine.Object)null))
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		if (!(rym_fx == null))
 		{
 			int num = invisible ? 1 : 0;
 			if (rym_fx.InvisibleFlags != num)
 			{
 				rym_fx.InvisibleFlags = num;
-				rym_fx.gameObject.GetComponentsInChildren(Temporary.rendererList);
+				rym_fx.get_gameObject().GetComponentsInChildren<Renderer>(Temporary.rendererList);
 				int i = 0;
 				for (int count = Temporary.rendererList.Count; i < count; i++)
 				{
-					Temporary.rendererList[i].enabled = !invisible;
+					Temporary.rendererList[i].set_enabled(!invisible);
 				}
 				Temporary.rendererList.Clear();
 			}
@@ -8073,10 +8662,48 @@ public class Enemy : Character
 
 	public void SetWarpToTarget(float warp_distance, bool reverse = false)
 	{
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
 		if (IsOriginal() || IsCoopNone())
 		{
-			Vector3 vector = _position;
-			if ((UnityEngine.Object)base.actionTarget != (UnityEngine.Object)null)
+			Vector3 val = _position;
+			if (base.actionTarget != null)
 			{
 				Vector3 position = _position;
 				position.y = 0f;
@@ -8084,17 +8711,17 @@ public class Enemy : Character
 				targetPosition.y = 0f;
 				if (targetPosition == position)
 				{
-					vector = position;
+					val = position;
 				}
 				else
 				{
-					Vector3 a = targetPosition - position;
-					float magnitude = a.magnitude;
-					a /= magnitude;
+					Vector3 val2 = targetPosition - position;
+					float magnitude = val2.get_magnitude();
+					val2 /= magnitude;
 					float num = 0f;
 					if (reverse)
 					{
-						a = -a;
+						val2 = -val2;
 						num = warp_distance;
 					}
 					else
@@ -8107,8 +8734,8 @@ public class Enemy : Character
 					}
 					while (true)
 					{
-						vector = position + a * num;
-						if (num <= 0f || MonoBehaviourSingleton<StageManager>.I.CheckPosInside(vector))
+						val = position + val2 * num;
+						if (num <= 0f || MonoBehaviourSingleton<StageManager>.I.CheckPosInside(val))
 						{
 							break;
 						}
@@ -8120,17 +8747,17 @@ public class Enemy : Character
 					}
 				}
 			}
-			if (_position != vector)
+			if (_position != val)
 			{
-				Vector3 vector2 = vector - _position;
-				vector2.y = 0f;
+				Vector3 val3 = val - _position;
+				val3.y = 0f;
 				if (reverse)
 				{
-					vector2 = -vector2;
+					val3 = -val3;
 				}
-				_rotation = Quaternion.LookRotation(vector2);
+				_rotation = Quaternion.LookRotation(val3);
 			}
-			_position = vector;
+			_position = val;
 			SetWarp();
 		}
 		else if (!warpWaitSync)
@@ -8142,10 +8769,24 @@ public class Enemy : Character
 
 	public void SetWarpToRandom(float warpMax, float warpMin)
 	{
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 		if (IsOriginal() || IsCoopNone())
 		{
-			SphereCollider x = base._collider as SphereCollider;
-			if (!((UnityEngine.Object)x == (UnityEngine.Object)null))
+			SphereCollider val = base._collider as SphereCollider;
+			if (!(val == null))
 			{
 				if (warpMin > warpMax)
 				{
@@ -8162,9 +8803,9 @@ public class Enemy : Character
 				_position = randomPosByInsideInfo;
 				if (position != randomPosByInsideInfo)
 				{
-					Vector3 forward = randomPosByInsideInfo - position;
-					forward.y = 0f;
-					_rotation = Quaternion.LookRotation(forward);
+					Vector3 val2 = randomPosByInsideInfo - position;
+					val2.y = 0f;
+					_rotation = Quaternion.LookRotation(val2);
 				}
 				SetWarp();
 			}
@@ -8181,7 +8822,7 @@ public class Enemy : Character
 		SetNextTrigger(0);
 		EndWaitingPacket(WAITING_PACKET.ENEMY_WARP);
 		warpWaitSync = false;
-		if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+		if (enemySender != null)
 		{
 			enemySender.OnSetWarp();
 		}
@@ -8210,7 +8851,7 @@ public class Enemy : Character
 		{
 			shotNetworkInfoQueue.Add(randomShotInfo);
 		}
-		if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+		if (enemySender != null)
 		{
 			enemySender.TargetRandamShotEvent(targets);
 		}
@@ -8239,7 +8880,7 @@ public class Enemy : Character
 		{
 			shotNetworkInfoQueue.Add(randomShotInfo);
 		}
-		if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+		if (enemySender != null)
 		{
 			enemySender.TargetRandamShotEvent(points);
 		}
@@ -8247,16 +8888,18 @@ public class Enemy : Character
 
 	private void UpdateRandomShot()
 	{
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 		int num = this.randomShotInfo.Count;
 		if (num > 0)
 		{
 			for (int i = 0; i < num; i++)
 			{
 				RandomShotInfo randomShotInfo = this.randomShotInfo[i];
-				randomShotInfo.countTime -= Time.deltaTime;
+				randomShotInfo.countTime -= Time.get_deltaTime();
 				if (randomShotInfo.targets.Count > randomShotInfo.shotCount)
 				{
-					randomShotInfo.countTime -= Time.deltaTime;
+					randomShotInfo.countTime -= Time.get_deltaTime();
 					if (randomShotInfo.countTime <= 0f)
 					{
 						AnimEventShot.Create(this, randomShotInfo.atkInfo, randomShotInfo.points[randomShotInfo.shotCount], randomShotInfo.targets[randomShotInfo.shotCount].rot, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
@@ -8298,9 +8941,11 @@ public class Enemy : Character
 
 	public override Vector3 GetTargetPosition(StageObject target)
 	{
-		if ((UnityEngine.Object)target == (UnityEngine.Object)null)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		if (target == null)
 		{
-			return Vector3.zero;
+			return Vector3.get_zero();
 		}
 		return target.GetPredictivePosition();
 	}
@@ -8316,11 +8961,19 @@ public class Enemy : Character
 
 	public override void ApplySyncPosition(Vector3 pos, float dir, bool force_sync = false)
 	{
-		_rotation = Quaternion.AngleAxis(dir, Vector3.up);
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+		_rotation = Quaternion.AngleAxis(dir, Vector3.get_up());
 		if (!force_sync && !isBoss)
 		{
 			float lesserEnemiesPositionMargin = enemyParameter.lesserEnemiesPositionMargin;
-			if ((_position - pos).sqrMagnitude < lesserEnemiesPositionMargin * lesserEnemiesPositionMargin)
+			Vector3 val = _position - pos;
+			if (val.get_sqrMagnitude() < lesserEnemiesPositionMargin * lesserEnemiesPositionMargin)
 			{
 				return;
 			}
@@ -8330,31 +8983,55 @@ public class Enemy : Character
 
 	public void SetAppearPosEnemy()
 	{
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
 		if (enemyPopIndex >= 0 && FieldManager.IsValidInGame())
 		{
 			FieldMapTable.EnemyPopTableData enemyPopData = Singleton<FieldMapTable>.I.GetEnemyPopData(MonoBehaviourSingleton<FieldManager>.I.currentMapID, enemyPopIndex);
 			if (enemyPopData != null)
 			{
 				bool valid = false;
-				Vector3 zero = Vector3.zero;
-				Quaternion rotation = Quaternion.identity;
-				float y = 0f;
+				Vector3 val = Vector3.get_zero();
+				Quaternion rotation = Quaternion.get_identity();
+				float num = 0f;
 				if (enemyPopData.enablePopY)
 				{
 					onTheGround = false;
-					y = enemyPopData.popY;
+					num = enemyPopData.popY;
 				}
 				if (MonoBehaviourSingleton<StageManager>.I.insideColliderData != null && enemyPopData.popRadius < MonoBehaviourSingleton<StageManager>.I.insideColliderData.chipSize * 0.5f * 1.42f)
 				{
-					zero = new Vector3(enemyPopData.popX, y, enemyPopData.popZ);
-					valid = MonoBehaviourSingleton<StageManager>.I.CheckPosInside(zero);
+					val._002Ector(enemyPopData.popX, num, enemyPopData.popZ);
+					valid = MonoBehaviourSingleton<StageManager>.I.CheckPosInside(val);
 				}
 				else
 				{
-					zero = MonoBehaviourSingleton<StageManager>.I.GetRandomPosByInsideInfo(new Vector3(enemyPopData.popX, y, enemyPopData.popZ), enemyPopData.popRadius, 0f, ref valid);
+					val = MonoBehaviourSingleton<StageManager>.I.GetRandomPosByInsideInfo(new Vector3(enemyPopData.popX, num, enemyPopData.popZ), enemyPopData.popRadius, 0f, ref valid);
 					if (!isHideSpawn)
 					{
-						rotation = ((!enemyPopData.enableRotY) ? Quaternion.AngleAxis(UnityEngine.Random.value * 360f, Vector3.up) : Quaternion.AngleAxis(enemyPopData.rotY, Vector3.up));
+						rotation = ((!enemyPopData.enableRotY) ? Quaternion.AngleAxis(Random.get_value() * 360f, Vector3.get_up()) : Quaternion.AngleAxis(enemyPopData.rotY, Vector3.get_up()));
 					}
 				}
 				if (!valid)
@@ -8365,23 +9042,25 @@ public class Enemy : Character
 				{
 					Vector3 bossAppearOffsetPos = MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.bossAppearOffsetPos;
 					float bossAppearAngleY = MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.bossAppearAngleY;
-					zero = bossAppearOffsetPos;
+					val = bossAppearOffsetPos;
 					rotation = Quaternion.Euler(0f, bossAppearAngleY, 0f);
 				}
 				walkSpeedRateFromTable = enemyPopData.GenerateWalkSpeed();
-				_position = zero;
+				_position = val;
 				_rotation = rotation;
-				SetAppearPos(zero);
+				SetAppearPos(val);
 			}
 		}
 		else
 		{
-			SetAppearPos(Vector3.zero);
+			SetAppearPos(Vector3.get_zero());
 		}
 	}
 
 	public void SetAppearPosForce(Vector3 pos, FieldMapTable.EnemyPopTableData popData)
 	{
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		if (popData != null)
 		{
 			walkSpeedRateFromTable = popData.GenerateWalkSpeed();
@@ -8454,13 +9133,13 @@ public class Enemy : Character
 		if (isBoss)
 		{
 			EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-			if (!((UnityEngine.Object)enemyBrain == (UnityEngine.Object)null))
+			if (!(enemyBrain == null))
 			{
 				GrabController grabController = enemyBrain.actionCtrl.grabController;
 				if ((grabController.releaseByWeakHit && isWeakHit) || (grabController.releaseBySpWeakHit && isSpWeakhit) || forceRelease)
 				{
 					enemyBrain.actionCtrl.grabController.ReleaseAll(angle, power);
-					if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+					if (enemySender != null)
 					{
 						enemySender.OnReleaseGrabbed(angle, power);
 					}
@@ -8472,9 +9151,10 @@ public class Enemy : Character
 
 	private void KeepRandomShot(AnimEventData.EventData data)
 	{
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		if (IsOriginal() || IsCoopNone())
 		{
-			StartCoroutine(DoShotAutomaticRandom(data.stringArgs[0], data.floatArgs[0], data.floatArgs[1], data.floatArgs[2], data.intArgs[0]));
+			this.StartCoroutine(DoShotAutomaticRandom(data.stringArgs[0], data.floatArgs[0], data.floatArgs[1], data.floatArgs[2], data.intArgs[0]));
 		}
 	}
 
@@ -8490,16 +9170,16 @@ public class Enemy : Character
 		float lastShotTime = 0f;
 		while (timer < duration && !base.isDead)
 		{
-			timer += Time.deltaTime;
+			timer += Time.get_deltaTime();
 			if (timer - lastShotTime > interval)
 			{
 				pointList.Clear();
 				for (int i = 0; i < shotNum; i++)
 				{
-					Vector3 offset2 = Vector3.forward * UnityEngine.Random.Range(3f, range);
-					Quaternion dirRotation = Quaternion.AngleAxis(UnityEngine.Random.Range(0f, 360f), Vector3.up);
+					Vector3 offset2 = Vector3.get_forward() * Random.Range(3f, range);
+					Quaternion dirRotation = Quaternion.AngleAxis(Random.Range(0f, 360f), Vector3.get_up());
 					offset2 = dirRotation * offset2;
-					pointList.Add(offset2 + base._transform.position);
+					pointList.Add(offset2 + base._transform.get_position());
 				}
 				ActShotBullet(atkName, pointList, rotList);
 				lastShotTime = timer;
@@ -8510,19 +9190,31 @@ public class Enemy : Character
 
 	public void ActShotBullet(string atkName, List<Vector3> posList, List<Quaternion> rotList)
 	{
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		AttackInfo atk_info = FindAttackInfo(atkName, true, false);
-		Vector3 position = base._transform.position;
+		Vector3 position = base._transform.get_position();
 		for (int i = 0; i < posList.Count; i++)
 		{
 			Vector3 pos = posList[i] - position;
-			Quaternion rot = Quaternion.identity;
+			Quaternion rot = Quaternion.get_identity();
 			if (i < rotList.Count)
 			{
 				rot = rotList[i];
 			}
 			AnimEventShot.Create(this, atk_info, pos, rot, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
 		}
-		if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+		if (enemySender != null)
 		{
 			enemySender.OnShotBullet(atkName, posList, rotList);
 		}
@@ -8530,6 +9222,18 @@ public class Enemy : Character
 
 	private void EventCreateIceFloor(AnimEventData.EventData data)
 	{
+		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
 		string text = data.stringArgs[0];
 		BulletData.BulletIceFloor.TARGETING_TYPE tARGETING_TYPE = (BulletData.BulletIceFloor.TARGETING_TYPE)data.intArgs[0];
 		List<Vector3> list = new List<Vector3>(4);
@@ -8542,7 +9246,7 @@ public class Enemy : Character
 		else
 		{
 			BulletData bulletData = attackInfo.bulletData;
-			if ((UnityEngine.Object)bulletData == (UnityEngine.Object)null)
+			if (bulletData == null)
 			{
 				Log.Error("[CREATE_ICE_FLOOR]BulletData is not found");
 			}
@@ -8558,12 +9262,12 @@ public class Enemy : Character
 				{
 				case BulletData.BulletIceFloor.TARGETING_TYPE.NONE:
 				{
-					Vector3 item = Vector3.zero;
+					Vector3 zero = Vector3.get_zero();
 					if (data.floatArgs.Length >= 3)
 					{
-						item = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+						zero._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
 					}
-					list.Add(item);
+					list.Add(zero);
 					break;
 				}
 				case BulletData.BulletIceFloor.TARGETING_TYPE.NODE_OFFSET:
@@ -8574,23 +9278,23 @@ public class Enemy : Character
 						return;
 					}
 					string name = data.stringArgs[1];
-					Transform transform = FindNode(name);
-					if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
+					Transform val = FindNode(name);
+					if (val == null)
 					{
 						Log.Error("[CREATE_ICE_FLOOR]AnimEventData Node is not found");
 						return;
 					}
-					Vector3 b = Vector3.zero;
+					Vector3 zero2 = Vector3.get_zero();
 					if (data.floatArgs.Length >= 3)
 					{
-						b = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+						zero2._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
 					}
-					Vector3 item2 = transform.position + b;
-					list.Add(item2);
+					Vector3 item = val.get_position() + zero2;
+					list.Add(item);
 					break;
 				}
 				case BulletData.BulletIceFloor.TARGETING_TYPE.RANDOM_CHOICE:
-					list.Add(playerList[UnityEngine.Random.Range(0, count)]._position);
+					list.Add(playerList[Random.Range(0, count)]._position);
 					break;
 				case BulletData.BulletIceFloor.TARGETING_TYPE.ALL_PLAYERS:
 					for (int i = 0; i < count; i++)
@@ -8600,7 +9304,7 @@ public class Enemy : Character
 					break;
 				}
 				ActCreateIceFloor(bulletData, list, list2);
-				if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+				if (enemySender != null)
 				{
 					enemySender.OnCreateIceFloor(text, list, list2);
 				}
@@ -8611,10 +9315,10 @@ public class Enemy : Character
 	public void ActCreateIceFloor(string attackInfoName, List<Vector3> posList, List<Quaternion> rotList)
 	{
 		AttackInfo attackInfo = FindAttackInfo(attackInfoName, true, false);
-		if (attackInfo != null && !((UnityEngine.Object)attackInfo.bulletData == (UnityEngine.Object)null))
+		if (attackInfo != null && !(attackInfo.bulletData == null))
 		{
 			BulletData bulletData = attackInfo.bulletData;
-			if (!((UnityEngine.Object)bulletData == (UnityEngine.Object)null))
+			if (!(bulletData == null))
 			{
 				ActCreateIceFloor(bulletData, posList, rotList);
 			}
@@ -8623,18 +9327,22 @@ public class Enemy : Character
 
 	public void ActCreateIceFloor(BulletData bulletData, List<Vector3> posList, List<Quaternion> rotList)
 	{
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 		string effectName = bulletData.data.effectName;
 		for (int i = 0; i < posList.Count; i++)
 		{
-			Transform transform = Utility.CreateGameObject(bulletData.name, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-			transform.position = posList[i];
-			transform.gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
-			Transform effect = EffectManager.GetEffect(effectName, transform);
-			if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
+			Transform val = Utility.CreateGameObject(bulletData.get_name(), MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
+			val.set_position(posList[i]);
+			val.get_gameObject().set_layer(LayerMask.NameToLayer("EnemyBullet"));
+			Transform effect = EffectManager.GetEffect(effectName, val);
+			if (effect != null)
 			{
-				effect.localScale = Vector3.one;
+				effect.set_localScale(Vector3.get_one());
 			}
-			IceFloor iceFloor = transform.gameObject.AddComponent<IceFloor>();
+			IceFloor iceFloor = val.get_gameObject().AddComponent<IceFloor>();
 			iceFloor.duration = bulletData.dataIceFloor.duration;
 			iceFloor.SetCollider(bulletData.data.radius, 2f);
 			iceFloor.SetEffect(effect);
@@ -8644,7 +9352,7 @@ public class Enemy : Character
 	public void EventActionModeIdChange(AnimEventData.EventData data)
 	{
 		EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-		if (!((UnityEngine.Object)enemyBrain == (UnityEngine.Object)null))
+		if (!(enemyBrain == null))
 		{
 			EnemyActionController actionCtrl = enemyBrain.actionCtrl;
 			if (actionCtrl != null)
@@ -8699,7 +9407,7 @@ public class Enemy : Character
 	public void EventTargetChangeHateRanking(AnimEventData.EventData data)
 	{
 		EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-		if (!((UnityEngine.Object)enemyBrain == (UnityEngine.Object)null))
+		if (!(enemyBrain == null))
 		{
 			int num = data.intArgs[0];
 			bool isIncludeDead = (data.intArgs[1] == 0) ? true : false;
@@ -8709,7 +9417,7 @@ public class Enemy : Character
 				int num2 = num - 1;
 				if (num == 0)
 				{
-					num2 = UnityEngine.Random.Range(0, hateRankingObjects.Length);
+					num2 = Random.Range(0, hateRankingObjects.Length);
 				}
 				if (0 <= num2 && num2 < hateRankingObjects.Length)
 				{
@@ -8868,7 +9576,7 @@ public class Enemy : Character
 			for (int count = playerList.Count; i < count; i++)
 			{
 				Player player = playerList[i] as Player;
-				if (!((UnityEngine.Object)player == (UnityEngine.Object)null))
+				if (!(player == null))
 				{
 					player.OnBuffCancellation();
 				}
@@ -8891,7 +9599,7 @@ public class Enemy : Character
 
 	private void EventSyncActionTarget(AnimEventData.EventData data)
 	{
-		if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+		if (enemySender != null)
 		{
 			enemySender.OnEnemySyncTarget(base.actionTarget);
 		}
@@ -8899,6 +9607,10 @@ public class Enemy : Character
 
 	protected override void EventCameraTargetOffsetOn(AnimEventData.EventData data)
 	{
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
 			float[] floatArgs = data.floatArgs;
@@ -8923,7 +9635,7 @@ public class Enemy : Character
 		switch (base.actionID)
 		{
 		case (ACTION_ID)17:
-			if (m_dizzyTime - Time.time <= 0f)
+			if (m_dizzyTime - Time.get_time() <= 0f)
 			{
 				SetNextTrigger(0);
 			}
@@ -8972,7 +9684,7 @@ public class Enemy : Character
 			{
 				Log.Error(LOG.INGAME, "Invalid GatherPointViewID enemyId:" + enemyID + " ViewID:" + gatherPointViewId);
 			}
-			else if (!string.IsNullOrEmpty(viewData.gatherEffectName) && (UnityEngine.Object)gatherEffect == (UnityEngine.Object)null)
+			else if (!string.IsNullOrEmpty(viewData.gatherEffectName) && gatherEffect == null)
 			{
 				gatherEffect = EffectManager.GetEffect(viewData.gatherEffectName, base._transform);
 			}
@@ -8993,59 +9705,86 @@ public class Enemy : Character
 
 	private void _TurnUp()
 	{
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Expected O, but got Unknown
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Expected O, but got Unknown
 		isHiding = false;
 		enemySender.OnTurnUp();
 		SetColliderStatuses(true);
-		if ((UnityEngine.Object)targetEffect != (UnityEngine.Object)null)
+		if (targetEffect != null)
 		{
-			EffectManager.ReleaseEffect(targetEffect.gameObject, true, false);
+			EffectManager.ReleaseEffect(targetEffect.get_gameObject(), true, false);
 		}
-		if ((UnityEngine.Object)gatherEffect != (UnityEngine.Object)null)
+		if (gatherEffect != null)
 		{
-			EffectManager.ReleaseEffect(gatherEffect.gameObject, true, false);
+			EffectManager.ReleaseEffect(gatherEffect.get_gameObject(), true, false);
 		}
 	}
 
 	public void UpdateGatherTargetMarker(bool isNear)
 	{
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0152: Expected O, but got Unknown
 		if (isHiding)
 		{
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 			float num = 0f;
-			if ((UnityEngine.Object)self != (UnityEngine.Object)null)
+			if (self != null)
 			{
-				num = Vector3.Distance(base._transform.position, self._position);
+				num = Vector3.Distance(base._transform.get_position(), self._position);
 			}
-			if ((UnityEngine.Object)self != (UnityEngine.Object)null && num <= viewData.targetRadius)
+			if (self != null && num <= viewData.targetRadius)
 			{
-				if ((UnityEngine.Object)targetEffect == (UnityEngine.Object)null && !string.IsNullOrEmpty(viewData.targetEffectName))
+				if (targetEffect == null && !string.IsNullOrEmpty(viewData.targetEffectName))
 				{
 					targetEffect = EffectManager.GetEffect(viewData.targetEffectName, base._transform);
 				}
-				if ((UnityEngine.Object)targetEffect != (UnityEngine.Object)null)
+				if (targetEffect != null)
 				{
 					Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-					Vector3 position = cameraTransform.position;
-					Quaternion rotation = cameraTransform.rotation;
-					Vector3 pos = (position - base._transform.position).normalized * viewData.targetEffectShift + Vector3.up * viewData.targetEffectHeight + base._transform.position;
+					Vector3 position = cameraTransform.get_position();
+					Quaternion rotation = cameraTransform.get_rotation();
+					Vector3 val = position - base._transform.get_position();
+					Vector3 pos = val.get_normalized() * viewData.targetEffectShift + Vector3.get_up() * viewData.targetEffectHeight + base._transform.get_position();
 					targetEffect.Set(pos, rotation);
 				}
 			}
-			else if ((UnityEngine.Object)targetEffect != (UnityEngine.Object)null)
+			else if (targetEffect != null)
 			{
-				EffectManager.ReleaseEffect(targetEffect.gameObject, true, false);
+				EffectManager.ReleaseEffect(targetEffect.get_gameObject(), true, false);
 			}
 		}
 	}
 
 	private void SetColliderStatuses(bool enabled)
 	{
-		base._collider.enabled = enabled;
+		base._collider.set_enabled(enabled);
 		if (colliders != null)
 		{
 			for (int i = 0; i < colliders.Length; i++)
 			{
-				colliders[i].enabled = enabled;
+				colliders[i].set_enabled(enabled);
 			}
 		}
 	}
@@ -9122,8 +9861,8 @@ public class Enemy : Character
 			float matCapPow = 0f;
 			while (duration > 0f)
 			{
-				duration -= Time.deltaTime;
-				matCapPow += Time.deltaTime;
+				duration -= Time.get_deltaTime();
+				matCapPow += Time.get_deltaTime();
 				if (matCapPow >= 1f)
 				{
 					matCapPow = 1f;
@@ -9132,7 +9871,7 @@ public class Enemy : Character
 				{
 					if (material.HasProperty("_MatCapPow"))
 					{
-						material.SetFloat("_MatCapPow", ((_003CSetShieldShaderParam_003Ec__Iterator1DB)/*Error near IL_009b: stateMachine*/)._003CmatCapPow_003E__1);
+						material.SetFloat("_MatCapPow", ((_003CSetShieldShaderParam_003Ec__Iterator1E2)/*Error near IL_009b: stateMachine*/)._003CmatCapPow_003E__1);
 					}
 				});
 				yield return (object)null;
@@ -9178,6 +9917,8 @@ public class Enemy : Character
 
 	public virtual void ActLightRing()
 	{
+		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsDebuffShadowSealing() || !shadowSealingStackDebuff.Contains((ACTION_ID)21))
 		{
 			ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
@@ -9194,9 +9935,9 @@ public class Enemy : Character
 				EndAction();
 				base.actionID = (ACTION_ID)21;
 				PlayMotion(6, (!(stopMotionByDebuffNormalizedTime < 0f)) ? 0f : (-1f));
-				if ((UnityEngine.Object)base._rigidbody != (UnityEngine.Object)null)
+				if (base._rigidbody != null)
 				{
-					base._rigidbody.velocity = Vector3.zero;
+					base._rigidbody.set_velocity(Vector3.get_zero());
 				}
 				rotateEventKeep = false;
 				rotateToTargetFlag = false;
@@ -9206,14 +9947,14 @@ public class Enemy : Character
 			InGameSettingsManager.LightRingParam lightRingParam = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.lightRingParam;
 			if (lightRingParam.startSeId != 0)
 			{
-				SoundManager.PlayOneShotSE(lightRingParam.startSeId, base._transform.position);
+				SoundManager.PlayOneShotSE(lightRingParam.startSeId, base._transform.get_position());
 			}
 			if (lightRingParam.loopSeId != 0)
 			{
 				SoundManager.PlayLoopSE(lightRingParam.loopSeId, this, base._transform);
 			}
 			OnActReaction();
-			lightRingTime = Time.time + lightRingParam.duration;
+			lightRingTime = Time.get_time() + lightRingParam.duration;
 			if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
 			{
 				MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
@@ -9223,7 +9964,9 @@ public class Enemy : Character
 
 	protected bool UpdateLightRingAction()
 	{
-		if (lightRingTime - Time.time <= 0f)
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		if (lightRingTime - Time.get_time() <= 0f)
 		{
 			ActLightRingEnd();
 			return true;
@@ -9234,7 +9977,7 @@ public class Enemy : Character
 			num = stopMotionByDebuffNormalizedTime;
 		}
 		AnimatorStateInfo currentAnimatorStateInfo = base.animator.GetCurrentAnimatorStateInfo(0);
-		if (currentAnimatorStateInfo.normalizedTime < num || currentAnimatorStateInfo.fullPathHash != Animator.StringToHash("Base Layer.damage"))
+		if (currentAnimatorStateInfo.get_normalizedTime() < num || currentAnimatorStateInfo.get_fullPathHash() != Animator.StringToHash("Base Layer.damage"))
 		{
 			return false;
 		}
@@ -9249,12 +9992,15 @@ public class Enemy : Character
 
 	protected virtual void ActLightRingEnd()
 	{
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Expected O, but got Unknown
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 		if (IsLightRing())
 		{
 			badStatusMax.lightRing *= 1.5f;
-			if ((UnityEngine.Object)effectLightRing != (UnityEngine.Object)null)
+			if (effectLightRing != null)
 			{
-				EffectManager.ReleaseEffect(effectLightRing.gameObject, true, false);
+				EffectManager.ReleaseEffect(effectLightRing.get_gameObject(), true, false);
 				effectLightRing = null;
 			}
 			if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
@@ -9269,7 +10015,7 @@ public class Enemy : Character
 			}
 			if (lightRingParam.endSeId != 0)
 			{
-				SoundManager.PlayOneShotSE(lightRingParam.endSeId, base._transform.position);
+				SoundManager.PlayOneShotSE(lightRingParam.endSeId, base._transform.get_position());
 			}
 			if (IsDebuffShadowSealing())
 			{
@@ -9288,23 +10034,31 @@ public class Enemy : Character
 
 	public override bool IsLightRing()
 	{
-		return (UnityEngine.Object)effectLightRing != (UnityEngine.Object)null;
+		return effectLightRing != null;
 	}
 
 	protected void CreateLightRingEffect()
 	{
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 		if (object.ReferenceEquals(effectLightRing, null))
 		{
 			Transform effect = EffectManager.GetEffect("ef_btl_enm_bindring_01", base._transform);
-			if (!((UnityEngine.Object)effect == (UnityEngine.Object)null))
+			if (!(effect == null))
 			{
 				ParticleSystem[] componentsInChildren = effect.GetComponentsInChildren<ParticleSystem>(true);
 				if (componentsInChildren != null)
 				{
 					CalcLightRingRadius();
-					effect.localScale *= lightRingRadius;
-					float d = lightRingHeight + lightRingHeightOffset;
-					effect.localPosition += Vector3.up * d;
+					Transform obj = effect;
+					obj.set_localScale(obj.get_localScale() * lightRingRadius);
+					float num = lightRingHeight + lightRingHeightOffset;
+					Transform obj2 = effect;
+					obj2.set_localPosition(obj2.get_localPosition() + Vector3.get_up() * num);
 					effectLightRing = effect;
 				}
 			}
@@ -9313,25 +10067,27 @@ public class Enemy : Character
 
 	private void CalcLightRingRadius()
 	{
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
 		if (!(lightRingRadius > 0f))
 		{
 			lightRingRadius = 1f;
 			lightRingHeight = 1f;
-			if (!((UnityEngine.Object)base._collider == (UnityEngine.Object)null))
+			if (!(base._collider == null))
 			{
 				float num = 1f;
-				SphereCollider sphereCollider = base._collider as SphereCollider;
-				if ((UnityEngine.Object)sphereCollider != (UnityEngine.Object)null)
+				SphereCollider val = base._collider as SphereCollider;
+				if (val != null)
 				{
-					num = sphereCollider.radius;
+					num = val.get_radius();
 				}
-				CapsuleCollider capsuleCollider = base._collider as CapsuleCollider;
-				if ((UnityEngine.Object)capsuleCollider != (UnityEngine.Object)null)
+				CapsuleCollider val2 = base._collider as CapsuleCollider;
+				if (val2 != null)
 				{
-					num = capsuleCollider.radius;
+					num = val2.get_radius();
 				}
 				float num2 = num;
-				Vector3 localScale = base._transform.localScale;
+				Vector3 localScale = base._transform.get_localScale();
 				lightRingRadius = (lightRingHeight = num2 * localScale.x) * 0.33f;
 				lightRingRadius = Mathf.Clamp(lightRingRadius, 0.5f, 1.5f);
 			}
@@ -9340,6 +10096,8 @@ public class Enemy : Character
 
 	public virtual void ActDebuffShadowSealingStart()
 	{
+		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsDebuffShadowSealing())
 		{
 			EndAction();
@@ -9357,15 +10115,15 @@ public class Enemy : Character
 			CreateShadowSealingEffect();
 			if (shadowSealingParam.startSeId != 0)
 			{
-				SoundManager.PlayOneShotSE(shadowSealingParam.startSeId, base._transform.position);
+				SoundManager.PlayOneShotSE(shadowSealingParam.startSeId, base._transform.get_position());
 			}
 			if (shadowSealingParam.loopSeId != 0)
 			{
 				SoundManager.PlayLoopSE(shadowSealingParam.loopSeId, this, base._transform);
 			}
-			if ((UnityEngine.Object)base._rigidbody != (UnityEngine.Object)null)
+			if (base._rigidbody != null)
 			{
-				base._rigidbody.velocity = Vector3.zero;
+				base._rigidbody.set_velocity(Vector3.get_zero());
 			}
 			rotateEventKeep = false;
 			rotateToTargetFlag = false;
@@ -9381,35 +10139,42 @@ public class Enemy : Character
 
 	private void CreateShadowSealingEffect()
 	{
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 		debuffShadowSealingEffect = EffectManager.GetEffect("ef_btl_wsk_bow_01_04", base._transform);
 		if (!object.ReferenceEquals(debuffShadowSealingEffect, null))
 		{
 			CalcShadowSealingEffectRadius();
-			debuffShadowSealingEffect.localScale *= debuffShadowSealingRadius;
+			Transform obj = debuffShadowSealingEffect;
+			obj.set_localScale(obj.get_localScale() * debuffShadowSealingRadius);
 		}
 	}
 
 	private void CalcShadowSealingEffectRadius()
 	{
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 		if (!(debuffShadowSealingRadius > 0f))
 		{
 			debuffShadowSealingRadius = 1f;
-			if (!((UnityEngine.Object)base._collider == (UnityEngine.Object)null))
+			if (!(base._collider == null))
 			{
-				SphereCollider sphereCollider = base._collider as SphereCollider;
-				if ((UnityEngine.Object)sphereCollider != (UnityEngine.Object)null)
+				SphereCollider val = base._collider as SphereCollider;
+				if (val != null)
 				{
-					float num = sphereCollider.radius / 4f;
-					Vector3 localScale = base._transform.localScale;
+					float num = val.get_radius() / 4f;
+					Vector3 localScale = base._transform.get_localScale();
 					debuffShadowSealingRadius = num * localScale.x;
 				}
 				else
 				{
-					CapsuleCollider capsuleCollider = base._collider as CapsuleCollider;
-					if ((UnityEngine.Object)capsuleCollider != (UnityEngine.Object)null)
+					CapsuleCollider val2 = base._collider as CapsuleCollider;
+					if (val2 != null)
 					{
-						float num2 = capsuleCollider.radius / 4f;
-						Vector3 localScale2 = base._transform.localScale;
+						float num2 = val2.get_radius() / 4f;
+						Vector3 localScale2 = base._transform.get_localScale();
 						debuffShadowSealingRadius = num2 * localScale2.x;
 					}
 				}
@@ -9419,6 +10184,12 @@ public class Enemy : Character
 
 	protected virtual void ActDebuffShadowSealingEnd()
 	{
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016d: Expected O, but got Unknown
+		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0197: Expected O, but got Unknown
+		//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
 		if (IsDebuffShadowSealing())
 		{
 			bool flag = true;
@@ -9441,9 +10212,9 @@ public class Enemy : Character
 					EndAction();
 					base.actionID = (ACTION_ID)21;
 					PlayMotion(6, (!(stopMotionByDebuffNormalizedTime < 0f)) ? 0f : (-1f));
-					if ((UnityEngine.Object)base._rigidbody != (UnityEngine.Object)null)
+					if (base._rigidbody != null)
 					{
-						base._rigidbody.velocity = Vector3.zero;
+						base._rigidbody.set_velocity(Vector3.get_zero());
 					}
 					rotateEventKeep = false;
 					rotateToTargetFlag = false;
@@ -9479,12 +10250,12 @@ public class Enemy : Character
 			}
 			if (!object.ReferenceEquals(paralyzeEffectTrans, null))
 			{
-				EffectManager.ReleaseEffect(paralyzeEffectTrans.gameObject, true, false);
+				EffectManager.ReleaseEffect(paralyzeEffectTrans.get_gameObject(), true, false);
 				paralyzeEffectTrans = null;
 			}
 			if (!object.ReferenceEquals(debuffShadowSealingEffect, null))
 			{
-				EffectManager.ReleaseEffect(debuffShadowSealingEffect.gameObject, true, false);
+				EffectManager.ReleaseEffect(debuffShadowSealingEffect.get_gameObject(), true, false);
 				debuffShadowSealingEffect = null;
 			}
 			InGameSettingsManager.ShadowSealingParam shadowSealingParam = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.shadowSealingParam;
@@ -9494,7 +10265,7 @@ public class Enemy : Character
 			}
 			if (shadowSealingParam.endSeId != 0)
 			{
-				SoundManager.PlayOneShotSE(shadowSealingParam.endSeId, base._transform.position);
+				SoundManager.PlayOneShotSE(shadowSealingParam.endSeId, base._transform.get_position());
 			}
 			badStatusMax.shadowSealing *= shadowSealingParam.resistRate;
 			badStatusMax.shadowSealingBind *= shadowSealingBindResist;
@@ -9519,9 +10290,11 @@ public class Enemy : Character
 
 	private void UpdateDebuffShadowSealingAction()
 	{
+		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
 		if (IsDebuffShadowSealing())
 		{
-			debuffShadowSealingTimer -= Time.deltaTime;
+			debuffShadowSealingTimer -= Time.get_deltaTime();
 			if (debuffShadowSealingTimer <= 0f)
 			{
 				ActDebuffShadowSealingEnd();
@@ -9557,7 +10330,7 @@ public class Enemy : Character
 					num = stopMotionByDebuffNormalizedTime;
 				}
 				AnimatorStateInfo currentAnimatorStateInfo = base.animator.GetCurrentAnimatorStateInfo(0);
-				if (!(currentAnimatorStateInfo.normalizedTime < num) && currentAnimatorStateInfo.fullPathHash == Animator.StringToHash("Base Layer.damage") && !m_isStopMotionByDebuff)
+				if (!(currentAnimatorStateInfo.get_normalizedTime() < num) && currentAnimatorStateInfo.get_fullPathHash() == Animator.StringToHash("Base Layer.damage") && !m_isStopMotionByDebuff)
 				{
 					setPause(true);
 					m_isStopMotionByDebuff = true;
@@ -9568,7 +10341,7 @@ public class Enemy : Character
 
 	public override bool IsDebuffShadowSealing()
 	{
-		return (UnityEngine.Object)debuffShadowSealingEffect != (UnityEngine.Object)null;
+		return debuffShadowSealingEffect != null;
 	}
 
 	public float GetDebuffShadowSealingTimeRate()
@@ -9578,6 +10351,10 @@ public class Enemy : Character
 
 	public void CountShadowSealingTarget()
 	{
+		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012a: Expected O, but got Unknown
+		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ad: Expected O, but got Unknown
 		shadowSealingTarget = 0;
 		if (isBoss && !object.ReferenceEquals(regionWorks, null) && !targetPoints.IsNullOrEmpty())
 		{
@@ -9602,7 +10379,7 @@ public class Enemy : Character
 							BleedWork bleedWork = enemyRegionWork.bleedWorkList[k];
 							if (!object.ReferenceEquals(bleedWork, null) && !object.ReferenceEquals(bleedWork.bleedEffect, null))
 							{
-								EffectManager.ReleaseEffect(bleedWork.bleedEffect.gameObject, true, false);
+								EffectManager.ReleaseEffect(bleedWork.bleedEffect.get_gameObject(), true, false);
 								bleedWork.bleedEffect = null;
 							}
 						}
@@ -9613,7 +10390,7 @@ public class Enemy : Character
 						enemyRegionWork.shadowSealingData.extendRate = 1f;
 						if (!object.ReferenceEquals(enemyRegionWork.shadowSealingEffect, null))
 						{
-							EffectManager.ReleaseEffect(enemyRegionWork.shadowSealingEffect.gameObject, false, true);
+							EffectManager.ReleaseEffect(enemyRegionWork.shadowSealingEffect.get_gameObject(), false, true);
 							enemyRegionWork.shadowSealingEffect = null;
 						}
 					}
@@ -9629,7 +10406,7 @@ public class Enemy : Character
 			{
 				ActDebuffShadowSealingStart();
 			}
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null)
+			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
 			{
 				MonoBehaviourSingleton<StageObjectManager>.I.self.ResetShadowSealingUI();
 			}
@@ -9732,7 +10509,7 @@ public class Enemy : Character
 	public OpponentMemory.OpponentRecord[] GetHateRankingObjects(bool isIncludeDead)
 	{
 		EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-		if ((UnityEngine.Object)enemyBrain != (UnityEngine.Object)null)
+		if (enemyBrain != null)
 		{
 			return enemyBrain.opponentMem.GetOpponentWithRankingHate(isIncludeDead, 4);
 		}
@@ -9867,7 +10644,7 @@ public class Enemy : Character
 			}
 			bulletObservableList.RemoveAll((IBulletObservable o) => o.GetObservedID() == brokenBulletID);
 			bulletObservableIdList.RemoveAll((int o) => o == brokenBulletID);
-			if ((UnityEngine.Object)enemySender != (UnityEngine.Object)null)
+			if (enemySender != null)
 			{
 				enemySender.OnBulletObservableBroken(brokenBulletID, isSendOnlyOrigin);
 			}

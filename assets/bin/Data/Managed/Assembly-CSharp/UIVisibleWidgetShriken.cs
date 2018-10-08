@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIVisibleWidgetShriken : MonoBehaviour
+public class UIVisibleWidgetShriken
 {
 	private UIPanel panel;
 
@@ -12,6 +12,11 @@ public class UIVisibleWidgetShriken : MonoBehaviour
 
 	private Transform[] children;
 
+	public UIVisibleWidgetShriken()
+		: this()
+	{
+	}
+
 	public static void Set(UIPanel panel, UIWidget widget)
 	{
 		Set(panel, widget, null);
@@ -19,12 +24,19 @@ public class UIVisibleWidgetShriken : MonoBehaviour
 
 	public static void Set(UIPanel panel, UIWidget widget, string current_section_name)
 	{
-		if (!((Object)widget == (Object)null))
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a3: Expected O, but got Unknown
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		if (!(widget == null))
 		{
 			UIVisibleWidgetShriken uIVisibleWidgetShriken = widget.GetComponent<UIVisibleWidgetShriken>();
-			if ((Object)uIVisibleWidgetShriken == (Object)null)
+			if (uIVisibleWidgetShriken == null)
 			{
-				uIVisibleWidgetShriken = widget.gameObject.AddComponent<UIVisibleWidgetShriken>();
+				uIVisibleWidgetShriken = widget.get_gameObject().AddComponent<UIVisibleWidgetShriken>();
 			}
 			uIVisibleWidgetShriken.panel = panel;
 			uIVisibleWidgetShriken.widget = widget;
@@ -32,12 +44,12 @@ public class UIVisibleWidgetShriken : MonoBehaviour
 			{
 				uIVisibleWidgetShriken.sectionName = (current_section_name ?? MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName());
 			}
-			if (uIVisibleWidgetShriken.transform.childCount > 0)
+			if (uIVisibleWidgetShriken.get_transform().get_childCount() > 0)
 			{
-				uIVisibleWidgetShriken.children = new Transform[uIVisibleWidgetShriken.transform.childCount];
-				for (int i = 0; i < uIVisibleWidgetShriken.transform.childCount; i++)
+				uIVisibleWidgetShriken.children = (Transform[])new Transform[uIVisibleWidgetShriken.get_transform().get_childCount()];
+				for (int i = 0; i < uIVisibleWidgetShriken.get_transform().get_childCount(); i++)
 				{
-					uIVisibleWidgetShriken.children[i] = uIVisibleWidgetShriken.transform.GetChild(i);
+					uIVisibleWidgetShriken.children[i] = uIVisibleWidgetShriken.get_transform().GetChild(i);
 				}
 			}
 		}
@@ -45,10 +57,10 @@ public class UIVisibleWidgetShriken : MonoBehaviour
 
 	public static void Remove(UIWidget widget)
 	{
-		if (!((Object)widget == (Object)null))
+		if (!(widget == null))
 		{
 			UIVisibleWidgetShriken component = widget.GetComponent<UIVisibleWidgetShriken>();
-			if ((Object)component != (Object)null)
+			if (component != null)
 			{
 				Object.Destroy(component);
 			}
@@ -57,19 +69,21 @@ public class UIVisibleWidgetShriken : MonoBehaviour
 
 	private void LateUpdate()
 	{
-		if ((Object)panel != (Object)null && children != null)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		if (panel != null && children != null)
 		{
 			bool active = IsVisibleCompletely(panel, widget);
 			for (int i = 0; i < children.Length; i++)
 			{
-				children[i].gameObject.SetActive(active);
+				children[i].get_gameObject().SetActive(active);
 			}
 		}
 	}
 
 	public bool IsVisibleCompletely(UIPanel p, UIWidget w)
 	{
-		if ((Object)p == (Object)null || (Object)w == (Object)null)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		if (p == null || w == null)
 		{
 			return true;
 		}

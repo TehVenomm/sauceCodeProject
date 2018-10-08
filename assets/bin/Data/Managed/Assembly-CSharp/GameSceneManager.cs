@@ -110,14 +110,15 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		global = new GameSceneGlobalSettings();
 		history = new GameSectionHistory();
 		hierarchy = new GameSectionHierarchy();
-		UnityEngine.Object.DontDestroyOnLoad(this);
+		Object.DontDestroyOnLoad(this);
 		GameSceneEvent.Initialize();
 		MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += global.OnScreenRotate;
 	}
 
 	public void Initialize()
 	{
-		StartCoroutine(DoInitialize());
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -136,9 +137,9 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		isInitialized = true;
 	}
 
-	private void OnEnable()
+	private unsafe void OnEnable()
 	{
-		MonoBehaviourSingleton<ResourceManager>.I.onDownloadErrorQuery = OnDownloadErrorQuery;
+		MonoBehaviourSingleton<ResourceManager>.I.onDownloadErrorQuery = new Func<bool, Error, int>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 	}
 
 	protected override void OnDisable()
@@ -177,10 +178,11 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 
 	public virtual void SetNotify(GameSection.NOTIFY_FLAG flag)
 	{
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		notifyFlags |= flag;
 		if (notifyCoroutine == null)
 		{
-			StartCoroutine(notifyCoroutine = DoNotifyUpdate());
+			this.StartCoroutine(notifyCoroutine = DoNotifyUpdate());
 		}
 	}
 
@@ -232,11 +234,11 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			}
 			if (param == null)
 			{
-				target.SendMessage(func, SendMessageOptions.DontRequireReceiver);
+				target.SendMessage(func, 1);
 			}
 			else
 			{
-				target.SendMessage(func, param, SendMessageOptions.DontRequireReceiver);
+				target.SendMessage(func, param, 1);
 			}
 			this.isWaiting = isWaiting;
 		}
@@ -353,22 +355,25 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 
 	public void ChangeScene(string scene_name, string section_name = null, UITransition.TYPE close_type = UITransition.TYPE.CLOSE, UITransition.TYPE open_type = UITransition.TYPE.OPEN, bool error = false)
 	{
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		if (!AppMain.isApplicationQuit)
 		{
-			StartCoroutine(DoChangeScene(scene_name, section_name, error, ResourceManager.internalMode, close_type, open_type, false));
+			this.StartCoroutine(DoChangeScene(scene_name, section_name, error, ResourceManager.internalMode, close_type, open_type, false));
 		}
 	}
 
 	private void ChangeCommonDialog(string scene_name, string section_name, bool error, bool internal_res)
 	{
-		StartCoroutine(DoChangeScene(scene_name, section_name, error, internal_res, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false));
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoChangeScene(scene_name, section_name, error, internal_res, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false));
 	}
 
 	public void ReloadScene(UITransition.TYPE close_type = UITransition.TYPE.CLOSE, UITransition.TYPE open_type = UITransition.TYPE.OPEN, bool error = false)
 	{
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		string scene_name = GetCurrentSceneName().Replace("Scene", string.Empty);
 		string section_name = null;
-		StartCoroutine(DoChangeScene(scene_name, section_name, error, ResourceManager.internalMode, close_type, open_type, true));
+		this.StartCoroutine(DoChangeScene(scene_name, section_name, error, ResourceManager.internalMode, close_type, open_type, true));
 	}
 
 	public void ChangeSectionBack()
@@ -470,7 +475,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 					bool save_enable_cache = ResourceManager.enableCache;
 					bool save_internal_mode5 = ResourceManager.internalMode;
 					bool internal_mode = internal_res;
-					if (!internal_mode && (UnityEngine.Object)MonoBehaviourSingleton<ResourceManager>.I.manifest != (UnityEngine.Object)null)
+					if (!internal_mode && MonoBehaviourSingleton<ResourceManager>.I.manifest != null)
 					{
 						internal_mode = true;
 						if (MonoBehaviourSingleton<GlobalSettingsManager>.IsValid() && !AppMain.CheckApplicationVersion(MonoBehaviourSingleton<GlobalSettingsManager>.I.ignoreExternalSceneTableNamesAppVer))
@@ -506,7 +511,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 					List<GameSectionHierarchy.HierarchyData> exclusive_list2 = isOpenImportantDialog ? new List<GameSectionHierarchy.HierarchyData>() : hierarchy.GetExclusiveList(GAME_SECTION_TYPE.SCENE);
 					exclusive_list2.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
 					{
-						o.section.Close(((_003CDoChangeScene_003Ec__Iterator259)/*Error near IL_0732: stateMachine*/).close_type);
+						o.section.Close(((_003CDoChangeScene_003Ec__Iterator260)/*Error near IL_0732: stateMachine*/).close_type);
 					});
 					while (MonoBehaviourSingleton<UIManager>.I.IsTransitioning())
 					{
@@ -618,7 +623,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 						List<GameSectionHierarchy.HierarchyData> exclusive_list = isOpenImportantDialog ? new List<GameSectionHierarchy.HierarchyData>() : hierarchy.GetExclusiveList(new_section_data.type);
 						exclusive_list.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
 						{
-							o.section.Close(((_003CDoChangeScene_003Ec__Iterator259)/*Error near IL_0ce0: stateMachine*/).close_type);
+							o.section.Close(((_003CDoChangeScene_003Ec__Iterator260)/*Error near IL_0ce0: stateMachine*/).close_type);
 						});
 						MonoBehaviourSingleton<UIManager>.I.UpdateDialogBlocker(hierarchy, new_section_data);
 						while (MonoBehaviourSingleton<UIManager>.I.IsTransitioning())
@@ -654,7 +659,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 							{
 								if (o.data.type != GAME_SECTION_TYPE.PAGE)
 								{
-									((_003CDoChangeScene_003Ec__Iterator259)/*Error near IL_0e5f: stateMachine*/)._003Clist_003E__41.Add(o);
+									((_003CDoChangeScene_003Ec__Iterator260)/*Error near IL_0e5f: stateMachine*/)._003Clist_003E__41.Add(o);
 								}
 							});
 							exclusive_list = list2;
@@ -666,7 +671,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 							{
 								if (o.data.type != GAME_SECTION_TYPE.PAGE_DIALOG)
 								{
-									((_003CDoChangeScene_003Ec__Iterator259)/*Error near IL_0ea3: stateMachine*/)._003Clist_003E__42.Add(o);
+									((_003CDoChangeScene_003Ec__Iterator260)/*Error near IL_0ea3: stateMachine*/)._003Clist_003E__42.Add(o);
 								}
 							});
 							exclusive_list = list;
@@ -715,7 +720,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 						List<GameSectionHierarchy.HierarchyData> cut_list = isOpenImportantDialog ? new List<GameSectionHierarchy.HierarchyData>() : hierarchy.GetCutList(now_hierarchy_data);
 						cut_list.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
 						{
-							o.section.Close(((_003CDoChangeScene_003Ec__Iterator259)/*Error near IL_1104: stateMachine*/).close_type);
+							o.section.Close(((_003CDoChangeScene_003Ec__Iterator260)/*Error near IL_1104: stateMachine*/).close_type);
 						});
 						MonoBehaviourSingleton<UIManager>.I.UpdateDialogBlocker(hierarchy, new_section_data);
 						while (MonoBehaviourSingleton<UIManager>.I.IsTransitioning())
@@ -813,7 +818,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 					}
 					isWaiting = save_isWaiting4;
 				}
-				if ((UnityEngine.Object)new_scene_section != (UnityEngine.Object)null)
+				if (new_scene_section != null)
 				{
 					bool save_isWaiting3 = isWaiting;
 					isWaiting = true;
@@ -837,7 +842,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 						ResourceManager.internalMode = save_internal_mode2;
 					}
 				}
-				if ((UnityEngine.Object)new_section != (UnityEngine.Object)null)
+				if (new_section != null)
 				{
 					bool save_isWaiting = isWaiting;
 					isWaiting = true;
@@ -866,7 +871,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 				{
 					DoNotify(GameSection.NOTIFY_FLAG.CHANGED_SCENE);
 					MonoBehaviourSingleton<UIManager>.I.UpdateMainUI();
-					if (MonoBehaviourSingleton<TransitionManager>.I.isTransing && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainMenu != (UnityEngine.Object)null)
+					if (MonoBehaviourSingleton<TransitionManager>.I.isTransing && MonoBehaviourSingleton<UIManager>.I.mainMenu != null)
 					{
 						while (MonoBehaviourSingleton<UIManager>.I.mainMenu.state == UIBehaviour.STATE.TO_CLOSE)
 						{
@@ -884,11 +889,11 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 					}
 					MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.SCENE_CHANGE, false);
 				}
-				global.SectionStart(scene_section_name, section_name, (UnityEngine.Object)new_section != (UnityEngine.Object)null);
+				global.SectionStart(scene_section_name, section_name, new_section != null);
 				MonoBehaviourSingleton<UIManager>.I.UpdateDialogBlocker(hierarchy, new_section_data);
 				isChangeing = save_isChangeing;
 				CrashlyticsReporter.SetSceneStatus(isChangeing);
-				if ((UnityEngine.Object)new_section != (UnityEngine.Object)null)
+				if (new_section != null)
 				{
 					new_section.StartSection();
 				}
@@ -902,7 +907,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 				}
 				if (GameSceneEvent.request != null)
 				{
-					ExecuteSceneEvent("REQUEST", base.gameObject, GameSceneEvent.request.eventName, GameSceneEvent.request.userData, null, true);
+					ExecuteSceneEvent("REQUEST", this.get_gameObject(), GameSceneEvent.request.eventName, GameSceneEvent.request.userData, null, true);
 					GameSceneEvent.request = null;
 				}
 			}
@@ -921,13 +926,15 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 
 	public void ExecuteSceneEvent(string caller, GameObject sender, string event_name, object user_data = null, string check_app_ver = null, bool is_send_query = true)
 	{
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
 		GameSectionHierarchy.HierarchyData last = hierarchy.GetLast();
 		if (last != null)
 		{
 			UIBehaviour uIBehaviour = null;
 			string text;
 			bool flag;
-			if ((UnityEngine.Object)sender == (UnityEngine.Object)base.gameObject)
+			if (sender == this.get_gameObject())
 			{
 				uIBehaviour = null;
 				text = string.Empty;
@@ -935,7 +942,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			}
 			else
 			{
-				if ((UnityEngine.Object)sender != (UnityEngine.Object)null)
+				if (sender != null)
 				{
 					try
 					{
@@ -947,10 +954,10 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 						uIBehaviour = null;
 					}
 				}
-				text = ((!((UnityEngine.Object)uIBehaviour != (UnityEngine.Object)null)) ? string.Empty : uIBehaviour.name);
+				text = ((!(uIBehaviour != null)) ? string.Empty : uIBehaviour.get_name());
 				flag = false;
 			}
-			if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.tutorialMessage != (UnityEngine.Object)null)
+			if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.tutorialMessage != null)
 			{
 				if (MonoBehaviourSingleton<UIManager>.I.tutorialMessage.IsEnableMessage())
 				{
@@ -966,7 +973,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			}
 			else if (isChangeing && !isOpenImportantDialog)
 			{
-				if ((UnityEngine.Object)sender != (UnityEngine.Object)null)
+				if (sender != null)
 				{
 					Log.Warning(LOG.GAMESCENE, "during scene change, so an event is ignored. {0}", event_name);
 				}
@@ -979,7 +986,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			{
 				if (!Protocol.strict && doWaitEventCount == 0)
 				{
-					StartCoroutine(DoWaitEvent(caller, sender, event_name, user_data, check_app_ver, is_send_query));
+					this.StartCoroutine(DoWaitEvent(caller, sender, event_name, user_data, check_app_ver, is_send_query));
 				}
 				else
 				{
@@ -993,15 +1000,15 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			else
 			{
 				GameSection gameSection = null;
-				if ((UnityEngine.Object)sender != (UnityEngine.Object)null)
+				if (sender != null)
 				{
 					gameSection = sender.GetComponentInParent<GameSection>();
 				}
-				if ((UnityEngine.Object)gameSection != (UnityEngine.Object)null && !gameSection.isInitialized)
+				if (gameSection != null && !gameSection.isInitialized)
 				{
 					Log.Warning(LOG.GAMESCENE, "It's initialized, so an event is ignored. {0}", event_name);
 				}
-				else if (!((UnityEngine.Object)gameSection != (UnityEngine.Object)null) || !last.data.type.IsDialog() || !((UnityEngine.Object)gameSection != (UnityEngine.Object)last.section) || GameSceneGlobalSettings.IsGlobalEvent(event_name))
+				else if (!(gameSection != null) || !last.data.type.IsDialog() || !(gameSection != last.section) || GameSceneGlobalSettings.IsGlobalEvent(event_name))
 				{
 					GameSceneEvent.request = null;
 					GameSceneEvent.current.eventName = event_name;
@@ -1230,6 +1237,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 
 	public void SetAutoEvents(EventData[] event_datas)
 	{
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 		if (event_datas == null || autoEvents != null)
 		{
 			if (event_datas == null)
@@ -1244,11 +1252,11 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		else
 		{
 			autoEvents = event_datas;
-			if ((UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.tutorialMessage != (UnityEngine.Object)null)
+			if (MonoBehaviourSingleton<UIManager>.I.tutorialMessage != null)
 			{
 				MonoBehaviourSingleton<UIManager>.I.tutorialMessage.SetSkipSectionRunCount(autoEvents.Length - 1);
 			}
-			StartCoroutine(DoAutoEvent());
+			this.StartCoroutine(DoAutoEvent());
 		}
 	}
 
@@ -1256,7 +1264,10 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 	{
 		if (autoEvents == null)
 		{
-			on_finished?.Invoke();
+			if (on_finished != null)
+			{
+				on_finished.Invoke();
+			}
 		}
 		else
 		{
@@ -1303,48 +1314,48 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 					Utility.ForEach(MonoBehaviourSingleton<UIManager>.I._transform, delegate(Transform t)
 					{
 						UIGameSceneEventSender component = t.GetComponent<UIGameSceneEventSender>();
-						if ((UnityEngine.Object)component == (UnityEngine.Object)null)
+						if (component == null)
 						{
 							return false;
 						}
-						if (component.eventName != ((_003CDoAutoEvent_003Ec__Iterator25B)/*Error near IL_0205: stateMachine*/)._003Cevent_data_003E__2.name)
+						if (component.eventName != ((_003CDoAutoEvent_003Ec__Iterator262)/*Error near IL_0205: stateMachine*/)._003Cevent_data_003E__2.name)
 						{
 							return false;
 						}
-						if (component.eventData != null && ((_003CDoAutoEvent_003Ec__Iterator25B)/*Error near IL_0205: stateMachine*/)._003Cevent_data_003E__2.data != null && !component.eventData.Equals(((_003CDoAutoEvent_003Ec__Iterator25B)/*Error near IL_0205: stateMachine*/)._003Cevent_data_003E__2.data))
+						if (component.eventData != null && ((_003CDoAutoEvent_003Ec__Iterator262)/*Error near IL_0205: stateMachine*/)._003Cevent_data_003E__2.data != null && !component.eventData.Equals(((_003CDoAutoEvent_003Ec__Iterator262)/*Error near IL_0205: stateMachine*/)._003Cevent_data_003E__2.data))
 						{
 							return false;
 						}
-						((_003CDoAutoEvent_003Ec__Iterator25B)/*Error near IL_0205: stateMachine*/)._003Csender_003E__5 = component;
+						((_003CDoAutoEvent_003Ec__Iterator262)/*Error near IL_0205: stateMachine*/)._003Csender_003E__5 = component;
 						return true;
 					});
-					if ((UnityEngine.Object)sender != (UnityEngine.Object)null)
+					if (sender != null)
 					{
 						UIButton button = sender.GetComponent<UIButton>();
-						if ((UnityEngine.Object)button != (UnityEngine.Object)null)
+						if (button != null)
 						{
 							UIScrollView scroll_view = button.GetComponentInParent<UIScrollView>();
-							if ((UnityEngine.Object)scroll_view != (UnityEngine.Object)null && scroll_view.enabled)
+							if (scroll_view != null && scroll_view.get_enabled())
 							{
 								UIPanel panel = scroll_view.GetComponent<UIPanel>();
 								if (!panel.IsVisible(button.GetComponent<UIWidget>()))
 								{
-									Vector3 offset = -panel.cachedTransform.InverseTransformPoint(button.transform.position);
+									Vector3 offset = -panel.cachedTransform.InverseTransformPoint(button.get_transform().get_position());
 									if (!scroll_view.canMoveHorizontally)
 									{
-										Vector3 localPosition = panel.cachedTransform.localPosition;
+										Vector3 localPosition = panel.cachedTransform.get_localPosition();
 										offset.x = localPosition.x;
 									}
 									if (!scroll_view.canMoveVertically)
 									{
-										Vector3 localPosition2 = panel.cachedTransform.localPosition;
+										Vector3 localPosition2 = panel.cachedTransform.get_localPosition();
 										offset.y = localPosition2.y;
 									}
 									SpringPanel sp = SpringPanel.Begin(panel.cachedGameObject, offset, 16f);
 									bool wait = true;
 									SpringPanel.OnFinished func = delegate
 									{
-										((_003CDoAutoEvent_003Ec__Iterator25B)/*Error near IL_0362: stateMachine*/)._003Cwait_003E__11 = false;
+										((_003CDoAutoEvent_003Ec__Iterator262)/*Error near IL_0362: stateMachine*/)._003Cwait_003E__11 = false;
 									};
 									SpringPanel springPanel = sp;
 									springPanel.onFinished = (SpringPanel.OnFinished)Delegate.Combine(springPanel.onFinished, func);
@@ -1356,7 +1367,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 									springPanel2.onFinished = (SpringPanel.OnFinished)Delegate.Remove(springPanel2.onFinished, func);
 								}
 							}
-							Vector3 pos = button.transform.position;
+							Vector3 pos = button.get_transform().get_position();
 							yield return (object)MonoBehaviourSingleton<OutGameEffectManager>.I.MoveAutoEventEffect(pos);
 							button.SetState(UIButtonColor.State.Pressed, false);
 							MonoBehaviourSingleton<OutGameEffectManager>.I.PopTouchEffect(pos);
@@ -1367,21 +1378,26 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 				}
 				if (is_execute_event)
 				{
-					if (event_data.data != null && event_data.data.GetType() == typeof(Network.EventData))
+					if (event_data.data != null && event_data.data.GetType() == typeof(EventListData))
 					{
 						Network.EventData ev = (Network.EventData)event_data.data;
 						if (ev.eventType == 15)
 						{
-							ExecuteSceneEvent("AUTO", base.gameObject, event_data.name + "_ARENA", event_data.data, null, true);
+							if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level < 50)
+							{
+								MonoBehaviourSingleton<GameSceneManager>.I.StopAutoEvent(null);
+								break;
+							}
+							ExecuteSceneEvent("AUTO", this.get_gameObject(), event_data.name + "_ARENA", event_data.data, null, true);
 						}
 						else
 						{
-							ExecuteSceneEvent("AUTO", base.gameObject, event_data.name, event_data.data, null, true);
+							ExecuteSceneEvent("AUTO", this.get_gameObject(), event_data.name, event_data.data, null, true);
 						}
 					}
 					else
 					{
-						ExecuteSceneEvent("AUTO", base.gameObject, event_data.name, event_data.data, null, true);
+						ExecuteSceneEvent("AUTO", this.get_gameObject(), event_data.name, event_data.data, null, true);
 					}
 					if (GameSceneEvent.current.eventName == "RecommendedVersionCheck")
 					{
@@ -1411,7 +1427,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		autoEvents = null;
 		if (onAutoEventFinished != null)
 		{
-			onAutoEventFinished();
+			onAutoEventFinished.Invoke();
 			onAutoEventFinished = null;
 		}
 	}
@@ -1423,11 +1439,12 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 
 	private void OpenCommonDialog_(CommonDialog.Desc desc, Action<string> callback, bool error, bool internal_res, int errorCode = 0)
 	{
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		if (callback != null)
 		{
 			if (isOpenCommonDialog)
 			{
-				StartCoroutine(DoWaitOpenCommonDialog(desc, callback, error, internal_res, errorCode));
+				this.StartCoroutine(DoWaitOpenCommonDialog(desc, callback, error, internal_res, errorCode));
 			}
 			else if (isChangeing && !error)
 			{
@@ -1498,7 +1515,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			}
 			else if (onCancel != null)
 			{
-				onCancel();
+				onCancel.Invoke();
 			}
 		}, true, 0);
 	}
@@ -1564,8 +1581,10 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		return CheckQuestAndOpenUpdateAppDialog(Singleton<QuestTable>.I.GetQuestData(quest_id), is_yes_no, false);
 	}
 
-	public bool CheckQuestAndOpenUpdateAppDialog(QuestTable.QuestTableData quest_data, bool is_yes_no = true, bool is_happen_quest = false)
+	public unsafe bool CheckQuestAndOpenUpdateAppDialog(QuestTable.QuestTableData quest_data, bool is_yes_no = true, bool is_happen_quest = false)
 	{
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Expected O, but got Unknown
 		if (quest_data != null)
 		{
 			int i = 0;
@@ -1576,10 +1595,12 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 					EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)quest_data.enemyID[i]);
 					if (enemyData != null && !enemyData.IsEnableNowApplicationVersion())
 					{
-						OpenUpdateAppDialog((uint)((!is_happen_quest) ? 2003 : 2002), is_yes_no, delegate
+						int msg_id = (!is_happen_quest) ? 2003 : 2002;
+						if (_003C_003Ef__am_0024cache16 == null)
 						{
-							GameSceneEvent.Cancel();
-						});
+							_003C_003Ef__am_0024cache16 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+						}
+						OpenUpdateAppDialog((uint)msg_id, is_yes_no, _003C_003Ef__am_0024cache16);
 						return false;
 					}
 				}
@@ -1642,7 +1663,8 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 
 	public void OpinionBox()
 	{
-		StartCoroutine(DoOpenOpinionBox());
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoOpenOpinionBox());
 	}
 
 	private IEnumerator DoOpenOpinionBox()

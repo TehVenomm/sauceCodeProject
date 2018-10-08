@@ -1,3 +1,5 @@
+using System;
+
 public class QuestOrderSellSettings : GameSection
 {
 	private enum UI
@@ -26,29 +28,29 @@ public class QuestOrderSellSettings : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText(UI.LBL_ITEM_NUM, string.Format("{0, 8:#,0}", haveNum));
-		SetProgressInt(UI.SLD_SALE_NUM, 1, 1, haveNum, OnChagenSlider);
+		SetLabelText((Enum)UI.LBL_ITEM_NUM, string.Format("{0, 8:#,0}", haveNum));
+		SetProgressInt((Enum)UI.SLD_SALE_NUM, 1, 1, haveNum, (EventDelegate.Callback)OnChagenSlider);
 	}
 
 	private void OnChagenSlider()
 	{
-		int progressInt = GetProgressInt(UI.SLD_SALE_NUM);
-		SetLabelText(UI.LBL_SALE_NUM, string.Format("{0,8:#,0}", progressInt));
+		int progressInt = GetProgressInt((Enum)UI.SLD_SALE_NUM);
+		SetLabelText((Enum)UI.LBL_SALE_NUM, string.Format("{0,8:#,0}", progressInt));
 	}
 
 	private void OnQuery_SALE_NUM_MINUS()
 	{
-		SetProgressInt(UI.SLD_SALE_NUM, GetProgressInt(UI.SLD_SALE_NUM) - 1, -1, -1, null);
+		SetProgressInt((Enum)UI.SLD_SALE_NUM, GetProgressInt((Enum)UI.SLD_SALE_NUM) - 1, -1, -1, (EventDelegate.Callback)null);
 	}
 
 	private void OnQuery_SALE_NUM_PLUS()
 	{
-		SetProgressInt(UI.SLD_SALE_NUM, GetProgressInt(UI.SLD_SALE_NUM) + 1, -1, -1, null);
+		SetProgressInt((Enum)UI.SLD_SALE_NUM, GetProgressInt((Enum)UI.SLD_SALE_NUM) + 1, -1, -1, (EventDelegate.Callback)null);
 	}
 
 	private void OnQuery_SELL()
 	{
-		sellNum = GetProgressInt(UI.SLD_SALE_NUM);
+		sellNum = GetProgressInt((Enum)UI.SLD_SALE_NUM);
 		GameSection.SetEventData(new object[2]
 		{
 			quest.questData.tableData.questText,

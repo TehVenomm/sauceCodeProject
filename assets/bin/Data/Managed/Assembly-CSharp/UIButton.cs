@@ -43,27 +43,29 @@ public class UIButton : UIButtonColor
 	{
 		get
 		{
-			if (!base.enabled)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			if (!this.get_enabled())
 			{
 				return false;
 			}
-			Collider component = base.gameObject.GetComponent<Collider>();
-			if ((bool)component && component.enabled)
+			Collider component = this.get_gameObject().GetComponent<Collider>();
+			if (Object.op_Implicit(component) && component.get_enabled())
 			{
 				return true;
 			}
-			Collider2D component2 = GetComponent<Collider2D>();
-			return (bool)component2 && component2.enabled;
+			Collider2D component2 = this.GetComponent<Collider2D>();
+			return Object.op_Implicit(component2) && component2.get_enabled();
 		}
 		set
 		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 			if (isEnabled != value)
 			{
-				Collider component = base.gameObject.GetComponent<Collider>();
-				if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+				Collider component = this.get_gameObject().GetComponent<Collider>();
+				if (component != null)
 				{
-					component.enabled = value;
-					UIButton[] components = GetComponents<UIButton>();
+					component.set_enabled(value);
+					UIButton[] components = this.GetComponents<UIButton>();
 					UIButton[] array = components;
 					foreach (UIButton uIButton in array)
 					{
@@ -72,11 +74,11 @@ public class UIButton : UIButtonColor
 				}
 				else
 				{
-					Collider2D component2 = GetComponent<Collider2D>();
-					if ((UnityEngine.Object)component2 != (UnityEngine.Object)null)
+					Collider2D component2 = this.GetComponent<Collider2D>();
+					if (component2 != null)
 					{
-						component2.enabled = value;
-						UIButton[] components2 = GetComponents<UIButton>();
+						component2.set_enabled(value);
+						UIButton[] components2 = this.GetComponents<UIButton>();
 						UIButton[] array2 = components2;
 						foreach (UIButton uIButton2 in array2)
 						{
@@ -85,7 +87,7 @@ public class UIButton : UIButtonColor
 					}
 					else
 					{
-						base.enabled = value;
+						this.set_enabled(value);
 					}
 				}
 			}
@@ -108,7 +110,7 @@ public class UIButton : UIButtonColor
 			{
 				OnInit();
 			}
-			if ((UnityEngine.Object)mSprite != (UnityEngine.Object)null && !string.IsNullOrEmpty(mNormalSprite) && mNormalSprite == mSprite.spriteName)
+			if (mSprite != null && !string.IsNullOrEmpty(mNormalSprite) && mNormalSprite == mSprite.spriteName)
 			{
 				mNormalSprite = value;
 				SetSprite(value);
@@ -141,7 +143,7 @@ public class UIButton : UIButtonColor
 			{
 				OnInit();
 			}
-			if ((UnityEngine.Object)mSprite2D != (UnityEngine.Object)null && (UnityEngine.Object)mNormalSprite2D == (UnityEngine.Object)mSprite2D.sprite2D)
+			if (mSprite2D != null && mNormalSprite2D == mSprite2D.sprite2D)
 			{
 				mNormalSprite2D = value;
 				SetSprite(value);
@@ -163,11 +165,11 @@ public class UIButton : UIButtonColor
 		base.OnInit();
 		mSprite = (mWidget as UISprite);
 		mSprite2D = (mWidget as UI2DSprite);
-		if ((UnityEngine.Object)mSprite != (UnityEngine.Object)null)
+		if (mSprite != null)
 		{
 			mNormalSprite = mSprite.spriteName;
 		}
-		if ((UnityEngine.Object)mSprite2D != (UnityEngine.Object)null)
+		if (mSprite2D != null)
 		{
 			mNormalSprite2D = mSprite2D.sprite2D;
 		}
@@ -175,11 +177,12 @@ public class UIButton : UIButtonColor
 
 	protected override void OnEnable()
 	{
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		if (isEnabled)
 		{
 			if (mInitDone)
 			{
-				OnHover((UnityEngine.Object)UICamera.hoveredObject == (UnityEngine.Object)base.gameObject);
+				OnHover(UICamera.hoveredObject == this.get_gameObject());
 			}
 		}
 		else
@@ -190,7 +193,8 @@ public class UIButton : UIButtonColor
 
 	protected override void OnDragOver()
 	{
-		if (isEnabled && (dragHighlight || (UnityEngine.Object)UICamera.currentTouch.pressed == (UnityEngine.Object)base.gameObject))
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		if (isEnabled && (dragHighlight || UICamera.currentTouch.pressed == this.get_gameObject()))
 		{
 			base.OnDragOver();
 		}
@@ -198,7 +202,8 @@ public class UIButton : UIButtonColor
 
 	protected override void OnDragOut()
 	{
-		if (isEnabled && (dragHighlight || (UnityEngine.Object)UICamera.currentTouch.pressed == (UnityEngine.Object)base.gameObject))
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		if (isEnabled && (dragHighlight || UICamera.currentTouch.pressed == this.get_gameObject()))
 		{
 			base.OnDragOut();
 		}
@@ -206,7 +211,9 @@ public class UIButton : UIButtonColor
 
 	protected virtual void OnClick()
 	{
-		if ((UnityEngine.Object)current == (UnityEngine.Object)null && isEnabled && TutorialMessage.IsActiveButton(base.gameObject))
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Expected O, but got Unknown
+		if (current == null && isEnabled && TutorialMessage.IsActiveButton(this.get_gameObject()))
 		{
 			current = this;
 			EventDelegate.Execute(onClick);
@@ -217,7 +224,7 @@ public class UIButton : UIButtonColor
 	public override void SetState(State state, bool immediate)
 	{
 		base.SetState(state, immediate);
-		if ((UnityEngine.Object)mSprite != (UnityEngine.Object)null)
+		if (mSprite != null)
 		{
 			switch (state)
 			{
@@ -235,7 +242,7 @@ public class UIButton : UIButtonColor
 				break;
 			}
 		}
-		else if ((UnityEngine.Object)mSprite2D != (UnityEngine.Object)null)
+		else if (mSprite2D != null)
 		{
 			switch (state)
 			{
@@ -243,7 +250,7 @@ public class UIButton : UIButtonColor
 				SetSprite(mNormalSprite2D);
 				break;
 			case State.Hover:
-				SetSprite((!((UnityEngine.Object)hoverSprite2D == (UnityEngine.Object)null)) ? hoverSprite2D : mNormalSprite2D);
+				SetSprite((!(hoverSprite2D == null)) ? hoverSprite2D : mNormalSprite2D);
 				break;
 			case State.Pressed:
 				SetSprite(pressedSprite2D);
@@ -257,7 +264,7 @@ public class UIButton : UIButtonColor
 
 	protected void SetSprite(string sp)
 	{
-		if ((UnityEngine.Object)mSprite != (UnityEngine.Object)null && !string.IsNullOrEmpty(sp) && mSprite.spriteName != sp)
+		if (mSprite != null && !string.IsNullOrEmpty(sp) && mSprite.spriteName != sp)
 		{
 			mSprite.spriteName = sp;
 			if (pixelSnap)
@@ -269,7 +276,7 @@ public class UIButton : UIButtonColor
 
 	protected void SetSprite(Sprite sp)
 	{
-		if ((UnityEngine.Object)sp != (UnityEngine.Object)null && (UnityEngine.Object)mSprite2D != (UnityEngine.Object)null && (UnityEngine.Object)mSprite2D.sprite2D != (UnityEngine.Object)sp)
+		if (sp != null && mSprite2D != null && mSprite2D.sprite2D != sp)
 		{
 			mSprite2D.sprite2D = sp;
 			if (pixelSnap)
@@ -281,11 +288,12 @@ public class UIButton : UIButtonColor
 
 	protected override void OnPress(bool isPressed)
 	{
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		if (!isCheckNeedButtonEffect)
 		{
-			if ((UnityEngine.Object)GetComponent<UINoAuto>() == (UnityEngine.Object)null && (UnityEngine.Object)null == (UnityEngine.Object)GetComponent<UIButtonEffect>())
+			if (this.GetComponent<UINoAuto>() == null && null == this.GetComponent<UIButtonEffect>())
 			{
-				base.gameObject.AddComponent<UIButtonEffect>();
+				this.get_gameObject().AddComponent<UIButtonEffect>();
 			}
 			isCheckNeedButtonEffect = true;
 		}

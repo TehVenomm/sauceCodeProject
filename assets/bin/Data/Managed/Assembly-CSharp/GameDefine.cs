@@ -277,12 +277,16 @@ public static class GameDefine
 
 	public static Vector3 GetCharaRotateVector(InputManager.TouchInfo touch_info)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		return GetCharaRotateVector(touch_info.move);
 	}
 
 	public static Vector3 GetCharaRotateVector(Vector2 move)
 	{
-		Vector3 result = new Vector3(0f, (0f - move.x) * 0.5f, 0f);
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		Vector3 result = default(Vector3);
+		result._002Ector(0f, (0f - move.x) * 0.5f, 0f);
 		if (Mathf.Abs(result.y) > 35f)
 		{
 			result.y = Mathf.Sign(result.y) * 35f;

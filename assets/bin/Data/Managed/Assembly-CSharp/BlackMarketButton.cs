@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class BlackMarketButton : UIBehaviour
@@ -17,28 +18,28 @@ public class BlackMarketButton : UIBehaviour
 
 	protected override void OnOpen()
 	{
-		PlayTween(UI.OBJ_TWEEN, true, null, false, 0);
+		PlayTween((Enum)UI.OBJ_TWEEN, true, (EventDelegate.Callback)null, false, 0);
 		OnInvitationBtnOpen(MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite || MonoBehaviourSingleton<UserInfoManager>.I.ExistsRallyInvite);
 		base.OnOpen();
 	}
 
 	public void OnInvitationBtnOpen(bool isOpen)
 	{
-		PlayTween(UI.OBJ_TWEEN, isOpen, null, true, 1);
+		PlayTween((Enum)UI.OBJ_TWEEN, isOpen, (EventDelegate.Callback)null, true, 1);
 	}
 
 	public void InitTime(int time)
 	{
-		if ((Object)timeLbl == (Object)null)
+		if (timeLbl == null)
 		{
 			timeLbl = GetCtrl(UI.TIME_COUNTDOWN_TXT).GetComponent<UILabel>();
 		}
-		SetActive(UI.SPR_NOTE_UPDATE, GameSaveData.instance.canShowNoteDarkMarket);
+		SetActive((Enum)UI.SPR_NOTE_UPDATE, GameSaveData.instance.canShowNoteDarkMarket);
 	}
 
 	public void ResetMarketTime()
 	{
-		if ((Object)timeLbl == (Object)null)
+		if (timeLbl == null)
 		{
 			timeLbl = GetCtrl(UI.TIME_COUNTDOWN_TXT).GetComponent<UILabel>();
 		}
@@ -46,7 +47,7 @@ public class BlackMarketButton : UIBehaviour
 		if (num > 0)
 		{
 			GameSaveData.instance.canShowNoteDarkMarket = true;
-			SetActive(UI.SPR_NOTE_UPDATE, true);
+			SetActive((Enum)UI.SPR_NOTE_UPDATE, true);
 			MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 37u), string.Empty);
 		}
 	}
@@ -63,7 +64,7 @@ public class BlackMarketButton : UIBehaviour
 	{
 		if (timer < 0.25f)
 		{
-			timer += Time.deltaTime;
+			timer += Time.get_deltaTime();
 		}
 		if (!(timer < 0.25f))
 		{
@@ -86,6 +87,6 @@ public class BlackMarketButton : UIBehaviour
 
 	public void UpdateNoteMarket()
 	{
-		SetActive(UI.SPR_NOTE_UPDATE, GameSaveData.instance.canShowNoteDarkMarket);
+		SetActive((Enum)UI.SPR_NOTE_UPDATE, GameSaveData.instance.canShowNoteDarkMarket);
 	}
 }

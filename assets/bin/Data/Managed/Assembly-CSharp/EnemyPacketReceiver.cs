@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class EnemyPacketReceiver : CharacterPacketReceiver
 {
 	protected Enemy enemy => (Enemy)base.owner;
@@ -16,10 +14,16 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 
 	protected override bool HandleCoopEvent(CoopPacket packet)
 	{
+		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0328: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0352: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0492: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0560: Unknown result type (might be due to invalid IL or missing references)
 		switch (packet.packetType)
 		{
 		case PACKET_TYPE.ENEMY_LOAD_COMPLETE:
-			if ((Object)enemy.enemySender != (Object)null)
+			if (enemy.enemySender != null)
 			{
 				enemy.enemySender.OnRecvLoadComplete(packet.fromClientId);
 			}
@@ -64,7 +68,7 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			enemy.buffParam.SetSyncParam(model8.buff_sync_param, true);
 			enemy.continusAttackParam.ApplySyncParam(model8.cntAtkSyncParam);
 			MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(enemy);
-			enemy.gameObject.SetActive(true);
+			enemy.get_gameObject().SetActive(true);
 			SetFilterMode(FILTER_MODE.NONE);
 			enemy.isCoopInitialized = true;
 			enemy.SetAppearPos(enemy._position);
@@ -72,7 +76,7 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			{
 				enemy.RequestShieldShaderEffect();
 			}
-			if ((Object)enemy.tailController != (Object)null)
+			if (enemy.tailController != null)
 			{
 				enemy.tailController.SetPreviousPositionList(model8.tailPosList);
 			}

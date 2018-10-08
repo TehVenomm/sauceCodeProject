@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackColliderObject : MonoBehaviour, IAttackCollider
+public class AttackColliderObject : IAttackCollider
 {
 	private StageObject m_attacker;
 
@@ -23,22 +23,36 @@ public class AttackColliderObject : MonoBehaviour, IAttackCollider
 		set;
 	}
 
+	public AttackColliderObject()
+		: this()
+	{
+	}
+
 	public void Initialize(StageObject attacker, Transform parent, AttackInfo atkInfo, Vector3 pos, Vector3 rot, float radius, float height, int attackLayer)
 	{
-		base.gameObject.layer = attackLayer;
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Expected O, but got Unknown
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().set_layer(attackLayer);
 		m_attacker = attacker;
 		m_attackInfo = atkInfo;
-		Transform transform = base.transform;
-		transform.parent = parent;
-		transform.localEulerAngles = rot;
-		transform.localPosition = transform.localRotation * pos;
-		transform.localScale = Vector3.one;
-		m_capsule.direction = 2;
-		m_capsule.radius = radius;
-		m_capsule.height = height;
-		m_capsule.enabled = true;
-		m_capsule.center = new Vector3(0f, 0f, height * 0.5f);
-		m_capsule.isTrigger = true;
+		Transform val = this.get_transform();
+		val.set_parent(parent);
+		val.set_localEulerAngles(rot);
+		val.set_localPosition(val.get_localRotation() * pos);
+		val.set_localScale(Vector3.get_one());
+		m_capsule.set_direction(2);
+		m_capsule.set_radius(radius);
+		m_capsule.set_height(height);
+		m_capsule.set_enabled(true);
+		m_capsule.set_center(new Vector3(0f, 0f, height * 0.5f));
+		m_capsule.set_isTrigger(true);
 		m_timeCount = 0f;
 		if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
 		{
@@ -49,20 +63,27 @@ public class AttackColliderObject : MonoBehaviour, IAttackCollider
 
 	public void Initialize(StageObject attacker, Transform parent, AttackInfo atkInfo, Vector3 pos, Vector3 rot, float radius, float height, int direction, Vector3 center, int attackLayer)
 	{
-		base.gameObject.layer = attackLayer;
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Expected O, but got Unknown
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().set_layer(attackLayer);
 		m_attacker = attacker;
 		m_attackInfo = atkInfo;
-		Transform transform = base.transform;
-		transform.parent = parent;
-		transform.localEulerAngles = rot;
-		transform.localPosition = pos;
-		transform.localScale = Vector3.one;
-		m_capsule.direction = direction;
-		m_capsule.radius = radius;
-		m_capsule.height = height;
-		m_capsule.enabled = true;
-		m_capsule.center = center;
-		m_capsule.isTrigger = true;
+		Transform val = this.get_transform();
+		val.set_parent(parent);
+		val.set_localEulerAngles(rot);
+		val.set_localPosition(pos);
+		val.set_localScale(Vector3.get_one());
+		m_capsule.set_direction(direction);
+		m_capsule.set_radius(radius);
+		m_capsule.set_height(height);
+		m_capsule.set_enabled(true);
+		m_capsule.set_center(center);
+		m_capsule.set_isTrigger(true);
 		m_timeCount = 0f;
 		if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
 		{
@@ -73,20 +94,27 @@ public class AttackColliderObject : MonoBehaviour, IAttackCollider
 
 	public void InitializeForExAtkCollider(StageObject attacker, Transform parent, AttackInfo atkInfo, Vector3 pos, Vector3 rot, float radius, float height, int attackLayer)
 	{
-		base.gameObject.layer = attackLayer;
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Expected O, but got Unknown
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().set_layer(attackLayer);
 		m_attacker = attacker;
 		m_attackInfo = atkInfo;
-		Transform transform = base.transform;
-		transform.parent = parent;
-		transform.localEulerAngles = rot;
-		transform.localPosition = pos;
-		transform.localScale = Vector3.one;
-		m_capsule.direction = 2;
-		m_capsule.radius = radius;
-		m_capsule.height = height;
-		m_capsule.enabled = true;
-		m_capsule.center = new Vector3(0f, 0f, height * 0.5f);
-		m_capsule.isTrigger = true;
+		Transform val = this.get_transform();
+		val.set_parent(parent);
+		val.set_localEulerAngles(rot);
+		val.set_localPosition(pos);
+		val.set_localScale(Vector3.get_one());
+		m_capsule.set_direction(2);
+		m_capsule.set_radius(radius);
+		m_capsule.set_height(height);
+		m_capsule.set_enabled(true);
+		m_capsule.set_center(new Vector3(0f, 0f, height * 0.5f));
+		m_capsule.set_isTrigger(true);
 		m_timeCount = 0f;
 		if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
 		{
@@ -97,40 +125,48 @@ public class AttackColliderObject : MonoBehaviour, IAttackCollider
 
 	public virtual void Destroy()
 	{
-		if ((Object)m_rigidBody != (Object)null)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		if (m_rigidBody != null)
 		{
 			m_rigidBody.Sleep();
 		}
 		if (m_attackInfo != null)
 		{
 			BulletData bulletData = m_attackInfo.bulletData;
-			if ((Object)bulletData != (Object)null && !string.IsNullOrEmpty(bulletData.data.landHiteffectName))
+			if (bulletData != null && !string.IsNullOrEmpty(bulletData.data.landHiteffectName))
 			{
 				Transform effect = EffectManager.GetEffect(bulletData.data.landHiteffectName, null);
-				if ((Object)effect != (Object)null)
+				if (effect != null)
 				{
-					effect.position = base.transform.position;
-					effect.rotation = base.transform.rotation;
+					effect.set_position(this.get_transform().get_position());
+					effect.set_rotation(this.get_transform().get_rotation());
 				}
 			}
 		}
-		Object.Destroy(base.gameObject);
+		Object.Destroy(this.get_gameObject());
 	}
 
 	protected void Awake()
 	{
-		m_capsule = base.gameObject.AddComponent<CapsuleCollider>();
-		m_rigidBody = base.gameObject.GetComponent<Rigidbody>();
-		if ((Object)m_rigidBody == (Object)null)
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		m_capsule = this.get_gameObject().AddComponent<CapsuleCollider>();
+		m_rigidBody = this.get_gameObject().GetComponent<Rigidbody>();
+		if (m_rigidBody == null)
 		{
-			m_rigidBody = base.gameObject.AddComponent<Rigidbody>();
+			m_rigidBody = this.get_gameObject().AddComponent<Rigidbody>();
 		}
-		m_rigidBody.useGravity = false;
+		m_rigidBody.set_useGravity(false);
 	}
 
 	private void Update()
 	{
-		m_timeCount += Time.deltaTime;
+		m_timeCount += Time.get_deltaTime();
 	}
 
 	protected virtual void OnTriggerEnter(Collider collider)
@@ -159,17 +195,17 @@ public class AttackColliderObject : MonoBehaviour, IAttackCollider
 
 	protected void ActivateOwnCollider()
 	{
-		if ((Object)m_capsule != (Object)null)
+		if (m_capsule != null)
 		{
-			m_capsule.enabled = true;
+			m_capsule.set_enabled(true);
 		}
 	}
 
 	protected void DeactivateOwnCollider()
 	{
-		if ((Object)m_capsule != (Object)null)
+		if (m_capsule != null)
 		{
-			m_capsule.enabled = false;
+			m_capsule.set_enabled(false);
 		}
 	}
 
@@ -201,11 +237,19 @@ public class AttackColliderObject : MonoBehaviour, IAttackCollider
 
 	public virtual Vector3 GetCrossCheckPoint(Collider from_collider)
 	{
-		Vector3 result = from_collider.bounds.center;
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		Bounds bounds = from_collider.get_bounds();
+		Vector3 result = bounds.get_center();
 		Character character = m_attacker as Character;
-		if ((Object)character != (Object)null && (Object)character.rootNode != (Object)null)
+		if (character != null && character.rootNode != null)
 		{
-			result = character.rootNode.position;
+			result = character.rootNode.get_position();
 		}
 		return result;
 	}
@@ -239,7 +283,7 @@ public class AttackColliderObject : MonoBehaviour, IAttackCollider
 
 	public void DetachRigidbody()
 	{
-		if ((Object)m_rigidBody != (Object)null)
+		if (m_rigidBody != null)
 		{
 			Object.Destroy(m_rigidBody);
 			m_rigidBody = null;

@@ -1,9 +1,13 @@
 using System.Collections.Generic;
-using UnityEngine;
 
-public class ExternalToInternalTable : ScriptableObject
+public class ExternalToInternalTable
 {
 	public List<string> samplingPaths;
 
 	public List<string> manualPaths;
+
+	public ExternalToInternalTable()
+		: this()
+	{
+	}
 }

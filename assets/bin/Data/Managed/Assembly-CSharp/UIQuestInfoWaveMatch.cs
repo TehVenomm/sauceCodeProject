@@ -16,13 +16,15 @@ public class UIQuestInfoWaveMatch : MonoBehaviourSingleton<UIQuestInfoWaveMatch>
 
 	private void Start()
 	{
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		if (!QuestManager.IsValidInGameWaveMatch(false))
 		{
-			base.gameObject.SetActive(false);
+			this.get_gameObject().SetActive(false);
 		}
 		else
 		{
-			base.gameObject.SetActive(true);
+			this.get_gameObject().SetActive(true);
 			m_inGameProgress = MonoBehaviourSingleton<InGameProgress>.I;
 			isShowFraction = QuestManager.IsValidInGameWaveMatch(true);
 			if (isShowFraction)
@@ -64,6 +66,7 @@ public class UIQuestInfoWaveMatch : MonoBehaviourSingleton<UIQuestInfoWaveMatch>
 
 	public void ShowWave(bool isShow)
 	{
-		waveText.gameObject.SetActive(isShow);
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		waveText.get_gameObject().SetActive(isShow);
 	}
 }

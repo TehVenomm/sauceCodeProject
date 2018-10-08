@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EffectPlayProcessor : MonoBehaviour
+public class EffectPlayProcessor
 {
 	[Serializable]
 	public class EffectSetting
@@ -17,16 +17,20 @@ public class EffectPlayProcessor : MonoBehaviour
 		public string nodeName;
 
 		[Tooltip("オフセット座標")]
-		public Vector3 position = Vector3.zero;
+		public Vector3 position = Vector3.get_zero();
 
 		[Tooltip("回転")]
-		public Vector3 rotation = Vector3.zero;
+		public Vector3 rotation = Vector3.get_zero();
 
 		[Tooltip("スケ\u30fcル")]
 		public float scale = 1f;
 
 		public EffectSetting Clone()
 		{
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 			EffectSetting effectSetting = new EffectSetting();
 			effectSetting.name = name;
 			effectSetting.effectName = effectName;
@@ -39,6 +43,11 @@ public class EffectPlayProcessor : MonoBehaviour
 	}
 
 	public EffectSetting[] effectSettings;
+
+	public EffectPlayProcessor()
+		: this()
+	{
+	}
 
 	public bool IsContainSetting(string setting_name)
 	{
@@ -94,10 +103,10 @@ public class EffectPlayProcessor : MonoBehaviour
 		int i = 0;
 		for (int count = settings.Count; i < count; i++)
 		{
-			Transform transform = PlayEffect(settings[i], owner_node);
-			if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
+			Transform val = PlayEffect(settings[i], owner_node);
+			if (val != null)
 			{
-				list.Add(transform);
+				list.Add(val);
 			}
 		}
 		if (list.Count <= 0)
@@ -109,6 +118,13 @@ public class EffectPlayProcessor : MonoBehaviour
 
 	public Transform PlayEffect(EffectSetting setting, Transform owner_node = null)
 	{
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Expected O, but got Unknown
+		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
 		if (setting == null)
 		{
 			return null;
@@ -117,26 +133,26 @@ public class EffectPlayProcessor : MonoBehaviour
 		{
 			return null;
 		}
-		if ((UnityEngine.Object)owner_node == (UnityEngine.Object)null)
+		if (owner_node == null)
 		{
-			owner_node = base.transform;
+			owner_node = this.get_transform();
 		}
-		Transform transform = (!string.IsNullOrEmpty(setting.nodeName)) ? Utility.Find(owner_node, setting.nodeName) : owner_node;
-		if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
+		Transform val = (!string.IsNullOrEmpty(setting.nodeName)) ? Utility.Find(owner_node, setting.nodeName) : owner_node;
+		if (val == null)
 		{
-			transform = owner_node;
+			val = owner_node;
 		}
-		Transform effect = EffectManager.GetEffect(setting.effectName, transform);
-		if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
+		Transform effect = EffectManager.GetEffect(setting.effectName, val);
+		if (effect != null)
 		{
-			effect.localPosition = setting.position;
-			effect.localRotation = Quaternion.Euler(setting.rotation);
+			effect.set_localPosition(setting.position);
+			effect.set_localRotation(Quaternion.Euler(setting.rotation));
 			float num = setting.scale;
 			if (num == 0f)
 			{
 				num = 1f;
 			}
-			effect.localScale = Vector3.one * num;
+			effect.set_localScale(Vector3.get_one() * num);
 		}
 		return effect;
 	}

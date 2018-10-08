@@ -157,6 +157,8 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 
 	private void UpdateEquipIcon()
 	{
+		//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0253: Unknown result type (might be due to invalid IL or missing references)
 		if (setInfo != null)
 		{
 			int i = 0;
@@ -193,29 +195,29 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 						SetLabelText(GetCtrl(iconsLevel[j]), text);
 					}
 					Transform ctrl = GetCtrl(icons[j]);
-					ctrl.GetComponentsInChildren(true, Temporary.itemIconList);
+					ctrl.GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
 					int k = 0;
 					for (int count = Temporary.itemIconList.Count; k < count; k++)
 					{
-						Temporary.itemIconList[k].gameObject.SetActive(true);
+						Temporary.itemIconList[k].get_gameObject().SetActive(true);
 					}
 					Temporary.itemIconList.Clear();
 					ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, ctrl, null, -1, "EQUIP", j, false, -1, false, null, false, false);
-					if ((UnityEngine.Object)itemIcon != (UnityEngine.Object)null)
+					if (itemIcon != null)
 					{
 						SetLongTouch(itemIcon.transform, "DETAIL", j);
 						SetEvent(GetCtrl(iconsBtn[j]), "DETAIL", j);
-						itemIcon.gameObject.SetActive(num3 != -1);
+						itemIcon.get_gameObject().SetActive(num3 != -1);
 						if (num3 != -1)
 						{
-							itemIcon.SetEquipExtInvertedColor(equipItemInfo, GetComponent<UILabel>(iconsLevel[j]));
+							itemIcon.SetEquipExtInvertedColor(equipItemInfo, base.GetComponent<UILabel>((Enum)iconsLevel[j]));
 						}
 					}
 					UpdateEquipSkillButton(equipItemInfo, j);
 				}
 			}
-			ResetTween(UI.OBJ_EQUIP_ROOT, 0);
-			PlayTween(UI.OBJ_EQUIP_ROOT, true, null, false, 0);
+			ResetTween((Enum)UI.OBJ_EQUIP_ROOT, 0);
+			PlayTween((Enum)UI.OBJ_EQUIP_ROOT, true, (EventDelegate.Callback)null, false, 0);
 		}
 	}
 
@@ -227,28 +229,28 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
 			if (enemyData != null)
 			{
-				SetLabelText(UI.LBL_ENEMY_LEVEL, StringTable.Format(STRING_CATEGORY.MAIN_STATUS, 1u, enemyData.level));
-				SetLabelText(UI.LBL_ENEMY_NAME, enemyData.name);
+				SetLabelText((Enum)UI.LBL_ENEMY_LEVEL, StringTable.Format(STRING_CATEGORY.MAIN_STATUS, 1u, enemyData.level));
+				SetLabelText((Enum)UI.LBL_ENEMY_NAME, enemyData.name);
 				Transform ctrl = GetCtrl(UI.OBJ_ENEMY);
 				ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(questData.questType), enemyData.iconId, questData.rarity, GetCtrl(UI.OBJ_ENEMY), enemyData.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY, ELEMENT_TYPE.MAX);
 				itemIcon.SetEnableCollider(false);
-				SetActive(UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
-				SetElementSprite(UI.SPR_ELEMENT, (int)enemyData.element);
-				SetElementSprite(UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
-				SetActive(UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
+				SetActive((Enum)UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
+				SetElementSprite((Enum)UI.SPR_ELEMENT, (int)enemyData.element);
+				SetElementSprite((Enum)UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
+				SetActive((Enum)UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
 			}
 		}
 	}
 
 	private void UpdateEquipSetInfo()
 	{
-		SetLabelText(UI.LBL_ASSIGNED_SET_NAME, targetData.setName);
+		SetLabelText((Enum)UI.LBL_ASSIGNED_SET_NAME, targetData.setName);
 		EquipItemTable.EquipItemData tableData = allEquipItemInfo[0].tableData;
 		if (tableData != null)
 		{
-			SetEquipmentTypeIcon(UI.SPR_TYPE_ICON_WEP, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, tableData);
-			SetActive(UI.SPR_TYPE_ICON_RARITY, false);
-			SetSprite(UI.SPR_SP_ATTACK_TYPE, tableData.spAttackType.GetBigFrameSpriteName());
+			SetEquipmentTypeIcon((Enum)UI.SPR_TYPE_ICON_WEP, (Enum)UI.SPR_TYPE_ICON_BG, (Enum)UI.SPR_TYPE_ICON_RARITY, tableData);
+			SetActive((Enum)UI.SPR_TYPE_ICON_RARITY, false);
+			SetSprite((Enum)UI.SPR_SP_ATTACK_TYPE, tableData.spAttackType.GetBigFrameSpriteName());
 		}
 	}
 
@@ -303,9 +305,11 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 
 	private void SetRenderPlayerModel(PlayerLoadInfo load_player_info)
 	{
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		SetRenderPlayerModel(base._transform, UI.TEX_MODEL, load_player_info, record.animID, new Vector3(0f, -0.75f, 14f), new Vector3(0f, 180f, 0f), false, delegate(PlayerLoader player_loader)
 		{
-			if ((UnityEngine.Object)player_loader != (UnityEngine.Object)null)
+			if (player_loader != null)
 			{
 				loader = player_loader;
 			}
@@ -340,14 +344,15 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 		int defencesSum = finalStatus.GetDefencesSum();
 		int hp = finalStatus.hp;
 		int num = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level;
-		SetLabelText(UI.LBL_ATK, attacksSum.ToString());
-		SetLabelText(UI.LBL_DEF, defencesSum.ToString());
-		SetLabelText(UI.LBL_HP, hp.ToString());
-		SetLabelText(UI.LBL_LEVEL, num.ToString());
+		SetLabelText((Enum)UI.LBL_ATK, attacksSum.ToString());
+		SetLabelText((Enum)UI.LBL_DEF, defencesSum.ToString());
+		SetLabelText((Enum)UI.LBL_HP, hp.ToString());
+		SetLabelText((Enum)UI.LBL_LEVEL, num.ToString());
 	}
 
 	private void UpdateEquipSkillButton(EquipItemInfo item, int i)
 	{
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(iconsBtn[i]);
 		bool flag = item != null && item.tableID != 0;
 		if (flag)
@@ -355,7 +360,7 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 			SkillSlotUIData[] assignedSkillSlotData = GetAssignedSkillSlotData(item);
 			SetSkillIconButton(ctrl, UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButtonTOP", item.tableData, assignedSkillSlotData, "SKILL_ICON_BUTTON", i);
 		}
-		FindCtrl(ctrl, UI.OBJ_SKILL_BUTTON_ROOT).gameObject.SetActive(flag);
+		FindCtrl(ctrl, UI.OBJ_SKILL_BUTTON_ROOT).get_gameObject().SetActive(flag);
 	}
 
 	private EquipItemAndSkillData CreateEquipItemAndSkillData(int index)
@@ -626,9 +631,11 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		if (!((UnityEngine.Object)loader == (UnityEngine.Object)null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == nowSectionName)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		if (!(loader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == nowSectionName)
 		{
-			loader.transform.Rotate(GameDefine.GetCharaRotateVector(touch_info));
+			loader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
 		}
 	}
 
@@ -709,7 +716,7 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 		}
 	}
 
-	protected void OnQuery_START()
+	protected unsafe void OnQuery_START()
 	{
 		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(deliveryData.needs[0].questId);
 		if (questData == null)
@@ -721,10 +728,13 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 			MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questData.questID, true);
 			record.charaInfo.equipSet = CreateEquipItemListForRecord(equips);
 			GameSection.StayEvent();
-			CoopApp.EnterQuestOfflineAssignedEquipment(targetData, record.charaInfo, delegate(bool isMatching, bool isConnect, bool isRegist, bool isStart)
+			AssignedEquipmentTable.AssignedEquipmentData assignedEquipmentData = targetData;
+			CharaInfo charaInfo = record.charaInfo;
+			if (_003C_003Ef__am_0024cacheD == null)
 			{
-				GameSection.ResumeEvent(isStart, null);
-			});
+				_003C_003Ef__am_0024cacheD = new Action<bool, bool, bool, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			CoopApp.EnterQuestOfflineAssignedEquipment(assignedEquipmentData, charaInfo, _003C_003Ef__am_0024cacheD);
 		}
 	}
 

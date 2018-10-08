@@ -13,6 +13,7 @@ public class Lounge_Model_RoomMove : Coop_Model_Base
 
 	public override string ToString()
 	{
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 		string empty = string.Empty;
 		empty = empty + ",cid=" + cid;
 		empty = empty + ",pos=" + pos;

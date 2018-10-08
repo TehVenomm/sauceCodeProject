@@ -1,3 +1,5 @@
+using System;
+
 public class StatusExchangeEntrance : GameSection
 {
 	public enum UI
@@ -22,11 +24,11 @@ public class StatusExchangeEntrance : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText(UI.LBL_TITLE_U, base.sectionData.GetText("WINDOW_TITLE"));
-		SetLabelText(UI.LBL_TITLE_D, base.sectionData.GetText("WINDOW_TITLE"));
-		SetLabelText(UI.LBL_HAVE_RARE, 0.ToString("N0"));
-		SetLabelText(UI.LBL_HAVE_NORMAL, 0.ToString("N0"));
-		SetLabelText(UI.LBL_HAVE_GOLD, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money.ToString("N0"));
+		SetLabelText((Enum)UI.LBL_TITLE_U, base.sectionData.GetText("WINDOW_TITLE"));
+		SetLabelText((Enum)UI.LBL_TITLE_D, base.sectionData.GetText("WINDOW_TITLE"));
+		SetLabelText((Enum)UI.LBL_HAVE_RARE, 0.ToString("N0"));
+		SetLabelText((Enum)UI.LBL_HAVE_NORMAL, 0.ToString("N0"));
+		SetLabelText((Enum)UI.LBL_HAVE_GOLD, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money.ToString("N0"));
 		base.UpdateUI();
 	}
 

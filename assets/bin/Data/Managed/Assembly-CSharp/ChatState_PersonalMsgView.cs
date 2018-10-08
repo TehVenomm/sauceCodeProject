@@ -13,7 +13,7 @@ public class ChatState_PersonalMsgView : ChatState
 	public override void Enter(MainChat _manager)
 	{
 		base.Enter(_manager);
-		if (!((UnityEngine.Object)m_manager == (UnityEngine.Object)null))
+		if (!(m_manager == null))
 		{
 			m_manager.ExecCoroutine(InitializeCoroutine());
 		}
@@ -29,10 +29,10 @@ public class ChatState_PersonalMsgView : ChatState
 		else
 		{
 			isInitializing = true;
-			UnityEngine.Object obj = Resources.Load(WINDOW_PREFAB_PATH);
-			Transform newItem = ResourceUtility.Realizes(obj, m_manager.transform, 5);
+			Object obj = Resources.Load(WINDOW_PREFAB_PATH);
+			Transform newItem = ResourceUtility.Realizes(obj, m_manager.get_transform(), 5);
 			m_friendMsg = newItem.GetComponent<FriendMessageUIController>();
-			if ((UnityEngine.Object)m_friendMsg == (UnityEngine.Object)null)
+			if (m_friendMsg == null)
 			{
 				m_manager.PopState();
 				EndInitialize();
@@ -49,7 +49,7 @@ public class ChatState_PersonalMsgView : ChatState
 
 	public override Type GetNextState()
 	{
-		if ((UnityEngine.Object)m_manager == (UnityEngine.Object)null || !base.IsInitialized)
+		if (m_manager == null || !base.IsInitialized)
 		{
 			return base.GetNextState();
 		}
@@ -58,7 +58,8 @@ public class ChatState_PersonalMsgView : ChatState
 
 	public override void Exit()
 	{
-		UnityEngine.Object.Destroy(m_friendMsg.gameObject);
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		Object.Destroy(m_friendMsg.get_gameObject());
 		m_friendMsg = null;
 	}
 }

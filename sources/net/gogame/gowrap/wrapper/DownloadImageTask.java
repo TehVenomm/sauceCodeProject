@@ -17,10 +17,10 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     }
 
     protected Bitmap doInBackground(String... strArr) {
+        InputStream openStream;
         Throwable e;
         Throwable th;
         Bitmap bitmap = null;
-        InputStream openStream;
         try {
             openStream = new URL(strArr[0]).openStream();
             try {

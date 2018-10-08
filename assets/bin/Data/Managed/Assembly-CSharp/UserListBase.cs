@@ -17,9 +17,10 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 
 	public override void Initialize()
 	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		if (isInitializeSend)
 		{
-			StartCoroutine(DoInitialize());
+			this.StartCoroutine(DoInitialize());
 		}
 		else
 		{
@@ -32,7 +33,7 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 		bool is_recv = false;
 		this.SendGetList(this.nowPage, (Action<bool>)delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator3D)/*Error near IL_0039: stateMachine*/)._003Cis_recv_003E__0 = true;
+			((_003CDoInitialize_003Ec__Iterator44)/*Error near IL_0039: stateMachine*/)._003Cis_recv_003E__0 = true;
 		});
 		while (!is_recv)
 		{
@@ -48,9 +49,10 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 
 	public override void InitializeReopen()
 	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		if (isInitializeSendReopen)
 		{
-			StartCoroutine(DoInitializeReopen());
+			this.StartCoroutine(DoInitializeReopen());
 		}
 		else
 		{
@@ -63,8 +65,8 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 		bool is_recv = false;
 		this.SendGetList(this.nowPage, (Action<bool>)delegate
 		{
-			((_003CDoInitializeReopen_003Ec__Iterator3E)/*Error near IL_0039: stateMachine*/)._003C_003Ef__this.PostSendGetListByReopen(((_003CDoInitializeReopen_003Ec__Iterator3E)/*Error near IL_0039: stateMachine*/)._003C_003Ef__this.nowPage);
-			((_003CDoInitializeReopen_003Ec__Iterator3E)/*Error near IL_0039: stateMachine*/)._003Cis_recv_003E__0 = true;
+			((_003CDoInitializeReopen_003Ec__Iterator45)/*Error near IL_0039: stateMachine*/)._003C_003Ef__this.PostSendGetListByReopen(((_003CDoInitializeReopen_003Ec__Iterator45)/*Error near IL_0039: stateMachine*/)._003C_003Ef__this.nowPage);
+			((_003CDoInitializeReopen_003Ec__Iterator45)/*Error near IL_0039: stateMachine*/)._003Cis_recv_003E__0 = true;
 		});
 		while (!is_recv)
 		{
@@ -89,8 +91,8 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 		int send_page = (this.nowPage <= 0) ? (this.pageNumMax - 1) : (this.nowPage - 1);
 		this.SendGetList(send_page, (Action<bool>)delegate(bool b)
 		{
-			((_003CGetPrevPage_003Ec__Iterator3F)/*Error near IL_0071: stateMachine*/)._003Cwait_003E__0 = false;
-			((_003CGetPrevPage_003Ec__Iterator3F)/*Error near IL_0071: stateMachine*/)._003Cis_success_003E__1 = b;
+			((_003CGetPrevPage_003Ec__Iterator46)/*Error near IL_0071: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CGetPrevPage_003Ec__Iterator46)/*Error near IL_0071: stateMachine*/)._003Cis_success_003E__1 = b;
 		});
 		while (wait)
 		{
@@ -106,8 +108,8 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 		int send_page = (this.nowPage < this.pageNumMax - 1) ? (this.nowPage + 1) : 0;
 		this.SendGetList(send_page, (Action<bool>)delegate(bool b)
 		{
-			((_003CGetNextPage_003Ec__Iterator40)/*Error near IL_0071: stateMachine*/)._003Cwait_003E__0 = false;
-			((_003CGetNextPage_003Ec__Iterator40)/*Error near IL_0071: stateMachine*/)._003Cis_success_003E__1 = b;
+			((_003CGetNextPage_003Ec__Iterator47)/*Error near IL_0071: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CGetNextPage_003Ec__Iterator47)/*Error near IL_0071: stateMachine*/)._003Cis_success_003E__1 = b;
 		});
 		while (wait)
 		{
@@ -118,8 +120,9 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 
 	protected virtual void OnQuery_PAGE_PREV()
 	{
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		GameSection.StayEvent();
-		StartCoroutine(GetPrevPage(delegate(bool b)
+		this.StartCoroutine(GetPrevPage(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b, null);
 		}));
@@ -127,8 +130,9 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 
 	protected virtual void OnQuery_PAGE_NEXT()
 	{
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		GameSection.StayEvent();
-		StartCoroutine(GetNextPage(delegate(bool b)
+		this.StartCoroutine(GetNextPage(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b, null);
 		}));

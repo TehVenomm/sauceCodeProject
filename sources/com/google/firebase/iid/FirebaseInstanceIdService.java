@@ -127,49 +127,49 @@ public class FirebaseInstanceIdService extends zzb {
     private final void zza(android.content.Intent r9, boolean r10, boolean r11) {
         /*
         r8 = this;
-        r2 = 1;
-        r1 = 0;
-        r3 = zzmjc;
-        monitor-enter(r3);
+        r3 = 1;
+        r2 = 0;
+        r1 = zzmjc;
+        monitor-enter(r1);
         r0 = 0;
         zzmjd = r0;	 Catch:{ all -> 0x0010 }
-        monitor-exit(r3);	 Catch:{ all -> 0x0010 }
+        monitor-exit(r1);	 Catch:{ all -> 0x0010 }
         r0 = com.google.firebase.iid.zzl.zzdg(r8);
         if (r0 != 0) goto L_0x0013;
     L_0x000f:
         return;
     L_0x0010:
         r0 = move-exception;
-        monitor-exit(r3);	 Catch:{ all -> 0x0010 }
+        monitor-exit(r1);	 Catch:{ all -> 0x0010 }
         throw r0;
     L_0x0013:
         r0 = com.google.firebase.iid.FirebaseInstanceId.getInstance();
-        r3 = r0.zzbyi();
-        if (r3 == 0) goto L_0x0025;
+        r1 = r0.zzbyi();
+        if (r1 == 0) goto L_0x0025;
     L_0x001d:
         r4 = com.google.firebase.iid.zzj.zzhtl;
-        r4 = r3.zzqa(r4);
+        r4 = r1.zzqa(r4);
         if (r4 == 0) goto L_0x0063;
     L_0x0025:
-        r1 = r0.zzbyj();	 Catch:{ IOException -> 0x004b, SecurityException -> 0x005a }
-        if (r1 == 0) goto L_0x0054;
+        r2 = r0.zzbyj();	 Catch:{ IOException -> 0x004b, SecurityException -> 0x005a }
+        if (r2 == 0) goto L_0x0054;
     L_0x002b:
-        r2 = r8.zzmje;	 Catch:{ IOException -> 0x004b, SecurityException -> 0x005a }
-        if (r2 == 0) goto L_0x0036;
+        r3 = r8.zzmje;	 Catch:{ IOException -> 0x004b, SecurityException -> 0x005a }
+        if (r3 == 0) goto L_0x0036;
     L_0x002f:
-        r2 = "FirebaseInstanceId";
+        r3 = "FirebaseInstanceId";
         r4 = "get master token succeeded";
-        android.util.Log.d(r2, r4);	 Catch:{ IOException -> 0x004b, SecurityException -> 0x005a }
+        android.util.Log.d(r3, r4);	 Catch:{ IOException -> 0x004b, SecurityException -> 0x005a }
     L_0x0036:
         zza(r8, r0);	 Catch:{ IOException -> 0x004b, SecurityException -> 0x005a }
         if (r11 != 0) goto L_0x0047;
     L_0x003b:
-        if (r3 == 0) goto L_0x0047;
+        if (r1 == 0) goto L_0x0047;
     L_0x003d:
-        if (r3 == 0) goto L_0x000f;
+        if (r1 == 0) goto L_0x000f;
     L_0x003f:
-        r0 = r3.zzkmz;	 Catch:{ IOException -> 0x004b, SecurityException -> 0x005a }
-        r0 = r1.equals(r0);	 Catch:{ IOException -> 0x004b, SecurityException -> 0x005a }
+        r0 = r1.zzkmz;	 Catch:{ IOException -> 0x004b, SecurityException -> 0x005a }
+        r0 = r2.equals(r0);	 Catch:{ IOException -> 0x004b, SecurityException -> 0x005a }
         if (r0 != 0) goto L_0x000f;
     L_0x0047:
         r8.onTokenRefresh();	 Catch:{ IOException -> 0x004b, SecurityException -> 0x005a }
@@ -192,77 +192,75 @@ public class FirebaseInstanceIdService extends zzb {
     L_0x0063:
         r4 = com.google.firebase.iid.FirebaseInstanceId.zzbyk();
         r0 = r4.zzbyn();
-        r3 = r0;
-    L_0x006c:
-        if (r3 == 0) goto L_0x00d4;
-    L_0x006e:
-        r0 = "!";
-        r0 = r3.split(r0);
-        r5 = r0.length;
+    L_0x006b:
+        if (r0 == 0) goto L_0x00d2;
+    L_0x006d:
+        r1 = "!";
+        r1 = r0.split(r1);
+        r5 = r1.length;
         r6 = 2;
-        if (r5 != r6) goto L_0x0087;
-    L_0x0078:
-        r5 = r0[r1];
-        r6 = r0[r2];
-        r0 = -1;
-        r7 = r5.hashCode();	 Catch:{ IOException -> 0x00b7 }
+        if (r5 != r6) goto L_0x0086;
+    L_0x0077:
+        r5 = r1[r2];
+        r6 = r1[r3];
+        r1 = -1;
+        r7 = r5.hashCode();	 Catch:{ IOException -> 0x00b5 }
         switch(r7) {
-            case 83: goto L_0x0090;
-            case 84: goto L_0x0084;
-            case 85: goto L_0x009a;
-            default: goto L_0x0084;
+            case 83: goto L_0x008e;
+            case 84: goto L_0x0083;
+            case 85: goto L_0x0098;
+            default: goto L_0x0083;
         };
-    L_0x0084:
-        switch(r0) {
-            case 0: goto L_0x00a4;
-            case 1: goto L_0x00c1;
-            default: goto L_0x0087;
+    L_0x0083:
+        switch(r1) {
+            case 0: goto L_0x00a2;
+            case 1: goto L_0x00bf;
+            default: goto L_0x0086;
         };
-    L_0x0087:
-        r4.zzpu(r3);
+    L_0x0086:
+        r4.zzpu(r0);
         r0 = r4.zzbyn();
-        r3 = r0;
-        goto L_0x006c;
-    L_0x0090:
+        goto L_0x006b;
+    L_0x008e:
         r7 = "S";
-        r5 = r5.equals(r7);	 Catch:{ IOException -> 0x00b7 }
-        if (r5 == 0) goto L_0x0084;
+        r5 = r5.equals(r7);	 Catch:{ IOException -> 0x00b5 }
+        if (r5 == 0) goto L_0x0083;
+    L_0x0096:
+        r1 = r2;
+        goto L_0x0083;
     L_0x0098:
-        r0 = r1;
-        goto L_0x0084;
-    L_0x009a:
         r7 = "U";
-        r5 = r5.equals(r7);	 Catch:{ IOException -> 0x00b7 }
-        if (r5 == 0) goto L_0x0084;
+        r5 = r5.equals(r7);	 Catch:{ IOException -> 0x00b5 }
+        if (r5 == 0) goto L_0x0083;
+    L_0x00a0:
+        r1 = r3;
+        goto L_0x0083;
     L_0x00a2:
-        r0 = r2;
-        goto L_0x0084;
-    L_0x00a4:
-        r0 = com.google.firebase.iid.FirebaseInstanceId.getInstance();	 Catch:{ IOException -> 0x00b7 }
-        r0.zzpr(r6);	 Catch:{ IOException -> 0x00b7 }
-        r0 = r8.zzmje;	 Catch:{ IOException -> 0x00b7 }
-        if (r0 == 0) goto L_0x0087;
-    L_0x00af:
-        r0 = "FirebaseInstanceId";
+        r1 = com.google.firebase.iid.FirebaseInstanceId.getInstance();	 Catch:{ IOException -> 0x00b5 }
+        r1.zzpr(r6);	 Catch:{ IOException -> 0x00b5 }
+        r1 = r8.zzmje;	 Catch:{ IOException -> 0x00b5 }
+        if (r1 == 0) goto L_0x0086;
+    L_0x00ad:
+        r1 = "FirebaseInstanceId";
         r5 = "subscribe operation succeeded";
-        android.util.Log.d(r0, r5);	 Catch:{ IOException -> 0x00b7 }
-        goto L_0x0087;
-    L_0x00b7:
+        android.util.Log.d(r1, r5);	 Catch:{ IOException -> 0x00b5 }
+        goto L_0x0086;
+    L_0x00b5:
         r0 = move-exception;
         r0 = r0.getMessage();
         r8.zza(r9, r0);
         goto L_0x000f;
-    L_0x00c1:
-        r0 = com.google.firebase.iid.FirebaseInstanceId.getInstance();	 Catch:{ IOException -> 0x00b7 }
-        r0.zzps(r6);	 Catch:{ IOException -> 0x00b7 }
-        r0 = r8.zzmje;	 Catch:{ IOException -> 0x00b7 }
-        if (r0 == 0) goto L_0x0087;
-    L_0x00cc:
-        r0 = "FirebaseInstanceId";
+    L_0x00bf:
+        r1 = com.google.firebase.iid.FirebaseInstanceId.getInstance();	 Catch:{ IOException -> 0x00b5 }
+        r1.zzps(r6);	 Catch:{ IOException -> 0x00b5 }
+        r1 = r8.zzmje;	 Catch:{ IOException -> 0x00b5 }
+        if (r1 == 0) goto L_0x0086;
+    L_0x00ca:
+        r1 = "FirebaseInstanceId";
         r5 = "unsubscribe operation succeeded";
-        android.util.Log.d(r0, r5);	 Catch:{ IOException -> 0x00b7 }
-        goto L_0x0087;
-    L_0x00d4:
+        android.util.Log.d(r1, r5);	 Catch:{ IOException -> 0x00b5 }
+        goto L_0x0086;
+    L_0x00d2:
         r0 = "FirebaseInstanceId";
         r1 = "topic sync succeeded";
         android.util.Log.d(r0, r1);

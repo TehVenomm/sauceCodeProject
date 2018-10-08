@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -85,6 +86,7 @@ public class QuestOffLineChangeEquipSet : QuestChangeEquipSet
 
 	public override void Initialize()
 	{
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 		isChangeEquip = true;
 		isVisualMode = false;
 		isSelfData = true;
@@ -92,8 +94,8 @@ public class QuestOffLineChangeEquipSet : QuestChangeEquipSet
 		record = InitializePlayerRecord();
 		localEquipSets = MonoBehaviourSingleton<StatusManager>.I.GetLocalEquipSet();
 		localEquipSet = localEquipSets[selfCharaEquipSetNo];
-		transRoot = SetPrefab(UI.OBJ_EQUIP_SET_ROOT, "OfflineChangeEquipSetBase");
-		StartCoroutine(DoInitialize());
+		transRoot = SetPrefab((Enum)UI.OBJ_EQUIP_SET_ROOT, "OfflineChangeEquipSetBase");
+		this.StartCoroutine(DoInitialize());
 	}
 
 	public override void UpdateUI()
@@ -101,8 +103,8 @@ public class QuestOffLineChangeEquipSet : QuestChangeEquipSet
 		localEquipSet = localEquipSets[selfCharaEquipSetNo];
 		UpdateEquipSetUI();
 		OnUpdateFriendDetailUI();
-		ResetTween(UI.OBJ_EQUIP_ROOT, 0);
-		PlayTween(UI.OBJ_EQUIP_ROOT, true, delegate
+		ResetTween((Enum)UI.OBJ_EQUIP_ROOT, 0);
+		PlayTween((Enum)UI.OBJ_EQUIP_ROOT, true, (EventDelegate.Callback)delegate
 		{
 		}, false, 0);
 		UpdateCopyModeButton();
@@ -110,13 +112,14 @@ public class QuestOffLineChangeEquipSet : QuestChangeEquipSet
 
 	protected override void UpdateEquipSkillButton(EquipItemInfo item, int i)
 	{
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(icons_btn[i]);
 		bool flag = item != null && item.tableID != 0;
 		if (flag)
 		{
 			SetSkillIconButton(ctrl, UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButtonTOP", item.tableData, GetSkillSlotData(item), "SKILL_ICON_BUTTON", i);
 		}
-		FindCtrl(ctrl, UI.OBJ_SKILL_BUTTON_ROOT).gameObject.SetActive(flag);
+		FindCtrl(ctrl, UI.OBJ_SKILL_BUTTON_ROOT).get_gameObject().SetActive(flag);
 	}
 
 	protected override void ReloadModel()
@@ -226,7 +229,7 @@ public class QuestOffLineChangeEquipSet : QuestChangeEquipSet
 
 	private void OnCloseDialog_QuestAcceptChangedEquipSetName()
 	{
-		SetLabelText(UI.LBL_SET_NAME, localEquipSets[selfCharaEquipSetNo].name);
+		SetLabelText((Enum)UI.LBL_SET_NAME, localEquipSets[selfCharaEquipSetNo].name);
 	}
 
 	protected override void OnQuery_SECTION_BACK()
@@ -275,6 +278,7 @@ public class QuestOffLineChangeEquipSet : QuestChangeEquipSet
 		equipSetCopyForm.no = selfCharaEquipSetNo;
 		MonoBehaviourSingleton<InventoryManager>.I.SendInventoryEquipSetCopy(equipSetCopyForm, delegate(bool is_success)
 		{
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			if (is_success)
 			{
 				if (MonoBehaviourSingleton<StatusManager>.IsValid())
@@ -284,7 +288,7 @@ public class QuestOffLineChangeEquipSet : QuestChangeEquipSet
 				ResetEquipSetCopy();
 				localEquipSetUpdate();
 				localEquipSet = localEquipSets[selfCharaEquipSetNo];
-				StartCoroutine(ReloadModelByLocalEquipSetCoroutine());
+				this.StartCoroutine(ReloadModelByLocalEquipSetCoroutine());
 				RefreshUI();
 			}
 			GameSection.ResumeEvent(is_success, null);
@@ -299,6 +303,7 @@ public class QuestOffLineChangeEquipSet : QuestChangeEquipSet
 
 	private void OnCloseDialog()
 	{
+		//IL_0203: Unknown result type (might be due to invalid IL or missing references)
 		object eventData = GameSection.GetEventData();
 		bool flag = false;
 		if (eventData is StatusEquip.ChangeEquipData)
@@ -340,7 +345,7 @@ public class QuestOffLineChangeEquipSet : QuestChangeEquipSet
 		{
 			localEquipSetUpdate();
 			RefreshUI();
-			StartCoroutine(ReloadModelByLocalEquipSetCoroutine());
+			this.StartCoroutine(ReloadModelByLocalEquipSetCoroutine());
 		}
 	}
 

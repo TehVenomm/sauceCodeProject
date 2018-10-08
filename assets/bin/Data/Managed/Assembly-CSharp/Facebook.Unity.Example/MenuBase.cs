@@ -30,48 +30,74 @@ namespace Facebook.Unity.Example
 			else
 			{
 				base.LastResponseTexture = null;
-				if (!string.IsNullOrEmpty(result.Error))
+				if (!string.IsNullOrEmpty(result.get_Error()))
 				{
 					base.Status = "Error - Check log for details";
-					base.LastResponse = "Error Response:\n" + result.Error;
+					base.LastResponse = "Error Response:\n" + result.get_Error();
 				}
-				else if (result.Cancelled)
+				else if (result.get_Cancelled())
 				{
 					base.Status = "Cancelled - Check log for details";
-					base.LastResponse = "Cancelled Response:\n" + result.RawResult;
+					base.LastResponse = "Cancelled Response:\n" + result.get_RawResult();
 				}
-				else if (!string.IsNullOrEmpty(result.RawResult))
+				else if (!string.IsNullOrEmpty(result.get_RawResult()))
 				{
 					base.Status = "Success - Check log for details";
-					base.LastResponse = "Success Response:\n" + result.RawResult;
+					base.LastResponse = "Success Response:\n" + result.get_RawResult();
 				}
 				else
 				{
 					base.LastResponse = "Empty Response\n";
 				}
-				LogView.AddLog(result.ToString());
+				LogView.AddLog(((object)result).ToString());
 			}
 		}
 
 		protected void OnGUI()
 		{
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Invalid comparison between Unknown and I4
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Expected O, but got Unknown
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Expected O, but got Unknown
 			if (IsHorizontalLayout())
 			{
-				GUILayout.BeginHorizontal();
-				GUILayout.BeginVertical();
+				GUILayout.BeginHorizontal((GUILayoutOption[])new GUILayoutOption[0]);
+				GUILayout.BeginVertical((GUILayoutOption[])new GUILayoutOption[0]);
 			}
-			GUILayout.Label(GetType().Name, base.LabelStyle);
+			GUILayout.Label(GetType().Name, base.LabelStyle, (GUILayoutOption[])new GUILayoutOption[0]);
 			AddStatus();
-			if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
+			if (Input.get_touchCount() > 0)
 			{
-				Vector2 scrollPosition = base.ScrollPosition;
-				float y = scrollPosition.y;
-				Vector2 deltaPosition = Input.GetTouch(0).deltaPosition;
-				scrollPosition.y = y + deltaPosition.y;
-				base.ScrollPosition = scrollPosition;
+				Touch touch = Input.GetTouch(0);
+				if ((int)touch.get_phase() == 1)
+				{
+					Vector2 scrollPosition = base.ScrollPosition;
+					float y = scrollPosition.y;
+					Touch touch2 = Input.GetTouch(0);
+					Vector2 deltaPosition = touch2.get_deltaPosition();
+					scrollPosition.y = y + deltaPosition.y;
+					base.ScrollPosition = scrollPosition;
+				}
 			}
-			base.ScrollPosition = GUILayout.BeginScrollView(base.ScrollPosition, GUILayout.MinWidth((float)ConsoleBase.MainWindowFullWidth));
-			GUILayout.BeginHorizontal();
+			base.ScrollPosition = GUILayout.BeginScrollView(base.ScrollPosition, (GUILayoutOption[])new GUILayoutOption[1]
+			{
+				GUILayout.MinWidth((float)ConsoleBase.MainWindowFullWidth)
+			});
+			GUILayout.BeginHorizontal((GUILayoutOption[])new GUILayoutOption[0]);
 			if (ShowBackButton())
 			{
 				AddBackButton();
@@ -79,14 +105,17 @@ namespace Facebook.Unity.Example
 			AddLogButton();
 			if (ShowBackButton())
 			{
-				GUILayout.Label(GUIContent.none, GUILayout.MinWidth((float)ConsoleBase.MarginFix));
+				GUILayout.Label(GUIContent.none, (GUILayoutOption[])new GUILayoutOption[1]
+				{
+					GUILayout.MinWidth((float)ConsoleBase.MarginFix)
+				});
 			}
 			GUILayout.EndHorizontal();
 			if (ShowDialogModeSelector())
 			{
 				AddDialogModeButtons();
 			}
-			GUILayout.BeginVertical();
+			GUILayout.BeginVertical((GUILayoutOption[])new GUILayoutOption[0]);
 			GetGui();
 			GUILayout.Space(10f);
 			GUILayout.EndVertical();
@@ -95,18 +124,23 @@ namespace Facebook.Unity.Example
 
 		private void AddStatus()
 		{
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Expected O, but got Unknown
 			GUILayout.Space(5f);
-			GUILayout.Box("Status: " + base.Status, base.TextStyle, GUILayout.MinWidth((float)ConsoleBase.MainWindowWidth));
+			GUILayout.Box("Status: " + base.Status, base.TextStyle, (GUILayoutOption[])new GUILayoutOption[1]
+			{
+				GUILayout.MinWidth((float)ConsoleBase.MainWindowWidth)
+			});
 		}
 
 		private void AddBackButton()
 		{
-			GUI.enabled = ConsoleBase.MenuStack.Any();
+			GUI.set_enabled(ConsoleBase.MenuStack.Any());
 			if (Button("Back"))
 			{
 				GoBack();
 			}
-			GUI.enabled = true;
+			GUI.set_enabled(true);
 		}
 
 		private void AddLogButton()
@@ -119,24 +153,30 @@ namespace Facebook.Unity.Example
 
 		private void AddDialogModeButtons()
 		{
-			GUILayout.BeginHorizontal();
+			GUILayout.BeginHorizontal((GUILayoutOption[])new GUILayoutOption[0]);
 			foreach (object value in Enum.GetValues(typeof(ShareDialogMode)))
 			{
-				AddDialogModeButton((ShareDialogMode)(int)value);
+				AddDialogModeButton((int)value);
 			}
 			GUILayout.EndHorizontal();
 		}
 
 		private void AddDialogModeButton(ShareDialogMode mode)
 		{
-			bool enabled = GUI.enabled;
-			GUI.enabled = (enabled && mode != shareDialogMode);
-			if (Button(mode.ToString()))
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			bool enabled = GUI.get_enabled();
+			GUI.set_enabled(enabled && mode != shareDialogMode);
+			if (Button(((Enum)mode).ToString()))
 			{
 				shareDialogMode = mode;
-				FB.Mobile.ShareDialogMode = mode;
+				Mobile.set_ShareDialogMode(mode);
 			}
-			GUI.enabled = enabled;
+			GUI.set_enabled(enabled);
 		}
 	}
 }

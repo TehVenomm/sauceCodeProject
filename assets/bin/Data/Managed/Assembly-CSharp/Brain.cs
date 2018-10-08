@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Brain : MonoBehaviour
+public class Brain
 {
 	public BrainParam param = new BrainParam();
 
@@ -101,7 +101,10 @@ public class Brain : MonoBehaviour
 	{
 		get
 		{
-			Vector3 position = _frontTransform.position;
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			Vector3 position = _frontTransform.get_position();
 			return new Vector2(position.x, position.z);
 		}
 	}
@@ -110,7 +113,10 @@ public class Brain : MonoBehaviour
 	{
 		get
 		{
-			Vector3 forward = _frontTransform.forward;
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			Vector3 forward = _frontTransform.get_forward();
 			return new Vector2(forward.x, forward.z);
 		}
 	}
@@ -119,7 +125,10 @@ public class Brain : MonoBehaviour
 	{
 		get
 		{
-			Vector3 position = _backTransform.position;
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			Vector3 position = _backTransform.get_position();
 			return new Vector2(position.x, position.z);
 		}
 	}
@@ -128,16 +137,24 @@ public class Brain : MonoBehaviour
 	{
 		get
 		{
-			Vector3 forward = _backTransform.forward;
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			Vector3 forward = _backTransform.get_forward();
 			return new Vector2(forward.x, forward.z);
 		}
 	}
 
 	public bool isNonActive => fsm != null && fsm.currentType == STATE_TYPE.NONACTIVE;
 
+	public Brain()
+		: this()
+	{
+	}
+
 	protected virtual void Awake()
 	{
-		owner = GetComponentInParent<Character>();
+		owner = this.GetComponentInParent<Character>();
 		isInitialized = false;
 	}
 
@@ -152,7 +169,7 @@ public class Brain : MonoBehaviour
 
 	protected virtual void Update()
 	{
-		if (!((Object)owner == (Object)null) && !owner.isDead && isInitialized)
+		if (!(owner == null) && !owner.isDead && isInitialized)
 		{
 			if (opponentMemSpanTimer != null && opponentMemSpanTimer.IsReady())
 			{
@@ -183,7 +200,7 @@ public class Brain : MonoBehaviour
 
 	public void Initialize()
 	{
-		if (!((Object)owner == (Object)null) && owner.isInitialized && !isInitialized)
+		if (!(owner == null) && owner.isInitialized && !isInitialized)
 		{
 			OnInitialize();
 			isInitialized = true;
@@ -192,6 +209,14 @@ public class Brain : MonoBehaviour
 
 	protected virtual void OnInitialize()
 	{
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
 		opponentMem = new OpponentMemory(this);
 		targetCtrl = new TargetController(this);
 		moveCtrl = new MoveController(this);
@@ -201,8 +226,10 @@ public class Brain : MonoBehaviour
 		_frontTransform = GetFront();
 		_backTransform = GetBack();
 		rootInternalRedius = param.sensorParam.internalRadius * GetScale();
-		rootFrontDistance = (frontPositionXZ - owner.positionXZ).magnitude - rootInternalRedius;
-		rootBackDistance = (backPositionXZ - owner.positionXZ).magnitude - rootInternalRedius;
+		Vector2 val = frontPositionXZ - owner.positionXZ;
+		rootFrontDistance = val.get_magnitude() - rootInternalRedius;
+		Vector2 val2 = backPositionXZ - owner.positionXZ;
+		rootBackDistance = val2.get_magnitude() - rootInternalRedius;
 	}
 
 	public void ResetInitialized()
@@ -244,11 +271,11 @@ public class Brain : MonoBehaviour
 			{
 				opponentMem.Remove(stageObject);
 			}
-			if (targetCtrl != null && (Object)targetCtrl.GetCurrentTarget() == (Object)stageObject)
+			if (targetCtrl != null && targetCtrl.GetCurrentTarget() == stageObject)
 			{
 				targetCtrl.MissCurrentTarget();
 			}
-			if (targetCtrl != null && (Object)targetCtrl.GetAllyTarget() == (Object)stageObject)
+			if (targetCtrl != null && targetCtrl.GetAllyTarget() == stageObject)
 			{
 				targetCtrl.SetAllyTarget(null);
 			}

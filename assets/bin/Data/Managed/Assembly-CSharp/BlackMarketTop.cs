@@ -63,7 +63,7 @@ public class BlackMarketTop : GameSection
 
 	private Color mediumSale = new Color(1f, 0.403921574f, 0.168627456f, 1f);
 
-	private Color hotSale = Color.red;
+	private Color hotSale = Color.get_red();
 
 	private Color disableTintColor = new Color(0.4f, 0.4f, 0.4f, 1f);
 
@@ -75,12 +75,17 @@ public class BlackMarketTop : GameSection
 
 	private bool isReseting;
 
-	public override void Initialize()
+	public unsafe override void Initialize()
 	{
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Expected O, but got Unknown
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003b: Expected O, but got Unknown
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
 		GameSaveData.instance.canShowNoteDarkMarket = false;
 		MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.UpdateNoteMarket();
 		ShopReceiver i = MonoBehaviourSingleton<ShopReceiver>.I;
-		i.onBillingUnavailable = (Action)Delegate.Combine(i.onBillingUnavailable, new Action(OnBillingUnavailable));
+		i.onBillingUnavailable = Delegate.Combine((Delegate)i.onBillingUnavailable, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		ShopReceiver i2 = MonoBehaviourSingleton<ShopReceiver>.I;
 		i2.onBuyItem = (Action<string>)Delegate.Combine(i2.onBuyItem, new Action<string>(OnBuyItem));
 		ShopReceiver i3 = MonoBehaviourSingleton<ShopReceiver>.I;
@@ -89,7 +94,7 @@ public class BlackMarketTop : GameSection
 		i4.onBuyMaterialItem = (Action<ShopReceiver.PaymentPurchaseData>)Delegate.Combine(i4.onBuyMaterialItem, new Action<ShopReceiver.PaymentPurchaseData>(OnBuyMaterial));
 		ShopReceiver i5 = MonoBehaviourSingleton<ShopReceiver>.I;
 		i5.onGetProductDatas = (Action<StoreDataList>)Delegate.Combine(i5.onGetProductDatas, new Action<StoreDataList>(OnGetProductDatas));
-		StartCoroutine(DoInitialize());
+		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -126,15 +131,19 @@ public class BlackMarketTop : GameSection
 		LoadDarkMarketUI(true);
 		UpdateNPC();
 		base.Initialize();
-		StartCoroutine("TimeCountDown");
+		this.StartCoroutine("TimeCountDown");
 	}
 
-	protected override void OnDestroy()
+	protected unsafe override void OnDestroy()
 	{
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Expected O, but got Unknown
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002b: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<ShopReceiver>.IsValid())
 		{
 			ShopReceiver i = MonoBehaviourSingleton<ShopReceiver>.I;
-			i.onBillingUnavailable = (Action)Delegate.Remove(i.onBillingUnavailable, new Action(OnBillingUnavailable));
+			i.onBillingUnavailable = Delegate.Remove((Delegate)i.onBillingUnavailable, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			ShopReceiver i2 = MonoBehaviourSingleton<ShopReceiver>.I;
 			i2.onBuyItem = (Action<string>)Delegate.Remove(i2.onBuyItem, new Action<string>(OnBuyItem));
 			ShopReceiver i3 = MonoBehaviourSingleton<ShopReceiver>.I;
@@ -149,8 +158,8 @@ public class BlackMarketTop : GameSection
 
 	private void LoadDarkMarketUI(bool isReloadIcon)
 	{
-		SetLabelText(UI.LBL_CRYSTAL_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal.ToString("N0"));
-		SetLabelText(UI.LBL_GOLD_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money.ToString("N0"));
+		SetLabelText((Enum)UI.LBL_CRYSTAL_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal.ToString("N0"));
+		SetLabelText((Enum)UI.LBL_GOLD_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money.ToString("N0"));
 		int count = MonoBehaviourSingleton<ShopManager>.I.darkMarketItemList.items.Count;
 		int num = 1;
 		bool flag = false;
@@ -178,50 +187,55 @@ public class BlackMarketTop : GameSection
 		}
 		if (!flag)
 		{
-			SetActive(UI.BTN_FEATURED_OFFER, false);
+			SetActive((Enum)UI.BTN_FEATURED_OFFER, false);
 		}
 	}
 
 	private void InitDrakMarketFeatured(DarkMarketItem data, bool isReloadIcon = true)
 	{
-		SetActive(UI.BTN_FEATURED_OFFER, true);
+		//IL_0205: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+		//IL_023d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_036f: Unknown result type (might be due to invalid IL or missing references)
+		SetActive((Enum)UI.BTN_FEATURED_OFFER, true);
 		if (data.saleType == 1)
 		{
-			SetEvent(UI.BTN_FEATURED_OFFER, "BUY_NORMAL", data.id);
+			SetEvent((Enum)UI.BTN_FEATURED_OFFER, "BUY_NORMAL", data.id);
 		}
 		else if (data.saleType == 2)
 		{
-			SetEvent(UI.BTN_FEATURED_OFFER, "BUY_NORMAL", data.id);
+			SetEvent((Enum)UI.BTN_FEATURED_OFFER, "BUY_NORMAL", data.id);
 		}
 		else if (data.saleType == 200)
 		{
-			SetEvent(UI.BTN_FEATURED_OFFER, "BUY_IAP", data.id);
+			SetEvent((Enum)UI.BTN_FEATURED_OFFER, "BUY_IAP", data.id);
 		}
-		SetFontStyle(UI.LBL_OFFER_SALE_VALUE, FontStyle.Italic);
-		SetLabelText(UI.LBL_OFFER_NAME, data.name);
+		SetFontStyle((Enum)UI.LBL_OFFER_SALE_VALUE, 2);
+		SetLabelText((Enum)UI.LBL_OFFER_NAME, data.name);
 		if (!string.IsNullOrEmpty(data.refProductId))
 		{
-			SetActive(UI.LBL_OFFER_OLD_PRICE, true);
-			SetLabelText(UI.LBL_OFFER_OLD_PRICE, $"[s]${data.baseNum}[/s]");
+			SetActive((Enum)UI.LBL_OFFER_OLD_PRICE, true);
+			SetLabelText((Enum)UI.LBL_OFFER_OLD_PRICE, $"[s]${data.baseNum}[/s]");
 			SetSupportEncoding(UI.LBL_OFFER_OLD_PRICE, true);
 		}
 		else
 		{
-			SetActive(UI.LBL_OFFER_OLD_PRICE, false);
+			SetActive((Enum)UI.LBL_OFFER_OLD_PRICE, false);
 		}
-		SetLabelText(UI.LBL_OFFER_SALE_PRICE, $"${data.saleNum}");
+		SetLabelText((Enum)UI.LBL_OFFER_SALE_PRICE, $"${data.saleNum}");
 		int num = 100 - Mathf.RoundToInt(data.saleNum / data.baseNum * 100f);
 		if (_nativeStoreList != null)
 		{
 			StoreData product = _nativeStoreList.getProduct(data.saleoffProductId);
 			if (product != null)
 			{
-				SetLabelText(UI.LBL_OFFER_SALE_PRICE, product.price.ToString());
+				SetLabelText((Enum)UI.LBL_OFFER_SALE_PRICE, product.price.ToString());
 			}
 			StoreData product2 = _nativeStoreList.getProduct(data.refProductId);
 			if (product2 != null)
 			{
-				SetLabelText(UI.LBL_OFFER_OLD_PRICE, $"[s]{product2.price}[/s]");
+				SetLabelText((Enum)UI.LBL_OFFER_OLD_PRICE, $"[s]{product2.price}[/s]");
 			}
 			if (product != null && product2 != null)
 			{
@@ -230,41 +244,41 @@ public class BlackMarketTop : GameSection
 		}
 		if (num < 30)
 		{
-			SetColor(UI.LBL_OFFER_SALE_VALUE, normalSale);
+			SetColor((Enum)UI.LBL_OFFER_SALE_VALUE, normalSale);
 		}
 		else if (num < 70)
 		{
-			SetColor(UI.LBL_OFFER_SALE_VALUE, mediumSale);
+			SetColor((Enum)UI.LBL_OFFER_SALE_VALUE, mediumSale);
 		}
 		else
 		{
-			SetColor(UI.LBL_OFFER_SALE_VALUE, hotSale);
+			SetColor((Enum)UI.LBL_OFFER_SALE_VALUE, hotSale);
 		}
 		if (num > 0)
 		{
-			SetLabelText(UI.LBL_OFFER_SALE_VALUE, $"-{num}%");
+			SetLabelText((Enum)UI.LBL_OFFER_SALE_VALUE, $"-{num}%");
 		}
 		else
 		{
-			SetLabelText(UI.LBL_OFFER_SALE_VALUE, $"{num}%");
+			SetLabelText((Enum)UI.LBL_OFFER_SALE_VALUE, $"{num}%");
 		}
 		if (data.usedCount >= data.limit)
 		{
-			SetSliderValue(UI.SLD_OFFER_BUY_PROGRESS, 0f);
-			SetActive(UI.LBL_OFFER_SALE_PROGRESS, false);
-			SetActive(UI.OBJ_OFFER_OUT_OFF_STOCK, true);
-			SetColor(UI.FEATURED_OFFER_BANNER, disableTintColor);
-			SetButtonEnabled(UI.BTN_FEATURED_OFFER, false);
+			SetSliderValue((Enum)UI.SLD_OFFER_BUY_PROGRESS, 0f);
+			SetActive((Enum)UI.LBL_OFFER_SALE_PROGRESS, false);
+			SetActive((Enum)UI.OBJ_OFFER_OUT_OFF_STOCK, true);
+			SetColor((Enum)UI.FEATURED_OFFER_BANNER, disableTintColor);
+			SetButtonEnabled((Enum)UI.BTN_FEATURED_OFFER, false);
 		}
 		else
 		{
 			float value = 1f - (float)data.usedCount / (float)data.limit;
-			SetSliderValue(UI.SLD_OFFER_BUY_PROGRESS, value);
-			SetActive(UI.LBL_OFFER_SALE_PROGRESS, true);
-			SetLabelText(UI.LBL_OFFER_SALE_PROGRESS, $"{data.limit - data.usedCount}/{data.limit}");
-			SetActive(UI.OBJ_OFFER_OUT_OFF_STOCK, false);
-			SetColor(UI.FEATURED_OFFER_BANNER, Color.white);
-			SetButtonEnabled(UI.BTN_FEATURED_OFFER, true);
+			SetSliderValue((Enum)UI.SLD_OFFER_BUY_PROGRESS, value);
+			SetActive((Enum)UI.LBL_OFFER_SALE_PROGRESS, true);
+			SetLabelText((Enum)UI.LBL_OFFER_SALE_PROGRESS, $"{data.limit - data.usedCount}/{data.limit}");
+			SetActive((Enum)UI.OBJ_OFFER_OUT_OFF_STOCK, false);
+			SetColor((Enum)UI.FEATURED_OFFER_BANNER, Color.get_white());
+			SetButtonEnabled((Enum)UI.BTN_FEATURED_OFFER, true);
 		}
 		if (isReloadIcon)
 		{
@@ -272,7 +286,7 @@ public class BlackMarketTop : GameSection
 			UITexture spro = FindCtrl(ctrl, UI.FEATURED_OFFER_BANNER).GetComponent<UITexture>();
 			ResourceLoad.LoadBlackMarketOfferTexture(spro, data.imgId, delegate(Texture tex)
 			{
-				if ((UnityEngine.Object)spro != (UnityEngine.Object)null)
+				if (spro != null)
 				{
 					spro.mainTexture = tex;
 				}
@@ -282,30 +296,33 @@ public class BlackMarketTop : GameSection
 
 	private void InitDrakMarketItem(int index, DarkMarketItem data, bool isReloadIcon = true)
 	{
+		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
 		if (data == null)
 		{
-			SetActive((UI)index, false);
+			SetActive((Enum)(UI)index, false);
 		}
 		else
 		{
 			Transform ctrl = GetCtrl((UI)index);
 			if (data.saleType == 1)
 			{
-				SetEvent((UI)index, "BUY_NORMAL", data.id);
+				SetEvent((Enum)(UI)index, "BUY_NORMAL", data.id);
 				SetActive(ctrl, UI.SPR_GOLD_ITEM_BG, false);
 				SetActive(ctrl, UI.SPR_GEM_ITEM_BG, true);
 				SetLabelText(ctrl, UI.LBL_GEM_SALE_PRICE, $"x{data.saleNum}");
 			}
 			else if (data.saleType == 2)
 			{
-				SetEvent((UI)index, "BUY_NORMAL", data.id);
+				SetEvent((Enum)(UI)index, "BUY_NORMAL", data.id);
 				SetActive(ctrl, UI.SPR_GOLD_ITEM_BG, true);
 				SetLabelText(ctrl, UI.LBL_GOLD_SALE_PRICE, string.Format("x{0}", data.saleNum.ToString("N0")));
 				SetActive(ctrl, UI.SPR_GEM_ITEM_BG, false);
 			}
 			else if (data.saleType == 200)
 			{
-				SetEvent((UI)index, "BUY_IAP", data.id);
+				SetEvent((Enum)(UI)index, "BUY_IAP", data.id);
 			}
 			int num = 100 - Mathf.RoundToInt(data.saleNum / data.baseNum * 100f);
 			if (num < 30)
@@ -336,7 +353,7 @@ public class BlackMarketTop : GameSection
 			{
 				SetLabelText(ctrl, UI.LBL_SALE_PERCENT, $"{num}%");
 			}
-			SetFontStyle(ctrl, UI.LBL_SALE_PERCENT, FontStyle.Italic);
+			SetFontStyle(ctrl, UI.LBL_SALE_PERCENT, 2);
 			SetLabelText(ctrl, UI.LBL_ITEM_NAME, data.name);
 			if (data.rewards != null && data.rewards.Count > 0)
 			{
@@ -381,19 +398,19 @@ public class BlackMarketTop : GameSection
 			if (flag2 || flag)
 			{
 				SetActive(ctrl, UI.SPR_DISABLE_MASK, true);
-				SetButtonEnabled((UI)index, false);
+				SetButtonEnabled((Enum)(UI)index, false);
 			}
 			else
 			{
 				SetActive(ctrl, UI.SPR_DISABLE_MASK, false);
-				SetButtonEnabled((UI)index, true);
+				SetButtonEnabled((Enum)(UI)index, true);
 			}
 			if (isReloadIcon)
 			{
 				UITexture spro = FindCtrl(ctrl, UI.IMG_ICON).GetComponent<UITexture>();
 				ResourceLoad.LoadBlackMarketIconTexture(spro, data.imgId, delegate(Texture tex)
 				{
-					if ((UnityEngine.Object)spro != (UnityEngine.Object)null)
+					if (spro != null)
 					{
 						spro.mainTexture = tex;
 					}
@@ -404,6 +421,8 @@ public class BlackMarketTop : GameSection
 
 	public override void OnNotify(NOTIFY_FLAG flags)
 	{
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 		if ((flags & NOTIFY_FLAG.UPDATE_DARK_MARKET) != (NOTIFY_FLAG)0L)
 		{
 			if (!isRelloading && !isReseting)
@@ -417,9 +436,9 @@ public class BlackMarketTop : GameSection
 			if (timeResetMarket > 0)
 			{
 				isRelloading = false;
-				StopAllCoroutines();
-				StartCoroutine("TimeCountDown");
-				StartCoroutine("DoResetMarketData");
+				this.StopAllCoroutines();
+				this.StartCoroutine("TimeCountDown");
+				this.StartCoroutine("DoResetMarketData");
 			}
 		}
 		base.OnNotify(flags);
@@ -427,6 +446,8 @@ public class BlackMarketTop : GameSection
 
 	private void UpdateNPC()
 	{
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 		string empty = string.Empty;
 		NPCMessageTable.Section section = Singleton<NPCMessageTable>.I.GetSection(base.sectionData.sectionName + "_TEXT");
 		if (section != null)
@@ -435,11 +456,11 @@ public class BlackMarketTop : GameSection
 			if (message != null)
 			{
 				empty = message.message;
-				SetRenderNPCModel(UI.TEX_NPCMODEL, message.npc, message.pos, message.rot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.questCenterNPCFOV, delegate(NPCLoader loader)
+				SetRenderNPCModel((Enum)UI.TEX_NPCMODEL, message.npc, message.pos, message.rot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.questCenterNPCFOV, (Action<NPCLoader>)delegate(NPCLoader loader)
 				{
 					loader.GetAnimator().Play(message.animationStateName);
 				});
-				SetLabelText(UI.LBL_NPC_MESSAGE, empty);
+				SetLabelText((Enum)UI.LBL_NPC_MESSAGE, empty);
 			}
 		}
 	}
@@ -467,11 +488,13 @@ public class BlackMarketTop : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<ShopManager>.I.SendBuyDarkMarket(currentItemChoosed.id, delegate(Error error)
 		{
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
 			switch (error)
 			{
 			case Error.None:
 				GameSection.ChangeStayEvent("BUY_SUCCESS", null);
-				StartCoroutine("DoReloadMarketData");
+				this.StartCoroutine("DoReloadMarketData");
 				break;
 			case Error.ERR_BM_NOT_ENOUGH_GOLD:
 			case Error.ERR_BM_NOT_ENOUGH_GEM:
@@ -487,7 +510,7 @@ public class BlackMarketTop : GameSection
 			{
 				string errorMessage = StringTable.GetErrorMessage((uint)error);
 				GameSection.ChangeStayEvent("BUY_ERROR", errorMessage);
-				StartCoroutine("DoReloadMarketData");
+				this.StartCoroutine("DoReloadMarketData");
 				break;
 			}
 			default:
@@ -572,16 +595,14 @@ public class BlackMarketTop : GameSection
 	{
 	}
 
-	private void OnBuyItem(string productId)
+	private unsafe void OnBuyItem(string productId)
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Expected O, but got Unknown
 		if (!string.IsNullOrEmpty(productId))
 		{
 			isPurchase = false;
-			SendRequestCurrentPresentAndShopList(delegate
-			{
-				GameSection.ChangeStayEvent("BUY_SUCCESS", null);
-				StartCoroutine("DoReloadMarketData");
-			});
+			SendRequestCurrentPresentAndShopList(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		if (isPurchase)
 		{
@@ -589,16 +610,14 @@ public class BlackMarketTop : GameSection
 		}
 	}
 
-	private void OnBuyBundle(ShopReceiver.PaymentPurchaseData purchaseData)
+	private unsafe void OnBuyBundle(ShopReceiver.PaymentPurchaseData purchaseData)
 	{
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0025: Expected O, but got Unknown
 		if (purchaseData != null && purchaseData.bundle != null)
 		{
 			isPurchase = false;
-			SendRequestCurrentPresentAndShopList(delegate
-			{
-				GameSection.ChangeStayEvent("BUY_SUCCESS", null);
-				StartCoroutine("DoReloadMarketData");
-			});
+			SendRequestCurrentPresentAndShopList(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		if (isPurchase)
 		{
@@ -606,16 +625,14 @@ public class BlackMarketTop : GameSection
 		}
 	}
 
-	private void OnBuyMaterial(ShopReceiver.PaymentPurchaseData purchaseData)
+	private unsafe void OnBuyMaterial(ShopReceiver.PaymentPurchaseData purchaseData)
 	{
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Expected O, but got Unknown
 		if (purchaseData != null)
 		{
 			isPurchase = false;
-			SendRequestCurrentPresentAndShopList(delegate
-			{
-				GameSection.ChangeStayEvent("BUY_SUCCESS", null);
-				StartCoroutine("DoReloadMarketData");
-			});
+			SendRequestCurrentPresentAndShopList(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		if (isPurchase)
 		{
@@ -631,15 +648,12 @@ public class BlackMarketTop : GameSection
 		}, string.Empty);
 	}
 
-	private void SendRequestCurrentPresentAndShopList(Action onFinish)
+	private unsafe void SendRequestCurrentPresentAndShopList(Action onFinish)
 	{
-		SendRequestCurrentCrystal(delegate
-		{
-			MonoBehaviourSingleton<PresentManager>.I.SendGetPresent(0, delegate
-			{
-				onFinish();
-			});
-		});
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Expected O, but got Unknown
+		_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2C8 _003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2C;
+		SendRequestCurrentCrystal(new Action((object)_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void CheckCrystalNum(OnceStatusInfoModel ret, Action onFinish)
@@ -648,7 +662,7 @@ public class BlackMarketTop : GameSection
 		{
 			MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal = ret.result.userStatus.crystal;
 			MonoBehaviourSingleton<UserInfoManager>.I.DirtyUserStatus();
-			onFinish();
+			onFinish.Invoke();
 		}
 	}
 
@@ -663,7 +677,7 @@ public class BlackMarketTop : GameSection
 		UILabel timeLbl = GetCtrl(UI.LBL_TIME_COUNT).GetComponent<UILabel>();
 		if (string.IsNullOrEmpty(GameSaveData.instance.resetMarketTime))
 		{
-			timeLbl.color = Color.red;
+			timeLbl.color = Color.get_red();
 			timeLbl.text = "00:00:00";
 		}
 		else
@@ -674,7 +688,7 @@ public class BlackMarketTop : GameSection
 				timeLbl.text = UIUtility.TimeFormat(timeResetMarket, true);
 				yield return (object)new WaitForSeconds(0.25f);
 			}
-			timeLbl.color = Color.red;
+			timeLbl.color = Color.get_red();
 			currentNPCMessageIndex = 1;
 			NPCMessageTable.Section npc_messgae = Singleton<NPCMessageTable>.I.GetSection(base.sectionData.sectionName + "_TEXT");
 			if (npc_messgae != null)
@@ -682,7 +696,7 @@ public class BlackMarketTop : GameSection
 				NPCMessageTable.Message message = npc_messgae.messages[currentNPCMessageIndex];
 				if (message != null)
 				{
-					SetLabelText(UI.LBL_NPC_MESSAGE, message.message);
+					SetLabelText((Enum)UI.LBL_NPC_MESSAGE, message.message);
 				}
 			}
 			while (timeResetMarket > 0)
@@ -693,7 +707,7 @@ public class BlackMarketTop : GameSection
 			}
 			yield return (object)null;
 			MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.Close(UITransition.TYPE.CLOSE);
-			yield return (object)StartCoroutine(_DoCloseDialog());
+			yield return (object)this.StartCoroutine(_DoCloseDialog());
 			GameSection.BackSection();
 		}
 	}
@@ -707,7 +721,7 @@ public class BlackMarketTop : GameSection
 		if (!MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName().Equals("BlackMarketTop"))
 		{
 			GameSection.BackSection();
-			yield return (object)StartCoroutine(_DoCloseDialog());
+			yield return (object)this.StartCoroutine(_DoCloseDialog());
 		}
 	}
 

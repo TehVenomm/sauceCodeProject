@@ -142,7 +142,8 @@ public final class zzcgd extends zzegi<zzcgd> {
 
     protected final int zzn() {
         int i;
-        int i2 = 0;
+        int i2;
+        int i3 = 0;
         int zzn = super.zzn();
         if (this.zzjaa == null || this.zzjaa.length <= 0) {
             i = zzn;
@@ -156,9 +157,11 @@ public final class zzcgd extends zzegi<zzcgd> {
         if (this.zzjab == null || this.zzjab.length <= 0) {
             return i;
         }
-        for (long zzcp2 : this.zzjab) {
-            i2 += zzegg.zzcp(zzcp2);
+        i2 = 0;
+        while (i3 < this.zzjab.length) {
+            i2 += zzegg.zzcp(this.zzjab[i3]);
+            i3++;
         }
-        return (i + i2) + (this.zzjab.length * 1);
+        return (i2 + i) + (this.zzjab.length * 1);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public abstract class SkillSelectBase : ItemDetailSkill
@@ -97,14 +98,14 @@ public abstract class SkillSelectBase : ItemDetailSkill
 
 	public override void UpdateUI()
 	{
-		SetFontStyle(UI.STR_TITLE_ITEM_INFO, FontStyle.Italic);
-		SetFontStyle(UI.STR_TITLE_DESCRIPTION, FontStyle.Italic);
-		SetFontStyle(UI.STR_TITLE_STATUS, FontStyle.Italic);
-		SetFontStyle(UI.STR_TITLE_SELL, FontStyle.Italic);
-		SetActive(UI.BTN_DECISION, true);
-		SetActive(UI.BTN_SKILL_DECISION, false);
-		SetLabelText(UI.STR_DECISION_R, base.sectionData.GetText("STR_DECISION"));
-		SetActive(UI.BTN_CHANGE_INVENTORY, false);
+		SetFontStyle((Enum)UI.STR_TITLE_ITEM_INFO, 2);
+		SetFontStyle((Enum)UI.STR_TITLE_DESCRIPTION, 2);
+		SetFontStyle((Enum)UI.STR_TITLE_STATUS, 2);
+		SetFontStyle((Enum)UI.STR_TITLE_SELL, 2);
+		SetActive((Enum)UI.BTN_DECISION, true);
+		SetActive((Enum)UI.BTN_SKILL_DECISION, false);
+		SetLabelText((Enum)UI.STR_DECISION_R, base.sectionData.GetText("STR_DECISION"));
+		SetActive((Enum)UI.BTN_CHANGE_INVENTORY, false);
 		if (inventory == null || updateInventory)
 		{
 			selectIndex = GetInventoryFirstIndex();
@@ -134,8 +135,8 @@ public abstract class SkillSelectBase : ItemDetailSkill
 			updateInventory = false;
 		}
 		SetInventoryIsEmptyParam();
-		SetLabelText(UI.LBL_SORT, inventory.sortSettings.GetSortLabel());
-		SetToggle(UI.TGL_ICON_ASC, inventory.sortSettings.orderTypeAsc);
+		SetLabelText((Enum)UI.LBL_SORT, inventory.sortSettings.GetSortLabel());
+		SetToggle((Enum)UI.TGL_ICON_ASC, inventory.sortSettings.orderTypeAsc);
 		UpdateInventoryUI();
 		UpdateParam();
 	}
@@ -158,13 +159,13 @@ public abstract class SkillSelectBase : ItemDetailSkill
 
 	protected void _SetupDetailBase()
 	{
-		SetActive(UI.OBJ_SKILL_INFO_ROOT, false);
+		SetActive((Enum)UI.OBJ_SKILL_INFO_ROOT, false);
 		base.SetupDetailBase();
 	}
 
 	protected void _SetupSkillInfoRoot()
 	{
-		SetActive(UI.OBJ_SKILL_INFO_ROOT, true);
+		SetActive((Enum)UI.OBJ_SKILL_INFO_ROOT, true);
 		detailBase = GetCtrl(UI.OBJ_SKILL_INFO_ROOT);
 	}
 
@@ -178,40 +179,12 @@ public abstract class SkillSelectBase : ItemDetailSkill
 		return new ItemStorageTop.SkillItemInventory(SortSettings.SETTINGS_TYPE.SKILL_ITEM, SKILL_SLOT_TYPE.NONE, false);
 	}
 
-	protected virtual void UpdateInventoryUI()
+	protected unsafe virtual void UpdateInventoryUI()
 	{
 		SetupEnableInventoryUI();
 		m_generatedIconList.Clear();
 		UpdateNewIconInfo();
-		SetDynamicList(inventoryUI, null, inventory.datas.Length, false, delegate(int i)
-		{
-			SortCompareData sortCompareData2 = inventory.datas[i];
-			if (sortCompareData2 == null || !sortCompareData2.IsPriority(inventory.sortSettings.orderTypeAsc))
-			{
-				return false;
-			}
-			return true;
-		}, null, delegate(int i, Transform t, bool is_recycle)
-		{
-			SortCompareData sortCompareData = inventory.datas[i];
-			if (sortCompareData != null && sortCompareData.IsPriority(inventory.sortSettings.orderTypeAsc))
-			{
-				ITEM_ICON_TYPE iconType = sortCompareData.GetIconType();
-				bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, sortCompareData.GetUniqID());
-				ItemIcon itemIcon = CreateItemIconDetail(iconType, sortCompareData.GetIconID(), sortCompareData.GetRarity(), sortCompareData as SkillItemSortData, IsShowMainStatus, t, "SELECT", i, is_new, 100, selectIndex == i, sortCompareData.IsEquipping(), sortCompareData.IsExceeded(), false);
-				itemIcon.SetItemID(sortCompareData.GetTableID());
-				itemIcon.SetButtonColor(inventory.datas[i].IsPriority(inventory.sortSettings.orderTypeAsc), true);
-				SetLongTouch(itemIcon.transform, "DETAIL", i);
-				if ((Object)itemIcon != (Object)null && sortCompareData != null)
-				{
-					itemIcon.SetInitData(sortCompareData);
-				}
-				if (!m_generatedIconList.Contains(itemIcon))
-				{
-					m_generatedIconList.Add(itemIcon);
-				}
-			}
-		});
+		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, false, new Func<int, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected void OnQuery_SORT()
@@ -309,11 +282,11 @@ public abstract class SkillSelectBase : ItemDetailSkill
 		int i = 0;
 		for (int num = switchInventoryAry.Length; i < num; i++)
 		{
-			SetActive(switchInventoryAry[i], false);
+			SetActive((Enum)switchInventoryAry[i], false);
 		}
-		SetActive(switchInventoryAry[inventoryUIIndex], true);
+		SetActive((Enum)switchInventoryAry[inventoryUIIndex], true);
 		inventoryUI = switchInventoryAry[inventoryUIIndex];
-		SetToggle(UI.TGL_CHANGE_INVENTORY, inventoryUI == UI.GRD_INVENTORY);
+		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, inventoryUI == UI.GRD_INVENTORY);
 	}
 
 	protected virtual void OnQuery_CHANGE_INVENTORY()

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class BulletData : ScriptableObject
+public class BulletData
 {
 	public enum BULLET_TYPE
 	{
@@ -56,17 +56,17 @@ public class BulletData : ScriptableObject
 
 		public float radius;
 
-		public Vector3 dispOffset = Vector3.zero;
+		public Vector3 dispOffset = Vector3.get_zero();
 
-		public Vector3 dispRotation = Vector3.zero;
+		public Vector3 dispRotation = Vector3.get_zero();
 
-		public Vector3 hitOffset = Vector3.zero;
+		public Vector3 hitOffset = Vector3.get_zero();
 
 		public float appearTime;
 
-		public Vector3 timeStartScale = Vector3.one;
+		public Vector3 timeStartScale = Vector3.get_one();
 
-		public Vector3 timeEndScale = Vector3.one;
+		public Vector3 timeEndScale = Vector3.get_one();
 
 		public bool isCharacterHitDelete = true;
 
@@ -88,6 +88,26 @@ public class BulletData : ScriptableObject
 
 		public BulletBase GetRateBullet(BulletBase rate_info, float rate)
 		{
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
 			if (rate_info == null)
 			{
 				return this;
@@ -116,7 +136,7 @@ public class BulletData : ScriptableObject
 
 		public string GetEffectName(Player player = null)
 		{
-			if (!useWeaponElementEffect || (UnityEngine.Object)player == (UnityEngine.Object)null)
+			if (!useWeaponElementEffect || player == null)
 			{
 				return effectName;
 			}
@@ -171,6 +191,10 @@ public class BulletData : ScriptableObject
 
 		public BulletCurve GetRateBullet(BulletCurve rate_info, float rate)
 		{
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 			if (rate_info == null)
 			{
 				return this;
@@ -220,7 +244,7 @@ public class BulletData : ScriptableObject
 	[Serializable]
 	public class BulletLaser
 	{
-		public Vector3 offsetPosition = Vector3.zero;
+		public Vector3 offsetPosition = Vector3.get_zero();
 
 		public float capsuleHeight = 1f;
 
@@ -234,6 +258,10 @@ public class BulletData : ScriptableObject
 
 		public BulletLaser GetRateBullet(BulletLaser srcInfo, float rate)
 		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			if (srcInfo == null)
 			{
 				return this;
@@ -252,7 +280,7 @@ public class BulletData : ScriptableObject
 	[Serializable]
 	public class BulletFunnel
 	{
-		public Vector3 offsetPosition = Vector3.zero;
+		public Vector3 offsetPosition = Vector3.get_zero();
 
 		public float floatingHeight;
 
@@ -270,6 +298,10 @@ public class BulletData : ScriptableObject
 
 		public BulletFunnel GetRateBullet(BulletFunnel srcInfo, float rate)
 		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			if (srcInfo == null)
 			{
 				return this;
@@ -468,7 +500,7 @@ public class BulletData : ScriptableObject
 
 		public string actionEffectName2 = string.Empty;
 
-		public Vector3 actionEffectOffset = Vector3.zero;
+		public Vector3 actionEffectOffset = Vector3.get_zero();
 
 		public float actionCoolTime;
 
@@ -486,6 +518,10 @@ public class BulletData : ScriptableObject
 
 		public BulletActionMine GetRateBullet(BulletActionMine srcInfo, float rate)
 		{
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
 			if (srcInfo == null)
 			{
 				return this;
@@ -664,9 +700,9 @@ public class BulletData : ScriptableObject
 
 		public float radius = 1f;
 
-		public Vector3 size = Vector3.one;
+		public Vector3 size = Vector3.get_one();
 
-		public Vector3 center = Vector3.zero;
+		public Vector3 center = Vector3.get_zero();
 	}
 
 	[Serializable]
@@ -815,13 +851,18 @@ public class BulletData : ScriptableObject
 
 	public BulletBarrier dataBarrier;
 
+	public BulletData()
+		: this()
+	{
+	}
+
 	public BulletData GetRateBulletData(BulletData rate_info, float rate)
 	{
-		if ((UnityEngine.Object)rate_info == (UnityEngine.Object)null)
+		if (rate_info == null)
 		{
 			return this;
 		}
-		BulletData bulletData = ResourceUtility.Instantiate(this);
+		BulletData bulletData = ResourceUtility.Instantiate<BulletData>(this);
 		bulletData.type = ((!(rate < 1f)) ? rate_info.type : type);
 		bulletData.data = data.GetRateBullet(rate_info.data, rate);
 		switch (bulletData.type)

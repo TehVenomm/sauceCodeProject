@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class UIModelRenderTexture : MonoBehaviour
+public class UIModelRenderTexture
 {
 	private enum LOADER_TYPE
 	{
@@ -115,12 +115,20 @@ public class UIModelRenderTexture : MonoBehaviour
 		private set;
 	}
 
+	public UIModelRenderTexture()
+		: this()
+	{
+	}//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+
+
 	public static UIModelRenderTexture Get(Transform t)
 	{
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		UIModelRenderTexture uIModelRenderTexture = t.GetComponent<UIModelRenderTexture>();
-		if ((UnityEngine.Object)uIModelRenderTexture == (UnityEngine.Object)null)
+		if (uIModelRenderTexture == null)
 		{
-			uIModelRenderTexture = t.gameObject.AddComponent<UIModelRenderTexture>();
+			uIModelRenderTexture = t.get_gameObject().AddComponent<UIModelRenderTexture>();
 		}
 		return uIModelRenderTexture;
 	}
@@ -132,7 +140,9 @@ public class UIModelRenderTexture : MonoBehaviour
 
 	public void InitPlayer(UITexture ui_tex, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback)
 	{
-		if ((!((UnityEngine.Object)playerLoader != (UnityEngine.Object)null) || !playerLoader.isLoading) && (playerLoadInfo == null || !playerLoadInfo.Equals(info) || isPriorityVisualEquip != is_priority_visual_equip))
+		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		if ((!(playerLoader != null) || !playerLoader.isLoading) && (playerLoadInfo == null || !playerLoadInfo.Equals(info) || isPriorityVisualEquip != is_priority_visual_equip))
 		{
 			InitPlayerInFact(ui_tex, info, anim_id, pos, rot, is_priority_visual_equip, onload_callback);
 		}
@@ -140,19 +150,23 @@ public class UIModelRenderTexture : MonoBehaviour
 
 	public void InitPlayerOneShot(UITexture ui_tex, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback)
 	{
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 		oneshot = true;
 		InitPlayer(ui_tex, info, anim_id, pos, rot, is_priority_visual_equip, onload_callback);
 	}
 
 	public void ForceInitPlayer(UITexture ui_tex, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback)
 	{
+		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 		if (playerLoadInfo != null && playerLoadInfo.Equals(info) && isPriorityVisualEquip == is_priority_visual_equip)
 		{
 			onload_callback?.Invoke(null);
 		}
 		else
 		{
-			if ((UnityEngine.Object)playerLoader != (UnityEngine.Object)null && playerLoader.isLoading)
+			if (playerLoader != null && playerLoader.isLoading)
 			{
 				DeleteModel();
 			}
@@ -162,9 +176,13 @@ public class UIModelRenderTexture : MonoBehaviour
 
 	public void InitPlayerInFact(UITexture ui_tex, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback)
 	{
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 		isPriorityVisualEquip = is_priority_visual_equip;
 		Init(ui_tex, 10f, LOADER_TYPE.PLAYER);
-		if ((UnityEngine.Object)uiRenderTexture != (UnityEngine.Object)null && uiRenderTexture.nearClipPlane == -1f && pos.z > 13f)
+		if (uiRenderTexture != null && uiRenderTexture.nearClipPlane == -1f && pos.z > 13f)
 		{
 			uiRenderTexture.nearClipPlane = pos.z - 5f;
 		}
@@ -179,22 +197,28 @@ public class UIModelRenderTexture : MonoBehaviour
 
 	public bool IsLoadingPlayer()
 	{
-		if ((UnityEngine.Object)playerLoader != (UnityEngine.Object)null && playerLoader.isLoading)
+		if (playerLoader != null && playerLoader.isLoading)
 		{
 			return true;
 		}
 		return false;
 	}
 
-	public void InitNPC(UITexture ui_tex, int npc_id, Vector3 pos, Vector3 rot, float fov, Action<NPCLoader> onload_callback)
+	public unsafe void InitNPC(UITexture ui_tex, int npc_id, Vector3 pos, Vector3 rot, float fov, Action<NPCLoader> onload_callback)
 	{
-		if (!((UnityEngine.Object)npcLoader != (UnityEngine.Object)null) || !npcLoader.isLoading)
+		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0178: Expected O, but got Unknown
+		if (!(npcLoader != null) || !npcLoader.isLoading)
 		{
 			NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData(npc_id);
 			if (nPCData != null && nPCData != npcData)
 			{
 				Init(ui_tex, (fov == -1f) ? 10f : fov, LOADER_TYPE.NPC);
-				if ((UnityEngine.Object)uiRenderTexture != (UnityEngine.Object)null && uiRenderTexture.nearClipPlane == -1f && ((fov >= 40f && pos.z > 13f) || (fov < 40f && pos.z > 5f)))
+				if (uiRenderTexture != null && uiRenderTexture.nearClipPlane == -1f && ((fov >= 40f && pos.z > 13f) || (fov < 40f && pos.z > 5f)))
 				{
 					uiRenderTexture.nearClipPlane = pos.z - 5f;
 				}
@@ -211,7 +235,7 @@ public class UIModelRenderTexture : MonoBehaviour
 					num2 = Singleton<HomeThemeTable>.I.GetNpcModelID(homeThemeData, nPCData.id);
 				}
 				num = ((num2 <= 0) ? num : num2);
-				npcLoader.Load(num, modelLayer, false, false, SHADER_TYPE.UI, OnNPCLoadFinished);
+				npcLoader.Load(num, modelLayer, false, false, SHADER_TYPE.UI, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
 				LoadStart();
 			}
 		}
@@ -219,7 +243,7 @@ public class UIModelRenderTexture : MonoBehaviour
 
 	public bool IsLoadingNPC()
 	{
-		if ((UnityEngine.Object)npcLoader != (UnityEngine.Object)null && npcLoader.isLoading)
+		if (npcLoader != null && npcLoader.isLoading)
 		{
 			return true;
 		}
@@ -243,22 +267,26 @@ public class UIModelRenderTexture : MonoBehaviour
 		}
 	}
 
-	public void InitEquip(UITexture ui_tex, uint equip_item_id, int sex_id, int face_id, float scale)
+	public unsafe void InitEquip(UITexture ui_tex, uint equip_item_id, int sex_id, int face_id, float scale)
 	{
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Expected O, but got Unknown
 		referenceSexID = sex_id;
 		referenceFaceID = face_id;
 		Init(ui_tex, 45f, LOADER_TYPE.ITEM);
 		equipItemID = (int)equip_item_id;
 		uiModelScale = scale;
-		itemLoader.LoadEquip(equip_item_id, model, modelLayer, referenceSexID, referenceFaceID, OnLoadFinished);
+		itemLoader.LoadEquip(equip_item_id, model, modelLayer, referenceSexID, referenceFaceID, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		LoadStart();
 	}
 
-	public void InitItem(UITexture ui_tex, uint item_id, bool rotation = true)
+	public unsafe void InitItem(UITexture ui_tex, uint item_id, bool rotation = true)
 	{
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Expected O, but got Unknown
 		Init(ui_tex, 45f, LOADER_TYPE.ITEM);
 		itemID = (int)item_id;
-		itemLoader.LoadItem(item_id, model, modelLayer, OnLoadFinished);
+		itemLoader.LoadItem(item_id, model, modelLayer, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		LoadStart();
 		if (rotation)
 		{
@@ -270,11 +298,13 @@ public class UIModelRenderTexture : MonoBehaviour
 		}
 	}
 
-	public void InitSkillItem(UITexture ui_tex, uint skill_item_id, bool rotation = true, bool light_rotation = false, float fov = 35f)
+	public unsafe void InitSkillItem(UITexture ui_tex, uint skill_item_id, bool rotation = true, bool light_rotation = false, float fov = 35f)
 	{
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Expected O, but got Unknown
 		Init(ui_tex, fov, LOADER_TYPE.ITEM);
 		skillItemID = (int)skill_item_id;
-		itemLoader.LoadSkillItem(skill_item_id, model, modelLayer, OnLoadFinished);
+		itemLoader.LoadSkillItem(skill_item_id, model, modelLayer, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		LoadStart();
 		if (rotation)
 		{
@@ -287,15 +317,19 @@ public class UIModelRenderTexture : MonoBehaviour
 		lightRotation = light_rotation;
 	}
 
-	public void InitSkillItemSymbol(UITexture ui_tex, uint skill_item_id, bool rotation = true, float fov = 13f)
+	public unsafe void InitSkillItemSymbol(UITexture ui_tex, uint skill_item_id, bool rotation = true, float fov = 13f)
 	{
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Expected O, but got Unknown
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 		Init(ui_tex, fov, LOADER_TYPE.ITEM);
 		skillSymbolItemID = (int)skill_item_id;
-		itemLoader.LoadSkillItemSymbol(skill_item_id, model, modelLayer, OnLoadFinished);
-		BlurFilter blurFilter = base.gameObject.GetComponent<BlurFilter>();
-		if ((UnityEngine.Object)blurFilter == (UnityEngine.Object)null)
+		itemLoader.LoadSkillItemSymbol(skill_item_id, model, modelLayer, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		BlurFilter blurFilter = this.get_gameObject().GetComponent<BlurFilter>();
+		if (blurFilter == null)
 		{
-			blurFilter = base.gameObject.AddComponent<BlurFilter>();
+			blurFilter = this.get_gameObject().AddComponent<BlurFilter>();
 			blurFilter.downSample = 1;
 			blurFilter.blurStrength = 0.4f;
 		}
@@ -319,7 +353,7 @@ public class UIModelRenderTexture : MonoBehaviour
 			Clear();
 			if (callback != null)
 			{
-				callback(false, null);
+				callback.Invoke(false, (EnemyLoader)null);
 			}
 		}
 		else
@@ -351,17 +385,17 @@ public class UIModelRenderTexture : MonoBehaviour
 			{
 				if (callback != null)
 				{
-					callback(true, enemyLoader);
+					callback.Invoke(true, enemyLoader);
 				}
-				if ((UnityEngine.Object)enemyLoader != (UnityEngine.Object)null && (UnityEngine.Object)enemyLoader.animator != (UnityEngine.Object)null)
+				if (enemyLoader != null && enemyLoader.animator != null)
 				{
 					if (moveType == ENEMY_MOVE_TYPE.DONT_MOVE)
 					{
-						enemyLoader.animator.applyRootMotion = false;
+						enemyLoader.animator.set_applyRootMotion(false);
 					}
 					else if (moveType == ENEMY_MOVE_TYPE.STOP)
 					{
-						enemyLoader.animator.speed = 0f;
+						enemyLoader.animator.set_speed(0f);
 					}
 				}
 				OnEnemyLoadFinished(enemy);
@@ -370,12 +404,14 @@ public class UIModelRenderTexture : MonoBehaviour
 		}
 	}
 
-	public void InitAccessory(UITexture ui_tex, uint accessory_id, float scale, bool rotation = true, bool light_rotation = false)
+	public unsafe void InitAccessory(UITexture ui_tex, uint accessory_id, float scale, bool rotation = true, bool light_rotation = false)
 	{
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Expected O, but got Unknown
 		Init(ui_tex, 45f, LOADER_TYPE.ITEM);
 		accessoryID = (int)accessory_id;
 		uiModelScale = scale;
-		itemLoader.LoadAccessory(accessory_id, model, modelLayer, OnLoadFinished);
+		itemLoader.LoadAccessory(accessory_id, model, modelLayer, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		LoadStart();
 		rotateSpeed = ((!rotation) ? 0f : 22f);
 		lightRotation = light_rotation;
@@ -383,7 +419,11 @@ public class UIModelRenderTexture : MonoBehaviour
 
 	private void Init(UITexture ui_tex, float fov, LOADER_TYPE loader_type = LOADER_TYPE.ITEM)
 	{
-		if ((UnityEngine.Object)model == (UnityEngine.Object)null)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+		if (model == null)
 		{
 			uiTexture = ui_tex;
 			uiRenderTexture = UIRenderTexture.Get(ui_tex, fov, false, -1);
@@ -391,16 +431,16 @@ public class UIModelRenderTexture : MonoBehaviour
 			switch (loader_type)
 			{
 			case LOADER_TYPE.PLAYER:
-				playerLoader = model.gameObject.AddComponent<PlayerLoader>();
+				playerLoader = model.get_gameObject().AddComponent<PlayerLoader>();
 				break;
 			case LOADER_TYPE.NPC:
-				npcLoader = model.gameObject.AddComponent<NPCLoader>();
+				npcLoader = model.get_gameObject().AddComponent<NPCLoader>();
 				break;
 			case LOADER_TYPE.ITEM:
-				itemLoader = model.gameObject.AddComponent<ItemLoader>();
+				itemLoader = model.get_gameObject().AddComponent<ItemLoader>();
 				break;
 			case LOADER_TYPE.ENEMY:
-				enemyLoader = model.gameObject.AddComponent<EnemyLoader>();
+				enemyLoader = model.get_gameObject().AddComponent<EnemyLoader>();
 				break;
 			}
 			modelLayer = uiRenderTexture.renderLayer;
@@ -409,9 +449,12 @@ public class UIModelRenderTexture : MonoBehaviour
 
 	private void OnLoadFinished()
 	{
-		if (!((UnityEngine.Object)model == (UnityEngine.Object)null))
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		if (!(model == null))
 		{
-			if (!base.gameObject.activeInHierarchy)
+			if (!this.get_gameObject().get_activeInHierarchy())
 			{
 				DeleteModel();
 			}
@@ -419,15 +462,15 @@ public class UIModelRenderTexture : MonoBehaviour
 			{
 				if (coroutine != null)
 				{
-					StopCoroutine(coroutine);
+					this.StopCoroutine(coroutine);
 					coroutine = null;
 				}
 				if (uiModelScale != 1f)
 				{
-					model.localScale = new Vector3(uiModelScale, uiModelScale, uiModelScale);
+					model.set_localScale(new Vector3(uiModelScale, uiModelScale, uiModelScale));
 				}
 				coroutine = DoViewing();
-				StartCoroutine(coroutine);
+				this.StartCoroutine(coroutine);
 			}
 		}
 	}
@@ -452,53 +495,54 @@ public class UIModelRenderTexture : MonoBehaviour
 
 	private void OnEnemyLoadFinished(Enemy o)
 	{
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
 		OnLoadFinished();
-		if (!((UnityEngine.Object)enemyLoader == (UnityEngine.Object)null) && !((UnityEngine.Object)enemyLoader.body == (UnityEngine.Object)null))
+		if (!(enemyLoader == null) && !(enemyLoader.body == null))
 		{
-			enemyLoader.body.GetComponentsInChildren(Temporary.rendererList);
+			enemyLoader.body.GetComponentsInChildren<Renderer>(Temporary.rendererList);
 			int i = 0;
 			for (int count = Temporary.rendererList.Count; i < count; i++)
 			{
-				Renderer renderer = Temporary.rendererList[i];
-				if (renderer is MeshRenderer || renderer is SkinnedMeshRenderer)
+				Renderer val = Temporary.rendererList[i];
+				if (val is MeshRenderer || val is SkinnedMeshRenderer)
 				{
-					Material[] materials = renderer.materials;
+					Material[] materials = val.get_materials();
 					int j = 0;
 					for (int num = materials.Length; j < num; j++)
 					{
-						Material material = materials[j];
-						if ((UnityEngine.Object)material != (UnityEngine.Object)null)
+						Material val2 = materials[j];
+						if (val2 != null)
 						{
-							string name = material.shader.name;
+							string name = val2.get_shader().get_name();
 							if (name.Contains("cut"))
 							{
-								material.shader = ResourceUtility.FindShader("Transparent/Cutout/Diffuse");
+								val2.set_shader(ResourceUtility.FindShader("Transparent/Cutout/Diffuse"));
 							}
 							else
 							{
 								if (name.Contains("_zako_"))
 								{
-									material.shader = ResourceUtility.FindShader(name + "__s");
+									val2.set_shader(ResourceUtility.FindShader(name + "__s"));
 								}
 								else if (CanChangeHighQualityShader(name))
 								{
-									Shader shader = ResourceUtility.FindShader("mobile/Custom/Enemy/enemy_single_tex__no_cull");
-									if (material.HasProperty("_CullMode") && material.GetInt("_CullMode") == 0 && (UnityEngine.Object)shader != (UnityEngine.Object)null)
+									Shader val3 = ResourceUtility.FindShader("mobile/Custom/Enemy/enemy_single_tex__no_cull");
+									if (val2.HasProperty("_CullMode") && val2.GetInt("_CullMode") == 0 && val3 != null)
 									{
-										material.shader = shader;
+										val2.set_shader(val3);
 									}
 									else
 									{
-										material.shader = ResourceUtility.FindShader("mobile/Custom/Enemy/enemy_single_tex__s");
+										val2.set_shader(ResourceUtility.FindShader("mobile/Custom/Enemy/enemy_single_tex__s"));
 									}
 								}
 								if (enemyLoader.bodyID == 2023)
 								{
-									material.shader = ResourceUtility.FindShader("mobile/Custom/Enemy/enemy_reflective_simple");
+									val2.set_shader(ResourceUtility.FindShader("mobile/Custom/Enemy/enemy_reflective_simple"));
 								}
 								else if (enemyLoader.bodyID == 2043)
 								{
-									material.shader = ResourceUtility.FindShader("mobile/Custom/Enemy/enemy_reflective_for_shadow");
+									val2.set_shader(ResourceUtility.FindShader("mobile/Custom/Enemy/enemy_reflective_for_shadow"));
 								}
 							}
 						}
@@ -520,44 +564,49 @@ public class UIModelRenderTexture : MonoBehaviour
 
 	private void DeleteModel()
 	{
-		if ((UnityEngine.Object)model != (UnityEngine.Object)null)
+		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+		if (model != null)
 		{
-			if ((UnityEngine.Object)playerLoader != (UnityEngine.Object)null)
+			if (playerLoader != null)
 			{
 				playerLoader.DeleteLoadedObjects();
-				UnityEngine.Object.Destroy(playerLoader);
+				Object.Destroy(playerLoader);
 				playerLoader = null;
 			}
-			if ((UnityEngine.Object)enemyLoader != (UnityEngine.Object)null)
+			if (enemyLoader != null)
 			{
 				enemyLoader.DeleteLoadedObjects();
-				UnityEngine.Object.Destroy(enemyLoader);
+				Object.Destroy(enemyLoader);
 				enemyLoader = null;
 				enemyAnimCtrl = null;
 			}
-			if ((UnityEngine.Object)itemLoader != (UnityEngine.Object)null)
+			if (itemLoader != null)
 			{
 				itemLoader.Clear();
-				UnityEngine.Object.Destroy(itemLoader);
+				Object.Destroy(itemLoader);
 				itemLoader = null;
 			}
-			UnityEngine.Object.Destroy(model.gameObject);
+			Object.Destroy(model.get_gameObject());
 			model = null;
-			if ((UnityEngine.Object)uiRenderTexture != (UnityEngine.Object)null && (UnityEngine.Object)uiRenderTexture.postEffectFilter != (UnityEngine.Object)null)
+			if (uiRenderTexture != null && uiRenderTexture.postEffectFilter != null)
 			{
 				uiRenderTexture.postEffectFilter = null;
 			}
 		}
 		if (coroutine != null)
 		{
-			StopCoroutine(coroutine);
+			this.StopCoroutine(coroutine);
 			coroutine = null;
 		}
 	}
 
 	private void ReloadModel()
 	{
-		if ((UnityEngine.Object)model == (UnityEngine.Object)null)
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		if (model == null)
 		{
 			if (playerLoadInfo != null)
 			{
@@ -598,33 +647,33 @@ public class UIModelRenderTexture : MonoBehaviour
 		}
 		else if (equipItemID != -1)
 		{
-			if ((UnityEngine.Object)itemLoader != (UnityEngine.Object)null && !itemLoader.IsLoading())
+			if (itemLoader != null && !itemLoader.IsLoading())
 			{
 				OnLoadFinished();
 			}
 		}
 		else if (itemID != -1)
 		{
-			if ((UnityEngine.Object)itemLoader != (UnityEngine.Object)null && !itemLoader.IsLoading())
+			if (itemLoader != null && !itemLoader.IsLoading())
 			{
 				OnLoadFinished();
 			}
 		}
 		else if (skillItemID != -1)
 		{
-			if ((UnityEngine.Object)itemLoader != (UnityEngine.Object)null && !itemLoader.IsLoading())
+			if (itemLoader != null && !itemLoader.IsLoading())
 			{
 				OnLoadFinished();
 			}
 		}
 		else if (skillSymbolItemID != -1)
 		{
-			if ((UnityEngine.Object)itemLoader != (UnityEngine.Object)null && !itemLoader.IsLoading())
+			if (itemLoader != null && !itemLoader.IsLoading())
 			{
 				OnLoadFinished();
 			}
 		}
-		else if (enemyID == -1 && accessoryID != -1 && (UnityEngine.Object)itemLoader != (UnityEngine.Object)null && !itemLoader.IsLoading())
+		else if (enemyID == -1 && accessoryID != -1 && itemLoader != null && !itemLoader.IsLoading())
 		{
 			OnLoadFinished();
 		}
@@ -632,10 +681,10 @@ public class UIModelRenderTexture : MonoBehaviour
 
 	public void Clear()
 	{
-		if ((UnityEngine.Object)uiRenderTexture != (UnityEngine.Object)null)
+		if (uiRenderTexture != null)
 		{
 			uiRenderTexture.Release();
-			UnityEngine.Object.Destroy(uiRenderTexture);
+			Object.Destroy(uiRenderTexture);
 			uiRenderTexture = null;
 		}
 		DeleteModel();
@@ -677,11 +726,11 @@ public class UIModelRenderTexture : MonoBehaviour
 
 	private void LoadStart()
 	{
-		if ((!((UnityEngine.Object)itemLoader != (UnityEngine.Object)null) || itemLoader.isLoading) && (!((UnityEngine.Object)npcLoader != (UnityEngine.Object)null) || npcLoader.isLoading) && (!((UnityEngine.Object)enemyLoader != (UnityEngine.Object)null) || enemyLoader.isLoading))
+		if ((!(itemLoader != null) || itemLoader.isLoading) && (!(npcLoader != null) || npcLoader.isLoading) && (!(enemyLoader != null) || enemyLoader.isLoading))
 		{
 			if (coroutine != null)
 			{
-				StopCoroutine(coroutine);
+				this.StopCoroutine(coroutine);
 				coroutine = null;
 			}
 			uiRenderTexture.enableTexture = false;
@@ -690,26 +739,26 @@ public class UIModelRenderTexture : MonoBehaviour
 
 	private IEnumerator DoViewing()
 	{
-		if ((UnityEngine.Object)model == (UnityEngine.Object)null)
+		if (model == null)
 		{
 			Log.Error("model is null!!");
 		}
 		else
 		{
-			model.localEulerAngles = Vector3.zero;
+			model.set_localEulerAngles(Vector3.get_zero());
 			uiRenderTexture.enableTexture = true;
 			float rot_wait = 1f;
-			if ((UnityEngine.Object)playerLoader != (UnityEngine.Object)null)
+			if (playerLoader != null)
 			{
-				model.localPosition = modelPos;
-				model.localEulerAngles = modelRot;
+				model.set_localPosition(modelPos);
+				model.set_localEulerAngles(modelRot);
 			}
-			else if ((UnityEngine.Object)npcLoader != (UnityEngine.Object)null)
+			else if (npcLoader != null)
 			{
-				model.localPosition = modelPos;
-				model.localEulerAngles = modelRot;
+				model.set_localPosition(modelPos);
+				model.set_localEulerAngles(modelRot);
 			}
-			else if ((UnityEngine.Object)enemyLoader != (UnityEngine.Object)null)
+			else if (enemyLoader != null)
 			{
 				if (enemyDispplayInfo == null)
 				{
@@ -717,28 +766,28 @@ public class UIModelRenderTexture : MonoBehaviour
 					int j = 0;
 					for (int i = enemyLoader.renderersBody.Length; j < i; j++)
 					{
-						bounds.Encapsulate(enemyLoader.renderersBody[j].bounds);
+						bounds.Encapsulate(enemyLoader.renderersBody[j].get_bounds());
 					}
-					Vector3 extents = bounds.extents;
+					Vector3 extents = bounds.get_extents();
 					float z = extents.x * 0.5f / Mathf.Tan(0.3926991f) + 1f;
-					Transform transform = model;
-					Vector3 extents2 = bounds.extents;
-					transform.localPosition = new Vector3(0f, extents2.y * -0.5f, z);
-					model.localEulerAngles = new Vector3(0f, 180f, 0f);
+					Transform obj = model;
+					Vector3 extents2 = bounds.get_extents();
+					obj.set_localPosition(new Vector3(0f, extents2.y * -0.5f, z));
+					model.set_localEulerAngles(new Vector3(0f, 180f, 0f));
 				}
 				else
 				{
-					model.localPosition = new Vector3(0f, -0.8f, 5f);
+					model.set_localPosition(new Vector3(0f, -0.8f, 5f));
 					if (enemyDispplayInfo.seIdhowl > 0 && isEnemyHowl)
 					{
 						audioObject = SoundManager.PlayUISE(enemyDispplayInfo.seIdhowl);
 					}
-					enemyLoader.body.localPosition = enemyDispplayInfo.pos;
-					enemyLoader.body.localEulerAngles = new Vector3(0f, enemyDispplayInfo.angleY, 0f);
-					enemyAnimCtrl = model.gameObject.AddComponent<EnemyAnimCtrl>();
+					enemyLoader.body.set_localPosition(enemyDispplayInfo.pos);
+					enemyLoader.body.set_localEulerAngles(new Vector3(0f, enemyDispplayInfo.angleY, 0f));
+					enemyAnimCtrl = model.get_gameObject().AddComponent<EnemyAnimCtrl>();
 					enemyAnimCtrl.Init(enemyLoader, uiRenderTexture.renderCamera, false);
 					Animator animator = enemyLoader.GetAnimator();
-					if ((UnityEngine.Object)animator != (UnityEngine.Object)null)
+					if (animator != null)
 					{
 						int stateHash = Animator.StringToHash("Base Layer.GACHA_HOWL");
 						if (animator.HasState(0, stateHash))
@@ -749,9 +798,9 @@ public class UIModelRenderTexture : MonoBehaviour
 					}
 				}
 			}
-			else if ((UnityEngine.Object)itemLoader != (UnityEngine.Object)null && accessoryID != -1)
+			else if (itemLoader != null && accessoryID != -1)
 			{
-				model.localEulerAngles = new Vector3(0f, 180f, 0f);
+				model.set_localEulerAngles(new Vector3(0f, 180f, 0f));
 			}
 			Vector3 lightDir = new Vector3(1.19f, -1.59f, -1f);
 			Quaternion rotation = Quaternion.AngleAxis(1f, new Vector3(-0.07124705f, 0f, -0.9974587f));
@@ -764,31 +813,31 @@ public class UIModelRenderTexture : MonoBehaviour
 			{
 				while (true)
 				{
-					if ((UnityEngine.Object)itemLoader != (UnityEngine.Object)null)
+					if (itemLoader != null)
 					{
-						model.localPosition = new Vector3(0f, 0f, itemLoader.displayInfo.zFromCamera);
+						model.set_localPosition(new Vector3(0f, 0f, itemLoader.displayInfo.zFromCamera));
 						itemLoader.ApplyDisplayInfo();
 						if (rot_wait <= 0f)
 						{
-							model.Rotate(new Vector3(0f, rotateSpeed, 0f) * Time.deltaTime);
+							model.Rotate(new Vector3(0f, rotateSpeed, 0f) * Time.get_deltaTime());
 						}
 						else
 						{
-							rot_wait -= Time.deltaTime;
+							rot_wait -= Time.get_deltaTime();
 						}
 						if (lightRotation)
 						{
 							lightDir = rotation * lightDir;
-							renderer.material.SetVector("_LightDir", lightDir);
+							renderer.get_material().SetVector("_LightDir", Vector4.op_Implicit(lightDir));
 						}
 					}
 					yield return (object)null;
 				}
 			}
 			yield return (object)new WaitForEndOfFrame();
-			if ((UnityEngine.Object)uiRenderTexture != (UnityEngine.Object)null && (UnityEngine.Object)uiRenderTexture.renderCamera != (UnityEngine.Object)null)
+			if (uiRenderTexture != null && uiRenderTexture.renderCamera != null)
 			{
-				uiRenderTexture.renderCamera.enabled = false;
+				uiRenderTexture.renderCamera.set_enabled(false);
 			}
 			DeleteModel();
 		}
@@ -796,18 +845,19 @@ public class UIModelRenderTexture : MonoBehaviour
 
 	public void SetApplyEnemyRootMotion(bool enable)
 	{
-		if (!((UnityEngine.Object)enemyLoader == (UnityEngine.Object)null) && !((UnityEngine.Object)enemyLoader.animator == (UnityEngine.Object)null))
+		if (!(enemyLoader == null) && !(enemyLoader.animator == null))
 		{
-			enemyLoader.animator.applyRootMotion = enable;
+			enemyLoader.animator.set_applyRootMotion(enable);
 		}
 	}
 
 	public void PlayRandomEnemyAnimation()
 	{
-		if (!((UnityEngine.Object)enemyLoader == (UnityEngine.Object)null) && !((UnityEngine.Object)enemyLoader.animator == (UnityEngine.Object)null))
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		if (!(enemyLoader == null) && !(enemyLoader.animator == null))
 		{
-			UnityEngine.Object.Destroy(enemyAnimCtrl);
-			StartCoroutine(_PlayRandomEnemyAnimation());
+			Object.Destroy(enemyAnimCtrl);
+			this.StartCoroutine(_PlayRandomEnemyAnimation());
 		}
 	}
 
@@ -816,9 +866,9 @@ public class UIModelRenderTexture : MonoBehaviour
 		if (!isRandomPlaying)
 		{
 			isRandomPlaying = true;
-			int animIndex = UnityEngine.Random.Range(0, enemyLoader.animEventData.animations.Length);
+			int animIndex = Random.Range(0, enemyLoader.animEventData.animations.Length);
 			enemyLoader.animator.Play(enemyLoader.animEventData.animations[animIndex].name);
-			yield return (object)new WaitForSeconds(enemyLoader.animator.GetCurrentAnimatorClipInfo(0)[0].clip.length - 0.5f);
+			yield return (object)new WaitForSeconds(enemyLoader.animator.GetCurrentAnimatorClipInfo(0)[0].get_clip().get_length() - 0.5f);
 			isRandomPlaying = false;
 			enemyLoader.animator.CrossFade("IDLE", 0.5f);
 		}
@@ -831,7 +881,7 @@ public class UIModelRenderTexture : MonoBehaviour
 
 	public void StopAudio(int fade_count)
 	{
-		if ((UnityEngine.Object)audioObject != (UnityEngine.Object)null)
+		if (audioObject != null)
 		{
 			audioObject.Stop(fade_count);
 			audioObject = null;

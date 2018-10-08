@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class RegionMapRoot : MonoBehaviour
+public class RegionMapRoot
 {
 	[SerializeField]
 	public Material roadMaterial;
@@ -29,12 +29,17 @@ public class RegionMapRoot : MonoBehaviour
 	{
 		get
 		{
-			if ((UnityEngine.Object)_animator == (UnityEngine.Object)null)
+			if (_animator == null)
 			{
-				_animator = GetComponent<Animator>();
+				_animator = this.GetComponent<Animator>();
 			}
 			return _animator;
 		}
+	}
+
+	public RegionMapRoot()
+		: this()
+	{
 	}
 
 	public RegionMapLocation FindLocation(int id)
@@ -54,7 +59,8 @@ public class RegionMapRoot : MonoBehaviour
 
 	public void InitPortalStatus(Action onComplete)
 	{
-		StartCoroutine(InitPortalStatusImpl(onComplete));
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(InitPortalStatusImpl(onComplete));
 	}
 
 	private IEnumerator InitPortalStatusImpl(Action onComplete)
@@ -89,6 +95,9 @@ public class RegionMapRoot : MonoBehaviour
 				portal.Open();
 			}
 		}
-		onComplete?.Invoke();
+		if (onComplete != null)
+		{
+			onComplete.Invoke();
+		}
 	}
 }

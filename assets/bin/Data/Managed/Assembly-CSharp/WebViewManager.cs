@@ -50,6 +50,8 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 
 	public static string GuildHint => "goclan";
 
+	public static string FortuneWheel => "dragon-vault";
+
 	public static string Wave => "wave/help";
 
 	public static string Trial => "trial/help";
@@ -71,8 +73,9 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 
 	public void Open(string url, Action<string> _onClose = null)
 	{
+		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		onClose = _onClose;
-		webViewObject = base.gameObject.AddComponent<WebViewObject>();
+		webViewObject = this.get_gameObject().AddComponent<WebViewObject>();
 		webViewObject.Init(string.Empty, string.Empty, string.Empty);
 		webViewObject.EvaluateJS("var appVersion='" + NetworkNative.getNativeVersionName() + "';");
 		webViewObject.SetCookie(NetworkManager.APP_HOST, "apv", NetworkNative.getNativeVersionName());
@@ -83,70 +86,82 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 		}
 		webViewObject.LoadURL(url);
 		webViewObject.SetVisibility(true);
-		int num = Screen.width;
-		int num2 = Screen.height;
+		int num = Screen.get_width();
+		int num2 = Screen.get_height();
 		if (MonoBehaviourSingleton<AppMain>.IsValid())
 		{
 			num = MonoBehaviourSingleton<AppMain>.I.defaultScreenWidth;
 			num2 = MonoBehaviourSingleton<AppMain>.I.defaultScreenHeight;
 		}
-		int left = (int)((float)num * m_Margine.xMin);
-		int top = (int)((float)num2 * m_Margine.yMin);
-		int right = (int)((float)num * m_Margine.width);
-		int bottom = (int)((float)num2 * m_Margine.height);
+		int left = (int)((float)num * m_Margine.get_xMin());
+		int top = (int)((float)num2 * m_Margine.get_yMin());
+		int right = (int)((float)num * m_Margine.get_width());
+		int bottom = (int)((float)num2 * m_Margine.get_height());
 		webViewObject.SetMargins(left, top, right, bottom);
 	}
 
-	public void OnWebViewEvent(string msg)
+	public unsafe void OnWebViewEvent(string msg)
 	{
+		//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ae: Expected O, but got Unknown
+		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01db: Expected O, but got Unknown
 		if (!string.IsNullOrEmpty(msg))
 		{
 			if (msg.StartsWith("mailto:"))
 			{
-				Debug.Log("[mailto]:" + msg);
+				Debug.Log((object)("[mailto]:" + msg));
 				Application.OpenURL(msg);
 			}
 			if (msg.StartsWith("browser:"))
 			{
 				string text = msg.Replace("browser:", string.Empty);
-				Debug.Log("[browser]:" + text);
+				Debug.Log((object)("[browser]:" + text));
 				Application.OpenURL(text);
 			}
 			if (msg.StartsWith("checkPurchase:"))
 			{
 				bool flag = (int.Parse(msg.Replace("checkPurchase:", string.Empty)) == 1) ? true : false;
-				Debug.Log("[checkPurchase]:" + flag);
+				Debug.Log((object)("[checkPurchase]:" + flag));
 				Native.RestorePurchasedItem(flag);
 			}
 			if (msg.StartsWith("openOpinionBox:"))
 			{
-				Debug.Log("[openOpinionBox]:");
+				Debug.Log((object)"[openOpinionBox]:");
 				Close(msg);
 				MonoBehaviourSingleton<GameSceneManager>.I.OpinionBox();
 			}
 			if (msg.StartsWith("close:"))
 			{
-				Debug.Log("[close]:");
+				Debug.Log((object)"[close]:");
 				Close(msg);
 			}
 			if (msg.StartsWith("movie:"))
 			{
 				string text2 = msg.Replace("movie:", string.Empty);
-				Debug.Log("[movie]:" + text2);
+				Debug.Log((object)("[movie]:" + text2));
 				switch (text2)
 				{
 				case "tutorial":
-					webViewObject.onDestroy = delegate
+				{
+					WebViewObject obj2 = webViewObject;
+					if (_003C_003Ef__am_0024cache4 == null)
 					{
-						Utility.PlayFullScreenMovie("tutorial_move.mp4");
-					};
+						_003C_003Ef__am_0024cache4 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					}
+					obj2.onDestroy = _003C_003Ef__am_0024cache4;
 					break;
+				}
 				case "skill":
-					webViewObject.onDestroy = delegate
+				{
+					WebViewObject obj = webViewObject;
+					if (_003C_003Ef__am_0024cache5 == null)
 					{
-						Utility.PlayFullScreenMovie("tutorial_skill.mp4");
-					};
+						_003C_003Ef__am_0024cache5 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					}
+					obj.onDestroy = _003C_003Ef__am_0024cache5;
 					break;
+				}
 				}
 				Close(msg);
 			}
@@ -164,7 +179,7 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 		string[] array = text.Split('/');
 		string text2 = array[0];
 		string text3 = (array.Length <= 1) ? null : array[1];
-		Debug.Log("[goto]:" + text2 + "/" + text3);
+		Debug.Log((object)("[goto]:" + text2 + "/" + text3));
 		string name = "MAIN_MENU_HOME";
 		if (LoungeMatchingManager.IsValidInLounge())
 		{
@@ -360,7 +375,7 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 
 	public void Close(string result)
 	{
-		UnityEngine.Object.Destroy(webViewObject);
+		Object.Destroy(webViewObject);
 		webViewObject = null;
 		try
 		{
@@ -369,9 +384,9 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 				onClose(result);
 			}
 		}
-		catch (Exception message)
+		catch (Exception ex)
 		{
-			Debug.LogError(message);
+			Debug.LogError((object)ex);
 		}
 		finally
 		{

@@ -4,16 +4,18 @@ public class InGameStoryMain : StoryMain
 {
 	public override void Initialize()
 	{
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
 		Utility.CreateGameObjectAndComponent("StoryDirector", MonoBehaviourSingleton<AppMain>.I._transform, -1);
 		if (MonoBehaviourSingleton<StageManager>.IsValid())
 		{
-			if ((Object)MonoBehaviourSingleton<StageManager>.I.stageObject != (Object)null)
+			if (MonoBehaviourSingleton<StageManager>.I.stageObject != null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.stageObject.gameObject.SetActive(false);
+				MonoBehaviourSingleton<StageManager>.I.stageObject.get_gameObject().SetActive(false);
 			}
-			if ((Object)MonoBehaviourSingleton<StageManager>.I.skyObject != (Object)null)
+			if (MonoBehaviourSingleton<StageManager>.I.skyObject != null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.skyObject.gameObject.SetActive(false);
+				MonoBehaviourSingleton<StageManager>.I.skyObject.get_gameObject().SetActive(false);
 			}
 		}
 		base.Initialize();
@@ -21,20 +23,23 @@ public class InGameStoryMain : StoryMain
 
 	protected override void OnDestroy()
 	{
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageManager>.IsValid())
 		{
-			if ((Object)MonoBehaviourSingleton<StageManager>.I.stageObject != (Object)null)
+			if (MonoBehaviourSingleton<StageManager>.I.stageObject != null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.stageObject.gameObject.SetActive(true);
+				MonoBehaviourSingleton<StageManager>.I.stageObject.get_gameObject().SetActive(true);
 			}
-			if ((Object)MonoBehaviourSingleton<StageManager>.I.skyObject != (Object)null)
+			if (MonoBehaviourSingleton<StageManager>.I.skyObject != null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.skyObject.gameObject.SetActive(true);
+				MonoBehaviourSingleton<StageManager>.I.skyObject.get_gameObject().SetActive(true);
 			}
 		}
 		if (MonoBehaviourSingleton<StoryDirector>.IsValid())
 		{
-			Object.Destroy(MonoBehaviourSingleton<StoryDirector>.I.gameObject);
+			Object.Destroy(MonoBehaviourSingleton<StoryDirector>.I.get_gameObject());
 		}
 		base.OnDestroy();
 	}

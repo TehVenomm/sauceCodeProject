@@ -46,12 +46,13 @@ namespace Google.Developers
 				throw new Exception("Java object already set");
 			}
 			IntPtr constructorID = AndroidJNIHelper.GetConstructorID(RawClass, args);
-			jvalue[] args2 = ConstructArgArray(args);
-			raw = AndroidJNI.NewObject(RawClass, constructorID, args2);
+			jvalue[] array = ConstructArgArray(args);
+			raw = AndroidJNI.NewObject(RawClass, constructorID, array);
 		}
 
 		protected static jvalue[] ConstructArgArray(object[] theArgs)
 		{
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 			object[] array = new object[theArgs.Length];
 			for (int i = 0; i < theArgs.Length; i++)
 			{
@@ -73,7 +74,7 @@ namespace Google.Developers
 				}
 				else if (theArgs[j] is JavaInterfaceProxy)
 				{
-					IntPtr l = AndroidJNIHelper.CreateJavaProxy((AndroidJavaProxy)theArgs[j]);
+					IntPtr l = AndroidJNIHelper.CreateJavaProxy(theArgs[j]);
 					array2[j].l = l;
 				}
 			}
@@ -81,7 +82,7 @@ namespace Google.Developers
 			{
 				for (int k = 0; k < array2.Length; k++)
 				{
-					Debug.Log("---- [" + k + "] -- " + array2[k].l);
+					Debug.Log((object)("---- [" + k + "] -- " + array2[k].l));
 				}
 			}
 			return array2;
@@ -89,43 +90,43 @@ namespace Google.Developers
 
 		public static T StaticInvokeObjectCall<T>(string type, string name, string sig, params object[] args)
 		{
-			IntPtr clazz = AndroidJNI.FindClass(type);
-			IntPtr staticMethodID = AndroidJNI.GetStaticMethodID(clazz, name, sig);
-			jvalue[] args2 = ConstructArgArray(args);
-			IntPtr intPtr = AndroidJNI.CallStaticObjectMethod(clazz, staticMethodID, args2);
+			IntPtr intPtr = AndroidJNI.FindClass(type);
+			IntPtr staticMethodID = AndroidJNI.GetStaticMethodID(intPtr, name, sig);
+			jvalue[] array = ConstructArgArray(args);
+			IntPtr intPtr2 = AndroidJNI.CallStaticObjectMethod(intPtr, staticMethodID, array);
 			ConstructorInfo constructor = typeof(T).GetConstructor(new Type[1]
 			{
-				intPtr.GetType()
+				intPtr2.GetType()
 			});
 			if (constructor != null)
 			{
 				return (T)constructor.Invoke(new object[1]
 				{
-					intPtr
+					intPtr2
 				});
 			}
 			if (typeof(T).IsArray)
 			{
-				return AndroidJNIHelper.ConvertFromJNIArray<T>(intPtr);
+				return AndroidJNIHelper.ConvertFromJNIArray<T>(intPtr2);
 			}
-			Debug.Log("Trying cast....");
+			Debug.Log((object)"Trying cast....");
 			Type typeFromHandle = typeof(T);
-			return (T)Marshal.PtrToStructure(intPtr, typeFromHandle);
+			return (T)Marshal.PtrToStructure(intPtr2, typeFromHandle);
 		}
 
 		public static void StaticInvokeCallVoid(string type, string name, string sig, params object[] args)
 		{
-			IntPtr clazz = AndroidJNI.FindClass(type);
-			IntPtr staticMethodID = AndroidJNI.GetStaticMethodID(clazz, name, sig);
-			jvalue[] args2 = ConstructArgArray(args);
-			AndroidJNI.CallStaticVoidMethod(clazz, staticMethodID, args2);
+			IntPtr intPtr = AndroidJNI.FindClass(type);
+			IntPtr staticMethodID = AndroidJNI.GetStaticMethodID(intPtr, name, sig);
+			jvalue[] array = ConstructArgArray(args);
+			AndroidJNI.CallStaticVoidMethod(intPtr, staticMethodID, array);
 		}
 
 		public static T GetStaticObjectField<T>(string clsName, string name, string sig)
 		{
-			IntPtr clazz = AndroidJNI.FindClass(clsName);
-			IntPtr staticFieldID = AndroidJNI.GetStaticFieldID(clazz, name, sig);
-			IntPtr staticObjectField = AndroidJNI.GetStaticObjectField(clazz, staticFieldID);
+			IntPtr intPtr = AndroidJNI.FindClass(clsName);
+			IntPtr staticFieldID = AndroidJNI.GetStaticFieldID(intPtr, name, sig);
+			IntPtr staticObjectField = AndroidJNI.GetStaticObjectField(intPtr, staticFieldID);
 			ConstructorInfo constructor = typeof(T).GetConstructor(new Type[1]
 			{
 				staticObjectField.GetType()
@@ -143,77 +144,77 @@ namespace Google.Developers
 
 		public static int GetStaticIntField(string clsName, string name)
 		{
-			IntPtr clazz = AndroidJNI.FindClass(clsName);
-			IntPtr staticFieldID = AndroidJNI.GetStaticFieldID(clazz, name, "I");
-			return AndroidJNI.GetStaticIntField(clazz, staticFieldID);
+			IntPtr intPtr = AndroidJNI.FindClass(clsName);
+			IntPtr staticFieldID = AndroidJNI.GetStaticFieldID(intPtr, name, "I");
+			return AndroidJNI.GetStaticIntField(intPtr, staticFieldID);
 		}
 
 		public static string GetStaticStringField(string clsName, string name)
 		{
-			IntPtr clazz = AndroidJNI.FindClass(clsName);
-			IntPtr staticFieldID = AndroidJNI.GetStaticFieldID(clazz, name, "Ljava/lang/String;");
-			return AndroidJNI.GetStaticStringField(clazz, staticFieldID);
+			IntPtr intPtr = AndroidJNI.FindClass(clsName);
+			IntPtr staticFieldID = AndroidJNI.GetStaticFieldID(intPtr, name, "Ljava/lang/String;");
+			return AndroidJNI.GetStaticStringField(intPtr, staticFieldID);
 		}
 
 		public static float GetStaticFloatField(string clsName, string name)
 		{
-			IntPtr clazz = AndroidJNI.FindClass(clsName);
-			IntPtr staticFieldID = AndroidJNI.GetStaticFieldID(clazz, name, "F");
-			return AndroidJNI.GetStaticFloatField(clazz, staticFieldID);
+			IntPtr intPtr = AndroidJNI.FindClass(clsName);
+			IntPtr staticFieldID = AndroidJNI.GetStaticFieldID(intPtr, name, "F");
+			return AndroidJNI.GetStaticFloatField(intPtr, staticFieldID);
 		}
 
 		public void InvokeCallVoid(string name, string sig, params object[] args)
 		{
 			IntPtr methodID = AndroidJNI.GetMethodID(RawClass, name, sig);
-			jvalue[] args2 = ConstructArgArray(args);
-			AndroidJNI.CallVoidMethod(raw, methodID, args2);
+			jvalue[] array = ConstructArgArray(args);
+			AndroidJNI.CallVoidMethod(raw, methodID, array);
 		}
 
 		public T InvokeCall<T>(string name, string sig, params object[] args)
 		{
 			Type typeFromHandle = typeof(T);
 			IntPtr methodID = AndroidJNI.GetMethodID(RawClass, name, sig);
-			jvalue[] args2 = ConstructArgArray(args);
+			jvalue[] array = ConstructArgArray(args);
 			if (methodID == IntPtr.Zero)
 			{
-				Debug.LogError("Cannot get method for " + name);
+				Debug.LogError((object)("Cannot get method for " + name));
 				throw new Exception("Cannot get method for " + name);
 			}
 			if (typeFromHandle == typeof(bool))
 			{
-				return (T)(object)AndroidJNI.CallBooleanMethod(raw, methodID, args2);
+				return (T)(object)AndroidJNI.CallBooleanMethod(raw, methodID, array);
 			}
 			if (typeFromHandle == typeof(string))
 			{
-				return (T)(object)AndroidJNI.CallStringMethod(raw, methodID, args2);
+				return (T)(object)AndroidJNI.CallStringMethod(raw, methodID, array);
 			}
 			if (typeFromHandle == typeof(int))
 			{
-				return (T)(object)AndroidJNI.CallIntMethod(raw, methodID, args2);
+				return (T)(object)AndroidJNI.CallIntMethod(raw, methodID, array);
 			}
 			if (typeFromHandle == typeof(float))
 			{
-				return (T)(object)AndroidJNI.CallFloatMethod(raw, methodID, args2);
+				return (T)(object)AndroidJNI.CallFloatMethod(raw, methodID, array);
 			}
 			if (typeFromHandle == typeof(double))
 			{
-				return (T)(object)AndroidJNI.CallDoubleMethod(raw, methodID, args2);
+				return (T)(object)AndroidJNI.CallDoubleMethod(raw, methodID, array);
 			}
 			if (typeFromHandle == typeof(byte))
 			{
-				return (T)(object)AndroidJNI.CallByteMethod(raw, methodID, args2);
+				return (T)(object)AndroidJNI.CallByteMethod(raw, methodID, array);
 			}
 			if (typeFromHandle == typeof(char))
 			{
-				return (T)(object)AndroidJNI.CallCharMethod(raw, methodID, args2);
+				return (T)(object)AndroidJNI.CallCharMethod(raw, methodID, array);
 			}
 			if (typeFromHandle == typeof(long))
 			{
-				return (T)(object)AndroidJNI.CallLongMethod(raw, methodID, args2);
+				return (T)(object)AndroidJNI.CallLongMethod(raw, methodID, array);
 			}
 			if (typeFromHandle == typeof(short))
 			{
-				return (T)(object)AndroidJNI.CallShortMethod(raw, methodID, args2);
+				return (T)(object)AndroidJNI.CallShortMethod(raw, methodID, array);
 			}
 			return InvokeObjectCall<T>(name, sig, args);
 		}
@@ -221,44 +222,44 @@ namespace Google.Developers
 		public static T StaticInvokeCall<T>(string type, string name, string sig, params object[] args)
 		{
 			Type typeFromHandle = typeof(T);
-			IntPtr clazz = AndroidJNI.FindClass(type);
-			IntPtr staticMethodID = AndroidJNI.GetStaticMethodID(clazz, name, sig);
-			jvalue[] args2 = ConstructArgArray(args);
+			IntPtr intPtr = AndroidJNI.FindClass(type);
+			IntPtr staticMethodID = AndroidJNI.GetStaticMethodID(intPtr, name, sig);
+			jvalue[] array = ConstructArgArray(args);
 			if (typeFromHandle == typeof(bool))
 			{
-				return (T)(object)AndroidJNI.CallStaticBooleanMethod(clazz, staticMethodID, args2);
+				return (T)(object)AndroidJNI.CallStaticBooleanMethod(intPtr, staticMethodID, array);
 			}
 			if (typeFromHandle == typeof(string))
 			{
-				return (T)(object)AndroidJNI.CallStaticStringMethod(clazz, staticMethodID, args2);
+				return (T)(object)AndroidJNI.CallStaticStringMethod(intPtr, staticMethodID, array);
 			}
 			if (typeFromHandle == typeof(int))
 			{
-				return (T)(object)AndroidJNI.CallStaticIntMethod(clazz, staticMethodID, args2);
+				return (T)(object)AndroidJNI.CallStaticIntMethod(intPtr, staticMethodID, array);
 			}
 			if (typeFromHandle == typeof(float))
 			{
-				return (T)(object)AndroidJNI.CallStaticFloatMethod(clazz, staticMethodID, args2);
+				return (T)(object)AndroidJNI.CallStaticFloatMethod(intPtr, staticMethodID, array);
 			}
 			if (typeFromHandle == typeof(double))
 			{
-				return (T)(object)AndroidJNI.CallStaticDoubleMethod(clazz, staticMethodID, args2);
+				return (T)(object)AndroidJNI.CallStaticDoubleMethod(intPtr, staticMethodID, array);
 			}
 			if (typeFromHandle == typeof(byte))
 			{
-				return (T)(object)AndroidJNI.CallStaticByteMethod(clazz, staticMethodID, args2);
+				return (T)(object)AndroidJNI.CallStaticByteMethod(intPtr, staticMethodID, array);
 			}
 			if (typeFromHandle == typeof(char))
 			{
-				return (T)(object)AndroidJNI.CallStaticCharMethod(clazz, staticMethodID, args2);
+				return (T)(object)AndroidJNI.CallStaticCharMethod(intPtr, staticMethodID, array);
 			}
 			if (typeFromHandle == typeof(long))
 			{
-				return (T)(object)AndroidJNI.CallStaticLongMethod(clazz, staticMethodID, args2);
+				return (T)(object)AndroidJNI.CallStaticLongMethod(intPtr, staticMethodID, array);
 			}
 			if (typeFromHandle == typeof(short))
 			{
-				return (T)(object)AndroidJNI.CallStaticShortMethod(clazz, staticMethodID, args2);
+				return (T)(object)AndroidJNI.CallStaticShortMethod(intPtr, staticMethodID, array);
 			}
 			return StaticInvokeObjectCall<T>(type, name, sig, args);
 		}
@@ -266,8 +267,8 @@ namespace Google.Developers
 		public T InvokeObjectCall<T>(string name, string sig, params object[] theArgs)
 		{
 			IntPtr methodID = AndroidJNI.GetMethodID(RawClass, name, sig);
-			jvalue[] args = ConstructArgArray(theArgs);
-			IntPtr intPtr = AndroidJNI.CallObjectMethod(raw, methodID, args);
+			jvalue[] array = ConstructArgArray(theArgs);
+			IntPtr intPtr = AndroidJNI.CallObjectMethod(raw, methodID, array);
 			if (intPtr.Equals(IntPtr.Zero))
 			{
 				return default(T);

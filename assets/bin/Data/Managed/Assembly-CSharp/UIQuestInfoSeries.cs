@@ -19,15 +19,17 @@ public class UIQuestInfoSeries : MonoBehaviourSingleton<UIQuestInfoSeries>
 
 	private void Start()
 	{
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		m_inGameProgress = MonoBehaviourSingleton<InGameProgress>.I;
 		m_questMgr = MonoBehaviourSingleton<QuestManager>.I;
 		if (!m_questMgr.IsCurrentQuestTypeSeries())
 		{
-			base.gameObject.SetActive(false);
+			this.get_gameObject().SetActive(false);
 		}
 		else
 		{
-			base.gameObject.SetActive(true);
+			this.get_gameObject().SetActive(true);
 			seriesMax.text = $"/{m_questMgr.GetCurrentQuestSeriesNum()}";
 			m_series = (int)(m_questMgr.currentQuestSeriesIndex + 1);
 			SetSeriesNow(m_series);

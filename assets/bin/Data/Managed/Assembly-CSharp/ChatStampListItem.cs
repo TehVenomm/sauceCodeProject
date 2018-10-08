@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class ChatStampListItem : MonoBehaviour
+public class ChatStampListItem
 {
 	[SerializeField]
 	private BoxCollider m_Colider;
@@ -26,6 +26,11 @@ public class ChatStampListItem : MonoBehaviour
 	{
 		get;
 		protected set;
+	}
+
+	public ChatStampListItem()
+		: this()
+	{
 	}
 
 	private void Awake()
@@ -54,7 +59,7 @@ public class ChatStampListItem : MonoBehaviour
 	{
 		if (!isDummy || !isActive)
 		{
-			m_Colider.enabled = isActive;
+			m_Colider.set_enabled(isActive);
 			m_Texture.alpha = (float)(isActive ? 1 : 0);
 		}
 	}
@@ -63,17 +68,19 @@ public class ChatStampListItem : MonoBehaviour
 	{
 		if (IsReady && onButton != null)
 		{
-			onButton();
+			onButton.Invoke();
 		}
 	}
 
 	private void RequestLoadStamp()
 	{
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		CancelLoadStamp();
 		m_CoroutineLoadStamp = CoroutineLoadStamp();
-		if (base.gameObject.activeInHierarchy)
+		if (this.get_gameObject().get_activeInHierarchy())
 		{
-			StartCoroutine(_Update());
+			this.StartCoroutine(_Update());
 		}
 	}
 
@@ -85,7 +92,7 @@ public class ChatStampListItem : MonoBehaviour
 		{
 			yield return (object)null;
 		}
-		if (lo_stamp.loadedObject != (UnityEngine.Object)null)
+		if (lo_stamp.loadedObject != null)
 		{
 			Texture2D stamp = lo_stamp.loadedObject as Texture2D;
 			m_Texture.mainTexture = stamp;

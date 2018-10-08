@@ -79,6 +79,8 @@ public class HomeInfoModel : BaseModel
 		public bool isTheaterRenewal;
 
 		public string blackShopEndDate;
+
+		public bool isWheelOfFortuneOn = true;
 	}
 
 	public static string URL = "ajax/home/info";

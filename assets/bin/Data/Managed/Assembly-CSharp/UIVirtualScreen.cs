@@ -1,8 +1,8 @@
 using UnityEngine;
 
-[AddComponentMenu("ProjectUI/UIVirtualScreen")]
 [RequireComponent(typeof(UIWidget))]
-public class UIVirtualScreen : MonoBehaviour
+[AddComponentMenu("ProjectUI/UIVirtualScreen")]
+public class UIVirtualScreen
 {
 	public const float BASE_SCREEN_HEIGHT = 854f;
 
@@ -12,6 +12,11 @@ public class UIVirtualScreen : MonoBehaviour
 
 	public static float screenWidth = 480f;
 
+	public UIVirtualScreen()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
 		InitWidget();
@@ -19,8 +24,8 @@ public class UIVirtualScreen : MonoBehaviour
 
 	public static void InitUIRoot(UIRoot root)
 	{
-		float num = (float)Screen.width;
-		float num2 = (float)Screen.height;
+		float num = (float)Screen.get_width();
+		float num2 = (float)Screen.get_height();
 		if (num > num2)
 		{
 			screenWidth = 854f;
@@ -40,16 +45,23 @@ public class UIVirtualScreen : MonoBehaviour
 
 	public void InitWidget()
 	{
-		UIWidget uIWidget = base.gameObject.GetComponent<UIWidget>();
-		if ((Object)uIWidget == (Object)null)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		UIWidget uIWidget = this.get_gameObject().GetComponent<UIWidget>();
+		if (uIWidget == null)
 		{
-			uIWidget = base.gameObject.AddComponent<UIWidget>();
+			uIWidget = this.get_gameObject().AddComponent<UIWidget>();
 		}
 		if ((float)uIWidget.width != screenWidth || (float)uIWidget.height != screenHeight)
 		{
-			Vector3 localPosition = uIWidget.transform.localPosition;
+			Vector3 localPosition = uIWidget.get_transform().get_localPosition();
 			uIWidget.SetRect(screenWidth * -0.5f, screenHeight * -0.5f, screenWidth, screenHeight);
-			uIWidget.transform.localPosition = localPosition;
+			uIWidget.get_transform().set_localPosition(localPosition);
 			uIWidget.SetDirty();
 		}
 	}

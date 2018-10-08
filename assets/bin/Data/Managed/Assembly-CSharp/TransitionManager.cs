@@ -64,7 +64,7 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 		faderSprite = MonoBehaviourSingleton<UIManager>.I.system.GetCtrl(UIManager.SYSTEM.FADER).GetComponent<UISprite>();
 		faderTweenAlpha = MonoBehaviourSingleton<UIManager>.I.system.GetCtrl(UIManager.SYSTEM.FADER).GetComponent<TweenAlpha>();
 		faderTweenAlpha.SetOnFinished(new EventDelegate(OnFaderTweenFinised));
-		faderTweenAlpha.gameObject.SetActive(false);
+		faderTweenAlpha.get_gameObject().SetActive(false);
 	}
 
 	private void Update()
@@ -73,15 +73,16 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 
 	private void OnFaderTweenFinised()
 	{
-		if ((bool)faderTexture)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		if (Object.op_Implicit(faderTexture))
 		{
 			faderTexture.alpha = faderTweenAlpha.to;
 		}
-		if ((bool)faderSprite)
+		if (Object.op_Implicit(faderSprite))
 		{
 			faderSprite.alpha = faderTweenAlpha.to;
 		}
-		StartCoroutine(DoFaderTweenFinised());
+		this.StartCoroutine(DoFaderTweenFinised());
 	}
 
 	private IEnumerator DoFaderTweenFinised()
@@ -91,7 +92,7 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 		if (!isOut)
 		{
 			faderPanel.depth = 4000;
-			faderTweenAlpha.gameObject.SetActive(false);
+			faderTweenAlpha.get_gameObject().SetActive(false);
 			OnEnd();
 		}
 	}
@@ -104,12 +105,14 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 
 	private void FadeOut(Color color, float time, int depth)
 	{
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 		color.a = 0f;
-		if ((bool)faderTexture)
+		if (Object.op_Implicit(faderTexture))
 		{
 			faderTexture.color = color;
 		}
-		if ((bool)faderSprite)
+		if (Object.op_Implicit(faderSprite))
 		{
 			faderSprite.color = color;
 		}
@@ -124,16 +127,21 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 
 	private void SetFade(float to, float time)
 	{
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		faderTweenAlpha.from = faderTweenAlpha.to;
 		faderTweenAlpha.to = to;
-		faderTweenAlpha.gameObject.SetActive(true);
+		faderTweenAlpha.get_gameObject().SetActive(true);
 		faderTweenAlpha.duration = time;
-		faderTweenAlpha.enabled = true;
+		faderTweenAlpha.set_enabled(true);
 		faderTweenAlpha.ResetToBeginning();
 	}
 
 	private void Begin(TYPE type)
 	{
+		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 		if (isTransing)
 		{
 			Log.Error("transing now.");
@@ -148,17 +156,17 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 			switch (type)
 			{
 			case TYPE.BLACK:
-				FadeOut(Color.black, 0.15f, 4000);
+				FadeOut(Color.get_black(), 0.15f, 4000);
 				break;
 			case TYPE.WHITE:
-				FadeOut(Color.white, 0.25f, 4000);
+				FadeOut(Color.get_white(), 0.25f, 4000);
 				break;
 			case TYPE.LOADING:
 				MonoBehaviourSingleton<UIManager>.I.loading.ShowTips(true);
-				FadeOut(Color.black, 0.25f, 4000);
+				FadeOut(Color.get_black(), 0.25f, 4000);
 				break;
 			case TYPE.AUTO_EVENT:
-				FadeOut(Color.black, 0.1f, 7000);
+				FadeOut(Color.get_black(), 0.1f, 7000);
 				break;
 			}
 			MonoBehaviourSingleton<UIManager>.I.loading.ShowRushUI(true);
@@ -203,11 +211,13 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 
 	public Coroutine Out(TYPE type = TYPE.BLACK)
 	{
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0015: Expected O, but got Unknown
 		if (type == TYPE.NONE)
 		{
 			return null;
 		}
-		return StartCoroutine(DoOut(type));
+		return this.StartCoroutine(DoOut(type));
 	}
 
 	private IEnumerator DoOut(TYPE type)
@@ -228,11 +238,13 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 
 	public Coroutine In()
 	{
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Expected O, but got Unknown
 		if (currentType == TYPE.NONE)
 		{
 			return null;
 		}
-		return StartCoroutine(DoIn());
+		return this.StartCoroutine(DoIn());
 	}
 
 	private IEnumerator DoIn()

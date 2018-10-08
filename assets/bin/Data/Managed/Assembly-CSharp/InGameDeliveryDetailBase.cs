@@ -1,3 +1,5 @@
+using System;
+
 public class InGameDeliveryDetailBase : QuestDeliveryDetail
 {
 	private new enum UI
@@ -86,7 +88,7 @@ public class InGameDeliveryDetailBase : QuestDeliveryDetail
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetPrefab(UI.OBJ_BASE_ROOT, "InGameDeliveryDetailSettings");
+		SetPrefab((Enum)UI.OBJ_BASE_ROOT, "InGameDeliveryDetailSettings");
 		isUpdatedUI = true;
 		OnScreenRotate(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
 	}
@@ -102,23 +104,25 @@ public class InGameDeliveryDetailBase : QuestDeliveryDetail
 
 	private void OnScreenRotate(bool is_portrait)
 	{
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 		if (isUpdatedUI)
 		{
 			if (is_portrait)
 			{
-				SetActive(UI.CHARA_ALL, true);
-				SetActive(UI.PORTRAIT_BACK, true);
-				SetActive(UI.LANDSCAPE_BACK, false);
-				GetCtrl(UI.SPR_WINDOW).localPosition = GetCtrl(UI.PORTRAIT_WINDOW).localPosition;
-				SetHeight(UI.SPR_WINDOW, GetHeight(UI.PORTRAIT_WINDOW));
+				SetActive((Enum)UI.CHARA_ALL, true);
+				SetActive((Enum)UI.PORTRAIT_BACK, true);
+				SetActive((Enum)UI.LANDSCAPE_BACK, false);
+				GetCtrl(UI.SPR_WINDOW).set_localPosition(GetCtrl(UI.PORTRAIT_WINDOW).get_localPosition());
+				SetHeight((Enum)UI.SPR_WINDOW, GetHeight(UI.PORTRAIT_WINDOW));
 			}
 			else
 			{
-				SetActive(UI.CHARA_ALL, false);
-				SetActive(UI.PORTRAIT_BACK, false);
-				SetActive(UI.LANDSCAPE_BACK, true);
-				GetCtrl(UI.SPR_WINDOW).localPosition = GetCtrl(UI.LANDSCAPE_WINDOW).localPosition;
-				SetHeight(UI.SPR_WINDOW, GetHeight(UI.LANDSCAPE_WINDOW));
+				SetActive((Enum)UI.CHARA_ALL, false);
+				SetActive((Enum)UI.PORTRAIT_BACK, false);
+				SetActive((Enum)UI.LANDSCAPE_BACK, true);
+				GetCtrl(UI.SPR_WINDOW).set_localPosition(GetCtrl(UI.LANDSCAPE_WINDOW).get_localPosition());
+				SetHeight((Enum)UI.SPR_WINDOW, GetHeight(UI.LANDSCAPE_WINDOW));
 			}
 			UpdateAnchors();
 		}

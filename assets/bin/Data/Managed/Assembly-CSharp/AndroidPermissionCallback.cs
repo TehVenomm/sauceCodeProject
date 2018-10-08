@@ -1,14 +1,13 @@
 using System;
-using UnityEngine;
 
-public class AndroidPermissionCallback : AndroidJavaProxy
+public class AndroidPermissionCallback
 {
 	private event Action<string> OnPermissionGrantedAction;
 
 	private event Action<string> OnPermissionDeniedAction;
 
 	public AndroidPermissionCallback(Action<string> onGrantedCallback, Action<string> onDeniedCallback)
-		: base("com.unity3d.player.UnityAndroidPermissions$IPermissionRequestResult")
+		: this("com.unity3d.player.UnityAndroidPermissions$IPermissionRequestResult")
 	{
 		if (onGrantedCallback != null)
 		{

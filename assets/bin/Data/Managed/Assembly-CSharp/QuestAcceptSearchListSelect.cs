@@ -1,4 +1,5 @@
 using Network;
+using System;
 
 public class QuestAcceptSearchListSelect : QuestSearchListSelect
 {
@@ -7,7 +8,7 @@ public class QuestAcceptSearchListSelect : QuestSearchListSelect
 		CloseSearchRoomCondition();
 	}
 
-	public void OnQuery_INVITED_ROOM()
+	public unsafe void OnQuery_INVITED_ROOM()
 	{
 		string inviteValue = MonoBehaviourSingleton<PartyManager>.I.InviteValue;
 		if (!string.IsNullOrEmpty(inviteValue))
@@ -18,26 +19,17 @@ public class QuestAcceptSearchListSelect : QuestSearchListSelect
 				false
 			});
 			GameSection.StayEvent();
-			MonoBehaviourSingleton<PartyManager>.I.SendApply(array[0], delegate(bool is_success, Error ret_code)
+			PartyManager i = MonoBehaviourSingleton<PartyManager>.I;
+			string partyNumber = array[0];
+			if (_003C_003Ef__am_0024cache0 == null)
 			{
-				if (is_success && !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(MonoBehaviourSingleton<PartyManager>.I.GetQuestId(), true))
-				{
-					Protocol.Force(delegate
-					{
-						MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate
-						{
-						});
-					});
-				}
-				else
-				{
-					GameSection.ResumeEvent(is_success, null);
-				}
-			}, 0);
+				_003C_003Ef__am_0024cache0 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			i.SendApply(partyNumber, _003C_003Ef__am_0024cache0, 0);
 		}
 	}
 
-	public void OnQuery_JOIN_ROOM()
+	public unsafe void OnQuery_JOIN_ROOM()
 	{
 		string text = (string)GameSection.GetEventData();
 		if (string.IsNullOrEmpty(text))
@@ -51,14 +43,15 @@ public class QuestAcceptSearchListSelect : QuestSearchListSelect
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<PartyManager>.I.SendEntry(text, true, delegate(bool is_success)
 		{
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Expected O, but got Unknown
 			if (is_success && !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(MonoBehaviourSingleton<PartyManager>.I.GetQuestId(), true))
 			{
-				Protocol.Force(delegate
+				if (_003C_003Ef__am_0024cache3 == null)
 				{
-					MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate
-					{
-					});
-				});
+					_003C_003Ef__am_0024cache3 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				Protocol.Force(_003C_003Ef__am_0024cache3);
 			}
 			else
 			{

@@ -52,7 +52,7 @@ namespace GooglePlayGames.Native.PInvoke
 				}
 				catch (Exception arg)
 				{
-					Debug.LogError("Exception creating string from char array: " + arg);
+					Debug.LogError((object)("Exception creating string from char array: " + arg));
 					return string.Empty;
 				}
 			}
@@ -75,13 +75,13 @@ namespace GooglePlayGames.Native.PInvoke
 		{
 			for (ulong i = 0uL; i < size.ToUInt64(); i++)
 			{
-				yield return getElement(new UIntPtr(i));
+				yield return getElement.Invoke(new UIntPtr(i));
 			}
 		}
 
 		internal static IEnumerator<T> ToEnumerator<T>(UIntPtr size, Func<UIntPtr, T> getElement)
 		{
-			return ToEnumerable(size, getElement).GetEnumerator();
+			return ToEnumerable<T>(size, getElement).GetEnumerator();
 		}
 
 		internal static UIntPtr ArrayToSizeT<T>(T[] array)

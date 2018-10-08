@@ -1,4 +1,5 @@
 using Network;
+using System;
 
 public class GuildRequestContinue : GameSection
 {
@@ -10,7 +11,7 @@ public class GuildRequestContinue : GameSection
 	public override void UpdateUI()
 	{
 		string text = GameSection.GetEventData() as string;
-		SetLabelText(UI.MESSAGE, text);
+		SetLabelText((Enum)UI.MESSAGE, text);
 		base.UpdateUI();
 	}
 

@@ -7,9 +7,10 @@ public class GoWrapManager : MonoBehaviourSingleton<GoWrapManager>, IGoWrapDeleg
 {
 	private void Start()
 	{
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		GoWrap.INSTANCE.setDelegate(this);
-		GoWrap.INSTANCE.initGoWrap(base.name);
-		base.gameObject.AddComponent<GoWrapComponent>();
+		GoWrap.INSTANCE.initGoWrap(this.get_name());
+		this.get_gameObject().AddComponent<GoWrapComponent>();
 		List<string> list = new List<string>();
 		list.Add("unity");
 		GoWrap.INSTANCE.setCustomUrlSchemes(list);
@@ -35,8 +36,8 @@ public class GoWrapManager : MonoBehaviourSingleton<GoWrapManager>, IGoWrapDeleg
 		if (!GameSaveData.instance.IsPushedTrackTutorialBit(stepName))
 		{
 			string text = stepName.ToString();
-			string key = "track_" + text;
-			if (PlayerPrefs.GetInt(key, 0) == 0)
+			string text2 = "track_" + text;
+			if (PlayerPrefs.GetInt(text2, 0) == 0)
 			{
 				GoWrap.INSTANCE.trackEvent(text, category);
 				GameSaveData.instance.SetPushedTrackTutorialBit(stepName);
@@ -49,8 +50,8 @@ public class GoWrapManager : MonoBehaviourSingleton<GoWrapManager>, IGoWrapDeleg
 		if (!GameSaveData.instance.IsPushedTrackTutorialBit(stepName))
 		{
 			string text = stepName.ToString();
-			string key = "track_" + text;
-			if (PlayerPrefs.GetInt(key, 0) == 0)
+			string text2 = "track_" + text;
+			if (PlayerPrefs.GetInt(text2, 0) == 0)
 			{
 				GoWrap.INSTANCE.trackEvent(text, category, values);
 				GameSaveData.instance.SetPushedTrackTutorialBit(stepName);

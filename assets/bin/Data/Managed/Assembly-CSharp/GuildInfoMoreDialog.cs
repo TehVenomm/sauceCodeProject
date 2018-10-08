@@ -1,3 +1,5 @@
+using System;
+
 public class GuildInfoMoreDialog : GameSection
 {
 	private enum UI
@@ -17,7 +19,7 @@ public class GuildInfoMoreDialog : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText(UI.ProvisionalLabel, desc);
+		SetLabelText((Enum)UI.ProvisionalLabel, desc);
 		UpdateAnchors();
 	}
 

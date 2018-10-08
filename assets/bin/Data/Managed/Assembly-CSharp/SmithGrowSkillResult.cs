@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -67,6 +68,7 @@ public class SmithGrowSkillResult : ItemDetailSkill
 
 	public override void Initialize()
 	{
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 		object[] array = GameSection.GetEventData() as object[];
 		resultData = (SmithManager.ResultData)array[0];
 		isGreat = (bool)array[1];
@@ -81,7 +83,7 @@ public class SmithGrowSkillResult : ItemDetailSkill
 			ItemDetailEquip.CURRENT_SECTION.UI_PARTS,
 			resultData.itemData
 		});
-		StartCoroutine(DoInitialize());
+		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -93,9 +95,9 @@ public class SmithGrowSkillResult : ItemDetailSkill
 		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, effectName);
 		yield return (object)load_queue.Wait();
 		Transform effect = EffectManager.GetUIEffect(effectName, GetCtrl(UI.TEX_MODEL), -1f, -2, GetCtrl(UI.TEX_MODEL).GetComponent<UIWidget>());
-		if ((Object)effect != (Object)null)
+		if (effect != null)
 		{
-			effect.localScale = new Vector3(100f, 100f, 1f);
+			effect.set_localScale(new Vector3(100f, 100f, 1f));
 		}
 		MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = false;
 		base.Initialize();
@@ -110,25 +112,25 @@ public class SmithGrowSkillResult : ItemDetailSkill
 		{
 			flag = skillItemInfo.IsEnableExceed();
 		}
-		SetActive(UI.SPR_BG_NORMAL, !isExceed);
-		SetActive(UI.SPR_BG_EXCEED, isExceed);
-		SetActive(UI.BTN_NEXT, flag);
-		SetActive(UI.BTN_NEXT_GRAY, !flag);
-		SetLabelText(UI.LBL_NEXT_GRAY_BTN, base.sectionData.GetText("STR_NEXT"));
+		SetActive((Enum)UI.SPR_BG_NORMAL, !isExceed);
+		SetActive((Enum)UI.SPR_BG_EXCEED, isExceed);
+		SetActive((Enum)UI.BTN_NEXT, flag);
+		SetActive((Enum)UI.BTN_NEXT_GRAY, !flag);
+		SetLabelText((Enum)UI.LBL_NEXT_GRAY_BTN, base.sectionData.GetText("STR_NEXT"));
 		if (isExceed)
 		{
 			if (resultData != null)
 			{
-				SetLabelText(UI.LBL_EXCEED_PREV, StringTable.Format(STRING_CATEGORY.SMITH, 9u, resultData.beforeExceedCnt));
+				SetLabelText((Enum)UI.LBL_EXCEED_PREV, StringTable.Format(STRING_CATEGORY.SMITH, 9u, resultData.beforeExceedCnt));
 			}
 			if (skillItemInfo != null)
 			{
 				int exceedCnt = skillItemInfo.exceedCnt;
-				SetLabelText(UI.LBL_EXCEED_NEXT, StringTable.Format(STRING_CATEGORY.SMITH, 9u, exceedCnt));
+				SetLabelText((Enum)UI.LBL_EXCEED_NEXT, StringTable.Format(STRING_CATEGORY.SMITH, 9u, exceedCnt));
 				ExceedSkillItemTable.ExceedSkillItemData exceedSkillItemData = Singleton<ExceedSkillItemTable>.I.GetExceedSkillItemData(exceedCnt);
 				if (exceedSkillItemData != null)
 				{
-					SetLabelText(UI.LBL_ADD_EXCEED, StringTable.Format(STRING_CATEGORY.SMITH, 8u, exceedSkillItemData.GetDecreaseUseGaugePercent()));
+					SetLabelText((Enum)UI.LBL_ADD_EXCEED, StringTable.Format(STRING_CATEGORY.SMITH, 8u, exceedSkillItemData.GetDecreaseUseGaugePercent()));
 				}
 			}
 		}
@@ -136,9 +138,10 @@ public class SmithGrowSkillResult : ItemDetailSkill
 
 	protected override void OnOpen()
 	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		if (isPlayExceedAnimation)
 		{
-			StartCoroutine(DoPlayExceedAnimation());
+			this.StartCoroutine(DoPlayExceedAnimation());
 		}
 		base.OnOpen();
 	}

@@ -14,5 +14,11 @@ namespace Network
 		public int rewardNum;
 
 		public string imgId;
+
+		public string rewardString;
+
+		public string userName;
+
+		public string createdDate;
 	}
 }

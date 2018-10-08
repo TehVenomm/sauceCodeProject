@@ -15,6 +15,8 @@ public class InkSplashInfo
 
 	public void Copy(InkSplashInfo src)
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		duration = src.duration;
 		reduceTimeByFlick = src.reduceTimeByFlick;
 		flickIconPos = src.flickIconPos;

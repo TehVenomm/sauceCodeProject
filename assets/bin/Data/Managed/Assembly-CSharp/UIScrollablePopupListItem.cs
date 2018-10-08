@@ -1,12 +1,15 @@
-using UnityEngine;
-
-public class UIScrollablePopupListItem : MonoBehaviour
+public class UIScrollablePopupListItem
 {
 	private UIScrollablePopupList popupRoot;
 
+	public UIScrollablePopupListItem()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
-		popupRoot = GetComponentInParent<UIScrollablePopupList>();
+		popupRoot = this.GetComponentInParent<UIScrollablePopupList>();
 	}
 
 	private void OnPress(bool isDown)

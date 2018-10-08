@@ -10,15 +10,18 @@ public class UIQuestInfo : MonoBehaviourSingleton<UIQuestInfo>
 
 	private void Start()
 	{
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo() || QuestManager.IsValidInGameWaveMatch(false) || QuestManager.IsValidInGameSeries())
 		{
-			base.gameObject.SetActive(false);
+			this.get_gameObject().SetActive(false);
 		}
 		else
 		{
 			if (QuestManager.IsValidInGame() && !MonoBehaviourSingleton<InGameManager>.I.IsRush())
 			{
-				if ((Object)questName != (Object)null)
+				if (questName != null)
 				{
 					string currentQuestName = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestName();
 					if (!string.IsNullOrEmpty(currentQuestName))
@@ -29,11 +32,11 @@ public class UIQuestInfo : MonoBehaviourSingleton<UIQuestInfo>
 			}
 			else
 			{
-				base.gameObject.SetActive(false);
+				this.get_gameObject().SetActive(false);
 			}
 			if (MonoBehaviourSingleton<QuestManager>.I.IsExplore() || MonoBehaviourSingleton<InGameManager>.I.IsRush())
 			{
-				base.gameObject.SetActive(false);
+				this.get_gameObject().SetActive(false);
 			}
 		}
 	}

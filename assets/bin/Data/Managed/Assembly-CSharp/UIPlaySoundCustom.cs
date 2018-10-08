@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("ProjectUI/UIPlaySoundCustom")]
-public class UIPlaySoundCustom : MonoBehaviour
+public class UIPlaySoundCustom
 {
 	public enum Trigger
 	{
@@ -30,6 +30,11 @@ public class UIPlaySoundCustom : MonoBehaviour
 	[Range(0f, 1f)]
 	public float volume = 1f;
 
+	public UIPlaySoundCustom()
+		: this()
+	{
+	}
+
 	private bool DoesNeedToFindSource()
 	{
 		if (SEType != SoundID.UISE.INVALID)
@@ -41,27 +46,34 @@ public class UIPlaySoundCustom : MonoBehaviour
 
 	private void FindSource()
 	{
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Expected O, but got Unknown
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Expected O, but got Unknown
 		SEName = ResourceName.GetSE(SEID);
-		if (!((Object)ResourceLink != (Object)null))
+		if (!(ResourceLink != null))
 		{
-			Transform parent = base.gameObject.transform.parent;
+			Transform val = this.get_gameObject().get_transform().get_parent();
 			ResourceLink component;
 			while (true)
 			{
-				if (!((Object)parent != (Object)null) || parent.name == "UI Root")
+				if (!(val != null) || val.get_name() == "UI Root")
 				{
 					return;
 				}
-				component = parent.GetComponent<ResourceLink>();
-				if ((Object)component != (Object)null)
+				component = val.GetComponent<ResourceLink>();
+				if (component != null)
 				{
-					AudioClip x = component.Get<AudioClip>(SEName);
-					if ((Object)x != (Object)null)
+					AudioClip val2 = component.Get<AudioClip>(SEName);
+					if (val2 != null)
 					{
 						break;
 					}
 				}
-				parent = parent.transform.parent;
+				val = val.get_transform().get_parent();
 			}
 			ResourceLink = component;
 		}
@@ -89,7 +101,7 @@ public class UIPlaySoundCustom : MonoBehaviour
 
 	private void KeyOnById()
 	{
-		if (!((Object)ResourceLink == (Object)null) && !string.IsNullOrEmpty(SEName))
+		if (!(ResourceLink == null) && !string.IsNullOrEmpty(SEName))
 		{
 			AudioClip clip = ResourceLink.Get<AudioClip>(SEName);
 			KeyOn(clip, SEID);
@@ -106,7 +118,7 @@ public class UIPlaySoundCustom : MonoBehaviour
 
 	private void KeyOn(AudioClip clip, int id)
 	{
-		if (!((Object)clip == (Object)null))
+		if (!(clip == null))
 		{
 			SoundManager.PlayUISE(clip, volume, false, null, id);
 		}

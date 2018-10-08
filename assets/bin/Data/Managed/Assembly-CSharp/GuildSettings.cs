@@ -1,6 +1,5 @@
 using Network;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 
 public class GuildSettings : GameSection
 {
@@ -20,51 +19,46 @@ public class GuildSettings : GameSection
 		base.Initialize();
 		if (MonoBehaviourSingleton<GuildManager>.I.guildData.clanMasterId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
-			SetActive(UI.BTN_SETTING, true);
-			SetActive(UI.BTN_DELETE, true);
-			SetActive(UI.BTN_LEAVE, false);
+			SetActive((Enum)UI.BTN_SETTING, true);
+			SetActive((Enum)UI.BTN_DELETE, true);
+			SetActive((Enum)UI.BTN_LEAVE, false);
 		}
 		else
 		{
-			SetActive(UI.BTN_SETTING, false);
-			SetActive(UI.BTN_DELETE, false);
-			SetActive(UI.BTN_LEAVE, true);
+			SetActive((Enum)UI.BTN_SETTING, false);
+			SetActive((Enum)UI.BTN_DELETE, false);
+			SetActive((Enum)UI.BTN_LEAVE, true);
 		}
 		if (MonoBehaviourSingleton<GuildManager>.I.guildData.privacy == 2)
 		{
 			if (MonoBehaviourSingleton<GuildManager>.I.guildData.clanMasterId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 			{
-				SetActive(UI.BTN_INVITE, true);
+				SetActive((Enum)UI.BTN_INVITE, true);
 			}
 			else
 			{
-				SetActive(UI.BTN_INVITE, false);
+				SetActive((Enum)UI.BTN_INVITE, false);
 			}
 		}
 		else
 		{
-			SetActive(UI.BTN_INVITE, true);
+			SetActive((Enum)UI.BTN_INVITE, true);
 		}
-		SetActive(UI.SPR_BADGE, false);
+		SetActive((Enum)UI.SPR_BADGE, false);
 		UpdateBadge();
 	}
 
-	private void UpdateBadge()
+	private unsafe void UpdateBadge()
 	{
 		if (MonoBehaviourSingleton<GuildManager>.I.guildData != null)
 		{
-			MonoBehaviourSingleton<GuildManager>.I.SendMemberList(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId, delegate(bool success, GuildMemberListModel ret)
-			{
-				List<FriendCharaInfo> list = new List<FriendCharaInfo>(ret.result.requesters);
-				list.Remove(list.FirstOrDefault((FriendCharaInfo o) => o.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id));
-				SetActive(FindCtrl(base._transform, UI.BTN_MEMBER), UI.SPR_BADGE, list.Count > 0);
-			});
+			MonoBehaviourSingleton<GuildManager>.I.SendMemberList(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId, new Action<bool, GuildMemberListModel>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
 	public override void UpdateUI()
 	{
-		SetLabelText(UI.LBL_GUILD_ID, $"{MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId:D5}");
+		SetLabelText((Enum)UI.LBL_GUILD_ID, $"{MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId:D5}");
 	}
 
 	private void OnQuery_MESSAGE()
@@ -72,32 +66,28 @@ public class GuildSettings : GameSection
 		MonoBehaviourSingleton<GuildManager>.I.EmptyTalkUser();
 	}
 
-	private void OnQuery_GuildDeleteConfirm_YES()
+	private unsafe void OnQuery_GuildDeleteConfirm_YES()
 	{
 		MonoBehaviourSingleton<GuildManager>.I.IsEnterGuild = false;
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildManager>.I.SendDelete(delegate(bool is_success, Error err)
+		GuildManager i = MonoBehaviourSingleton<GuildManager>.I;
+		if (_003C_003Ef__am_0024cache0 == null)
 		{
-			if (is_success)
-			{
-				MonoBehaviourSingleton<ChatManager>.I.DestroyClanChat();
-			}
-			GameSection.ResumeEvent(is_success, null);
-		});
+			_003C_003Ef__am_0024cache0 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		i.SendDelete(_003C_003Ef__am_0024cache0);
 	}
 
-	private void OnQuery_GuildLeaveConfirm_YES()
+	private unsafe void OnQuery_GuildLeaveConfirm_YES()
 	{
 		MonoBehaviourSingleton<GuildManager>.I.IsEnterGuild = false;
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildManager>.I.SendLeave(delegate(bool is_success, Error err)
+		GuildManager i = MonoBehaviourSingleton<GuildManager>.I;
+		if (_003C_003Ef__am_0024cache1 == null)
 		{
-			if (is_success)
-			{
-				MonoBehaviourSingleton<ChatManager>.I.DestroyClanChat();
-			}
-			GameSection.ResumeEvent(is_success, null);
-		});
+			_003C_003Ef__am_0024cache1 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		i.SendLeave(_003C_003Ef__am_0024cache1);
 	}
 
 	private void OnQuery_EXIT()

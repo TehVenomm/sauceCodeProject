@@ -4,34 +4,23 @@ public class FriendBlackList : FollowListBase
 {
 	public override void Initialize()
 	{
-		SetActive(UI.BTN_SORT, false);
+		SetActive((Enum)UI.BTN_SORT, false);
 		titleType = TITLE_TYPE.BLACKLIST;
 		base.Initialize();
 	}
 
 	public override void UpdateUI()
 	{
-		SetActive(UI.OBJ_FOLLOW_NUMBER_ROOT, true);
-		SetLabelText(UI.LBL_FOLLOW_NUMBER_NOW, MonoBehaviourSingleton<BlackListManager>.I.GetBlackListUserNum().ToString());
-		SetLabelText(UI.LBL_FOLLOW_NUMBER_MAX, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.BLACKLIST_MAX.ToString());
+		SetActive((Enum)UI.OBJ_FOLLOW_NUMBER_ROOT, true);
+		SetLabelText((Enum)UI.LBL_FOLLOW_NUMBER_NOW, MonoBehaviourSingleton<BlackListManager>.I.GetBlackListUserNum().ToString());
+		SetLabelText((Enum)UI.LBL_FOLLOW_NUMBER_MAX, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.BLACKLIST_MAX.ToString());
 		ListUI();
 	}
 
-	protected override void SendGetList(int page, Action<bool> callback)
+	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		MonoBehaviourSingleton<BlackListManager>.I.SendList(page, delegate(bool is_success, BlackListListModel.Param recv_data)
-		{
-			if (is_success)
-			{
-				recvList = recv_data.black;
-				nowPage = page;
-				pageNumMax = recv_data.pageNumMax;
-			}
-			if (callback != null)
-			{
-				callback(is_success);
-			}
-		});
+		_003CSendGetList_003Ec__AnonStorey303 _003CSendGetList_003Ec__AnonStorey;
+		MonoBehaviourSingleton<BlackListManager>.I.SendList(page, new Action<bool, BlackListListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void PostSendGetListByReopen(int page)

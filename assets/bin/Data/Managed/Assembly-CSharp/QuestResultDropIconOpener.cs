@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class QuestResultDropIconOpener : MonoBehaviour
+public class QuestResultDropIconOpener
 {
 	public class Info
 	{
@@ -33,9 +33,14 @@ public class QuestResultDropIconOpener : MonoBehaviour
 
 	private Action<Transform, Info, bool> loadEffCallback;
 
+	public QuestResultDropIconOpener()
+		: this()
+	{
+	}
+
 	public void Initialized(ItemIcon _icon, Info info, Action<Transform, Info, bool> load_eff_callback)
 	{
-		if (!((UnityEngine.Object)iconParent == (UnityEngine.Object)null))
+		if (!(iconParent == null))
 		{
 			SetIcon(_icon);
 			m_Info = info;
@@ -55,16 +60,17 @@ public class QuestResultDropIconOpener : MonoBehaviour
 				iconParent.duration = 0f;
 				iconParent.delay = 0f;
 			}
-			loadEffCallback(icon._transform, m_Info, is_skip);
-			sprite.enabled = false;
+			loadEffCallback.Invoke(icon._transform, m_Info, is_skip);
+			sprite.set_enabled(false);
 			OpenIcon();
 		}
 	}
 
 	private void SetIcon(ItemIcon _icon)
 	{
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		icon = _icon;
-		icon.transform.parent = iconParent.transform;
+		icon.transform.set_parent(iconParent.get_transform());
 		icon.VisibleIcon(false, true);
 	}
 
@@ -91,9 +97,10 @@ public class QuestResultDropIconOpener : MonoBehaviour
 
 	private void SetSpriteBreakReward(bool visible)
 	{
-		if ((UnityEngine.Object)spriteRewardCategory != (UnityEngine.Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		if (spriteRewardCategory != null)
 		{
-			spriteRewardCategory.gameObject.SetActive(visible);
+			spriteRewardCategory.get_gameObject().SetActive(visible);
 		}
 	}
 }

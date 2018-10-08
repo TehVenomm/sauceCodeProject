@@ -2,23 +2,28 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Toggled Objects")]
-public class UIToggledObjects : MonoBehaviour
+public class UIToggledObjects
 {
 	public List<GameObject> activate;
 
 	public List<GameObject> deactivate;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private GameObject target;
 
 	[HideInInspector]
 	[SerializeField]
 	private bool inverse;
 
+	public UIToggledObjects()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
-		if ((Object)target != (Object)null)
+		if (target != null)
 		{
 			if (activate.Count == 0 && deactivate.Count == 0)
 			{
@@ -36,14 +41,14 @@ public class UIToggledObjects : MonoBehaviour
 				target = null;
 			}
 		}
-		UIToggle component = GetComponent<UIToggle>();
+		UIToggle component = this.GetComponent<UIToggle>();
 		EventDelegate.Add(component.onChange, Toggle);
 	}
 
 	public void Toggle()
 	{
 		bool value = UIToggle.current.value;
-		if (base.enabled)
+		if (this.get_enabled())
 		{
 			for (int i = 0; i < activate.Count; i++)
 			{
@@ -58,7 +63,7 @@ public class UIToggledObjects : MonoBehaviour
 
 	private void Set(GameObject go, bool state)
 	{
-		if ((Object)go != (Object)null)
+		if (go != null)
 		{
 			NGUITools.SetActive(go, state);
 		}

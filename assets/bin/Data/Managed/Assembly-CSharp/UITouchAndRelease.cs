@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UITouchAndRelease : MonoBehaviour
+public class UITouchAndRelease
 {
 	private string touchEventName;
 
@@ -10,12 +10,17 @@ public class UITouchAndRelease : MonoBehaviour
 
 	private bool touched;
 
+	public UITouchAndRelease()
+		: this()
+	{
+	}
+
 	public static void Set(GameObject button, string touch_event_name, string release_event_name = null, object event_data = null)
 	{
-		if (!((Object)button.GetComponent<UIButton>() == (Object)null))
+		if (!(button.GetComponent<UIButton>() == null))
 		{
 			UITouchAndRelease uITouchAndRelease = button.GetComponent<UITouchAndRelease>();
-			if ((Object)uITouchAndRelease == (Object)null)
+			if (uITouchAndRelease == null)
 			{
 				uITouchAndRelease = button.AddComponent<UITouchAndRelease>();
 			}
@@ -28,7 +33,7 @@ public class UITouchAndRelease : MonoBehaviour
 	public static void NoEventRelease(GameObject button)
 	{
 		UITouchAndRelease component = button.GetComponent<UITouchAndRelease>();
-		if ((bool)component)
+		if (Object.op_Implicit(component))
 		{
 			component.touched = false;
 		}
@@ -57,13 +62,15 @@ public class UITouchAndRelease : MonoBehaviour
 
 	private void Send(bool is_touch)
 	{
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004c: Expected O, but got Unknown
 		if (touched != is_touch)
 		{
 			touched = is_touch;
 			string text = (!is_touch) ? releaseEventName : touchEventName;
 			if (!string.IsNullOrEmpty(text))
 			{
-				UIGameSceneEventSender.SendEvent("UITouchAndRelease", base.gameObject, text, eventData, null);
+				UIGameSceneEventSender.SendEvent("UITouchAndRelease", this.get_gameObject(), text, eventData, null);
 			}
 		}
 	}

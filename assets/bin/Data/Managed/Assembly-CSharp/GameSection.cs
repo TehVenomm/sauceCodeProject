@@ -136,7 +136,9 @@ public class GameSection : UIBehaviour
 
 	protected void DispatchEvent(string event_name, object event_data = null)
 	{
-		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("GameSection", base.gameObject, event_name, event_data, null, true);
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0014: Expected O, but got Unknown
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("GameSection", this.get_gameObject(), event_name, event_data, null, true);
 	}
 
 	protected void RequestEvent(string event_name, object event_data = null)
@@ -205,7 +207,7 @@ public class GameSection : UIBehaviour
 		{
 			GameSceneEvent.Cancel();
 			GameSection currentSection = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection();
-			if ((UnityEngine.Object)currentSection != (UnityEngine.Object)null && currentSection.isClose)
+			if (currentSection != null && currentSection.isClose)
 			{
 				currentSection.Open(UITransition.TYPE.OPEN);
 			}
@@ -249,8 +251,9 @@ public class GameSection : UIBehaviour
 
 	public void LoadRequireDataTable()
 	{
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		isLoadedRequireDataTable = false;
-		StartCoroutine(WaitDataTable());
+		this.StartCoroutine(WaitDataTable());
 	}
 
 	protected IEnumerator WaitDataTable()
@@ -272,7 +275,8 @@ public class GameSection : UIBehaviour
 
 	protected void DoWaitProtocolBusyFinish(Action callback)
 	{
-		StartCoroutine(WaitProtocolBusyFinish(callback));
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(WaitProtocolBusyFinish(callback));
 	}
 
 	protected IEnumerator WaitProtocolBusyFinish(Action callback)
@@ -281,7 +285,10 @@ public class GameSection : UIBehaviour
 		{
 			yield return (object)null;
 		}
-		callback?.Invoke();
+		if (callback != null)
+		{
+			callback.Invoke();
+		}
 	}
 
 	private void OnQuery_ITEM_SHOP()
@@ -354,7 +361,7 @@ public class GameSection : UIBehaviour
 
 	private void OnQuery_MAIN_MENU_MENU()
 	{
-		if ((UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.Find("MenuTop") != (UnityEngine.Object)null)
+		if (MonoBehaviourSingleton<UIManager>.I.Find("MenuTop") != null)
 		{
 			MonoBehaviourSingleton<GameSceneManager>.I.ChangeSectionBack();
 		}
@@ -394,7 +401,7 @@ public class GameSection : UIBehaviour
 		MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomAction, false, null, null);
 	}
 
-	protected virtual void OnQuery_QUEST_ROOM_IN_GAME()
+	protected unsafe virtual void OnQuery_QUEST_ROOM_IN_GAME()
 	{
 		QuestTable.QuestTableData table = GetEventData() as QuestTable.QuestTableData;
 		bool flag = MonoBehaviourSingleton<GameSceneManager>.I.IsCurrentSceneHomeOrLounge();
@@ -411,23 +418,8 @@ public class GameSection : UIBehaviour
 			}
 			MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(table.questID, is_free_join);
 			StayEvent();
-			CoopApp.EnterPartyQuest(delegate(bool is_m, bool is_c, bool is_r, bool is_s)
-			{
-				bool is_resume = is_s;
-				if (is_r)
-				{
-					if (is_s)
-					{
-						QuestRoomObserver.OffObserve();
-					}
-				}
-				else if (!is_c && table.questType != QUEST_TYPE.ORDER)
-				{
-					ChangeStayEvent("COOP_SERVER_INVALID", null);
-					is_resume = true;
-				}
-				ResumeEvent(is_resume, null);
-			});
+			_003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2B2 _003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2B;
+			CoopApp.EnterPartyQuest(new Action<bool, bool, bool, bool>((object)_003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -446,20 +438,20 @@ public class GameSection : UIBehaviour
 		_OnQuery_FIELD(false);
 	}
 
-	protected void _OnQuery_FIELD(bool fromQuest)
+	protected unsafe void _OnQuery_FIELD(bool fromQuest)
 	{
 		WorldMapOpenNewField.EVENT_TYPE eventType = WorldMapOpenNewField.EVENT_TYPE.NONE;
-		uint portal_id = (uint)MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.linkFieldPortalID;
+		uint num = (uint)MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.linkFieldPortalID;
 		if (fromQuest)
 		{
 			eventType = WorldMapOpenNewField.EVENT_TYPE.QUEST_TO_FIELD;
-			portal_id = MonoBehaviourSingleton<WorldMapManager>.I.GetJumpPortalID();
+			num = MonoBehaviourSingleton<WorldMapManager>.I.GetJumpPortalID();
 		}
 		else if (MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledPortal((uint)MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.linkFieldPortalID))
 		{
 			eventType = WorldMapOpenNewField.EVENT_TYPE.ONLY_CAMERA_MOVE;
 		}
-		if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portal_id, false, true))
+		if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(num, false, true))
 		{
 			StopEvent();
 		}
@@ -468,18 +460,12 @@ public class GameSection : UIBehaviour
 			WorldMapOpenNewField.SectionEventData eventData = new WorldMapOpenNewField.SectionEventData(eventType, ENEMY_TYPE.BAT);
 			SetEventData(eventData);
 			StayEvent();
-			CoopApp.EnterField(portal_id, 0u, delegate(bool is_matching, bool is_connect, bool is_regist)
+			uint portal_id = num;
+			if (_003C_003Ef__am_0024cache6 == null)
 			{
-				if (!is_connect)
-				{
-					ChangeStayEvent("COOP_SERVER_INVALID", null);
-					ResumeEvent(true, null);
-				}
-				else
-				{
-					ResumeEvent(is_regist, null);
-				}
-			});
+				_003C_003Ef__am_0024cache6 = new Action<bool, bool, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			CoopApp.EnterField(portal_id, 0u, _003C_003Ef__am_0024cache6);
 		}
 	}
 
@@ -783,7 +769,7 @@ public class GameSection : UIBehaviour
 		MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Home", string.Empty, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
 	}
 
-	public void OnQuery_FORCE_MOVETO_LOUNGE()
+	public unsafe void OnQuery_FORCE_MOVETO_LOUNGE()
 	{
 		string roomPass = GetEventData() as string;
 		StayEvent();
@@ -791,26 +777,24 @@ public class GameSection : UIBehaviour
 		{
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendLeave(delegate
 			{
-				MonoBehaviourSingleton<LoungeMatchingManager>.I.SendApply(roomPass, delegate(bool isSucceed, Error error)
+				LoungeMatchingManager i2 = MonoBehaviourSingleton<LoungeMatchingManager>.I;
+				string loungeNumber2 = roomPass;
+				if (_003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2B3._003C_003Ef__am_0024cache1 == null)
 				{
-					if (isSucceed)
-					{
-						MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Lounge", string.Empty, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
-					}
-					ResumeEvent(true, null);
-				});
+					_003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2B3._003C_003Ef__am_0024cache1 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				i2.SendApply(loungeNumber2, _003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2B3._003C_003Ef__am_0024cache1);
 			});
 		}
 		else
 		{
-			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendApply(roomPass, delegate(bool isSucceed, Error error)
+			LoungeMatchingManager i = MonoBehaviourSingleton<LoungeMatchingManager>.I;
+			string loungeNumber = roomPass;
+			if (_003C_003Ef__am_0024cacheA == null)
 			{
-				if (isSucceed)
-				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Lounge", string.Empty, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
-				}
-				ResumeEvent(true, null);
-			});
+				_003C_003Ef__am_0024cacheA = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			i.SendApply(loungeNumber, _003C_003Ef__am_0024cacheA);
 		}
 	}
 }

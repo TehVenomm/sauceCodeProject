@@ -266,13 +266,13 @@ public class IabHelper {
     }
 
     public boolean handleActivityResult(int i, int i2, Intent intent) {
+        IabResult iabResult;
         JSONException e;
         if (i != this.mRequestCode) {
             return false;
         }
         checkSetupDone("handleActivityResult");
         flagEndAsync();
-        IabResult iabResult;
         if (intent == null) {
             logError("Null data in IAB activity result.");
             iabResult = new IabResult(-1002, "Null data in IAB result");
@@ -366,9 +366,9 @@ public class IabHelper {
     }
 
     public void launchPurchaseFlow(Activity activity, String str, String str2, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str3, String str4) {
-        IabResult iabResult;
         checkSetupDone("launchPurchaseFlow");
         flagStartAsync("launchPurchaseFlow");
+        IabResult iabResult;
         if (!str2.equals("subs") || this.mSubscriptionsSupported) {
             try {
                 Bundle buyIntentExtraParams;

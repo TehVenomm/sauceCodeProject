@@ -1,13 +1,11 @@
-using UnityEngine;
-
 namespace gogame
 {
-	public class GoWrapDelegate_Android : AndroidJavaProxy
+	public class GoWrapDelegate_Android
 	{
 		private IGoWrapDelegate goWrapDelegate;
 
 		public GoWrapDelegate_Android(IGoWrapDelegate goWrapDelegate)
-			: base("net.gogame.gowrap.sdk.GoWrapDelegateV2")
+			: this("net.gogame.gowrap.sdk.GoWrapDelegateV2")
 		{
 			this.goWrapDelegate = goWrapDelegate;
 		}

@@ -8,13 +8,14 @@ public class NativeShare : MonoBehaviourSingleton<NativeShare>
 
 	public void ShareScreenshotWithText()
 	{
-		string text = Application.persistentDataPath + "/" + ScreenshotName;
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		string text = Application.get_persistentDataPath() + "/" + ScreenshotName;
 		if (File.Exists(text))
 		{
 			File.Delete(text);
 		}
 		Application.CaptureScreenshot(ScreenshotName);
-		StartCoroutine(delayedShare(text));
+		this.StartCoroutine(delayedShare(text));
 	}
 
 	private IEnumerator delayedShare(string screenShotPath)
@@ -28,33 +29,44 @@ public class NativeShare : MonoBehaviourSingleton<NativeShare>
 
 	public void Share(string imagePath, string url, string subject = "")
 	{
-		AndroidJavaClass androidJavaClass = new AndroidJavaClass("android.content.Intent");
-		AndroidJavaObject androidJavaObject = new AndroidJavaObject("android.content.Intent");
-		androidJavaObject.Call<AndroidJavaObject>("setAction", new object[1]
+		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000a: Expected O, but got Unknown
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001b: Expected O, but got Unknown
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Expected O, but got Unknown
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Expected O, but got Unknown
+		AndroidJavaClass val = new AndroidJavaClass("android.content.Intent");
+		AndroidJavaObject val2 = new AndroidJavaObject("android.content.Intent", new object[0]);
+		val2.Call<AndroidJavaObject>("setAction", new object[1]
 		{
-			androidJavaClass.GetStatic<string>("ACTION_SEND")
+			val.GetStatic<string>("ACTION_SEND")
 		});
-		AndroidJavaClass androidJavaClass2 = new AndroidJavaClass("android.net.Uri");
-		AndroidJavaObject androidJavaObject2 = androidJavaClass2.CallStatic<AndroidJavaObject>("parse", new object[1]
+		AndroidJavaClass val3 = new AndroidJavaClass("android.net.Uri");
+		AndroidJavaObject val4 = val3.CallStatic<AndroidJavaObject>("parse", new object[1]
 		{
 			"file://" + imagePath
 		});
-		androidJavaObject.Call<AndroidJavaObject>("putExtra", new object[2]
+		val2.Call<AndroidJavaObject>("putExtra", new object[2]
 		{
-			androidJavaClass.GetStatic<string>("EXTRA_STREAM"),
-			androidJavaObject2
+			val.GetStatic<string>("EXTRA_STREAM"),
+			val4
 		});
-		androidJavaObject.Call<AndroidJavaObject>("setType", new object[1]
+		val2.Call<AndroidJavaObject>("setType", new object[1]
 		{
 			"image/png"
 		});
-		AndroidJavaClass androidJavaClass3 = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-		AndroidJavaObject @static = androidJavaClass3.GetStatic<AndroidJavaObject>("currentActivity");
-		AndroidJavaObject androidJavaObject3 = androidJavaClass.CallStatic<AndroidJavaObject>("createChooser", new object[2]
+		AndroidJavaClass val5 = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+		AndroidJavaObject @static = val5.GetStatic<AndroidJavaObject>("currentActivity");
+		AndroidJavaObject val6 = val.CallStatic<AndroidJavaObject>("createChooser", new object[2]
 		{
-			androidJavaObject,
+			val2,
 			subject
 		});
-		@static.Call("startActivity", androidJavaObject3);
+		@static.Call("startActivity", new object[1]
+		{
+			val6
+		});
 	}
 }

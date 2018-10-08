@@ -1,4 +1,4 @@
-using UnityEngine;
+using System;
 
 public class GachaPerformanceSkill : GachaPerformanceBase, SkillGachaDirector.ISectionCommand
 {
@@ -21,14 +21,14 @@ public class GachaPerformanceSkill : GachaPerformanceBase, SkillGachaDirector.IS
 
 	void SkillGachaDirector.ISectionCommand.OnShowSkillModel(uint skill_item_id)
 	{
-		SetRenderSkillItemModel(UI.TEX_MODEL, skill_item_id, false, false);
-		SetRenderSkillItemSymbolModel(UI.TEX_INNER_MODEL, skill_item_id, false);
+		SetRenderSkillItemModel((Enum)UI.TEX_MODEL, skill_item_id, false, false);
+		SetRenderSkillItemSymbolModel((Enum)UI.TEX_INNER_MODEL, skill_item_id, false);
 	}
 
 	void SkillGachaDirector.ISectionCommand.OnHideSkillModel()
 	{
-		ClearRenderModel(UI.TEX_MODEL);
-		ClearRenderModel(UI.TEX_INNER_MODEL);
+		ClearRenderModel((Enum)UI.TEX_MODEL);
+		ClearRenderModel((Enum)UI.TEX_INNER_MODEL);
 	}
 
 	void SkillGachaDirector.ISectionCommand.OnShowRarity(RARITY_TYPE rarity)
@@ -48,8 +48,8 @@ public class GachaPerformanceSkill : GachaPerformanceBase, SkillGachaDirector.IS
 
 	protected override void OnOpen()
 	{
-		SetActive(UI.BTN_SKIP, true);
-		if ((Object)AnimationDirector.I != (Object)null)
+		SetActive((Enum)UI.BTN_SKIP, true);
+		if (AnimationDirector.I != null)
 		{
 			(AnimationDirector.I as SkillGachaDirector).StartDirection(this);
 		}

@@ -48,7 +48,7 @@ public class InGameItem : GameSection
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
 			isInActiveRotate = true;
 		}
-		PlayTween(UI.OBJ_CAPTION_3, true, null, false, 0);
+		PlayTween((Enum)UI.OBJ_CAPTION_3, true, (EventDelegate.Callback)null, false, 0);
 	}
 
 	public override void Exit()
@@ -60,38 +60,13 @@ public class InGameItem : GameSection
 		}
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
 		UpdateAnchors();
 		base.UpdateUI();
-		SetToggle(UI.TGL_CHANGE_INVENTORY, true);
+		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, true);
 		inventory = new InGameUseItemInventory();
-		SetDynamicList(SelectListTarget(showInventoryMode), null, inventory.datas.Length, false, delegate(int i)
-		{
-			SortCompareData sortCompareData2 = inventory.datas[i];
-			if (sortCompareData2 == null || !sortCompareData2.IsPriority(inventory.sortSettings.orderTypeAsc))
-			{
-				return false;
-			}
-			return true;
-		}, null, delegate(int i, Transform t, bool is_recycre)
-		{
-			SortCompareData sortCompareData = inventory.datas[i];
-			ItemIcon itemIcon = inventory.CreateIcon(new object[4]
-			{
-				sortCompareData,
-				t,
-				i,
-				showInventoryMode
-			});
-			if ((UnityEngine.Object)itemIcon != (UnityEngine.Object)null)
-			{
-				itemIcon.toggleSelectFrame.onChange.Clear();
-				itemIcon.toggleSelectFrame.onChange.Add(new EventDelegate(this, "IconToggleChange"));
-				SetEvent(itemIcon.transform, "DETAIL", i);
-				SetLongTouch(itemIcon.transform, "DETAIL", i);
-			}
-		});
+		SetDynamicList((Enum)SelectListTarget(showInventoryMode), (string)null, inventory.datas.Length, false, new Func<int, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		UIPanel component = GetCtrl(UI.SCR_INVENTORY).GetComponent<UIPanel>();
 		component.Refresh();
 		if (isInActiveRotate && MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
@@ -101,8 +76,12 @@ public class InGameItem : GameSection
 		isInActiveRotate = false;
 	}
 
-	private void Reposition(bool isPortrait)
+	private unsafe void Reposition(bool isPortrait)
 	{
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a5: Expected O, but got Unknown
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Expected O, but got Unknown
 		UIScreenRotationHandler[] components = GetCtrl(UI.BG).GetComponents<UIScreenRotationHandler>();
 		for (int i = 0; i < components.Length; i++)
 		{
@@ -115,21 +94,20 @@ public class InGameItem : GameSection
 		UIScrollView component = GetCtrl(UI.SCR_INVENTORY).GetComponent<UIScrollView>();
 		component.ResetPosition();
 		AppMain i2 = MonoBehaviourSingleton<AppMain>.I;
-		i2.onDelayCall = (Action)Delegate.Combine(i2.onDelayCall, (Action)delegate
-		{
-			RefreshUI();
-		});
+		i2.onDelayCall = Delegate.Combine((Delegate)i2.onDelayCall, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnScreenRotate(bool isPortrait)
 	{
-		if ((UnityEngine.Object)base.transferUI != (UnityEngine.Object)null)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		if (base.transferUI != null)
 		{
-			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
+			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
 		}
 		else
 		{
-			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
+			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
 		}
 		if (!isInActiveRotate)
 		{
@@ -139,8 +117,8 @@ public class InGameItem : GameSection
 
 	private UI SelectListTarget(ItemStorageTop.SHOW_INVENTORY_MODE show_detail_icon)
 	{
-		SetActive(UI.GRD_INVENTORY, true);
-		SetActive(UI.GRD_INVENTORY_SMALL, false);
+		SetActive((Enum)UI.GRD_INVENTORY, true);
+		SetActive((Enum)UI.GRD_INVENTORY_SMALL, false);
 		return UI.GRD_INVENTORY;
 	}
 

@@ -191,17 +191,15 @@ public class StatusTop : SkillInfoBase
 		DispatchEvent(event_name, null);
 	}
 
-	public override void Initialize()
+	public unsafe override void Initialize()
 	{
+		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
 		showEquipMode = true;
 		tweenTarget = null;
-		SetActive(UI.OBJ_WITH_MONSTER_ROOT, true);
-		SetActive(UI.OBJ_WITHOUT_MONSTER_ROOT, false);
+		SetActive((Enum)UI.OBJ_WITH_MONSTER_ROOT, true);
+		SetActive((Enum)UI.OBJ_WITHOUT_MONSTER_ROOT, false);
 		SettingEquipSetInfo();
-		SetDynamicList(UI.GRD_DRUM, "equipno", SET_NO_MAX, false, null, null, delegate(int i, Transform t, bool isRecycle)
-		{
-			SetLabelText(t, UI.LBL_EQUIP_NO, (i + 1).ToString());
-		});
+		SetDynamicList((Enum)UI.GRD_DRUM, "equipno", SET_NO_MAX, false, null, null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		SetCenterOnChildFunc((Enum)UI.GRD_DRUM, (SpringPanel.OnFinished)delegate
 		{
 			int result = equipSetNo;
@@ -214,7 +212,7 @@ public class StatusTop : SkillInfoBase
 			RefreshUI();
 		});
 		SetCenter(GetCtrl(UI.GRD_DRUM), equipSetNo, true);
-		StartCoroutine(DoInitialize());
+		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -228,7 +226,7 @@ public class StatusTop : SkillInfoBase
 		base.Initialize();
 	}
 
-	protected override void OnOpen()
+	protected unsafe override void OnOpen()
 	{
 		object eventData = GameSection.GetEventData();
 		if (eventData is StatusEquip.ChangeEquipData)
@@ -254,12 +252,12 @@ public class StatusTop : SkillInfoBase
 		else if (eventData is StatusEquip.ChangeEquipData[])
 		{
 			StatusEquip.ChangeEquipData[] array = eventData as StatusEquip.ChangeEquipData[];
-			for (int j = 0; j < array.Length; j++)
+			for (int i = 0; i < array.Length; i++)
 			{
-				if ((array[j].index != 0 || array[j].item != null) && (array[j].index != 3 || array[j].item != null))
+				if ((array[i].index != 0 || array[i].item != null) && (array[i].index != 3 || array[i].item != null))
 				{
-					localEquipSet[array[j].setNo].item[array[j].index] = array[j].item;
-					MonoBehaviourSingleton<StatusManager>.I.ReplaceEquipItem(localEquipSet[array[j].setNo], array[j].setNo, array[j].index);
+					localEquipSet[array[i].setNo].item[array[i].index] = array[i].item;
+					MonoBehaviourSingleton<StatusManager>.I.ReplaceEquipItem(localEquipSet[array[i].setNo], array[i].setNo, array[i].index);
 				}
 			}
 		}
@@ -268,10 +266,7 @@ public class StatusTop : SkillInfoBase
 			ResetEquipSetCopy();
 		}
 		localEquipSetUpdate();
-		SetDynamicList(UI.GRD_DRUM, "equipno", SET_NO_MAX, false, null, null, delegate(int i, Transform t, bool isRecycle)
-		{
-			SetLabelText(t, UI.LBL_EQUIP_NO, (i + 1).ToString());
-		});
+		SetDynamicList((Enum)UI.GRD_DRUM, "equipno", SET_NO_MAX, false, null, null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		SetCenter(GetCtrl(UI.GRD_DRUM), equipSetNo, true);
 	}
 
@@ -321,28 +316,33 @@ public class StatusTop : SkillInfoBase
 		DrawEquipSetModel();
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0253: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0356: Unknown result type (might be due to invalid IL or missing references)
 		int badgeTotalNum = MonoBehaviourSingleton<SmithManager>.I.GetBadgeTotalNum();
-		SetBadge(UI.BTN_STUDIO, badgeTotalNum, SpriteAlignment.TopLeft, 8, -8, true);
+		SetBadge((Enum)UI.BTN_STUDIO, badgeTotalNum, 1, 8, -8, true);
 		DrawEquipModeButton();
 		int sex = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex;
 		if (showEquipMode)
 		{
 			EquipSetInfo equipSetInfo = localEquipSet[equipSetNo];
-			int j = 0;
-			for (int num = icons.Length; j < num; j++)
+			int i = 0;
+			for (int num = icons.Length; i < num; i++)
 			{
-				EquipItemInfo equipItemInfo = equipSetInfo.item[j];
-				Transform ctrl = GetCtrl(icons[j]);
-				ctrl.GetComponentsInChildren(true, Temporary.itemIconList);
-				int k = 0;
-				for (int count = Temporary.itemIconList.Count; k < count; k++)
+				EquipItemInfo equipItemInfo = equipSetInfo.item[i];
+				Transform ctrl = GetCtrl(icons[i]);
+				ctrl.GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
+				int j = 0;
+				for (int count = Temporary.itemIconList.Count; j < count; j++)
 				{
-					Temporary.itemIconList[k].gameObject.SetActive(true);
+					Temporary.itemIconList[j].get_gameObject().SetActive(true);
 				}
 				Temporary.itemIconList.Clear();
-				ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, sex, GetCtrl(icons[j]), null, -1, "DETAIL", j, false, -1, false, null, false, false);
+				ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, sex, GetCtrl(icons[i]), null, -1, "DETAIL", i, false, -1, false, null, false, false);
 				int num2 = -1;
 				string text = string.Empty;
 				if (equipItemInfo != null && equipItemInfo.tableID != 0)
@@ -351,95 +351,92 @@ public class StatusTop : SkillInfoBase
 					num2 = tableData.GetIconID(sex);
 					text = string.Format(StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 1u), equipItemInfo.level);
 				}
-				itemIcon.gameObject.SetActive(num2 != -1);
-				SetEvent(iconsBtn[j], (num2 == -1) ? "EQUIP" : "DETAIL", j);
-				SetLabelText(lblEquipLevel[j], text);
-				SetLabelText(lblShadowEquipLevel[j], text);
+				itemIcon.get_gameObject().SetActive(num2 != -1);
+				SetEvent((Enum)iconsBtn[i], (num2 == -1) ? "EQUIP" : "DETAIL", i);
+				SetLabelText((Enum)lblEquipLevel[i], text);
+				SetLabelText((Enum)lblShadowEquipLevel[i], text);
 				if (num2 != -1)
 				{
-					itemIcon.SetEquipExt(equipItemInfo, GetComponent<UILabel>(lblEquipLevel[j]));
+					itemIcon.SetEquipExt(equipItemInfo, base.GetComponent<UILabel>((Enum)lblEquipLevel[i]));
 				}
-				Transform ctrl2 = GetCtrl(iconsBtn[j]);
+				Transform ctrl2 = GetCtrl(iconsBtn[i]);
 				bool flag = equipItemInfo != null && equipItemInfo.tableID != 0;
 				if (flag)
 				{
-					int button_event_data = j;
+					int button_event_data = i;
 					SetSkillIconButton(ctrl2, UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButtonTOP", equipItemInfo.tableData, GetSkillSlotData(equipItemInfo), "SKILL_ICON_BUTTON", button_event_data);
 				}
-				FindCtrl(ctrl2, UI.OBJ_SKILL_BUTTON_ROOT).gameObject.SetActive(flag);
+				FindCtrl(ctrl2, UI.OBJ_SKILL_BUTTON_ROOT).get_gameObject().SetActive(flag);
 			}
 		}
 		else
 		{
-			int l = 0;
-			for (int num3 = visualEquip.visualItem.Length; l < num3; l++)
+			int k = 0;
+			for (int num3 = visualEquip.visualItem.Length; k < num3; k++)
 			{
-				EquipItemInfo equipItemInfo2 = visualEquip.visualItem[l];
-				Transform ctrl3 = GetCtrl(iconsVisual[l]);
-				ctrl3.GetComponentsInChildren(true, Temporary.itemIconList);
-				int m = 0;
-				for (int count2 = Temporary.itemIconList.Count; m < count2; m++)
+				EquipItemInfo equipItemInfo2 = visualEquip.visualItem[k];
+				Transform ctrl3 = GetCtrl(iconsVisual[k]);
+				ctrl3.GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
+				int l = 0;
+				for (int count2 = Temporary.itemIconList.Count; l < count2; l++)
 				{
-					Temporary.itemIconList[m].gameObject.SetActive(true);
+					Temporary.itemIconList[l].get_gameObject().SetActive(true);
 				}
 				Temporary.itemIconList.Clear();
-				ItemIcon itemIcon2 = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo2, sex, ctrl3, null, -1, "AVATAR", l, false, -1, false, null, false, false);
-				SetLongTouch(itemIcon2.transform, "VISUAL_DETAIL", l);
+				ItemIcon itemIcon2 = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo2, sex, ctrl3, null, -1, "AVATAR", k, false, -1, false, null, false, false);
+				SetLongTouch(itemIcon2.transform, "VISUAL_DETAIL", k);
 				int num4 = -1;
 				if (equipItemInfo2 != null)
 				{
 					num4 = equipItemInfo2.tableData.GetIconID(sex);
 				}
-				itemIcon2.gameObject.SetActive(num4 != -1);
-				SetEvent(iconsVisualBtn[l], "AVATAR", l);
-				SetLongTouch(iconsVisualBtn[l], "VISUAL_DETAIL", l);
+				itemIcon2.get_gameObject().SetActive(num4 != -1);
+				SetEvent((Enum)iconsVisualBtn[k], "AVATAR", k);
+				SetLongTouch((Enum)iconsVisualBtn[k], "VISUAL_DETAIL", (object)k);
 			}
 		}
 		DrawEquipSetModel();
 		UI? nullable = tweenTarget;
 		if (nullable.HasValue)
 		{
-			ResetTween(tweenTarget, 0);
-			PlayTween(tweenTarget, true, null, false, 0);
+			ResetTween((Enum)tweenTarget, 0);
+			PlayTween((Enum)tweenTarget, true, (EventDelegate.Callback)null, false, 0);
 		}
-		SetActive(UI.OBJ_STUDIO_BUTTON_ROOT, showEquipMode);
-		SetActive(UI.TGL_VISIBLE_UI_BUTTON, !showEquipMode);
-		SetToggle(UI.TGL_SHOW_EQUIP_TYPE, showEquipMode);
+		SetActive((Enum)UI.OBJ_STUDIO_BUTTON_ROOT, showEquipMode);
+		SetActive((Enum)UI.TGL_VISIBLE_UI_BUTTON, !showEquipMode);
+		SetToggle((Enum)UI.TGL_SHOW_EQUIP_TYPE, showEquipMode);
 		if (visualEquip.isVisibleHelm != (localEquipSet[equipSetNo].showHelm == 1))
 		{
-			ResetTween(UI.BTN_VISIBLE_HELM, 0);
-			ResetTween(UI.BTN_INVISIBLE_HELM, 0);
+			ResetTween((Enum)UI.BTN_VISIBLE_HELM, 0);
+			ResetTween((Enum)UI.BTN_INVISIBLE_HELM, 0);
 			if (localEquipSet[equipSetNo].showHelm == 1)
 			{
-				PlayTween(UI.BTN_INVISIBLE_HELM, true, null, false, 0);
+				PlayTween((Enum)UI.BTN_INVISIBLE_HELM, true, (EventDelegate.Callback)null, false, 0);
 			}
 			else
 			{
-				PlayTween(UI.BTN_VISIBLE_HELM, true, null, false, 0);
+				PlayTween((Enum)UI.BTN_VISIBLE_HELM, true, (EventDelegate.Callback)null, false, 0);
 			}
 			visualEquip.isVisibleHelm = (localEquipSet[equipSetNo].showHelm == 1);
 		}
-		SetToggleButton(UI.TGL_VISIBLE_HELM_BUTTON, visualEquip.isVisibleHelm, delegate(bool is_active)
+		SetToggleButton((Enum)UI.TGL_VISIBLE_HELM_BUTTON, visualEquip.isVisibleHelm, (Action<bool>)delegate(bool is_active)
 		{
 			visualEquip.isVisibleHelm = is_active;
 			localEquipSet[equipSetNo].showHelm = (visualEquip.isVisibleHelm ? 1 : 0);
-			ResetTween(UI.BTN_VISIBLE_HELM, 0);
-			ResetTween(UI.BTN_INVISIBLE_HELM, 0);
+			ResetTween((Enum)UI.BTN_VISIBLE_HELM, 0);
+			ResetTween((Enum)UI.BTN_INVISIBLE_HELM, 0);
 			if (is_active)
 			{
-				PlayTween(UI.BTN_INVISIBLE_HELM, true, null, false, 0);
+				PlayTween((Enum)UI.BTN_INVISIBLE_HELM, true, (EventDelegate.Callback)null, false, 0);
 			}
 			else
 			{
-				PlayTween(UI.BTN_VISIBLE_HELM, true, null, false, 0);
+				PlayTween((Enum)UI.BTN_VISIBLE_HELM, true, (EventDelegate.Callback)null, false, 0);
 			}
 			UpdateModel();
 		});
 		DrawEquipSetCopyModeButton();
-		SetDynamicList(UI.GRD_DRUM, "equipno", SET_NO_MAX, false, null, null, delegate(int i, Transform t, bool isRecycle)
-		{
-			SetLabelText(t, UI.LBL_EQUIP_NO, (i + 1).ToString());
-		});
+		SetDynamicList((Enum)UI.GRD_DRUM, "equipno", SET_NO_MAX, false, null, null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		base.UpdateUI();
 	}
 
@@ -447,33 +444,33 @@ public class StatusTop : SkillInfoBase
 	{
 		EquipSetCalculator equipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetEquipSetCalculator(equipSetNo);
 		SimpleStatus finalStatus = equipSetCalculator.GetFinalStatus(0, MonoBehaviourSingleton<UserInfoManager>.I.userStatus);
-		SetLabelText(UI.LBL_ATK, finalStatus.GetAttacksSum().ToString());
-		SetLabelText(UI.LBL_DEF, finalStatus.GetDefencesSum().ToString());
-		SetLabelText(UI.LBL_HP, finalStatus.hp.ToString());
-		SetLabelText(UI.LBL_NOW, (equipSetNo + 1).ToString());
-		SetLabelText(UI.LBL_MAX, SET_NO_MAX.ToString());
-		SetLabelText(UI.LBL_SET_NAME, localEquipSet[equipSetNo].name);
+		SetLabelText((Enum)UI.LBL_ATK, finalStatus.GetAttacksSum().ToString());
+		SetLabelText((Enum)UI.LBL_DEF, finalStatus.GetDefencesSum().ToString());
+		SetLabelText((Enum)UI.LBL_HP, finalStatus.hp.ToString());
+		SetLabelText((Enum)UI.LBL_NOW, (equipSetNo + 1).ToString());
+		SetLabelText((Enum)UI.LBL_MAX, SET_NO_MAX.ToString());
+		SetLabelText((Enum)UI.LBL_SET_NAME, localEquipSet[equipSetNo].name);
 		UpdateModel();
 	}
 
 	private void DrawEquipModeButton()
 	{
-		SetActive(UI.OBJ_EQUIP_ROOT, showEquipMode);
-		SetActive(UI.BTN_AVATAR_INACTIVE, showEquipMode);
-		SetActive(UI.OBJ_EQUIP_SET_SELECT, showEquipMode);
-		SetActive(UI.SPR_PARAMETER_ACTIVE, showEquipMode);
-		SetActive(UI.OBJ_VISUAL_ROOT, !showEquipMode);
-		SetActive(UI.BTN_PARAMETER_INACTIVE, !showEquipMode);
-		SetActive(UI.SPR_AVATAR_ACTIVE, !showEquipMode);
+		SetActive((Enum)UI.OBJ_EQUIP_ROOT, showEquipMode);
+		SetActive((Enum)UI.BTN_AVATAR_INACTIVE, showEquipMode);
+		SetActive((Enum)UI.OBJ_EQUIP_SET_SELECT, showEquipMode);
+		SetActive((Enum)UI.SPR_PARAMETER_ACTIVE, showEquipMode);
+		SetActive((Enum)UI.OBJ_VISUAL_ROOT, !showEquipMode);
+		SetActive((Enum)UI.BTN_PARAMETER_INACTIVE, !showEquipMode);
+		SetActive((Enum)UI.SPR_AVATAR_ACTIVE, !showEquipMode);
 	}
 
 	private void DrawEquipSetCopyModeButton()
 	{
 		bool flag = equipSetNo == equipSetCopyNo;
 		bool flag2 = equipSetCopyMode == EQUIP_SET_COPY_MODE.COPY;
-		SetActive(UI.BTN_EQUIP_SET_COPY, !flag2);
-		SetActive(UI.BTN_EQUIP_SET_PASTE, flag2 && !flag);
-		SetActive(UI.BTN_EQUIP_SET_DELETE, flag2 && flag);
+		SetActive((Enum)UI.BTN_EQUIP_SET_COPY, !flag2);
+		SetActive((Enum)UI.BTN_EQUIP_SET_PASTE, flag2 && !flag);
+		SetActive((Enum)UI.BTN_EQUIP_SET_DELETE, flag2 && flag);
 	}
 
 	private void OnQuery_EQUIP_SET_L()
@@ -550,8 +547,8 @@ public class StatusTop : SkillInfoBase
 		{
 			MonoBehaviourSingleton<StatusStageManager>.I.SetViewMode(StatusStageManager.VIEW_MODE.EQUIP);
 		}
-		ResetTween(UI.OBJ_PARAMETER_BUTTON_ROOT, 0);
-		PlayTween(UI.OBJ_PARAMETER_BUTTON_ROOT, true, null, false, 0);
+		ResetTween((Enum)UI.OBJ_PARAMETER_BUTTON_ROOT, 0);
+		PlayTween((Enum)UI.OBJ_PARAMETER_BUTTON_ROOT, true, (EventDelegate.Callback)null, false, 0);
 		RefreshUI();
 	}
 
@@ -564,8 +561,8 @@ public class StatusTop : SkillInfoBase
 		{
 			MonoBehaviourSingleton<StatusStageManager>.I.SetViewMode(StatusStageManager.VIEW_MODE.AVATAR);
 		}
-		ResetTween(UI.OBJ_AVATAR_BUTTON_ROOT, 0);
-		PlayTween(UI.OBJ_AVATAR_BUTTON_ROOT, true, null, false, 0);
+		ResetTween((Enum)UI.OBJ_AVATAR_BUTTON_ROOT, 0);
+		PlayTween((Enum)UI.OBJ_AVATAR_BUTTON_ROOT, true, (EventDelegate.Callback)null, false, 0);
 		RefreshUI();
 	}
 
@@ -771,7 +768,7 @@ public class StatusTop : SkillInfoBase
 
 	private void OnCloseDialog_StatusChangedEquipSetName()
 	{
-		SetLabelText(UI.LBL_SET_NAME, localEquipSet[equipSetNo].name);
+		SetLabelText((Enum)UI.LBL_SET_NAME, localEquipSet[equipSetNo].name);
 	}
 
 	protected override NOTIFY_FLAG GetUpdateUINotifyFlags()

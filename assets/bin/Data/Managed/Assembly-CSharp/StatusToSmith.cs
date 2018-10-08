@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class StatusToSmith : GameSection
@@ -16,7 +17,7 @@ public class StatusToSmith : GameSection
 
 	public override void Initialize()
 	{
-		if (!TutorialStep.HasAllTutorialCompleted() && (Object)MonoBehaviourSingleton<UIManager>.I.npcMessage != (Object)null)
+		if (!TutorialStep.HasAllTutorialCompleted() && MonoBehaviourSingleton<UIManager>.I.npcMessage != null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.npcMessage.HideMessage();
 		}
@@ -25,8 +26,8 @@ public class StatusToSmith : GameSection
 
 	public override void UpdateUI()
 	{
-		SetBadge(UI.BTN_CREATE_WEAPON, MonoBehaviourSingleton<SmithManager>.I.smithBadgeData.GetAllWeaponBadgeNum(), SpriteAlignment.TopLeft, 7, -9, true);
-		SetBadge(UI.BTN_CREATE_DEFENSE, MonoBehaviourSingleton<SmithManager>.I.smithBadgeData.GetAllDefenseBadgeNum(), SpriteAlignment.TopLeft, 7, -9, true);
+		SetBadge((Enum)UI.BTN_CREATE_WEAPON, MonoBehaviourSingleton<SmithManager>.I.smithBadgeData.GetAllWeaponBadgeNum(), 1, 7, -9, true);
+		SetBadge((Enum)UI.BTN_CREATE_DEFENSE, MonoBehaviourSingleton<SmithManager>.I.smithBadgeData.GetAllDefenseBadgeNum(), 1, 7, -9, true);
 		base.UpdateUI();
 	}
 
@@ -109,8 +110,9 @@ public class StatusToSmith : GameSection
 
 	private void OnQuery_EXCHANGE()
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.BTN_EXCHANGE);
-		if (!((Object)ctrl == (Object)null) && !ctrl.gameObject.activeSelf)
+		if (!(ctrl == null) && !ctrl.get_gameObject().get_activeSelf())
 		{
 			return;
 		}

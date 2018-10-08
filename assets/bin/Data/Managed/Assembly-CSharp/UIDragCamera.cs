@@ -1,22 +1,31 @@
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Drag Camera")]
 [ExecuteInEditMode]
-public class UIDragCamera : MonoBehaviour
+[AddComponentMenu("NGUI/Interaction/Drag Camera")]
+public class UIDragCamera
 {
 	public UIDraggableCamera draggableCamera;
 
+	public UIDragCamera()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
-		if ((Object)draggableCamera == (Object)null)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Expected O, but got Unknown
+		if (draggableCamera == null)
 		{
-			draggableCamera = NGUITools.FindInParents<UIDraggableCamera>(base.gameObject);
+			draggableCamera = NGUITools.FindInParents<UIDraggableCamera>(this.get_gameObject());
 		}
 	}
 
 	private void OnPress(bool isPressed)
 	{
-		if (base.enabled && NGUITools.GetActive(base.gameObject) && (Object)draggableCamera != (Object)null)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Expected O, but got Unknown
+		if (this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && draggableCamera != null)
 		{
 			draggableCamera.Press(isPressed);
 		}
@@ -24,7 +33,10 @@ public class UIDragCamera : MonoBehaviour
 
 	private void OnDrag(Vector2 delta)
 	{
-		if (base.enabled && NGUITools.GetActive(base.gameObject) && (Object)draggableCamera != (Object)null)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Expected O, but got Unknown
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		if (this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && draggableCamera != null)
 		{
 			draggableCamera.Drag(delta);
 		}
@@ -32,7 +44,9 @@ public class UIDragCamera : MonoBehaviour
 
 	private void OnScroll(float delta)
 	{
-		if (base.enabled && NGUITools.GetActive(base.gameObject) && (Object)draggableCamera != (Object)null)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Expected O, but got Unknown
+		if (this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && draggableCamera != null)
 		{
 			draggableCamera.Scroll(delta);
 		}

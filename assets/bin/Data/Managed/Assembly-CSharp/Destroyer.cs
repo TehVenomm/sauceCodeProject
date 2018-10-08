@@ -1,20 +1,25 @@
 using UnityEngine;
 
-public class Destroyer : MonoBehaviour
+public class Destroyer
 {
 	public float time;
+
+	public Destroyer()
+		: this()
+	{
+	}
 
 	private void Start()
 	{
 		if (time <= 0f)
 		{
-			base.enabled = false;
+			this.set_enabled(false);
 		}
 	}
 
 	private void Update()
 	{
-		time -= Time.deltaTime;
+		time -= Time.get_deltaTime();
 		if (time <= 0f)
 		{
 			DestroyGameObject();
@@ -23,6 +28,7 @@ public class Destroyer : MonoBehaviour
 
 	public void DestroyGameObject()
 	{
-		Object.Destroy(base.gameObject);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		Object.Destroy(this.get_gameObject());
 	}
 }

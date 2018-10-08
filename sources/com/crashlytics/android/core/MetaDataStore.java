@@ -154,9 +154,9 @@ class MetaDataStore {
     }
 
     public void writeKeyData(String str, Map<String, String> map) {
+        Closeable bufferedWriter;
         Throwable e;
         File keysFileForSession = getKeysFileForSession(str);
-        Closeable bufferedWriter;
         try {
             String keysDataToJson = keysDataToJson(map);
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(keysFileForSession), UTF_8));

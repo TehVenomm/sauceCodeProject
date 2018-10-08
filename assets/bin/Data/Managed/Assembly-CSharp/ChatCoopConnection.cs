@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 public class ChatCoopConnection : IChatConnection
 {
@@ -31,7 +30,10 @@ public class ChatCoopConnection : IChatConnection
 	public void Disconnect(Action onFinished = null)
 	{
 		established = false;
-		onFinished?.Invoke();
+		if (onFinished != null)
+		{
+			onFinished.Invoke();
+		}
 	}
 
 	public void Join(int roomNo, string userName)
@@ -45,6 +47,7 @@ public class ChatCoopConnection : IChatConnection
 
 	public void SendText(string message)
 	{
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			MonoBehaviourSingleton<CoopManager>.I.coopStage.SendChatMessage(MonoBehaviourSingleton<CoopManager>.I.GetSelfID(), message);
@@ -52,7 +55,7 @@ public class ChatCoopConnection : IChatConnection
 		else
 		{
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if ((UnityEngine.Object)self == (UnityEngine.Object)null || !self.gameObject.activeInHierarchy || !self.uiPlayerStatusGizmo.isActiveAndEnabled)
+			if (self == null || !self.get_gameObject().get_activeInHierarchy() || !self.uiPlayerStatusGizmo.get_isActiveAndEnabled())
 			{
 				MonoBehaviourSingleton<CoopManager>.I.coopStage.SendChatMessage(MonoBehaviourSingleton<CoopManager>.I.GetSelfID(), message);
 			}
@@ -70,6 +73,7 @@ public class ChatCoopConnection : IChatConnection
 
 	public void SendStamp(int stampId)
 	{
+		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			if (QuestManager.IsValidInGameExplore())
@@ -84,7 +88,7 @@ public class ChatCoopConnection : IChatConnection
 		else
 		{
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if ((UnityEngine.Object)self == (UnityEngine.Object)null || !self.gameObject.activeInHierarchy || !self.uiPlayerStatusGizmo.isActiveAndEnabled)
+			if (self == null || !self.get_gameObject().get_activeInHierarchy() || !self.uiPlayerStatusGizmo.get_isActiveAndEnabled())
 			{
 				if (QuestManager.IsValidInGameExplore())
 				{

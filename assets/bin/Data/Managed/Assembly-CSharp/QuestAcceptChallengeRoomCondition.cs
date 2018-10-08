@@ -1,4 +1,5 @@
 using Network;
+using System;
 using UnityEngine;
 
 public class QuestAcceptChallengeRoomCondition : QuestSearchRoomCondition
@@ -143,7 +144,7 @@ public class QuestAcceptChallengeRoomCondition : QuestSearchRoomCondition
 	private void UpdateEnemyLevel()
 	{
 		int enemyLevelIndex = challengeRequest.enemyLevelIndex;
-		SetLabelText(UI.LBL_TARGET_LEVEL, enemyLevelNames[enemyLevelIndex]);
+		SetLabelText((Enum)UI.LBL_TARGET_LEVEL, enemyLevelNames[enemyLevelIndex]);
 	}
 
 	private void OnQuery_TARGET_LEVEL()
@@ -153,11 +154,11 @@ public class QuestAcceptChallengeRoomCondition : QuestSearchRoomCondition
 
 	private void ShowLevelPopup()
 	{
-		if ((Object)levelPopup == (Object)null)
+		if (levelPopup == null)
 		{
 			levelPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_LEVEL), false);
 		}
-		if (!((Object)levelPopup == (Object)null))
+		if (!(levelPopup == null))
 		{
 			bool[] array = new bool[enemyLevelNames.Count];
 			for (int i = 0; i < array.Length; i++)
@@ -193,17 +194,10 @@ public class QuestAcceptChallengeRoomCondition : QuestSearchRoomCondition
 		}
 	}
 
-	protected override void SendSearch()
+	protected unsafe override void SendSearch()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeList(challengeRequest, delegate(bool is_success, Error err)
-		{
-			if (!is_success && err == Error.WRN_PARTY_SEARCH_NOT_FOUND_QUEST)
-			{
-				OnNotFoundQuest();
-			}
-			GameSection.ResumeEvent(true, null);
-		}, true);
+		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeList(challengeRequest, new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), true);
 	}
 
 	protected override void OnQuery_SPECIES_SEARCH_REQUEST()

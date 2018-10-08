@@ -31,16 +31,17 @@ public class HomePointShopEventDetail : GameSection
 
 	public override void Initialize()
 	{
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		data = (GameSection.GetEventData() as PointShop);
 		currentPage = 1;
-		StartCoroutine(DoInitialize());
+		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
 		LoadingQueue loadingQueue = new LoadingQueue(this);
 		loadingQueue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName(data.pointShopId), false);
-		loadingQueue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointSHopBGImageName(data.pointShopId), false);
+		loadingQueue.Load(true, RESOURCE_CATEGORY.COMMON, ResourceName.GetPointSHopBGImageName(data.pointShopId), false);
 		if (loadingQueue.IsLoading())
 		{
 			yield return (object)loadingQueue.Wait();
@@ -55,11 +56,11 @@ public class HomePointShopEventDetail : GameSection
 		UITexture component2 = GetCtrl(UI.TEX_EVENT_POP).GetComponent<UITexture>();
 		ResourceLoad.LoadPointIconImageTexture(component, (uint)data.pointShopId);
 		ResourceLoad.LoadPointShopBGTexture(component2, (uint)data.pointShopId);
-		SetLabelText(UI.LBL_POINT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), data.userPoint));
+		SetLabelText((Enum)UI.LBL_POINT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), data.userPoint));
 		SetList();
 	}
 
-	private void SetList()
+	private unsafe void SetList()
 	{
 		currentPointShopItem = GetBuyableItemList();
 		if (filter != null)
@@ -71,31 +72,10 @@ public class HomePointShopEventDetail : GameSection
 		{
 			maxPage++;
 		}
-		SetLabelText(UI.LBL_ARROW_NOW, (maxPage <= 0) ? "0" : currentPage.ToString());
-		SetLabelText(UI.LBL_ARROW_MAX, maxPage.ToString());
+		SetLabelText((Enum)UI.LBL_ARROW_NOW, (maxPage <= 0) ? "0" : currentPage.ToString());
+		SetLabelText((Enum)UI.LBL_ARROW_MAX, maxPage.ToString());
 		int item_num = Mathf.Min(GameDefine.POINT_SHOP_LIST_COUNT, currentPointShopItem.Count - (currentPage - 1) * GameDefine.POINT_SHOP_LIST_COUNT);
-		SetGrid(UI.GRD_LIST, "PointShopListItem", item_num, true, delegate(int i, Transform t, bool b)
-		{
-			int index = i + (currentPage - 1) * GameDefine.POINT_SHOP_LIST_COUNT;
-			PointShopItem pointShopItem = currentPointShopItem[index];
-			object event_data = new object[3]
-			{
-				pointShopItem,
-				data,
-				new Action<PointShopItem, int>(OnBuy)
-			};
-			SetEvent(t, "CONFIRM_BUY", event_data);
-			PointShopItemList component = t.GetComponent<PointShopItemList>();
-			component.SetUp(pointShopItem, (uint)data.pointShopId, pointShopItem.needPoint <= data.userPoint);
-			int num = -1;
-			REWARD_TYPE type = (REWARD_TYPE)pointShopItem.type;
-			if (type == REWARD_TYPE.ITEM)
-			{
-				num = MonoBehaviourSingleton<InventoryManager>.I.GetHaveingItemNum((uint)pointShopItem.itemId);
-			}
-			SetLabelText(t, UI.LBL_HAVE, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 6u), num.ToString()));
-			SetActive(t, UI.LBL_HAVE, num >= 0);
-		});
+		SetGrid(UI.GRD_LIST, "PointShopListItem", item_num, true, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnQuery_CONFIRM_BUY()
@@ -178,13 +158,28 @@ public class HomePointShopEventDetail : GameSection
 		}
 	}
 
-	private List<PointShopItem> GetBuyableItemList()
+	private unsafe List<PointShopItem> GetBuyableItemList()
 	{
-		return (from x in data.items
-		where x.isBuyable
-		where x.type != 8 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedStamp(x.itemId)
-		where x.type != 9 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedDegree(x.itemId)
-		where x.type != 7 || !MonoBehaviourSingleton<GlobalSettingsManager>.I.IsUnlockedAvatar(x.itemId)
-		select x).ToList();
+		List<PointShopItem> items = data.items;
+		if (_003C_003Ef__am_0024cache5 == null)
+		{
+			_003C_003Ef__am_0024cache5 = new Func<PointShopItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		IEnumerable<PointShopItem> source = items.Where(_003C_003Ef__am_0024cache5);
+		if (_003C_003Ef__am_0024cache6 == null)
+		{
+			_003C_003Ef__am_0024cache6 = new Func<PointShopItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		IEnumerable<PointShopItem> source2 = source.Where(_003C_003Ef__am_0024cache6);
+		if (_003C_003Ef__am_0024cache7 == null)
+		{
+			_003C_003Ef__am_0024cache7 = new Func<PointShopItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		IEnumerable<PointShopItem> source3 = source2.Where(_003C_003Ef__am_0024cache7);
+		if (_003C_003Ef__am_0024cache8 == null)
+		{
+			_003C_003Ef__am_0024cache8 = new Func<PointShopItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		return source3.Where(_003C_003Ef__am_0024cache8).ToList();
 	}
 }

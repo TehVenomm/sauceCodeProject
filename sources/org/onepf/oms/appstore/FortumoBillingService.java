@@ -500,36 +500,36 @@ public class FortumoBillingService implements AppstoreInAppBillingService {
     }
 
     public Inventory queryInventory(boolean z, @Nullable List<String> list, List<String> list2) throws IabException {
-        FortumoProduct fortumoProduct;
+        String str;
         Inventory inventory = new Inventory();
         SharedPreferences sharedPreferences = this.context.getSharedPreferences(SHARED_PREFS_FORTUMO, 0);
         Map all = sharedPreferences.getAll();
         if (all != null) {
             Editor edit = sharedPreferences.edit();
-            for (String str : all.keySet()) {
-                String str2 = (String) all.get(str);
-                if (str2 != null) {
-                    PaymentResponse paymentResponse = MpUtils.getPaymentResponse(this.context, Long.valueOf(str2).longValue());
+            for (String str2 : all.keySet()) {
+                str = (String) all.get(str2);
+                if (str != null) {
+                    PaymentResponse paymentResponse = MpUtils.getPaymentResponse(this.context, Long.valueOf(str).longValue());
                     if (paymentResponse.getBillingStatus() == 2) {
                         inventory.addPurchase(purchaseFromPaymentResponse(this.context, paymentResponse));
                     } else if (paymentResponse.getBillingStatus() == 3) {
-                        edit.remove(str);
+                        edit.remove(str2);
                     }
                 } else {
-                    all.remove(str);
+                    all.remove(str2);
                 }
             }
             edit.commit();
         }
-        for (FortumoProduct fortumoProduct2 : this.inappsMap.values()) {
-            if (!fortumoProduct2.isConsumable()) {
-                List<PaymentResponse> purchaseHistory = MpUtils.getPurchaseHistory(this.context, fortumoProduct2.getServiceId(), fortumoProduct2.getInAppSecret(), 5000);
+        for (FortumoProduct fortumoProduct : this.inappsMap.values()) {
+            if (!fortumoProduct.isConsumable()) {
+                List<PaymentResponse> purchaseHistory = MpUtils.getPurchaseHistory(this.context, fortumoProduct.getServiceId(), fortumoProduct.getInAppSecret(), 5000);
                 if (purchaseHistory != null && purchaseHistory.size() > 0) {
                     for (PaymentResponse paymentResponse2 : purchaseHistory) {
-                        if (paymentResponse2.getProductName().equals(fortumoProduct2.getProductId())) {
+                        if (paymentResponse2.getProductName().equals(fortumoProduct.getProductId())) {
                             inventory.addPurchase(purchaseFromPaymentResponse(this.context, paymentResponse2));
                             if (z) {
-                                inventory.addSkuDetails(fortumoProduct2.toSkuDetails(getSkuPrice(fortumoProduct2)));
+                                inventory.addSkuDetails(fortumoProduct.toSkuDetails(getSkuPrice(fortumoProduct)));
                             }
                         }
                     }
@@ -538,7 +538,7 @@ public class FortumoBillingService implements AppstoreInAppBillingService {
         }
         if (z && list != null && list.size() > 0) {
             for (String str3 : list) {
-                fortumoProduct2 = (FortumoProduct) this.inappsMap.get(str3);
+                FortumoProduct fortumoProduct2 = (FortumoProduct) this.inappsMap.get(str3);
                 if (fortumoProduct2 != null) {
                     inventory.addSkuDetails(fortumoProduct2.toSkuDetails(getSkuPrice(fortumoProduct2)));
                 } else {

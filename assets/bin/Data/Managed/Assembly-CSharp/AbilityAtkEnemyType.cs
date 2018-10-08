@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 public class AbilityAtkEnemyType : AbilityAtkBase
 {
@@ -18,7 +17,7 @@ public class AbilityAtkEnemyType : AbilityAtkBase
 	public override AtkAttribute GetDamageRate(Character chara, AttackedHitStatusLocal status)
 	{
 		Enemy enemy = chara as Enemy;
-		if ((UnityEngine.Object)enemy == (UnityEngine.Object)null)
+		if (enemy == null)
 		{
 			return null;
 		}

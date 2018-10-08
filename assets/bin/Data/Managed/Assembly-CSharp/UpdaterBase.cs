@@ -25,7 +25,7 @@ public abstract class UpdaterBase : MonoBehaviourSingleton<UpdaterBase>
 		int i = 0;
 		for (int size = list.size; i < size; i++)
 		{
-			list[i]();
+			list[i].Invoke();
 		}
 	}
 }

@@ -15,11 +15,11 @@ public final class FileUtils {
     }
 
     public static void copy(File file, File file2) throws IOException {
+        OutputStream fileOutputStream;
         Throwable th;
         InputStream inputStream = null;
         try {
             InputStream fileInputStream = new FileInputStream(file);
-            OutputStream fileOutputStream;
             try {
                 fileOutputStream = new FileOutputStream(file2);
                 try {
@@ -95,8 +95,8 @@ public final class FileUtils {
     }
 
     public static String toString(File file, String str) throws IOException {
-        InputStream fileInputStream;
         Throwable th;
+        InputStream fileInputStream;
         try {
             fileInputStream = new FileInputStream(file);
             try {
@@ -117,9 +117,9 @@ public final class FileUtils {
     }
 
     public static void gzipCopyFromAsset(Context context, String str, File file) throws IOException {
+        InputStream open;
         Throwable th;
         Throwable th2;
-        InputStream open;
         try {
             InputStream gZIPInputStream;
             OutputStream fileOutputStream;

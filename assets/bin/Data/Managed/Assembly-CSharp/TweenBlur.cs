@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TweenBlur : MonoBehaviour
+public class TweenBlur
 {
 	[Range(0f, 5f)]
 	public float from = 1f;
@@ -27,7 +27,7 @@ public class TweenBlur : MonoBehaviour
 		{
 			foreach (UIDrawCall active in UIDrawCall.activeList)
 			{
-				if ((Object)sourceMaterial == (Object)active.baseMaterial)
+				if (sourceMaterial == active.baseMaterial)
 				{
 					return active.dynamicMaterial.GetFloat("_Lod");
 				}
@@ -38,7 +38,7 @@ public class TweenBlur : MonoBehaviour
 		{
 			foreach (UIDrawCall active in UIDrawCall.activeList)
 			{
-				if ((Object)sourceMaterial == (Object)active.baseMaterial)
+				if (sourceMaterial == active.baseMaterial)
 				{
 					sourceMaterial.SetFloat("_Lod", value);
 					active.dynamicMaterial.SetFloat("_Lod", value);
@@ -48,9 +48,14 @@ public class TweenBlur : MonoBehaviour
 		}
 	}
 
+	public TweenBlur()
+		: this()
+	{
+	}
+
 	private void LateUpdate()
 	{
-		timer += Time.deltaTime;
+		timer += Time.get_deltaTime();
 		if (timer < delay)
 		{
 			lod = from;
@@ -62,7 +67,7 @@ public class TweenBlur : MonoBehaviour
 		else
 		{
 			lod = to;
-			base.enabled = false;
+			this.set_enabled(false);
 		}
 	}
 }

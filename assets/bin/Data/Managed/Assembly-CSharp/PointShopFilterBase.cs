@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -69,11 +70,9 @@ public class PointShopFilterBase : GameSection
 				checkboxUI = ui;
 			}
 
-			public void DoFiltering(ref List<PointShopItem> list)
+			public unsafe void DoFiltering(ref List<PointShopItem> list)
 			{
-				list = (from x in list
-				where !IsCondition(x)
-				select x).ToList();
+				list = list.Where(new Func<PointShopItem, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList();
 			}
 
 			protected virtual bool IsCondition(PointShopItem item)
@@ -81,9 +80,9 @@ public class PointShopFilterBase : GameSection
 				return false;
 			}
 
-			public bool IsInclude(List<PointShopItem> list)
+			public unsafe bool IsInclude(List<PointShopItem> list)
 			{
-				return list.Any((PointShopItem x) => IsCondition(x));
+				return list.Any(new Func<PointShopItem, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 
@@ -196,6 +195,7 @@ public class PointShopFilterBase : GameSection
 					case ITEM_TYPE.LITHOGRAPH:
 					case ITEM_TYPE.USE_ITEM:
 					case ITEM_TYPE.TICKET:
+					case ITEM_TYPE.FORTUNE_TICKET:
 						return false;
 					default:
 						return true;
@@ -445,6 +445,8 @@ public class PointShopFilterBase : GameSection
 
 	public override void Initialize()
 	{
+		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0197: Expected O, but got Unknown
 		object[] array = GameSection.GetEventData() as object[];
 		Filter filter = array[0] as Filter;
 		if (filter == null)
@@ -482,21 +484,21 @@ public class PointShopFilterBase : GameSection
 		Filter.CheckFilterBase[] typeFilter = this.filter.typeFilter;
 		foreach (Filter.CheckFilterBase checkFilterBase in typeFilter)
 		{
-			SetEvent(checkFilterBase.checkboxUI, "TYPE", (int)checkFilterBase.type);
+			SetEvent((Enum)checkFilterBase.checkboxUI, "TYPE", (int)checkFilterBase.type);
 			if (list != null)
 			{
 				bool flag = checkFilterBase.IsInclude(list);
-				SetActive(checkFilterBase.checkboxUI, flag);
-				SetActive(GetCtrl(checkFilterBase.checkboxUI).parent, UI.SPR_GRAY, !flag);
+				SetActive((Enum)checkFilterBase.checkboxUI, flag);
+				SetActive(GetCtrl(checkFilterBase.checkboxUI).get_parent(), UI.SPR_GRAY, !flag);
 			}
 		}
 		Filter.CheckFilterBase[] rarityFilter = this.filter.rarityFilter;
 		foreach (Filter.CheckFilterBase checkFilterBase2 in rarityFilter)
 		{
-			SetEvent(checkFilterBase2.checkboxUI, "RARITY", (int)checkFilterBase2.rarity);
+			SetEvent((Enum)checkFilterBase2.checkboxUI, "RARITY", (int)checkFilterBase2.rarity);
 		}
-		SetEvent(UI.BTN_ALL_DESELECT, "ALL", 0);
-		SetEvent(UI.BTN_ALL_SELECT, "ALL", 1);
+		SetEvent((Enum)UI.BTN_ALL_DESELECT, "ALL", 0);
+		SetEvent((Enum)UI.BTN_ALL_SELECT, "ALL", 1);
 		RefreshUI();
 		base.Initialize();
 	}
@@ -508,12 +510,12 @@ public class PointShopFilterBase : GameSection
 			Filter.CheckFilterBase[] rarityFilter = filter.rarityFilter;
 			foreach (Filter.CheckFilterBase checkFilterBase in rarityFilter)
 			{
-				SetToggle(checkFilterBase.checkboxUI, filter.IsCheck(Filter.CATEGORY.RARITY, (int)checkFilterBase.rarity));
+				SetToggle((Enum)checkFilterBase.checkboxUI, filter.IsCheck(Filter.CATEGORY.RARITY, (int)checkFilterBase.rarity));
 			}
 			Filter.CheckFilterBase[] typeFilter = filter.typeFilter;
 			foreach (Filter.CheckFilterBase checkFilterBase2 in typeFilter)
 			{
-				SetToggle(checkFilterBase2.checkboxUI, filter.IsCheck(Filter.CATEGORY.TYPE, (int)checkFilterBase2.type));
+				SetToggle((Enum)checkFilterBase2.checkboxUI, filter.IsCheck(Filter.CATEGORY.TYPE, (int)checkFilterBase2.type));
 			}
 		}
 	}

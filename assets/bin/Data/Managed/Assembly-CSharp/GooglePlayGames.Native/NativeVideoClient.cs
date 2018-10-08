@@ -18,18 +18,18 @@ namespace GooglePlayGames.Native
 
 		public void GetCaptureCapabilities(Action<ResponseStatus, GooglePlayGames.BasicApi.Video.VideoCapabilities> callback)
 		{
-			Misc.CheckNotNull(callback);
-			callback = CallbackUtils.ToOnGameThread(callback);
+			Misc.CheckNotNull<Action<ResponseStatus, GooglePlayGames.BasicApi.Video.VideoCapabilities>>(callback);
+			callback = CallbackUtils.ToOnGameThread<ResponseStatus, GooglePlayGames.BasicApi.Video.VideoCapabilities>(callback);
 			mManager.GetCaptureCapabilities(delegate(GetCaptureCapabilitiesResponse response)
 			{
-				ResponseStatus arg = ConversionUtils.ConvertResponseStatus(response.GetStatus());
+				ResponseStatus responseStatus = ConversionUtils.ConvertResponseStatus(response.GetStatus());
 				if (!response.RequestSucceeded())
 				{
-					callback(arg, null);
+					callback.Invoke(responseStatus, (GooglePlayGames.BasicApi.Video.VideoCapabilities)null);
 				}
 				else
 				{
-					callback(arg, FromNativeVideoCapabilities(response.GetData()));
+					callback.Invoke(responseStatus, FromNativeVideoCapabilities(response.GetData()));
 				}
 			});
 		}
@@ -54,18 +54,18 @@ namespace GooglePlayGames.Native
 
 		public void GetCaptureState(Action<ResponseStatus, GooglePlayGames.BasicApi.Video.VideoCaptureState> callback)
 		{
-			Misc.CheckNotNull(callback);
-			callback = CallbackUtils.ToOnGameThread(callback);
+			Misc.CheckNotNull<Action<ResponseStatus, GooglePlayGames.BasicApi.Video.VideoCaptureState>>(callback);
+			callback = CallbackUtils.ToOnGameThread<ResponseStatus, GooglePlayGames.BasicApi.Video.VideoCaptureState>(callback);
 			mManager.GetCaptureState(delegate(GetCaptureStateResponse response)
 			{
-				ResponseStatus arg = ConversionUtils.ConvertResponseStatus(response.GetStatus());
+				ResponseStatus responseStatus = ConversionUtils.ConvertResponseStatus(response.GetStatus());
 				if (!response.RequestSucceeded())
 				{
-					callback(arg, null);
+					callback.Invoke(responseStatus, (GooglePlayGames.BasicApi.Video.VideoCaptureState)null);
 				}
 				else
 				{
-					callback(arg, FromNativeVideoCaptureState(response.GetData()));
+					callback.Invoke(responseStatus, FromNativeVideoCaptureState(response.GetData()));
 				}
 			});
 		}
@@ -77,18 +77,18 @@ namespace GooglePlayGames.Native
 
 		public void IsCaptureAvailable(VideoCaptureMode captureMode, Action<ResponseStatus, bool> callback)
 		{
-			Misc.CheckNotNull(callback);
-			callback = CallbackUtils.ToOnGameThread(callback);
+			Misc.CheckNotNull<Action<ResponseStatus, bool>>(callback);
+			callback = CallbackUtils.ToOnGameThread<ResponseStatus, bool>(callback);
 			mManager.IsCaptureAvailable(ConversionUtils.ConvertVideoCaptureMode(captureMode), delegate(IsCaptureAvailableResponse response)
 			{
-				ResponseStatus arg = ConversionUtils.ConvertResponseStatus(response.GetStatus());
+				ResponseStatus responseStatus = ConversionUtils.ConvertResponseStatus(response.GetStatus());
 				if (!response.RequestSucceeded())
 				{
-					callback(arg, false);
+					callback.Invoke(responseStatus, false);
 				}
 				else
 				{
-					callback(arg, response.IsCaptureAvailable());
+					callback.Invoke(responseStatus, response.IsCaptureAvailable());
 				}
 			});
 		}

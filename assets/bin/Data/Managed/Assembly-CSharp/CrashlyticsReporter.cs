@@ -1,22 +1,26 @@
 using Network;
+using System;
 using UnityEngine;
 
 public class CrashlyticsReporter
 {
 	private static bool isEnable;
 
-	public static void EnableReport()
+	public unsafe static void EnableReport()
 	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		if (!isEnable)
 		{
-			Application.RegisterLogCallback(HandleLog);
+			Application.RegisterLogCallback(new LogCallback((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			isEnable = true;
 		}
 	}
 
 	private static void HandleLog(string log, string stack, LogType type)
 	{
-		if (type == LogType.Exception)
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0002: Invalid comparison between Unknown and I4
+		if ((int)type == 4)
 		{
 			ReportException(log, stack);
 		}

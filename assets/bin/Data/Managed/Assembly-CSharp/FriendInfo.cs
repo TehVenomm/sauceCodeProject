@@ -153,6 +153,7 @@ public class FriendInfo : SkillInfoBase
 
 	public override void Initialize()
 	{
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 		friendCharaInfo = (GameSection.GetEventData() as FriendCharaInfo);
 		data = (GameSection.GetEventData() as CharaInfo);
 		m_msgUserInfo = (GameSection.GetEventData() as FriendMessageUserListModel.MessageUserInfo);
@@ -162,7 +163,7 @@ public class FriendInfo : SkillInfoBase
 			dataFollowing = friendCharaInfo.following;
 		}
 		nowSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-		isFollowerList = UnityEngine.Object.FindObjectOfType(typeof(FriendFollowerList));
+		isFollowerList = Object.op_Implicit(Object.FindObjectOfType(typeof(FriendFollowerList)));
 		InitializeBase();
 	}
 
@@ -184,15 +185,17 @@ public class FriendInfo : SkillInfoBase
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		if (!((UnityEngine.Object)loader == (UnityEngine.Object)null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == nowSectionName)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		if (!(loader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == nowSectionName)
 		{
-			loader.transform.Rotate(GameDefine.GetCharaRotateVector(touch_info));
+			loader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
 		}
 	}
 
 	public override void UpdateUI()
 	{
-		transRoot = SetPrefab(UI.OBJ_EQUIP_SET_ROOT, GetCreatePrefabName());
+		transRoot = SetPrefab((Enum)UI.OBJ_EQUIP_SET_ROOT, GetCreatePrefabName());
 		UpdateUserIDLabel();
 		UpdateHeader();
 		LoadModel();
@@ -237,9 +240,11 @@ public class FriendInfo : SkillInfoBase
 
 	protected virtual void LoadModel()
 	{
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		SetRenderPlayerModel(transRoot, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data, true, true, true, isVisualMode), PLAYER_ANIM_TYPE.GetStatus(data.sex), new Vector3(0f, -0.75f, 14f), new Vector3(0f, 180f, 0f), isVisualMode, delegate(PlayerLoader player_loader)
 		{
-			if ((UnityEngine.Object)player_loader != (UnityEngine.Object)null)
+			if (player_loader != null)
 			{
 				loader = player_loader;
 			}
@@ -283,11 +288,11 @@ public class FriendInfo : SkillInfoBase
 						return;
 					}
 				}
-				Transform transform = null;
+				Transform val = null;
 				int num2 = -1;
 				if (equipItemData.IsWeapon())
 				{
-					transform = FindCtrl(transRoot, icons[weapon_cnt]);
+					val = FindCtrl(transRoot, icons[weapon_cnt]);
 					num2 = weapon_cnt;
 					weapon_cnt++;
 				}
@@ -318,19 +323,19 @@ public class FriendInfo : SkillInfoBase
 					}
 					if (num2 != -1)
 					{
-						transform = FindCtrl(transRoot, icons[num2]);
+						val = FindCtrl(transRoot, icons[num2]);
 					}
 				}
-				if (!((UnityEngine.Object)transform == (UnityEngine.Object)null))
+				if (!(val == null))
 				{
 					SetActive(FindCtrl(transRoot, icons[num2]), true);
 					string event_name = (!isVisualMode) ? "DETAIL" : "VISUAL_DETAIL";
-					ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemTable(equipItemData, GetCharaSex(), transform, null, -1, event_name, num2, false, -1, false, null, false, false);
+					ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemTable(equipItemData, GetCharaSex(), val, null, -1, event_name, num2, false, -1, false, null, false, false);
 					SetLongTouch(itemIcon.transform, event_name, num2);
 					SetEvent(FindCtrl(transRoot, icons_btn[num2]), event_name, num2);
 					SetLongTouch(FindCtrl(transRoot, icons_btn[num2]), event_name, num2);
 					EquipItemInfo info = new EquipItemInfo(equip_data);
-					itemIcon.SetEquipExtInvertedColor(info, GetComponent<UILabel>(icons_level[num2]));
+					itemIcon.SetEquipExtInvertedColor(info, base.GetComponent<UILabel>((Enum)icons_level[num2]));
 					SetActive(FindCtrl(transRoot, icons_level[num2]), !isVisualMode);
 					if (equip_data != null)
 					{
@@ -376,20 +381,21 @@ public class FriendInfo : SkillInfoBase
 
 	protected void SetVisualModeIcon(int index, int table_id, EQUIPMENT_TYPE e_type, CharaInfo chara_info)
 	{
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		string event_name = "VISUAL_DETAIL";
-		Transform transform = FindCtrl(transRoot, icons[index]);
+		Transform val = FindCtrl(transRoot, icons[index]);
 		EquipItemTable.EquipItemData visualModeTargetTable = GetVisualModeTargetTable((uint)table_id, e_type, chara_info);
 		if (visualModeTargetTable != null)
 		{
-			transform.GetComponentsInChildren(true, Temporary.itemIconList);
+			val.GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
 			int i = 0;
 			for (int count = Temporary.itemIconList.Count; i < count; i++)
 			{
-				Temporary.itemIconList[i].gameObject.SetActive(true);
+				Temporary.itemIconList[i].get_gameObject().SetActive(true);
 			}
 			Temporary.itemIconList.Clear();
 			SetActive(FindCtrl(transRoot, icons[index]), true);
-			ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemTable(visualModeTargetTable, GetCharaSex(), transform, null, -1, event_name, index, false, -1, false, null, false, false);
+			ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemTable(visualModeTargetTable, GetCharaSex(), val, null, -1, event_name, index, false, -1, false, null, false, false);
 			SetLongTouch(itemIcon.transform, event_name, index);
 			SetEvent(FindCtrl(transRoot, icons_btn[index]), event_name, index);
 			SetLongTouch(FindCtrl(transRoot, icons_btn[index]), event_name, index);
@@ -399,6 +405,14 @@ public class FriendInfo : SkillInfoBase
 
 	protected void UpdateBottomButton()
 	{
+		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(transRoot, UI.OBJ_FRIEND_INFO_ROOT, IsFriendInfo);
 		SetActive(transRoot, UI.OBJ_CHANGE_EQUIP_INFO_ROOT, !IsFriendInfo);
 		SetActive(transRoot, UI.BTN_MAGI, showMagiButton);
@@ -427,15 +441,15 @@ public class FriendInfo : SkillInfoBase
 				SetActive(transRoot, UI.BTN_FOLLOW, true);
 				if (!isFollowerListChengeTrans)
 				{
-					Transform transform = FindCtrl(transRoot, UI.BTN_FOLLOW);
-					Transform transform2 = transform;
-					Vector3 localPosition = transform.localPosition;
-					float x = localPosition.x - 167f;
-					Vector3 localPosition2 = transform.localPosition;
-					float y = localPosition2.y - 502f;
-					Vector3 localPosition3 = transform.localPosition;
-					transform2.localPosition = new Vector3(x, y, localPosition3.z);
-					transform.localScale = new Vector3(1f, 1f, 1f);
+					Transform val = FindCtrl(transRoot, UI.BTN_FOLLOW);
+					Transform obj = val;
+					Vector3 localPosition = val.get_localPosition();
+					float num = localPosition.x - 167f;
+					Vector3 localPosition2 = val.get_localPosition();
+					float num2 = localPosition2.y - 502f;
+					Vector3 localPosition3 = val.get_localPosition();
+					obj.set_localPosition(new Vector3(num, num2, localPosition3.z));
+					val.set_localScale(new Vector3(1f, 1f, 1f));
 					isFollowerListChengeTrans = true;
 				}
 			}
@@ -602,18 +616,11 @@ public class FriendInfo : SkillInfoBase
 		});
 	}
 
-	protected void SendFollow(List<int> send_follow_list, Action<bool> callback = null)
+	protected unsafe void SendFollow(List<int> send_follow_list, Action<bool> callback = null)
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(send_follow_list, delegate(Error err, List<int> follow_list)
-		{
-			bool flag = err == Error.None && follow_list.Count > 0;
-			if (callback != null)
-			{
-				callback(flag);
-			}
-			GameSection.ResumeEvent(flag, null);
-		});
+		_003CSendFollow_003Ec__AnonStorey2FD _003CSendFollow_003Ec__AnonStorey2FD;
+		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(send_follow_list, new Action<Error, List<int>>((object)_003CSendFollow_003Ec__AnonStorey2FD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected void SendUnFollow(int send_unfollow, Action<bool> callback = null)

@@ -1,11 +1,16 @@
 using System.Collections;
 using UnityEngine;
 
-public class EffectObject : MonoBehaviour
+public class EffectObject
 {
 	public static bool wait = true;
 
 	public string effectName;
+
+	public EffectObject()
+		: this()
+	{
+	}
 
 	private IEnumerator Start()
 	{
@@ -13,7 +18,7 @@ public class EffectObject : MonoBehaviour
 		{
 			yield return (object)null;
 		}
-		EffectManager.GetEffect(effectName, base.transform);
+		EffectManager.GetEffect(effectName, this.get_transform());
 		yield return (object)null;
 		Object.DestroyImmediate(this);
 	}

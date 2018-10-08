@@ -20,18 +20,13 @@ public class DoubleUIntKeyTable<T> : UIntKeyTable<UIntKeyTable<T>>
 		uIntKeyTable.Add(key2, value);
 	}
 
-	public void ForEachDoubleKeyValue(Action<uint, uint, T> a)
+	public unsafe void ForEachDoubleKeyValue(Action<uint, uint, T> a)
 	{
-		ForEachKeyValue(delegate(uint key1, UIntKeyTable<T> table2)
-		{
-			table2.ForEachKeyValue(delegate(uint key2, T data)
-			{
-				a(key1, key2, data);
-			});
-		});
+		_003CForEachDoubleKeyValue_003Ec__AnonStorey53A _003CForEachDoubleKeyValue_003Ec__AnonStorey53A;
+		ForEachKeyValue(new Action<uint, UIntKeyTable<uint>>((object)_003CForEachDoubleKeyValue_003Ec__AnonStorey53A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
-	public override bool Equals(object obj)
+	public unsafe override bool Equals(object obj)
 	{
 		if (obj == null)
 		{
@@ -47,11 +42,8 @@ public class DoubleUIntKeyTable<T> : UIntKeyTable<UIntKeyTable<T>>
 			return false;
 		}
 		bool isEqual = true;
-		ForEachDoubleKeyValue(delegate(uint key1, uint key2, T value1)
-		{
-			T val = rhs.Get(key1, key2);
-			isEqual = (isEqual && value1.Equals(val));
-		});
+		_003CEquals_003Ec__AnonStorey53C _003CEquals_003Ec__AnonStorey53C;
+		ForEachDoubleKeyValue(new Action<uint, uint, uint>((object)_003CEquals_003Ec__AnonStorey53C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		return isEqual;
 	}
 

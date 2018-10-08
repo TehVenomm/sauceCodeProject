@@ -77,7 +77,7 @@ public class XMLInStream
 				return this;
 			}
 		}
-		Debug.LogError("No child node named: " + tag + " in node " + current.tag);
+		Debug.LogError((object)("No child node named: " + tag + " in node " + current.tag));
 		return null;
 	}
 
@@ -85,7 +85,7 @@ public class XMLInStream
 	{
 		if (current.parent == null)
 		{
-			Debug.LogError("No parent node for tag: " + current.tag);
+			Debug.LogError((object)("No parent node for tag: " + current.tag));
 			return null;
 		}
 		current = current.parent;
@@ -170,7 +170,7 @@ public class XMLInStream
 			value4 = (float)GetDouble(array[2]);
 			value5 = (float)GetDouble(array[3]);
 		}
-		value = new Color(value2, value3, value4, value5);
+		value._002Ector(value2, value3, value4, value5);
 		return this;
 	}
 
@@ -208,7 +208,7 @@ public class XMLInStream
 			value2 = (float)GetDouble(array[0]);
 			value3 = (float)GetDouble(array[1]);
 		}
-		value = new Vector2(value2, value3);
+		value._002Ector(value2, value3);
 		return this;
 	}
 
@@ -248,7 +248,7 @@ public class XMLInStream
 			value3 = (float)GetDouble(array[1]);
 			value4 = (float)GetDouble(array[2]);
 		}
-		value = new Vector3(value2, value3, value4);
+		value._002Ector(value2, value3, value4);
 		return this;
 	}
 
@@ -291,7 +291,7 @@ public class XMLInStream
 			value4 = (float)GetDouble(array[2]);
 			value5 = (float)GetDouble(array[3]);
 		}
-		value = new Quaternion(value2, value3, value4, value5);
+		value._002Ector(value2, value3, value4, value5);
 		return this;
 	}
 
@@ -334,7 +334,7 @@ public class XMLInStream
 			value4 = (float)GetDouble(array[2]);
 			value5 = (float)GetDouble(array[3]);
 		}
-		value = new Vector4(value2, value3, value4, value5);
+		value._002Ector(value2, value3, value4, value5);
 		return this;
 	}
 
@@ -377,7 +377,7 @@ public class XMLInStream
 			value4 = (float)GetDouble(array[2]);
 			value5 = (float)GetDouble(array[3]);
 		}
-		value = new Rect(value2, value3, value4, value5);
+		value._002Ector(value2, value3, value4, value5);
 		return this;
 	}
 
@@ -533,7 +533,7 @@ public class XMLInStream
 		{
 			return current.attributes[name];
 		}
-		Debug.LogError("Attribute " + name + " don't exist in node " + current.tag);
+		Debug.LogError((object)("Attribute " + name + " don't exist in node " + current.tag));
 		return null;
 	}
 

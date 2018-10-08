@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class ConfigGraphics : GameSection
@@ -36,37 +37,37 @@ public class ConfigGraphics : GameSection
 	public override void Initialize()
 	{
 		base.Initialize();
-		GetCtrl(UI.DSV_ROOT).GetComponent<Collider>().enabled = false;
+		GetCtrl(UI.DSV_ROOT).GetComponent<Collider>().set_enabled(false);
 	}
 
 	public override void UpdateUI()
 	{
 		int graphicOptionType = InGameManager.GetGraphicOptionType(GameSaveData.instance.graphicOptionKey);
 		int arrowCameraType = InGameManager.GetArrowCameraType(GameSaveData.instance.arrowCameraKey);
-		SetToggle(UI.TGL_DRAW_LOW, graphicOptionType == 0);
-		SetToggle(UI.TGL_DRAW_STANDARD, graphicOptionType == 1);
-		SetToggle(UI.TGL_DRAW_HIGH, graphicOptionType == 2);
-		SetToggle(UI.TGL_DRAW_HIGHEST, graphicOptionType == 3);
-		SetToggle(UI.TGL_HEAD_NAME_ON, GameSaveData.instance.headName);
-		SetToggle(UI.TGL_HEAD_NAME_OFF, !GameSaveData.instance.headName);
-		SetToggle(UI.TGL_AUTO_ROTATION_ON, GameSaveData.instance.enableLandscape);
-		SetToggle(UI.TGL_AUTO_ROTATION_OFF, !GameSaveData.instance.enableLandscape);
-		SetToggle(UI.TGL_MINIMAP_ENEMY_ON, GameSaveData.instance.enableMinimapEnemy);
-		SetToggle(UI.TGL_MINIMAP_ENEMY_OFF, !GameSaveData.instance.enableMinimapEnemy);
-		SetToggle(UI.TGL_ARROW_CAMERA_A, arrowCameraType == 0);
-		SetToggle(UI.TGL_ARROW_CAMERA_B, arrowCameraType == 1);
-		SetButtonEnabled(UI.BTN_DRAW_LOW, graphicOptionType != 0);
-		SetButtonEnabled(UI.BTN_DRAW_STANDARD, graphicOptionType != 1);
-		SetButtonEnabled(UI.BTN_DRAW_HIGH, graphicOptionType != 2);
-		SetButtonEnabled(UI.BTN_DRAW_HIGHEST, graphicOptionType != 3);
-		SetButtonEnabled(UI.BTN_HEAD_NAME_ON, !GameSaveData.instance.headName);
-		SetButtonEnabled(UI.BTN_HEAD_NAME_OFF, GameSaveData.instance.headName);
-		SetButtonEnabled(UI.BTN_AUTO_ROTATION_ON, !GameSaveData.instance.enableLandscape);
-		SetButtonEnabled(UI.BTN_AUTO_ROTATION_OFF, GameSaveData.instance.enableLandscape);
-		SetButtonEnabled(UI.BTN_MINIMAP_ENEMY_ON, !GameSaveData.instance.enableMinimapEnemy);
-		SetButtonEnabled(UI.BTN_MINIMAP_ENEMY_OFF, GameSaveData.instance.enableMinimapEnemy);
-		SetButtonEnabled(UI.BTN_ARROW_CAMERA_A, arrowCameraType != 0);
-		SetButtonEnabled(UI.BTN_ARROW_CAMERA_B, arrowCameraType != 1);
+		SetToggle((Enum)UI.TGL_DRAW_LOW, graphicOptionType == 0);
+		SetToggle((Enum)UI.TGL_DRAW_STANDARD, graphicOptionType == 1);
+		SetToggle((Enum)UI.TGL_DRAW_HIGH, graphicOptionType == 2);
+		SetToggle((Enum)UI.TGL_DRAW_HIGHEST, graphicOptionType == 3);
+		SetToggle((Enum)UI.TGL_HEAD_NAME_ON, GameSaveData.instance.headName);
+		SetToggle((Enum)UI.TGL_HEAD_NAME_OFF, !GameSaveData.instance.headName);
+		SetToggle((Enum)UI.TGL_AUTO_ROTATION_ON, GameSaveData.instance.enableLandscape);
+		SetToggle((Enum)UI.TGL_AUTO_ROTATION_OFF, !GameSaveData.instance.enableLandscape);
+		SetToggle((Enum)UI.TGL_MINIMAP_ENEMY_ON, GameSaveData.instance.enableMinimapEnemy);
+		SetToggle((Enum)UI.TGL_MINIMAP_ENEMY_OFF, !GameSaveData.instance.enableMinimapEnemy);
+		SetToggle((Enum)UI.TGL_ARROW_CAMERA_A, arrowCameraType == 0);
+		SetToggle((Enum)UI.TGL_ARROW_CAMERA_B, arrowCameraType == 1);
+		SetButtonEnabled((Enum)UI.BTN_DRAW_LOW, graphicOptionType != 0);
+		SetButtonEnabled((Enum)UI.BTN_DRAW_STANDARD, graphicOptionType != 1);
+		SetButtonEnabled((Enum)UI.BTN_DRAW_HIGH, graphicOptionType != 2);
+		SetButtonEnabled((Enum)UI.BTN_DRAW_HIGHEST, graphicOptionType != 3);
+		SetButtonEnabled((Enum)UI.BTN_HEAD_NAME_ON, !GameSaveData.instance.headName);
+		SetButtonEnabled((Enum)UI.BTN_HEAD_NAME_OFF, GameSaveData.instance.headName);
+		SetButtonEnabled((Enum)UI.BTN_AUTO_ROTATION_ON, !GameSaveData.instance.enableLandscape);
+		SetButtonEnabled((Enum)UI.BTN_AUTO_ROTATION_OFF, GameSaveData.instance.enableLandscape);
+		SetButtonEnabled((Enum)UI.BTN_MINIMAP_ENEMY_ON, !GameSaveData.instance.enableMinimapEnemy);
+		SetButtonEnabled((Enum)UI.BTN_MINIMAP_ENEMY_OFF, GameSaveData.instance.enableMinimapEnemy);
+		SetButtonEnabled((Enum)UI.BTN_ARROW_CAMERA_A, arrowCameraType != 0);
+		SetButtonEnabled((Enum)UI.BTN_ARROW_CAMERA_B, arrowCameraType != 1);
 		base.UpdateUI();
 	}
 
@@ -78,8 +79,8 @@ public class ConfigGraphics : GameSection
 		{
 			MonoBehaviourSingleton<InGameManager>.I.UpdateConfig();
 		}
-		MonoBehaviourSingleton<AppMain>.I.UpdateResolution(Screen.width < Screen.height);
-		Application.targetFrameRate = 30;
+		MonoBehaviourSingleton<AppMain>.I.UpdateResolution(Screen.get_width() < Screen.get_height());
+		Application.set_targetFrameRate(30);
 	}
 
 	private void OnQuery_DRAW_STANDARD()
@@ -90,8 +91,8 @@ public class ConfigGraphics : GameSection
 		{
 			MonoBehaviourSingleton<InGameManager>.I.UpdateConfig();
 		}
-		MonoBehaviourSingleton<AppMain>.I.UpdateResolution(Screen.width < Screen.height);
-		Application.targetFrameRate = 30;
+		MonoBehaviourSingleton<AppMain>.I.UpdateResolution(Screen.get_width() < Screen.get_height());
+		Application.set_targetFrameRate(30);
 	}
 
 	private void OnQuery_DRAW_HIGH()
@@ -102,8 +103,8 @@ public class ConfigGraphics : GameSection
 		{
 			MonoBehaviourSingleton<InGameManager>.I.UpdateConfig();
 		}
-		MonoBehaviourSingleton<AppMain>.I.UpdateResolution(Screen.width < Screen.height);
-		Application.targetFrameRate = 30;
+		MonoBehaviourSingleton<AppMain>.I.UpdateResolution(Screen.get_width() < Screen.get_height());
+		Application.set_targetFrameRate(30);
 	}
 
 	private void OnQuery_DRAW_HIGHEST()
@@ -114,9 +115,9 @@ public class ConfigGraphics : GameSection
 		{
 			MonoBehaviourSingleton<InGameManager>.I.UpdateConfig();
 		}
-		MonoBehaviourSingleton<AppMain>.I.UpdateResolution(Screen.width < Screen.height);
-		Application.targetFrameRate = 120;
-		Time.fixedDeltaTime = 0.008333335f;
+		MonoBehaviourSingleton<AppMain>.I.UpdateResolution(Screen.get_width() < Screen.get_height());
+		Application.set_targetFrameRate(120);
+		Time.set_fixedDeltaTime(0.008333335f);
 	}
 
 	private void OnQuery_DRAW_HEAD_NAME_ON()

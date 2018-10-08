@@ -1,4 +1,5 @@
 using GooglePlayGames.OurUtils;
+using System;
 using System.Linq;
 
 namespace GooglePlayGames.BasicApi.Video
@@ -50,11 +51,29 @@ namespace GooglePlayGames.BasicApi.Video
 			return false;
 		}
 
-		public override string ToString()
+		public unsafe override string ToString()
 		{
-			return string.Format("[VideoCapabilities: mIsCameraSupported={0}, mIsMicSupported={1}, mIsWriteStorageSupported={2}, mCaptureModesSupported={3}, mQualityLevelsSupported={4}]", mIsCameraSupported, mIsMicSupported, mIsWriteStorageSupported, string.Join(",", (from p in mCaptureModesSupported
-			select p.ToString()).ToArray()), string.Join(",", (from p in mQualityLevelsSupported
-			select p.ToString()).ToArray()));
+			object[] obj = new object[5]
+			{
+				mIsCameraSupported,
+				mIsMicSupported,
+				mIsWriteStorageSupported,
+				null,
+				null
+			};
+			bool[] source = mCaptureModesSupported;
+			if (_003C_003Ef__am_0024cache5 == null)
+			{
+				_003C_003Ef__am_0024cache5 = new Func<bool, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			obj[3] = string.Join(",", source.Select<bool, string>(_003C_003Ef__am_0024cache5).ToArray());
+			bool[] source2 = mQualityLevelsSupported;
+			if (_003C_003Ef__am_0024cache6 == null)
+			{
+				_003C_003Ef__am_0024cache6 = new Func<bool, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			obj[4] = string.Join(",", source2.Select<bool, string>(_003C_003Ef__am_0024cache6).ToArray());
+			return string.Format("[VideoCapabilities: mIsCameraSupported={0}, mIsMicSupported={1}, mIsWriteStorageSupported={2}, mCaptureModesSupported={3}, mQualityLevelsSupported={4}]", obj);
 		}
 	}
 }

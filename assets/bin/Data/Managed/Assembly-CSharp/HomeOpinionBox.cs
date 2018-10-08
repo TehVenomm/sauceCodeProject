@@ -1,3 +1,5 @@
+using System;
+
 public class HomeOpinionBox : OpinionBox
 {
 	private bool isFromRieviewAppeal;
@@ -13,13 +15,13 @@ public class HomeOpinionBox : OpinionBox
 			infoDataOnStart = (HomeAppReviewAppealDialogBase.Info)eventData;
 		}
 		base.Initialize();
-		SetEvent(UI.CLOSE, "CLOSE", 0);
+		SetEvent((Enum)UI.CLOSE, "CLOSE", 0);
 	}
 
 	protected override void OnQuery_SEND()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<UserInfoManager>.I.SendOpinionMessage(GetInputValue(UI.IPT_TEXT), delegate(bool is_success)
+		MonoBehaviourSingleton<UserInfoManager>.I.SendOpinionMessage(GetInputValue((Enum)UI.IPT_TEXT), delegate(bool is_success)
 		{
 			if (isFromRieviewAppeal && is_success)
 			{

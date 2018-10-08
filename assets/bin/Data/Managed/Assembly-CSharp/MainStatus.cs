@@ -1,5 +1,5 @@
 using Network;
-using UnityEngine;
+using System;
 
 public class MainStatus : UIBehaviour
 {
@@ -39,7 +39,7 @@ public class MainStatus : UIBehaviour
 		base.OnNotify(flags);
 		if ((flags & GameSection.NOTIFY_FLAG.PRETREAT_SCENE) != (GameSection.NOTIFY_FLAG)0L)
 		{
-			NoEventReleaseTouchAndRelease(UI.SPR_BG02);
+			NoEventReleaseTouchAndRelease((Enum)UI.SPR_BG02);
 			OnQuery_EXP_NEXT_HIDE();
 		}
 	}
@@ -49,20 +49,20 @@ public class MainStatus : UIBehaviour
 		UserInfo userInfo = MonoBehaviourSingleton<UserInfoManager>.I.userInfo;
 		UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
 		SetSupportEncoding(base._transform, UI.LBL_NAME, true);
-		SetLabelText(UI.LBL_NAME, Utility.GetNameWithColoredClanTag(string.Empty, userInfo.name, true, true));
-		SetLabelText(UI.LBL_LEVEL, userStatus.level.ToString());
-		SetLabelText(UI.LBL_CRYSTAL, userStatus.crystal.ToString("N0"));
-		SetLabelText(UI.LBL_MONEY, userStatus.money.ToString("N0"));
-		SetProgressValue(UI.PBR_EXP, userStatus.ExpProgress01);
-		InitDeactive(UI.SPR_EXP_NEXT);
-		if (TutorialStep.HasAllTutorialCompleted() && !MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() && (Object)TutorialMessage.GetCursor(0) == (Object)null)
+		SetLabelText((Enum)UI.LBL_NAME, Utility.GetNameWithColoredClanTag(string.Empty, userInfo.name, true, true));
+		SetLabelText((Enum)UI.LBL_LEVEL, userStatus.level.ToString());
+		SetLabelText((Enum)UI.LBL_CRYSTAL, userStatus.crystal.ToString("N0"));
+		SetLabelText((Enum)UI.LBL_MONEY, userStatus.money.ToString("N0"));
+		SetProgressValue((Enum)UI.PBR_EXP, userStatus.ExpProgress01);
+		InitDeactive((Enum)UI.SPR_EXP_NEXT);
+		if (TutorialStep.HasAllTutorialCompleted() && !MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() && TutorialMessage.GetCursor(0) == null)
 		{
-			SetTouchAndRelease(UI.SPR_BG02, "EXP_NEXT_SHOW", "EXP_NEXT_HIDE", null);
+			SetTouchAndRelease((Enum)UI.SPR_BG02, "EXP_NEXT_SHOW", "EXP_NEXT_HIDE", (object)null);
 		}
-		SetBadge(UI.BTN_MENU, MonoBehaviourSingleton<PresentManager>.I.presentNum + MonoBehaviourSingleton<FriendManager>.I.noReadMessageNum + (GameSaveData.instance.IsShowNewsNotification() ? 1 : 0), SpriteAlignment.TopRight, -15, -8, false);
-		if ((Object)boostAnimator == (Object)null)
+		SetBadge((Enum)UI.BTN_MENU, MonoBehaviourSingleton<PresentManager>.I.presentNum + MonoBehaviourSingleton<FriendManager>.I.noReadMessageNum + (GameSaveData.instance.IsShowNewsNotification() ? 1 : 0), 3, -15, -8, false);
+		if (boostAnimator == null)
 		{
-			boostAnimator = GetComponentInChildren<StatusBoostAnimator>();
+			boostAnimator = this.GetComponentInChildren<StatusBoostAnimator>();
 		}
 		boostAnimator.SetupUI(delegate(BoostStatus update_boost)
 		{
@@ -86,30 +86,30 @@ public class MainStatus : UIBehaviour
 				EndShowBoost();
 			}
 		});
-		SetFontStyle(UI.LBL_BOOST_RATE, FontStyle.Italic);
-		SetFontStyle(UI.LBL_BOOST_TIME, FontStyle.Italic);
+		SetFontStyle((Enum)UI.LBL_BOOST_RATE, 2);
+		SetFontStyle((Enum)UI.LBL_BOOST_TIME, 2);
 	}
 
 	public void OnQuery_EXP_NEXT_SHOW()
 	{
 		UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
-		SetActive(UI.SPR_EXP_NEXT, true);
-		SetLabelText(UI.STR_NOW_EXP, StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 2u));
-		SetLabelText(UI.STR_NEXT_EXP, StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 3u));
-		SetLabelText(UI.LBL_NOW_EXP, userStatus.exp.ToString());
+		SetActive((Enum)UI.SPR_EXP_NEXT, true);
+		SetLabelText((Enum)UI.STR_NOW_EXP, StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 2u));
+		SetLabelText((Enum)UI.STR_NEXT_EXP, StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 3u));
+		SetLabelText((Enum)UI.LBL_NOW_EXP, userStatus.exp.ToString());
 		if ((int)userStatus.level >= Singleton<UserLevelTable>.I.GetMaxLevel())
 		{
-			SetLabelText(UI.LBL_NEXT_EXP, "-");
+			SetLabelText((Enum)UI.LBL_NEXT_EXP, "-");
 		}
 		else
 		{
-			SetLabelText(UI.LBL_NEXT_EXP, (userStatus.ExpNext - (int)userStatus.exp).ToString());
+			SetLabelText((Enum)UI.LBL_NEXT_EXP, (userStatus.ExpNext - (int)userStatus.exp).ToString());
 		}
 	}
 
 	public void OnQuery_EXP_NEXT_HIDE()
 	{
-		SetActive(UI.SPR_EXP_NEXT, false);
+		SetActive((Enum)UI.SPR_EXP_NEXT, false);
 	}
 
 	public void OnQuery_SHOW_GEMS_DIALOG()
@@ -124,7 +124,7 @@ public class MainStatus : UIBehaviour
 
 	public void SetMenuButtonEnable(bool is_enable)
 	{
-		SetButtonEnabled(UI.BTN_MENU, is_enable);
+		SetButtonEnabled((Enum)UI.BTN_MENU, is_enable);
 	}
 
 	private void EndShowBoost()
@@ -134,39 +134,40 @@ public class MainStatus : UIBehaviour
 
 	private void ChangeShowBoost(int _show_type)
 	{
-		SetActive(UI.LBL_BOOST_RATE, _show_type != 0);
-		SetActive(UI.OBJ_BOOST_DROP_ROOT, _show_type == 3);
-		SetActive(UI.OBJ_BOOST_EXP_ROOT, _show_type == 1);
-		SetActive(UI.OBJ_BOOST_GOLD_ROOT, _show_type == 2);
-		SetActive(UI.OBJ_BOOST_HGP_ROOT, _show_type == 201);
-		SetActive(UI.OBJ_BOOST_NOVICE_DROP_ROOT, _show_type == 210);
+		SetActive((Enum)UI.LBL_BOOST_RATE, _show_type != 0);
+		SetActive((Enum)UI.OBJ_BOOST_DROP_ROOT, _show_type == 3);
+		SetActive((Enum)UI.OBJ_BOOST_EXP_ROOT, _show_type == 1);
+		SetActive((Enum)UI.OBJ_BOOST_GOLD_ROOT, _show_type == 2);
+		SetActive((Enum)UI.OBJ_BOOST_HGP_ROOT, _show_type == 201);
+		SetActive((Enum)UI.OBJ_BOOST_NOVICE_DROP_ROOT, _show_type == 210);
 		switch (_show_type)
 		{
 		case 3:
-			ResetTween(UI.OBJ_BOOST_DROP_ROOT, 0);
-			PlayTween(UI.OBJ_BOOST_DROP_ROOT, true, null, false, 0);
+			ResetTween((Enum)UI.OBJ_BOOST_DROP_ROOT, 0);
+			PlayTween((Enum)UI.OBJ_BOOST_DROP_ROOT, true, (EventDelegate.Callback)null, false, 0);
 			break;
 		case 1:
-			ResetTween(UI.OBJ_BOOST_EXP_ROOT, 0);
-			PlayTween(UI.OBJ_BOOST_EXP_ROOT, true, null, false, 0);
+			ResetTween((Enum)UI.OBJ_BOOST_EXP_ROOT, 0);
+			PlayTween((Enum)UI.OBJ_BOOST_EXP_ROOT, true, (EventDelegate.Callback)null, false, 0);
 			break;
 		case 2:
-			ResetTween(UI.OBJ_BOOST_GOLD_ROOT, 0);
-			PlayTween(UI.OBJ_BOOST_GOLD_ROOT, true, null, false, 0);
+			ResetTween((Enum)UI.OBJ_BOOST_GOLD_ROOT, 0);
+			PlayTween((Enum)UI.OBJ_BOOST_GOLD_ROOT, true, (EventDelegate.Callback)null, false, 0);
 			break;
 		case 201:
-			ResetTween(UI.OBJ_BOOST_HGP_ROOT, 0);
-			PlayTween(UI.OBJ_BOOST_HGP_ROOT, true, null, false, 0);
+			ResetTween((Enum)UI.OBJ_BOOST_HGP_ROOT, 0);
+			PlayTween((Enum)UI.OBJ_BOOST_HGP_ROOT, true, (EventDelegate.Callback)null, false, 0);
 			break;
 		case 210:
-			ResetTween(UI.OBJ_BOOST_NOVICE_DROP_ROOT, 0);
-			PlayTween(UI.OBJ_BOOST_NOVICE_DROP_ROOT, true, null, false, 0);
+			ResetTween((Enum)UI.OBJ_BOOST_NOVICE_DROP_ROOT, 0);
+			PlayTween((Enum)UI.OBJ_BOOST_NOVICE_DROP_ROOT, true, (EventDelegate.Callback)null, false, 0);
 			break;
 		}
 	}
 
 	private void UpdateShowBoost(BoostStatus boost)
 	{
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 		switch (boost.type)
 		{
 		case 1:
@@ -174,9 +175,9 @@ public class MainStatus : UIBehaviour
 		case 3:
 		case 201:
 		case 210:
-			SetColor(UI.LBL_BOOST_RATE, boostAnimator.GetRateColor(boost.value));
-			SetLabelText(UI.LBL_BOOST_RATE, boost.GetBoostRateText());
-			SetLabelText(UI.LBL_BOOST_TIME, (boost.type != 210) ? boost.GetRemainTime() : string.Empty);
+			SetColor((Enum)UI.LBL_BOOST_RATE, boostAnimator.GetRateColor(boost.value));
+			SetLabelText((Enum)UI.LBL_BOOST_RATE, boost.GetBoostRateText());
+			SetLabelText((Enum)UI.LBL_BOOST_TIME, (boost.type != 210) ? boost.GetRemainTime() : string.Empty);
 			break;
 		}
 	}

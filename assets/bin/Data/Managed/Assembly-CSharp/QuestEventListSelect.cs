@@ -8,7 +8,8 @@ public class QuestEventListSelect : QuestListSelectBase
 
 	public override void Initialize()
 	{
-		StartCoroutine(DoInitialize());
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -21,33 +22,17 @@ public class QuestEventListSelect : QuestListSelectBase
 		base.Initialize();
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
-		SetActive(UI.BTN_SORT, false);
+		SetActive((Enum)UI.BTN_SORT, false);
 		if (eventLocation == null || eventLocation.Length == 0)
 		{
-			SetActive(UI.STR_NON_LIST, true);
+			SetActive((Enum)UI.STR_NON_LIST, true);
 		}
 		else
 		{
-			SetActive(UI.STR_NON_LIST, false);
-			SetGrid(UI.GRD_QUEST, "QuestEventListSelectItem", eventLocation.Length, true, delegate(int i, Transform t, bool is_recycle)
-			{
-				SetEvent(t, "SELECT_EVENT", i);
-				SetTexture(t, UI.TEX_EVENT_BANNER, null);
-				SetLabelText(t, UI.LBL_QUEST_NAME, string.Empty);
-				SetLabelText(t, UI.LBL_REMAIN_TIME, eventLocation[i].eventAppearRemain);
-				if (eventLocation[i].isPayingLocation)
-				{
-					SetActive(t, UI.SPR_CRYSTAL, true);
-					SetActive(t, UI.SPR_FREE_PLAY, eventLocation[i].isFreePlaying);
-					SetLabelText(t, UI.LBL_PAYING_REMAIN, eventLocation[i].eventFreePayingRemain);
-				}
-				else
-				{
-					SetActive(t, UI.SPR_CRYSTAL, false);
-				}
-			});
+			SetActive((Enum)UI.STR_NON_LIST, false);
+			SetGrid(UI.GRD_QUEST, "QuestEventListSelectItem", eventLocation.Length, true, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			base.UpdateUI();
 		}
 	}

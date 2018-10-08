@@ -1,6 +1,4 @@
-using UnityEngine;
-
-public class ChairPoint : MonoBehaviour
+public class ChairPoint
 {
 	public ChairPoint dir;
 
@@ -8,6 +6,11 @@ public class ChairPoint : MonoBehaviour
 	{
 		get;
 		private set;
+	}
+
+	public ChairPoint()
+		: this()
+	{
 	}
 
 	public void SetSittingCharacter(HomePlayerCharacterBase chara)

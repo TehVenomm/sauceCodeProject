@@ -9,9 +9,10 @@ namespace Network
 	{
 		public List<StoreData> shopList = new List<StoreData>();
 
-		public StoreData getProduct(string id)
+		public unsafe StoreData getProduct(string id)
 		{
-			return shopList.FirstOrDefault((StoreData o) => o.productId == id);
+			_003CgetProduct_003Ec__AnonStorey54D _003CgetProduct_003Ec__AnonStorey54D;
+			return shopList.FirstOrDefault(new Func<StoreData, bool>((object)_003CgetProduct_003Ec__AnonStorey54D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 }

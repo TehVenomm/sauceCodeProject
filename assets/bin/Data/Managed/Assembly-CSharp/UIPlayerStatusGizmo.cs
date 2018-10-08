@@ -84,36 +84,36 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 	[Tooltip("自キャラ表示時間")]
 	protected float selfShowTime = 5f;
 
-	[Tooltip("矢印横表示時のXオフセット")]
 	[SerializeField]
+	[Tooltip("矢印横表示時のXオフセット")]
 	protected float arrowSideOffset = 25f;
 
-	[Tooltip("スクリ\u30fcン横オフセット")]
 	[SerializeField]
+	[Tooltip("スクリ\u30fcン横オフセット")]
 	protected float screenSideOffset = 36f;
 
 	[Tooltip("スクリ\u30fcン下オフセット")]
 	[SerializeField]
 	protected float screenBottomOffset = 107f;
 
-	[SerializeField]
 	[Tooltip("スクリ\u30fcン下オフセット、フィ\u30fcルド時")]
+	[SerializeField]
 	protected float screenBottomFieldOffset = 107f;
 
 	[SerializeField]
 	[Tooltip("チャット横オフセット")]
 	protected float chatSideOffset = 60f;
 
-	[SerializeField]
 	[Tooltip("チャット上オフセット")]
+	[SerializeField]
 	protected float chatTopOffset = 120f;
 
-	[Tooltip("チャットスタンプ横オフセット")]
 	[SerializeField]
+	[Tooltip("チャットスタンプ横オフセット")]
 	protected float chatStampSideOffset = 60f;
 
-	[Tooltip("チャットスタンプ上オフセット")]
 	[SerializeField]
+	[Tooltip("チャットスタンプ上オフセット")]
 	protected float chatStampTopOffset = 120f;
 
 	[SerializeField]
@@ -135,15 +135,15 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 
 	protected float damagedTimer = -1f;
 
-	protected Vector3 chatUILocalPos = Vector3.zero;
+	protected Vector3 chatUILocalPos = Vector3.get_zero();
 
 	protected Transform chatTransform;
 
-	protected Vector3 chatStampUILocalPos = Vector3.zero;
+	protected Vector3 chatStampUILocalPos = Vector3.get_zero();
 
 	protected Transform chatStampTransform;
 
-	protected Vector3 emotionUILocalPos = Vector3.zero;
+	protected Vector3 emotionUILocalPos = Vector3.get_zero();
 
 	protected Transform emotionTransform;
 
@@ -159,16 +159,18 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 		}
 		set
 		{
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			_targetPlayer = value;
-			if ((Object)_targetPlayer != (Object)null)
+			if (_targetPlayer != null)
 			{
-				base.gameObject.SetActive(true);
+				this.get_gameObject().SetActive(true);
 				currentUserId = -1;
 				UpdateParam();
 			}
 			else
 			{
-				base.gameObject.SetActive(false);
+				this.get_gameObject().SetActive(false);
 			}
 		}
 	}
@@ -181,76 +183,176 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 
 	public UIPlayerStatusGizmo()
 	{
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
 		isVisible = true;
 	}
 
 	protected override void OnEnable()
 	{
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Expected O, but got Unknown
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0062: Expected O, but got Unknown
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a1: Expected O, but got Unknown
+		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018c: Expected O, but got Unknown
+		//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
 		base.OnEnable();
-		if ((Object)chatUI != (Object)null)
+		if (chatUI != null)
 		{
-			chatTransform = chatUI.transform;
-			chatUILocalPos = chatTransform.localPosition;
+			chatTransform = chatUI.get_transform();
+			chatUILocalPos = chatTransform.get_localPosition();
 			chatUI.SetActive(false);
 		}
-		if ((Object)chatStampUI != (Object)null)
+		if (chatStampUI != null)
 		{
-			chatStampTransform = chatStampUI.transform;
-			chatStampUILocalPos = chatStampTransform.localPosition;
+			chatStampTransform = chatStampUI.get_transform();
+			chatStampUILocalPos = chatStampTransform.get_localPosition();
 			chatStampUI.SetActive(false);
 		}
-		if ((Object)emotionUI != (Object)null)
+		if (emotionUI != null)
 		{
-			emotionTransform = emotionUI.transform;
-			emotionUILocalPos = emotionTransform.localPosition;
+			emotionTransform = emotionUI.get_transform();
+			emotionUILocalPos = emotionTransform.get_localPosition();
 			emotionUI.SetActive(false);
 		}
-		if ((Object)chatTween != (Object)null)
+		if (chatTween != null)
 		{
 			chatTween.SetOnFinished(OnFinishChat);
 		}
-		if ((Object)chatStampTween != (Object)null)
+		if (chatStampTween != null)
 		{
 			chatStampTween.SetOnFinished(OnFinishedChatStamp);
 		}
-		if ((Object)prayerGauge != (Object)null)
+		if (prayerGauge != null)
 		{
-			prayerGauge.gameObject.SetActive(false);
+			prayerGauge.get_gameObject().SetActive(false);
 		}
-		if ((Object)prayerGaugeAdd != (Object)null)
+		if (prayerGaugeAdd != null)
 		{
-			prayerGaugeAdd.gameObject.SetActive(false);
+			prayerGaugeAdd.get_gameObject().SetActive(false);
 		}
 		nearUI.SetActive(false);
 		farUI.SetActive(false);
-		if ((Object)arrowUI != (Object)null)
+		if (arrowUI != null)
 		{
-			arrowTransform = arrowUI.transform;
+			arrowTransform = arrowUI.get_transform();
 			arrowUI.SetActive(false);
 		}
-		if ((Object)friendIcon != (Object)null)
+		if (friendIcon != null)
 		{
-			friendIcon.gameObject.SetActive(false);
+			friendIcon.get_gameObject().SetActive(false);
 		}
-		if ((Object)hostEffect != (Object)null)
+		if (hostEffect != null)
 		{
-			hostEffect.enabled = false;
+			hostEffect.set_enabled(false);
 		}
 	}
 
 	protected override void UpdateParam()
 	{
-		if ((Object)targetPlayer == (Object)null || !targetPlayer.gameObject.activeSelf || targetPlayer.isLoading || (!MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop && targetPlayer.isStopCounter) || (!targetPlayer.isCoopInitialized && targetPlayer.IsPuppet()) || !isVisible)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d6: Expected O, but got Unknown
+		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_034f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0350: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0355: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0357: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0359: Unknown result type (might be due to invalid IL or missing references)
+		//IL_035b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_035d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0379: Unknown result type (might be due to invalid IL or missing references)
+		//IL_037b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0380: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0402: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0406: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0408: Unknown result type (might be due to invalid IL or missing references)
+		//IL_040d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_043a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0467: Unknown result type (might be due to invalid IL or missing references)
+		//IL_046c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0470: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0472: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0477: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04e5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04eb: Expected O, but got Unknown
+		//IL_051f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_052f: Expected O, but got Unknown
+		//IL_054b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0551: Expected O, but got Unknown
+		//IL_05a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05dc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05f3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0605: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0620: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0626: Expected O, but got Unknown
+		//IL_0637: Unknown result type (might be due to invalid IL or missing references)
+		//IL_063d: Expected O, but got Unknown
+		//IL_074d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_074e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_074f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0754: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0756: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0758: Unknown result type (might be due to invalid IL or missing references)
+		//IL_076c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0771: Unknown result type (might be due to invalid IL or missing references)
+		//IL_078d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0807: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0895: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b85: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b9b: Unknown result type (might be due to invalid IL or missing references)
+		if (targetPlayer == null || !targetPlayer.get_gameObject().get_activeSelf() || targetPlayer.isLoading || (!MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop && targetPlayer.isStopCounter) || (!targetPlayer.isCoopInitialized && targetPlayer.IsPuppet()) || !isVisible)
 		{
 			SetActiveSafe(nearUI, false);
 			SetActiveSafe(farUI, false);
-			if ((Object)arrowUI != (Object)null)
+			if (arrowUI != null)
 			{
 				SetActiveSafe(arrowUI, false);
 			}
-			if ((Object)prayerGauge != (Object)null)
+			if (prayerGauge != null)
 			{
-				SetActiveSafe(prayerGauge.gameObject, false);
+				SetActiveSafe(prayerGauge.get_gameObject(), false);
 			}
 		}
 		else
@@ -265,10 +367,10 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 			screenZ = screenUIPosition.z;
 			screenUIPosition.z = 0f;
 			float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
-			Vector3 a = screenUIPosition;
+			Vector3 val = screenUIPosition;
 			bool flag = false;
-			float num2 = (float)Screen.width;
-			float num3 = (float)Screen.height;
+			float num2 = (float)Screen.get_width();
+			float num3 = (float)Screen.get_height();
 			if (screenUIPosition.x < screenSideOffset * num)
 			{
 				screenUIPosition.x = screenSideOffset * num;
@@ -289,81 +391,84 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 				screenUIPosition.y = num4 * num;
 				flag = true;
 			}
-			Vector3 position2 = screenUIPosition;
-			if (chatUI.activeSelf)
+			Vector3 val2 = screenUIPosition;
+			if (chatUI.get_activeSelf())
 			{
-				if (position2.x < chatSideOffset * num)
+				if (val2.x < chatSideOffset * num)
 				{
-					position2.x = chatSideOffset * num;
+					val2.x = chatSideOffset * num;
 				}
-				else if (position2.x > num2 - chatSideOffset * num)
+				else if (val2.x > num2 - chatSideOffset * num)
 				{
-					position2.x = num2 - chatSideOffset * num;
+					val2.x = num2 - chatSideOffset * num;
 				}
-				if (position2.y > num3 - chatTopOffset * num)
+				if (val2.y > num3 - chatTopOffset * num)
 				{
-					position2.y = num3 - chatTopOffset * num;
-				}
-			}
-			Vector3 position3 = screenUIPosition;
-			if (chatStampUI.activeSelf || emotionUI.activeSelf)
-			{
-				if (position3.x < chatStampSideOffset * num)
-				{
-					position3.x = chatStampSideOffset * num;
-				}
-				else if (position3.x > num2 - chatStampSideOffset * num)
-				{
-					position3.x = num2 - chatStampSideOffset * num;
-				}
-				if (position3.y > num3 - chatStampTopOffset * num)
-				{
-					position3.y = num3 - chatStampTopOffset * num;
+					val2.y = num3 - chatTopOffset * num;
 				}
 			}
-			Vector3 vector = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
-			Vector3 v = vector;
-			Vector3 v2 = vector;
-			if (chatUI.activeSelf)
+			Vector3 val3 = screenUIPosition;
+			if (chatStampUI.get_activeSelf() || emotionUI.get_activeSelf())
 			{
-				v = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(position2);
+				if (val3.x < chatStampSideOffset * num)
+				{
+					val3.x = chatStampSideOffset * num;
+				}
+				else if (val3.x > num2 - chatStampSideOffset * num)
+				{
+					val3.x = num2 - chatStampSideOffset * num;
+				}
+				if (val3.y > num3 - chatStampTopOffset * num)
+				{
+					val3.y = num3 - chatStampTopOffset * num;
+				}
 			}
-			if (chatStampUI.activeSelf || emotionUI.activeSelf)
+			Vector3 val4 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
+			Vector3 val5 = val4;
+			Vector3 val6 = val4;
+			if (chatUI.get_activeSelf())
 			{
-				v2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(position3);
+				val5 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val2);
 			}
-			if ((transform.position - vector).sqrMagnitude >= 2E-05f)
+			if (chatStampUI.get_activeSelf() || emotionUI.get_activeSelf())
 			{
-				transform.position = vector;
+				val6 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val3);
 			}
-			if (chatUI.activeSelf)
+			Vector3 val7 = transform.get_position() - val4;
+			if (val7.get_sqrMagnitude() >= 2E-05f)
 			{
-				Vector3 localPosition = transform.worldToLocalMatrix.MultiplyPoint3x4(v);
+				transform.set_position(val4);
+			}
+			if (chatUI.get_activeSelf())
+			{
+				Matrix4x4 worldToLocalMatrix = transform.get_worldToLocalMatrix();
+				Vector3 localPosition = worldToLocalMatrix.MultiplyPoint3x4(val5);
 				localPosition.y += chatUILocalPos.y;
 				localPosition.z = 0f;
-				chatTransform.localPosition = localPosition;
+				chatTransform.set_localPosition(localPosition);
 			}
-			if (chatStampUI.activeSelf || emotionUI.activeSelf)
+			if (chatStampUI.get_activeSelf() || emotionUI.get_activeSelf())
 			{
-				Vector3 localPosition2 = transform.worldToLocalMatrix.MultiplyPoint3x4(v2);
+				Matrix4x4 worldToLocalMatrix2 = transform.get_worldToLocalMatrix();
+				Vector3 localPosition2 = worldToLocalMatrix2.MultiplyPoint3x4(val6);
 				localPosition2.y += chatUILocalPos.y;
 				localPosition2.z = 0f;
-				chatStampTransform.localPosition = localPosition2;
-				emotionTransform.localPosition = localPosition2;
+				chatStampTransform.set_localPosition(localPosition2);
+				emotionTransform.set_localPosition(localPosition2);
 			}
-			if ((Object)prayerGauge != (Object)null)
+			if (prayerGauge != null)
 			{
 				if (targetPlayer.revivalTimePercent > 0f)
 				{
-					SetActiveSafe(prayerGauge.gameObject, true);
+					SetActiveSafe(prayerGauge.get_gameObject(), true);
 					prayerGauge.SetPercent(targetPlayer.revivalTimePercent, true);
-					if ((Object)nowPrayer != (Object)null)
+					if (nowPrayer != null)
 					{
-						SetActiveSafe(nowPrayer.gameObject, targetPlayer.IsPrayed());
+						SetActiveSafe(nowPrayer.get_gameObject(), targetPlayer.IsPrayed());
 					}
 					if (targetPlayer.IsPrayed())
 					{
-						SetActiveSafe(prayerGaugeAdd.gameObject, true);
+						SetActiveSafe(prayerGaugeAdd.get_gameObject(), true);
 						prayerGaugeAdd.SetPercent(targetPlayer.revivalTimePercent, true);
 						switch (targetPlayer.prayerIds.Count)
 						{
@@ -383,21 +488,21 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 					}
 					else
 					{
-						SetActiveSafe(prayerGaugeAdd.gameObject, false);
+						SetActiveSafe(prayerGaugeAdd.get_gameObject(), false);
 					}
 				}
 				else
 				{
-					SetActiveSafe(prayerGauge.gameObject, false);
+					SetActiveSafe(prayerGauge.get_gameObject(), false);
 				}
 			}
-			Self x = targetPlayer as Self;
-			if ((Object)x != (Object)null)
+			Self self = targetPlayer as Self;
+			if (self != null)
 			{
 				bool flag2 = false;
 				if (damagedTimer >= 0f)
 				{
-					if (Time.time - damagedTimer >= selfShowTime)
+					if (Time.get_time() - damagedTimer >= selfShowTime)
 					{
 						damagedTimer = -1f;
 					}
@@ -424,19 +529,20 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 				{
 					flag = true;
 				}
-				if (flag && (Object)x == (Object)null)
+				if (flag && self == null)
 				{
 					SetActiveSafe(nearUI, false);
 					SetActiveSafe(farUI, true);
-					if ((Object)arrowUI != (Object)null)
+					if (arrowUI != null)
 					{
-						Vector3 vector2 = a - screenUIPosition;
-						if (vector2 != Vector3.zero)
+						Vector3 val8 = val - screenUIPosition;
+						if (val8 != Vector3.get_zero())
 						{
-							float num5 = 90f - Vector3.Angle(Vector3.right, vector2);
-							arrowTransform.eulerAngles = new Vector3(0f, 0f, num5);
+							float num5 = 90f - Vector3.Angle(Vector3.get_right(), val8);
+							arrowTransform.set_eulerAngles(new Vector3(0f, 0f, num5));
 							SetActiveSafe(arrowUI, true);
-							Vector3 localPosition3 = new Vector3(0f, 0f, 0f);
+							Vector3 localPosition3 = default(Vector3);
+							localPosition3._002Ector(0f, 0f, 0f);
 							float num6 = Mathf.Sin(num5 * 0.0174532924f);
 							if (num6 > 0.01f)
 							{
@@ -446,22 +552,23 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 							{
 								localPosition3.x = 0f - arrowSideOffset;
 							}
-							arrowTransform.localPosition = localPosition3;
+							arrowTransform.set_localPosition(localPosition3);
 						}
 						else
 						{
 							SetActiveSafe(arrowUI, false);
 						}
 					}
-					if ((Object)distanceLabel != (Object)null)
+					if (distanceLabel != null)
 					{
 						if (targetPlayer.rescueTime > 0f)
 						{
 							distanceLabel.text = string.Empty + Mathf.CeilToInt(targetPlayer.rescueTime) + "\u3000";
 						}
-						else if ((Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (Object)null)
+						else if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
 						{
-							int num7 = (int)(targetPlayer._position - MonoBehaviourSingleton<StageObjectManager>.I.self._position).magnitude;
+							Vector3 val9 = targetPlayer._position - MonoBehaviourSingleton<StageObjectManager>.I.self._position;
+							int num7 = (int)val9.get_magnitude();
 							distanceLabel.text = string.Empty + num7 + "m";
 						}
 					}
@@ -471,7 +578,7 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 				{
 					SetActiveSafe(nearUI, true);
 					SetActiveSafe(farUI, false);
-					if ((Object)gaugeUI != (Object)null)
+					if (gaugeUI != null)
 					{
 						float num8 = (float)targetPlayer.hp / (float)targetPlayer.hpMax;
 						if (num8 < 0f)
@@ -483,7 +590,7 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 							gaugeUI.SetPercent(num8, true);
 						}
 					}
-					if ((Object)healGaugeUI != (Object)null)
+					if (healGaugeUI != null)
 					{
 						float num9 = (float)targetPlayer.healHp / (float)targetPlayer.hpMax;
 						if (num9 < 0f)
@@ -495,7 +602,7 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 							healGaugeUI.SetPercent(num9, true);
 						}
 					}
-					if ((Object)shieldGaugeUI != (Object)null)
+					if (shieldGaugeUI != null)
 					{
 						float num10 = 0f;
 						num10 = ((!targetPlayer.IsValidShield()) ? 0f : ((float)(int)targetPlayer.ShieldHp / (float)(int)targetPlayer.ShieldHpMax));
@@ -508,7 +615,7 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 							shieldGaugeUI.SetPercent(num10, true);
 						}
 					}
-					if ((Object)nameLabel != (Object)null)
+					if (nameLabel != null)
 					{
 						if (targetPlayer.createInfo != null && targetPlayer.createInfo.charaInfo != null && MonoBehaviourSingleton<FieldManager>.IsValid() && MonoBehaviourSingleton<FieldManager>.I.fieldData != null && MonoBehaviourSingleton<FieldManager>.I.fieldData.field != null && MonoBehaviourSingleton<FieldManager>.I.fieldData.field.slotInfos != null && currentUserId != targetPlayer.createInfo.charaInfo.userId)
 						{
@@ -527,11 +634,11 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 							{
 								if (friendCharaInfo.follower && friendCharaInfo.following)
 								{
-									friendIcon.gameObject.SetActive(true);
+									friendIcon.get_gameObject().SetActive(true);
 								}
 								else
 								{
-									friendIcon.gameObject.SetActive(false);
+									friendIcon.get_gameObject().SetActive(false);
 								}
 								currentUserId = targetPlayer.createInfo.charaInfo.userId;
 							}
@@ -546,10 +653,12 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 
 	private void SetVitalSprite(bool _isOwner)
 	{
-		if (!((Object)vitalSprite == (Object)null) && !((Object)hostEffect == (Object)null))
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Expected O, but got Unknown
+		if (!(vitalSprite == null) && !(hostEffect == null))
 		{
-			GameObject gameObject = hostEffect.gameObject;
-			hostEffect.enabled = false;
+			GameObject val = hostEffect.get_gameObject();
+			hostEffect.set_enabled(false);
 			string empty = string.Empty;
 			if (targetPlayer.hp > 0)
 			{
@@ -558,9 +667,9 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 			else if (targetPlayer.IsRescuable())
 			{
 				empty = "Ingame_member_vitalsign_red";
-				if (!hostEffect.enabled && _isOwner)
+				if (!hostEffect.get_enabled() && _isOwner)
 				{
-					hostEffect.enabled = true;
+					hostEffect.set_enabled(true);
 				}
 			}
 			else
@@ -573,7 +682,10 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 
 	public void SetUISpriteColor(UISprite sprite, Color c)
 	{
-		if ((Object)sprite != (Object)null)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		if (sprite != null)
 		{
 			Color color = sprite.color;
 			if (color.r != c.r || color.g != c.g || color.b != c.b)
@@ -604,7 +716,7 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 
 	public void SetChatDuration(float duration)
 	{
-		if ((Object)chatTween != (Object)null)
+		if (chatTween != null)
 		{
 			chatTween.duration = duration;
 		}
@@ -616,7 +728,7 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 		{
 			chatLabel.text = message;
 			chatUI.SetActive(true);
-			if ((Object)chatTween != (Object)null)
+			if (chatTween != null)
 			{
 				chatTween.ResetToBeginning();
 				chatTween.PlayForward();
@@ -626,7 +738,8 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 
 	public void SayChatStamp(int stampId)
 	{
-		StartCoroutine(DoDisplayChatStamp(stampId));
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoDisplayChatStamp(stampId));
 	}
 
 	private IEnumerator DoDisplayChatStamp(int stampId)
@@ -635,16 +748,16 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 		LoadingQueue lqstamp = new LoadingQueue(this);
 		LoadObject lostamp = lqstamp.LoadChatStamp(stampId, true);
 		yield return (object)lqstamp.Wait();
-		if (!(lostamp.loadedObject == (Object)null))
+		if (!(lostamp.loadedObject == null))
 		{
-			if ((Object)chatStampTexture != (Object)null)
+			if (chatStampTexture != null)
 			{
 				chatStampTexture.mainTexture = (lostamp.loadedObject as Texture2D);
 			}
 			if (CanDisplayChat())
 			{
 				chatStampUI.SetActive(true);
-				if ((Object)chatStampTween != (Object)null)
+				if (chatStampTween != null)
 				{
 					chatStampTween.ResetToBeginning();
 					chatStampTween.PlayForward();
@@ -655,7 +768,7 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 
 	private bool CanDisplayChat()
 	{
-		return (Object)targetPlayer != (Object)null && targetPlayer.isInitialized;
+		return targetPlayer != null && targetPlayer.isInitialized;
 	}
 
 	public void OnFinishChat()
@@ -670,7 +783,7 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 
 	public void OnDamageSelf()
 	{
-		damagedTimer = Time.time;
+		damagedTimer = Time.get_time();
 	}
 
 	public void OnDispEmotion(bool isDisp)
@@ -714,6 +827,8 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 
 	protected void UpdateUIDepth()
 	{
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Expected O, but got Unknown
 		int i = 0;
 		for (int count = UIStatusGizmoBase.uiList.Count; i < count; i++)
 		{
@@ -721,7 +836,7 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 			int num = i * 10;
 			if (uIStatusGizmoBase.depthOffset != num)
 			{
-				UIStatusGizmoBase.AdjustDepth(uIStatusGizmoBase.gameObject, num - uIStatusGizmoBase.depthOffset);
+				UIStatusGizmoBase.AdjustDepth(uIStatusGizmoBase.get_gameObject(), num - uIStatusGizmoBase.depthOffset);
 				uIStatusGizmoBase.BasePanel.depth = num;
 				uIStatusGizmoBase.depthOffset = num;
 			}

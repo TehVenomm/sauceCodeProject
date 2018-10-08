@@ -8,7 +8,8 @@ public class CoopClientPacketReceiver : PacketReceiver
 
 	protected virtual void Awake()
 	{
-		coopClient = base.gameObject.GetComponent<CoopClient>();
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		coopClient = this.get_gameObject().GetComponent<CoopClient>();
 	}
 
 	protected override bool HandleCoopEvent(CoopPacket packet)

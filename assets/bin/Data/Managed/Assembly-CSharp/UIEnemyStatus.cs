@@ -80,7 +80,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 
 	private Coroutine shakeCoroutine;
 
-	private Vector3 shakeTargetDefaultPos = Vector3.zero;
+	private Vector3 shakeTargetDefaultPos = Vector3.get_zero();
 
 	protected float downPercent;
 
@@ -114,42 +114,47 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 
 	protected override void Awake()
 	{
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		base.gameObject.SetActive(false);
+		this.get_gameObject().SetActive(false);
 		SetGaugeType(GaugeType.HP);
 	}
 
 	private void Start()
 	{
-		if (!((Object)targetEnemy == (Object)null))
+		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+		if (!(targetEnemy == null))
 		{
-			if ((bool)hpGaugeUI)
+			if (Object.op_Implicit(hpGaugeUI))
 			{
 				float percent = (targetEnemy.hpMax <= 0) ? 0f : ((float)targetEnemy.hp / (float)targetEnemy.hpMax);
 				hpGaugeUI.SetPercent(percent, false);
 			}
-			if ((bool)downGaugeUI)
+			if (Object.op_Implicit(downGaugeUI))
 			{
 				downGaugeUISpr = downGaugeUI.GetComponent<UISprite>();
 				float percent2 = CalcDownPercent();
 				downGaugeUI.SetPercent(percent2, false);
 				downPercent = percent2;
 			}
-			if ((bool)shadowSealingGaugeUI)
+			if (Object.op_Implicit(shadowSealingGaugeUI))
 			{
 				float percent3 = CalcShadowSealingPercent();
 				shadowSealingGaugeUI.SetPercent(percent3, false);
 				shadowSealingPercent = percent3;
 			}
-			if ((bool)shieldGaugeUI)
+			if (Object.op_Implicit(shieldGaugeUI))
 			{
 				isLoadEffectComplete = false;
-				StartCoroutine(DoLoadEffect());
+				this.StartCoroutine(DoLoadEffect());
 				shieldGaugeUI.SetPercent(0f, false);
 			}
-			if ((Object)shakeTarget != (Object)null)
+			if (shakeTarget != null)
 			{
-				shakeTargetDefaultPos = shakeTarget.transform.localPosition;
+				shakeTargetDefaultPos = shakeTarget.get_transform().get_localPosition();
 			}
 		}
 	}
@@ -186,29 +191,31 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 
 	public void SetTarget(Enemy enemy)
 	{
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
 		targetEnemy = enemy;
-		if ((Object)targetEnemy == (Object)null)
+		if (targetEnemy == null)
 		{
-			base.gameObject.SetActive(false);
+			this.get_gameObject().SetActive(false);
 		}
 		else
 		{
 			statusIcons.target = enemy;
-			if ((bool)enemyName)
+			if (Object.op_Implicit(enemyName))
 			{
 				string charaName = enemy.charaName;
 				enemyName.text = charaName;
 				int num = enemy.enemyLevel;
-				if ((Object)level == (Object)null && num > 0)
+				if (level == null && num > 0)
 				{
 					enemyName.text = $"Lv{num.ToString()} {charaName}";
 				}
 			}
-			if ((bool)level)
+			if (Object.op_Implicit(level))
 			{
 				level.text = enemy.enemyLevel.ToString();
 			}
-			if ((bool)hpGaugeUI)
+			if (Object.op_Implicit(hpGaugeUI))
 			{
 				float num2 = (targetEnemy.hpMax <= 0) ? 0f : ((float)targetEnemy.hp / (float)targetEnemy.hpMax);
 				if (hpGaugeUI.nowPercent != num2)
@@ -216,7 +223,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 					hpGaugeUI.SetPercent(num2, false);
 				}
 			}
-			if ((bool)downGaugeUI)
+			if (Object.op_Implicit(downGaugeUI))
 			{
 				float num3 = CalcDownPercent();
 				if (downGaugeUI.nowPercent != num3)
@@ -225,7 +232,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 					downPercent = num3;
 				}
 			}
-			if ((bool)shadowSealingGaugeUI)
+			if (Object.op_Implicit(shadowSealingGaugeUI))
 			{
 				float num4 = CalcShadowSealingPercent();
 				if (shadowSealingGaugeUI.nowPercent != num4)
@@ -238,16 +245,17 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 			UpDateStatusIcon();
 			if (!MonoBehaviourSingleton<FieldManager>.I.isTutorialField)
 			{
-				base.gameObject.SetActive(true);
+				this.get_gameObject().SetActive(true);
 			}
 		}
 	}
 
 	private void LateUpdate()
 	{
-		if (!((Object)targetEnemy == (Object)null))
+		//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
+		if (!(targetEnemy == null))
 		{
-			if ((bool)hpGaugeUI)
+			if (Object.op_Implicit(hpGaugeUI))
 			{
 				float num = (targetEnemy.hpMax <= 0) ? 0f : ((float)targetEnemy.hpShow / (float)targetEnemy.hpMax);
 				if (hpGaugeUI.nowPercent != num)
@@ -255,7 +263,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 					hpGaugeUI.SetPercent(num, true);
 				}
 			}
-			if ((bool)downGaugeUI && (playEffectCount == 0 || targetEnemy.IsActDown()))
+			if (Object.op_Implicit(downGaugeUI) && (playEffectCount == 0 || targetEnemy.IsActDown()))
 			{
 				float num2 = CalcDownPercent();
 				if (downGaugeUI.nowPercent != num2)
@@ -264,7 +272,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 					downPercent = num2;
 				}
 			}
-			if ((bool)shadowSealingGaugeUI && (playShadowSealingEffectCount == 0 || targetEnemy.IsDebuffShadowSealing()))
+			if (Object.op_Implicit(shadowSealingGaugeUI) && (playShadowSealingEffectCount == 0 || targetEnemy.IsDebuffShadowSealing()))
 			{
 				float num3 = CalcShadowSealingPercent();
 				if (shadowSealingGaugeUI.nowPercent != num3)
@@ -273,7 +281,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 					shadowSealingPercent = num3;
 				}
 			}
-			if ((bool)shieldGaugeUI && targetEnemy.IsValidShield())
+			if (Object.op_Implicit(shieldGaugeUI) && targetEnemy.IsValidShield())
 			{
 				if (currentGaugeType != GaugeType.SHIELD)
 				{
@@ -287,7 +295,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 						if (!isPlayShieldGaugeAnimation)
 						{
 							isPlayShieldGaugeAnimation = true;
-							StartCoroutine(PlayShieldGaugeAnimation());
+							this.StartCoroutine(PlayShieldGaugeAnimation());
 						}
 					}
 					else if (shieldGaugeUI.nowPercent > num4 && !isPlayShieldGaugeAnimation)
@@ -305,11 +313,13 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 
 	public void PlayShakeHpGauge(float power, float shakeTime, float cycleTime, bool reset = true)
 	{
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Expected O, but got Unknown
 		if (cycleTime == 0f)
 		{
 			Log.Error(LOG.INGAME, "cycleTime is 0 at PlayShakeHpGauge in UIEnemyStatus.cs");
 		}
-		else if ((Object)shakeTarget == (Object)null)
+		else if (shakeTarget == null)
 		{
 			Log.Error(LOG.INGAME, "shakeTarget is null in UIEnemyStatus:InGameMain/StaticPanel/EnemyStatus");
 		}
@@ -317,12 +327,12 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 		{
 			if (reset && shakeCoroutine != null)
 			{
-				StopCoroutine(shakeCoroutine);
+				this.StopCoroutine(shakeCoroutine);
 				shakeCoroutine = null;
 			}
 			if (shakeCoroutine == null)
 			{
-				shakeCoroutine = StartCoroutine(_PlayShakeHpGauge(power, shakeTime, cycleTime));
+				shakeCoroutine = this.StartCoroutine(_PlayShakeHpGauge(power, shakeTime, cycleTime));
 			}
 		}
 	}
@@ -332,13 +342,13 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 		float timer = 0f;
 		while (timer < shakeTime)
 		{
-			timer += Time.deltaTime;
+			timer += Time.get_deltaTime();
 			float y = power * Mathf.Sin(6.28f * timer / cycleTime);
-			shakeTarget.transform.localPosition = shakeTargetDefaultPos + y * Vector3.up;
-			power -= power * Time.deltaTime / shakeTime;
+			shakeTarget.get_transform().set_localPosition(shakeTargetDefaultPos + y * Vector3.get_up());
+			power -= power * Time.get_deltaTime() / shakeTime;
 			yield return (object)null;
 		}
-		shakeTarget.transform.localPosition = shakeTargetDefaultPos;
+		shakeTarget.get_transform().set_localPosition(shakeTargetDefaultPos);
 	}
 
 	private IEnumerator PlayShieldGaugeAnimation()
@@ -346,44 +356,46 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 		Renderer r_shieldGauge = shieldGaugeUI.GetComponent<Renderer>();
 		Renderer r_hpGauge = hpGaugeUI.GetComponent<Renderer>();
 		UISprite r_base = hpGaugeBase.GetComponent<UISprite>();
-		r_hpGauge.material.renderQueue = r_base.material.renderQueue + 1;
-		r_shieldGauge.material.renderQueue = r_hpGauge.material.renderQueue + 1;
+		r_hpGauge.get_material().set_renderQueue(r_base.material.get_renderQueue() + 1);
+		r_shieldGauge.get_material().set_renderQueue(r_hpGauge.get_material().get_renderQueue() + 1);
 		Transform effectTrans = null;
 		if (isLoadEffectComplete)
 		{
-			effectTrans = EffectManager.GetUIEffect("ef_ui_shieldgauge_01", r_base, -0.001f, r_shieldGauge.material.renderQueue + 10);
-			if ((Object)effectTrans != (Object)null)
+			effectTrans = EffectManager.GetUIEffect("ef_ui_shieldgauge_01", (UIWidget)r_base, -0.001f, r_shieldGauge.get_material().get_renderQueue() + 10);
+			if (effectTrans != null)
 			{
-				effectTrans.rotation = Quaternion.identity;
-				effectTrans.localScale = Vector3.one;
+				effectTrans.set_rotation(Quaternion.get_identity());
+				effectTrans.set_localScale(Vector3.get_one());
 			}
 		}
 		float width = (float)(r_base.width - r_base.GetAtlasSprite().borderLeft - r_base.GetAtlasSprite().borderRight);
-		Vector3 offset = Vector3.right * (float)r_base.GetAtlasSprite().borderLeft + Vector3.down * (float)r_base.height / 2f;
+		Vector3 offset = Vector3.get_right() * (float)r_base.GetAtlasSprite().borderLeft + Vector3.get_down() * (float)r_base.height / 2f;
 		float shieldPercent = Mathf.Max(0f, (float)(int)targetEnemy.ShieldHp / (float)(int)targetEnemy.ShieldHpMax);
 		while (shieldGaugeUI.nowPercent < shieldPercent)
 		{
-			shieldGaugeUI.SetPercent(shieldGaugeUI.nowPercent + Time.deltaTime / shieldChargeTime, true);
-			if ((Object)effectTrans != (Object)null)
+			shieldGaugeUI.SetPercent(shieldGaugeUI.nowPercent + Time.get_deltaTime() / shieldChargeTime, true);
+			if (effectTrans != null)
 			{
-				effectTrans.localPosition = offset + Vector3.right * width * shieldGaugeUI.nowPercent;
+				effectTrans.set_localPosition(offset + Vector3.get_right() * width * shieldGaugeUI.nowPercent);
 			}
 			shieldPercent = Mathf.Max(0f, (float)(int)targetEnemy.ShieldHp / (float)(int)targetEnemy.ShieldHpMax);
 			yield return (object)null;
 		}
 		yield return (object)null;
-		if ((Object)effectTrans != (Object)null)
+		if (effectTrans != null)
 		{
-			EffectManager.ReleaseEffect(effectTrans.gameObject, true, false);
+			EffectManager.ReleaseEffect(effectTrans.get_gameObject(), true, false);
 		}
 		isPlayShieldGaugeAnimation = false;
 	}
 
 	public void DirectionDownGauge(AttackedHitStatusFix status)
 	{
-		if (base.gameObject.activeInHierarchy)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		if (this.get_gameObject().get_activeInHierarchy())
 		{
-			StartCoroutine(_DirectionDownGauge(status));
+			this.StartCoroutine(_DirectionDownGauge(status));
 		}
 	}
 
@@ -395,7 +407,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 		int effect_num = (int)((down_percent - downPercent) * 10f) + 1;
 		downPercent = down_percent;
 		playEffectCount++;
-		yield return (object)StartCoroutine(_DirectionDownParticle(effect_num, world_hit_pos));
+		yield return (object)this.StartCoroutine(_DirectionDownParticle(effect_num, world_hit_pos));
 		EffectManager.GetUIEffect("ef_ui_downgauge_01", downGaugeUI.GetGaugeTransform(), -0.001f, 0, null);
 		if (!targetEnemy.IsActDown())
 		{
@@ -409,17 +421,21 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 		yield return (object)new WaitForSeconds(1f);
 		if (down_percent >= 1f && !targetEnemy.IsActDown())
 		{
-			yield return (object)StartCoroutine(_DirectionDownCompleteEffect(false));
+			yield return (object)this.StartCoroutine(_DirectionDownCompleteEffect(false));
 		}
 		else if (workDownTotal > 0f && targetEnemy.IsActDown())
 		{
-			yield return (object)StartCoroutine(_DirectionDownCompleteEffect(true));
+			yield return (object)this.StartCoroutine(_DirectionDownCompleteEffect(true));
 		}
 		playEffectCount--;
 	}
 
 	private IEnumerator _DirectionDownParticle(int effect_num, Vector3 world_hit_pos)
 	{
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameManager>.I.graphicOptionType > 0)
 		{
 			float speed = (float)((!targetEnemy.IsActDown()) ? 1 : 2);
@@ -429,15 +445,15 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 			for (int i = 0; i < effect_num; i++)
 			{
 				Transform trans = EffectManager.GetUIEffect("ef_ui_downenergy_01", downGaugeUI.GetGaugeTransform(), -0.001f, 0, null);
-				if (!((Object)trans == (Object)null))
+				if (!(trans == null))
 				{
 					ui_pos.z = 1f;
-					trans.position = ui_pos;
-					GameObject obj2 = trans.gameObject;
+					trans.set_position(ui_pos);
+					GameObject obj2 = trans.get_gameObject();
 					TransformInterpolator interp = obj2.AddComponent<TransformInterpolator>();
-					if (!((Object)interp == (Object)null))
+					if (!(interp == null))
 					{
-						interp.Translate(add_value: new Vector3(Random.Range(0f - downEffectAddRandomMax, downEffectAddRandomMax), Random.Range(0f - downEffectAddRandomMax, downEffectAddRandomMax), 0f), _time: downEffectTime / speed, target: Vector3.zero, ease_curve: downEffectEaseCurve, add_curve: downEffectAddCurve);
+						interp.Translate(add_value: new Vector3(Random.Range(0f - downEffectAddRandomMax, downEffectAddRandomMax), Random.Range(0f - downEffectAddRandomMax, downEffectAddRandomMax), 0f), _time: downEffectTime / speed, target: Vector3.get_zero(), ease_curve: downEffectEaseCurve, add_curve: downEffectAddCurve);
 						effects.Add(obj2);
 						playEffects.Add(obj2);
 					}
@@ -446,7 +462,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 			yield return (object)new WaitForSeconds(downEffectTime / speed);
 			effects.ForEach(delegate(GameObject obj)
 			{
-				((_003C_DirectionDownParticle_003Ec__Iterator1F5)/*Error near IL_0233: stateMachine*/)._003C_003Ef__this.playEffects.Remove(obj);
+				((_003C_DirectionDownParticle_003Ec__Iterator1FC)/*Error near IL_0233: stateMachine*/)._003C_003Ef__this.playEffects.Remove(obj);
 				EffectManager.ReleaseEffect(obj, true, false);
 			});
 		}
@@ -455,16 +471,16 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 	private IEnumerator _DirectionDownCompleteEffect(bool isInActDown)
 	{
 		Transform trans = EffectManager.GetUIEffect("ef_ui_downgauge_02", downGaugeUI.GetGaugeTransform(), -0.001f, 0, null);
-		if (!((Object)trans == (Object)null))
+		if (!(trans == null))
 		{
-			playEffects.Add(trans.gameObject);
+			playEffects.Add(trans.get_gameObject());
 			bool isDownMotion = targetEnemy.actionID == (Character.ACTION_ID)13;
 			while (isInActDown != isDownMotion)
 			{
 				yield return (object)null;
 			}
-			playEffects.Remove(trans.gameObject);
-			EffectManager.ReleaseEffect(trans.gameObject, true, false);
+			playEffects.Remove(trans.get_gameObject());
+			EffectManager.ReleaseEffect(trans.get_gameObject(), true, false);
 		}
 	}
 
@@ -475,7 +491,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 
 	private void UpdateElementIcon()
 	{
-		if ((Object)targetEnemy == (Object)null)
+		if (targetEnemy == null)
 		{
 			Log.Error("targetEnemy is null !!");
 		}
@@ -496,61 +512,70 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 
 	public void SetElementIcon(ELEMENT_TYPE element)
 	{
-		if ((Object)sprElement != (Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+		if (sprElement != null)
 		{
-			sprElement.gameObject.SetActive(false);
+			sprElement.get_gameObject().SetActive(false);
 			string iconElementSpriteName = ItemIcon.GetIconElementSpriteName(element);
 			if (!string.IsNullOrEmpty(iconElementSpriteName))
 			{
 				sprElement.spriteName = iconElementSpriteName;
-				sprElement.gameObject.SetActive(true);
+				sprElement.get_gameObject().SetActive(true);
 			}
 		}
 	}
 
 	public void SetWeakElementIcon(ELEMENT_TYPE weakElement)
 	{
-		if ((Object)weakRootName != (Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+		if (weakRootName != null)
 		{
-			weakRootName.gameObject.SetActive(true);
+			weakRootName.get_gameObject().SetActive(true);
 		}
-		if ((Object)sprWeakElement != (Object)null)
+		if (sprWeakElement != null)
 		{
-			sprWeakElement.gameObject.SetActive(false);
+			sprWeakElement.get_gameObject().SetActive(false);
 		}
-		if ((Object)nonWeakElementName != (Object)null)
+		if (nonWeakElementName != null)
 		{
-			nonWeakElementName.gameObject.SetActive(false);
+			nonWeakElementName.get_gameObject().SetActive(false);
 		}
 		if (weakElement == ELEMENT_TYPE.MAX)
 		{
-			if ((Object)nonWeakElementName != (Object)null)
+			if (nonWeakElementName != null)
 			{
-				nonWeakElementName.gameObject.SetActive(true);
+				nonWeakElementName.get_gameObject().SetActive(true);
 			}
 		}
-		else if ((Object)sprWeakElement != (Object)null)
+		else if (sprWeakElement != null)
 		{
 			string iconElementSpriteName = ItemIcon.GetIconElementSpriteName(weakElement);
 			if (!string.IsNullOrEmpty(iconElementSpriteName))
 			{
 				sprWeakElement.spriteName = iconElementSpriteName;
-				sprWeakElement.gameObject.SetActive(true);
+				sprWeakElement.get_gameObject().SetActive(true);
 			}
 		}
 	}
 
 	private void SetGaugeType(GaugeType type)
 	{
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		currentGaugeType = type;
 		switch (type)
 		{
 		case GaugeType.HP:
-			shieldGaugeUI.gameObject.SetActive(false);
+			shieldGaugeUI.get_gameObject().SetActive(false);
 			hpFocusFrame.SetActive(false);
 			break;
 		case GaugeType.SHIELD:
-			shieldGaugeUI.gameObject.SetActive(true);
+			shieldGaugeUI.get_gameObject().SetActive(true);
 			hpFocusFrame.SetActive(true);
 			break;
 		}
@@ -578,6 +603,8 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 
 	public void ShowShadowSealing(bool isVisible)
 	{
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
 		int num = 0;
 		if (object.ReferenceEquals(targetEnemy, null))
 		{
@@ -601,7 +628,7 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 			{
 				if (i < num - 1)
 				{
-					shadowSealingPartitions[i].transform.localPosition = new Vector3(-61.5f + num2 * (float)(i + 1), 2f, 0f);
+					shadowSealingPartitions[i].get_transform().set_localPosition(new Vector3(-61.5f + num2 * (float)(i + 1), 2f, 0f));
 					shadowSealingPartitions[i].SetActive(true);
 				}
 				else
@@ -628,14 +655,21 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 
 	public void DirectionShadowSealingGauge(Vector3 world_hit_pos)
 	{
-		if (base.gameObject.activeInHierarchy && shadowSealingRoot.activeInHierarchy)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		if (this.get_gameObject().get_activeInHierarchy() && shadowSealingRoot.get_activeInHierarchy())
 		{
-			StartCoroutine(_DirectionShadowSealingGauge(world_hit_pos));
+			this.StartCoroutine(_DirectionShadowSealingGauge(world_hit_pos));
 		}
 	}
 
 	private IEnumerator _DirectionShadowSealingGauge(Vector3 world_hit_pos)
 	{
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 		float per = CalcShadowSealingPercent();
 		int effect_num = (int)((per - shadowSealingPercent) * 10f) + 1;
 		shadowSealingPercent = per;
@@ -648,15 +682,15 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 			for (int i = 0; i < effect_num; i++)
 			{
 				Transform trans2 = EffectManager.GetUIEffect("ef_ui_downenergy_01", shadowSealingGaugeUI.GetGaugeTransform(), -0.001f, 0, null);
-				if (!((Object)trans2 == (Object)null))
+				if (!(trans2 == null))
 				{
 					ui_pos.z = 1f;
-					trans2.position = ui_pos;
-					GameObject obj2 = trans2.gameObject;
+					trans2.set_position(ui_pos);
+					GameObject obj2 = trans2.get_gameObject();
 					TransformInterpolator interp = obj2.AddComponent<TransformInterpolator>();
-					if (!((Object)interp == (Object)null))
+					if (!(interp == null))
 					{
-						interp.Translate(add_value: new Vector3(Random.Range(0f - downEffectAddRandomMax, downEffectAddRandomMax), Random.Range(0f - downEffectAddRandomMax, downEffectAddRandomMax), 0f), _time: downEffectTime, target: Vector3.zero, ease_curve: downEffectEaseCurve, add_curve: downEffectAddCurve);
+						interp.Translate(add_value: new Vector3(Random.Range(0f - downEffectAddRandomMax, downEffectAddRandomMax), Random.Range(0f - downEffectAddRandomMax, downEffectAddRandomMax), 0f), _time: downEffectTime, target: Vector3.get_zero(), ease_curve: downEffectEaseCurve, add_curve: downEffectAddCurve);
 						effects.Add(obj2);
 						playShadowSealingEffects.Add(obj2);
 					}
@@ -665,29 +699,29 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 			yield return (object)new WaitForSeconds(downEffectTime);
 			effects.ForEach(delegate(GameObject obj)
 			{
-				((_003C_DirectionShadowSealingGauge_003Ec__Iterator1F7)/*Error near IL_025b: stateMachine*/)._003C_003Ef__this.playShadowSealingEffects.Remove(obj);
+				((_003C_DirectionShadowSealingGauge_003Ec__Iterator1FE)/*Error near IL_025b: stateMachine*/)._003C_003Ef__this.playShadowSealingEffects.Remove(obj);
 				EffectManager.ReleaseEffect(obj, true, false);
 			});
 		}
 		Transform tmp = EffectManager.GetUIEffect("ef_ui_downgauge_01", shadowSealingGaugeUI.GetGaugeTransform(), -0.001f, 0, null);
-		if ((Object)tmp != (Object)null)
+		if (tmp != null)
 		{
-			tmp.localScale = kShadowSealingGaugeEffectScale;
+			tmp.set_localScale(kShadowSealingGaugeEffectScale);
 		}
 		shadowSealingGaugeUI.SetPercent(per, false);
 		yield return (object)new WaitForSeconds(1f);
 		if (per >= 1f && !targetEnemy.IsDebuffShadowSealing())
 		{
 			Transform trans = EffectManager.GetUIEffect("ef_ui_downgauge_02", shadowSealingGaugeUI.GetGaugeTransform(), -0.001f, 0, null);
-			if ((Object)trans != (Object)null)
+			if (trans != null)
 			{
-				playShadowSealingEffects.Add(trans.gameObject);
+				playShadowSealingEffects.Add(trans.get_gameObject());
 				while (targetEnemy.actionID == (Character.ACTION_ID)18)
 				{
 					yield return (object)null;
 				}
-				playShadowSealingEffects.Remove(trans.gameObject);
-				EffectManager.ReleaseEffect(trans.gameObject, true, false);
+				playShadowSealingEffects.Remove(trans.get_gameObject());
+				EffectManager.ReleaseEffect(trans.get_gameObject(), true, false);
 			}
 		}
 		playShadowSealingEffectCount--;
@@ -695,19 +729,22 @@ public class UIEnemyStatus : MonoBehaviourSingleton<UIEnemyStatus>
 
 	public void SetAegisBarPercent(float percent)
 	{
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 		if (!object.ReferenceEquals(hpFocusFrame, null))
 		{
 			if (percent <= 0f)
 			{
-				aegisGaugeUI.gameObject.SetActive(false);
+				aegisGaugeUI.get_gameObject().SetActive(false);
 				hpFocusFrame.SetActive(false);
 			}
 			else
 			{
 				aegisGaugeUI.SetPercent(percent, false);
-				if (!aegisGaugeUI.gameObject.activeSelf)
+				if (!aegisGaugeUI.get_gameObject().get_activeSelf())
 				{
-					aegisGaugeUI.gameObject.SetActive(true);
+					aegisGaugeUI.get_gameObject().SetActive(true);
 					hpFocusFrame.SetActive(true);
 				}
 			}

@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 public class InGameShopItemSelect : ShopItemSelect
 {
@@ -34,31 +33,32 @@ public class InGameShopItemSelect : ShopItemSelect
 		base.UpdateUI();
 	}
 
-	private void Reposition(bool isPortrait)
+	private unsafe void Reposition(bool isPortrait)
 	{
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Expected O, but got Unknown
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Expected O, but got Unknown
 		GetCtrl(UI.OBJ_FRAME).GetComponent<UIScreenRotationHandler>().InvokeRotate();
 		GetCtrl(UI.OBJ_FRAME).GetComponent<UIRect>().UpdateAnchors();
 		UpdateAnchors();
 		UIScrollView component = GetCtrl(UI.SCR_LIST).GetComponent<UIScrollView>();
 		component.ResetPosition();
 		AppMain i = MonoBehaviourSingleton<AppMain>.I;
-		i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-		{
-			RefreshUI();
-			UIPanel component2 = GetCtrl(UI.SCR_LIST).GetComponent<UIPanel>();
-			component2.Refresh();
-		});
+		i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnScreenRotate(bool isPortrait)
 	{
-		if ((UnityEngine.Object)base.transferUI != (UnityEngine.Object)null)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		if (base.transferUI != null)
 		{
-			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
+			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
 		}
 		else
 		{
-			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
+			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
 		}
 		if (!isInActiveRotate)
 		{

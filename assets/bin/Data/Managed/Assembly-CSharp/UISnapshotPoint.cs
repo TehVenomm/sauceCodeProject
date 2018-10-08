@@ -1,8 +1,8 @@
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Internal/Snapshot Point")]
-public class UISnapshotPoint : MonoBehaviour
+[ExecuteInEditMode]
+public class UISnapshotPoint
 {
 	public bool isOrthographic = true;
 
@@ -17,11 +17,16 @@ public class UISnapshotPoint : MonoBehaviour
 
 	public Texture2D thumbnail;
 
+	public UISnapshotPoint()
+		: this()
+	{
+	}
+
 	private void Start()
 	{
-		if (base.tag != "EditorOnly")
+		if (this.get_tag() != "EditorOnly")
 		{
-			base.tag = "EditorOnly";
+			this.set_tag("EditorOnly");
 		}
 	}
 }

@@ -21,17 +21,20 @@ public class UIBingoPanel : MonoBehaviourSingleton<UIBingoPanel>
 
 	protected override void Awake()
 	{
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		noticeObject.SetActive(false);
-		base.gameObject.SetActive(FieldManager.IsValidInGameNoQuest());
+		this.get_gameObject().SetActive(FieldManager.IsValidInGameNoQuest());
 	}
 
 	private void Update()
 	{
+		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if (!((Object)self == (Object)null))
+			if (!(self == null))
 			{
 				int num = 4;
 				List<IFieldGimmickObject> list = MonoBehaviourSingleton<InGameProgress>.I.fieldGimmickList[num];
@@ -44,7 +47,7 @@ public class UIBingoPanel : MonoBehaviourSingleton<UIBingoPanel>
 						IFieldGimmickObject fieldGimmickObject = list[i];
 						if (fieldGimmickObject != null)
 						{
-							float num3 = Vector3.Distance(fieldGimmickObject.GetTransform().position, self._position);
+							float num3 = Vector3.Distance(fieldGimmickObject.GetTransform().get_position(), self._position);
 							if (num3 < 10f && num3 < num2)
 							{
 								bingoReq = fieldGimmickObject;
@@ -52,7 +55,7 @@ public class UIBingoPanel : MonoBehaviourSingleton<UIBingoPanel>
 							}
 						}
 					}
-					if (bingo != bingoReq && !noticeTween.isActiveAndEnabled)
+					if (bingo != bingoReq && !noticeTween.get_isActiveAndEnabled())
 					{
 						if (noticeTween.value == 0f)
 						{
@@ -79,9 +82,16 @@ public class UIBingoPanel : MonoBehaviourSingleton<UIBingoPanel>
 
 	private void LateUpdate()
 	{
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
 		if (bingo != null)
 		{
-			Vector3 position = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToScreenPoint(bingo.GetTransform().position + offset));
+			Vector3 position = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToScreenPoint(bingo.GetTransform().get_position() + offset));
 			if (position.z >= 0f)
 			{
 				position.z = 0f;
@@ -90,7 +100,7 @@ public class UIBingoPanel : MonoBehaviourSingleton<UIBingoPanel>
 			{
 				position.z = -100f;
 			}
-			base._transform.position = position;
+			base._transform.set_position(position);
 		}
 	}
 }

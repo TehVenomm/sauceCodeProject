@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class CoopStagePacketSender : MonoBehaviour
+public class CoopStagePacketSender
 {
 	private CoopStage coopStage
 	{
@@ -9,9 +9,15 @@ public class CoopStagePacketSender : MonoBehaviour
 		set;
 	}
 
+	public CoopStagePacketSender()
+		: this()
+	{
+	}
+
 	protected virtual void Awake()
 	{
-		coopStage = base.gameObject.GetComponent<CoopStage>();
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		coopStage = this.get_gameObject().GetComponent<CoopStage>();
 	}
 
 	protected virtual void Start()
@@ -41,7 +47,7 @@ public class CoopStagePacketSender : MonoBehaviour
 
 	public void SendStagePlayerPop(Player player, int to_client_id = 0)
 	{
-		if (!((UnityEngine.Object)player == (UnityEngine.Object)null))
+		if (!(player == null))
 		{
 			if (player.IsCoopNone())
 			{
@@ -51,10 +57,10 @@ public class CoopStagePacketSender : MonoBehaviour
 			coop_Model_StagePlayerPop.id = 1002;
 			coop_Model_StagePlayerPop.sid = player.id;
 			coop_Model_StagePlayerPop.isSelf = (player is Self);
-			NonPlayer x = player as NonPlayer;
+			NonPlayer nonPlayer = player as NonPlayer;
 			if (player.createInfo != null)
 			{
-				if ((UnityEngine.Object)x == (UnityEngine.Object)null)
+				if (nonPlayer == null)
 				{
 					coop_Model_StagePlayerPop.charaInfo = player.createInfo.charaInfo;
 				}
@@ -65,8 +71,12 @@ public class CoopStagePacketSender : MonoBehaviour
 		}
 	}
 
-	public void SendStageInfo(int to_client_id = 0)
+	public unsafe void SendStageInfo(int to_client_id = 0)
 	{
+		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_StageInfo model = new Coop_Model_StageInfo();
 		model.id = 1002;
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
@@ -82,6 +92,7 @@ public class CoopStagePacketSender : MonoBehaviour
 		{
 			MonoBehaviourSingleton<StageObjectManager>.I.gimmickList.ForEach(delegate(StageObject o)
 			{
+				//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 				if (o.IsCoopNone())
 				{
 					o.SetCoopMode(StageObject.COOP_MODE_TYPE.ORIGINAL, 0);
@@ -89,14 +100,14 @@ public class CoopStagePacketSender : MonoBehaviour
 				Coop_Model_StageInfo.GimmickInfo item = new Coop_Model_StageInfo.GimmickInfo
 				{
 					id = o.id,
-					enable = o.gameObject.activeSelf
+					enable = o.get_gameObject().get_activeSelf()
 				};
 				model.gimmicks.Add(item);
 			});
-			model.enemyPos = Vector3.zero;
-			if ((UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.boss != (UnityEngine.Object)null)
+			model.enemyPos = Vector3.get_zero();
+			if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
 			{
-				model.enemyPos = MonoBehaviourSingleton<StageObjectManager>.I.boss._transform.position;
+				model.enemyPos = MonoBehaviourSingleton<StageObjectManager>.I.boss._transform.get_position();
 			}
 		}
 		if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && MonoBehaviourSingleton<InGameProgress>.IsValid())
@@ -119,7 +130,7 @@ public class CoopStagePacketSender : MonoBehaviour
 				for (int count = MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList.Count; i < count; i++)
 				{
 					FieldWaveTargetObject fieldWaveTargetObject = MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList[i] as FieldWaveTargetObject;
-					if (!((UnityEngine.Object)fieldWaveTargetObject == (UnityEngine.Object)null))
+					if (!(fieldWaveTargetObject == null))
 					{
 						Coop_Model_StageInfo.WaveTargetInfo waveTargetInfo = new Coop_Model_StageInfo.WaveTargetInfo();
 						waveTargetInfo.id = fieldWaveTargetObject.id;
@@ -130,20 +141,17 @@ public class CoopStagePacketSender : MonoBehaviour
 				}
 			}
 		}
-		Send(model, true, to_client_id, null, delegate(Coop_Model_Base send_model)
+		Coop_Model_StageInfo model2 = model;
+		if (_003C_003Ef__am_0024cache1 == null)
 		{
-			Coop_Model_StageInfo coop_Model_StageInfo = send_model as Coop_Model_StageInfo;
-			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
-			{
-				coop_Model_StageInfo.elapsedTime = MonoBehaviourSingleton<InGameProgress>.I.GetElapsedTime();
-			}
-			return true;
-		});
+			_003C_003Ef__am_0024cache1 = new Func<Coop_Model_Base, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		Send(model2, true, to_client_id, null, _003C_003Ef__am_0024cache1);
 	}
 
 	public void SendObjectInfo(StageObject _stgObj, StageObject.COOP_MODE_TYPE _type, int _to_client_id = 0)
 	{
-		if (!((UnityEngine.Object)_stgObj == (UnityEngine.Object)null))
+		if (!(_stgObj == null))
 		{
 			Coop_Model_StageObjectInfo coop_Model_StageObjectInfo = new Coop_Model_StageObjectInfo();
 			coop_Model_StageObjectInfo.StageObjectID = _stgObj.id;

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SkyDomeWeatherController : MonoBehaviour
+public class SkyDomeWeatherController
 {
 	[SerializeField]
 	private Renderer[] originalRenderer;
@@ -10,6 +10,11 @@ public class SkyDomeWeatherController : MonoBehaviour
 
 	private int MATERIALCOLOR_PROPERTY_KEY;
 
+	public SkyDomeWeatherController()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
 		MATERIALCOLOR_PROPERTY_KEY = Shader.PropertyToID("_MainColor");
@@ -18,20 +23,26 @@ public class SkyDomeWeatherController : MonoBehaviour
 
 	public void UpdateRenderers(float rate)
 	{
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
 		if (originalRenderer != null)
 		{
 			for (int i = 0; i < originalRenderer.Length; i++)
 			{
-				if (!((Object)originalRenderer[i] == (Object)null))
+				if (!(originalRenderer[i] == null))
 				{
-					Material[] sharedMaterials = originalRenderer[i].sharedMaterials;
-					foreach (Material material in sharedMaterials)
+					Material[] sharedMaterials = originalRenderer[i].get_sharedMaterials();
+					foreach (Material val in sharedMaterials)
 					{
-						if (!((Object)material == (Object)null) && material.HasProperty(MATERIALCOLOR_PROPERTY_KEY))
+						if (!(val == null) && val.HasProperty(MATERIALCOLOR_PROPERTY_KEY))
 						{
-							Color color = material.GetColor(MATERIALCOLOR_PROPERTY_KEY);
+							Color color = val.GetColor(MATERIALCOLOR_PROPERTY_KEY);
 							color.a = 1f - rate;
-							material.SetColor(MATERIALCOLOR_PROPERTY_KEY, color);
+							val.SetColor(MATERIALCOLOR_PROPERTY_KEY, color);
 						}
 					}
 				}
@@ -41,17 +52,17 @@ public class SkyDomeWeatherController : MonoBehaviour
 		{
 			for (int k = 0; k < afterRenderer.Length; k++)
 			{
-				if (!((Object)afterRenderer[k] == (Object)null))
+				if (!(afterRenderer[k] == null))
 				{
-					Material[] materials = afterRenderer[k].materials;
-					for (int l = 0; l < afterRenderer[k].materials.Length; l++)
+					Material[] materials = afterRenderer[k].get_materials();
+					for (int l = 0; l < afterRenderer[k].get_materials().Length; l++)
 					{
-						Material material2 = afterRenderer[k].sharedMaterials[l];
-						if (!((Object)material2 == (Object)null) && material2.HasProperty(MATERIALCOLOR_PROPERTY_KEY))
+						Material val2 = afterRenderer[k].get_sharedMaterials()[l];
+						if (!(val2 == null) && val2.HasProperty(MATERIALCOLOR_PROPERTY_KEY))
 						{
-							Color color2 = material2.GetColor(MATERIALCOLOR_PROPERTY_KEY);
+							Color color2 = val2.GetColor(MATERIALCOLOR_PROPERTY_KEY);
 							color2.a = rate;
-							material2.SetColor(MATERIALCOLOR_PROPERTY_KEY, color2);
+							val2.SetColor(MATERIALCOLOR_PROPERTY_KEY, color2);
 						}
 					}
 				}

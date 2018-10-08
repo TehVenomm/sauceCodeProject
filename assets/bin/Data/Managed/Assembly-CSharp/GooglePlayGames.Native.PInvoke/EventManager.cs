@@ -63,11 +63,15 @@ namespace GooglePlayGames.Native.PInvoke
 				return GooglePlayGames.Native.Cwrapper.EventManager.EventManager_FetchAllResponse_GetStatus(SelfPtr());
 			}
 
-			internal List<NativeEvent> Data()
+			internal unsafe List<NativeEvent> Data()
 			{
-				IntPtr[] source = PInvokeUtilities.OutParamsToArray((IntPtr[] out_arg, UIntPtr out_size) => GooglePlayGames.Native.Cwrapper.EventManager.EventManager_FetchAllResponse_GetData(SelfPtr(), out_arg, out_size));
-				return (from ptr in source
-				select new NativeEvent(ptr)).ToList();
+				IntPtr[] array = PInvokeUtilities.OutParamsToArray((IntPtr[] out_arg, UIntPtr out_size) => GooglePlayGames.Native.Cwrapper.EventManager.EventManager_FetchAllResponse_GetData(SelfPtr(), out_arg, out_size));
+				IntPtr[] source = array;
+				if (_003C_003Ef__am_0024cache0 == null)
+				{
+					_003C_003Ef__am_0024cache0 = new Func<IntPtr, NativeEvent>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				return source.Select<IntPtr, NativeEvent>(_003C_003Ef__am_0024cache0).ToList();
 			}
 
 			internal bool RequestSucceeded()
@@ -97,9 +101,9 @@ namespace GooglePlayGames.Native.PInvoke
 			mServices = Misc.CheckNotNull(services);
 		}
 
-		internal void FetchAll(Types.DataSource source, Action<FetchAllResponse> callback)
+		internal unsafe void FetchAll(Types.DataSource source, Action<FetchAllResponse> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.EventManager.EventManager_FetchAll(mServices.AsHandle(), source, InternalFetchAllCallback, Callbacks.ToIntPtr(callback, FetchAllResponse.FromPointer));
+			GooglePlayGames.Native.Cwrapper.EventManager.EventManager_FetchAll(mServices.AsHandle(), source, InternalFetchAllCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, FetchAllResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.EventManager.FetchAllCallback))]
@@ -108,9 +112,9 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("EventManager#FetchAllCallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal void Fetch(Types.DataSource source, string eventId, Action<FetchResponse> callback)
+		internal unsafe void Fetch(Types.DataSource source, string eventId, Action<FetchResponse> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.EventManager.EventManager_Fetch(mServices.AsHandle(), source, eventId, InternalFetchCallback, Callbacks.ToIntPtr(callback, FetchResponse.FromPointer));
+			GooglePlayGames.Native.Cwrapper.EventManager.EventManager_Fetch(mServices.AsHandle(), source, eventId, InternalFetchCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, FetchResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.EventManager.FetchCallback))]

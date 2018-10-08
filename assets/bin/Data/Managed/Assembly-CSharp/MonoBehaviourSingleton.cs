@@ -8,10 +8,11 @@ public class MonoBehaviourSingleton<T> : DisableNotifyMonoBehaviour where T : Di
 	{
 		get
 		{
-			if ((Object)instance == (Object)null)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			if (instance == null)
 			{
-				instance = (T)Object.FindObjectOfType(typeof(T));
-				if ((Object)instance == (Object)null)
+				instance = (T)(object)Object.FindObjectOfType(typeof(T));
+				if (instance == null)
 				{
 					Log.Error(LOG.SYSTEM, typeof(T) + " is nothing");
 				}
@@ -26,7 +27,7 @@ public class MonoBehaviourSingleton<T> : DisableNotifyMonoBehaviour where T : Di
 		{
 			_OnDestroy();
 		}
-		if ((Object)instance == (Object)this)
+		if (instance == this)
 		{
 			OnDestroySingleton();
 			instance = (T)null;
@@ -49,7 +50,7 @@ public class MonoBehaviourSingleton<T> : DisableNotifyMonoBehaviour where T : Di
 
 	protected bool CheckInstance()
 	{
-		if ((Object)this == (Object)I)
+		if (this == I)
 		{
 			return true;
 		}
@@ -59,6 +60,6 @@ public class MonoBehaviourSingleton<T> : DisableNotifyMonoBehaviour where T : Di
 
 	public static bool IsValid()
 	{
-		return (Object)instance != (Object)null;
+		return instance != null;
 	}
 }

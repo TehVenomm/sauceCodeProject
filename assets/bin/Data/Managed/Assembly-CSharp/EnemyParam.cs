@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EnemyParam : MonoBehaviour
+public class EnemyParam
 {
 	public StageObject.StampInfo[] stampInfos;
 
@@ -163,8 +163,15 @@ public class EnemyParam : MonoBehaviour
 	[Tooltip("拘束/凍結のダメ\u30fcジモ\u30fcション指定割合(0.0〜1.0)")]
 	public float stopMotionByDebuffNormalizedTime = -1f;
 
+	public EnemyParam()
+		: this()
+	{
+	}
+
 	public void SetParam(Enemy targetEnemy)
 	{
+		//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
 		targetEnemy.SetResidentEffectSetting(residentEffectSetting);
 		targetEnemy.SetAttackInfos(Utility.CreateMergedArray((AttackInfo[])attackHitInfos, (AttackInfo[])attackContinuationInfos));
 		targetEnemy.convertAttackInfos = Utility.CreateMergedArray((AttackInfo[])convertAttackHitInfos, (AttackInfo[])convertAttackContinuationInfos);
@@ -220,10 +227,10 @@ public class EnemyParam : MonoBehaviour
 		targetEnemy.stopMotionByDebuffNormalizedTime = stopMotionByDebuffNormalizedTime;
 		if (stampInfos != null && stampInfos.Length > 0)
 		{
-			CharacterStampCtrl characterStampCtrl = base.gameObject.GetComponent<CharacterStampCtrl>();
-			if ((Object)characterStampCtrl == (Object)null)
+			CharacterStampCtrl characterStampCtrl = this.get_gameObject().GetComponent<CharacterStampCtrl>();
+			if (characterStampCtrl == null)
 			{
-				characterStampCtrl = base.gameObject.AddComponent<CharacterStampCtrl>();
+				characterStampCtrl = this.get_gameObject().AddComponent<CharacterStampCtrl>();
 			}
 			characterStampCtrl.Init(stampInfos, targetEnemy, false);
 		}

@@ -6,12 +6,14 @@ public class UIAnimationGauge : UIHGauge
 
 	private void Awake()
 	{
-		_mat = GetComponent<MeshRenderer>().material;
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Expected O, but got Unknown
+		_mat = this.GetComponent<MeshRenderer>().get_material();
 	}
 
 	protected override void UpdateGauge()
 	{
-		if (!((Object)_mat == (Object)null))
+		if (!(_mat == null))
 		{
 			_mat.SetFloat("_Ratio", base.nowPercent);
 		}

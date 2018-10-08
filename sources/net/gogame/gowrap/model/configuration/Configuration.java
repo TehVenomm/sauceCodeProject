@@ -44,7 +44,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -70,7 +70,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -117,7 +117,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -130,20 +130,20 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
                 public void setWhatsNewUrl(java.lang.String r1) {
                     /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables already executed
-	at jadx.core.dex.visitors.ssa.SSATransform.renameVariables(SSATransform.java:120)
-	at jadx.core.dex.visitors.ssa.SSATransform.process(SSATransform.java:52)
-	at jadx.core.dex.visitors.ssa.SSATransform.visit(SSATransform.java:42)
+Error: java.lang.NullPointerException
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -169,7 +169,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -195,7 +195,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -221,7 +221,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -234,20 +234,20 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
                 public void setTwitterUrl(java.lang.String r1) {
                     /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables already executed
-	at jadx.core.dex.visitors.ssa.SSATransform.renameVariables(SSATransform.java:120)
-	at jadx.core.dex.visitors.ssa.SSATransform.process(SSATransform.java:52)
-	at jadx.core.dex.visitors.ssa.SSATransform.visit(SSATransform.java:42)
+Error: java.lang.NullPointerException
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -273,7 +273,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -286,20 +286,20 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
                 public void setInstagramUrl(java.lang.String r1) {
                     /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables already executed
-	at jadx.core.dex.visitors.ssa.SSATransform.renameVariables(SSATransform.java:120)
-	at jadx.core.dex.visitors.ssa.SSATransform.process(SSATransform.java:52)
-	at jadx.core.dex.visitors.ssa.SSATransform.visit(SSATransform.java:42)
+Error: java.lang.NullPointerException
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -312,20 +312,20 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
                 public java.lang.String getYoutubeUrl() {
                     /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables already executed
-	at jadx.core.dex.visitors.ssa.SSATransform.renameVariables(SSATransform.java:120)
-	at jadx.core.dex.visitors.ssa.SSATransform.process(SSATransform.java:52)
-	at jadx.core.dex.visitors.ssa.SSATransform.visit(SSATransform.java:42)
+Error: java.lang.NullPointerException
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -338,20 +338,20 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
                 public void setYoutubeUrl(java.lang.String r1) {
                     /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables already executed
-	at jadx.core.dex.visitors.ssa.SSATransform.renameVariables(SSATransform.java:120)
-	at jadx.core.dex.visitors.ssa.SSATransform.process(SSATransform.java:52)
-	at jadx.core.dex.visitors.ssa.SSATransform.visit(SSATransform.java:42)
+Error: java.lang.NullPointerException
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -377,7 +377,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -390,20 +390,20 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
                 public void setForumUrl(java.lang.String r1) {
                     /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables already executed
-	at jadx.core.dex.visitors.ssa.SSATransform.renameVariables(SSATransform.java:120)
-	at jadx.core.dex.visitors.ssa.SSATransform.process(SSATransform.java:52)
-	at jadx.core.dex.visitors.ssa.SSATransform.visit(SSATransform.java:42)
+Error: java.lang.NullPointerException
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -429,7 +429,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -442,20 +442,20 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
                 public void setWikiUrl(java.lang.String r1) {
                     /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables already executed
-	at jadx.core.dex.visitors.ssa.SSATransform.renameVariables(SSATransform.java:120)
-	at jadx.core.dex.visitors.ssa.SSATransform.process(SSATransform.java:52)
-	at jadx.core.dex.visitors.ssa.SSATransform.visit(SSATransform.java:42)
+Error: java.lang.NullPointerException
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -483,7 +483,7 @@ Error: java.lang.NullPointerException
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                 /*
                 r0 = this;
@@ -509,7 +509,7 @@ Error: java.util.ConcurrentModificationException
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                 /*
                 r6 = this;
@@ -594,7 +594,7 @@ Error: java.lang.NullPointerException
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                 /*
                 r1 = this;
@@ -619,7 +619,7 @@ Error: java.lang.NullPointerException
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                 /*
                 r0 = this;
@@ -632,19 +632,19 @@ Error: java.lang.NullPointerException
             public java.util.List<java.lang.String> getSupportedLocales() {
                 /* JADX: method processing error */
 /*
-Error: java.lang.NullPointerException
-	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
-	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
+Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables already executed
+	at jadx.core.dex.visitors.ssa.SSATransform.renameVariables(SSATransform.java:120)
+	at jadx.core.dex.visitors.ssa.SSATransform.process(SSATransform.java:52)
+	at jadx.core.dex.visitors.ssa.SSATransform.visit(SSATransform.java:42)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
-	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                 /*
                 r1 = this;
@@ -669,7 +669,7 @@ Error: java.lang.NullPointerException
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                 /*
                 r0 = this;
@@ -694,7 +694,7 @@ Error: java.lang.NullPointerException
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                 /*
                 r1 = this;
@@ -719,7 +719,7 @@ Error: java.lang.NullPointerException
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                 /*
                 r0 = this;
@@ -732,19 +732,19 @@ Error: java.lang.NullPointerException
             public java.lang.Boolean getSlideIn() {
                 /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables already executed
-	at jadx.core.dex.visitors.ssa.SSATransform.renameVariables(SSATransform.java:120)
-	at jadx.core.dex.visitors.ssa.SSATransform.process(SSATransform.java:52)
-	at jadx.core.dex.visitors.ssa.SSATransform.visit(SSATransform.java:42)
+Error: java.lang.NullPointerException
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                 /*
                 r1 = this;
@@ -769,7 +769,7 @@ Error: java.lang.NullPointerException
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
                 /*
                 r0 = this;
@@ -796,7 +796,7 @@ Error: java.lang.NullPointerException
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
             /*
             r0 = this;
@@ -824,7 +824,7 @@ Error: java.lang.NullPointerException
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
             /*
             r2 = this;
@@ -860,7 +860,7 @@ Error: java.lang.NullPointerException
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
             /*
             r1 = this;
@@ -884,7 +884,7 @@ Error: java.lang.NullPointerException
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
             /*
             r0 = this;

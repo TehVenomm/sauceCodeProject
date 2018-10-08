@@ -22,9 +22,9 @@ public class WorldMapCameraController : DraggableCamera
 	{
 		get
 		{
-			if ((Object)__camera == (Object)null)
+			if (__camera == null)
 			{
-				__camera = GetComponent<Camera>();
+				__camera = this.GetComponent<Camera>();
 			}
 			return __camera;
 		}
@@ -34,14 +34,14 @@ public class WorldMapCameraController : DraggableCamera
 
 	protected float cameraFovMax => MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.cameraFovMax;
 
-	protected override Plane hitPlane => new Plane(Vector3.back, 1f);
+	protected override Plane hitPlane => new Plane(Vector3.get_back(), 1f);
 
 	private void Awake()
 	{
 		base.distance = MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.cameraManualDistance;
 		base.distanceManual = base.distance;
 		CreateRenderTexture(false);
-		_camera.fieldOfView = cameraFovMin;
+		_camera.set_fieldOfView(cameraFovMin);
 		isInteractive_ = true;
 		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
 		{
@@ -56,32 +56,59 @@ public class WorldMapCameraController : DraggableCamera
 
 	private void OnDestroy()
 	{
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<GameSceneManager>.IsValid() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
 		{
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= CreateRenderTexture;
 		}
-		if ((Object)_camera.targetTexture != (Object)null)
+		if (_camera.get_targetTexture() != null)
 		{
-			RenderTexture.ReleaseTemporary(_camera.targetTexture);
-			_camera.targetTexture = null;
+			RenderTexture.ReleaseTemporary(_camera.get_targetTexture());
+			_camera.set_targetTexture(null);
 		}
 	}
 
 	protected override Vector3 GetCameraMove(Vector2 old_screen_pos, Vector2 now_screen_pos)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 		Plane hitPlane = this.hitPlane;
-		Ray ray = _camera.ScreenPointToRay(old_screen_pos.ToVector3XY());
-		Ray ray2 = _camera.ScreenPointToRay(now_screen_pos.ToVector3XY());
-		if (!hitPlane.Raycast(ray, out float enter))
+		Ray val = _camera.ScreenPointToRay(old_screen_pos.ToVector3XY());
+		Ray val2 = _camera.ScreenPointToRay(now_screen_pos.ToVector3XY());
+		float num = default(float);
+		if (!hitPlane.Raycast(val, ref num))
 		{
-			return Vector3.zero;
+			return Vector3.get_zero();
 		}
-		if (!hitPlane.Raycast(ray2, out float enter2))
+		float num2 = default(float);
+		if (!hitPlane.Raycast(val2, ref num2))
 		{
-			return Vector3.zero;
+			return Vector3.get_zero();
 		}
-		Vector3 point = ray.GetPoint(enter);
-		Vector3 point2 = ray2.GetPoint(enter2);
+		Vector3 point = val.GetPoint(num);
+		Vector3 point2 = val2.GetPoint(num2);
 		Vector3 result = point2 - point;
 		result.x = 0f - result.x;
 		result.y = 0f - result.y;
@@ -91,6 +118,7 @@ public class WorldMapCameraController : DraggableCamera
 
 	protected override Vector3 ClampEnableMapArea(Vector3 pos)
 	{
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 		float num = 0f - MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.cameraMoveClampLeft;
 		float cameraMoveClampRight = MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.cameraMoveClampRight;
 		float cameraMoveClampUpper = MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.cameraMoveClampUpper;
@@ -116,18 +144,33 @@ public class WorldMapCameraController : DraggableCamera
 
 	protected override void OnPinch(InputManager.TouchInfo touch_info0, InputManager.TouchInfo touch_info1, float pinch_length)
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		if (IsInteractive() && touch_info0 != null && touch_info1 != null)
 		{
 			Plane hitPlane = this.hitPlane;
-			cameraMove = Vector3.zero;
+			cameraMove = Vector3.get_zero();
 			Vector2 vector = (touch_info0.position + touch_info1.position) * 0.5f;
-			Ray ray = _camera.ScreenPointToRay(vector.ToVector3XY());
-			if (hitPlane.Raycast(ray, out float _))
+			Ray val = _camera.ScreenPointToRay(vector.ToVector3XY());
+			float num = default(float);
+			if (hitPlane.Raycast(val, ref num))
 			{
 				GlobalSettingsManager.WorldMapParam worldMapParam = MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam;
 				fov -= pinch_length * worldMapParam.cameraPinchSpeed;
 				fov = Mathf.Clamp(fov, worldMapParam.cameraFovMin, worldMapParam.cameraFovMax);
-				_camera.fieldOfView = fov;
+				_camera.set_fieldOfView(fov);
 				UpdateCameraTransform();
 			}
 		}
@@ -140,17 +183,26 @@ public class WorldMapCameraController : DraggableCamera
 
 	protected override void UpdateCameraTransform()
 	{
+		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		base.targetPos = ClampEnableMapArea(base.targetPos);
-		cameraTransform.position = base.targetPos - cameraTransform.forward * base.distance;
+		cameraTransform.set_position(base.targetPos - cameraTransform.get_forward() * base.distance);
 	}
 
 	public void Restore()
 	{
-		if ((Object)null != (Object)_camera.targetTexture)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		if (null != _camera.get_targetTexture())
 		{
-			RenderTexture.ReleaseTemporary(_camera.targetTexture);
-			_camera.targetTexture = null;
+			RenderTexture.ReleaseTemporary(_camera.get_targetTexture());
+			_camera.set_targetTexture(null);
 		}
-		_camera.targetTexture = RenderTexture.GetTemporary(Screen.width, Screen.height);
+		_camera.set_targetTexture(RenderTexture.GetTemporary(Screen.get_width(), Screen.get_height()));
 	}
 }

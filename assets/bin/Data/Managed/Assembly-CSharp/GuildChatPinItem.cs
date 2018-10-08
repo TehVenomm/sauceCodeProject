@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class GuildChatPinItem : MonoBehaviour
+public class GuildChatPinItem
 {
 	private const int MIN_HEIGHT = 140;
 
@@ -41,19 +41,34 @@ public class GuildChatPinItem : MonoBehaviour
 
 	public int GetHeight => m_SpriteBase.height;
 
+	public GuildChatPinItem()
+		: this()
+	{
+	}
+
 	public void ShowPinMsg(string userPin, string pinMsg)
 	{
-		m_TexStamp.gameObject.SetActive(false);
-		m_LabelMessage.gameObject.SetActive(true);
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+		m_TexStamp.get_gameObject().SetActive(false);
+		m_LabelMessage.get_gameObject().SetActive(true);
 		m_LabelMessage.text = pinMsg;
 		m_LabelSender.text = userPin;
 		Vector2 printedSize = m_LabelMessage.printedSize;
 		int num = (int)(printedSize.y + 50f);
 		m_SpriteBase.height = ((num <= 140) ? 140 : num);
-		m_BoxCollider.center = new Vector3(0f, (0f - (float)m_SpriteBase.height) / 2f, 0f);
-		Transform transform = m_UnPinButton.transform;
-		Vector3 localPosition = m_UnPinButton.transform.localPosition;
-		transform.localPosition = new Vector3(localPosition.x, 0f - ((float)m_SpriteBase.height - 35f), 0f);
+		m_BoxCollider.set_center(new Vector3(0f, (0f - (float)m_SpriteBase.height) / 2f, 0f));
+		Transform transform = m_UnPinButton.get_transform();
+		Vector3 localPosition = m_UnPinButton.get_transform().get_localPosition();
+		transform.set_localPosition(new Vector3(localPosition.x, 0f - ((float)m_SpriteBase.height - 35f), 0f));
 		if (MonoBehaviourSingleton<GuildManager>.I.guildData != null && MonoBehaviourSingleton<GuildManager>.I.guildData.clanMasterId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
 			canUnPinMsg = true;
@@ -62,15 +77,22 @@ public class GuildChatPinItem : MonoBehaviour
 
 	public void ShowPinStamp(string userPin, int stampId)
 	{
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
 		m_LabelMessage.text = string.Empty;
 		m_LabelSender.text = userPin;
-		m_LabelMessage.gameObject.SetActive(false);
+		m_LabelMessage.get_gameObject().SetActive(false);
 		RequestLoadStamp(stampId);
 		m_SpriteBase.height = 140;
-		m_BoxCollider.center = new Vector3(0f, (0f - (float)m_SpriteBase.height) / 2f, 0f);
-		Transform transform = m_UnPinButton.transform;
-		Vector3 localPosition = m_UnPinButton.transform.localPosition;
-		transform.localPosition = new Vector3(localPosition.x, 0f - ((float)m_SpriteBase.height - 35f), 0f);
+		m_BoxCollider.set_center(new Vector3(0f, (0f - (float)m_SpriteBase.height) / 2f, 0f));
+		Transform transform = m_UnPinButton.get_transform();
+		Vector3 localPosition = m_UnPinButton.get_transform().get_localPosition();
+		transform.set_localPosition(new Vector3(localPosition.x, 0f - ((float)m_SpriteBase.height - 35f), 0f));
 		if (MonoBehaviourSingleton<GuildManager>.I.guildData != null && MonoBehaviourSingleton<GuildManager>.I.guildData.clanMasterId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
 			canUnPinMsg = true;
@@ -79,11 +101,13 @@ public class GuildChatPinItem : MonoBehaviour
 
 	private void RequestLoadStamp(int stampId)
 	{
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		CancelLoadStamp();
 		m_CoroutineLoadStamp = CoroutineLoadStamp(stampId);
-		if (base.gameObject.activeInHierarchy)
+		if (this.get_gameObject().get_activeInHierarchy())
 		{
-			StartCoroutine(_Update());
+			this.StartCoroutine(_Update());
 		}
 	}
 
@@ -95,10 +119,10 @@ public class GuildChatPinItem : MonoBehaviour
 		{
 			yield return (object)null;
 		}
-		if (lo_stamp.loadedObject != (Object)null)
+		if (lo_stamp.loadedObject != null)
 		{
 			Texture2D stamp = lo_stamp.loadedObject as Texture2D;
-			m_TexStamp.gameObject.SetActive(true);
+			m_TexStamp.get_gameObject().SetActive(true);
 			m_TexStamp.mainTexture = stamp;
 		}
 		m_CoroutineLoadStamp = null;
@@ -106,10 +130,11 @@ public class GuildChatPinItem : MonoBehaviour
 
 	private void CancelLoadStamp()
 	{
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		if (m_CoroutineLoadStamp != null)
 		{
 			m_CoroutineLoadStamp = null;
-			m_TexStamp.gameObject.SetActive(false);
+			m_TexStamp.get_gameObject().SetActive(false);
 		}
 	}
 
@@ -123,30 +148,37 @@ public class GuildChatPinItem : MonoBehaviour
 
 	private void Update()
 	{
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		if (checkLongPress)
 		{
-			float num = Vector2.Distance(mousePosition, Input.mousePosition);
+			float num = Vector2.Distance(mousePosition, Vector2.op_Implicit(Input.get_mousePosition()));
 			if (num > 10f)
 			{
 				checkLongPress = false;
 			}
-			else if (Time.time - startPressTime > 1f)
+			else if (Time.get_time() - startPressTime > 1f)
 			{
 				checkLongPress = false;
-				m_UnPinButton.gameObject.SetActive(true);
+				m_UnPinButton.get_gameObject().SetActive(true);
 			}
 		}
 	}
 
 	private void OnPress(bool isDown)
 	{
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		if (canUnPinMsg)
 		{
 			if (isDown)
 			{
 				checkLongPress = true;
-				startPressTime = Time.time;
-				mousePosition = Input.mousePosition;
+				startPressTime = Time.get_time();
+				mousePosition = Vector2.op_Implicit(Input.get_mousePosition());
 			}
 			else
 			{
@@ -157,6 +189,7 @@ public class GuildChatPinItem : MonoBehaviour
 
 	public void HideUnPinButton()
 	{
-		m_UnPinButton.gameObject.SetActive(false);
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		m_UnPinButton.get_gameObject().SetActive(false);
 	}
 }

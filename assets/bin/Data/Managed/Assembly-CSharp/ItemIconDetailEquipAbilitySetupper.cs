@@ -4,13 +4,14 @@ public class ItemIconDetailEquipAbilitySetupper : ItemIconDetailEquipSetupper
 {
 	public override void Set(object[] data)
 	{
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		base.Set((object[])null);
 		SkillSlotUIData[] slot_data = data[1] as SkillSlotUIData[];
 		bool is_show_main_status = (bool)data[2];
 		infoRootAry[0].SetActive(true);
-		if ((Object)gridEquipMark == (Object)null)
+		if (gridEquipMark == null)
 		{
-			gridEquipMark = spEquipIndex.gameObject.GetComponentInParent<UIGrid>();
+			gridEquipMark = spEquipIndex.get_gameObject().GetComponentInParent<UIGrid>();
 		}
 		if (data[0] is EquipItemInfo)
 		{
@@ -58,20 +59,20 @@ public class ItemIconDetailEquipAbilitySetupper : ItemIconDetailEquipSetupper
 			SetName(item.tableData.name);
 			bool enabled = true;
 			EquipItemAbility[] ability = item.ability;
-			objAbilityRoot.GetComponentsInChildren(Temporary.uiLabelList);
+			objAbilityRoot.GetComponentsInChildren<UILabel>(Temporary.uiLabelList);
 			int i = 0;
 			for (int count = Temporary.uiLabelList.Count; i < count; i++)
 			{
 				UILabel uILabel = Temporary.uiLabelList[i];
-				uILabel.enabled = (i < ability.Length && ability[i].id != 0 && ability[i].ap > 0);
-				if (uILabel.enabled)
+				uILabel.set_enabled(i < ability.Length && ability[i].id != 0 && ability[i].ap > 0);
+				if (uILabel.get_enabled())
 				{
 					uILabel.text = ability[i].GetNameAndAP();
 					enabled = false;
 				}
 			}
 			Temporary.uiLabelList.Clear();
-			lblNonAbility.enabled = enabled;
+			lblNonAbility.set_enabled(enabled);
 		}
 	}
 }

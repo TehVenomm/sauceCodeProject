@@ -96,8 +96,18 @@ public class SkillGrowDirector : AnimationDirector
 		Init();
 	}
 
-	public void Init()
+	public unsafe void Init()
 	{
+		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Expected O, but got Unknown
+		//IL_00ae: Expected O, but got Unknown
+		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Expected O, but got Unknown
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
 		if (!initialized)
 		{
 			Play("MainAnim_Init", null, 0f);
@@ -109,16 +119,16 @@ public class SkillGrowDirector : AnimationDirector
 			else
 			{
 				mainCameraBlur = directionCameraBlur;
-				useCamera.gameObject.AddComponent<RenderTargetCacher>();
+				useCamera.get_gameObject().AddComponent<RenderTargetCacher>();
 			}
 			origDownsample = mainCameraBlur.downSample;
 			mainCameraBlur.downSample = directionCameraBlur.downSample;
-			base.enabled = false;
-			rymFX.OnDisableDelegate = (rymFX.CallbackFunction)Delegate.Combine(rymFX.OnDisableDelegate, new rymFX.CallbackFunction(OnFxDisable));
-			RenderTexture temporary = RenderTexture.GetTemporary(256, 256);
-			magiInnerCamera.targetTexture = temporary;
-			magiInnerQuadRenderer.material.mainTexture = temporary;
-			magiInnerRenderTexture = temporary;
+			this.set_enabled(false);
+			rymFX.OnDisableDelegate = Delegate.Combine((Delegate)rymFX.OnDisableDelegate, (Delegate)new CallbackFunction((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			RenderTexture val = RenderTexture.GetTemporary(256, 256);
+			magiInnerCamera.set_targetTexture(val);
+			magiInnerQuadRenderer.get_material().set_mainTexture(val);
+			magiInnerRenderTexture = val;
 			initialized = true;
 		}
 	}
@@ -135,24 +145,30 @@ public class SkillGrowDirector : AnimationDirector
 	{
 		foreach (GameObject effect in effects)
 		{
-			if ((bool)effect)
+			if (Object.op_Implicit(effect))
 			{
 				effect.GetComponent<rymFX>().PlayRate = 1f;
 			}
 		}
 	}
 
-	protected override void OnDestroy()
+	protected unsafe override void OnDestroy()
 	{
-		rymFX.OnDisableDelegate = (rymFX.CallbackFunction)Delegate.Remove(rymFX.OnDisableDelegate, new rymFX.CallbackFunction(OnFxDisable));
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Expected O, but got Unknown
+		//IL_0011: Expected O, but got Unknown
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		rymFX.OnDisableDelegate = Delegate.Remove((Delegate)rymFX.OnDisableDelegate, (Delegate)new CallbackFunction((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		mainCameraBlur.downSample = origDownsample;
 		RenderTexture.ReleaseTemporary(magiInnerRenderTexture);
 		base.OnDestroy();
 	}
 
-	private IEnumerator TEst()
+	private unsafe IEnumerator TEst()
 	{
-		base.gameObject.AddComponent<ResourceManager>();
+		this.get_gameObject().AddComponent<ResourceManager>();
 		SkillItemInfo s = new SkillItemInfo();
 		s.tableData = new SkillItemTable.SkillItemData();
 		s.tableData.type = SKILL_SLOT_TYPE.ATTACK;
@@ -171,7 +187,7 @@ public class SkillGrowDirector : AnimationDirector
 		LoadObject[] materialLoadObjects = new LoadObject[materials.Length];
 		for (int j = 0; j < materials.Length; j++)
 		{
-			materialLoadObjects[j] = loadingQueue.Load(RESOURCE_CATEGORY.ITEM_MODEL, ResourceName.GetSkillItemModel(UnityEngine.Random.Range(1, 5)), false);
+			materialLoadObjects[j] = loadingQueue.Load(RESOURCE_CATEGORY.ITEM_MODEL, ResourceName.GetSkillItemModel(Random.Range(1, 5)), false);
 		}
 		LoadObject npcTableLoadObject = loadingQueue.Load(RESOURCE_CATEGORY.TABLE, "NPCTable", false);
 		yield return (object)loadingQueue.Wait();
@@ -179,78 +195,115 @@ public class SkillGrowDirector : AnimationDirector
 		if (!Singleton<NPCTable>.IsValid())
 		{
 			Singleton<NPCTable>.Create();
-			Singleton<NPCTable>.I.CreateTable(tableCSV.text);
+			Singleton<NPCTable>.I.CreateTable(tableCSV.get_text());
 		}
 		bool wait = true;
 		NPCTable.NPCData npcData = Singleton<NPCTable>.I.GetNPCData(3);
-		npcData.LoadModel(npcParent.gameObject, false, true, delegate
+		npcData.LoadModel(npcParent.get_gameObject(), false, true, delegate
 		{
-			((_003CTEst_003Ec__Iterator156)/*Error near IL_0251: stateMachine*/)._003C_003Ef__this.SetNPC(((_003CTEst_003Ec__Iterator156)/*Error near IL_0251: stateMachine*/)._003C_003Ef__this.npcParent.gameObject);
-			((_003CTEst_003Ec__Iterator156)/*Error near IL_0251: stateMachine*/)._003Cwait_003E__9 = false;
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			((_003CTEst_003Ec__Iterator15D)/*Error near IL_0251: stateMachine*/)._003C_003Ef__this.SetNPC(((_003CTEst_003Ec__Iterator15D)/*Error near IL_0251: stateMachine*/)._003C_003Ef__this.npcParent.get_gameObject());
+			((_003CTEst_003Ec__Iterator15D)/*Error near IL_0251: stateMachine*/)._003Cwait_003E__9 = false;
 		}, false);
-		GameObject[] materialObjects = new GameObject[materials.Length];
+		GameObject[] materialObjects = (GameObject[])new GameObject[materials.Length];
 		for (int i = 0; i < materials.Length; i++)
 		{
 			Transform item = ResourceUtility.Realizes(materialLoadObjects[i].loadedObject, -1);
-			materialObjects[i] = item.gameObject;
+			materialObjects[i] = item.get_gameObject();
 		}
 		Transform magi = ResourceUtility.Realizes(lo.loadedObject, -1);
 		Transform magiSymbol = ResourceUtility.Realizes(lo_symbol.loadedObject, -1);
-		SetMagiModel(magi.gameObject, magiSymbol.gameObject, materialObjects);
+		SetMagiModel(magi.get_gameObject(), magiSymbol.get_gameObject(), materialObjects);
 		while (wait)
 		{
 			yield return (object)null;
 		}
 		yield return (object)new WaitForSeconds(0.2f);
-		StartDirection(delegate
+		if (_003CTEst_003Ec__Iterator15D._003C_003Ef__am_0024cache13 == null)
 		{
-		});
+			_003CTEst_003Ec__Iterator15D._003C_003Ef__am_0024cache13 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		StartDirection(_003CTEst_003Ec__Iterator15D._003C_003Ef__am_0024cache13);
 	}
 
 	public void SetNPC(GameObject npc)
 	{
-		Utility.Attach(npcParent, npc.transform);
-		Utility.SetLayerWithChildren(npc.transform, npcParent.gameObject.layer);
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Expected O, but got Unknown
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Expected O, but got Unknown
+		Utility.Attach(npcParent, npc.get_transform());
+		Utility.SetLayerWithChildren(npc.get_transform(), npcParent.get_gameObject().get_layer());
 		npcAnimator = npc.GetComponentInChildren<Animator>();
 	}
 
 	public void SetMagiModel(GameObject magi, GameObject symbol, GameObject[] materials)
 	{
-		Utility.Attach(magiObjectParent, magi.transform);
-		Utility.SetLayerWithChildren(magi.transform, magiObjectParent.gameObject.layer);
-		Utility.Attach(magiSymbolParent, symbol.transform);
-		Utility.SetLayerWithChildren(symbol.transform, magiSymbolParent.gameObject.layer);
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Expected O, but got Unknown
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Expected O, but got Unknown
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Expected O, but got Unknown
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Expected O, but got Unknown
+		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0099: Expected O, but got Unknown
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0188: Expected O, but got Unknown
+		//IL_0188: Expected O, but got Unknown
+		//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a4: Expected O, but got Unknown
+		//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b8: Expected O, but got Unknown
+		//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01dc: Expected O, but got Unknown
+		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
+		Utility.Attach(magiObjectParent, magi.get_transform());
+		Utility.SetLayerWithChildren(magi.get_transform(), magiObjectParent.get_gameObject().get_layer());
+		Utility.Attach(magiSymbolParent, symbol.get_transform());
+		Utility.SetLayerWithChildren(symbol.get_transform(), magiSymbolParent.get_gameObject().get_layer());
 		CreateEffect(foundationEffect, foundationEffectParent, magiCamera);
 		RenderTargetCacher component = mainCameraBlur.GetComponent<RenderTargetCacher>();
 		Renderer[] componentsInChildren = magi.GetComponentsInChildren<Renderer>();
 		Renderer[] array = componentsInChildren;
-		foreach (Renderer renderer in array)
+		foreach (Renderer val in array)
 		{
-			Material material = renderer.material;
-			material.SetTexture("_EnvTex", component.GetTexture());
-			material.SetVector("_LightDir", new Vector4(-0.24f, -0.24f, -1.64f, 1f));
+			Material val2 = val.get_material();
+			val2.SetTexture("_EnvTex", component.GetTexture());
+			val2.SetVector("_LightDir", new Vector4(-0.24f, -0.24f, -1.64f, 1f));
 		}
 		component.cacheAfter = true;
-		magiMaterialEffects = new GameObject[materials.Length];
+		magiMaterialEffects = (GameObject[])new GameObject[materials.Length];
 		for (int j = 0; j < materials.Length; j++)
 		{
-			GameObject gameObject = materials[j];
-			gameObject.name = "MAGI";
-			GrowMagiMaterialRotator growMagiMaterialRotator = gameObject.AddComponent<GrowMagiMaterialRotator>();
-			growMagiMaterialRotator.Setup(new Vector3(UnityEngine.Random.value * 360f, UnityEngine.Random.value * 360f, UnityEngine.Random.value * 360f), UnityEngine.Random.Range(180f, 540f));
-			Transform transform = ResourceUtility.Realizes(magiMaterialEffectPrefab, magiEffectParent, magiEffectParent.gameObject.layer);
-			Utility.Attach(transform.GetChild(0), gameObject.transform);
-			Utility.SetLayerWithChildren(gameObject.transform, magiEffectParent.gameObject.layer);
-			magiMaterialEffects[j] = transform.gameObject;
-			Renderer[] componentsInChildren2 = gameObject.GetComponentsInChildren<Renderer>();
+			GameObject val3 = materials[j];
+			val3.set_name("MAGI");
+			GrowMagiMaterialRotator growMagiMaterialRotator = val3.AddComponent<GrowMagiMaterialRotator>();
+			growMagiMaterialRotator.Setup(new Vector3(Random.get_value() * 360f, Random.get_value() * 360f, Random.get_value() * 360f), Random.Range(180f, 540f));
+			Transform val4 = ResourceUtility.Realizes(magiMaterialEffectPrefab, magiEffectParent, magiEffectParent.get_gameObject().get_layer());
+			Utility.Attach(val4.GetChild(0), val3.get_transform());
+			Utility.SetLayerWithChildren(val3.get_transform(), magiEffectParent.get_gameObject().get_layer());
+			magiMaterialEffects[j] = val4.get_gameObject();
+			Renderer[] componentsInChildren2 = val3.GetComponentsInChildren<Renderer>();
 			Renderer[] array2 = componentsInChildren2;
-			foreach (Renderer renderer2 in array2)
+			foreach (Renderer val5 in array2)
 			{
-				Material material2 = renderer2.material;
-				material2.SetTexture("_EnvTex", component.GetTexture());
-				material2.SetVector("_LightDir", new Vector4(13.07f, -12.7f, -0.6f, 1f));
+				Material val6 = val5.get_material();
+				val6.SetTexture("_EnvTex", component.GetTexture());
+				val6.SetVector("_LightDir", new Vector4(13.07f, -12.7f, -0.6f, 1f));
 			}
-			transform.gameObject.SetActive(false);
+			val4.get_gameObject().SetActive(false);
 		}
 	}
 
@@ -259,10 +312,12 @@ public class SkillGrowDirector : AnimationDirector
 		this.materials = materials;
 	}
 
-	public void StartDirection(Action onEnd)
+	public unsafe void StartDirection(Action onEnd)
 	{
-		base.enabled = true;
-		SetLinkCamera((UnityEngine.Object)mainCameraBlur != (UnityEngine.Object)directionCameraBlur);
+		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f3: Expected O, but got Unknown
+		this.set_enabled(true);
+		SetLinkCamera(mainCameraBlur != directionCameraBlur);
 		mainCameraBlur.StartFilter();
 		CreateEffect(completeEffect, completeEffectParent, magiCamera);
 		CreateEffect(npcEffect, npcEffectParent, npcCamera);
@@ -271,32 +326,28 @@ public class SkillGrowDirector : AnimationDirector
 		npcAnimator.Update(0f);
 		SoundManager.PlayOneShotSE(40000065, null, null);
 		Animator[] array = cameraAnimators;
-		foreach (Animator animator in array)
+		foreach (Animator val in array)
 		{
-			animator.Play("CameraAnim_Start", 0, 0f);
-			animator.Update(0f);
+			val.Play("CameraAnim_Start", 0, 0f);
+			val.Update(0f);
 		}
-		Play("MainAnim_Start", delegate
-		{
-			ResetPlayRate();
-			if (onEnd != null)
-			{
-				onEnd();
-			}
-		}, 0f);
+		_003CStartDirection_003Ec__AnonStorey45D _003CStartDirection_003Ec__AnonStorey45D;
+		Play("MainAnim_Start", new Action((object)_003CStartDirection_003Ec__AnonStorey45D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), 0f);
 	}
 
 	private void StartCreateMagiEffects()
 	{
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		float num = 250f;
 		float num2 = 360f / (float)magiMaterialEffects.Length;
 		GameObject[] array = magiMaterialEffects;
-		foreach (GameObject gameObject in array)
+		foreach (GameObject val in array)
 		{
-			gameObject.transform.localEulerAngles = new Vector3(0f, num, 0f);
+			val.get_transform().set_localEulerAngles(new Vector3(0f, num, 0f));
 			num += num2;
-			gameObject.SetActive(true);
-			Animator componentInChildren = gameObject.GetComponentInChildren<Animator>();
+			val.SetActive(true);
+			Animator componentInChildren = val.GetComponentInChildren<Animator>();
 			componentInChildren.Play("MagiMaterialAnim_Init", 0, 0f);
 			componentInChildren.Update(0f);
 			playingAnimators.Add(componentInChildren);
@@ -323,14 +374,17 @@ public class SkillGrowDirector : AnimationDirector
 
 	private Transform CreateEffect(GameObject effect, Transform parent, Camera cam)
 	{
-		Transform transform = ResourceUtility.Realizes(effect, parent, parent.gameObject.layer);
-		rymFX component = transform.GetComponent<rymFX>();
-		component.Cameras = new Camera[1]
+		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Expected O, but got Unknown
+		Transform val = ResourceUtility.Realizes(effect, parent, parent.get_gameObject().get_layer());
+		rymFX component = val.GetComponent<rymFX>();
+		component.Cameras = (Camera[])new Camera[1]
 		{
 			cam
 		};
-		effects.Add(transform.gameObject);
-		return transform;
+		effects.Add(val.get_gameObject());
+		return val;
 	}
 
 	public override void Skip()
@@ -339,7 +393,7 @@ public class SkillGrowDirector : AnimationDirector
 		{
 			foreach (GameObject effect in effects)
 			{
-				if ((bool)effect)
+				if (Object.op_Implicit(effect))
 				{
 					rymFX component = effect.GetComponent<rymFX>();
 					float num = component.GetLoopLastFrame() - component.GetCurFrame();
@@ -354,27 +408,30 @@ public class SkillGrowDirector : AnimationDirector
 	{
 		for (int i = 0; i < cameraAnimators.Length; i++)
 		{
-			cameraAnimators[i].speed = ((!skip) ? 1f : 1000f);
+			cameraAnimators[i].set_speed((!skip) ? 1f : 1000f);
 		}
 		for (int j = 0; j < playingAnimators.Count; j++)
 		{
-			playingAnimators[j].speed = ((!skip) ? 1f : 1000f);
+			playingAnimators[j].set_speed((!skip) ? 1f : 1000f);
 		}
 		base.Update();
 	}
 
 	protected override void LateUpdate()
 	{
-		if ((UnityEngine.Object)useCamera != (UnityEngine.Object)null)
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		if (useCamera != null)
 		{
-			Animator animator = cameraAnimators[0];
-			Vector3 localScale = animator.transform.localScale;
+			Animator val = cameraAnimators[0];
+			Vector3 localScale = val.get_transform().get_localScale();
 			float x = localScale.x;
 			if (x > 0f)
 			{
 				float fieldOfView = Utility.HorizontalToVerticalFOV(x);
-				useCamera.fieldOfView = fieldOfView;
-				npcCamera.fieldOfView = fieldOfView;
+				useCamera.set_fieldOfView(fieldOfView);
+				npcCamera.set_fieldOfView(fieldOfView);
 			}
 		}
 		mainCameraBlur.blurStrength = directionCameraBlur.blurStrength;
@@ -386,10 +443,10 @@ public class SkillGrowDirector : AnimationDirector
 		Play("MainAnim_Init", null, 0f);
 		foreach (GameObject effect in effects)
 		{
-			if ((bool)effect)
+			if (Object.op_Implicit(effect))
 			{
 				effect.GetComponent<rymFX>().PlayRate = 1f;
-				UnityEngine.Object.Destroy(effect);
+				Object.Destroy(effect);
 			}
 		}
 		effects.Clear();
@@ -399,6 +456,6 @@ public class SkillGrowDirector : AnimationDirector
 		component.cacheAfter = false;
 		skip = false;
 		base.Reset();
-		base.enabled = false;
+		this.set_enabled(false);
 	}
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class HomeAppReviewAppealDialog : HomeAppReviewAppealDialogBase
@@ -30,7 +31,7 @@ public class HomeAppReviewAppealDialog : HomeAppReviewAppealDialogBase
 
 	public override void UpdateUI()
 	{
-		SetLabelText(UI.LBL_ITEM_TEXT, itemString);
+		SetLabelText((Enum)UI.LBL_ITEM_TEXT, itemString);
 		if (starValue == 0)
 		{
 			MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce("Received: " + itemString, string.Empty);
@@ -68,8 +69,14 @@ public class HomeAppReviewAppealDialog : HomeAppReviewAppealDialogBase
 
 	private void SetEnableYesButton(bool isEnable)
 	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		yesButton.isEnabled = isEnable;
-		Color color = (!isEnable) ? Color.gray : Color.white;
+		Color color = (!isEnable) ? Color.get_gray() : Color.get_white();
 		GetCtrl(UI.LBL_BTN_YES).GetComponent<UILabel>().color = color;
 		yesButton.GetComponent<UISprite>().color = color;
 	}

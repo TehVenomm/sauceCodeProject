@@ -40,13 +40,13 @@ namespace GooglePlayGames.Native
 			NearbyConnectionsManagerBuilder nearbyConnectionsManagerBuilder = new NearbyConnectionsManagerBuilder();
 			nearbyConnectionsManagerBuilder.SetOnInitializationFinished(OnManagerInitialized);
 			PlatformConfiguration configuration = new AndroidClient().CreatePlatformConfiguration(PlayGamesClientConfiguration.DefaultConfiguration);
-			Debug.Log("Building manager Now");
+			Debug.Log((object)"Building manager Now");
 			sManager = nearbyConnectionsManagerBuilder.Build(configuration);
 		}
 
 		internal static void OnManagerInitialized(NearbyConnectionsStatus.InitializationStatus status)
 		{
-			Debug.Log("Nearby Init Complete: " + status + " sManager = " + sManager);
+			Debug.Log((object)("Nearby Init Complete: " + status + " sManager = " + sManager));
 			if (status == NearbyConnectionsStatus.InitializationStatus.VALID)
 			{
 				if (sCreationCallback != null)
@@ -57,7 +57,7 @@ namespace GooglePlayGames.Native
 			}
 			else
 			{
-				Debug.LogError("ERROR: NearbyConnectionManager not initialized: " + status);
+				Debug.LogError((object)("ERROR: NearbyConnectionManager not initialized: " + status));
 			}
 		}
 	}

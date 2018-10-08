@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class GuildChatAdvisoryItem : MonoBehaviour
+public class GuildChatAdvisoryItem
 {
 	public Transform close;
 
@@ -11,6 +11,11 @@ public class GuildChatAdvisoryItem : MonoBehaviour
 	private string title;
 
 	private string content;
+
+	public GuildChatAdvisoryItem()
+		: this()
+	{
+	}
 
 	public void Init(string t, string c)
 	{

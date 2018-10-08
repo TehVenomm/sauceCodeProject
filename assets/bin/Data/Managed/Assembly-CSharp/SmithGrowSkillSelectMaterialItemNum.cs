@@ -1,3 +1,5 @@
+using System;
+
 public class SmithGrowSkillSelectMaterialItemNum : GameSection
 {
 	protected enum UI
@@ -42,33 +44,33 @@ public class SmithGrowSkillSelectMaterialItemNum : GameSection
 	public override void UpdateUI()
 	{
 		string key = "TEXT_SELECT";
-		SetLabelText(UI.LBL_CAPTION, base.sectionData.GetText(key));
-		SetLabelText(UI.STR_TITLE_U, base.sectionData.GetText(key));
-		SetLabelText(UI.STR_TITLE_D, base.sectionData.GetText(key));
+		SetLabelText((Enum)UI.LBL_CAPTION, base.sectionData.GetText(key));
+		SetLabelText((Enum)UI.STR_TITLE_U, base.sectionData.GetText(key));
+		SetLabelText((Enum)UI.STR_TITLE_D, base.sectionData.GetText(key));
 		string key2 = "TEXT_SELECT_NUM";
-		SetLabelText(UI.STR_SELECT_NUM, base.sectionData.GetText(key2));
-		SetProgressInt(UI.SLD_SELECT_NUM, m_nowSelect, 0, m_maxNum, OnChagenSlider);
+		SetLabelText((Enum)UI.STR_SELECT_NUM, base.sectionData.GetText(key2));
+		SetProgressInt((Enum)UI.SLD_SELECT_NUM, m_nowSelect, 0, m_maxNum, (EventDelegate.Callback)OnChagenSlider);
 	}
 
 	private void OnChagenSlider()
 	{
-		int progressInt = GetProgressInt(UI.SLD_SELECT_NUM);
-		SetLabelText(UI.LBL_SELECT_NUM, string.Format("{0,8:#,0}", progressInt));
+		int progressInt = GetProgressInt((Enum)UI.SLD_SELECT_NUM);
+		SetLabelText((Enum)UI.LBL_SELECT_NUM, string.Format("{0,8:#,0}", progressInt));
 	}
 
 	private void OnQuery_SELECT_NUM_MINUS()
 	{
-		SetProgressInt(UI.SLD_SELECT_NUM, GetProgressInt(UI.SLD_SELECT_NUM) - 1, -1, -1, null);
+		SetProgressInt((Enum)UI.SLD_SELECT_NUM, GetProgressInt((Enum)UI.SLD_SELECT_NUM) - 1, -1, -1, (EventDelegate.Callback)null);
 	}
 
 	private void OnQuery_SELECT_NUM_PLUS()
 	{
-		SetProgressInt(UI.SLD_SELECT_NUM, GetProgressInt(UI.SLD_SELECT_NUM) + 1, -1, -1, null);
+		SetProgressInt((Enum)UI.SLD_SELECT_NUM, GetProgressInt((Enum)UI.SLD_SELECT_NUM) + 1, -1, -1, (EventDelegate.Callback)null);
 	}
 
 	protected int GetSliderNum()
 	{
-		return GetProgressInt(UI.SLD_SELECT_NUM);
+		return GetProgressInt((Enum)UI.SLD_SELECT_NUM);
 	}
 
 	private void OnQuery_SELECT()

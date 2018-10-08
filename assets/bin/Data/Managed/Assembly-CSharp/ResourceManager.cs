@@ -36,6 +36,8 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 		public bool internalMode;
 
+		public bool eventAsset;
+
 		public object progressObject;
 
 		public LoadComplateDelegate onComplate;
@@ -142,11 +144,11 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		{
 			if (progressObject is ResourceRequest)
 			{
-				return (progressObject as ResourceRequest).progress;
+				return (progressObject as ResourceRequest).get_progress();
 			}
 			if (progressObject is WWW)
 			{
-				return (progressObject as WWW).progress;
+				return (progressObject as WWW).get_progress();
 			}
 			if (progressObject == PROGRESS_COMPLATE)
 			{
@@ -226,7 +228,19 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		private set;
 	}
 
+	public string downloadEventUrl
+	{
+		get;
+		private set;
+	}
+
 	public AssetBundleManifest manifest
+	{
+		get;
+		private set;
+	}
+
+	public AssetBundleManifest event_manifest
 	{
 		get;
 		private set;
@@ -285,7 +299,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		}
 	}
 
-	private static string cacheDir => Path.Combine(Application.temporaryCachePath, "assets");
+	private static string cacheDir => Path.Combine(Application.get_temporaryCachePath(), "assets");
 
 	public bool isAllStay => loadRequests.Count == stayCount;
 
@@ -303,12 +317,13 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	public bool isLoading => loadRequests.Count > 0;
 
-	protected override void Awake()
+	protected unsafe override void Awake()
 	{
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		base.gameObject.AddComponent<GoGameResourceManager>();
-		UnityEngine.Object.DontDestroyOnLoad(this);
-		onAsyncLoadQuery = OnAsyncLoadQueryDefault;
+		this.get_gameObject().AddComponent<GoGameResourceManager>();
+		Object.DontDestroyOnLoad(this);
+		onAsyncLoadQuery = new Func<bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		loadingAssetCountLimit = 4;
 	}
 
@@ -329,7 +344,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	private string GetRelativePath()
 	{
-		return Application.streamingAssetsPath;
+		return Application.get_streamingAssetsPath();
 	}
 
 	public void SetURL(string url)
@@ -343,11 +358,13 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 	{
 		int assetIndex = this.assetIndex;
 		downloadURL = $"{baseURL}assets/{assetIndex}/{GetPlatformName()}/";
+		downloadEventUrl = $"{baseURL}assets/event/{GetPlatformName()}/";
 	}
 
 	public void LoadManifest()
 	{
-		StartCoroutine(DoLoadManifest());
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoLoadManifest());
 	}
 
 	private IEnumerator DoLoadManifest()
@@ -370,20 +387,20 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 				string www_url = url;
 				WWW _www = new WWW(www_url);
 				yield return (object)_www;
-				string www_error = _www.error;
+				string www_error = _www.get_error();
 				if (!string.IsNullOrEmpty(www_error))
 				{
 					error_code = ((!www_error.Contains("404")) ? Error.AssetLoadFailed : Error.AssetNotFound);
 				}
-				else if ((UnityEngine.Object)_www.assetBundle != (UnityEngine.Object)null)
+				else if (_www.get_assetBundle() != null)
 				{
-					manifest = _www.assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-					_www.assetBundle.Unload(false);
+					manifest = _www.get_assetBundle().LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+					_www.get_assetBundle().Unload(false);
 				}
 				else
 				{
 					error_code = Error.AssetLoadFailed;
-					Log.Error(LOG.RESOURCE, _www.text);
+					Log.Error(LOG.RESOURCE, _www.get_text());
 				}
 				_www.Dispose();
 				if (error_code != 0)
@@ -397,7 +414,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 						{
 							while (onDownloadErrorQuery != null)
 							{
-								query_result = onDownloadErrorQuery(true, error_code);
+								query_result = onDownloadErrorQuery.Invoke(true, error_code);
 								if (query_result == 0)
 								{
 									break;
@@ -406,7 +423,75 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 							}
 							while (query_result == 0 && onDownloadErrorQuery != null)
 							{
-								query_result = onDownloadErrorQuery(false, error_code);
+								query_result = onDownloadErrorQuery.Invoke(false, error_code);
+								yield return (object)null;
+							}
+							if (query_result == -1)
+							{
+								yield break;
+							}
+						}
+						retry_count = 0;
+					}
+					yield return (object)new WaitForSeconds(1f);
+				}
+			}
+			while (error_code != 0);
+		}
+		yield return (object)this.StartCoroutine(DoLoadEventManifest());
+	}
+
+	private IEnumerator DoLoadEventManifest()
+	{
+		event_manifest = null;
+		if (isDownloadAssets)
+		{
+			string url = $"{downloadEventUrl}{GetPlatformName()}_v{manifestVersion}";
+			int retry_count = 0;
+			Error error_code;
+			do
+			{
+				error_code = Error.None;
+				string www_url = url;
+				WWW _www = new WWW(www_url);
+				yield return (object)_www;
+				string www_error = _www.get_error();
+				if (!string.IsNullOrEmpty(www_error))
+				{
+					error_code = ((!www_error.Contains("404")) ? Error.AssetLoadFailed : Error.AssetNotFound);
+				}
+				else if (_www.get_assetBundle() != null)
+				{
+					event_manifest = _www.get_assetBundle().LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+					_www.get_assetBundle().Unload(false);
+				}
+				else
+				{
+					error_code = Error.AssetLoadFailed;
+					Log.Error(LOG.RESOURCE, _www.get_text());
+				}
+				_www.Dispose();
+				if (error_code != 0)
+				{
+					retry_count++;
+					if (retry_count >= 3)
+					{
+						Log.Error(LOG.RESOURCE, www_error);
+						int query_result = 0;
+						if (onDownloadErrorQuery != null)
+						{
+							while (onDownloadErrorQuery != null)
+							{
+								query_result = onDownloadErrorQuery.Invoke(true, error_code);
+								if (query_result == 0)
+								{
+									break;
+								}
+								yield return (object)null;
+							}
+							while (query_result == 0 && onDownloadErrorQuery != null)
+							{
+								query_result = onDownloadErrorQuery.Invoke(false, error_code);
 								yield return (object)null;
 							}
 							if (query_result == -1)
@@ -428,11 +513,11 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 	{
 		if (isLoading)
 		{
-			Debug.LogError("isLoading == true");
+			Debug.LogError((object)"isLoading == true");
 		}
 		CancelAll();
 		loadRequests.Clear();
-		StopAllCoroutines();
+		this.StopAllCoroutines();
 		cache.ClearObjectCaches(true);
 		cache.ClearPackageCaches();
 		cache.ClearSystemPackageCaches();
@@ -442,6 +527,24 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		downloadList.Clear();
 		m_cacheABDependencies.Clear();
 		isDownloadError = false;
+	}
+
+	public void Load(bool isEventAsset, object master, RESOURCE_CATEGORY category, string resource_name, LoadComplateDelegate complate_func, LoadErrorDelegate error_func, bool cache_package = false, object userData = null)
+	{
+		LoadRequest loadRequest = new LoadRequest();
+		loadRequest.master = master;
+		loadRequest.category = category;
+		loadRequest.packageName = resource_name;
+		loadRequest.resourceNames = new string[1]
+		{
+			resource_name
+		};
+		loadRequest.onComplate = complate_func;
+		loadRequest.onError = error_func;
+		loadRequest.cachePackage = cache_package;
+		loadRequest.userData = userData;
+		loadRequest.eventAsset = isEventAsset;
+		Load(loadRequest);
 	}
 
 	public void Load(object master, RESOURCE_CATEGORY category, string resource_name, LoadComplateDelegate complate_func, LoadErrorDelegate error_func, bool cache_package = false, object userData = null)
@@ -461,6 +564,21 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		Load(loadRequest);
 	}
 
+	public void Load(bool isEventAsset, object master, RESOURCE_CATEGORY category, string package_name, string[] resource_names, LoadComplateDelegate complate_func, LoadErrorDelegate error_func, bool cache_package = false, object userData = null)
+	{
+		LoadRequest loadRequest = new LoadRequest();
+		loadRequest.master = master;
+		loadRequest.category = category;
+		loadRequest.packageName = package_name;
+		loadRequest.resourceNames = resource_names;
+		loadRequest.onComplate = complate_func;
+		loadRequest.onError = error_func;
+		loadRequest.cachePackage = cache_package;
+		loadRequest.userData = userData;
+		loadRequest.eventAsset = isEventAsset;
+		Load(loadRequest);
+	}
+
 	public void Load(object master, RESOURCE_CATEGORY category, string package_name, string[] resource_names, LoadComplateDelegate complate_func, LoadErrorDelegate error_func, bool cache_package = false, object userData = null)
 	{
 		LoadRequest loadRequest = new LoadRequest();
@@ -477,6 +595,10 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	private void Load(LoadRequest request)
 	{
+		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
 		request.enableCache = enableCache;
 		request.downloadOnly = downloadOnly;
 		request.internalMode = internalMode;
@@ -485,12 +607,20 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 			request.internalMode = false;
 		}
 		List<LoadRequest> list = null;
-		if ((!request.internalMode || request.downloadOnly) && isDownloadAssets && (UnityEngine.Object)manifest != (UnityEngine.Object)null)
+		if ((!request.internalMode || request.downloadOnly) && isDownloadAssets && manifest != null)
 		{
 			request.Setup();
 			if (request.category != RESOURCE_CATEGORY.UI)
 			{
-				request.hash = manifest.GetAssetBundleHash(MonoBehaviourSingleton<GoGameResourceManager>.I.GetFullBundleName(request.packageName));
+				if (request.eventAsset)
+				{
+					Debug.Log((object)("Check hash: " + request.packageName));
+					request.hash = event_manifest.GetAssetBundleHash(MonoBehaviourSingleton<GoGameResourceManager>.I.GetFullBundleName(request.packageName));
+				}
+				else
+				{
+					request.hash = manifest.GetAssetBundleHash(MonoBehaviourSingleton<GoGameResourceManager>.I.GetFullBundleName(request.packageName));
+				}
 				list = GetManifestDependencyRequests(request);
 			}
 			else
@@ -580,17 +710,21 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	private UIDependency GetUIDependency(LoadRequest request)
 	{
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Expected O, but got Unknown
 		string str = Path.GetFileNameWithoutExtension(request.packageName).ToLower();
-		TextAsset textAsset = Resources.Load("InternalUI/Deps/" + str) as TextAsset;
-		if ((UnityEngine.Object)textAsset != (UnityEngine.Object)null)
+		TextAsset val = Resources.Load("InternalUI/Deps/" + str) as TextAsset;
+		if (val != null)
 		{
-			return new ObjectPacker().Unpack<UIDependency>(textAsset.bytes);
+			return new ObjectPacker().Unpack<UIDependency>(val.get_bytes());
 		}
 		return null;
 	}
 
 	private List<LoadRequest> GetManifestDependencyRequests(LoadRequest request)
 	{
+		//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
 		string fullBundleName = MonoBehaviourSingleton<GoGameResourceManager>.I.GetFullBundleName(request.packageName);
 		string[] array;
 		if (m_cacheABDependencies.ContainsKey(fullBundleName))
@@ -650,6 +784,8 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	private List<LoadRequest> GetUIDependencyRequests(LoadRequest request, UIDependency dep)
 	{
+		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
 		List<LoadRequest> list = null;
 		for (int i = 0; i < dep.atlasPaths.Length; i++)
 		{
@@ -714,24 +850,27 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	private void LinkAtlas(PackageObject package, string atlasPath, string resourceName)
 	{
-		GameObject gameObject = Resources.Load(atlasPath) as GameObject;
-		UIAtlas uIAtlas = package.hostAtlas = gameObject.GetComponent<UIAtlas>();
-		AssetBundle assetBundle = package.obj as AssetBundle;
-		if ((UnityEngine.Object)assetBundle != (UnityEngine.Object)null)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Expected O, but got Unknown
+		GameObject val = Resources.Load(atlasPath) as GameObject;
+		UIAtlas uIAtlas = package.hostAtlas = val.GetComponent<UIAtlas>();
+		AssetBundle val2 = package.obj as AssetBundle;
+		if (val2 != null)
 		{
-			GameObject gameObject2 = assetBundle.LoadAsset<GameObject>(resourceName);
-			UIAtlas uIAtlas2 = uIAtlas.replacement = gameObject2.GetComponent<UIAtlas>();
+			GameObject val3 = val2.LoadAsset<GameObject>(resourceName);
+			UIAtlas uIAtlas2 = uIAtlas.replacement = val3.GetComponent<UIAtlas>();
 		}
 	}
 
 	private void AddRequest(LoadRequest request)
 	{
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		loadRequests.Add(request);
 		if (onAddRequest != null)
 		{
-			onAddRequest();
+			onAddRequest.Invoke();
 		}
-		StartCoroutine(DoLoad(request));
+		this.StartCoroutine(DoLoad(request));
 	}
 
 	private bool CheckPackageDownloading(LoadRequest request)
@@ -845,7 +984,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 			asset_bundle = (load_package.obj as AssetBundle);
 			use_package_cache = true;
 		}
-		if ((UnityEngine.Object)asset_bundle == (UnityEngine.Object)null)
+		if (asset_bundle == null)
 		{
 			load_package = null;
 		}
@@ -860,7 +999,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 					load_objects[i2] = object_cache_category.Get(res_name);
 					if (load_objects[i2] == null)
 					{
-						load_objects[i2] = cache.systemCaches.Find((ResourceObject o) => o.obj.name == ((_003CDoLoad_003Ec__Iterator278)/*Error near IL_04da: stateMachine*/)._003Cres_name_003E__19);
+						load_objects[i2] = cache.systemCaches.Find((ResourceObject o) => o.obj.get_name() == ((_003CDoLoad_003Ec__Iterator280)/*Error near IL_04da: stateMachine*/)._003Cres_name_003E__19);
 					}
 					if (load_objects[i2] != null)
 					{
@@ -870,7 +1009,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 				}
 			}
 		}
-		if (loaded_num < load_num && !request.downloadOnly && load_package != null && (UnityEngine.Object)asset_bundle != (UnityEngine.Object)null)
+		if (loaded_num < load_num && !request.downloadOnly && load_package != null && asset_bundle != null)
 		{
 			int i8 = 0;
 			for (int n6 = load_num; i8 < n6; i8++)
@@ -879,13 +1018,13 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 				{
 					break;
 				}
-				if ((UnityEngine.Object)asset_bundle == (UnityEngine.Object)null)
+				if (asset_bundle == null)
 				{
 					break;
 				}
 				if (load_objects[i8] == null)
 				{
-					if (onAsyncLoadQuery())
+					if (onAsyncLoadQuery.Invoke())
 					{
 						while (IsWaitAssetBundleLoadAsync())
 						{
@@ -893,11 +1032,11 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 						}
 						loadingAssetCountFromAssetBundle++;
 						AssetBundleRequest asset_bundle_load_asset2 = asset_bundle.LoadAssetAsync(request.resourceNames[i8]);
-						while (!asset_bundle_load_asset2.isDone)
+						while (!asset_bundle_load_asset2.get_isDone())
 						{
 							yield return (object)null;
 						}
-						load_objects[i8] = ResourceObject.Get(request.category, request.resourceNames[i8], asset_bundle_load_asset2.asset);
+						load_objects[i8] = ResourceObject.Get(request.category, request.resourceNames[i8], asset_bundle_load_asset2.get_asset());
 						loadingAssetCountFromAssetBundle--;
 					}
 					else
@@ -913,7 +1052,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		}
 		if (load_package == null && (loaded_num < load_num || package_only))
 		{
-			if (request.category == RESOURCE_CATEGORY.MAX || (isDownloadAssets && (UnityEngine.Object)manifest != (UnityEngine.Object)null && (!request.internalMode || request.downloadOnly)))
+			if (request.category == RESOURCE_CATEGORY.MAX || (isDownloadAssets && manifest != null && (!request.internalMode || request.downloadOnly)))
 			{
 				while (downloadList.size >= MAX_DL_COUNT || CheckPackageDownloading(request))
 				{
@@ -944,7 +1083,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 							use_package_cache = true;
 						}
 					}
-					if (load_package != null || (UnityEngine.Object)asset_bundle == (UnityEngine.Object)null)
+					if (load_package != null || asset_bundle == null)
 					{
 						while (isDownloadError && !request.internalMode)
 						{
@@ -956,8 +1095,16 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 							}
 						}
 						RESOURCE_CATEGORY? category = MonoBehaviourSingleton<GoGameResourceManager>.I.GetCategory(request.packageName);
-						string tail = MonoBehaviourSingleton<GoGameResourceManager>.I.GetVariantName(category.HasValue ? category.Value : RESOURCE_CATEGORY.MAX);
-						string url = (!request.packageName.Contains("-sd")) ? (downloadURL + request.packageName + tail + "?v=" + request.hash.ToString()) : (downloadURL + request.packageName + "?v=" + request.hash.ToString());
+						string url;
+						if (request.eventAsset)
+						{
+							url = downloadEventUrl + request.packageName + "?v=" + request.hash.ToString();
+						}
+						else
+						{
+							string tail = MonoBehaviourSingleton<GoGameResourceManager>.I.GetVariantName(category.HasValue ? category.Value : RESOURCE_CATEGORY.MAX);
+							url = ((!request.packageName.Contains("-sd")) ? (downloadURL + request.packageName + tail + "?v=" + request.hash.ToString()) : (downloadURL + request.packageName + "?v=" + request.hash.ToString()));
+						}
 						string filename = Path.GetFileName(request.packageName);
 						string www_url = url;
 						if (request.IsValid())
@@ -968,19 +1115,19 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 							AssetBundle loaded_assetBundle = null;
 							if (!is_cached)
 							{
-								www = (WWW)(request.progressObject = new WWW(www_url));
+								www = (request.progressObject = (object)new WWW(www_url));
 								float timeOut = WWW_TIME_OUT;
-								float currentProgress = www.progress;
-								while (!www.isDone && timeOut > 0f)
+								float currentProgress = www.get_progress();
+								while (!www.get_isDone() && timeOut > 0f)
 								{
 									yield return (object)null;
-									if (currentProgress == www.progress)
+									if (currentProgress == www.get_progress())
 									{
-										timeOut -= Time.deltaTime;
+										timeOut -= Time.get_deltaTime();
 									}
 									else
 									{
-										currentProgress = www.progress;
+										currentProgress = www.get_progress();
 										timeOut = WWW_TIME_OUT;
 									}
 									if (!request.IsValid())
@@ -990,13 +1137,13 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 										yield break;
 									}
 								}
-								if (!www.isDone)
+								if (!www.get_isDone())
 								{
 									error_code = Error.AssetLoadFailed;
 								}
-								else if (www.error != null)
+								else if (www.get_error() != null)
 								{
-									error_code = ((!www.error.Contains("404")) ? Error.AssetLoadFailed : Error.AssetNotFound);
+									error_code = ((!www.get_error().Contains("404")) ? Error.AssetLoadFailed : Error.AssetNotFound);
 								}
 								else
 								{
@@ -1004,7 +1151,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 									{
 										CrashlyticsReporter.SetLoadingBundle(url);
 										loaded_assetBundle = cache.PopDelayUnloadAssetBundle(request.packageName);
-										if ((UnityEngine.Object)loaded_assetBundle == (UnityEngine.Object)null)
+										if (loaded_assetBundle == null)
 										{
 											load_package = cache.GetCachedPackage(request.packageName);
 											if (load_package != null)
@@ -1015,13 +1162,13 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 												use_package_cache_delay = true;
 											}
 										}
-										if ((UnityEngine.Object)loaded_assetBundle == (UnityEngine.Object)null)
+										if (loaded_assetBundle == null)
 										{
-											loaded_assetBundle = www.assetBundle;
+											loaded_assetBundle = www.get_assetBundle();
 										}
 										CrashlyticsReporter.SetLoadingBundle(string.Empty);
 									}
-									error_code = SaveAssetBundle(filename, request.hash, www.bytes);
+									error_code = SaveAssetBundle(filename, request.hash, www.get_bytes());
 								}
 							}
 							else if (!request.downloadOnly)
@@ -1029,7 +1176,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 								string path = GetCachePath(filename, request.hash);
 								CrashlyticsReporter.SetLoadingBundle(url);
 								loaded_assetBundle = cache.PopDelayUnloadAssetBundle(request.packageName);
-								if ((UnityEngine.Object)loaded_assetBundle == (UnityEngine.Object)null)
+								if (loaded_assetBundle == null)
 								{
 									load_package = cache.GetCachedPackage(request.packageName);
 									if (load_package != null)
@@ -1040,14 +1187,14 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 										use_package_cache_delay = true;
 									}
 								}
-								if ((UnityEngine.Object)loaded_assetBundle == (UnityEngine.Object)null)
+								if (loaded_assetBundle == null)
 								{
 									AssetBundleCreateRequest req = AssetBundle.LoadFromFileAsync(path);
 									yield return (object)req;
-									loaded_assetBundle = req.assetBundle;
+									loaded_assetBundle = req.get_assetBundle();
 								}
 								CrashlyticsReporter.SetLoadingBundle(string.Empty);
-								if ((UnityEngine.Object)loaded_assetBundle == (UnityEngine.Object)null)
+								if (loaded_assetBundle == null)
 								{
 									Log.Warning(LOG.RESOURCE, "cached file load failed: {0}", filename);
 									error_code = Error.AssetLoadFailed;
@@ -1080,7 +1227,10 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 									load_package = PackageObject.Get(request.packageName, loaded_assetBundle);
 									asset_bundle = (load_package.obj as AssetBundle);
 								}
-								www?.Dispose();
+								if (www != null)
+								{
+									www.Dispose();
+								}
 								if (!use_package_cache_delay)
 								{
 									use_package_cache = false;
@@ -1094,7 +1244,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 									asset_bundle = (load_package.obj as AssetBundle);
 									use_package_cache = true;
 								}
-								if (load_package != null || (UnityEngine.Object)asset_bundle == (UnityEngine.Object)null)
+								if (load_package != null || asset_bundle == null)
 								{
 									retry_count++;
 									if (autoRetry)
@@ -1137,7 +1287,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 											{
 												while (onDownloadErrorQuery != null)
 												{
-													query_result = onDownloadErrorQuery(true, error_code);
+													query_result = onDownloadErrorQuery.Invoke(true, error_code);
 													if (query_result == 0)
 													{
 														break;
@@ -1146,7 +1296,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 												}
 												while (query_result == 0 && onDownloadErrorQuery != null)
 												{
-													query_result = onDownloadErrorQuery(false, error_code);
+													query_result = onDownloadErrorQuery.Invoke(false, error_code);
 													yield return (object)null;
 												}
 												if (query_result == -1)
@@ -1172,13 +1322,16 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 										}
 									}
 								}
-								www?.Dispose();
+								if (www != null)
+								{
+									www.Dispose();
+								}
 							}
 						}
 					}
 				}
 				while (is_retry);
-				if ((UnityEngine.Object)asset_bundle != (UnityEngine.Object)null)
+				if (asset_bundle != null)
 				{
 					int i6 = 0;
 					for (int n5 = load_num; i6 < n5; i6++)
@@ -1187,13 +1340,13 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 						{
 							break;
 						}
-						if ((UnityEngine.Object)asset_bundle == (UnityEngine.Object)null)
+						if (asset_bundle == null)
 						{
 							break;
 						}
 						if (load_objects[i6] == null)
 						{
-							if (onAsyncLoadQuery())
+							if (onAsyncLoadQuery.Invoke())
 							{
 								while (IsWaitAssetBundleLoadAsync())
 								{
@@ -1201,11 +1354,11 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 								}
 								loadingAssetCountFromAssetBundle++;
 								AssetBundleRequest asset_bundle_load_asset = asset_bundle.LoadAssetAsync(request.resourceNames[i6]);
-								while (!asset_bundle_load_asset.isDone)
+								while (!asset_bundle_load_asset.get_isDone())
 								{
 									yield return (object)null;
 								}
-								load_objects[i6] = ResourceObject.Get(request.category, request.resourceNames[i6], asset_bundle_load_asset.asset);
+								load_objects[i6] = ResourceObject.Get(request.category, request.resourceNames[i6], asset_bundle_load_asset.get_asset());
 								loadingAssetCountFromAssetBundle--;
 							}
 							else
@@ -1219,7 +1372,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 						}
 					}
 				}
-				if ((UnityEngine.Object)asset_bundle != (UnityEngine.Object)null && (request.downloadOnly || (!use_package_cache && !request.cachePackage)))
+				if (asset_bundle != null && (request.downloadOnly || (!use_package_cache && !request.cachePackage)))
 				{
 					if (!use_package_cache && !use_package_cache_delay)
 					{
@@ -1263,11 +1416,11 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 						{
 							bool save_enableLoadDirect = enableLoadDirect;
 							enableLoadDirect = true;
-							Coroutine c = StartCoroutine(LoadDirect(request, sub_path + request.resourceNames[i7], delegate(UnityEngine.Object o)
+							Coroutine c = this.StartCoroutine(LoadDirect(request, sub_path + request.resourceNames[i7], delegate(Object o)
 							{
-								if (o != (UnityEngine.Object)null)
+								if (o != null)
 								{
-									((_003CDoLoad_003Ec__Iterator278)/*Error near IL_177d: stateMachine*/)._003Cload_objects_003E__9[((_003CDoLoad_003Ec__Iterator278)/*Error near IL_177d: stateMachine*/)._003Ci_003E__45] = ResourceObject.Get(((_003CDoLoad_003Ec__Iterator278)/*Error near IL_177d: stateMachine*/).request.category, ((_003CDoLoad_003Ec__Iterator278)/*Error near IL_177d: stateMachine*/).request.resourceNames[((_003CDoLoad_003Ec__Iterator278)/*Error near IL_177d: stateMachine*/)._003Ci_003E__45], o);
+									((_003CDoLoad_003Ec__Iterator280)/*Error near IL_17c8: stateMachine*/)._003Cload_objects_003E__9[((_003CDoLoad_003Ec__Iterator280)/*Error near IL_17c8: stateMachine*/)._003Ci_003E__45] = ResourceObject.Get(((_003CDoLoad_003Ec__Iterator280)/*Error near IL_17c8: stateMachine*/).request.category, ((_003CDoLoad_003Ec__Iterator280)/*Error near IL_17c8: stateMachine*/).request.resourceNames[((_003CDoLoad_003Ec__Iterator280)/*Error near IL_17c8: stateMachine*/)._003Ci_003E__45], o);
 								}
 							}));
 							enableLoadDirect = save_enableLoadDirect;
@@ -1276,14 +1429,14 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 						else if (request.category == RESOURCE_CATEGORY.UI)
 						{
 							string path3 = request.uiDep.path;
-							if (onAsyncLoadQuery() || request.downloadOnly)
+							if (onAsyncLoadQuery.Invoke() || request.downloadOnly)
 							{
 								ResourceRequest req3 = Resources.LoadAsync(path3);
-								while (!req3.isDone)
+								while (!req3.get_isDone())
 								{
 									yield return (object)null;
 								}
-								load_objects[i7] = ResourceObject.Get(request.category, request.resourceNames[i7], req3.asset);
+								load_objects[i7] = ResourceObject.Get(request.category, request.resourceNames[i7], req3.get_asset());
 							}
 							else
 							{
@@ -1293,14 +1446,14 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 						else
 						{
 							string path2 = $"Internal/internal__{request.category.ToString()}__{request.resourceNames[i7]}";
-							if (onAsyncLoadQuery() || request.downloadOnly)
+							if (onAsyncLoadQuery.Invoke() || request.downloadOnly)
 							{
 								ResourceRequest req2 = Resources.LoadAsync(path2);
-								while (!req2.isDone)
+								while (!req2.get_isDone())
 								{
 									yield return (object)null;
 								}
-								load_objects[i7] = ResourceObject.Get(request.category, request.resourceNames[i7], req2.asset);
+								load_objects[i7] = ResourceObject.Get(request.category, request.resourceNames[i7], req2.get_asset());
 							}
 							else
 							{
@@ -1339,7 +1492,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 				}
 			}
 		}
-		bool need_unload_asset_bundle = (UnityEngine.Object)asset_bundle != (UnityEngine.Object)null;
+		bool need_unload_asset_bundle = asset_bundle != null;
 		if (enable_request_count > 0)
 		{
 			if (cache.objectCaches != null && request.enableCache && load_num > 0)
@@ -1473,7 +1626,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		request = null;
 		if (onRemoveRequest != null)
 		{
-			onRemoveRequest();
+			onRemoveRequest.Invoke();
 		}
 	}
 
@@ -1583,7 +1736,8 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	public bool IsCached(string dependency)
 	{
-		if ((UnityEngine.Object)manifest == (UnityEngine.Object)null)
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		if (manifest == null)
 		{
 			return false;
 		}
@@ -1613,7 +1767,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 	public string[] GetALLDependenciesFileName(string assetName)
 	{
 		HashSet<string> hashSet = new HashSet<string>();
-		if ((UnityEngine.Object)manifest != (UnityEngine.Object)null)
+		if (manifest != null)
 		{
 			string[] allDependencies = manifest.GetAllDependencies(MonoBehaviourSingleton<GoGameResourceManager>.I.GetFullBundleName(assetName));
 			for (int i = 0; i < allDependencies.Length; i++)
@@ -1628,6 +1782,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	private bool IsVersionCached(string filename, Hash128 hash)
 	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		string cachePath = GetCachePath(filename, hash);
 		return File.Exists(cachePath);
 	}
@@ -1646,6 +1801,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	private Error SaveAssetBundle(string filename, Hash128 hash, byte[] bytes)
 	{
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 		if (bytes.Length != 0)
 		{
 			Error result = Error.None;
@@ -1691,32 +1847,32 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		}
 	}
 
-	public UnityEngine.Object LoadDirect(RESOURCE_CATEGORY category, string resource_name)
+	public Object LoadDirect(RESOURCE_CATEGORY category, string resource_name)
 	{
 		if (!enableLoadDirect)
 		{
 			Log.Error(LOG.RESOURCE, "can not LoadDirect. " + category.ToString() + " : " + resource_name);
 			return null;
 		}
-		UnityEngine.Object @object = null;
+		Object val = null;
 		string[] array = ResourceDefine.subPaths[(int)category];
 		int i = 0;
 		for (int num = array.Length; i < num; i++)
 		{
 			string path = array[i] + resource_name;
-			@object = ExternalResources.Load<UnityEngine.Object>(path);
-			if (@object != (UnityEngine.Object)null)
+			val = ExternalResources.Load<Object>(path);
+			if (val != null)
 			{
 				break;
 			}
 		}
-		return @object;
+		return val;
 	}
 
-	public IEnumerator LoadDirect(LoadRequest request, string resource_name, Action<UnityEngine.Object> onComplete)
+	public IEnumerator LoadDirect(LoadRequest request, string resource_name, Action<Object> onComplete)
 	{
 		RESOURCE_CATEGORY category = request.category;
-		UnityEngine.Object load_object = null;
+		Object load_object = null;
 		if (!enableLoadDirect)
 		{
 			Log.Error(LOG.RESOURCE, "can not LoadDirect. " + category.ToString() + " : " + resource_name);
@@ -1731,33 +1887,33 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 				string path2 = paths[j] + resource_name;
 				if (path2.Contains("StreamingAssets"))
 				{
-					path2 = Application.streamingAssetsPath + path2.Replace("StreamingAssets", string.Empty).ToLower();
-					WWW www = (WWW)(request.progressObject = new WWW(path2));
-					while (!www.isDone)
+					path2 = Application.get_streamingAssetsPath() + path2.Replace("StreamingAssets", string.Empty).ToLower();
+					WWW www = request.progressObject = (object)new WWW(path2);
+					while (!www.get_isDone())
 					{
 						yield return (object)null;
 					}
 					request.progressObject = PROGRESS_COMPLATE;
-					load_object = www.assetBundle;
+					load_object = www.get_assetBundle();
 					www.Dispose();
 				}
-				else if (onAsyncLoadQuery() || request.downloadOnly)
+				else if (onAsyncLoadQuery.Invoke() || request.downloadOnly)
 				{
-					yield return (object)ExternalResources.LoadAsync(path2, delegate(ResourceRequest progress)
+					yield return (object)ExternalResources.LoadAsync<Object>(path2, (Action<ResourceRequest>)delegate(ResourceRequest progress)
 					{
-						((_003CLoadDirect_003Ec__Iterator27A)/*Error near IL_01c2: stateMachine*/).request.progressObject = progress;
-					}, delegate(UnityEngine.Object asset)
+						((_003CLoadDirect_003Ec__Iterator282)/*Error near IL_01c2: stateMachine*/).request.progressObject = progress;
+					}, (Action<Object>)delegate(Object asset)
 					{
-						((_003CLoadDirect_003Ec__Iterator27A)/*Error near IL_01ce: stateMachine*/).request.progressObject = PROGRESS_COMPLATE;
-						((_003CLoadDirect_003Ec__Iterator27A)/*Error near IL_01ce: stateMachine*/)._003Cload_object_003E__1 = asset;
+						((_003CLoadDirect_003Ec__Iterator282)/*Error near IL_01ce: stateMachine*/).request.progressObject = PROGRESS_COMPLATE;
+						((_003CLoadDirect_003Ec__Iterator282)/*Error near IL_01ce: stateMachine*/)._003Cload_object_003E__1 = asset;
 					});
 				}
 				else
 				{
 					yield return (object)null;
-					load_object = ExternalResources.Load<UnityEngine.Object>(path2);
+					load_object = ExternalResources.Load<Object>(path2);
 				}
-				if (load_object != (UnityEngine.Object)null)
+				if (load_object != null)
 				{
 					break;
 				}
@@ -1766,42 +1922,42 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		}
 	}
 
-	public static UnityEngine.Object LoadDirect(RESOURCE_CATEGORY category, string package_name, string resource_name)
+	public static Object LoadDirect(RESOURCE_CATEGORY category, string package_name, string resource_name)
 	{
 		if (!enableLoadDirect)
 		{
 			Log.Error(LOG.RESOURCE, "can not LoadDirect. " + category.ToString() + " : " + package_name + " : " + resource_name);
 			return null;
 		}
-		UnityEngine.Object @object = null;
+		Object val = null;
 		string[] array = ResourceDefine.subPaths[(int)category];
 		int i = 0;
 		for (int num = array.Length; i < num; i++)
 		{
 			string path = array[i] + package_name + "/" + resource_name;
-			@object = ExternalResources.Load<UnityEngine.Object>(path);
-			if (@object != (UnityEngine.Object)null)
+			val = ExternalResources.Load<Object>(path);
+			if (val != null)
 			{
 				break;
 			}
 		}
-		return @object;
+		return val;
 	}
 
-	public UnityEngine.Object __LoadDirect(RESOURCE_CATEGORY category, string resource_name)
+	public Object __LoadDirect(RESOURCE_CATEGORY category, string resource_name)
 	{
 		bool flag = enableLoadDirect;
 		enableLoadDirect = true;
-		UnityEngine.Object result = LoadDirect(category, resource_name);
+		Object result = LoadDirect(category, resource_name);
 		enableLoadDirect = flag;
 		return result;
 	}
 
-	public UnityEngine.Object __LoadDirect(RESOURCE_CATEGORY category, string package_name, string resource_name)
+	public Object __LoadDirect(RESOURCE_CATEGORY category, string package_name, string resource_name)
 	{
 		bool flag = enableLoadDirect;
 		enableLoadDirect = true;
-		UnityEngine.Object result = LoadDirect(category, package_name, resource_name);
+		Object result = LoadDirect(category, package_name, resource_name);
 		enableLoadDirect = flag;
 		return result;
 	}

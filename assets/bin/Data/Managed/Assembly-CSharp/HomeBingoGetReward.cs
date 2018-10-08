@@ -1,4 +1,5 @@
 using Network;
+using System;
 using UnityEngine;
 
 public class HomeBingoGetReward : GameSection
@@ -53,7 +54,7 @@ public class HomeBingoGetReward : GameSection
 		texInnerModelRenderTexture_ = UIModelRenderTexture.Get(texInnerModel_);
 		texInnerModelTexture_ = texInnerModel_.GetComponent<UITexture>();
 		glowModel_ = Utility.Find(base._transform, "LIB_00000003");
-		SetLabelText(UI.LBL_TITLE, eventData.name);
+		SetLabelText((Enum)UI.LBL_TITLE, eventData.name);
 	}
 
 	public override void UpdateUI()
@@ -63,36 +64,22 @@ public class HomeBingoGetReward : GameSection
 		base.UpdateUI();
 	}
 
-	private void UpdateRewardIcon(DeliveryRewardTable.DeliveryRewardData[] rewards)
+	private unsafe void UpdateRewardIcon(DeliveryRewardTable.DeliveryRewardData[] rewards)
 	{
 		if (rewards != null && rewards.Length > 0)
 		{
 			int exp = 0;
-			SetGrid(UI.GRD_REWARD, string.Empty, rewards.Length, false, delegate(int index, Transform t, bool is_recycle)
-			{
-				DeliveryRewardTable.DeliveryRewardData.Reward reward = rewards[index].reward;
-				bool is_visible = false;
-				if (reward.type == REWARD_TYPE.EXP)
-				{
-					exp += reward.num;
-				}
-				else
-				{
-					is_visible = true;
-					ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(reward.type, reward.item_id, t, reward.num, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_DETAIL);
-					SetMaterialInfo(itemIcon.transform, reward.type, reward.item_id, null);
-					itemIcon.SetRewardBG(true);
-				}
-				SetActive(t, is_visible);
-			});
+			_003CUpdateRewardIcon_003Ec__AnonStorey376 _003CUpdateRewardIcon_003Ec__AnonStorey;
+			SetGrid(UI.GRD_REWARD, string.Empty, rewards.Length, false, new Action<int, Transform, bool>((object)_003CUpdateRewardIcon_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
 	private void OnQuery_CLOSE()
 	{
-		if ((Object)null != (Object)glowModel_)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		if (null != glowModel_)
 		{
-			glowModel_.gameObject.SetActive(false);
+			glowModel_.get_gameObject().SetActive(false);
 		}
 		GameSection.BackSection();
 	}

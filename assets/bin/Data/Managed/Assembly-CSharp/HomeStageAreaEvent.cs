@@ -37,13 +37,15 @@ public class HomeStageAreaEvent : HomeStageEventBase
 
 	protected override void Awake()
 	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Expected O, but got Unknown
 		base.Awake();
-		_transform = base.transform;
-		_collider = GetComponent<SphereCollider>();
-		if (!((Object)_collider == (Object)null))
+		_transform = this.get_transform();
+		_collider = this.GetComponent<SphereCollider>();
+		if (!(_collider == null))
 		{
-			defaultRadius = _collider.radius;
-			_collider.radius += noticeRange;
+			defaultRadius = _collider.get_radius();
+			_collider.set_radius(_collider.get_radius() + noticeRange);
 		}
 	}
 }

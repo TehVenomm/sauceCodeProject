@@ -10,14 +10,14 @@ namespace Network
 
 		public int requiredTicket;
 
-		public int requiredGem;
-
 		public int requiredTicketx10;
-
-		public int requiredGemx10;
 
 		public int jackpot;
 
 		public List<FortuneWheelItem> itemList;
+
+		public int ticketPrice;
+
+		public bool freeSpin;
 	}
 }

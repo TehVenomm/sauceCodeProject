@@ -32,13 +32,13 @@ public class UISlider : UIProgressBar
 	{
 		get
 		{
-			Collider component = GetComponent<Collider>();
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			Collider component = this.GetComponent<Collider>();
+			if (component != null)
 			{
-				return component.enabled;
+				return component.get_enabled();
 			}
-			Collider2D component2 = GetComponent<Collider2D>();
-			return (UnityEngine.Object)component2 != (UnityEngine.Object)null && component2.enabled;
+			Collider2D component2 = this.GetComponent<Collider2D>();
+			return component2 != null && component2.get_enabled();
 		}
 	}
 
@@ -72,7 +72,7 @@ public class UISlider : UIProgressBar
 		if (direction != Direction.Upgraded)
 		{
 			mValue = rawValue;
-			if ((UnityEngine.Object)foreground != (UnityEngine.Object)null)
+			if (foreground != null)
 			{
 				mFG = foreground.GetComponent<UIWidget>();
 			}
@@ -90,15 +90,20 @@ public class UISlider : UIProgressBar
 
 	protected override void OnStart()
 	{
-		GameObject go = (!((UnityEngine.Object)mBG != (UnityEngine.Object)null) || (!((UnityEngine.Object)mBG.GetComponent<Collider>() != (UnityEngine.Object)null) && !((UnityEngine.Object)mBG.GetComponent<Collider2D>() != (UnityEngine.Object)null))) ? base.gameObject : mBG.gameObject;
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Expected O, but got Unknown
+		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0113: Expected O, but got Unknown
+		GameObject go = (!(mBG != null) || (!(mBG.GetComponent<Collider>() != null) && !(mBG.GetComponent<Collider2D>() != null))) ? this.get_gameObject() : mBG.get_gameObject();
 		UIEventListener uIEventListener = UIEventListener.Get(go);
 		UIEventListener uIEventListener2 = uIEventListener;
 		uIEventListener2.onPress = (UIEventListener.BoolDelegate)Delegate.Combine(uIEventListener2.onPress, new UIEventListener.BoolDelegate(OnPressBackground));
 		UIEventListener uIEventListener3 = uIEventListener;
 		uIEventListener3.onDrag = (UIEventListener.VectorDelegate)Delegate.Combine(uIEventListener3.onDrag, new UIEventListener.VectorDelegate(OnDragBackground));
-		if ((UnityEngine.Object)thumb != (UnityEngine.Object)null && ((UnityEngine.Object)thumb.GetComponent<Collider>() != (UnityEngine.Object)null || (UnityEngine.Object)thumb.GetComponent<Collider2D>() != (UnityEngine.Object)null) && ((UnityEngine.Object)mFG == (UnityEngine.Object)null || (UnityEngine.Object)thumb != (UnityEngine.Object)mFG.cachedTransform))
+		if (thumb != null && (thumb.GetComponent<Collider>() != null || thumb.GetComponent<Collider2D>() != null) && (mFG == null || thumb != mFG.cachedTransform))
 		{
-			UIEventListener uIEventListener4 = UIEventListener.Get(thumb.gameObject);
+			UIEventListener uIEventListener4 = UIEventListener.Get(thumb.get_gameObject());
 			UIEventListener uIEventListener5 = uIEventListener4;
 			uIEventListener5.onPress = (UIEventListener.BoolDelegate)Delegate.Combine(uIEventListener5.onPress, new UIEventListener.BoolDelegate(OnPressForeground));
 			UIEventListener uIEventListener6 = uIEventListener4;
@@ -108,6 +113,7 @@ public class UISlider : UIProgressBar
 
 	protected void OnPressBackground(GameObject go, bool isPressed)
 	{
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		if (UICamera.currentScheme != UICamera.ControlScheme.Controller)
 		{
 			mCam = UICamera.currentCamera;
@@ -121,6 +127,7 @@ public class UISlider : UIProgressBar
 
 	protected void OnDragBackground(GameObject go, Vector2 delta)
 	{
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		if (UICamera.currentScheme != UICamera.ControlScheme.Controller)
 		{
 			mCam = UICamera.currentCamera;
@@ -130,12 +137,13 @@ public class UISlider : UIProgressBar
 
 	protected void OnPressForeground(GameObject go, bool isPressed)
 	{
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 		if (UICamera.currentScheme != UICamera.ControlScheme.Controller)
 		{
 			mCam = UICamera.currentCamera;
 			if (isPressed)
 			{
-				mOffset = ((!((UnityEngine.Object)mFG == (UnityEngine.Object)null)) ? (base.value - ScreenToValue(UICamera.lastEventPosition)) : 0f);
+				mOffset = ((!(mFG == null)) ? (base.value - ScreenToValue(UICamera.lastEventPosition)) : 0f);
 			}
 			else if (onDragFinished != null)
 			{
@@ -146,6 +154,7 @@ public class UISlider : UIProgressBar
 
 	protected void OnDragForeground(GameObject go, Vector2 delta)
 	{
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		if (UICamera.currentScheme != UICamera.ControlScheme.Controller)
 		{
 			mCam = UICamera.currentCamera;
@@ -155,7 +164,8 @@ public class UISlider : UIProgressBar
 
 	public override void OnPan(Vector2 delta)
 	{
-		if (base.enabled && isColliderEnabled)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		if (this.get_enabled() && isColliderEnabled)
 		{
 			base.OnPan(delta);
 		}

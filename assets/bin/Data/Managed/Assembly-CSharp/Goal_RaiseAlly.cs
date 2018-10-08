@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class Goal_RaiseAlly : GoalComposite
 {
 	protected override GOAL_TYPE GetGoalType()
@@ -57,7 +55,7 @@ public class Goal_RaiseAlly : GoalComposite
 	public override void HandleEvent(Brain brain, BRAIN_EVENT ev, object param = null)
 	{
 		base.HandleEvent(brain, ev, param);
-		if (ev == BRAIN_EVENT.BULLET_CATCH && !IsNowProcess(GOAL_TYPE.ENSURE_SAFETY) && (Object)brain.dangerRader != (Object)null && !brain.dangerRader.AskWillBulletHit(0.2f))
+		if (ev == BRAIN_EVENT.BULLET_CATCH && !IsNowProcess(GOAL_TYPE.ENSURE_SAFETY) && brain.dangerRader != null && !brain.dangerRader.AskWillBulletHit(0.2f))
 		{
 			return;
 		}

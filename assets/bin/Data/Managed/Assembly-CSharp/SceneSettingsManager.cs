@@ -50,7 +50,7 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 	private const string BINGO_BLOCK_OBJECT_NAME = "block";
 
 	[Tooltip("フォグカラ\u30fc")]
-	public Color fogColor = Color.white;
+	public Color fogColor = Color.get_white();
 
 	[Tooltip("フォグ開始距離。フォグモ\u30fcドLinearでのみ使用")]
 	public float linearFogStart;
@@ -100,7 +100,7 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 	[Tooltip("フォグ強制ON")]
 	public bool forceFogON;
 
-	public UnityEngine.Object[] linkResources;
+	public Object[] linkResources;
 
 	[Tooltip("マップの内外情報保存フラグ")]
 	public bool saveInsideCollider = true;
@@ -138,19 +138,30 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 
 	private void ParseObjectName()
 	{
-		foreach (Transform item in base.transform)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Expected O, but got Unknown
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Expected O, but got Unknown
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Expected O, but got Unknown
+		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Expected O, but got Unknown
+		foreach (Transform item in this.get_transform())
 		{
-			if (item.name.Contains("Objects"))
+			Transform val = item;
+			if (val.get_name().Contains("Objects"))
 			{
-				foreach (Transform item2 in item)
+				foreach (Transform item2 in val)
 				{
-					if (item2.name.Contains("bingoboard"))
+					Transform val2 = item2;
+					if (val2.get_name().Contains("bingoboard"))
 					{
-						m_bingoBoardObject = item2.gameObject;
+						m_bingoBoardObject = val2.get_gameObject();
 					}
-					if (item2.name.Contains("block"))
+					if (val2.get_name().Contains("block"))
 					{
-						m_bingoBlockObject = item2.gameObject;
+						m_bingoBlockObject = val2.get_gameObject();
 					}
 				}
 			}
@@ -164,24 +175,32 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 
 	public void ApplyScene(bool isEditorAmbientColor)
 	{
-		if (Application.isPlaying)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		if (Application.get_isPlaying())
 		{
 			isEditorAmbientColor = false;
 		}
-		RenderSettings.fog = false;
+		RenderSettings.set_fog(false);
 		if (!isEditorAmbientColor)
 		{
-			RenderSettings.ambientLight = ambientColor;
+			RenderSettings.set_ambientLight(ambientColor);
 		}
 		else
 		{
-			RenderSettings.ambientLight = editorAmbientColor;
+			RenderSettings.set_ambientLight(editorAmbientColor);
 		}
 		weatherController.Init();
 	}
 
 	public void ApplyStageMaterial()
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 		ShaderGlobal.fogColor = fogColor;
 		ShaderGlobal.fogNear = linearFogStart;
 		ShaderGlobal.fogFar = linearFogEnd;
@@ -194,43 +213,50 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 		ShaderGlobal.npcAmbientColor = npcAmbientColor;
 		if (MonoBehaviourSingleton<GlobalSettingsManager>.IsValid())
 		{
-			MonoBehaviourSingleton<GlobalSettingsManager>.I.npcLightDirection.localEulerAngles = npcLightDir;
+			MonoBehaviourSingleton<GlobalSettingsManager>.I.npcLightDirection.set_localEulerAngles(npcLightDir);
 		}
 	}
 
 	public static void ApplyEffect(rymFX fx, bool force)
 	{
-		if (!((UnityEngine.Object)fx == (UnityEngine.Object)null) && (force || fx.BaseColor.a == 0f))
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		if (!(fx == null) && (force || fx.BaseColor.a == 0f))
 		{
-			Color color = fx.BaseColor = ((!MonoBehaviourSingleton<SceneSettingsManager>.IsValid()) ? Color.white : MonoBehaviourSingleton<SceneSettingsManager>.I.effectColor);
+			Color val = fx.BaseColor = ((!MonoBehaviourSingleton<SceneSettingsManager>.IsValid()) ? Color.get_white() : MonoBehaviourSingleton<SceneSettingsManager>.I.effectColor);
 		}
 	}
 
-	public static T GetLinkResource<T>(string name) where T : UnityEngine.Object
+	public static T GetLinkResource<T>(string name) where T : Object
 	{
 		if (!MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
 		{
-			return (T)null;
+			return (T)(object)null;
 		}
-		UnityEngine.Object[] array = MonoBehaviourSingleton<SceneSettingsManager>.I.linkResources;
+		Object[] array = MonoBehaviourSingleton<SceneSettingsManager>.I.linkResources;
 		if (array == null)
 		{
-			return (T)null;
+			return (T)(object)null;
 		}
 		int i = 0;
 		for (int num = array.Length; i < num; i++)
 		{
-			if (array[i] != (UnityEngine.Object)null && array[i].name == name)
+			if (array[i] != null && array[i].get_name() == name)
 			{
 				return array[i] as T;
 			}
 		}
-		return (T)null;
+		return (T)(object)null;
 	}
 
 	public void ChangeWeather(float changingTime, float duration)
 	{
-		StartCoroutine(DoChangeWeather(changingTime, duration));
+		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoChangeWeather(changingTime, duration));
 	}
 
 	private IEnumerator DoChangeWeather(float changingTime, float duration)
@@ -239,7 +265,7 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 		weatherController.OnStartWeatherChange();
 		while (timer2 < changingTime)
 		{
-			timer2 += Time.deltaTime;
+			timer2 += Time.get_deltaTime();
 			weatherController.Update(timer2 / changingTime);
 			yield return (object)null;
 		}
@@ -249,7 +275,7 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 		weatherController.OnStartReturnToOriginal();
 		while (timer2 < changingTime)
 		{
-			timer2 += Time.deltaTime;
+			timer2 += Time.get_deltaTime();
 			weatherController.Update(1f - timer2 / changingTime);
 			yield return (object)null;
 		}
@@ -264,10 +290,10 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 		}
 		for (int i = 0; i < waveTargets.Length; i++)
 		{
-			GameObject gameObject = waveTargets[i];
-			if ((UnityEngine.Object)gameObject != (UnityEngine.Object)null && gameObject.name == name)
+			GameObject val = waveTargets[i];
+			if (val != null && val.get_name() == name)
 			{
-				return gameObject;
+				return val;
 			}
 		}
 		return null;
@@ -275,7 +301,7 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 
 	public void AddWaveTarget(GameObject target)
 	{
-		if (!((UnityEngine.Object)target == (UnityEngine.Object)null))
+		if (!(target == null))
 		{
 			addWaveTargetList.Add(target);
 		}
@@ -288,10 +314,10 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 			int i = 0;
 			for (int count = addWaveTargetList.Count; i < count; i++)
 			{
-				GameObject gameObject = addWaveTargetList[i];
-				if ((UnityEngine.Object)gameObject != (UnityEngine.Object)null)
+				GameObject val = addWaveTargetList[i];
+				if (val != null)
 				{
-					gameObject.SetActive(false);
+					val.SetActive(false);
 				}
 			}
 		}
@@ -300,10 +326,10 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 			int j = 0;
 			for (int num = waveTargets.Length; j < num; j++)
 			{
-				GameObject gameObject2 = waveTargets[j];
-				if ((UnityEngine.Object)gameObject2 != (UnityEngine.Object)null)
+				GameObject val2 = waveTargets[j];
+				if (val2 != null)
 				{
-					gameObject2.SetActive(false);
+					val2.SetActive(false);
 				}
 			}
 		}
@@ -333,31 +359,31 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 
 	private void _ExecEventItemCount(EventItemCounts eic, HomeInfoCountData hicd)
 	{
-		int value = eic.rewardGrade;
+		int num = eic.rewardGrade;
 		if (hicd.gradeToValue != null)
 		{
-			for (int num = hicd.gradeToValue.Length - 1; num >= 0; num--)
+			for (int num2 = hicd.gradeToValue.Length - 1; num2 >= 0; num2--)
 			{
-				if (eic.rewardGrade >= hicd.gradeToValue[num].threshold)
+				if (eic.rewardGrade >= hicd.gradeToValue[num2].threshold)
 				{
-					value = hicd.gradeToValue[num].value;
+					num = hicd.gradeToValue[num2].value;
 					break;
 				}
 			}
 		}
-		if ((UnityEngine.Object)hicd.animator != (UnityEngine.Object)null)
+		if (hicd.animator != null)
 		{
-			hicd.animator.SetInteger("Value", value);
+			hicd.animator.SetInteger("Value", num);
 		}
 	}
 
 	public void SwitchBingoObjectsActivation(bool _isActive)
 	{
-		if ((UnityEngine.Object)m_bingoBoardObject != (UnityEngine.Object)null && m_bingoBoardObject.activeSelf != _isActive)
+		if (m_bingoBoardObject != null && m_bingoBoardObject.get_activeSelf() != _isActive)
 		{
 			m_bingoBoardObject.SetActive(_isActive);
 		}
-		if ((UnityEngine.Object)m_bingoBlockObject != (UnityEngine.Object)null && m_bingoBlockObject.activeSelf != _isActive)
+		if (m_bingoBlockObject != null && m_bingoBlockObject.get_activeSelf() != _isActive)
 		{
 			m_bingoBlockObject.SetActive(_isActive);
 		}

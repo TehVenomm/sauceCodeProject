@@ -4,7 +4,7 @@ using System.Text;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/UI/Input Field")]
-public class UIInput : MonoBehaviour
+public class UIInput
 {
 	public enum InputType
 	{
@@ -72,7 +72,7 @@ public class UIInput : MonoBehaviour
 	[SerializeField]
 	private GameObject selectOnTab;
 
-	public Color activeTextColor = Color.white;
+	public Color activeTextColor = Color.get_white();
 
 	public Color caretColor = new Color(1f, 1f, 1f, 0.8f);
 
@@ -84,15 +84,15 @@ public class UIInput : MonoBehaviour
 
 	public OnValidate onValidate;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected string mValue;
 
 	[NonSerialized]
 	protected string mDefaultText = string.Empty;
 
 	[NonSerialized]
-	protected Color mDefaultColor = Color.white;
+	protected Color mDefaultColor = Color.get_white();
 
 	[NonSerialized]
 	protected float mPosition;
@@ -170,7 +170,7 @@ public class UIInput : MonoBehaviour
 		}
 	}
 
-	public bool inputShouldBeHidden => hideInput && (UnityEngine.Object)label != (UnityEngine.Object)null && !label.multiLine && inputType != InputType.Password;
+	public bool inputShouldBeHidden => hideInput && label != null && !label.multiLine && inputType != InputType.Password;
 
 	[Obsolete("Use UIInput.value instead")]
 	public string text
@@ -197,19 +197,21 @@ public class UIInput : MonoBehaviour
 		}
 		set
 		{
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Invalid comparison between Unknown and I4
 			if (mDoInit)
 			{
 				Init();
 			}
 			mDrawStart = 0;
-			if (Application.platform == RuntimePlatform.BlackBerryPlayer)
+			if ((int)Application.get_platform() == 22)
 			{
 				value = value.Replace("\\b", "\b");
 			}
 			value = Validate(value);
 			if (isSelected && mKeyboard != null && mCached != value)
 			{
-				mKeyboard.text = value;
+				mKeyboard.set_text(value);
 				mCached = value;
 			}
 			if (mValue != value)
@@ -256,10 +258,12 @@ public class UIInput : MonoBehaviour
 	{
 		get
 		{
-			return (UnityEngine.Object)selection == (UnityEngine.Object)this;
+			return selection == this;
 		}
 		set
 		{
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Expected O, but got Unknown
 			if (!value)
 			{
 				if (isSelected)
@@ -269,7 +273,7 @@ public class UIInput : MonoBehaviour
 			}
 			else
 			{
-				UICamera.selectedObject = base.gameObject;
+				UICamera.selectedObject = this.get_gameObject();
 			}
 		}
 	}
@@ -336,6 +340,19 @@ public class UIInput : MonoBehaviour
 
 	public UITexture caret => mCaret;
 
+	public UIInput()
+		: this()
+	{
+	}//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+	//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+	//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+	//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+
+
 	public string Validate(string val)
 	{
 		if (string.IsNullOrEmpty(val))
@@ -368,12 +385,13 @@ public class UIInput : MonoBehaviour
 
 	private void Start()
 	{
-		if ((UnityEngine.Object)selectOnTab != (UnityEngine.Object)null)
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		if (selectOnTab != null)
 		{
-			UIKeyNavigation component = GetComponent<UIKeyNavigation>();
-			if ((UnityEngine.Object)component == (UnityEngine.Object)null)
+			UIKeyNavigation component = this.GetComponent<UIKeyNavigation>();
+			if (component == null)
 			{
-				component = base.gameObject.AddComponent<UIKeyNavigation>();
+				component = this.get_gameObject().AddComponent<UIKeyNavigation>();
 				component.onDown = selectOnTab;
 			}
 			selectOnTab = null;
@@ -391,7 +409,11 @@ public class UIInput : MonoBehaviour
 
 	protected void Init()
 	{
-		if (mDoInit && (UnityEngine.Object)label != (UnityEngine.Object)null)
+		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		if (mDoInit && label != null)
 		{
 			mDoInit = false;
 			mDefaultText = label.text;
@@ -400,10 +422,10 @@ public class UIInput : MonoBehaviour
 			if (label.alignment == NGUIText.Alignment.Justified)
 			{
 				label.alignment = NGUIText.Alignment.Left;
-				Debug.LogWarning("Input fields using labels with justified alignment are not supported at this time", this);
+				Debug.LogWarning((object)"Input fields using labels with justified alignment are not supported at this time", this);
 			}
 			mPivot = label.pivot;
-			Vector3 localPosition = label.cachedTransform.localPosition;
+			Vector3 localPosition = label.cachedTransform.get_localPosition();
 			mPosition = localPosition.x;
 			UpdateLabel();
 		}
@@ -438,31 +460,32 @@ public class UIInput : MonoBehaviour
 
 	protected void OnSelectEvent()
 	{
-		mSelectTime = Time.frameCount;
+		mSelectTime = Time.get_frameCount();
 		selection = this;
 		if (mDoInit)
 		{
 			Init();
 		}
-		if ((UnityEngine.Object)label != (UnityEngine.Object)null && NGUITools.GetActive(this))
+		if (label != null && NGUITools.GetActive(this))
 		{
-			mSelectMe = Time.frameCount;
+			mSelectMe = Time.get_frameCount();
 		}
 	}
 
 	protected void OnDeselectEvent()
 	{
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 		if (mDoInit)
 		{
 			Init();
 		}
-		if ((UnityEngine.Object)label != (UnityEngine.Object)null && NGUITools.GetActive(this))
+		if (label != null && NGUITools.GetActive(this))
 		{
 			mValue = value;
 			if (mKeyboard != null)
 			{
 				mWaitForKeyboard = false;
-				mKeyboard.active = false;
+				mKeyboard.set_active(false);
 				mKeyboard = null;
 			}
 			if (string.IsNullOrEmpty(mValue))
@@ -474,7 +497,7 @@ public class UIInput : MonoBehaviour
 			{
 				label.text = mValue;
 			}
-			Input.imeCompositionMode = IMECompositionMode.Auto;
+			Input.set_imeCompositionMode(0);
 			RestoreLabelPivot();
 		}
 		selection = null;
@@ -483,7 +506,43 @@ public class UIInput : MonoBehaviour
 
 	protected virtual void Update()
 	{
-		if (isSelected && mSelectTime != Time.frameCount)
+		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Invalid comparison between Unknown and I4
+		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e5: Invalid comparison between Unknown and I4
+		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ed: Invalid comparison between Unknown and I4
+		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f5: Invalid comparison between Unknown and I4
+		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fd: Invalid comparison between Unknown and I4
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0105: Invalid comparison between Unknown and I4
+		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010d: Invalid comparison between Unknown and I4
+		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e4: Expected O, but got Unknown
+		//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0233: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0253: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0258: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0274: Unknown result type (might be due to invalid IL or missing references)
+		//IL_053c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_056c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_061f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_063a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06ed: Unknown result type (might be due to invalid IL or missing references)
+		if (isSelected && mSelectTime != Time.get_frameCount())
 		{
 			if (mDoInit)
 			{
@@ -491,63 +550,63 @@ public class UIInput : MonoBehaviour
 			}
 			if (mWaitForKeyboard)
 			{
-				if (mKeyboard != null && !mKeyboard.active)
+				if (mKeyboard != null && !mKeyboard.get_active())
 				{
 					return;
 				}
 				mWaitForKeyboard = false;
 			}
-			if (mSelectMe != -1 && mSelectMe != Time.frameCount)
+			if (mSelectMe != -1 && mSelectMe != Time.get_frameCount())
 			{
 				mSelectMe = -1;
 				mSelectionEnd = ((!string.IsNullOrEmpty(mValue)) ? mValue.Length : 0);
 				mDrawStart = 0;
 				mSelectionStart = ((!selectAllTextOnFocus) ? mSelectionEnd : 0);
 				label.color = activeTextColor;
-				RuntimePlatform platform = Application.platform;
-				if (platform == RuntimePlatform.IPhonePlayer || platform == RuntimePlatform.Android || platform == RuntimePlatform.WP8Player || platform == RuntimePlatform.BlackBerryPlayer || platform == RuntimePlatform.MetroPlayerARM || platform == RuntimePlatform.MetroPlayerX64 || platform == RuntimePlatform.MetroPlayerX86)
+				RuntimePlatform platform = Application.get_platform();
+				if ((int)platform == 8 || (int)platform == 11 || (int)platform == 21 || (int)platform == 22 || (int)platform == 20 || (int)platform == 19 || (int)platform == 18)
 				{
-					TouchScreenKeyboardType touchScreenKeyboardType;
+					TouchScreenKeyboardType val;
 					string text;
 					if (inputShouldBeHidden)
 					{
-						TouchScreenKeyboard.hideInput = true;
-						touchScreenKeyboardType = (TouchScreenKeyboardType)keyboardType;
+						TouchScreenKeyboard.set_hideInput(true);
+						val = keyboardType;
 						text = "|";
 					}
 					else if (inputType == InputType.Password)
 					{
-						TouchScreenKeyboard.hideInput = false;
-						touchScreenKeyboardType = TouchScreenKeyboardType.Default;
+						TouchScreenKeyboard.set_hideInput(false);
+						val = 0;
 						text = mValue;
 						mSelectionStart = mSelectionEnd;
 					}
 					else
 					{
-						TouchScreenKeyboard.hideInput = false;
-						touchScreenKeyboardType = (TouchScreenKeyboardType)keyboardType;
+						TouchScreenKeyboard.set_hideInput(false);
+						val = keyboardType;
 						text = mValue;
 						mSelectionStart = mSelectionEnd;
 					}
 					mWaitForKeyboard = true;
-					mKeyboard = ((inputType != InputType.Password) ? TouchScreenKeyboard.Open(text, touchScreenKeyboardType, !inputShouldBeHidden && inputType == InputType.AutoCorrect, label.multiLine && !hideInput, false, false, defaultText) : TouchScreenKeyboard.Open(text, touchScreenKeyboardType, false, false, true));
+					mKeyboard = ((inputType != InputType.Password) ? TouchScreenKeyboard.Open(text, val, !inputShouldBeHidden && inputType == InputType.AutoCorrect, label.multiLine && !hideInput, false, false, defaultText) : TouchScreenKeyboard.Open(text, val, false, false, true));
 				}
 				else
 				{
-					Vector2 compositionCursorPos = (!((UnityEngine.Object)UICamera.current != (UnityEngine.Object)null) || !((UnityEngine.Object)UICamera.current.cachedCamera != (UnityEngine.Object)null)) ? label.worldCorners[0] : UICamera.current.cachedCamera.WorldToScreenPoint(label.worldCorners[0]);
-					compositionCursorPos.y = (float)Screen.height - compositionCursorPos.y;
-					Input.imeCompositionMode = IMECompositionMode.On;
-					Input.compositionCursorPos = compositionCursorPos;
+					Vector2 compositionCursorPos = Vector2.op_Implicit((!(UICamera.current != null) || !(UICamera.current.cachedCamera != null)) ? label.worldCorners[0] : UICamera.current.cachedCamera.WorldToScreenPoint(label.worldCorners[0]));
+					compositionCursorPos.y = (float)Screen.get_height() - compositionCursorPos.y;
+					Input.set_imeCompositionMode(1);
+					Input.set_compositionCursorPos(compositionCursorPos);
 				}
 				UpdateLabel();
-				if (string.IsNullOrEmpty(Input.inputString))
+				if (string.IsNullOrEmpty(Input.get_inputString()))
 				{
 					return;
 				}
 			}
 			if (mKeyboard != null)
 			{
-				string text2 = (!mKeyboard.done && mKeyboard.active) ? mKeyboard.text : mCached;
+				string text2 = (!mKeyboard.get_done() && mKeyboard.get_active()) ? mKeyboard.get_text() : mCached;
 				if (inputShouldBeHidden)
 				{
 					if (text2 != "|")
@@ -560,20 +619,20 @@ public class UIInput : MonoBehaviour
 						{
 							DoBackspace();
 						}
-						mKeyboard.text = "|";
+						mKeyboard.set_text("|");
 					}
 				}
 				else if (mCached != text2)
 				{
 					mCached = text2;
-					if (!mKeyboard.done && mKeyboard.active)
+					if (!mKeyboard.get_done() && mKeyboard.get_active())
 					{
 						value = text2;
 					}
 				}
-				if (mKeyboard.done || !mKeyboard.active)
+				if (mKeyboard.get_done() || !mKeyboard.get_active())
 				{
-					if (!mKeyboard.wasCanceled)
+					if (!mKeyboard.get_wasCanceled())
 					{
 						Submit();
 					}
@@ -584,10 +643,10 @@ public class UIInput : MonoBehaviour
 			}
 			else
 			{
-				string compositionString = Input.compositionString;
-				if (string.IsNullOrEmpty(compositionString) && !string.IsNullOrEmpty(Input.inputString))
+				string compositionString = Input.get_compositionString();
+				if (string.IsNullOrEmpty(compositionString) && !string.IsNullOrEmpty(Input.get_inputString()))
 				{
-					string inputString = Input.inputString;
+					string inputString = Input.get_inputString();
 					for (int i = 0; i < inputString.Length; i++)
 					{
 						char c = inputString[i];
@@ -605,30 +664,30 @@ public class UIInput : MonoBehaviour
 					ExecuteOnChange();
 				}
 			}
-			if ((UnityEngine.Object)mCaret != (UnityEngine.Object)null && mNextBlink < RealTime.time)
+			if (mCaret != null && mNextBlink < RealTime.time)
 			{
 				mNextBlink = RealTime.time + 0.5f;
-				mCaret.enabled = !mCaret.enabled;
+				mCaret.set_enabled(!mCaret.get_enabled());
 			}
 			if (isSelected && mLastAlpha != label.finalAlpha)
 			{
 				UpdateLabel();
 			}
-			if ((UnityEngine.Object)mCam == (UnityEngine.Object)null)
+			if (mCam == null)
 			{
-				mCam = UICamera.FindCameraForLayer(base.gameObject.layer);
+				mCam = UICamera.FindCameraForLayer(this.get_gameObject().get_layer());
 			}
-			if ((UnityEngine.Object)mCam != (UnityEngine.Object)null)
+			if (mCam != null)
 			{
 				if (UICamera.GetKeyDown(mCam.submitKey0))
 				{
-					if (onReturnKey == OnReturnKey.NewLine || (onReturnKey == OnReturnKey.Default && label.multiLine && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl) && label.overflowMethod != UILabel.Overflow.ClampContent && validation == Validation.None))
+					if (onReturnKey == OnReturnKey.NewLine || (onReturnKey == OnReturnKey.Default && label.multiLine && !Input.GetKey(306) && !Input.GetKey(305) && label.overflowMethod != UILabel.Overflow.ClampContent && validation == Validation.None))
 					{
 						Insert("\n");
 					}
 					else
 					{
-						if ((UnityEngine.Object)UICamera.controller.current != (UnityEngine.Object)null)
+						if (UICamera.controller.current != null)
 						{
 							UICamera.controller.clickNotification = UICamera.ClickNotification.None;
 						}
@@ -638,13 +697,13 @@ public class UIInput : MonoBehaviour
 				}
 				if (UICamera.GetKeyDown(mCam.submitKey1))
 				{
-					if (onReturnKey == OnReturnKey.NewLine || (onReturnKey == OnReturnKey.Default && label.multiLine && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl) && label.overflowMethod != UILabel.Overflow.ClampContent && validation == Validation.None))
+					if (onReturnKey == OnReturnKey.NewLine || (onReturnKey == OnReturnKey.Default && label.multiLine && !Input.GetKey(306) && !Input.GetKey(305) && label.overflowMethod != UILabel.Overflow.ClampContent && validation == Validation.None))
 					{
 						Insert("\n");
 					}
 					else
 					{
-						if ((UnityEngine.Object)UICamera.controller.current != (UnityEngine.Object)null)
+						if (UICamera.controller.current != null)
 						{
 							UICamera.controller.clickNotification = UICamera.ClickNotification.None;
 						}
@@ -652,9 +711,9 @@ public class UIInput : MonoBehaviour
 						Submit();
 					}
 				}
-				if (!mCam.useKeyboard && UICamera.GetKeyUp(KeyCode.Tab))
+				if (!mCam.useKeyboard && UICamera.GetKeyUp(9))
 				{
-					OnKey(KeyCode.Tab);
+					OnKey(9);
 				}
 			}
 		}
@@ -662,7 +721,13 @@ public class UIInput : MonoBehaviour
 
 	private void OnKey(KeyCode key)
 	{
-		int frameCount = Time.frameCount;
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Invalid comparison between Unknown and I4
+		int frameCount = Time.get_frameCount();
 		if (mIgnoreKey != frameCount)
 		{
 			if (key == mCam.cancelKey0 || key == mCam.cancelKey1)
@@ -670,14 +735,14 @@ public class UIInput : MonoBehaviour
 				mIgnoreKey = frameCount;
 				isSelected = false;
 			}
-			else if (key == KeyCode.Tab)
+			else if ((int)key == 9)
 			{
 				mIgnoreKey = frameCount;
 				isSelected = false;
-				UIKeyNavigation component = GetComponent<UIKeyNavigation>();
-				if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+				UIKeyNavigation component = this.GetComponent<UIKeyNavigation>();
+				if (component != null)
 				{
-					component.OnKey(KeyCode.Tab);
+					component.OnKey(9);
 				}
 			}
 		}
@@ -783,18 +848,27 @@ public class UIInput : MonoBehaviour
 
 	protected int GetCharUnderMouse()
 	{
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 		Vector3[] worldCorners = label.worldCorners;
 		Ray currentRay = UICamera.currentRay;
-		float enter;
-		return new Plane(worldCorners[0], worldCorners[1], worldCorners[2]).Raycast(currentRay, out enter) ? (mDrawStart + label.GetCharacterIndexAtPosition(currentRay.GetPoint(enter), false)) : 0;
+		Plane val = default(Plane);
+		val._002Ector(worldCorners[0], worldCorners[1], worldCorners[2]);
+		float num = default(float);
+		return val.Raycast(currentRay, ref num) ? (mDrawStart + label.GetCharacterIndexAtPosition(currentRay.GetPoint(num), false)) : 0;
 	}
 
 	protected virtual void OnPress(bool isPressed)
 	{
-		if (isPressed && isSelected && (UnityEngine.Object)label != (UnityEngine.Object)null && (UICamera.currentScheme == UICamera.ControlScheme.Mouse || UICamera.currentScheme == UICamera.ControlScheme.Touch))
+		if (isPressed && isSelected && label != null && (UICamera.currentScheme == UICamera.ControlScheme.Mouse || UICamera.currentScheme == UICamera.ControlScheme.Touch))
 		{
 			selectionEnd = GetCharUnderMouse();
-			if (!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
+			if (!Input.GetKey(304) && !Input.GetKey(303))
 			{
 				selectionStart = mSelectionEnd;
 			}
@@ -803,7 +877,7 @@ public class UIInput : MonoBehaviour
 
 	protected virtual void OnDrag(Vector2 delta)
 	{
-		if ((UnityEngine.Object)label != (UnityEngine.Object)null && (UICamera.currentScheme == UICamera.ControlScheme.Mouse || UICamera.currentScheme == UICamera.ControlScheme.Touch))
+		if (label != null && (UICamera.currentScheme == UICamera.ControlScheme.Mouse || UICamera.currentScheme == UICamera.ControlScheme.Touch))
 		{
 			selectionEnd = GetCharUnderMouse();
 		}
@@ -816,15 +890,15 @@ public class UIInput : MonoBehaviour
 
 	protected virtual void Cleanup()
 	{
-		if ((bool)mHighlight)
+		if (Object.op_Implicit(mHighlight))
 		{
-			mHighlight.enabled = false;
+			mHighlight.set_enabled(false);
 		}
-		if ((bool)mCaret)
+		if (Object.op_Implicit(mCaret))
 		{
-			mCaret.enabled = false;
+			mCaret.set_enabled(false);
 		}
-		if ((bool)mBlankTex)
+		if (Object.op_Implicit(mBlankTex))
 		{
 			NGUITools.Destroy(mBlankTex);
 			mBlankTex = null;
@@ -836,7 +910,7 @@ public class UIInput : MonoBehaviour
 		if (NGUITools.GetActive(this))
 		{
 			mValue = value;
-			if ((UnityEngine.Object)current == (UnityEngine.Object)null)
+			if (current == null)
 			{
 				current = this;
 				EventDelegate.Execute(onSubmit);
@@ -848,7 +922,16 @@ public class UIInput : MonoBehaviour
 
 	public void UpdateLabel()
 	{
-		if ((UnityEngine.Object)label != (UnityEngine.Object)null)
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d0: Expected O, but got Unknown
+		//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0520: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0526: Unknown result type (might be due to invalid IL or missing references)
+		if (label != null)
 		{
 			if (mDoInit)
 			{
@@ -856,7 +939,7 @@ public class UIInput : MonoBehaviour
 			}
 			bool isSelected = this.isSelected;
 			string value = this.value;
-			bool flag = string.IsNullOrEmpty(value) && string.IsNullOrEmpty(Input.compositionString);
+			bool flag = string.IsNullOrEmpty(value) && string.IsNullOrEmpty(Input.get_compositionString());
 			label.color = ((!flag || isSelected) ? activeTextColor : mDefaultColor);
 			string text;
 			if (flag)
@@ -870,7 +953,7 @@ public class UIInput : MonoBehaviour
 				{
 					text = string.Empty;
 					string str = "*";
-					if ((UnityEngine.Object)label.bitmapFont != (UnityEngine.Object)null && label.bitmapFont.bmFont != null && label.bitmapFont.bmFont.GetGlyph(42) == null)
+					if (label.bitmapFont != null && label.bitmapFont.bmFont != null && label.bitmapFont.bmFont.GetGlyph(42) == null)
 					{
 						str = "x";
 					}
@@ -888,7 +971,7 @@ public class UIInput : MonoBehaviour
 				string str2 = text.Substring(0, num);
 				if (isSelected)
 				{
-					str2 += Input.compositionString;
+					str2 += Input.get_compositionString();
 				}
 				text = str2 + text.Substring(num, text.Length - num);
 				if (isSelected && label.overflowMethod == UILabel.Overflow.ClampContent && label.maxLineCount == 1)
@@ -934,64 +1017,64 @@ public class UIInput : MonoBehaviour
 			{
 				int num3 = mSelectionStart - mDrawStart;
 				int num4 = mSelectionEnd - mDrawStart;
-				if ((UnityEngine.Object)mBlankTex == (UnityEngine.Object)null)
+				if (mBlankTex == null)
 				{
-					mBlankTex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
+					mBlankTex = new Texture2D(2, 2, 5, false);
 					for (int j = 0; j < 2; j++)
 					{
 						for (int k = 0; k < 2; k++)
 						{
-							mBlankTex.SetPixel(k, j, Color.white);
+							mBlankTex.SetPixel(k, j, Color.get_white());
 						}
 					}
 					mBlankTex.Apply();
 				}
 				if (num3 != num4)
 				{
-					if ((UnityEngine.Object)mHighlight == (UnityEngine.Object)null)
+					if (mHighlight == null)
 					{
 						mHighlight = NGUITools.AddWidget<UITexture>(label.cachedGameObject);
-						mHighlight.name = "Input Highlight";
+						mHighlight.set_name("Input Highlight");
 						mHighlight.mainTexture = mBlankTex;
 						mHighlight.fillGeometry = false;
 						mHighlight.pivot = label.pivot;
-						mHighlight.SetAnchor(label.cachedTransform);
+						((UIRect)mHighlight).SetAnchor(label.cachedTransform);
 					}
 					else
 					{
 						mHighlight.pivot = label.pivot;
 						mHighlight.mainTexture = mBlankTex;
 						mHighlight.MarkAsChanged();
-						mHighlight.enabled = true;
+						mHighlight.set_enabled(true);
 					}
 				}
-				if ((UnityEngine.Object)mCaret == (UnityEngine.Object)null)
+				if (mCaret == null)
 				{
 					mCaret = NGUITools.AddWidget<UITexture>(label.cachedGameObject);
-					mCaret.name = "Input Caret";
+					mCaret.set_name("Input Caret");
 					mCaret.mainTexture = mBlankTex;
 					mCaret.fillGeometry = false;
 					mCaret.pivot = label.pivot;
-					mCaret.SetAnchor(label.cachedTransform);
+					((UIRect)mCaret).SetAnchor(label.cachedTransform);
 				}
 				else
 				{
 					mCaret.pivot = label.pivot;
 					mCaret.mainTexture = mBlankTex;
 					mCaret.MarkAsChanged();
-					mCaret.enabled = true;
+					mCaret.set_enabled(true);
 				}
 				if (num3 != num4)
 				{
 					label.PrintOverlay(num3, num4, mCaret.geometry, mHighlight.geometry, caretColor, selectionColor);
-					mHighlight.enabled = mHighlight.geometry.hasVertices;
+					mHighlight.set_enabled(mHighlight.geometry.hasVertices);
 				}
 				else
 				{
 					label.PrintOverlay(num3, num4, mCaret.geometry, null, caretColor, selectionColor);
-					if ((UnityEngine.Object)mHighlight != (UnityEngine.Object)null)
+					if (mHighlight != null)
 					{
-						mHighlight.enabled = false;
+						mHighlight.set_enabled(false);
 					}
 				}
 				mNextBlink = RealTime.time + 0.5f;
@@ -1006,6 +1089,9 @@ public class UIInput : MonoBehaviour
 
 	protected void SetPivotToLeft()
 	{
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		Vector2 pivotOffset = NGUIMath.GetPivotOffset(mPivot);
 		pivotOffset.x = 0f;
 		label.pivot = NGUIMath.GetPivot(pivotOffset);
@@ -1013,6 +1099,9 @@ public class UIInput : MonoBehaviour
 
 	protected void SetPivotToRight()
 	{
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		Vector2 pivotOffset = NGUIMath.GetPivotOffset(mPivot);
 		pivotOffset.x = 1f;
 		label.pivot = NGUIMath.GetPivot(pivotOffset);
@@ -1020,7 +1109,7 @@ public class UIInput : MonoBehaviour
 
 	protected void RestoreLabelPivot()
 	{
-		if ((UnityEngine.Object)label != (UnityEngine.Object)null && label.pivot != mPivot)
+		if (label != null && label.pivot != mPivot)
 		{
 			label.pivot = mPivot;
 		}
@@ -1028,7 +1117,7 @@ public class UIInput : MonoBehaviour
 
 	protected char Validate(string text, int pos, char ch)
 	{
-		if (validation == Validation.None || !base.enabled)
+		if (validation == Validation.None || !this.get_enabled())
 		{
 			return ch;
 		}
@@ -1166,7 +1255,7 @@ public class UIInput : MonoBehaviour
 
 	protected void ExecuteOnChange()
 	{
-		if ((UnityEngine.Object)current == (UnityEngine.Object)null && EventDelegate.IsValid(onChange))
+		if (current == null && EventDelegate.IsValid(onChange))
 		{
 			current = this;
 			EventDelegate.Execute(onChange);

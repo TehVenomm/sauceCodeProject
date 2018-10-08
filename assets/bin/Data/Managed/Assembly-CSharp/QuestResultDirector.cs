@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class QuestResultDirector : MonoBehaviour, AnimationEventProxy.IEvent
+public class QuestResultDirector : AnimationEventProxy.IEvent
 {
 	public float[] playerAnimTimings;
 
@@ -23,6 +23,11 @@ public class QuestResultDirector : MonoBehaviour, AnimationEventProxy.IEvent
 		private set;
 	}
 
+	public QuestResultDirector()
+		: this()
+	{
+	}
+
 	void AnimationEventProxy.IEvent.OnEvent()
 	{
 	}
@@ -33,7 +38,7 @@ public class QuestResultDirector : MonoBehaviour, AnimationEventProxy.IEvent
 
 	void AnimationEventProxy.IEvent.OnEventInt(int i)
 	{
-		if (i < players.Length && (Object)players[i] != (Object)null)
+		if (i < players.Length && players[i] != null)
 		{
 			players[i].animator.Play("win", 0, 0f);
 		}
@@ -41,6 +46,9 @@ public class QuestResultDirector : MonoBehaviour, AnimationEventProxy.IEvent
 
 	private void Start()
 	{
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004d: Expected O, but got Unknown
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 		if (QuestManager.IsValidTrial())
 		{
 			targetAnim = cameraAnimTrial;
@@ -53,52 +61,62 @@ public class QuestResultDirector : MonoBehaviour, AnimationEventProxy.IEvent
 		int i = 0;
 		for (int num = playerAnimTimings.Length; i < num; i++)
 		{
-			AnimationEvent animationEvent = new AnimationEvent();
-			animationEvent.functionName = "OnEventInt";
-			animationEvent.intParameter = i;
-			animationEvent.time = playerAnimTimings[i];
-			targetAnim.clip.AddEvent(animationEvent);
+			AnimationEvent val = new AnimationEvent();
+			val.set_functionName("OnEventInt");
+			val.set_intParameter(i);
+			val.set_time(playerAnimTimings[i]);
+			targetAnim.get_clip().AddEvent(val);
 		}
 	}
 
 	private void Update()
 	{
-		if (!((Object)targetAnim == (Object)null))
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Expected O, but got Unknown
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		if (!(targetAnim == null))
 		{
-			Transform transform = targetAnim.transform;
-			MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.position = transform.position;
-			MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.rotation = transform.rotation;
-			Vector3 localScale = transform.localScale;
+			Transform val = targetAnim.get_transform();
+			MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_position(val.get_position());
+			MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_rotation(val.get_rotation());
+			Vector3 localScale = val.get_localScale();
 			float x = localScale.x;
 			if (x > 0f)
 			{
-				MonoBehaviourSingleton<AppMain>.I.mainCamera.fieldOfView = Utility.HorizontalToVerticalFOV(x);
+				MonoBehaviourSingleton<AppMain>.I.mainCamera.set_fieldOfView(Utility.HorizontalToVerticalFOV(x));
 			}
 		}
 	}
 
 	public void Skip()
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		if (!skip)
 		{
 			skip = true;
-			StartCoroutine(DoSkip());
+			this.StartCoroutine(DoSkip());
 		}
 	}
 
 	private IEnumerator DoSkip()
 	{
 		yield return (object)MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.WHITE);
-		Time.timeScale = 100f;
+		Time.set_timeScale(100f);
 	}
 
 	private void OnDestroy()
 	{
-		if ((Object)targetAnim != (Object)null && skip)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		if (targetAnim != null && skip)
 		{
-			targetAnim.clip.SampleAnimation(targetAnim.gameObject, targetAnim.clip.length);
+			targetAnim.get_clip().SampleAnimation(targetAnim.get_gameObject(), targetAnim.get_clip().get_length());
 			Update();
-			Time.timeScale = 1f;
+			Time.set_timeScale(1f);
 		}
 	}
 }

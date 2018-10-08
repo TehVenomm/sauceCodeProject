@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class ChatPacketReceiver : MonoBehaviour
+public class ChatPacketReceiver
 {
 	[SerializeField]
 	private List<ChatPacket> m_packets = new List<ChatPacket>();
@@ -20,6 +20,7 @@ public class ChatPacketReceiver : MonoBehaviour
 	public List<ChatPacket> packets => m_packets;
 
 	public ChatPacketReceiver()
+		: this()
 	{
 		stopPacketUpdate = false;
 	}

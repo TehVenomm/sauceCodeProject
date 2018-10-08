@@ -24,11 +24,14 @@ public class BreakObject : GimmickObject
 
 	public override void OnAttackedHitFix(AttackedHitStatusFix status)
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		base.OnAttackedHitFix(status);
 		if (IsBreakable(status))
 		{
 			EffectManager.OneShot(breakEffectName, _position, _rotation, false);
-			base.gameObject.SetActive(false);
+			this.get_gameObject().SetActive(false);
 		}
 	}
 

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class AnimatedAlpha : MonoBehaviour
+public class AnimatedAlpha
 {
 	[Range(0f, 1f)]
 	public float alpha = 1f;
@@ -10,20 +10,25 @@ public class AnimatedAlpha : MonoBehaviour
 
 	private UIPanel mPanel;
 
+	public AnimatedAlpha()
+		: this()
+	{
+	}
+
 	private void OnEnable()
 	{
-		mWidget = GetComponent<UIWidget>();
-		mPanel = GetComponent<UIPanel>();
+		mWidget = this.GetComponent<UIWidget>();
+		mPanel = this.GetComponent<UIPanel>();
 		LateUpdate();
 	}
 
 	private void LateUpdate()
 	{
-		if ((Object)mWidget != (Object)null)
+		if (mWidget != null)
 		{
 			mWidget.alpha = alpha;
 		}
-		if ((Object)mPanel != (Object)null)
+		if (mPanel != null)
 		{
 			mPanel.alpha = alpha;
 		}

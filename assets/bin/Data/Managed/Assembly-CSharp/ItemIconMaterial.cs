@@ -18,11 +18,15 @@ public class ItemIconMaterial : ItemIcon
 
 	public void SetMaterialNum(int have_num, int need_num)
 	{
-		UIBehaviour.SetMaterialNumText(lblHave.transform, lblNeed.transform, have_num, need_num);
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Expected O, but got Unknown
+		//IL_0018: Expected O, but got Unknown
+		UIBehaviour.SetMaterialNumText(lblHave.get_transform(), lblNeed.get_transform(), have_num, need_num);
 	}
 
 	public void SetVisibleBG(bool is_visible)
 	{
-		baseBG.enabled = is_visible;
+		baseBG.set_enabled(is_visible);
 	}
 }

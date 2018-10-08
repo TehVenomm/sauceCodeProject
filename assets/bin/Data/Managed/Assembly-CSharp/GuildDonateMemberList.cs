@@ -1,7 +1,6 @@
 using Network;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class GuildDonateMemberList : GuildMemberList
@@ -45,21 +44,10 @@ public class GuildDonateMemberList : GuildMemberList
 		base.Initialize();
 	}
 
-	protected override void GetListItem(Action<bool, object> callback)
+	protected unsafe override void GetListItem(Action<bool, object> callback)
 	{
-		base.GetListItem(delegate(bool success, object obj)
-		{
-			MonoBehaviourSingleton<GuildManager>.I.SendDonateInviteList(_info.id, delegate(bool donate_success, GuildDonate.GuildDonateInviteListModel ret)
-			{
-				allMember = new List<FriendCharaInfo>(ret.result.list);
-				allMember.Remove(members.FirstOrDefault((FriendCharaInfo o) => o.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id));
-				_invitedList = (from user in ret.result.donate_list
-				where user.isInvited
-				select user into x
-				select x.userId).ToList();
-				callback(success, null);
-			});
-		});
+		_003CGetListItem_003Ec__AnonStorey321 _003CGetListItem_003Ec__AnonStorey;
+		base.GetListItem(new Action<bool, object>((object)_003CGetListItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void SetListItem(int i, Transform t, string event_name, FriendCharaInfo member)
@@ -86,12 +74,15 @@ public class GuildDonateMemberList : GuildMemberList
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateInvite(_info.id, member.userId, delegate(bool success)
 		{
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Expected O, but got Unknown
 			if (success)
 			{
 				Transform ctrl = GetCtrl(UI.GRD_LIST);
-				Transform child = ctrl.GetChild(index).GetChild(0);
-				SetActive(child, UI.OBJ_SELECTED, true);
-				SetButtonEnabled(child, false);
+				Transform val = ctrl.GetChild(index).GetChild(0);
+				SetActive(val, UI.OBJ_SELECTED, true);
+				SetButtonEnabled(val, false);
 				_invitedList.Remove(member.userId);
 			}
 			GameSection.ResumeEvent(false, null);

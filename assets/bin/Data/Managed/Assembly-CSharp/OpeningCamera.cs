@@ -1,7 +1,12 @@
 using UnityEngine;
 
-public class OpeningCamera : MonoBehaviour
+public class OpeningCamera
 {
 	[SerializeField]
 	private BlurFilter filter;
+
+	public OpeningCamera()
+		: this()
+	{
+	}
 }

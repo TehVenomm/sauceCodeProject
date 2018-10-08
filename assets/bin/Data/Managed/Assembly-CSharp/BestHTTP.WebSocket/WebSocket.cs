@@ -53,20 +53,14 @@ namespace BestHTTP.WebSocket
 		{
 		}
 
-		public WebSocket(Uri uri, string origin, string protocol = "")
+		public unsafe WebSocket(Uri uri, string origin, string protocol = "")
 		{
 			PingFrequency = 1000;
 			if (uri.Port == -1)
 			{
 				uri = new Uri(uri.Scheme + "://" + uri.Host + ":" + ((!uri.Scheme.Equals("wss", StringComparison.OrdinalIgnoreCase)) ? "80" : "443") + uri.PathAndQuery);
 			}
-			InternalRequest = new HTTPRequest(uri, delegate(HTTPRequest req, HTTPResponse resp)
-			{
-				if ((resp == null || req.Exception != null) && OnError != null)
-				{
-					OnError(this, req.Exception);
-				}
-			});
+			InternalRequest = new HTTPRequest(uri, new Action<HTTPRequest, HTTPResponse>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			InternalRequest.SetHeader("Host", uri.Host + ":" + uri.Port);
 			InternalRequest.SetHeader("Upgrade", "websocket");
 			InternalRequest.SetHeader("Connection", "keep-alive, Upgrade");
@@ -88,69 +82,7 @@ namespace BestHTTP.WebSocket
 			}
 			InternalRequest.SetHeader("Cache-Control", "no-cache");
 			InternalRequest.SetHeader("Pragma", "no-cache");
-			InternalRequest.OnUpgraded = delegate(HTTPRequest req, HTTPResponse resp)
-			{
-				webSocket = (resp as WebSocketResponse);
-				if (webSocket == null)
-				{
-					if (OnError != null)
-					{
-						OnError(this, req.Exception);
-					}
-				}
-				else
-				{
-					if (OnOpen != null)
-					{
-						OnOpen(this);
-					}
-					webSocket.OnText = delegate(WebSocketResponse ws, string msg)
-					{
-						if (OnMessage != null)
-						{
-							OnMessage(this, msg);
-						}
-					};
-					webSocket.OnBinary = delegate(WebSocketResponse ws, byte[] bin)
-					{
-						if (OnBinary != null)
-						{
-							OnBinary(this, bin);
-						}
-					};
-					webSocket.OnClosed = delegate(WebSocketResponse ws, ushort code, string msg)
-					{
-						if (OnClosed != null)
-						{
-							OnClosed(this, code, msg);
-						}
-					};
-					if (OnPong != null)
-					{
-						webSocket.OnPong = delegate(WebSocketResponse ws, byte[] bin)
-						{
-							if (OnPong != null)
-							{
-								OnPong(this, bin);
-							}
-						};
-					}
-					if (OnIncompleteFrame != null)
-					{
-						webSocket.OnIncompleteFrame = delegate(WebSocketResponse ws, WebSocketFrameReader frame)
-						{
-							if (OnIncompleteFrame != null)
-							{
-								OnIncompleteFrame(this, frame);
-							}
-						};
-					}
-					if (StartPingThread)
-					{
-						webSocket.StartPinging(Math.Max(PingFrequency, 100));
-					}
-				}
-			};
+			InternalRequest.OnUpgraded = new Action<HTTPRequest, HTTPResponse>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 
 		public void Open()

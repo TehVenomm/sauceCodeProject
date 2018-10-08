@@ -30,7 +30,7 @@ public class GimmickGeneratorObject : StageObject, IFieldGimmickObject
 
 		public void Update()
 		{
-			timer += Time.deltaTime;
+			timer += Time.get_deltaTime();
 			if (timer >= duration)
 			{
 				Destroy();
@@ -39,9 +39,10 @@ public class GimmickGeneratorObject : StageObject, IFieldGimmickObject
 
 		public void Destroy()
 		{
-			if ((Object)trans != (Object)null)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			if (trans != null)
 			{
-				Object.Destroy(trans.gameObject);
+				Object.Destroy(trans.get_gameObject());
 				trans = null;
 			}
 			enable = false;
@@ -54,7 +55,8 @@ public class GimmickGeneratorObject : StageObject, IFieldGimmickObject
 
 		public Vector3 GetPosition()
 		{
-			return trans.position;
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			return trans.get_position();
 		}
 	}
 
@@ -92,11 +94,11 @@ public class GimmickGeneratorObject : StageObject, IFieldGimmickObject
 
 	private float colliderCenterZ;
 
-	private Vector3 startPos = Vector3.zero;
+	private Vector3 startPos = Vector3.get_zero();
 
-	private Vector3 endPos = Vector3.zero;
+	private Vector3 endPos = Vector3.get_zero();
 
-	private Vector3 center = Vector3.zero;
+	private Vector3 center = Vector3.get_zero();
 
 	private float generateTimer;
 
@@ -157,6 +159,7 @@ public class GimmickGeneratorObject : StageObject, IFieldGimmickObject
 
 	protected override void Update()
 	{
+		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 		base.Update();
 		int i = 0;
 		for (int count = generatedObjectList.Count; i < count; i++)
@@ -166,7 +169,7 @@ public class GimmickGeneratorObject : StageObject, IFieldGimmickObject
 		generatedObjectList.RemoveAll((GeneratedObject o) => !o.IsEnable());
 		if (IsCoopNone() || IsOriginal())
 		{
-			generateTimer += Time.deltaTime;
+			generateTimer += Time.get_deltaTime();
 			GENERATE_TYPE gENERATE_TYPE = (GENERATE_TYPE)generateType;
 			if (gENERATE_TYPE == GENERATE_TYPE.LINEAR_MOVE && generateTimer > interval)
 			{
@@ -178,26 +181,64 @@ public class GimmickGeneratorObject : StageObject, IFieldGimmickObject
 
 	public void OnGenerateForLinearMove(Vector3 pos)
 	{
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018b: Expected O, but got Unknown
+		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c4: Expected O, but got Unknown
+		//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f8: Expected O, but got Unknown
+		//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0231: Expected O, but got Unknown
+		//IL_0284: Unknown result type (might be due to invalid IL or missing references)
 		if (generatedObjectList != null && ((!IsCoopNone() && !IsOriginal()) || generatedObjectList.Count <= 0))
 		{
-			Transform transform = Utility.CreateGameObject("GimmickShot", base._transform, -1);
-			transform.position = pos;
-			transform.rotation = Quaternion.LookRotation((endPos - startPos).normalized);
-			Transform transform2 = null;
+			Transform val = Utility.CreateGameObject("GimmickShot", base._transform, -1);
+			val.set_position(pos);
+			Transform obj = val;
+			Vector3 val2 = endPos - startPos;
+			obj.set_rotation(Quaternion.LookRotation(val2.get_normalized()));
+			Transform val3 = null;
 			if (!effectName.IsNullOrWhiteSpace())
 			{
-				transform2 = EffectManager.GetEffect(effectName, transform);
-				transform2.localPosition = Vector3.zero;
-				transform2.localRotation = Quaternion.identity;
+				val3 = EffectManager.GetEffect(effectName, val);
+				val3.set_localPosition(Vector3.get_zero());
+				val3.set_localRotation(Quaternion.get_identity());
 			}
-			if ((Object)transform2 != (Object)null)
+			if (val3 != null)
 			{
-				Transform transform3 = Utility.Find(transform2, "attack_R");
-				Transform transform4 = Utility.Find(transform2, "attack_L");
-				GeneratedAttackObject generatedAttackObject = transform3.gameObject.AddComponent<GeneratedAttackObject>();
-				GeneratedAttackObject generatedAttackObject2 = transform4.gameObject.AddComponent<GeneratedAttackObject>();
-				GeneratedAttackObject generatedAttackObject3 = transform3.gameObject.AddComponent<GeneratedAttackObject>();
-				GeneratedAttackObject generatedAttackObject4 = transform4.gameObject.AddComponent<GeneratedAttackObject>();
+				Transform val4 = Utility.Find(val3, "attack_R");
+				Transform val5 = Utility.Find(val3, "attack_L");
+				GeneratedAttackObject generatedAttackObject = val4.get_gameObject().AddComponent<GeneratedAttackObject>();
+				GeneratedAttackObject generatedAttackObject2 = val5.get_gameObject().AddComponent<GeneratedAttackObject>();
+				GeneratedAttackObject generatedAttackObject3 = val4.get_gameObject().AddComponent<GeneratedAttackObject>();
+				GeneratedAttackObject generatedAttackObject4 = val5.get_gameObject().AddComponent<GeneratedAttackObject>();
 				AttackHitInfo attackHitInfo = new AttackHitInfo();
 				attackHitInfo.name = "generatedAttack";
 				attackHitInfo.attackType = AttackHitInfo.ATTACK_TYPE.GIMMICK_GENERATED;
@@ -205,19 +246,19 @@ public class GimmickGeneratorObject : StageObject, IFieldGimmickObject
 				attackHitInfo.toPlayer.reactionBlowForce = 100f;
 				attackHitInfo.toPlayer.reactionBlowAngle = 20f;
 				attackHitInfo.atk.normal = normalAtk;
-				generatedAttackObject.Initialize(this, transform3.parent, attackHitInfo, Vector3.zero, Vector3.zero, colliderRadius, colliderHeight, colliderDirection, center, 31);
-				generatedAttackObject2.Initialize(this, transform4.parent, attackHitInfo, Vector3.zero, Vector3.zero, colliderRadius, colliderHeight, colliderDirection, -center, 31);
-				generatedAttackObject3.Initialize(this, transform3.parent, attackHitInfo, Vector3.zero, Vector3.zero, colliderRadius, colliderHeight, colliderDirection, center, 31);
-				generatedAttackObject4.Initialize(this, transform4.parent, attackHitInfo, Vector3.zero, Vector3.zero, colliderRadius, colliderHeight, colliderDirection, -center, 31);
+				generatedAttackObject.Initialize(this, val4.get_parent(), attackHitInfo, Vector3.get_zero(), Vector3.get_zero(), colliderRadius, colliderHeight, colliderDirection, center, 31);
+				generatedAttackObject2.Initialize(this, val5.get_parent(), attackHitInfo, Vector3.get_zero(), Vector3.get_zero(), colliderRadius, colliderHeight, colliderDirection, -center, 31);
+				generatedAttackObject3.Initialize(this, val4.get_parent(), attackHitInfo, Vector3.get_zero(), Vector3.get_zero(), colliderRadius, colliderHeight, colliderDirection, center, 31);
+				generatedAttackObject4.Initialize(this, val5.get_parent(), attackHitInfo, Vector3.get_zero(), Vector3.get_zero(), colliderRadius, colliderHeight, colliderDirection, -center, 31);
 			}
-			GeneratedObject item = new GeneratedObject(transform, 10f);
+			GeneratedObject item = new GeneratedObject(val, 10f);
 			generatedObjectList.Add(item);
 			if (referenceCheckerFlag)
 			{
 				attackHitChecker = new AttackHitChecker();
 				referenceCheckerFlag = false;
 			}
-			if ((Object)base.packetSender != (Object)null)
+			if (base.packetSender != null)
 			{
 				base.packetSender.OnShotGimmickGenerator(pos);
 			}
@@ -226,12 +267,18 @@ public class GimmickGeneratorObject : StageObject, IFieldGimmickObject
 
 	private void SetAppearPoints()
 	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		startPos = new Vector3(startX, 0f, startZ);
 		endPos = new Vector3(endX, 0f, endZ);
 	}
 
 	private void SetCenter()
 	{
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		center = new Vector3(colliderCenterX, colliderCenterY, colliderCenterZ);
 	}
 

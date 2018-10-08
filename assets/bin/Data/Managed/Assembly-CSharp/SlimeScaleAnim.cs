@@ -4,13 +4,14 @@ public class SlimeScaleAnim : SlimeAnimBase<Vector3>
 {
 	public override Vector3 UpdateAnim()
 	{
-		float time = nowTime / playTime;
-		float num = animCurve.Evaluate(time);
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		float num = nowTime / playTime;
+		float num2 = animCurve.Evaluate(num);
 		if (isBlend && nowTime <= blendEndTime)
 		{
-			float num2 = blendCurve.Evaluate(time);
-			num = blendParam.x + (num - blendParam.x) * num2;
+			float num3 = blendCurve.Evaluate(num);
+			num2 = blendParam.x + (num2 - blendParam.x) * num3;
 		}
-		return new Vector3(num, num, num);
+		return new Vector3(num2, num2, num2);
 	}
 }

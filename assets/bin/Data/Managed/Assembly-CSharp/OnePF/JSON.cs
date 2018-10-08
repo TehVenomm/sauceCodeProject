@@ -596,6 +596,12 @@ namespace OnePF
 
 		public T[] ToArray<T>(string fieldName)
 		{
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
 			if (fields.ContainsKey(fieldName) && fields[fieldName] is IEnumerable)
 			{
 				List<T> list = new List<T>();
@@ -619,27 +625,27 @@ namespace OnePF
 					}
 					else if (list is List<Vector2>)
 					{
-						(list as List<Vector2>).Add((Vector2)(JSON)item);
+						(list as List<Vector2>).Add((JSON)item);
 					}
 					else if (list is List<Vector3>)
 					{
-						(list as List<Vector3>).Add((Vector3)(JSON)item);
+						(list as List<Vector3>).Add((JSON)item);
 					}
 					else if (list is List<Rect>)
 					{
-						(list as List<Rect>).Add((Rect)(JSON)item);
+						(list as List<Rect>).Add((JSON)item);
 					}
 					else if (list is List<Color>)
 					{
-						(list as List<Color>).Add((Color)(JSON)item);
+						(list as List<Color>).Add((JSON)item);
 					}
 					else if (list is List<Color32>)
 					{
-						(list as List<Color32>).Add((Color32)(JSON)item);
+						(list as List<Color32>).Add((JSON)item);
 					}
 					else if (list is List<Quaternion>)
 					{
-						(list as List<Quaternion>).Add((Quaternion)(JSON)item);
+						(list as List<Quaternion>).Add((JSON)item);
 					}
 					else if (list is List<JSON>)
 					{
@@ -653,7 +659,9 @@ namespace OnePF
 
 		public static implicit operator Vector2(JSON value)
 		{
-			return new Vector3(Convert.ToSingle(value["x"]), Convert.ToSingle(value["y"]));
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			return Vector2.op_Implicit(new Vector3(Convert.ToSingle(value["x"]), Convert.ToSingle(value["y"])));
 		}
 
 		public static explicit operator JSON(Vector2 value)
@@ -666,6 +674,7 @@ namespace OnePF
 
 		public static implicit operator Vector3(JSON value)
 		{
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			return new Vector3(Convert.ToSingle(value["x"]), Convert.ToSingle(value["y"]), Convert.ToSingle(value["z"]));
 		}
 
@@ -680,6 +689,7 @@ namespace OnePF
 
 		public static implicit operator Quaternion(JSON value)
 		{
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			return new Quaternion(Convert.ToSingle(value["x"]), Convert.ToSingle(value["y"]), Convert.ToSingle(value["z"]), Convert.ToSingle(value["w"]));
 		}
 
@@ -695,6 +705,7 @@ namespace OnePF
 
 		public static implicit operator Color(JSON value)
 		{
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			return new Color(Convert.ToSingle(value["r"]), Convert.ToSingle(value["g"]), Convert.ToSingle(value["b"]), Convert.ToSingle(value["a"]));
 		}
 
@@ -710,6 +721,7 @@ namespace OnePF
 
 		public static implicit operator Color32(JSON value)
 		{
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			return new Color32(Convert.ToByte(value["r"]), Convert.ToByte(value["g"]), Convert.ToByte(value["b"]), Convert.ToByte(value["a"]));
 		}
 
@@ -725,16 +737,17 @@ namespace OnePF
 
 		public static implicit operator Rect(JSON value)
 		{
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			return new Rect((float)(int)Convert.ToByte(value["left"]), (float)(int)Convert.ToByte(value["top"]), (float)(int)Convert.ToByte(value["width"]), (float)(int)Convert.ToByte(value["height"]));
 		}
 
 		public static explicit operator JSON(Rect value)
 		{
 			JSON jSON = new JSON();
-			jSON["left"] = value.xMin;
-			jSON["top"] = value.yMax;
-			jSON["width"] = value.width;
-			jSON["height"] = value.height;
+			jSON["left"] = value.get_xMin();
+			jSON["top"] = value.get_yMax();
+			jSON["width"] = value.get_width();
+			jSON["height"] = value.get_height();
 			return jSON;
 		}
 	}

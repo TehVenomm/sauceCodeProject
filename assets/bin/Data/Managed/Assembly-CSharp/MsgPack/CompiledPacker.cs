@@ -32,11 +32,11 @@ namespace MsgPack
 				{
 					if (!_packers.TryGetValue(typeof(T), out value))
 					{
-						value = CreatePacker_Internal<T>();
+						value = (Delegate)CreatePacker_Internal<T>();
 						_packers.Add(typeof(T), value);
 					}
 				}
-				return (Action<MsgPackWriter, T>)value;
+				return value;
 			}
 
 			public Func<MsgPackReader, T> CreateUnpacker<T>()
@@ -46,11 +46,11 @@ namespace MsgPack
 				{
 					if (!_unpackers.TryGetValue(typeof(T), out value))
 					{
-						value = CreateUnpacker_Internal<T>();
+						value = (Delegate)CreateUnpacker_Internal<T>();
 						_unpackers.Add(typeof(T), value);
 					}
 				}
-				return (Func<MsgPackReader, T>)value;
+				return value;
 			}
 
 			protected abstract Action<MsgPackWriter, T> CreatePacker_Internal<T>();
@@ -75,28 +75,28 @@ namespace MsgPack
 			protected override Action<MsgPackWriter, T> CreatePacker_Internal<T>()
 			{
 				DynamicMethod dynamicMethod = CreatePacker(typeof(T), CreatePackDynamicMethod(typeof(T)));
-				return (Action<MsgPackWriter, T>)dynamicMethod.CreateDelegate(typeof(Action<MsgPackWriter, T>));
+				return dynamicMethod.CreateDelegate(typeof(Action<MsgPackWriter, T>));
 			}
 
 			protected override Func<MsgPackReader, T> CreateUnpacker_Internal<T>()
 			{
 				DynamicMethod dynamicMethod = CreateUnpacker(typeof(T), CreateUnpackDynamicMethod(typeof(T)));
-				return (Func<MsgPackReader, T>)dynamicMethod.CreateDelegate(typeof(Func<MsgPackReader, T>));
+				return dynamicMethod.CreateDelegate(typeof(Func<MsgPackReader, T>));
 			}
 
-			private DynamicMethod CreatePacker(Type t, DynamicMethod dm)
+			private unsafe DynamicMethod CreatePacker(Type t, DynamicMethod dm)
 			{
 				ILGenerator iLGenerator = dm.GetILGenerator();
 				_packMethods.Add(t, dm);
-				PackILGenerator.EmitPackCode(t, dm, iLGenerator, LookupMembers, FormatMemberName, LookupPackMethod);
+				PackILGenerator.EmitPackCode(t, dm, iLGenerator, new Func<Type, MemberInfo[]>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<MemberInfo, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<Type, MethodInfo>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				return dm;
 			}
 
-			private DynamicMethod CreateUnpacker(Type t, DynamicMethod dm)
+			private unsafe DynamicMethod CreateUnpacker(Type t, DynamicMethod dm)
 			{
 				ILGenerator iLGenerator = dm.GetILGenerator();
 				_unpackMethods.Add(t, dm);
-				PackILGenerator.EmitUnpackCode(t, dm, iLGenerator, LookupMembers, FormatMemberName, LookupUnpackMethod, LookupMemberMapping, LookupMemberMappingMethod);
+				PackILGenerator.EmitUnpackCode(t, dm, iLGenerator, new Func<Type, MemberInfo[]>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<MemberInfo, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<Type, MethodInfo>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<Type, IDictionary<string, int>>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), LookupMemberMappingMethod);
 				return dm;
 			}
 
@@ -210,7 +210,7 @@ namespace MsgPack
 				_packMethods.Add(typeof(T), (MethodInfo)mb);
 				CreatePacker(typeof(T), mb);
 				MethodInfo method = ToCallableMethodInfo(typeof(T), tb, true);
-				return (Action<MsgPackWriter, T>)Delegate.CreateDelegate(typeof(Action<MsgPackWriter, T>), method);
+				return Delegate.CreateDelegate(typeof(Action<MsgPackWriter, T>), method);
 			}
 
 			protected override Func<MsgPackReader, T> CreateUnpacker_Internal<T>()
@@ -219,19 +219,19 @@ namespace MsgPack
 				_unpackMethods.Add(typeof(T), (MethodInfo)mb);
 				CreateUnpacker(typeof(T), mb);
 				MethodInfo method = ToCallableMethodInfo(typeof(T), tb, false);
-				return (Func<MsgPackReader, T>)Delegate.CreateDelegate(typeof(Func<MsgPackReader, T>), method);
+				return Delegate.CreateDelegate(typeof(Func<MsgPackReader, T>), method);
 			}
 
-			private void CreatePacker(Type t, MethodBuilder mb)
+			private unsafe void CreatePacker(Type t, MethodBuilder mb)
 			{
 				ILGenerator iLGenerator = mb.GetILGenerator();
-				PackILGenerator.EmitPackCode(t, mb, iLGenerator, LookupMembers, FormatMemberName, LookupPackMethod);
+				PackILGenerator.EmitPackCode(t, mb, iLGenerator, new Func<Type, MemberInfo[]>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<MemberInfo, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<Type, MethodInfo>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 
-			private void CreateUnpacker(Type t, MethodBuilder mb)
+			private unsafe void CreateUnpacker(Type t, MethodBuilder mb)
 			{
 				ILGenerator iLGenerator = mb.GetILGenerator();
-				PackILGenerator.EmitUnpackCode(t, mb, iLGenerator, LookupMembers, FormatMemberName, LookupUnpackMethod, LookupMemberMapping, LookupMemberMappingMethod);
+				PackILGenerator.EmitUnpackCode(t, mb, iLGenerator, new Func<Type, MemberInfo[]>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<MemberInfo, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<Type, MethodInfo>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<Type, IDictionary<string, int>>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), LookupMemberMappingMethod);
 			}
 
 			private MethodInfo ToCallableMethodInfo(Type t, TypeBuilder tb, bool isPacker)
@@ -523,7 +523,7 @@ namespace MsgPack
 
 		public void Pack<T>(Stream strm, T o)
 		{
-			_packer.CreatePacker<T>()(new MsgPackWriter(strm), o);
+			_packer.CreatePacker<T>().Invoke(new MsgPackWriter(strm), o);
 		}
 
 		public T Unpack<T>(byte[] buf)
@@ -544,7 +544,7 @@ namespace MsgPack
 
 		public T Unpack<T>(Stream strm)
 		{
-			return _packer.CreateUnpacker<T>()(new MsgPackReader(strm));
+			return _packer.CreateUnpacker<T>().Invoke(new MsgPackReader(strm));
 		}
 
 		public byte[] Pack(object o)

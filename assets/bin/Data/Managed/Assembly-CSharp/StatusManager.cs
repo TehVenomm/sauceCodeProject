@@ -146,7 +146,8 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	public void _LoadTable()
 	{
-		StartCoroutine(_LoadTableData());
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(_LoadTableData());
 	}
 
 	private IEnumerator _LoadTableData()
@@ -170,42 +171,42 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			{
 				Singleton<EquipModelTable>.Create();
 			}
-			Singleton<EquipModelTable>.I.CreateTable(((TextAsset)lo_equip_model_table.loadedObject).text);
+			Singleton<EquipModelTable>.I.CreateTable(lo_equip_model_table.loadedObject.get_text());
 			if (!Singleton<EquipItemTable>.IsValid())
 			{
 				Singleton<EquipItemTable>.Create();
 			}
-			Singleton<EquipItemTable>.I.CreateTable(((TextAsset)lo_equip_table.loadedObject).text);
+			Singleton<EquipItemTable>.I.CreateTable(lo_equip_table.loadedObject.get_text());
 			if (!Singleton<EquipItemExceedTable>.IsValid())
 			{
 				Singleton<EquipItemExceedTable>.Create();
 			}
-			Singleton<EquipItemExceedTable>.I.CreateTable(((TextAsset)lo_equip_exceed_table.loadedObject).text);
+			Singleton<EquipItemExceedTable>.I.CreateTable(lo_equip_exceed_table.loadedObject.get_text());
 			if (!Singleton<SkillItemTable>.IsValid())
 			{
 				Singleton<SkillItemTable>.Create();
 			}
-			Singleton<SkillItemTable>.I.CreateTable(((TextAsset)lo_skill_table.loadedObject).text);
+			Singleton<SkillItemTable>.I.CreateTable(lo_skill_table.loadedObject.get_text());
 			if (!Singleton<AbilityTable>.IsValid())
 			{
 				Singleton<AbilityTable>.Create();
 			}
-			Singleton<AbilityTable>.I.CreateTable(((TextAsset)lo_ability_table.loadedObject).text);
+			Singleton<AbilityTable>.I.CreateTable(lo_ability_table.loadedObject.get_text());
 			if (!Singleton<AbilityDataTable>.IsValid())
 			{
 				Singleton<AbilityDataTable>.Create();
 			}
-			Singleton<AbilityDataTable>.I.CreateTable(((TextAsset)lo_ability_data_table.loadedObject).text);
+			Singleton<AbilityDataTable>.I.CreateTable(lo_ability_data_table.loadedObject.get_text());
 			if (!Singleton<AbilityItemLotTable>.IsValid())
 			{
 				Singleton<AbilityItemLotTable>.Create();
 			}
-			Singleton<AbilityItemLotTable>.I.CreateTable(((TextAsset)lo_ability_item_lot_table.loadedObject).text);
+			Singleton<AbilityItemLotTable>.I.CreateTable(lo_ability_item_lot_table.loadedObject.get_text());
 			if (!Singleton<AssignedEquipmentTable>.IsValid())
 			{
 				Singleton<AssignedEquipmentTable>.Create();
 			}
-			Singleton<AssignedEquipmentTable>.I.CreateTable(((TextAsset)lo_assigned_equipment_table.loadedObject).text);
+			Singleton<AssignedEquipmentTable>.I.CreateTable(lo_assigned_equipment_table.loadedObject.get_text());
 			initialized = true;
 		}
 	}
@@ -548,7 +549,8 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	public void CheckChangeEquip(int equip_set_no, Action<bool> callback)
 	{
-		StartCoroutine(_CheckChangeEquipCoroutine(equip_set_no, callback));
+		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(_CheckChangeEquipCoroutine(equip_set_no, callback));
 	}
 
 	private IEnumerator _CheckChangeEquipCoroutine(int equip_set_no, Action<bool> callback)
@@ -559,15 +561,15 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		{
 			if (!is_success)
 			{
-				if (((_003C_CheckChangeEquipCoroutine_003Ec__Iterator244)/*Error near IL_0034: stateMachine*/).callback != null)
+				if (((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0034: stateMachine*/).callback != null)
 				{
-					((_003C_CheckChangeEquipCoroutine_003Ec__Iterator244)/*Error near IL_0034: stateMachine*/).callback(false);
+					((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0034: stateMachine*/).callback(false);
 				}
-				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator244)/*Error near IL_0034: stateMachine*/)._003Crecv_break_003E__0 = true;
+				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0034: stateMachine*/)._003Crecv_break_003E__0 = true;
 			}
 			else
 			{
-				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator244)/*Error near IL_0034: stateMachine*/)._003Cwait_visual_equip_003E__1 = false;
+				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0034: stateMachine*/)._003Cwait_visual_equip_003E__1 = false;
 			}
 		});
 		bool wait_equip = true;
@@ -575,13 +577,13 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		{
 			if (!is_success)
 			{
-				if (((_003C_CheckChangeEquipCoroutine_003Ec__Iterator244)/*Error near IL_0057: stateMachine*/).callback != null)
+				if (((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0057: stateMachine*/).callback != null)
 				{
-					((_003C_CheckChangeEquipCoroutine_003Ec__Iterator244)/*Error near IL_0057: stateMachine*/).callback(false);
+					((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0057: stateMachine*/).callback(false);
 				}
-				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator244)/*Error near IL_0057: stateMachine*/)._003Crecv_break_003E__0 = true;
+				((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0057: stateMachine*/)._003Crecv_break_003E__0 = true;
 			}
-			((_003C_CheckChangeEquipCoroutine_003Ec__Iterator244)/*Error near IL_0057: stateMachine*/)._003Cwait_equip_003E__2 = false;
+			((_003C_CheckChangeEquipCoroutine_003Ec__Iterator24B)/*Error near IL_0057: stateMachine*/)._003Cwait_equip_003E__2 = false;
 		});
 		while (wait_equip || wait_visual_equip)
 		{
@@ -634,17 +636,13 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		return false;
 	}
 
-	public void UpdateEquip(EquipItemInfo equip)
+	public unsafe void UpdateEquip(EquipItemInfo equip)
 	{
 		int i = 0;
+		_003CUpdateEquip_003Ec__AnonStorey6B4 _003CUpdateEquip_003Ec__AnonStorey6B;
 		for (int num = equipSet.Length; i < num; i++)
 		{
-			IsEquipping(i, equip, delegate(int set_no, int index)
-			{
-				EquipSetInfo equipSetInfo = MonoBehaviourSingleton<StatusManager>.I.GetEquipSet(set_no);
-				equipSetInfo.item[index] = equip;
-				ReplaceEquipItem(equipSetInfo, set_no, index);
-			});
+			IsEquipping(i, equip, new Action<int, int>((object)_003CUpdateEquip_003Ec__AnonStorey6B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -1517,7 +1515,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 	{
 		if (localEquipSet == null || localEquipSetNo == -1)
 		{
-			Debug.LogWarning("AccessoryOn() : invalid");
+			Debug.LogWarning((object)"AccessoryOn() : invalid");
 		}
 		else
 		{
@@ -1532,7 +1530,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 	{
 		if (localEquipSet == null || localEquipSetNo == -1)
 		{
-			Debug.LogWarning("AccessoryOff() : invalid");
+			Debug.LogWarning((object)"AccessoryOff() : invalid");
 		}
 		else
 		{
@@ -1673,15 +1671,15 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		requestSendForm.euid = equip_uniq_id.ToString();
 		Protocol.Send(InventoryEquipLockModel.URL, requestSendForm, delegate(InventoryEquipLockModel ret)
 		{
-			bool arg = false;
-			EquipItemInfo arg2 = null;
+			bool flag = false;
+			EquipItemInfo equipItemInfo = null;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
-				arg2 = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(equip_uniq_id);
+				flag = true;
+				equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(equip_uniq_id);
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_FAVORITE);
 			}
-			call_back(arg, arg2);
+			call_back.Invoke(flag, equipItemInfo);
 		}, string.Empty);
 	}
 
@@ -1691,15 +1689,15 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		requestSendForm.suid = skill_uniq_id.ToString();
 		Protocol.Send(InventorySkillLockModel.URL, requestSendForm, delegate(InventorySkillLockModel ret)
 		{
-			bool arg = false;
-			SkillItemInfo arg2 = null;
+			bool flag = false;
+			SkillItemInfo skillItemInfo = null;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
-				arg2 = MonoBehaviourSingleton<InventoryManager>.I.skillItemInventory.Find(skill_uniq_id);
+				flag = true;
+				skillItemInfo = MonoBehaviourSingleton<InventoryManager>.I.skillItemInventory.Find(skill_uniq_id);
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_SKILL_FAVORITE);
 			}
-			call_back(arg, arg2);
+			call_back.Invoke(flag, skillItemInfo);
 		}, string.Empty);
 	}
 

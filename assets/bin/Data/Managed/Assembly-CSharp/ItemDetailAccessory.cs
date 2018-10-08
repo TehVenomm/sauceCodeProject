@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class ItemDetailAccessory : SkillInfoBase
@@ -35,12 +36,12 @@ public class ItemDetailAccessory : SkillInfoBase
 	public override void UpdateUI()
 	{
 		detailBase = SetPrefab(GetCtrl(UI.OBJ_DETAIL_ROOT), "ItemDetailAccessoryBase", true);
-		if (!((Object)detailBase == (Object)null))
+		if (!(detailBase == null))
 		{
 			SetLabelText(detailBase, UI.LBL_NAME, info.tableData.name);
 			SetLabelText(detailBase, UI.LBL_DESCRIPTION, info.tableData.descriptPart);
 			SetAccessoryRarityIcon(FindCtrl(detailBase, UI.SPR_SKILL_TYPE_ICON_BG), FindCtrl(detailBase, UI.SPR_SKILL_TYPE_ICON_RARITY), info.tableData);
-			SetRenderAccessoryModel(UI.TEX_MODEL, info.tableData.accessoryId, info.tableData.detailScale, true, false);
+			SetRenderAccessoryModel((Enum)UI.TEX_MODEL, info.tableData.accessoryId, info.tableData.detailScale, true, false);
 		}
 	}
 }

@@ -1,4 +1,3 @@
-using Network;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -151,7 +150,8 @@ public class QuestSelect : GameSection
 
 	public override void Initialize()
 	{
-		StartCoroutine(DoInitialize());
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -212,7 +212,7 @@ public class QuestSelect : GameSection
 		DeleteModel();
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
 		UI[] array = new UI[3]
 		{
@@ -247,9 +247,9 @@ public class QuestSelect : GameSection
 		QuestInfoData info = questInfo;
 		QUEST_TYPE questType = info.questData.tableData.questType;
 		int num = 0;
-		SetFontStyle(UI.STR_MISSION, FontStyle.Italic);
-		SetFontStyle(UI.STR_TREASURE, FontStyle.Italic);
-		SetFontStyle(UI.STR_SELL, FontStyle.Italic);
+		SetFontStyle((Enum)UI.STR_MISSION, 2);
+		SetFontStyle((Enum)UI.STR_TREASURE, 2);
+		SetFontStyle((Enum)UI.STR_SELL, 2);
 		string text = null;
 		switch (questType)
 		{
@@ -266,69 +266,47 @@ public class QuestSelect : GameSection
 			text = "STR_QUEST_TYPE_STORY";
 			break;
 		}
-		SetText(UI.LBL_QUEST_TYPE, text);
-		SetLabelText(UI.LBL_QUEST_NUM, string.Format(base.sectionData.GetText("QUEST_NUMBER"), info.questData.tableData.locationNumber, info.questData.tableData.questNumber));
-		SetLabelText(UI.LBL_QUEST_NAME, info.questData.tableData.questText);
+		SetText((Enum)UI.LBL_QUEST_TYPE, text);
+		SetLabelText((Enum)UI.LBL_QUEST_NUM, string.Format(base.sectionData.GetText("QUEST_NUMBER"), info.questData.tableData.locationNumber, info.questData.tableData.questNumber));
+		SetLabelText((Enum)UI.LBL_QUEST_NAME, info.questData.tableData.questText);
 		int num2 = (int)info.questData.tableData.limitTime;
-		SetLabelText(UI.LBL_LIMIT_TIME, $"{num2 / 60:D2}:{num2 % 60:D2}");
-		SetActive(UI.LBL_GUILD_REQUEST_NEED_POINT, false);
-		SetActive(UI.STR_MISSION_EMPTY, false);
+		SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num2 / 60:D2}:{num2 % 60:D2}");
+		SetActive((Enum)UI.LBL_GUILD_REQUEST_NEED_POINT, false);
+		SetActive((Enum)UI.STR_MISSION_EMPTY, false);
 		if (!info.isExistMission)
 		{
-			SetActive(UI.OBJ_MISSION_INFO_ROOT, false);
+			SetActive((Enum)UI.OBJ_MISSION_INFO_ROOT, false);
 		}
 		else
 		{
-			SetActive(UI.OBJ_MISSION_INFO_ROOT, true);
+			SetActive((Enum)UI.OBJ_MISSION_INFO_ROOT, true);
 			int i = 0;
 			for (int num3 = info.missionData.Length; i < num3; i++)
 			{
-				SetActive(array[i], info.missionData[i] != null);
-				SetActive(array2[i], info.missionData[i] != null);
+				SetActive((Enum)array[i], info.missionData[i] != null);
+				SetActive((Enum)array2[i], info.missionData[i] != null);
 				if (info.missionData[i] != null)
 				{
-					SetActive(array4[i], info.missionData[i].state >= CLEAR_STATUS.CLEAR);
-					SetActive(array5[i], info.missionData[i].state >= CLEAR_STATUS.CLEAR);
-					SetLabelText(array3[i], info.missionData[i].tableData.missionText);
+					SetActive((Enum)array4[i], info.missionData[i].state >= CLEAR_STATUS.CLEAR);
+					SetActive((Enum)array5[i], info.missionData[i].state >= CLEAR_STATUS.CLEAR);
+					SetLabelText((Enum)array3[i], info.missionData[i].tableData.missionText);
 				}
 			}
 		}
 		if (questType == QUEST_TYPE.ORDER)
 		{
-			SetActive(UI.OBJ_SELL_ITEM, true);
+			SetActive((Enum)UI.OBJ_SELL_ITEM, true);
 			QuestItemInfo quest_item = MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem(info.questData.tableData.questID);
 			if (quest_item != null && quest_item.sellItems != null && quest_item.sellItems.Count > 0)
 			{
-				SetGrid(UI.GRD_REWARD_SELL, string.Empty, quest_item.sellItems.Count, false, delegate(int i_2, Transform t_2, bool is_recycle_2)
-				{
-					QuestItem.SellItem sellItem = quest_item.sellItems[i_2];
-					REWARD_TYPE type2 = (REWARD_TYPE)sellItem.type;
-					uint itemId = (uint)sellItem.itemId;
-					if (sellItem.num <= 0)
-					{
-						Log.Error(LOG.OUTGAME, "QuestItem sold get item num is zero. type={0},itemId={1}", type2, itemId);
-					}
-					else
-					{
-						int num4 = -1;
-						ItemIcon itemIcon4 = ItemIcon.CreateRewardItemIcon(type2, itemId, t_2, num4, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-						SetMaterialInfo(itemIcon4.transform, type2, itemId, null);
-					}
-				});
+				_003CUpdateUI_003Ec__AnonStorey350 _003CUpdateUI_003Ec__AnonStorey;
+				SetGrid(UI.GRD_REWARD_SELL, string.Empty, quest_item.sellItems.Count, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
-			SetActive(UI.OBJ_TOP_CROWN_ROOT, false);
+			SetActive((Enum)UI.OBJ_TOP_CROWN_ROOT, false);
 		}
-		SetActive(UI.OBJ_TREASURE, true);
-		SetGrid(UI.GRD_REWARD_QUEST, string.Empty, 5, false, delegate(int i_2, Transform t_2, bool is_recycle_2)
-		{
-			if (info.questData.reward != null && info.questData.reward.Length > i_2)
-			{
-				REWARD_TYPE type = (REWARD_TYPE)info.questData.reward[i_2].type;
-				uint id = (uint)info.questData.reward[i_2].id;
-				ItemIcon itemIcon3 = ItemIcon.CreateRewardItemIcon(type, id, t_2, -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-				SetMaterialInfo(itemIcon3.transform, type, id, null);
-			}
-		});
+		SetActive((Enum)UI.OBJ_TREASURE, true);
+		_003CUpdateUI_003Ec__AnonStorey351 _003CUpdateUI_003Ec__AnonStorey2;
+		SetGrid(UI.GRD_REWARD_QUEST, string.Empty, 5, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey2, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)info.questData.tableData.GetMainEnemyID());
 		if (enemyData != null)
 		{
@@ -339,45 +317,45 @@ public class QuestSelect : GameSection
 			ItemIcon itemIcon2 = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, GetCtrl(UI.OBJ_ENEMY), enemyData.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY, ELEMENT_TYPE.MAX);
 			itemIcon2.SetEnableCollider(false);
 		}
-		SetActive(UI.SPR_ELEMENT_ROOT, false);
+		SetActive((Enum)UI.SPR_ELEMENT_ROOT, false);
 		if (enemyData != null)
 		{
-			SetActive(UI.SPR_ELEMENT_ROOT_2, true);
-			SetElementSprite(UI.SPR_ELEMENT_2, (int)enemyData.element);
-			SetActive(UI.STR_NON_ELEMENT_2, enemyData.element == ELEMENT_TYPE.MAX);
-			SetElementSprite(UI.SPR_WEAK_ELEMENT_2, (int)enemyData.weakElement);
-			SetActive(UI.STR_NON_WEAK_ELEMENT_2, enemyData.weakElement == ELEMENT_TYPE.MAX);
+			SetActive((Enum)UI.SPR_ELEMENT_ROOT_2, true);
+			SetElementSprite((Enum)UI.SPR_ELEMENT_2, (int)enemyData.element);
+			SetActive((Enum)UI.STR_NON_ELEMENT_2, enemyData.element == ELEMENT_TYPE.MAX);
+			SetElementSprite((Enum)UI.SPR_WEAK_ELEMENT_2, (int)enemyData.weakElement);
+			SetActive((Enum)UI.STR_NON_WEAK_ELEMENT_2, enemyData.weakElement == ELEMENT_TYPE.MAX);
 		}
 		else
 		{
-			SetActive(UI.SPR_ELEMENT_ROOT_2, false);
-			SetActive(UI.STR_NON_WEAK_ELEMENT_2, false);
+			SetActive((Enum)UI.SPR_ELEMENT_ROOT_2, false);
+			SetActive((Enum)UI.STR_NON_WEAK_ELEMENT_2, false);
 		}
 		ShowInfo(questType, isShowDropInfo);
-		SetActive(UI.TWN_DIFFICULT_STAR, false);
+		SetActive((Enum)UI.TWN_DIFFICULT_STAR, false);
 		num = (MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestEnemySpecies(info.questData.tableData.questID)?.questStatus ?? 1);
 		SetClearStatus((CLEAR_STATUS)num);
 		if (!MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
-			SetActive(UI.BTN_GUILD_REQUEST, false);
+			SetActive((Enum)UI.BTN_GUILD_REQUEST, false);
 		}
 	}
 
 	protected virtual void SetClearStatus(CLEAR_STATUS clear_status)
 	{
 		int value = 11;
-		SetToggleGroup(UI.OBJ_ICON_NEW, value);
-		SetToggleGroup(UI.OBJ_ICON_CLEARED, value);
-		SetToggleGroup(UI.OBJ_ICON_COMPLETE, value);
+		SetToggleGroup((Enum)UI.OBJ_ICON_NEW, value);
+		SetToggleGroup((Enum)UI.OBJ_ICON_CLEARED, value);
+		SetToggleGroup((Enum)UI.OBJ_ICON_COMPLETE, value);
 		if (clear_status != CLEAR_STATUS.NEW)
 		{
-			SetToggle(UI.OBJ_ICON_NEW, false);
-			SetToggle(UI.OBJ_ICON_CLEARED, false);
-			SetToggle(UI.OBJ_ICON_COMPLETE, false);
+			SetToggle((Enum)UI.OBJ_ICON_NEW, false);
+			SetToggle((Enum)UI.OBJ_ICON_CLEARED, false);
+			SetToggle((Enum)UI.OBJ_ICON_COMPLETE, false);
 		}
 		else
 		{
-			SetToggle(UI.OBJ_ICON_NEW, true);
+			SetToggle((Enum)UI.OBJ_ICON_NEW, true);
 			SetVisibleWidgetEffect(UI.SPR_ICON_NEW, "ef_ui_questselect_new");
 		}
 	}
@@ -386,21 +364,21 @@ public class QuestSelect : GameSection
 	{
 		if (quest_type != QUEST_TYPE.ORDER)
 		{
-			SetActive(UI.OBJ_TREASURE, is_show_drop_info);
-			SetActive(UI.OBJ_MISSION_INFO, !is_show_drop_info);
-			SetActive(UI.OBJ_SELL_ITEM, false);
-			SetActive(UI.OBJ_CHANGE_INFO_TREASURE_ROOT, isShowDropInfo);
-			SetActive(UI.OBJ_CHANGE_INFO_MISSION_ROOT, !isShowDropInfo);
-			SetActive(UI.OBJ_CHANGE_INFO_SELL_ROOT, false);
+			SetActive((Enum)UI.OBJ_TREASURE, is_show_drop_info);
+			SetActive((Enum)UI.OBJ_MISSION_INFO, !is_show_drop_info);
+			SetActive((Enum)UI.OBJ_SELL_ITEM, false);
+			SetActive((Enum)UI.OBJ_CHANGE_INFO_TREASURE_ROOT, isShowDropInfo);
+			SetActive((Enum)UI.OBJ_CHANGE_INFO_MISSION_ROOT, !isShowDropInfo);
+			SetActive((Enum)UI.OBJ_CHANGE_INFO_SELL_ROOT, false);
 		}
 		else
 		{
-			SetActive(UI.OBJ_MISSION_INFO, false);
-			SetActive(UI.OBJ_TREASURE, is_show_drop_info);
-			SetActive(UI.OBJ_SELL_ITEM, !is_show_drop_info);
-			SetActive(UI.OBJ_CHANGE_INFO_TREASURE_ROOT, isShowDropInfo);
-			SetActive(UI.OBJ_CHANGE_INFO_SELL_ROOT, !isShowDropInfo);
-			SetActive(UI.OBJ_CHANGE_INFO_MISSION_ROOT, false);
+			SetActive((Enum)UI.OBJ_MISSION_INFO, false);
+			SetActive((Enum)UI.OBJ_TREASURE, is_show_drop_info);
+			SetActive((Enum)UI.OBJ_SELL_ITEM, !is_show_drop_info);
+			SetActive((Enum)UI.OBJ_CHANGE_INFO_TREASURE_ROOT, isShowDropInfo);
+			SetActive((Enum)UI.OBJ_CHANGE_INFO_SELL_ROOT, !isShowDropInfo);
+			SetActive((Enum)UI.OBJ_CHANGE_INFO_MISSION_ROOT, false);
 		}
 	}
 
@@ -440,66 +418,71 @@ public class QuestSelect : GameSection
 
 	private void DeleteModel()
 	{
-		DeleteRenderTexture(UI.TEX_ENEMY);
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		DeleteRenderTexture((Enum)UI.TEX_ENEMY);
 		SetVisibleWidgetEffect(UI.TEX_ENEMY, null);
-		if ((UnityEngine.Object)model != (UnityEngine.Object)null)
+		if (model != null)
 		{
-			UnityEngine.Object.DestroyImmediate(model.gameObject);
+			Object.DestroyImmediate(model.get_gameObject());
 			model = null;
 			loader = null;
 		}
 	}
 
-	private void LoadModel()
+	private unsafe void LoadModel()
 	{
 		DeleteModel();
 		QUEST_TYPE questType = questInfo.questData.tableData.questType;
 		InitLoading();
 		if (questType != QUEST_TYPE.STORY)
 		{
-			SetRenderEnemyModel(UI.TEX_ENEMY, (uint)questInfo.questData.tableData.GetMainEnemyID(), questInfo.questData.tableData.GetFoundationName(), OutGameSettingsManager.EnemyDisplayInfo.SCENE.QUEST, delegate
-			{
-				CompleteEnemyLoading();
-			}, UIModelRenderTexture.ENEMY_MOVE_TYPE.DEFULT, true);
+			SetRenderEnemyModel((Enum)UI.TEX_ENEMY, (uint)questInfo.questData.tableData.GetMainEnemyID(), questInfo.questData.tableData.GetFoundationName(), OutGameSettingsManager.EnemyDisplayInfo.SCENE.QUEST, new Action<bool, EnemyLoader>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), UIModelRenderTexture.ENEMY_MOVE_TYPE.DEFULT, true);
 		}
 	}
 
 	private void InitLoading()
 	{
 		loadComplete = false;
-		SetActive(UI.OBJ_LOADING, true);
+		SetActive((Enum)UI.OBJ_LOADING, true);
 	}
 
 	private void CompleteEnemyLoading()
 	{
-		SetActive(UI.OBJ_LOADING, false);
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Expected O, but got Unknown
+		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+		SetActive((Enum)UI.OBJ_LOADING, false);
 		Transform renderTextureModelTransform = GetRenderTextureModelTransform(UI.TEX_ENEMY);
-		if ((UnityEngine.Object)renderTextureModelTransform != (UnityEngine.Object)null && MonoBehaviourSingleton<OutGameEffectManager>.IsValid())
+		if (renderTextureModelTransform != null && MonoBehaviourSingleton<OutGameEffectManager>.IsValid())
 		{
-			MonoBehaviourSingleton<OutGameEffectManager>.I.ShowSilhoutteffect(renderTextureModelTransform.parent, GetRenderTextureLayer(UI.TEX_ENEMY));
+			MonoBehaviourSingleton<OutGameEffectManager>.I.ShowSilhoutteffect(renderTextureModelTransform.get_parent(), GetRenderTextureLayer(UI.TEX_ENEMY));
 		}
 		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questInfo.questData.tableData.GetMainEnemyID());
 		if (enemyData != null && enemyData.element < ELEMENT_TYPE.MAX)
 		{
 			SetVisibleWidgetEffect(UI.TEX_ENEMY, EnemyLoader.GetElementEffectName(enemyData.element));
 		}
-		if ((UnityEngine.Object)renderTextureModelTransform != (UnityEngine.Object)null && MonoBehaviourSingleton<OutGameEffectManager>.IsValid())
+		if (renderTextureModelTransform != null && MonoBehaviourSingleton<OutGameEffectManager>.IsValid())
 		{
-			StartCoroutine(HideSilhoutteEffect());
+			this.StartCoroutine(HideSilhoutteEffect());
 		}
-		GetCtrl(UI.SPR_LOAD_ROTATE_CIRCLE).localRotation = Quaternion.identity;
+		GetCtrl(UI.SPR_LOAD_ROTATE_CIRCLE).set_localRotation(Quaternion.get_identity());
 		loadComplete = true;
 	}
 
 	private void CompleteStoryNPCLoading(NPCTable.NPCData npc_data)
 	{
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 		PLCA default_anim = PlayerAnimCtrl.StringToEnum(npc_data.anim);
-		model.localPosition = new Vector3(0f, -1.5f, 1.5f);
-		model.localEulerAngles = new Vector3(0f, 180f, 0f);
+		model.set_localPosition(new Vector3(0f, -1.5f, 1.5f));
+		model.set_localEulerAngles(new Vector3(0f, 180f, 0f));
 		PlayerAnimCtrl.Get(loader.animator, default_anim, null, null, null);
 		EnableRenderTexture(UI.TEX_ENEMY);
-		SetActive(UI.OBJ_LOADING, false);
-		GetCtrl(UI.SPR_LOAD_ROTATE_CIRCLE).localRotation = Quaternion.identity;
+		SetActive((Enum)UI.OBJ_LOADING, false);
+		GetCtrl(UI.SPR_LOAD_ROTATE_CIRCLE).set_localRotation(Quaternion.get_identity());
 		loadComplete = true;
 	}
 
@@ -511,8 +494,8 @@ public class QuestSelect : GameSection
 
 	private void OnQuery_CHANGE_INFO()
 	{
-		ResetTween(UI.TWN_CHANGE_BTN, 0);
-		PlayTween(UI.TWN_CHANGE_BTN, true, null, false, 0);
+		ResetTween((Enum)UI.TWN_CHANGE_BTN, 0);
+		PlayTween((Enum)UI.TWN_CHANGE_BTN, true, (EventDelegate.Callback)null, false, 0);
 		isShowDropInfo = !isShowDropInfo;
 		ShowInfo(questInfo.questData.tableData.questType, isShowDropInfo);
 	}
@@ -555,46 +538,11 @@ public class QuestSelect : GameSection
 		}
 	}
 
-	private void OnQuery_AUTO_MATCH()
+	private unsafe void OnQuery_AUTO_MATCH()
 	{
 		GameSection.StayEvent();
-		Action<bool, bool, bool, bool> matching_end_action = delegate(bool is_m, bool is_c, bool is_r, bool is_s)
-		{
-			if (!is_m)
-			{
-				QuestResume(false);
-			}
-			else if (is_s)
-			{
-				UIModelRenderTexture component = GetComponent<UIModelRenderTexture>(UI.TEX_ENEMY);
-				if ((UnityEngine.Object)component != (UnityEngine.Object)null && (UnityEngine.Object)component.enemyAnimCtrl != (UnityEngine.Object)null)
-				{
-					component.enemyAnimCtrl.PlayQuestStartAnim(delegate
-					{
-						StartCoroutine(GoToQuest(delegate
-						{
-							QuestResume(true);
-						}));
-					});
-				}
-				else
-				{
-					StartCoroutine(GoToQuest(delegate
-					{
-						QuestResume(true);
-					}));
-				}
-			}
-			else if (!is_c)
-			{
-				GameSection.ChangeStayEvent("COOP_SERVER_INVALID", null);
-				QuestResume(true);
-			}
-			else
-			{
-				QuestResume(false);
-			}
-		};
+		_003COnQuery_AUTO_MATCH_003Ec__AnonStorey352 _003COnQuery_AUTO_MATCH_003Ec__AnonStorey;
+		Action<bool, bool, bool, bool> matching_end_action = new Action<bool, bool, bool, bool>((object)_003COnQuery_AUTO_MATCH_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		if (questInfo.questData.tableData.questType == QUEST_TYPE.ORDER)
 		{
 			int questID = (int)questInfo.questData.tableData.questID;
@@ -630,16 +578,17 @@ public class QuestSelect : GameSection
 	{
 		yield return (object)null;
 		yield return (object)new WaitForSeconds(1f);
-		onComplete();
+		onComplete.Invoke();
 	}
 
-	protected void OnQuery_CoopServerInvalidConfirm_YES()
+	protected unsafe void OnQuery_CoopServerInvalidConfirm_YES()
 	{
 		GameSection.StayEvent();
-		CoopApp.EnterQuestOffline(delegate(bool is_m, bool is_c, bool is_r, bool is_s)
+		if (_003C_003Ef__am_0024cacheC == null)
 		{
-			GameSection.ResumeEvent(is_s, null);
-		});
+			_003C_003Ef__am_0024cacheC = new Action<bool, bool, bool, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		CoopApp.EnterQuestOffline(_003C_003Ef__am_0024cacheC);
 	}
 
 	protected void OnQuery_CoopServerInvalidConfirm_NO()
@@ -690,7 +639,7 @@ public class QuestSelect : GameSection
 		int i = 0;
 		for (int num = btnInvisibleTween.Length; i < num; i++)
 		{
-			UITweener component = GetComponent<UITweener>(btnInvisibleTween[i]);
+			UITweener component = base.GetComponent<UITweener>((Enum)btnInvisibleTween[i]);
 			component.Play(isforward);
 		}
 	}

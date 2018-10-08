@@ -25,24 +25,28 @@ public class ObjectPacketReceiver : PacketReceiver
 
 	public static ObjectPacketReceiver SetupComponent(StageObject set_object)
 	{
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		if (set_object is Enemy)
 		{
-			return set_object.gameObject.AddComponent<EnemyPacketReceiver>();
+			return set_object.get_gameObject().AddComponent<EnemyPacketReceiver>();
 		}
 		if (set_object is Player)
 		{
-			return set_object.gameObject.AddComponent<PlayerPacketReceiver>();
+			return set_object.get_gameObject().AddComponent<PlayerPacketReceiver>();
 		}
 		if (set_object is Character)
 		{
-			return set_object.gameObject.AddComponent<CharacterPacketReceiver>();
+			return set_object.get_gameObject().AddComponent<CharacterPacketReceiver>();
 		}
-		return set_object.gameObject.AddComponent<ObjectPacketReceiver>();
+		return set_object.get_gameObject().AddComponent<ObjectPacketReceiver>();
 	}
 
 	protected virtual void Awake()
 	{
-		owner = GetComponent<StageObject>();
+		owner = this.GetComponent<StageObject>();
 	}
 
 	public override void SetStopPacketUpdate(bool is_stop)
@@ -53,7 +57,7 @@ public class ObjectPacketReceiver : PacketReceiver
 	public override void Set(CoopPacket packet)
 	{
 		base.Set(packet);
-		packet.GetModel<Coop_Model_ObjectBase>()?.SetReceiveTime(Time.time);
+		packet.GetModel<Coop_Model_ObjectBase>()?.SetReceiveTime(Time.get_time());
 	}
 
 	protected override void PacketUpdate()
@@ -114,14 +118,14 @@ public class ObjectPacketReceiver : PacketReceiver
 							{
 								num = MonoBehaviourSingleton<InGameSettingsManager>.I.stageObject.packetHandleMarginTime;
 							}
-							if (Time.time > model2.GetReceiveTime() + num)
+							if (Time.get_time() > model2.GetReceiveTime() + num)
 							{
 								flag = true;
 								if (!model2.IsHandleable(owner))
 								{
 									int num2 = -1;
 									Character character = owner as Character;
-									if ((Object)character != (Object)null)
+									if (character != null)
 									{
 										num2 = (int)character.actionID;
 									}
@@ -136,7 +140,7 @@ public class ObjectPacketReceiver : PacketReceiver
 					}
 					if (!flag || !HandleCoopEvent(coopPacket2))
 					{
-						if (Time.time > model2.GetReceiveTime() + 20f)
+						if (Time.get_time() > model2.GetReceiveTime() + 20f)
 						{
 							Log.Warning(LOG.COOP, "ObjectPacketReceiver::PacketUpdate() Err. ( Over 20 Second. ) type : " + coopPacket2.packetType);
 						}
@@ -186,7 +190,11 @@ public class ObjectPacketReceiver : PacketReceiver
 
 	public virtual bool GetPredictivePosition(out Vector3 pos)
 	{
-		pos = Vector3.zero;
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		pos = Vector3.get_zero();
 		for (int num = base.packets.Count - 1; num >= 0; num--)
 		{
 			CoopPacket coopPacket = base.packets[num];
@@ -202,6 +210,7 @@ public class ObjectPacketReceiver : PacketReceiver
 
 	protected override bool HandleCoopEvent(CoopPacket packet)
 	{
+		//IL_018c: Unknown result type (might be due to invalid IL or missing references)
 		switch (packet.packetType)
 		{
 		case PACKET_TYPE.OBJECT_DESTROY:
@@ -219,7 +228,7 @@ public class ObjectPacketReceiver : PacketReceiver
 				owner.OnAttackedHitOwner(status2);
 				AttackedHitStatusFix status3 = new AttackedHitStatusFix(status2.origin);
 				owner.OnAttackedHitFix(status3);
-				if ((Object)owner.packetSender != (Object)null)
+				if (owner.packetSender != null)
 				{
 					owner.packetSender.OnAttackedHitFix(status3);
 				}
@@ -255,7 +264,7 @@ public class ObjectPacketReceiver : PacketReceiver
 		{
 			Coop_Model_ObjectShotGimmickGenerator model2 = packet.GetModel<Coop_Model_ObjectShotGimmickGenerator>();
 			GimmickGeneratorObject gimmickGeneratorObject = owner as GimmickGeneratorObject;
-			if ((Object)gimmickGeneratorObject != (Object)null)
+			if (gimmickGeneratorObject != null)
 			{
 				gimmickGeneratorObject.OnGenerateForLinearMove(model2.pos);
 			}

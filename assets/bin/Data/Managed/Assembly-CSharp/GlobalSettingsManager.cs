@@ -90,36 +90,44 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 		public Color GetSkinColor(int id)
 		{
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			if (id < 0 || id >= skinColors.Length)
 			{
-				return Color.white;
+				return Color.get_white();
 			}
 			return skinColors[id];
 		}
 
 		public Color GetHairColor(int id)
 		{
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			if (id < 0 || id >= hairColors.Length)
 			{
-				return Color.white;
+				return Color.get_white();
 			}
 			return hairColors[id];
 		}
 
 		public Color GetModelElementColor(int id)
 		{
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			if (id < 0 || id >= modelElementColors.Length)
 			{
-				return Color.white;
+				return Color.get_white();
 			}
 			return modelElementColors[id];
 		}
 
 		public Color GetModelElementColor2(int id)
 		{
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			if (id < 0 || id >= modelElementColors2.Length)
 			{
-				return Color.white;
+				return Color.get_white();
 			}
 			return modelElementColors2[id];
 		}
@@ -200,16 +208,20 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 		public Transform CreateShadow(float size, float body_radius, float scale, bool fixedY0, Transform parent = null, bool is_lightweight = false)
 		{
-			Transform transform = (!is_lightweight) ? ResourceUtility.Realizes(shadowPrefab, parent, -1) : ResourceUtility.Realizes(shadowPrefabLightweight, parent, -1);
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			Transform val = (!is_lightweight) ? ResourceUtility.Realizes(shadowPrefab, parent, -1) : ResourceUtility.Realizes(shadowPrefabLightweight, parent, -1);
 			size *= 0.5f;
-			transform.localPosition = new Vector3(0f, 0.01f, 0f);
-			transform.localEulerAngles = Vector3.zero;
-			transform.localScale = new Vector3(size, size, size);
+			val.set_localPosition(new Vector3(0f, 0.01f, 0f));
+			val.set_localEulerAngles(Vector3.get_zero());
+			val.set_localScale(new Vector3(size, size, size));
 			if (fixedY0)
 			{
-				transform.gameObject.AddComponent<CircleShadow>();
+				val.get_gameObject().AddComponent<CircleShadow>();
 			}
-			return transform;
+			return val;
 		}
 
 		public IEnumerator LoadIconPrefabs(MonoBehaviour mono)
@@ -276,6 +288,14 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 			public DisplayInfo(DisplayInfo displayInfo)
 			{
+				//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+				//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
 				zFromCamera = displayInfo.zFromCamera;
 				mainPos = new Vector3(displayInfo.mainPos.x, displayInfo.mainPos.y, displayInfo.mainPos.z);
 				mainRot = new Vector3(displayInfo.mainRot.x, displayInfo.mainRot.y, displayInfo.mainRot.z);
@@ -634,6 +654,8 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 	public bool enableBlackMarketBanner = true;
 
+	public bool enableFortuneWheelBanner = true;
+
 	private Quaternion initLightRot;
 
 	private Quaternion initNpcLightRot;
@@ -648,31 +670,42 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 	private void Start()
 	{
-		initLightRot = lightDirection.localRotation;
-		initNpcLightRot = npcLightDirection.localRotation;
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		initLightRot = lightDirection.get_localRotation();
+		initNpcLightRot = npcLightDirection.get_localRotation();
 		initAmbientColor = defaultAmbientColor;
 	}
 
 	public void ResetLightRot()
 	{
-		lightDirection.localRotation = initLightRot;
-		npcLightDirection.localRotation = initNpcLightRot;
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		lightDirection.set_localRotation(initLightRot);
+		npcLightDirection.set_localRotation(initNpcLightRot);
 	}
 
 	public void ResetAmbientColor()
 	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		defaultAmbientColor = initAmbientColor;
 	}
 
 	public void LoadLinkResources(Action callback)
 	{
-		StartCoroutine(_LoadLinkResources(callback));
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(_LoadLinkResources(callback));
 	}
 
 	private IEnumerator _LoadLinkResources(Action callback)
 	{
-		yield return (object)StartCoroutine(linkResources.LoadIconPrefabs(this));
-		callback();
+		yield return (object)this.StartCoroutine(linkResources.LoadIconPrefabs(this));
+		callback.Invoke();
 	}
 
 	public void InitAvatarData()
@@ -735,20 +768,38 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 	private void LateUpdate()
 	{
-		if (lightRot != lightDirection.localRotation)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+		if (lightRot != lightDirection.get_localRotation())
 		{
-			lightRot = lightDirection.localRotation;
-			Shader.SetGlobalVector("_light_dir", lightDirection.forward.ToVector4());
+			lightRot = lightDirection.get_localRotation();
+			Shader.SetGlobalVector("_light_dir", lightDirection.get_forward().ToVector4());
 		}
-		if (npcLightRot != npcLightDirection.localRotation)
+		if (npcLightRot != npcLightDirection.get_localRotation())
 		{
-			npcLightRot = npcLightDirection.localRotation;
-			Shader.SetGlobalVector("_npc_light_dir", npcLightDirection.forward.ToVector4());
+			npcLightRot = npcLightDirection.get_localRotation();
+			Shader.SetGlobalVector("_npc_light_dir", npcLightDirection.get_forward().ToVector4());
 		}
 		if (ambientColor != defaultAmbientColor)
 		{
 			ambientColor = defaultAmbientColor;
-			Shader.SetGlobalVector("_ambient_color", ambientColor);
+			Shader.SetGlobalVector("_ambient_color", Color.op_Implicit(ambientColor));
 		}
 	}
 

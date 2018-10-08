@@ -255,7 +255,9 @@ namespace BestHTTP
 
 		public void AddField(string fieldName, string value)
 		{
-			if (FieldsImpl == null)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Expected O, but got Unknown
+			if ((object)FieldsImpl == null)
 			{
 				FieldsImpl = new WWWForm();
 			}
@@ -264,7 +266,9 @@ namespace BestHTTP
 
 		public void AddBinaryData(string fieldName, byte[] contents)
 		{
-			if (FieldsImpl == null)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Expected O, but got Unknown
+			if ((object)FieldsImpl == null)
 			{
 				FieldsImpl = new WWWForm();
 			}
@@ -355,7 +359,7 @@ namespace BestHTTP
 			int num = (entityBody != null) ? entityBody.Length : 0;
 			if (RawData == null)
 			{
-				byte[] array = (FieldsImpl == null) ? null : FieldsImpl.data;
+				byte[] array = ((object)FieldsImpl == null) ? null : FieldsImpl.get_data();
 				if (array != null && array.Length > 0 && !HasHeader("Content-Type"))
 				{
 					AddHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -417,7 +421,7 @@ namespace BestHTTP
 
 		internal byte[] GetEntityBody()
 		{
-			return (RawData != null) ? RawData : ((FieldsImpl == null) ? null : FieldsImpl.data);
+			return (RawData != null) ? RawData : (((object)FieldsImpl == null) ? null : FieldsImpl.get_data());
 		}
 
 		internal bool SendOutTo(Stream stream)
@@ -430,7 +434,7 @@ namespace BestHTTP
 				binaryWriter.Write(EOL);
 				SendHeaders(binaryWriter);
 				binaryWriter.Write(EOL);
-				byte[] array = (RawData != null) ? RawData : ((FieldsImpl == null) ? null : FieldsImpl.data);
+				byte[] array = (RawData != null) ? RawData : (((object)FieldsImpl == null) ? null : FieldsImpl.get_data());
 				if (array != null && array.Length > 0)
 				{
 					binaryWriter.Write(array, 0, array.Length);
@@ -452,12 +456,12 @@ namespace BestHTTP
 				{
 					if (OnUpgraded != null)
 					{
-						OnUpgraded(this, Response);
+						OnUpgraded.Invoke(this, Response);
 					}
 				}
 				catch (Exception ex)
 				{
-					Debug.LogError($"{ex.Message}: {ex.StackTrace}");
+					Debug.LogError((object)$"{ex.Message}: {ex.StackTrace}");
 				}
 			}
 		}
@@ -468,12 +472,12 @@ namespace BestHTTP
 			{
 				if (Callback != null)
 				{
-					Callback(this, Response);
+					Callback.Invoke(this, Response);
 				}
 			}
 			catch (Exception ex)
 			{
-				Debug.LogError($"{ex.Message}: {ex.StackTrace}");
+				Debug.LogError((object)$"{ex.Message}: {ex.StackTrace}");
 			}
 		}
 

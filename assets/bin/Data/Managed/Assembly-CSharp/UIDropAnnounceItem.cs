@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class UIDropAnnounceItem : MonoBehaviour
+public class UIDropAnnounceItem
 {
 	[SerializeField]
 	protected UILabel itemName;
@@ -21,27 +21,38 @@ public class UIDropAnnounceItem : MonoBehaviour
 
 	protected Action<UIDropAnnounceItem> onEndCallback;
 
+	public UIDropAnnounceItem()
+		: this()
+	{
+	}
+
 	protected void Awake()
 	{
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Expected O, but got Unknown
 		int i = 0;
 		for (int num = animStart.Length; i < num; i++)
 		{
-			animStart[i].enabled = false;
+			animStart[i].set_enabled(false);
 			animStart[i].Sample(1f, true);
 		}
 		int j = 0;
 		for (int num2 = animEnd.Length; j < num2; j++)
 		{
-			animEnd[j].enabled = false;
+			animEnd[j].set_enabled(false);
 		}
-		_transform = base.transform;
+		_transform = this.get_transform();
 	}
 
 	public void StartAnnounce(string text, Color color, bool stop, Action<UIDropAnnounceItem> end_callback)
 	{
-		if (!base.gameObject.activeSelf)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		if (!this.get_gameObject().get_activeSelf())
 		{
-			base.gameObject.SetActive(true);
+			this.get_gameObject().SetActive(true);
 		}
 		itemName.text = text;
 		itemName.color = color;
@@ -53,7 +64,7 @@ public class UIDropAnnounceItem : MonoBehaviour
 			animStart[i].ResetToBeginning();
 			animStart[i].PlayForward();
 		}
-		StartCoroutine(Direction());
+		this.StartCoroutine(Direction());
 	}
 
 	protected IEnumerator Direction()
@@ -61,7 +72,7 @@ public class UIDropAnnounceItem : MonoBehaviour
 		int n = 0;
 		for (int m = animStart.Length; n < m; n++)
 		{
-			while (animStart[n].enabled)
+			while (animStart[n].get_enabled())
 			{
 				yield return (object)null;
 			}
@@ -84,26 +95,31 @@ public class UIDropAnnounceItem : MonoBehaviour
 		int j = 0;
 		for (int i = animEnd.Length; j < i; j++)
 		{
-			while (animEnd[j].enabled)
+			while (animEnd[j].get_enabled())
 			{
 				yield return (object)null;
 			}
 		}
-		base.gameObject.SetActive(false);
+		this.get_gameObject().SetActive(false);
 	}
 
 	public void MovePos(bool stop, Vector3 pos, float time)
 	{
-		anim.Set(time, _transform.localPosition, pos, null, default(Vector3), null);
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		anim.Set(time, _transform.get_localPosition(), pos, null, default(Vector3), null);
 		anim.Play();
 		isStop = stop;
 	}
 
 	private void LateUpdate()
 	{
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		if (anim.IsPlaying())
 		{
-			_transform.localPosition = anim.Update();
+			_transform.set_localPosition(anim.Update());
 		}
 	}
 }

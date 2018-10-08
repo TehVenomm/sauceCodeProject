@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -44,8 +45,10 @@ public class QuestRequestItem : UIBehaviour
 		"RequestPlate_SubEvent"
 	};
 
-	public virtual void Setup(Transform t, DeliveryTable.DeliveryData info)
+	public unsafe virtual void Setup(Transform t, DeliveryTable.DeliveryData info)
 	{
+		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_040b: Unknown result type (might be due to invalid IL or missing references)
 		SetIcon(t, info);
 		SetDeliveryName(t, info);
 		bool is_visible = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)info.id);
@@ -77,10 +80,10 @@ public class QuestRequestItem : UIBehaviour
 		SetActive(t, UI.SPR_DROP_DIFFICULTY_RARE, info.GetDeliveryDropRarity() == DELIVERY_DROP_DIFFICULTY.RARE);
 		SetActive(t, UI.SPR_DROP_DIFFICULTY_SUPER_RARE, info.GetDeliveryDropRarity() == DELIVERY_DROP_DIFFICULTY.SUPER_RARE);
 		DeliveryDropRareTextColor componentInChildren = t.GetComponentInChildren<DeliveryDropRareTextColor>();
-		if ((Object)componentInChildren != (Object)null)
+		if (componentInChildren != null)
 		{
-			UILabel component = GetComponent<UILabel>(t, UI.LBL_NEED_ITEM_NAME);
-			if ((Object)component != (Object)null)
+			UILabel component = base.GetComponent<UILabel>(t, (Enum)UI.LBL_NEED_ITEM_NAME);
+			if (component != null)
 			{
 				SetColor(t, UI.LBL_NEED_ITEM_NAME, componentInChildren.GetRarityColor(info.GetDeliveryDropRarity()));
 			}
@@ -113,9 +116,7 @@ public class QuestRequestItem : UIBehaviour
 		{
 			if (list.Count >= 2)
 			{
-				list = (from x in list
-				orderby GetRewardPriority(x)
-				select x).ToList();
+				list = list.OrderBy<DeliveryRewardTable.DeliveryRewardData.Reward, int>(new Func<DeliveryRewardTable.DeliveryRewardData.Reward, int>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList();
 			}
 			UI[] array2 = new UI[2]
 			{
@@ -130,7 +131,7 @@ public class QuestRequestItem : UIBehaviour
 				{
 					DeliveryRewardTable.DeliveryRewardData.Reward reward2 = list[j];
 					ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(reward2.type, reward2.item_id, FindCtrl(t, array2[j]), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST);
-					if ((Object)itemIcon != (Object)null)
+					if (itemIcon != null)
 					{
 						itemIcon.SetEnableCollider(false);
 					}
@@ -145,9 +146,9 @@ public class QuestRequestItem : UIBehaviour
 			UIWidget[] array3 = componentsInChildren;
 			foreach (UIWidget uIWidget in array3)
 			{
-				if (flag2 && !uIWidget.name.Contains("Mask"))
+				if (flag2 && !uIWidget.get_name().Contains("Mask"))
 				{
-					uIWidget.color = Color.gray;
+					uIWidget.color = Color.get_gray();
 				}
 			}
 			SetActive(t, UI.OBJ_LEVEL_LIMIT, flag2);
@@ -158,8 +159,8 @@ public class QuestRequestItem : UIBehaviour
 		{
 			SetActive(t, UI.OBJ_LEVEL_LIMIT, false);
 		}
-		UIGrid component2 = GetComponent<UIGrid>(t, UI.GRD_ICON_ROOT);
-		if ((Object)component2 != (Object)null)
+		UIGrid component2 = base.GetComponent<UIGrid>(t, (Enum)UI.GRD_ICON_ROOT);
+		if (component2 != null)
 		{
 			component2.Reposition();
 		}
@@ -178,7 +179,14 @@ public class QuestRequestItem : UIBehaviour
 	protected virtual void SetIcon(Transform t, DeliveryTable.DeliveryData info)
 	{
 		NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData((int)info.npcID);
-		SetNPCIcon(t, UI.TEX_NPC, nPCData.npcModelID, false);
+		if (info.id == 99140101)
+		{
+			SetNPCIcon(t, UI.TEX_NPC, 999, false);
+		}
+		else
+		{
+			SetNPCIcon(t, UI.TEX_NPC, nPCData.npcModelID, false);
+		}
 	}
 
 	protected virtual void SetDeliveryName(Transform t, DeliveryTable.DeliveryData info)

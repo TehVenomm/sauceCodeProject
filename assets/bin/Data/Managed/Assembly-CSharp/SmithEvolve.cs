@@ -233,6 +233,15 @@ public class SmithEvolve : EquipGenerateBase
 
 	public override void Initialize()
 	{
+		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
 		SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
 		EquipItemInfo selectEquipData = smithData.selectEquipData;
 		if (selectEquipData != null)
@@ -253,30 +262,36 @@ public class SmithEvolve : EquipGenerateBase
 			}
 		}
 		Transform root = (!smithData.selectEquipData.tableData.IsWeapon()) ? GetCtrl(UI.OBJ_ARMOR_ROOT) : GetCtrl(UI.OBJ_WEAPON_ROOT);
-		Transform transform = FindCtrl(root, UI.OBJ_ORDER_CENTER_ANIM_ROOT);
-		Transform transform2 = FindCtrl(root, UI.OBJ_ORDER_L_ANIM_ROOT);
-		Transform transform3 = FindCtrl(root, UI.OBJ_ORDER_R_ANIM_ROOT);
-		defaultCenterPos = transform.localPosition;
-		defaultRightPos = transform2.localPosition;
-		defaultLeftPos = transform3.localPosition;
-		centerAnim = transform.gameObject.AddComponent<TweenPosition>();
-		rightAnim = transform3.gameObject.AddComponent<TweenPosition>();
-		leftAnim = transform2.gameObject.AddComponent<TweenPosition>();
+		Transform val = FindCtrl(root, UI.OBJ_ORDER_CENTER_ANIM_ROOT);
+		Transform val2 = FindCtrl(root, UI.OBJ_ORDER_L_ANIM_ROOT);
+		Transform val3 = FindCtrl(root, UI.OBJ_ORDER_R_ANIM_ROOT);
+		defaultCenterPos = val.get_localPosition();
+		defaultRightPos = val2.get_localPosition();
+		defaultLeftPos = val3.get_localPosition();
+		centerAnim = val.get_gameObject().AddComponent<TweenPosition>();
+		rightAnim = val3.get_gameObject().AddComponent<TweenPosition>();
+		leftAnim = val2.get_gameObject().AddComponent<TweenPosition>();
 		smithType = SmithType.EVOLVE;
 		base.Initialize();
 	}
 
 	public override void UpdateUI()
 	{
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0203: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0215: Unknown result type (might be due to invalid IL or missing references)
 		SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
 		Transform root = (!smithData.selectEquipData.tableData.IsWeapon()) ? GetCtrl(UI.OBJ_ARMOR_ROOT) : GetCtrl(UI.OBJ_WEAPON_ROOT);
 		bool flag = smithData.evolveData.evolveEquipDataTable.Length > 1;
 		SetActive(root, UI.BTN_EVO_L_INACTIVE, !flag);
 		SetActive(root, UI.BTN_EVO_R_INACTIVE, !flag);
-		SetColor(root, UI.SPR_EVO_L, (!flag) ? Color.clear : Color.white);
-		SetColor(root, UI.SPR_EVO_R, (!flag) ? Color.clear : Color.white);
-		SetLabelText(UI.LBL_EVO_INDEX, (smithData.evolveData.selectIndex + 1).ToString());
-		SetLabelText(UI.LBL_EVO_INDEX_MAX, smithData.evolveData.evolveTable.Length.ToString());
+		SetColor(root, UI.SPR_EVO_L, (!flag) ? Color.get_clear() : Color.get_white());
+		SetColor(root, UI.SPR_EVO_R, (!flag) ? Color.get_clear() : Color.get_white());
+		SetLabelText((Enum)UI.LBL_EVO_INDEX, (smithData.evolveData.selectIndex + 1).ToString());
+		SetLabelText((Enum)UI.LBL_EVO_INDEX_MAX, smithData.evolveData.evolveTable.Length.ToString());
 		int selectIndex = smithData.evolveData.selectIndex;
 		SetActive(root, UI.OBJ_ORDER_NORMAL_CENTER, true);
 		SetActive(root, UI.OBJ_ORDER_ATTRIBUTE_CENTER, true);
@@ -297,11 +312,11 @@ public class SmithEvolve : EquipGenerateBase
 		}
 		else if (isRightChange)
 		{
-			StartCoroutine("ChangePanelRight", smithData);
+			this.StartCoroutine("ChangePanelRight", (object)smithData);
 		}
 		else
 		{
-			StartCoroutine("ChangePanelLeft", smithData);
+			this.StartCoroutine("ChangePanelLeft", (object)smithData);
 		}
 		isButtonChange = false;
 		base.UpdateUI();
@@ -311,90 +326,90 @@ public class SmithEvolve : EquipGenerateBase
 	{
 		int num = smith_data.evolveData.evolveEquipDataTable.Length;
 		int selectIndex = smith_data.evolveData.selectIndex;
-		Transform transform = (!smith_data.evolveData.evolveEquipDataTable[selectIndex].IsWeapon()) ? GetCtrl(UI.OBJ_ARMOR_ROOT) : GetCtrl(UI.OBJ_WEAPON_ROOT);
+		Transform val = (!smith_data.evolveData.evolveEquipDataTable[selectIndex].IsWeapon()) ? GetCtrl(UI.OBJ_ARMOR_ROOT) : GetCtrl(UI.OBJ_WEAPON_ROOT);
 		if (num == 0)
 		{
-			SetActive(UI.OBJ_EVOLVE_ROOT, false);
+			SetActive((Enum)UI.OBJ_EVOLVE_ROOT, false);
 		}
 		else if (num == 1)
 		{
-			SetModifyCenterPanel(smith_data.evolveData.evolveEquipDataTable[selectIndex], transform);
-			SetActive(transform, UI.OBJ_ORDER_L2, false);
-			SetActive(transform, UI.OBJ_ORDER_R2, false);
+			SetModifyCenterPanel(smith_data.evolveData.evolveEquipDataTable[selectIndex], val);
+			SetActive(val, UI.OBJ_ORDER_L2, false);
+			SetActive(val, UI.OBJ_ORDER_R2, false);
 		}
 		else if (num == 2)
 		{
-			SetModifyCenterPanel(smith_data.evolveData.evolveEquipDataTable[selectIndex], transform);
+			SetModifyCenterPanel(smith_data.evolveData.evolveEquipDataTable[selectIndex], val);
 			if (selectIndex == 0)
 			{
-				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex + 1], true, transform);
-				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex + 1], false, transform);
+				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex + 1], true, val);
+				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex + 1], false, val);
 			}
 			else
 			{
-				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex - 1], true, transform);
-				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex - 1], false, transform);
+				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex - 1], true, val);
+				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex - 1], false, val);
 			}
 		}
 		else if (num > 2)
 		{
-			SetModifyCenterPanel(smith_data.evolveData.evolveEquipDataTable[selectIndex], transform);
+			SetModifyCenterPanel(smith_data.evolveData.evolveEquipDataTable[selectIndex], val);
 			if (selectIndex == 0)
 			{
-				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex + 1], true, transform);
-				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[num - 1], false, transform);
+				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex + 1], true, val);
+				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[num - 1], false, val);
 			}
 			else if (selectIndex == num - 1)
 			{
-				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[0], true, transform);
-				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex - 1], false, transform);
+				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[0], true, val);
+				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex - 1], false, val);
 			}
 			else
 			{
-				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex + 1], true, transform);
-				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex - 1], false, transform);
+				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex + 1], true, val);
+				SetModifySidePanel(smith_data.evolveData.evolveEquipDataTable[selectIndex - 1], false, val);
 			}
 		}
 	}
 
 	private IEnumerator ChangePanelLeft(SmithManager.SmithGrowData data)
 	{
-		centerAnim.enabled = true;
+		centerAnim.set_enabled(true);
 		centerAnim.ResetToBeginning();
 		centerAnim.duration = 0.1f;
 		centerAnim.from = defaultCenterPos;
 		centerAnim.to = new Vector3(defaultCenterPos.x + 200f, defaultCenterPos.y, defaultCenterPos.z);
 		centerAnim.PlayForward();
-		rightAnim.enabled = true;
+		rightAnim.set_enabled(true);
 		rightAnim.ResetToBeginning();
 		rightAnim.duration = 0.1f;
 		rightAnim.from = defaultRightPos;
 		rightAnim.to = new Vector3(defaultRightPos.x + 200f, defaultRightPos.y, defaultRightPos.z);
 		rightAnim.PlayForward();
-		leftAnim.enabled = true;
+		leftAnim.set_enabled(true);
 		leftAnim.ResetToBeginning();
 		leftAnim.duration = 0.1f;
 		leftAnim.from = defaultLeftPos;
 		leftAnim.to = new Vector3(defaultLeftPos.x + 200f, defaultLeftPos.y, defaultLeftPos.z);
 		leftAnim.PlayForward();
-		while (centerAnim.enabled)
+		while (centerAnim.get_enabled())
 		{
 			yield return (object)null;
 		}
 		SetModifyPanel(data);
-		centerAnim.enabled = true;
+		centerAnim.set_enabled(true);
 		centerAnim.ResetToBeginning();
 		centerAnim.duration = 0.1f;
 		centerAnim.from = new Vector3(defaultCenterPos.x - 200f, defaultCenterPos.y, defaultCenterPos.z);
 		centerAnim.to = defaultCenterPos;
 		centerAnim.PlayForward();
-		rightAnim.enabled = true;
+		rightAnim.set_enabled(true);
 		rightAnim.ResetToBeginning();
 		rightAnim.duration = 0.1f;
 		rightAnim.from = new Vector3(defaultRightPos.x - 200f, defaultRightPos.y, defaultRightPos.z);
 		rightAnim.to = defaultRightPos;
 		rightAnim.PlayForward();
-		leftAnim.enabled = true;
+		leftAnim.set_enabled(true);
 		leftAnim.ResetToBeginning();
 		leftAnim.duration = 0.1f;
 		leftAnim.from = new Vector3(defaultLeftPos.x - 200f, defaultLeftPos.y, defaultLeftPos.z);
@@ -404,42 +419,42 @@ public class SmithEvolve : EquipGenerateBase
 
 	private IEnumerator ChangePanelRight(SmithManager.SmithGrowData data)
 	{
-		centerAnim.enabled = true;
+		centerAnim.set_enabled(true);
 		centerAnim.ResetToBeginning();
 		centerAnim.duration = 0.1f;
 		centerAnim.from = defaultCenterPos;
 		centerAnim.to = new Vector3(defaultCenterPos.x - 200f, defaultCenterPos.y, defaultCenterPos.z);
 		centerAnim.PlayForward();
-		rightAnim.enabled = true;
+		rightAnim.set_enabled(true);
 		rightAnim.ResetToBeginning();
 		rightAnim.duration = 0.1f;
 		rightAnim.from = defaultRightPos;
 		rightAnim.to = new Vector3(defaultRightPos.x - 200f, defaultRightPos.y, defaultRightPos.z);
 		rightAnim.PlayForward();
-		leftAnim.enabled = true;
+		leftAnim.set_enabled(true);
 		leftAnim.ResetToBeginning();
 		leftAnim.duration = 0.1f;
 		leftAnim.from = defaultLeftPos;
 		leftAnim.to = new Vector3(defaultLeftPos.x - 200f, defaultLeftPos.y, defaultLeftPos.z);
 		leftAnim.PlayForward();
-		while (centerAnim.enabled)
+		while (centerAnim.get_enabled())
 		{
 			yield return (object)null;
 		}
 		SetModifyPanel(data);
-		centerAnim.enabled = true;
+		centerAnim.set_enabled(true);
 		centerAnim.ResetToBeginning();
 		centerAnim.duration = 0.1f;
 		centerAnim.from = new Vector3(defaultCenterPos.x + 200f, defaultCenterPos.y, defaultCenterPos.z);
 		centerAnim.to = defaultCenterPos;
 		centerAnim.PlayForward();
-		rightAnim.enabled = true;
+		rightAnim.set_enabled(true);
 		rightAnim.ResetToBeginning();
 		rightAnim.duration = 0.1f;
 		rightAnim.from = new Vector3(defaultRightPos.x + 200f, defaultRightPos.y, defaultRightPos.z);
 		rightAnim.to = defaultRightPos;
 		rightAnim.PlayForward();
-		leftAnim.enabled = true;
+		leftAnim.set_enabled(true);
 		leftAnim.ResetToBeginning();
 		leftAnim.duration = 0.1f;
 		leftAnim.from = new Vector3(defaultLeftPos.x + 200f, defaultLeftPos.y, defaultLeftPos.z);
@@ -458,8 +473,8 @@ public class SmithEvolve : EquipGenerateBase
 	private void SetModifyCenterPanel(EquipItemTable.EquipItemData data, Transform rootObj)
 	{
 		bool flag = data.IsWeapon();
-		SetActive(UI.OBJ_ARMOR_ROOT, !flag);
-		SetActive(UI.OBJ_WEAPON_ROOT, flag);
+		SetActive((Enum)UI.OBJ_ARMOR_ROOT, !flag);
+		SetActive((Enum)UI.OBJ_WEAPON_ROOT, flag);
 		int num = 0;
 		if (flag)
 		{
@@ -486,8 +501,8 @@ public class SmithEvolve : EquipGenerateBase
 	private void SetModifySidePanel(EquipItemTable.EquipItemData data, bool isRight, Transform rootObj)
 	{
 		bool flag = data.IsWeapon();
-		SetActive(UI.OBJ_ARMOR_ROOT, !flag);
-		SetActive(UI.OBJ_WEAPON_ROOT, flag);
+		SetActive((Enum)UI.OBJ_ARMOR_ROOT, !flag);
+		SetActive((Enum)UI.OBJ_WEAPON_ROOT, flag);
 		int num = 0;
 		if (flag)
 		{
@@ -544,7 +559,7 @@ public class SmithEvolve : EquipGenerateBase
 		CheckNeedMaterialNumFromInventory();
 	}
 
-	protected override void EquipTableParam()
+	protected unsafe override void EquipTableParam()
 	{
 		base.EquipTableParam();
 		SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
@@ -555,24 +570,24 @@ public class SmithEvolve : EquipGenerateBase
 		adapterAbilityList.Clear();
 		if (!object.ReferenceEquals(equipTable.fixedAbility, null) && equipTable.fixedAbility.Length > 0)
 		{
-			int j = 0;
-			for (int num = equipTable.fixedAbility.Length; j < num; j++)
+			int i = 0;
+			for (int num = equipTable.fixedAbility.Length; i < num; i++)
 			{
 				AdapterAbility adapterAbility = new AdapterAbility();
-				adapterAbility.Set(equipTable.fixedAbility[j]);
+				adapterAbility.Set(equipTable.fixedAbility[i]);
 				adapterAbilityList.Add(adapterAbility);
 			}
 		}
 		EquipItemInfo selectEquipData = smithData.selectEquipData;
 		if (!object.ReferenceEquals(selectEquipData.ability, null) && selectEquipData.ability.Length > 0)
 		{
-			int k = 0;
-			for (int num2 = selectEquipData.ability.Length; k < num2; k++)
+			int j = 0;
+			for (int num2 = selectEquipData.ability.Length; j < num2; j++)
 			{
-				if (!selectEquipData.IsFixedAbility(k))
+				if (!selectEquipData.IsFixedAbility(j))
 				{
 					AdapterAbility adapterAbility2 = new AdapterAbility();
-					adapterAbility2.Set(selectEquipData.ability[k]);
+					adapterAbility2.Set(selectEquipData.ability[j]);
 					adapterAbilityList.Add(adapterAbility2);
 				}
 			}
@@ -580,54 +595,20 @@ public class SmithEvolve : EquipGenerateBase
 		if (adapterAbilityList.Count > 0 || abilityItem != null)
 		{
 			bool empty_ability = true;
-			SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", adapterAbilityList.Count + ((abilityItem != null) ? 1 : 0), false, delegate(int i, Transform t, bool is_recycle)
-			{
-				if (i < adapterAbilityList.Count)
-				{
-					AdapterAbility adapterAbility3 = adapterAbilityList[i];
-					if (adapterAbility3.GetId() == 0)
-					{
-						SetActive(t, false);
-					}
-					else
-					{
-						empty_ability = false;
-						SetActive(t, true);
-						if (adapterAbility3.isFix)
-						{
-							SetActive(t, UI.OBJ_ABILITY, false);
-							SetActive(t, UI.OBJ_FIXEDABILITY, true);
-							SetLabelText(t, UI.LBL_FIXEDABILITY, adapterAbility3.GetName());
-							SetLabelText(t, UI.LBL_FIXEDABILITY_NUM, adapterAbility3.GetAP());
-						}
-						else
-						{
-							SetLabelText(t, UI.LBL_ABILITY, adapterAbility3.GetName());
-							SetLabelText(t, UI.LBL_ABILITY_NUM, adapterAbility3.GetAP());
-						}
-						SetAbilityItemEvent(t, i, touchAndReleaseButtons);
-					}
-				}
-				else if (abilityItem != null)
-				{
-					SetActive(t, UI.OBJ_ABILITY, false);
-					SetActive(t, UI.OBJ_ABILITY_ITEM, true);
-					SetLabelText(t, UI.LBL_ABILITY_ITEM, abilityItem.GetName());
-					SetTouchAndRelease(t.GetComponentInChildren<UIButton>().transform, "ABILITY_ITEM_DATA_POPUP", "RELEASE_ABILITY", t);
-				}
-			});
+			_003CEquipTableParam_003Ec__AnonStorey460 _003CEquipTableParam_003Ec__AnonStorey;
+			SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", adapterAbilityList.Count + ((abilityItem != null) ? 1 : 0), false, new Action<int, Transform, bool>((object)_003CEquipTableParam_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			if (empty_ability)
 			{
-				SetActive(UI.STR_NON_ABILITY, true);
+				SetActive((Enum)UI.STR_NON_ABILITY, true);
 			}
 			else
 			{
-				SetActive(UI.STR_NON_ABILITY, false);
+				SetActive((Enum)UI.STR_NON_ABILITY, false);
 			}
 		}
 		else
 		{
-			SetActive(UI.STR_NON_ABILITY, true);
+			SetActive((Enum)UI.STR_NON_ABILITY, true);
 		}
 	}
 
@@ -696,7 +677,7 @@ public class SmithEvolve : EquipGenerateBase
 		OnQueryConfirmYES();
 	}
 
-	protected override void Send()
+	protected unsafe override void Send()
 	{
 		SmithManager.SmithGrowData data = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
 		if (data == null)
@@ -708,31 +689,8 @@ public class SmithEvolve : EquipGenerateBase
 			SmithManager.ResultData result_data = new SmithManager.ResultData();
 			GameSection.SetEventData(result_data);
 			GameSection.StayEvent();
-			MonoBehaviourSingleton<SmithManager>.I.SendEvolveEquipItem(data.evolveData.evolveBeforeEquipData.uniqueID, data.evolveData.GetEvolveTable().id, selectedUniqueIdList, delegate(Error err, EquipItemInfo evolve_item)
-			{
-				if (err == Error.None)
-				{
-					result_data.itemData = evolve_item;
-					result_data.beforeRarity = (int)data.evolveData.evolveBeforeEquipData.tableData.rarity;
-					result_data.beforeLevel = data.evolveData.evolveBeforeEquipData.level;
-					result_data.beforeMaxLevel = data.evolveData.evolveBeforeEquipData.tableData.maxLv;
-					result_data.beforeExceedCnt = data.evolveData.evolveBeforeEquipData.exceed;
-					result_data.beforeAtk = data.evolveData.evolveBeforeEquipData.atk;
-					result_data.beforeDef = data.evolveData.evolveBeforeEquipData.def;
-					result_data.beforeHp = data.evolveData.evolveBeforeEquipData.hp;
-					result_data.beforeElemAtk = data.evolveData.evolveBeforeEquipData.elemAtk;
-					result_data.beforeElemDef = data.evolveData.evolveBeforeEquipData.elemDef;
-					SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
-					smithData.selectEquipData = evolve_item;
-					MonoBehaviourSingleton<SmithManager>.I.CreateLocalInventory();
-					MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
-					GameSection.ResumeEvent(true, null);
-				}
-				else
-				{
-					GameSection.ResumeEvent(false, null);
-				}
-			});
+			_003CSend_003Ec__AnonStorey462 _003CSend_003Ec__AnonStorey;
+			MonoBehaviourSingleton<SmithManager>.I.SendEvolveEquipItem(data.evolveData.evolveBeforeEquipData.uniqueID, data.evolveData.GetEvolveTable().id, selectedUniqueIdList, new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -758,6 +716,7 @@ public class SmithEvolve : EquipGenerateBase
 
 	private void MoveLeftIndex()
 	{
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
 		int num = smithData.evolveData.evolveEquipDataTable.Length;
 		int selectIndex = smithData.evolveData.selectIndex;
@@ -766,13 +725,14 @@ public class SmithEvolve : EquipGenerateBase
 			smithData.evolveData.selectIndex = num - 1;
 		}
 		rotateSign = -1f;
-		StartCoroutine(ChangeLeftModel(selectIndex, smithData.evolveData.selectIndex));
+		this.StartCoroutine(ChangeLeftModel(selectIndex, smithData.evolveData.selectIndex));
 		isButtonChange = true;
 		isRightChange = false;
 	}
 
 	private void MoveRightIndex()
 	{
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 		SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
 		int num = smithData.evolveData.evolveEquipDataTable.Length;
 		int selectIndex = smithData.evolveData.selectIndex;
@@ -781,16 +741,17 @@ public class SmithEvolve : EquipGenerateBase
 			smithData.evolveData.selectIndex = 0;
 		}
 		rotateSign = 1f;
-		StartCoroutine(ChangeRightModel(selectIndex, smithData.evolveData.selectIndex));
+		this.StartCoroutine(ChangeRightModel(selectIndex, smithData.evolveData.selectIndex));
 		isButtonChange = true;
 		isRightChange = true;
 	}
 
 	private void UpdateModel()
 	{
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		DeleteItemModelObject();
-		StopCoroutine("DoLoadModel");
-		StartCoroutine("DoLoadModel");
+		this.StopCoroutine("DoLoadModel");
+		this.StartCoroutine("DoLoadModel");
 	}
 
 	private IEnumerator DoLoadModel()
@@ -799,15 +760,15 @@ public class SmithEvolve : EquipGenerateBase
 		SmithManager.SmithGrowData smith_data = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
 		int max = smith_data.evolveData.evolveEquipDataTable.Length;
 		itemModelRoot = Utility.CreateGameObject("ItemModelRoot", GetRenderTextureModelTransform(UI.TEX_MODEL), -1);
-		itemModelRoot.localPosition = Vector3.up * 100f;
-		itemModelRoot.localEulerAngles = Vector3.zero;
-		itemModels = new Transform[max];
+		itemModelRoot.set_localPosition(Vector3.get_up() * 100f);
+		itemModelRoot.set_localEulerAngles(Vector3.get_zero());
+		itemModels = (Transform[])new Transform[max];
 		bool[] load_complete = new bool[max];
 		for (int l = 0; l < max; l++)
 		{
 			LoadItemModelData(l, max, delegate(int index)
 			{
-				((_003CDoLoadModel_003Ec__Iterator160)/*Error near IL_0101: stateMachine*/)._003Cload_complete_003E__2[index] = true;
+				((_003CDoLoadModel_003Ec__Iterator167)/*Error near IL_0101: stateMachine*/)._003Cload_complete_003E__2[index] = true;
 			});
 		}
 		while (true)
@@ -828,53 +789,55 @@ public class SmithEvolve : EquipGenerateBase
 			yield return (object)null;
 		}
 		SmithManager.SmithGrowData data = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
-		defaultModelPos = itemModels[data.evolveData.selectIndex].transform.localPosition;
+		defaultModelPos = itemModels[data.evolveData.selectIndex].get_transform().get_localPosition();
 		animPosList = new List<TweenPosition>();
 		for (int j = 0; j < max; j++)
 		{
-			TweenPosition animPos = itemModels[j].gameObject.AddComponent<TweenPosition>();
+			TweenPosition animPos = itemModels[j].get_gameObject().AddComponent<TweenPosition>();
 			animPosList.Add(animPos);
-			animPos.enabled = false;
+			animPos.set_enabled(false);
 		}
 		for (int i = 0; i < max; i++)
 		{
 			if (i != data.evolveData.selectIndex)
 			{
-				itemModels[i].localPosition = new Vector3(10f, 0f, 0f);
+				itemModels[i].set_localPosition(new Vector3(10f, 0f, 0f));
 			}
 		}
 		EnableRenderTexture(UI.TEX_MODEL);
 	}
 
-	private void LoadItemModelData(int i, int max, Action<int> callback)
+	private unsafe void LoadItemModelData(int i, int max, Action<int> callback)
 	{
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0130: Expected O, but got Unknown
 		SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
 		ItemLoader loader;
-		if ((UnityEngine.Object)itemModels[i] == (UnityEngine.Object)null)
+		if (itemModels[i] == null)
 		{
 			itemModels[i] = Utility.CreateGameObject("ItemModel", itemModelRoot, -1);
-			itemModels[i].localPosition = new Vector3((float)(i * 10), 0f, 0f);
+			itemModels[i].set_localPosition(new Vector3((float)(i * 10), 0f, 0f));
 		}
 		else
 		{
-			loader = itemModels[i].gameObject.GetComponent<ItemLoader>();
-			if ((UnityEngine.Object)loader != (UnityEngine.Object)null)
+			loader = itemModels[i].get_gameObject().GetComponent<ItemLoader>();
+			if (loader != null)
 			{
 				loader.Clear();
-				UnityEngine.Object.DestroyImmediate(loader);
+				Object.DestroyImmediate(loader);
 			}
 		}
-		loader = itemModels[i].gameObject.AddComponent<ItemLoader>();
-		loader.LoadEquip(smithData.evolveData.evolveEquipDataTable[i].id, GetRenderTextureModelTransform(UI.TEX_MODEL), GetRenderTextureLayer(UI.TEX_MODEL), -1, -1, delegate
-		{
-			itemModelRoot.localPosition = new Vector3(0f, 0f, loader.displayInfo.zFromCamera);
-			callback(i);
-		});
+		loader = itemModels[i].get_gameObject().AddComponent<ItemLoader>();
+		_003CLoadItemModelData_003Ec__AnonStorey463 _003CLoadItemModelData_003Ec__AnonStorey;
+		loader.LoadEquip(smithData.evolveData.evolveEquipDataTable[i].id, GetRenderTextureModelTransform(UI.TEX_MODEL), GetRenderTextureLayer(UI.TEX_MODEL), -1, -1, new Action((object)_003CLoadItemModelData_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void OnOpen()
 	{
-		if ((UnityEngine.Object)itemModelRoot == (UnityEngine.Object)null)
+		if (itemModelRoot == null)
 		{
 			UpdateModel();
 		}
@@ -898,13 +861,17 @@ public class SmithEvolve : EquipGenerateBase
 
 	private void DeleteItemModelObject()
 	{
-		DeleteRenderTexture(UI.TEX_MODEL);
+		DeleteRenderTexture((Enum)UI.TEX_MODEL);
 		itemModels = null;
 		itemModelRoot = null;
 	}
 
 	private void TurnItemModel(int before_index, int index, int max, bool is_immediate = true)
 	{
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 		float num = 360f / (float)max * (float)before_index;
 		float num2 = 360f / (float)max * (float)index;
 		nowAngle = 10f;
@@ -929,7 +896,7 @@ public class SmithEvolve : EquipGenerateBase
 			int i = 0;
 			for (int num3 = itemModels.Length; i < num3; i++)
 			{
-				itemModels[i].transform.localPosition = ((index != i) ? (Vector3.back * 100f) : Vector3.zero);
+				itemModels[i].get_transform().set_localPosition((index != i) ? (Vector3.get_back() * 100f) : Vector3.get_zero());
 			}
 			isModelScrolling = false;
 		}
@@ -937,34 +904,34 @@ public class SmithEvolve : EquipGenerateBase
 
 	private IEnumerator ChangeRightModel(int beforeIndex, int selectIndex)
 	{
-		if ((UnityEngine.Object)animPosList[beforeIndex] != (UnityEngine.Object)null)
+		if (animPosList[beforeIndex] != null)
 		{
-			animPosList[beforeIndex].enabled = true;
+			animPosList[beforeIndex].set_enabled(true);
 			animPosList[beforeIndex].ResetToBeginning();
 			animPosList[beforeIndex].duration = 0.15f;
 			animPosList[beforeIndex].from = defaultModelPos;
 			animPosList[beforeIndex].to = new Vector3(defaultModelPos.x - 2f, defaultModelPos.y, defaultModelPos.z);
 			animPosList[beforeIndex].PlayForward();
 		}
-		if ((UnityEngine.Object)animPosList[selectIndex] != (UnityEngine.Object)null)
+		if (animPosList[selectIndex] != null)
 		{
-			animPosList[selectIndex].enabled = true;
+			animPosList[selectIndex].set_enabled(true);
 			animPosList[selectIndex].ResetToBeginning();
 			animPosList[selectIndex].duration = 0.15f;
 			animPosList[selectIndex].from = new Vector3(defaultModelPos.x + 2f, defaultModelPos.y, defaultModelPos.z);
 			animPosList[selectIndex].to = defaultModelPos;
 			animPosList[selectIndex].PlayForward();
 		}
-		if ((UnityEngine.Object)animPosList[beforeIndex] != (UnityEngine.Object)null)
+		if (animPosList[beforeIndex] != null)
 		{
-			while (animPosList[beforeIndex].enabled)
+			while (animPosList[beforeIndex].get_enabled())
 			{
 				yield return (object)null;
 			}
 		}
-		if ((UnityEngine.Object)animPosList[selectIndex] != (UnityEngine.Object)null)
+		if (animPosList[selectIndex] != null)
 		{
-			while (animPosList[selectIndex].enabled)
+			while (animPosList[selectIndex].get_enabled())
 			{
 				yield return (object)null;
 			}
@@ -973,34 +940,34 @@ public class SmithEvolve : EquipGenerateBase
 
 	private IEnumerator ChangeLeftModel(int beforeIndex, int selectIndex)
 	{
-		if ((UnityEngine.Object)animPosList[beforeIndex] != (UnityEngine.Object)null)
+		if (animPosList[beforeIndex] != null)
 		{
-			animPosList[beforeIndex].enabled = true;
+			animPosList[beforeIndex].set_enabled(true);
 			animPosList[beforeIndex].ResetToBeginning();
 			animPosList[beforeIndex].duration = 0.15f;
 			animPosList[beforeIndex].from = defaultModelPos;
 			animPosList[beforeIndex].to = new Vector3(defaultModelPos.x + 2f, defaultModelPos.y, defaultModelPos.z);
 			animPosList[beforeIndex].PlayForward();
 		}
-		if ((UnityEngine.Object)animPosList[selectIndex] != (UnityEngine.Object)null)
+		if (animPosList[selectIndex] != null)
 		{
-			animPosList[selectIndex].enabled = true;
+			animPosList[selectIndex].set_enabled(true);
 			animPosList[selectIndex].ResetToBeginning();
 			animPosList[selectIndex].duration = 0.15f;
 			animPosList[selectIndex].from = new Vector3(defaultModelPos.x - 2f, defaultModelPos.y, defaultModelPos.z);
 			animPosList[selectIndex].to = defaultModelPos;
 			animPosList[selectIndex].PlayForward();
 		}
-		if ((UnityEngine.Object)animPosList[beforeIndex] != (UnityEngine.Object)null)
+		if (animPosList[beforeIndex] != null)
 		{
-			while (animPosList[beforeIndex].enabled)
+			while (animPosList[beforeIndex].get_enabled())
 			{
 				yield return (object)null;
 			}
 		}
-		if ((UnityEngine.Object)animPosList[selectIndex] != (UnityEngine.Object)null)
+		if (animPosList[selectIndex] != null)
 		{
-			while (animPosList[selectIndex].enabled)
+			while (animPosList[selectIndex].get_enabled())
 			{
 				yield return (object)null;
 			}
@@ -1009,11 +976,16 @@ public class SmithEvolve : EquipGenerateBase
 
 	public void LateUpdate()
 	{
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
 		if (itemModels != null)
 		{
 			if (isModelScrolling)
 			{
-				float num = targetAngle * Time.deltaTime * 4f;
+				float num = targetAngle * Time.get_deltaTime() * 4f;
 				if (nowAngle + num >= targetAngle)
 				{
 					num = targetAngle - nowAngle;
@@ -1026,22 +998,22 @@ public class SmithEvolve : EquipGenerateBase
 				int i = 0;
 				for (int num2 = itemModels.Length; i < num2; i++)
 				{
-					itemModels[i].RotateAround(itemModelRoot.position, itemModelRoot.up, num * rotateSign);
-					itemModels[i].eulerAngles = new Vector3(0f, 0f, 0f);
+					itemModels[i].RotateAround(itemModelRoot.get_position(), itemModelRoot.get_up(), num * rotateSign);
+					itemModels[i].set_eulerAngles(new Vector3(0f, 0f, 0f));
 				}
 			}
 			if (localRotateWait < 1f)
 			{
-				localRotateWait += Time.deltaTime;
+				localRotateWait += Time.get_deltaTime();
 			}
 			else
 			{
-				localRotate += Time.deltaTime * 10f;
+				localRotate += Time.get_deltaTime() * 10f;
 				int j = 0;
 				for (int num3 = itemModels.Length; j < num3; j++)
 				{
-					itemModels[j].eulerAngles = new Vector3(0f, 0f, 0f);
-					itemModels[j].Rotate(itemModels[j].up, localRotate);
+					itemModels[j].set_eulerAngles(new Vector3(0f, 0f, 0f));
+					itemModels[j].Rotate(itemModels[j].get_up(), localRotate);
 				}
 			}
 		}
@@ -1061,9 +1033,9 @@ public class SmithEvolve : EquipGenerateBase
 		object[] array = GameSection.GetEventData() as object[];
 		int index = (int)array[0];
 		Transform targetTrans = array[1] as Transform;
-		if ((UnityEngine.Object)abilityDetailPopUp == (UnityEngine.Object)null)
+		if (abilityDetailPopUp == null)
 		{
-			abilityDetailPopUp = CreateAndGetAbilityDetail(UI.OBJ_DETAIL_ROOT);
+			abilityDetailPopUp = CreateAndGetAbilityDetail((Enum)UI.OBJ_DETAIL_ROOT);
 		}
 		abilityDetailPopUp.ShowAbilityDetail(targetTrans);
 		abilityDetailPopUp.SetAbilityDetailText(adapterAbilityList[index].ability);
@@ -1074,9 +1046,9 @@ public class SmithEvolve : EquipGenerateBase
 	{
 		Transform targetTrans = GameSection.GetEventData() as Transform;
 		AbilityItemInfo abilityItem = GetEquipData().GetAbilityItem();
-		if ((UnityEngine.Object)abilityDetailPopUp == (UnityEngine.Object)null)
+		if (abilityDetailPopUp == null)
 		{
-			abilityDetailPopUp = CreateAndGetAbilityDetail(UI.OBJ_DETAIL_ROOT);
+			abilityDetailPopUp = CreateAndGetAbilityDetail((Enum)UI.OBJ_DETAIL_ROOT);
 		}
 		abilityDetailPopUp.ShowAbilityDetail(targetTrans);
 		abilityDetailPopUp.SetAbilityDetailText(abilityItem.GetName(), string.Empty, abilityItem.GetDescription());

@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 [AddComponentMenu("ProjectUI/UIGameSceneEventSender")]
-public class UIGameSceneEventSender : MonoBehaviour
+public class UIGameSceneEventSender
 {
 	public string eventName = string.Empty;
 
@@ -27,16 +27,24 @@ public class UIGameSceneEventSender : MonoBehaviour
 		set;
 	}
 
+	public UIGameSceneEventSender()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
-		buttonTweenCtrl = base.gameObject.GetComponent<UIButtonTweenEventCtrl>();
-		playSoundCtrl = base.gameObject.GetComponent<UIPlaySoundCustom>();
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		buttonTweenCtrl = this.get_gameObject().GetComponent<UIButtonTweenEventCtrl>();
+		playSoundCtrl = this.get_gameObject().GetComponent<UIPlaySoundCustom>();
 	}
 
 	private void OnValidate()
 	{
-		UIButton component = base.gameObject.GetComponent<UIButton>();
-		if ((UnityEngine.Object)component != (UnityEngine.Object)null && component.onClick.Find((EventDelegate o) => (UnityEngine.Object)o.target == (UnityEngine.Object)this) == null)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		UIButton component = this.get_gameObject().GetComponent<UIButton>();
+		if (component != null && component.onClick.Find((EventDelegate o) => o.target == this) == null)
 		{
 			component.onClick.Add(new EventDelegate(this, "SendEvent"));
 		}
@@ -44,14 +52,15 @@ public class UIGameSceneEventSender : MonoBehaviour
 
 	private void OnPress(bool isDown)
 	{
-		if (!((UnityEngine.Object)UICamera.currentTouch.current == (UnityEngine.Object)null) && IsActiveButton())
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		if (!(UICamera.currentTouch.current == null) && IsActiveButton())
 		{
-			bool flag = base.gameObject.GetInstanceID() == UICamera.currentTouch.current.GetInstanceID();
+			bool flag = this.get_gameObject().GetInstanceID() == UICamera.currentTouch.current.GetInstanceID();
 			if (isDown)
 			{
 				enablePress = flag;
 				enableRelease = false;
-				if ((UnityEngine.Object)buttonTweenCtrl != (UnityEngine.Object)null && flag)
+				if (buttonTweenCtrl != null && flag)
 				{
 					buttonTweenCtrl.PlayPush(isDown);
 				}
@@ -59,7 +68,7 @@ public class UIGameSceneEventSender : MonoBehaviour
 			else if (enablePress)
 			{
 				enableRelease = flag;
-				if ((bool)buttonTweenCtrl && enablePress)
+				if (Object.op_Implicit(buttonTweenCtrl) && enablePress)
 				{
 					buttonTweenCtrl.PlayPush(isDown);
 				}
@@ -70,7 +79,7 @@ public class UIGameSceneEventSender : MonoBehaviour
 	private IEnumerator DoButtonTweenCtrlReset()
 	{
 		yield return (object)null;
-		if ((UnityEngine.Object)buttonTweenCtrl != (UnityEngine.Object)null)
+		if (buttonTweenCtrl != null)
 		{
 			buttonTweenCtrl.Reset();
 		}
@@ -82,7 +91,7 @@ public class UIGameSceneEventSender : MonoBehaviour
 		{
 			enablePress = (enableRelease = false);
 			PlaySound();
-			if ((UnityEngine.Object)buttonTweenCtrl != (UnityEngine.Object)null && buttonTweenCtrl.tweens.Length > 0 && (UnityEngine.Object)buttonTweenCtrl.tweens[0] != (UnityEngine.Object)null)
+			if (buttonTweenCtrl != null && buttonTweenCtrl.tweens.Length > 0 && buttonTweenCtrl.tweens[0] != null)
 			{
 				if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 				{
@@ -93,6 +102,7 @@ public class UIGameSceneEventSender : MonoBehaviour
 					buttonTweenCtrl.Reset();
 					buttonTweenCtrl.Play(true, delegate
 					{
+						//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 						if (MonoBehaviourSingleton<UIManager>.IsValid())
 						{
 							MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.UITWEEN_SMALL, false);
@@ -103,7 +113,7 @@ public class UIGameSceneEventSender : MonoBehaviour
 						}
 						else
 						{
-							StartCoroutine(DoButtonTweenCtrlReset());
+							this.StartCoroutine(DoButtonTweenCtrlReset());
 						}
 					});
 				}
@@ -117,12 +127,14 @@ public class UIGameSceneEventSender : MonoBehaviour
 
 	public void _SendEvent()
 	{
-		SendEvent("UIButton", base.gameObject, eventName, eventData, callback);
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Expected O, but got Unknown
+		SendEvent("UIButton", this.get_gameObject(), eventName, eventData, callback);
 	}
 
 	private void PlaySound()
 	{
-		if ((UnityEngine.Object)playSoundCtrl != (UnityEngine.Object)null)
+		if (playSoundCtrl != null)
 		{
 			playSoundCtrl.Play();
 		}
@@ -158,7 +170,9 @@ public class UIGameSceneEventSender : MonoBehaviour
 
 	private bool IsActiveButton()
 	{
-		if (!TutorialMessage.IsActiveButton(base.gameObject))
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Expected O, but got Unknown
+		if (!TutorialMessage.IsActiveButton(this.get_gameObject()))
 		{
 			if (eventName == "TUTORIAL_NEXT")
 			{
@@ -184,7 +198,7 @@ public class UIGameSceneEventSender : MonoBehaviour
 			if (MonoBehaviourSingleton<GameSceneManager>.I.isChangeing)
 			{
 				UIPanel componentInParent = sender.GetComponentInParent<UIPanel>();
-				if ((UnityEngine.Object)componentInParent == (UnityEngine.Object)null || componentInParent.depth != 9999)
+				if (componentInParent == null || componentInParent.depth != 9999)
 				{
 					Log.Error(LOG.UI, "GameSceneManager.I.isChangeing == true");
 					return;
@@ -192,7 +206,7 @@ public class UIGameSceneEventSender : MonoBehaviour
 			}
 			string text = null;
 			UIGameSceneEventSenderVersionRestriction component = sender.GetComponent<UIGameSceneEventSenderVersionRestriction>();
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			if (component != null)
 			{
 				text = component.GetCheckApplicationVersionText();
 			}
@@ -202,7 +216,7 @@ public class UIGameSceneEventSender : MonoBehaviour
 			}
 			else
 			{
-				callback(event_name, event_data, text);
+				callback.Invoke(event_name, event_data, text);
 			}
 		}
 	}

@@ -16,155 +16,155 @@ public static class NGUITools
 
 	private static AudioClip mLastClip;
 
-	private static Vector3[] mSides = new Vector3[4];
+	private static Vector3[] mSides = (Vector3[])new Vector3[4];
 
-	public static KeyCode[] keys = new KeyCode[145]
+	public static KeyCode[] keys = (KeyCode[])new KeyCode[145]
 	{
-		KeyCode.Backspace,
-		KeyCode.Tab,
-		KeyCode.Clear,
-		KeyCode.Return,
-		KeyCode.Pause,
-		KeyCode.Escape,
-		KeyCode.Space,
-		KeyCode.Exclaim,
-		KeyCode.DoubleQuote,
-		KeyCode.Hash,
-		KeyCode.Dollar,
-		KeyCode.Ampersand,
-		KeyCode.Quote,
-		KeyCode.LeftParen,
-		KeyCode.RightParen,
-		KeyCode.Asterisk,
-		KeyCode.Plus,
-		KeyCode.Comma,
-		KeyCode.Minus,
-		KeyCode.Period,
-		KeyCode.Slash,
-		KeyCode.Alpha0,
-		KeyCode.Alpha1,
-		KeyCode.Alpha2,
-		KeyCode.Alpha3,
-		KeyCode.Alpha4,
-		KeyCode.Alpha5,
-		KeyCode.Alpha6,
-		KeyCode.Alpha7,
-		KeyCode.Alpha8,
-		KeyCode.Alpha9,
-		KeyCode.Colon,
-		KeyCode.Semicolon,
-		KeyCode.Less,
-		KeyCode.Equals,
-		KeyCode.Greater,
-		KeyCode.Question,
-		KeyCode.At,
-		KeyCode.LeftBracket,
-		KeyCode.Backslash,
-		KeyCode.RightBracket,
-		KeyCode.Caret,
-		KeyCode.Underscore,
-		KeyCode.BackQuote,
-		KeyCode.A,
-		KeyCode.B,
-		KeyCode.C,
-		KeyCode.D,
-		KeyCode.E,
-		KeyCode.F,
-		KeyCode.G,
-		KeyCode.H,
-		KeyCode.I,
-		KeyCode.J,
-		KeyCode.K,
-		KeyCode.L,
-		KeyCode.M,
-		KeyCode.N,
-		KeyCode.O,
-		KeyCode.P,
-		KeyCode.Q,
-		KeyCode.R,
-		KeyCode.S,
-		KeyCode.T,
-		KeyCode.U,
-		KeyCode.V,
-		KeyCode.W,
-		KeyCode.X,
-		KeyCode.Y,
-		KeyCode.Z,
-		KeyCode.Delete,
-		KeyCode.Keypad0,
-		KeyCode.Keypad1,
-		KeyCode.Keypad2,
-		KeyCode.Keypad3,
-		KeyCode.Keypad4,
-		KeyCode.Keypad5,
-		KeyCode.Keypad6,
-		KeyCode.Keypad7,
-		KeyCode.Keypad8,
-		KeyCode.Keypad9,
-		KeyCode.KeypadPeriod,
-		KeyCode.KeypadDivide,
-		KeyCode.KeypadMultiply,
-		KeyCode.KeypadMinus,
-		KeyCode.KeypadPlus,
-		KeyCode.KeypadEnter,
-		KeyCode.KeypadEquals,
-		KeyCode.UpArrow,
-		KeyCode.DownArrow,
-		KeyCode.RightArrow,
-		KeyCode.LeftArrow,
-		KeyCode.Insert,
-		KeyCode.Home,
-		KeyCode.End,
-		KeyCode.PageUp,
-		KeyCode.PageDown,
-		KeyCode.F1,
-		KeyCode.F2,
-		KeyCode.F3,
-		KeyCode.F4,
-		KeyCode.F5,
-		KeyCode.F6,
-		KeyCode.F7,
-		KeyCode.F8,
-		KeyCode.F9,
-		KeyCode.F10,
-		KeyCode.F11,
-		KeyCode.F12,
-		KeyCode.F13,
-		KeyCode.F14,
-		KeyCode.F15,
-		KeyCode.Numlock,
-		KeyCode.CapsLock,
-		KeyCode.ScrollLock,
-		KeyCode.RightShift,
-		KeyCode.LeftShift,
-		KeyCode.RightControl,
-		KeyCode.LeftControl,
-		KeyCode.RightAlt,
-		KeyCode.LeftAlt,
-		KeyCode.Mouse3,
-		KeyCode.Mouse4,
-		KeyCode.Mouse5,
-		KeyCode.Mouse6,
-		KeyCode.JoystickButton0,
-		KeyCode.JoystickButton1,
-		KeyCode.JoystickButton2,
-		KeyCode.JoystickButton3,
-		KeyCode.JoystickButton4,
-		KeyCode.JoystickButton5,
-		KeyCode.JoystickButton6,
-		KeyCode.JoystickButton7,
-		KeyCode.JoystickButton8,
-		KeyCode.JoystickButton9,
-		KeyCode.JoystickButton10,
-		KeyCode.JoystickButton11,
-		KeyCode.JoystickButton12,
-		KeyCode.JoystickButton13,
-		KeyCode.JoystickButton14,
-		KeyCode.JoystickButton15,
-		KeyCode.JoystickButton16,
-		KeyCode.JoystickButton17,
-		KeyCode.JoystickButton18,
-		KeyCode.JoystickButton19
+		8,
+		9,
+		12,
+		13,
+		19,
+		27,
+		32,
+		33,
+		34,
+		35,
+		36,
+		38,
+		39,
+		40,
+		41,
+		42,
+		43,
+		44,
+		45,
+		46,
+		47,
+		48,
+		49,
+		50,
+		51,
+		52,
+		53,
+		54,
+		55,
+		56,
+		57,
+		58,
+		59,
+		60,
+		61,
+		62,
+		63,
+		64,
+		91,
+		92,
+		93,
+		94,
+		95,
+		96,
+		97,
+		98,
+		99,
+		100,
+		101,
+		102,
+		103,
+		104,
+		105,
+		106,
+		107,
+		108,
+		109,
+		110,
+		111,
+		112,
+		113,
+		114,
+		115,
+		116,
+		117,
+		118,
+		119,
+		120,
+		121,
+		122,
+		127,
+		256,
+		257,
+		258,
+		259,
+		260,
+		261,
+		262,
+		263,
+		264,
+		265,
+		266,
+		267,
+		268,
+		269,
+		270,
+		271,
+		272,
+		273,
+		274,
+		275,
+		276,
+		277,
+		278,
+		279,
+		280,
+		281,
+		282,
+		283,
+		284,
+		285,
+		286,
+		287,
+		288,
+		289,
+		290,
+		291,
+		292,
+		293,
+		294,
+		295,
+		296,
+		300,
+		301,
+		302,
+		303,
+		304,
+		305,
+		306,
+		307,
+		308,
+		326,
+		327,
+		328,
+		329,
+		330,
+		331,
+		332,
+		333,
+		334,
+		335,
+		336,
+		337,
+		338,
+		339,
+		340,
+		341,
+		342,
+		343,
+		344,
+		345,
+		346,
+		347,
+		348,
+		349
 	};
 
 	public static float soundVolume
@@ -189,26 +189,30 @@ public static class NGUITools
 		}
 	}
 
-	public static bool fileAccess => Application.platform != RuntimePlatform.WindowsWebPlayer && Application.platform != RuntimePlatform.OSXWebPlayer;
+	public static bool fileAccess => (int)Application.get_platform() != 5 && (int)Application.get_platform() != 3;
 
 	public static string clipboard
 	{
 		get
 		{
-			TextEditor textEditor = new TextEditor();
-			textEditor.Paste();
-			return textEditor.text;
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Expected O, but got Unknown
+			TextEditor val = new TextEditor();
+			val.Paste();
+			return val.get_text();
 		}
 		set
 		{
-			TextEditor textEditor = new TextEditor();
-			textEditor.text = value;
-			textEditor.OnFocus();
-			textEditor.Copy();
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Expected O, but got Unknown
+			TextEditor val = new TextEditor();
+			val.set_text(value);
+			val.OnFocus();
+			val.Copy();
 		}
 	}
 
-	public static Vector2 screenSize => new Vector2((float)Screen.width, (float)Screen.height);
+	public static Vector2 screenSize => new Vector2((float)Screen.get_width(), (float)Screen.get_height());
 
 	public static AudioSource PlaySound(AudioClip clip)
 	{
@@ -222,54 +226,62 @@ public static class NGUITools
 
 	public static AudioSource PlaySound(AudioClip clip, float volume, float pitch)
 	{
+		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d2: Expected O, but got Unknown
+		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ee: Expected O, but got Unknown
+		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0139: Expected O, but got Unknown
+		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
 		float time = RealTime.time;
-		if ((UnityEngine.Object)mLastClip == (UnityEngine.Object)clip && mLastTimestamp + 0.1f > time)
+		if (mLastClip == clip && mLastTimestamp + 0.1f > time)
 		{
 			return null;
 		}
 		mLastClip = clip;
 		mLastTimestamp = time;
 		volume *= soundVolume;
-		if ((UnityEngine.Object)clip != (UnityEngine.Object)null && volume > 0.01f)
+		if (clip != null && volume > 0.01f)
 		{
-			if ((UnityEngine.Object)mListener == (UnityEngine.Object)null || !GetActive(mListener))
+			if (mListener == null || !NGUITools.GetActive(mListener))
 			{
-				AudioListener[] array = UnityEngine.Object.FindObjectsOfType(typeof(AudioListener)) as AudioListener[];
+				AudioListener[] array = Object.FindObjectsOfType(typeof(AudioListener)) as AudioListener[];
 				if (array != null)
 				{
 					for (int i = 0; i < array.Length; i++)
 					{
-						if (GetActive(array[i]))
+						if (NGUITools.GetActive(array[i]))
 						{
 							mListener = array[i];
 							break;
 						}
 					}
 				}
-				if ((UnityEngine.Object)mListener == (UnityEngine.Object)null)
+				if (mListener == null)
 				{
-					Camera camera = Camera.main;
-					if ((UnityEngine.Object)camera == (UnityEngine.Object)null)
+					Camera val = Camera.get_main();
+					if (val == null)
 					{
-						camera = (UnityEngine.Object.FindObjectOfType(typeof(Camera)) as Camera);
+						val = (Object.FindObjectOfType(typeof(Camera)) as Camera);
 					}
-					if ((UnityEngine.Object)camera != (UnityEngine.Object)null)
+					if (val != null)
 					{
-						mListener = camera.gameObject.AddComponent<AudioListener>();
+						mListener = val.get_gameObject().AddComponent<AudioListener>();
 					}
 				}
 			}
-			if ((UnityEngine.Object)mListener != (UnityEngine.Object)null && mListener.enabled && GetActive(mListener.gameObject))
+			if (mListener != null && mListener.get_enabled() && NGUITools.GetActive(mListener.get_gameObject()))
 			{
-				AudioSource audioSource = mListener.GetComponent<AudioSource>();
-				if ((UnityEngine.Object)audioSource == (UnityEngine.Object)null)
+				AudioSource val2 = mListener.GetComponent<AudioSource>();
+				if (val2 == null)
 				{
-					audioSource = mListener.gameObject.AddComponent<AudioSource>();
+					val2 = mListener.get_gameObject().AddComponent<AudioSource>();
 				}
-				audioSource.priority = 50;
-				audioSource.pitch = pitch;
-				audioSource.PlayOneShot(clip, volume);
-				return audioSource;
+				val2.set_priority(50);
+				val2.set_pitch(pitch);
+				val2.PlayOneShot(clip, volume);
+				return val2;
 			}
 		}
 		return null;
@@ -281,52 +293,60 @@ public static class NGUITools
 		{
 			return min;
 		}
-		return UnityEngine.Random.Range(min, max + 1);
+		return Random.Range(min, max + 1);
 	}
 
 	public static string GetHierarchy(GameObject obj)
 	{
-		if ((UnityEngine.Object)obj == (UnityEngine.Object)null)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Expected O, but got Unknown
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		if (obj == null)
 		{
 			return string.Empty;
 		}
-		string text = obj.name;
-		while ((UnityEngine.Object)obj.transform.parent != (UnityEngine.Object)null)
+		string text = obj.get_name();
+		while (obj.get_transform().get_parent() != null)
 		{
-			obj = obj.transform.parent.gameObject;
-			text = obj.name + "\\" + text;
+			obj = obj.get_transform().get_parent().get_gameObject();
+			text = obj.get_name() + "\\" + text;
 		}
 		return text;
 	}
 
 	public static T[] FindActive<T>() where T : Component
 	{
-		return UnityEngine.Object.FindObjectsOfType(typeof(T)) as T[];
+		return Object.FindObjectsOfType(typeof(T)) as T[];
 	}
 
 	public static Camera FindCameraForLayer(int layer)
 	{
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Expected O, but got Unknown
 		int num = 1 << layer;
 		Camera cachedCamera;
 		for (int i = 0; i < UICamera.list.size; i++)
 		{
 			cachedCamera = UICamera.list.buffer[i].cachedCamera;
-			if ((bool)cachedCamera && (cachedCamera.cullingMask & num) != 0)
+			if (Object.op_Implicit(cachedCamera) && (cachedCamera.get_cullingMask() & num) != 0)
 			{
 				return cachedCamera;
 			}
 		}
-		cachedCamera = Camera.main;
-		if ((bool)cachedCamera && (cachedCamera.cullingMask & num) != 0)
+		cachedCamera = Camera.get_main();
+		if (Object.op_Implicit(cachedCamera) && (cachedCamera.get_cullingMask() & num) != 0)
 		{
 			return cachedCamera;
 		}
-		Camera[] array = new Camera[Camera.allCamerasCount];
+		Camera[] array = (Camera[])new Camera[Camera.get_allCamerasCount()];
 		int allCameras = Camera.GetAllCameras(array);
 		for (int j = 0; j < allCameras; j++)
 		{
 			cachedCamera = array[j];
-			if ((bool)cachedCamera && cachedCamera.enabled && (cachedCamera.cullingMask & num) != 0)
+			if (Object.op_Implicit(cachedCamera) && cachedCamera.get_enabled() && (cachedCamera.get_cullingMask() & num) != 0)
 			{
 				return cachedCamera;
 			}
@@ -341,30 +361,30 @@ public static class NGUITools
 
 	public static void AddWidgetCollider(GameObject go, bool considerInactive)
 	{
-		if ((UnityEngine.Object)go != (UnityEngine.Object)null)
+		if (go != null)
 		{
 			Collider component = go.GetComponent<Collider>();
-			BoxCollider boxCollider = component as BoxCollider;
-			if ((UnityEngine.Object)boxCollider != (UnityEngine.Object)null)
+			BoxCollider val = component as BoxCollider;
+			if (val != null)
 			{
-				UpdateWidgetCollider(boxCollider, considerInactive);
+				UpdateWidgetCollider(val, considerInactive);
 			}
-			else if (!((UnityEngine.Object)component != (UnityEngine.Object)null))
+			else if (!(component != null))
 			{
 				BoxCollider2D component2 = go.GetComponent<BoxCollider2D>();
-				if ((UnityEngine.Object)component2 != (UnityEngine.Object)null)
+				if (component2 != null)
 				{
 					UpdateWidgetCollider(component2, considerInactive);
 				}
 				else
 				{
-					UICamera uICamera = UICamera.FindCameraForLayer(go.layer);
-					if ((UnityEngine.Object)uICamera != (UnityEngine.Object)null && (uICamera.eventType == UICamera.EventType.World_2D || uICamera.eventType == UICamera.EventType.UI_2D))
+					UICamera uICamera = UICamera.FindCameraForLayer(go.get_layer());
+					if (uICamera != null && (uICamera.eventType == UICamera.EventType.World_2D || uICamera.eventType == UICamera.EventType.UI_2D))
 					{
 						component2 = go.AddComponent<BoxCollider2D>();
-						component2.isTrigger = true;
+						component2.set_isTrigger(true);
 						UIWidget component3 = go.GetComponent<UIWidget>();
-						if ((UnityEngine.Object)component3 != (UnityEngine.Object)null)
+						if (component3 != null)
 						{
 							component3.autoResizeBoxCollider = true;
 						}
@@ -372,14 +392,14 @@ public static class NGUITools
 					}
 					else
 					{
-						boxCollider = go.AddComponent<BoxCollider>();
-						boxCollider.isTrigger = true;
+						val = go.AddComponent<BoxCollider>();
+						val.set_isTrigger(true);
 						UIWidget component4 = go.GetComponent<UIWidget>();
-						if ((UnityEngine.Object)component4 != (UnityEngine.Object)null)
+						if (component4 != null)
 						{
 							component4.autoResizeBoxCollider = true;
 						}
-						UpdateWidgetCollider(boxCollider, considerInactive);
+						UpdateWidgetCollider(val, considerInactive);
 					}
 				}
 			}
@@ -393,17 +413,17 @@ public static class NGUITools
 
 	public static void UpdateWidgetCollider(GameObject go, bool considerInactive)
 	{
-		if ((UnityEngine.Object)go != (UnityEngine.Object)null)
+		if (go != null)
 		{
 			BoxCollider component = go.GetComponent<BoxCollider>();
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			if (component != null)
 			{
 				UpdateWidgetCollider(component, considerInactive);
 			}
 			else
 			{
 				BoxCollider2D component2 = go.GetComponent<BoxCollider2D>();
-				if ((UnityEngine.Object)component2 != (UnityEngine.Object)null)
+				if (component2 != null)
 				{
 					UpdateWidgetCollider(component2, considerInactive);
 				}
@@ -413,58 +433,103 @@ public static class NGUITools
 
 	public static void UpdateWidgetCollider(BoxCollider box, bool considerInactive)
 	{
-		if ((UnityEngine.Object)box != (UnityEngine.Object)null)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Expected O, but got Unknown
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013e: Expected O, but got Unknown
+		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+		if (box != null)
 		{
-			GameObject gameObject = box.gameObject;
-			UIWidget component = gameObject.GetComponent<UIWidget>();
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			GameObject val = box.get_gameObject();
+			UIWidget component = val.GetComponent<UIWidget>();
+			if (component != null)
 			{
 				Vector4 drawRegion = component.drawRegion;
 				if (drawRegion.x != 0f || drawRegion.y != 0f || drawRegion.z != 1f || drawRegion.w != 1f)
 				{
 					Vector4 drawingDimensions = component.drawingDimensions;
-					box.center = new Vector3((drawingDimensions.x + drawingDimensions.z) * 0.5f, (drawingDimensions.y + drawingDimensions.w) * 0.5f);
-					box.size = new Vector3(drawingDimensions.z - drawingDimensions.x, drawingDimensions.w - drawingDimensions.y);
+					box.set_center(new Vector3((drawingDimensions.x + drawingDimensions.z) * 0.5f, (drawingDimensions.y + drawingDimensions.w) * 0.5f));
+					box.set_size(new Vector3(drawingDimensions.z - drawingDimensions.x, drawingDimensions.w - drawingDimensions.y));
 				}
 				else
 				{
 					Vector3[] localCorners = component.localCorners;
-					box.center = Vector3.Lerp(localCorners[0], localCorners[2], 0.5f);
-					box.size = localCorners[2] - localCorners[0];
+					box.set_center(Vector3.Lerp(localCorners[0], localCorners[2], 0.5f));
+					box.set_size(localCorners[2] - localCorners[0]);
 				}
 			}
 			else
 			{
-				Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(gameObject.transform, considerInactive);
-				box.center = bounds.center;
-				Vector3 size = bounds.size;
+				Bounds val2 = NGUIMath.CalculateRelativeWidgetBounds(val.get_transform(), considerInactive);
+				box.set_center(val2.get_center());
+				Vector3 size = val2.get_size();
 				float x = size.x;
-				Vector3 size2 = bounds.size;
-				box.size = new Vector3(x, size2.y, 0f);
+				Vector3 size2 = val2.get_size();
+				box.set_size(new Vector3(x, size2.y, 0f));
 			}
 		}
 	}
 
 	public static void UpdateWidgetCollider(BoxCollider2D box, bool considerInactive)
 	{
-		if ((UnityEngine.Object)box != (UnityEngine.Object)null)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Expected O, but got Unknown
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008e: Expected O, but got Unknown
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+		if (box != null)
 		{
-			GameObject gameObject = box.gameObject;
-			UIWidget component = gameObject.GetComponent<UIWidget>();
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			GameObject val = box.get_gameObject();
+			UIWidget component = val.GetComponent<UIWidget>();
+			if (component != null)
 			{
 				Vector3[] localCorners = component.localCorners;
-				box.offset = Vector3.Lerp(localCorners[0], localCorners[2], 0.5f);
-				box.size = localCorners[2] - localCorners[0];
+				box.set_offset(Vector2.op_Implicit(Vector3.Lerp(localCorners[0], localCorners[2], 0.5f)));
+				box.set_size(Vector2.op_Implicit(localCorners[2] - localCorners[0]));
 			}
 			else
 			{
-				Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(gameObject.transform, considerInactive);
-				box.offset = bounds.center;
-				Vector3 size = bounds.size;
+				Bounds val2 = NGUIMath.CalculateRelativeWidgetBounds(val.get_transform(), considerInactive);
+				box.set_offset(Vector2.op_Implicit(val2.get_center()));
+				Vector3 size = val2.get_size();
 				float x = size.x;
-				Vector3 size2 = bounds.size;
-				box.size = new Vector2(x, size2.y);
+				Vector3 size2 = val2.get_size();
+				box.set_size(new Vector2(x, size2.y));
 			}
 		}
 	}
@@ -483,13 +548,13 @@ public static class NGUITools
 		return text;
 	}
 
-	public static string GetTypeName(UnityEngine.Object obj)
+	public static string GetTypeName(Object obj)
 	{
-		if (obj == (UnityEngine.Object)null)
+		if (obj == null)
 		{
 			return "Null";
 		}
-		string text = obj.GetType().ToString();
+		string text = ((object)obj).GetType().ToString();
 		if (text.StartsWith("UI"))
 		{
 			text = text.Substring(2);
@@ -501,11 +566,11 @@ public static class NGUITools
 		return text;
 	}
 
-	public static void RegisterUndo(UnityEngine.Object obj, string name)
+	public static void RegisterUndo(Object obj, string name)
 	{
 	}
 
-	public static void SetDirty(UnityEngine.Object obj)
+	public static void SetDirty(Object obj)
 	{
 	}
 
@@ -516,42 +581,56 @@ public static class NGUITools
 
 	public static GameObject AddChild(GameObject parent, bool undo)
 	{
-		GameObject gameObject = new GameObject();
-		if ((UnityEngine.Object)parent != (UnityEngine.Object)null)
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0005: Expected O, but got Unknown
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Expected O, but got Unknown
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		GameObject val = new GameObject();
+		if (parent != null)
 		{
-			Transform transform = gameObject.transform;
-			transform.parent = parent.transform;
-			transform.localPosition = Vector3.zero;
-			transform.localRotation = Quaternion.identity;
-			transform.localScale = Vector3.one;
-			gameObject.layer = parent.layer;
+			Transform val2 = val.get_transform();
+			val2.set_parent(parent.get_transform());
+			val2.set_localPosition(Vector3.get_zero());
+			val2.set_localRotation(Quaternion.get_identity());
+			val2.set_localScale(Vector3.get_one());
+			val.set_layer(parent.get_layer());
 		}
-		return gameObject;
+		return val;
 	}
 
 	public static GameObject AddChild(GameObject parent, GameObject prefab)
 	{
-		GameObject gameObject = UnityEngine.Object.Instantiate(prefab);
-		if ((UnityEngine.Object)gameObject != (UnityEngine.Object)null && (UnityEngine.Object)parent != (UnityEngine.Object)null)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0025: Expected O, but got Unknown
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		GameObject val = Object.Instantiate<GameObject>(prefab);
+		if (val != null && parent != null)
 		{
-			Transform transform = gameObject.transform;
-			transform.parent = parent.transform;
-			transform.localPosition = Vector3.zero;
-			transform.localRotation = Quaternion.identity;
-			transform.localScale = Vector3.one;
-			gameObject.layer = parent.layer;
+			Transform val2 = val.get_transform();
+			val2.set_parent(parent.get_transform());
+			val2.set_localPosition(Vector3.get_zero());
+			val2.set_localRotation(Quaternion.get_identity());
+			val2.set_localScale(Vector3.get_one());
+			val.set_layer(parent.get_layer());
 		}
-		return gameObject;
+		return val;
 	}
 
 	public static int CalculateRaycastDepth(GameObject go)
 	{
 		UIWidget component = go.GetComponent<UIWidget>();
-		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+		if (component != null)
 		{
 			return component.raycastDepth;
 		}
-		go.GetComponentsInChildren(Temporary.uiWidgetList);
+		go.GetComponentsInChildren<UIWidget>(Temporary.uiWidgetList);
 		if (Temporary.uiWidgetList.Count == 0)
 		{
 			return 0;
@@ -560,7 +639,7 @@ public static class NGUITools
 		int i = 0;
 		for (int count = Temporary.uiWidgetList.Count; i < count; i++)
 		{
-			if (Temporary.uiWidgetList[i].enabled)
+			if (Temporary.uiWidgetList[i].get_enabled())
 			{
 				num = Mathf.Min(num, Temporary.uiWidgetList[i].raycastDepth);
 			}
@@ -571,7 +650,7 @@ public static class NGUITools
 
 	public static int CalculateNextDepth(GameObject go)
 	{
-		if ((bool)go)
+		if (Object.op_Implicit(go))
 		{
 			int num = -1;
 			UIWidget[] componentsInChildren = go.GetComponentsInChildren<UIWidget>();
@@ -587,7 +666,7 @@ public static class NGUITools
 
 	public static int CalculateNextDepth(GameObject go, bool ignoreChildrenWithColliders)
 	{
-		if ((bool)go && ignoreChildrenWithColliders)
+		if (Object.op_Implicit(go) && ignoreChildrenWithColliders)
 		{
 			int num = -1;
 			UIWidget[] componentsInChildren = go.GetComponentsInChildren<UIWidget>();
@@ -595,7 +674,7 @@ public static class NGUITools
 			for (int num2 = componentsInChildren.Length; i < num2; i++)
 			{
 				UIWidget uIWidget = componentsInChildren[i];
-				if (!((UnityEngine.Object)uIWidget.cachedGameObject != (UnityEngine.Object)go) || (!((UnityEngine.Object)uIWidget.GetComponent<Collider>() != (UnityEngine.Object)null) && !((UnityEngine.Object)uIWidget.GetComponent<Collider2D>() != (UnityEngine.Object)null)))
+				if (!(uIWidget.cachedGameObject != go) || (!(uIWidget.GetComponent<Collider>() != null) && !(uIWidget.GetComponent<Collider2D>() != null)))
 				{
 					num = Mathf.Max(num, uIWidget.depth);
 				}
@@ -607,10 +686,10 @@ public static class NGUITools
 
 	public static int AdjustDepth(GameObject go, int adjustment)
 	{
-		if ((UnityEngine.Object)go != (UnityEngine.Object)null)
+		if (go != null)
 		{
 			UIPanel component = go.GetComponent<UIPanel>();
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			if (component != null)
 			{
 				UIPanel[] componentsInChildren = go.GetComponentsInChildren<UIPanel>(true);
 				foreach (UIPanel uIPanel in componentsInChildren)
@@ -619,8 +698,8 @@ public static class NGUITools
 				}
 				return 1;
 			}
-			component = FindInParents<UIPanel>(go);
-			if ((UnityEngine.Object)component == (UnityEngine.Object)null)
+			component = NGUITools.FindInParents<UIPanel>(go);
+			if (component == null)
 			{
 				return 0;
 			}
@@ -629,7 +708,7 @@ public static class NGUITools
 			for (int num = componentsInChildren2.Length; j < num; j++)
 			{
 				UIWidget uIWidget = componentsInChildren2[j];
-				if (!((UnityEngine.Object)uIWidget.panel != (UnityEngine.Object)component))
+				if (!(uIWidget.panel != component))
 				{
 					uIWidget.depth += adjustment;
 				}
@@ -673,7 +752,7 @@ public static class NGUITools
 
 	public static void NormalizeWidgetDepths()
 	{
-		NormalizeWidgetDepths(FindActive<UIWidget>());
+		NormalizeWidgetDepths(NGUITools.FindActive<UIWidget>());
 	}
 
 	public static void NormalizeWidgetDepths(GameObject go)
@@ -707,7 +786,7 @@ public static class NGUITools
 
 	public static void NormalizePanelDepths()
 	{
-		UIPanel[] array = FindActive<UIPanel>();
+		UIPanel[] array = NGUITools.FindActive<UIPanel>();
 		int num = array.Length;
 		if (num > 0)
 		{
@@ -742,46 +821,76 @@ public static class NGUITools
 
 	public static UIPanel CreateUI(Transform trans, bool advanced3D, int layer)
 	{
-		UIRoot uIRoot = (!((UnityEngine.Object)trans != (UnityEngine.Object)null)) ? null : FindInParents<UIRoot>(trans.gameObject);
-		if ((UnityEngine.Object)uIRoot == (UnityEngine.Object)null && UIRoot.list.Count > 0)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Expected O, but got Unknown
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ba: Expected O, but got Unknown
+		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ff: Invalid comparison between Unknown and I4
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020c: Invalid comparison between Unknown and I4
+		//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024e: Expected O, but got Unknown
+		//IL_0257: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0279: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0323: Unknown result type (might be due to invalid IL or missing references)
+		//IL_032f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_034d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0352: Expected O, but got Unknown
+		//IL_0355: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0368: Unknown result type (might be due to invalid IL or missing references)
+		//IL_036d: Expected O, but got Unknown
+		//IL_0378: Unknown result type (might be due to invalid IL or missing references)
+		//IL_038c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0397: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03a2: Unknown result type (might be due to invalid IL or missing references)
+		UIRoot uIRoot = (!(trans != null)) ? null : NGUITools.FindInParents<UIRoot>(trans.get_gameObject());
+		if (uIRoot == null && UIRoot.list.Count > 0)
 		{
 			foreach (UIRoot item in UIRoot.list)
 			{
-				if (item.gameObject.layer == layer)
+				if (item.get_gameObject().get_layer() == layer)
 				{
 					uIRoot = item;
 					break;
 				}
 			}
 		}
-		if ((UnityEngine.Object)uIRoot == (UnityEngine.Object)null)
+		if (uIRoot == null)
 		{
 			int i = 0;
 			for (int count = UIPanel.list.Count; i < count; i++)
 			{
 				UIPanel uIPanel = UIPanel.list[i];
-				GameObject gameObject = uIPanel.gameObject;
-				if (gameObject.hideFlags == HideFlags.None && gameObject.layer == layer)
+				GameObject val = uIPanel.get_gameObject();
+				if ((int)val.get_hideFlags() == 0 && val.get_layer() == layer)
 				{
-					trans.parent = uIPanel.transform;
-					trans.localScale = Vector3.one;
+					trans.set_parent(uIPanel.get_transform());
+					trans.set_localScale(Vector3.get_one());
 					return uIPanel;
 				}
 			}
 		}
-		if ((UnityEngine.Object)uIRoot != (UnityEngine.Object)null)
+		if (uIRoot != null)
 		{
 			UICamera componentInChildren = uIRoot.GetComponentInChildren<UICamera>();
-			if ((UnityEngine.Object)componentInChildren != (UnityEngine.Object)null && componentInChildren.GetComponent<Camera>().orthographic == advanced3D)
+			if (componentInChildren != null && componentInChildren.GetComponent<Camera>().get_orthographic() == advanced3D)
 			{
 				trans = null;
 				uIRoot = null;
 			}
 		}
-		if ((UnityEngine.Object)uIRoot == (UnityEngine.Object)null)
+		if (uIRoot == null)
 		{
-			GameObject gameObject2 = AddChild(null, false);
-			uIRoot = gameObject2.AddComponent<UIRoot>();
+			GameObject val2 = AddChild(null, false);
+			uIRoot = val2.AddComponent<UIRoot>();
 			if (layer == -1)
 			{
 				layer = LayerMask.NameToLayer("UI");
@@ -790,76 +899,76 @@ public static class NGUITools
 			{
 				layer = LayerMask.NameToLayer("2D UI");
 			}
-			gameObject2.layer = layer;
+			val2.set_layer(layer);
 			if (advanced3D)
 			{
-				gameObject2.name = "UI Root (3D)";
+				val2.set_name("UI Root (3D)");
 				uIRoot.scalingStyle = UIRoot.Scaling.Constrained;
 			}
 			else
 			{
-				gameObject2.name = "UI Root";
+				val2.set_name("UI Root");
 				uIRoot.scalingStyle = UIRoot.Scaling.Flexible;
 			}
 		}
 		UIPanel uIPanel2 = uIRoot.GetComponentInChildren<UIPanel>();
-		if ((UnityEngine.Object)uIPanel2 == (UnityEngine.Object)null)
+		if (uIPanel2 == null)
 		{
-			Camera[] array = FindActive<Camera>();
+			Camera[] array = NGUITools.FindActive<Camera>();
 			float num = -1f;
 			bool flag = false;
-			int num2 = 1 << uIRoot.gameObject.layer;
-			foreach (Camera camera in array)
+			int num2 = 1 << uIRoot.get_gameObject().get_layer();
+			foreach (Camera val3 in array)
 			{
-				if (camera.clearFlags == CameraClearFlags.Color || camera.clearFlags == CameraClearFlags.Skybox)
+				if ((int)val3.get_clearFlags() == 2 || (int)val3.get_clearFlags() == 1)
 				{
 					flag = true;
 				}
-				num = Mathf.Max(num, camera.depth);
-				camera.cullingMask &= ~num2;
+				num = Mathf.Max(num, val3.get_depth());
+				val3.set_cullingMask(val3.get_cullingMask() & ~num2);
 			}
-			Camera camera2 = AddChild<Camera>(uIRoot.gameObject, false);
-			camera2.gameObject.AddComponent<UICamera>();
-			camera2.clearFlags = ((!flag) ? CameraClearFlags.Color : CameraClearFlags.Depth);
-			camera2.backgroundColor = Color.grey;
-			camera2.cullingMask = num2;
-			camera2.depth = num + 1f;
+			Camera val4 = NGUITools.AddChild<Camera>(uIRoot.get_gameObject(), false);
+			val4.get_gameObject().AddComponent<UICamera>();
+			val4.set_clearFlags((!flag) ? 2 : 3);
+			val4.set_backgroundColor(Color.get_grey());
+			val4.set_cullingMask(num2);
+			val4.set_depth(num + 1f);
 			if (advanced3D)
 			{
-				camera2.nearClipPlane = 0.1f;
-				camera2.farClipPlane = 4f;
-				camera2.transform.localPosition = new Vector3(0f, 0f, -700f);
+				val4.set_nearClipPlane(0.1f);
+				val4.set_farClipPlane(4f);
+				val4.get_transform().set_localPosition(new Vector3(0f, 0f, -700f));
 			}
 			else
 			{
-				camera2.orthographic = true;
-				camera2.orthographicSize = 1f;
-				camera2.nearClipPlane = -10f;
-				camera2.farClipPlane = 10f;
+				val4.set_orthographic(true);
+				val4.set_orthographicSize(1f);
+				val4.set_nearClipPlane(-10f);
+				val4.set_farClipPlane(10f);
 			}
-			AudioListener[] array2 = FindActive<AudioListener>();
+			AudioListener[] array2 = NGUITools.FindActive<AudioListener>();
 			if (array2 == null || array2.Length == 0)
 			{
-				camera2.gameObject.AddComponent<AudioListener>();
+				val4.get_gameObject().AddComponent<AudioListener>();
 			}
-			uIPanel2 = uIRoot.gameObject.AddComponent<UIPanel>();
+			uIPanel2 = uIRoot.get_gameObject().AddComponent<UIPanel>();
 		}
-		if ((UnityEngine.Object)trans != (UnityEngine.Object)null)
+		if (trans != null)
 		{
-			while ((UnityEngine.Object)trans.parent != (UnityEngine.Object)null)
+			while (trans.get_parent() != null)
 			{
-				trans = trans.parent;
+				trans = trans.get_parent();
 			}
-			if (IsChild(trans, uIPanel2.transform))
+			if (IsChild(trans, uIPanel2.get_transform()))
 			{
-				uIPanel2 = trans.gameObject.AddComponent<UIPanel>();
+				uIPanel2 = trans.get_gameObject().AddComponent<UIPanel>();
 			}
 			else
 			{
-				trans.parent = uIPanel2.transform;
-				trans.localScale = Vector3.one;
-				trans.localPosition = Vector3.zero;
-				SetChildLayer(uIPanel2.cachedTransform, uIPanel2.cachedGameObject.layer);
+				trans.set_parent(uIPanel2.get_transform());
+				trans.set_localScale(Vector3.get_one());
+				trans.set_localPosition(Vector3.get_zero());
+				SetChildLayer(uIPanel2.cachedTransform, uIPanel2.cachedGameObject.get_layer());
 			}
 		}
 		return uIPanel2;
@@ -867,32 +976,35 @@ public static class NGUITools
 
 	public static void SetChildLayer(Transform t, int layer)
 	{
-		for (int i = 0; i < t.childCount; i++)
+		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Expected O, but got Unknown
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+		for (int i = 0; i < t.get_childCount(); i++)
 		{
-			Transform child = t.GetChild(i);
-			child.gameObject.layer = layer;
-			SetChildLayer(child, layer);
+			Transform val = t.GetChild(i);
+			val.get_gameObject().set_layer(layer);
+			SetChildLayer(val, layer);
 		}
 	}
 
 	public static T AddChild<T>(GameObject parent) where T : Component
 	{
-		GameObject gameObject = AddChild(parent);
-		gameObject.name = GetTypeName<T>();
-		return gameObject.AddComponent<T>();
+		GameObject val = AddChild(parent);
+		val.set_name(GetTypeName<T>());
+		return val.AddComponent<T>();
 	}
 
 	public static T AddChild<T>(GameObject parent, bool undo) where T : Component
 	{
-		GameObject gameObject = AddChild(parent, undo);
-		gameObject.name = GetTypeName<T>();
-		return gameObject.AddComponent<T>();
+		GameObject val = AddChild(parent, undo);
+		val.set_name(GetTypeName<T>());
+		return val.AddComponent<T>();
 	}
 
 	public static T AddWidget<T>(GameObject go) where T : UIWidget
 	{
 		int depth = CalculateNextDepth(go);
-		T result = AddChild<T>(go);
+		T result = NGUITools.AddChild<T>(go);
 		result.width = 100;
 		result.height = 100;
 		result.depth = depth;
@@ -901,7 +1013,7 @@ public static class NGUITools
 
 	public static T AddWidget<T>(GameObject go, int depth) where T : UIWidget
 	{
-		T result = AddChild<T>(go);
+		T result = NGUITools.AddChild<T>(go);
 		result.width = 100;
 		result.height = 100;
 		result.depth = depth;
@@ -910,7 +1022,7 @@ public static class NGUITools
 
 	public static UISprite AddSprite(GameObject go, UIAtlas atlas, string spriteName)
 	{
-		UISpriteData uISpriteData = (!((UnityEngine.Object)atlas != (UnityEngine.Object)null)) ? null : atlas.GetSprite(spriteName);
+		UISpriteData uISpriteData = (!(atlas != null)) ? null : atlas.GetSprite(spriteName);
 		UISprite uISprite = AddWidget<UISprite>(go);
 		uISprite.type = ((uISpriteData != null && uISpriteData.hasBorder) ? UIBasicSprite.Type.Sliced : UIBasicSprite.Type.Simple);
 		uISprite.atlas = atlas;
@@ -920,33 +1032,45 @@ public static class NGUITools
 
 	public static GameObject GetRoot(GameObject go)
 	{
-		Transform transform = go.transform;
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Expected O, but got Unknown
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Expected O, but got Unknown
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Expected O, but got Unknown
+		Transform val = go.get_transform();
 		while (true)
 		{
-			Transform parent = transform.parent;
-			if ((UnityEngine.Object)parent == (UnityEngine.Object)null)
+			Transform val2 = val.get_parent();
+			if (val2 == null)
 			{
 				break;
 			}
-			transform = parent;
+			val = val2;
 		}
-		return transform.gameObject;
+		return val.get_gameObject();
 	}
 
 	public static T FindInParents<T>(GameObject go) where T : Component
 	{
-		if ((UnityEngine.Object)go == (UnityEngine.Object)null)
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Expected O, but got Unknown
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Expected O, but got Unknown
+		if (go == null)
 		{
-			return (T)null;
+			return (T)(object)null;
 		}
 		T component = go.GetComponent<T>();
-		if ((UnityEngine.Object)component == (UnityEngine.Object)null)
+		if ((object)component == null)
 		{
-			Transform parent = go.transform.parent;
-			while ((UnityEngine.Object)parent != (UnityEngine.Object)null && (UnityEngine.Object)component == (UnityEngine.Object)null)
+			Transform val = go.get_transform().get_parent();
+			while (val != null && (object)component == null)
 			{
-				component = parent.gameObject.GetComponent<T>();
-				parent = parent.parent;
+				component = val.get_gameObject().GetComponent<T>();
+				val = val.get_parent();
 			}
 		}
 		return component;
@@ -954,122 +1078,132 @@ public static class NGUITools
 
 	public static T FindInParents<T>(Transform trans) where T : Component
 	{
-		if ((UnityEngine.Object)trans == (UnityEngine.Object)null)
+		if (trans == null)
 		{
-			return (T)null;
+			return (T)(object)null;
 		}
 		return trans.GetComponentInParent<T>();
 	}
 
-	public static void Destroy(UnityEngine.Object obj)
+	public static void Destroy(Object obj)
 	{
-		if ((bool)obj)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Expected O, but got Unknown
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Expected O, but got Unknown
+		if (Object.op_Implicit(obj))
 		{
 			if (obj is Transform)
 			{
-				Transform transform = obj as Transform;
-				GameObject gameObject = transform.gameObject;
-				if (Application.isPlaying)
+				Transform val = obj as Transform;
+				GameObject val2 = val.get_gameObject();
+				if (Application.get_isPlaying())
 				{
-					transform.parent = null;
-					UnityEngine.Object.Destroy(gameObject);
+					val.set_parent(null);
+					Object.Destroy(val2);
 				}
 				else
 				{
-					UnityEngine.Object.DestroyImmediate(gameObject);
+					Object.DestroyImmediate(val2);
 				}
 			}
 			else if (obj is GameObject)
 			{
-				GameObject gameObject2 = obj as GameObject;
-				Transform transform2 = gameObject2.transform;
-				if (Application.isPlaying)
+				GameObject val3 = obj as GameObject;
+				Transform val4 = val3.get_transform();
+				if (Application.get_isPlaying())
 				{
-					transform2.parent = null;
-					UnityEngine.Object.Destroy(gameObject2);
+					val4.set_parent(null);
+					Object.Destroy(val3);
 				}
 				else
 				{
-					UnityEngine.Object.DestroyImmediate(gameObject2);
+					Object.DestroyImmediate(val3);
 				}
 			}
-			else if (Application.isPlaying)
+			else if (Application.get_isPlaying())
 			{
-				UnityEngine.Object.Destroy(obj);
+				Object.Destroy(obj);
 			}
 			else
 			{
-				UnityEngine.Object.DestroyImmediate(obj);
+				Object.DestroyImmediate(obj);
 			}
 		}
 	}
 
 	public static void DestroyChildren(this Transform t)
 	{
-		bool isPlaying = Application.isPlaying;
-		while (t.childCount != 0)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Expected O, but got Unknown
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		bool isPlaying = Application.get_isPlaying();
+		while (t.get_childCount() != 0)
 		{
-			Transform child = t.GetChild(0);
+			Transform val = t.GetChild(0);
 			if (isPlaying)
 			{
-				child.parent = null;
-				UnityEngine.Object.Destroy(child.gameObject);
+				val.set_parent(null);
+				Object.Destroy(val.get_gameObject());
 			}
 			else
 			{
-				UnityEngine.Object.DestroyImmediate(child.gameObject);
+				Object.DestroyImmediate(val.get_gameObject());
 			}
 		}
 	}
 
-	public static void DestroyImmediate(UnityEngine.Object obj)
+	public static void DestroyImmediate(Object obj)
 	{
-		if (obj != (UnityEngine.Object)null)
+		if (obj != null)
 		{
-			if (Application.isEditor)
+			if (Application.get_isEditor())
 			{
-				UnityEngine.Object.DestroyImmediate(obj);
+				Object.DestroyImmediate(obj);
 			}
 			else
 			{
-				UnityEngine.Object.Destroy(obj);
+				Object.Destroy(obj);
 			}
 		}
 	}
 
 	public static void Broadcast(string funcName)
 	{
-		GameObject[] array = UnityEngine.Object.FindObjectsOfType(typeof(GameObject)) as GameObject[];
+		GameObject[] array = Object.FindObjectsOfType(typeof(GameObject)) as GameObject[];
 		int i = 0;
 		for (int num = array.Length; i < num; i++)
 		{
-			array[i].SendMessage(funcName, SendMessageOptions.DontRequireReceiver);
+			array[i].SendMessage(funcName, 1);
 		}
 	}
 
 	public static void Broadcast(string funcName, object param)
 	{
-		GameObject[] array = UnityEngine.Object.FindObjectsOfType(typeof(GameObject)) as GameObject[];
+		GameObject[] array = Object.FindObjectsOfType(typeof(GameObject)) as GameObject[];
 		int i = 0;
 		for (int num = array.Length; i < num; i++)
 		{
-			array[i].SendMessage(funcName, param, SendMessageOptions.DontRequireReceiver);
+			array[i].SendMessage(funcName, param, 1);
 		}
 	}
 
 	public static bool IsChild(Transform parent, Transform child)
 	{
-		if ((UnityEngine.Object)parent == (UnityEngine.Object)null || (UnityEngine.Object)child == (UnityEngine.Object)null)
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Expected O, but got Unknown
+		if (parent == null || child == null)
 		{
 			return false;
 		}
-		while ((UnityEngine.Object)child != (UnityEngine.Object)null)
+		while (child != null)
 		{
-			if ((UnityEngine.Object)child == (UnityEngine.Object)parent)
+			if (child == parent)
 			{
 				return true;
 			}
-			child = child.parent;
+			child = child.get_parent();
 		}
 		return false;
 	}
@@ -1081,30 +1215,39 @@ public static class NGUITools
 
 	private static void Activate(Transform t, bool compatibilityMode)
 	{
-		SetActiveSelf(t.gameObject, true);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Expected O, but got Unknown
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Expected O, but got Unknown
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Expected O, but got Unknown
+		SetActiveSelf(t.get_gameObject(), true);
 		if (compatibilityMode)
 		{
 			int i = 0;
-			for (int childCount = t.childCount; i < childCount; i++)
+			for (int childCount = t.get_childCount(); i < childCount; i++)
 			{
-				Transform child = t.GetChild(i);
-				if (child.gameObject.activeSelf)
+				Transform val = t.GetChild(i);
+				if (val.get_gameObject().get_activeSelf())
 				{
 					return;
 				}
 			}
 			int j = 0;
-			for (int childCount2 = t.childCount; j < childCount2; j++)
+			for (int childCount2 = t.get_childCount(); j < childCount2; j++)
 			{
-				Transform child2 = t.GetChild(j);
-				Activate(child2, true);
+				Transform t2 = t.GetChild(j);
+				Activate(t2, true);
 			}
 		}
 	}
 
 	private static void Deactivate(Transform t)
 	{
-		SetActiveSelf(t.gameObject, false);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Expected O, but got Unknown
+		SetActiveSelf(t.get_gameObject(), false);
 	}
 
 	public static void SetActive(GameObject go, bool state)
@@ -1114,31 +1257,39 @@ public static class NGUITools
 
 	public static void SetActive(GameObject go, bool state, bool compatibilityMode)
 	{
-		if ((bool)go)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Expected O, but got Unknown
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Expected O, but got Unknown
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Expected O, but got Unknown
+		if (Object.op_Implicit(go))
 		{
 			if (state)
 			{
-				Activate(go.transform, compatibilityMode);
-				CallCreatePanel(go.transform);
+				Activate(go.get_transform(), compatibilityMode);
+				CallCreatePanel(go.get_transform());
 			}
 			else
 			{
-				Deactivate(go.transform);
+				Deactivate(go.get_transform());
 			}
 		}
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	private static void CallCreatePanel(Transform t)
 	{
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Expected O, but got Unknown
 		UIWidget component = t.GetComponent<UIWidget>();
-		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+		if (component != null)
 		{
 			component.CreatePanel();
 		}
 		int i = 0;
-		for (int childCount = t.childCount; i < childCount; i++)
+		for (int childCount = t.get_childCount(); i < childCount; i++)
 		{
 			CallCreatePanel(t.GetChild(i));
 		}
@@ -1146,23 +1297,29 @@ public static class NGUITools
 
 	public static void SetActiveChildren(GameObject go, bool state)
 	{
-		Transform transform = go.transform;
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Expected O, but got Unknown
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Expected O, but got Unknown
+		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Expected O, but got Unknown
+		Transform val = go.get_transform();
 		if (state)
 		{
 			int i = 0;
-			for (int childCount = transform.childCount; i < childCount; i++)
+			for (int childCount = val.get_childCount(); i < childCount; i++)
 			{
-				Transform child = transform.GetChild(i);
-				Activate(child);
+				Transform t = val.GetChild(i);
+				Activate(t);
 			}
 		}
 		else
 		{
 			int j = 0;
-			for (int childCount2 = transform.childCount; j < childCount2; j++)
+			for (int childCount2 = val.get_childCount(); j < childCount2; j++)
 			{
-				Transform child2 = transform.GetChild(j);
-				Deactivate(child2);
+				Transform t2 = val.GetChild(j);
+				Deactivate(t2);
 			}
 		}
 	}
@@ -1170,21 +1327,23 @@ public static class NGUITools
 	[Obsolete("Use NGUITools.GetActive instead")]
 	public static bool IsActive(Behaviour mb)
 	{
-		return (UnityEngine.Object)mb != (UnityEngine.Object)null && mb.enabled && mb.gameObject.activeInHierarchy;
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		return mb != null && mb.get_enabled() && mb.get_gameObject().get_activeInHierarchy();
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static bool GetActive(Behaviour mb)
 	{
-		return (bool)mb && mb.enabled && mb.gameObject.activeInHierarchy;
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		return Object.op_Implicit(mb) && mb.get_enabled() && mb.get_gameObject().get_activeInHierarchy();
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static bool GetActive(GameObject go)
 	{
-		return (bool)go && go.activeInHierarchy;
+		return Object.op_Implicit(go) && go.get_activeInHierarchy();
 	}
 
 	[DebuggerHidden]
@@ -1196,18 +1355,25 @@ public static class NGUITools
 
 	public static void SetLayer(GameObject go, int layer)
 	{
-		go.layer = layer;
-		Transform transform = go.transform;
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Expected O, but got Unknown
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Expected O, but got Unknown
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002b: Expected O, but got Unknown
+		go.set_layer(layer);
+		Transform val = go.get_transform();
 		int i = 0;
-		for (int childCount = transform.childCount; i < childCount; i++)
+		for (int childCount = val.get_childCount(); i < childCount; i++)
 		{
-			Transform child = transform.GetChild(i);
-			SetLayer(child.gameObject, layer);
+			Transform val2 = val.GetChild(i);
+			SetLayer(val2.get_gameObject(), layer);
 		}
 	}
 
 	public static Vector3 Round(Vector3 v)
 	{
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 		v.x = Mathf.Round(v.x);
 		v.y = Mathf.Round(v.y);
 		v.z = Mathf.Round(v.z);
@@ -1216,18 +1382,24 @@ public static class NGUITools
 
 	public static void MakePixelPerfect(Transform t)
 	{
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0072: Expected O, but got Unknown
 		UIWidget component = t.GetComponent<UIWidget>();
-		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+		if (component != null)
 		{
 			component.MakePixelPerfect();
 		}
-		if ((UnityEngine.Object)t.GetComponent<UIAnchor>() == (UnityEngine.Object)null && (UnityEngine.Object)t.GetComponent<UIRoot>() == (UnityEngine.Object)null)
+		if (t.GetComponent<UIAnchor>() == null && t.GetComponent<UIRoot>() == null)
 		{
-			t.localPosition = Round(t.localPosition);
-			t.localScale = Round(t.localScale);
+			t.set_localPosition(Round(t.get_localPosition()));
+			t.set_localScale(Round(t.get_localScale()));
 		}
 		int i = 0;
-		for (int childCount = t.childCount; i < childCount; i++)
+		for (int childCount = t.get_childCount(); i < childCount; i++)
 		{
 			MakePixelPerfect(t.GetChild(i));
 		}
@@ -1239,7 +1411,7 @@ public static class NGUITools
 		{
 			return false;
 		}
-		string path = Application.persistentDataPath + "/" + fileName;
+		string path = Application.get_persistentDataPath() + "/" + fileName;
 		if (bytes == null)
 		{
 			if (File.Exists(path))
@@ -1255,7 +1427,7 @@ public static class NGUITools
 		}
 		catch (Exception ex)
 		{
-			UnityEngine.Debug.LogError(ex.Message);
+			Debug.LogError((object)ex.Message);
 			return false;
 			IL_0057:;
 		}
@@ -1270,7 +1442,7 @@ public static class NGUITools
 		{
 			return null;
 		}
-		string path = Application.persistentDataPath + "/" + fileName;
+		string path = Application.get_persistentDataPath() + "/" + fileName;
 		if (File.Exists(path))
 		{
 			return File.ReadAllBytes(path);
@@ -1280,6 +1452,7 @@ public static class NGUITools
 
 	public static Color ApplyPMA(Color c)
 	{
+		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 		if (c.a != 1f)
 		{
 			c.r *= c.a;
@@ -1302,12 +1475,14 @@ public static class NGUITools
 	[Obsolete("Use NGUIText.EncodeColor instead")]
 	public static string EncodeColor(Color c)
 	{
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 		return NGUIText.EncodeColor24(c);
 	}
 
 	[Obsolete("Use NGUIText.ParseColor instead")]
 	public static Color ParseColor(string text, int offset)
 	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		return NGUIText.ParseColor24(text, offset);
 	}
 
@@ -1320,7 +1495,7 @@ public static class NGUITools
 	public static T AddMissingComponent<T>(this GameObject go) where T : Component
 	{
 		T val = go.GetComponent<T>();
-		if ((UnityEngine.Object)val == (UnityEngine.Object)null)
+		if ((object)val == null)
 		{
 			val = go.AddComponent<T>();
 		}
@@ -1329,7 +1504,7 @@ public static class NGUITools
 
 	public static Vector3[] GetSides(this Camera cam)
 	{
-		return cam.GetSides(Mathf.Lerp(cam.nearClipPlane, cam.farClipPlane, 0.5f), null);
+		return cam.GetSides(Mathf.Lerp(cam.get_nearClipPlane(), cam.get_farClipPlane(), 0.5f), null);
 	}
 
 	public static Vector3[] GetSides(this Camera cam, float depth)
@@ -1339,41 +1514,90 @@ public static class NGUITools
 
 	public static Vector3[] GetSides(this Camera cam, Transform relativeTo)
 	{
-		return cam.GetSides(Mathf.Lerp(cam.nearClipPlane, cam.farClipPlane, 0.5f), relativeTo);
+		return cam.GetSides(Mathf.Lerp(cam.get_nearClipPlane(), cam.get_farClipPlane(), 0.5f), relativeTo);
 	}
 
 	public static Vector3[] GetSides(this Camera cam, float depth, Transform relativeTo)
 	{
-		if (cam.orthographic)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Expected O, but got Unknown
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0212: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0217: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0253: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0258: Unknown result type (might be due to invalid IL or missing references)
+		if (cam.get_orthographic())
 		{
-			float orthographicSize = cam.orthographicSize;
+			float orthographicSize = cam.get_orthographicSize();
 			float num = 0f - orthographicSize;
 			float num2 = orthographicSize;
-			float y = 0f - orthographicSize;
-			float y2 = orthographicSize;
-			Rect rect = cam.rect;
+			float num3 = 0f - orthographicSize;
+			float num4 = orthographicSize;
+			Rect rect = cam.get_rect();
 			Vector2 screenSize = NGUITools.screenSize;
-			float num3 = screenSize.x / screenSize.y;
-			num3 *= rect.width / rect.height;
-			num *= num3;
-			num2 *= num3;
-			Transform transform = cam.transform;
-			Quaternion rotation = transform.rotation;
-			Vector3 position = transform.position;
-			int num4 = Mathf.RoundToInt(screenSize.x);
-			int num5 = Mathf.RoundToInt(screenSize.y);
-			if ((num4 & 1) == 1)
+			float num5 = screenSize.x / screenSize.y;
+			num5 *= rect.get_width() / rect.get_height();
+			num *= num5;
+			num2 *= num5;
+			Transform val = cam.get_transform();
+			Quaternion rotation = val.get_rotation();
+			Vector3 position = val.get_position();
+			int num6 = Mathf.RoundToInt(screenSize.x);
+			int num7 = Mathf.RoundToInt(screenSize.y);
+			if ((num6 & 1) == 1)
 			{
 				position.x -= 1f / screenSize.x;
 			}
-			if ((num5 & 1) == 1)
+			if ((num7 & 1) == 1)
 			{
 				position.y += 1f / screenSize.y;
 			}
 			mSides[0] = rotation * new Vector3(num, 0f, depth) + position;
-			mSides[1] = rotation * new Vector3(0f, y2, depth) + position;
+			mSides[1] = rotation * new Vector3(0f, num4, depth) + position;
 			mSides[2] = rotation * new Vector3(num2, 0f, depth) + position;
-			mSides[3] = rotation * new Vector3(0f, y, depth) + position;
+			mSides[3] = rotation * new Vector3(0f, num3, depth) + position;
 		}
 		else
 		{
@@ -1382,7 +1606,7 @@ public static class NGUITools
 			mSides[2] = cam.ViewportToWorldPoint(new Vector3(1f, 0.5f, depth));
 			mSides[3] = cam.ViewportToWorldPoint(new Vector3(0.5f, 0f, depth));
 		}
-		if ((UnityEngine.Object)relativeTo != (UnityEngine.Object)null)
+		if (relativeTo != null)
 		{
 			for (int i = 0; i < 4; i++)
 			{
@@ -1394,7 +1618,7 @@ public static class NGUITools
 
 	public static Vector3[] GetWorldCorners(this Camera cam)
 	{
-		float depth = Mathf.Lerp(cam.nearClipPlane, cam.farClipPlane, 0.5f);
+		float depth = Mathf.Lerp(cam.get_nearClipPlane(), cam.get_farClipPlane(), 0.5f);
 		return cam.GetWorldCorners(depth, null);
 	}
 
@@ -1405,31 +1629,80 @@ public static class NGUITools
 
 	public static Vector3[] GetWorldCorners(this Camera cam, Transform relativeTo)
 	{
-		return cam.GetWorldCorners(Mathf.Lerp(cam.nearClipPlane, cam.farClipPlane, 0.5f), relativeTo);
+		return cam.GetWorldCorners(Mathf.Lerp(cam.get_nearClipPlane(), cam.get_farClipPlane(), 0.5f), relativeTo);
 	}
 
 	public static Vector3[] GetWorldCorners(this Camera cam, float depth, Transform relativeTo)
 	{
-		if (cam.orthographic)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Expected O, but got Unknown
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+		if (cam.get_orthographic())
 		{
-			float orthographicSize = cam.orthographicSize;
+			float orthographicSize = cam.get_orthographicSize();
 			float num = 0f - orthographicSize;
 			float num2 = orthographicSize;
-			float y = 0f - orthographicSize;
-			float y2 = orthographicSize;
-			Rect rect = cam.rect;
+			float num3 = 0f - orthographicSize;
+			float num4 = orthographicSize;
+			Rect rect = cam.get_rect();
 			Vector2 screenSize = NGUITools.screenSize;
-			float num3 = screenSize.x / screenSize.y;
-			num3 *= rect.width / rect.height;
-			num *= num3;
-			num2 *= num3;
-			Transform transform = cam.transform;
-			Quaternion rotation = transform.rotation;
-			Vector3 position = transform.position;
-			mSides[0] = rotation * new Vector3(num, y, depth) + position;
-			mSides[1] = rotation * new Vector3(num, y2, depth) + position;
-			mSides[2] = rotation * new Vector3(num2, y2, depth) + position;
-			mSides[3] = rotation * new Vector3(num2, y, depth) + position;
+			float num5 = screenSize.x / screenSize.y;
+			num5 *= rect.get_width() / rect.get_height();
+			num *= num5;
+			num2 *= num5;
+			Transform val = cam.get_transform();
+			Quaternion rotation = val.get_rotation();
+			Vector3 position = val.get_position();
+			mSides[0] = rotation * new Vector3(num, num3, depth) + position;
+			mSides[1] = rotation * new Vector3(num, num4, depth) + position;
+			mSides[2] = rotation * new Vector3(num2, num4, depth) + position;
+			mSides[3] = rotation * new Vector3(num2, num3, depth) + position;
 		}
 		else
 		{
@@ -1438,7 +1711,7 @@ public static class NGUITools
 			mSides[2] = cam.ViewportToWorldPoint(new Vector3(1f, 1f, depth));
 			mSides[3] = cam.ViewportToWorldPoint(new Vector3(1f, 0f, depth));
 		}
-		if ((UnityEngine.Object)relativeTo != (UnityEngine.Object)null)
+		if (relativeTo != null)
 		{
 			for (int i = 0; i < 4; i++)
 			{
@@ -1469,335 +1742,351 @@ public static class NGUITools
 		T[] array = components;
 		for (int i = 0; i < array.Length; i++)
 		{
-			T obj = array[i];
-			obj.GetType().GetMethod(funcName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.Invoke(obj, null);
+			T val = array[i];
+			((object)val).GetType().GetMethod(funcName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.Invoke(val, null);
 		}
 	}
 
 	public static void ExecuteAll<T>(GameObject root, string funcName) where T : Component
 	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Expected O, but got Unknown
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Expected O, but got Unknown
 		Execute<T>(root, funcName);
-		Transform transform = root.transform;
+		Transform val = root.get_transform();
 		int i = 0;
-		for (int childCount = transform.childCount; i < childCount; i++)
+		for (int childCount = val.get_childCount(); i < childCount; i++)
 		{
-			ExecuteAll<T>(transform.GetChild(i).gameObject, funcName);
+			ExecuteAll<T>(val.GetChild(i).get_gameObject(), funcName);
 		}
 	}
 
 	public static void ImmediatelyCreateDrawCalls(GameObject root)
 	{
-		ExecuteAll<UIWidget>(root, "Start");
-		ExecuteAll<UIPanel>(root, "Start");
-		ExecuteAll<UIWidget>(root, "Update");
-		ExecuteAll<UIPanel>(root, "Update");
-		ExecuteAll<UIPanel>(root, "LateUpdate");
+		NGUITools.ExecuteAll<UIWidget>(root, "Start");
+		NGUITools.ExecuteAll<UIPanel>(root, "Start");
+		NGUITools.ExecuteAll<UIWidget>(root, "Update");
+		NGUITools.ExecuteAll<UIPanel>(root, "Update");
+		NGUITools.ExecuteAll<UIPanel>(root, "LateUpdate");
 	}
 
 	public static string KeyToCaption(KeyCode key)
 	{
-		switch (key)
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0003: Expected I4, but got Unknown
+		//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020f: Expected I4, but got Unknown
+		switch ((int)key)
 		{
-		case KeyCode.None:
-			return null;
-		case KeyCode.Backspace:
-			return "BS";
-		case KeyCode.Tab:
-			return "Tab";
-		case KeyCode.Clear:
-			return "Clr";
-		case KeyCode.Return:
-			return "NT";
-		case KeyCode.Pause:
-			return "PS";
-		case KeyCode.Escape:
-			return "Esc";
-		case KeyCode.Space:
-			return "SP";
-		case KeyCode.Exclaim:
-			return "!";
-		case KeyCode.DoubleQuote:
-			return "\"";
-		case KeyCode.Hash:
-			return "#";
-		case KeyCode.Dollar:
-			return "$";
-		case KeyCode.Ampersand:
-			return "&";
-		case KeyCode.Quote:
-			return "'";
-		case KeyCode.LeftParen:
-			return "(";
-		case KeyCode.RightParen:
-			return ")";
-		case KeyCode.Asterisk:
-			return "*";
-		case KeyCode.Plus:
-			return "+";
-		case KeyCode.Comma:
-			return ",";
-		case KeyCode.Minus:
-			return "-";
-		case KeyCode.Period:
-			return ".";
-		case KeyCode.Slash:
-			return "/";
-		case KeyCode.Alpha0:
-			return "0";
-		case KeyCode.Alpha1:
-			return "1";
-		case KeyCode.Alpha2:
-			return "2";
-		case KeyCode.Alpha3:
-			return "3";
-		case KeyCode.Alpha4:
-			return "4";
-		case KeyCode.Alpha5:
-			return "5";
-		case KeyCode.Alpha6:
-			return "6";
-		case KeyCode.Alpha7:
-			return "7";
-		case KeyCode.Alpha8:
-			return "8";
-		case KeyCode.Alpha9:
-			return "9";
-		case KeyCode.Colon:
-			return ":";
-		case KeyCode.Semicolon:
-			return ";";
-		case KeyCode.Less:
-			return "<";
-		case KeyCode.Equals:
-			return "=";
-		case KeyCode.Greater:
-			return ">";
-		case KeyCode.Question:
-			return "?";
-		case KeyCode.At:
-			return "@";
-		case KeyCode.LeftBracket:
-			return "[";
-		case KeyCode.Backslash:
-			return "\\";
-		case KeyCode.RightBracket:
-			return "]";
-		case KeyCode.Caret:
-			return "^";
-		case KeyCode.Underscore:
-			return "_";
-		case KeyCode.BackQuote:
-			return "`";
-		case KeyCode.A:
-			return "A";
-		case KeyCode.B:
-			return "B";
-		case KeyCode.C:
-			return "C";
-		case KeyCode.D:
-			return "D";
-		case KeyCode.E:
-			return "E";
-		case KeyCode.F:
-			return "F";
-		case KeyCode.G:
-			return "G";
-		case KeyCode.H:
-			return "H";
-		case KeyCode.I:
-			return "I";
-		case KeyCode.J:
-			return "J";
-		case KeyCode.K:
-			return "K";
-		case KeyCode.L:
-			return "L";
-		case KeyCode.M:
-			return "M";
-		case KeyCode.N:
-			return "N0";
-		case KeyCode.O:
-			return "O";
-		case KeyCode.P:
-			return "P";
-		case KeyCode.Q:
-			return "Q";
-		case KeyCode.R:
-			return "R";
-		case KeyCode.S:
-			return "S";
-		case KeyCode.T:
-			return "T";
-		case KeyCode.U:
-			return "U";
-		case KeyCode.V:
-			return "V";
-		case KeyCode.W:
-			return "W";
-		case KeyCode.X:
-			return "X";
-		case KeyCode.Y:
-			return "Y";
-		case KeyCode.Z:
-			return "Z";
-		case KeyCode.Delete:
-			return "Del";
-		case KeyCode.Keypad0:
-			return "K0";
-		case KeyCode.Keypad1:
-			return "K1";
-		case KeyCode.Keypad2:
-			return "K2";
-		case KeyCode.Keypad3:
-			return "K3";
-		case KeyCode.Keypad4:
-			return "K4";
-		case KeyCode.Keypad5:
-			return "K5";
-		case KeyCode.Keypad6:
-			return "K6";
-		case KeyCode.Keypad7:
-			return "K7";
-		case KeyCode.Keypad8:
-			return "K8";
-		case KeyCode.Keypad9:
-			return "K9";
-		case KeyCode.KeypadPeriod:
-			return ".";
-		case KeyCode.KeypadDivide:
-			return "/";
-		case KeyCode.KeypadMultiply:
-			return "*";
-		case KeyCode.KeypadMinus:
-			return "-";
-		case KeyCode.KeypadPlus:
-			return "+";
-		case KeyCode.KeypadEnter:
-			return "NT";
-		case KeyCode.KeypadEquals:
-			return "=";
-		case KeyCode.UpArrow:
-			return "UP";
-		case KeyCode.DownArrow:
-			return "DN";
-		case KeyCode.RightArrow:
-			return "LT";
-		case KeyCode.LeftArrow:
-			return "RT";
-		case KeyCode.Insert:
-			return "Ins";
-		case KeyCode.Home:
-			return "Home";
-		case KeyCode.End:
-			return "End";
-		case KeyCode.PageUp:
-			return "PU";
-		case KeyCode.PageDown:
-			return "PD";
-		case KeyCode.F1:
-			return "F1";
-		case KeyCode.F2:
-			return "F2";
-		case KeyCode.F3:
-			return "F3";
-		case KeyCode.F4:
-			return "F4";
-		case KeyCode.F5:
-			return "F5";
-		case KeyCode.F6:
-			return "F6";
-		case KeyCode.F7:
-			return "F7";
-		case KeyCode.F8:
-			return "F8";
-		case KeyCode.F9:
-			return "F9";
-		case KeyCode.F10:
-			return "F10";
-		case KeyCode.F11:
-			return "F11";
-		case KeyCode.F12:
-			return "F12";
-		case KeyCode.F13:
-			return "F13";
-		case KeyCode.F14:
-			return "F14";
-		case KeyCode.F15:
-			return "F15";
-		case KeyCode.Numlock:
-			return "Num";
-		case KeyCode.CapsLock:
-			return "Cap";
-		case KeyCode.ScrollLock:
-			return "Scr";
-		case KeyCode.RightShift:
-			return "RS";
-		case KeyCode.LeftShift:
-			return "LS";
-		case KeyCode.RightControl:
-			return "RC";
-		case KeyCode.LeftControl:
-			return "LC";
-		case KeyCode.RightAlt:
-			return "RA";
-		case KeyCode.LeftAlt:
-			return "LA";
-		case KeyCode.Mouse0:
-			return "M0";
-		case KeyCode.Mouse1:
-			return "M1";
-		case KeyCode.Mouse2:
-			return "M2";
-		case KeyCode.Mouse3:
-			return "M3";
-		case KeyCode.Mouse4:
-			return "M4";
-		case KeyCode.Mouse5:
-			return "M5";
-		case KeyCode.Mouse6:
-			return "M6";
-		case KeyCode.JoystickButton0:
-			return "(A)";
-		case KeyCode.JoystickButton1:
-			return "(B)";
-		case KeyCode.JoystickButton2:
-			return "(X)";
-		case KeyCode.JoystickButton3:
-			return "(Y)";
-		case KeyCode.JoystickButton4:
-			return "(RB)";
-		case KeyCode.JoystickButton5:
-			return "(LB)";
-		case KeyCode.JoystickButton6:
-			return "(Back)";
-		case KeyCode.JoystickButton7:
-			return "(Start)";
-		case KeyCode.JoystickButton8:
-			return "(LS)";
-		case KeyCode.JoystickButton9:
-			return "(RS)";
-		case KeyCode.JoystickButton10:
-			return "J10";
-		case KeyCode.JoystickButton11:
-			return "J11";
-		case KeyCode.JoystickButton12:
-			return "J12";
-		case KeyCode.JoystickButton13:
-			return "J13";
-		case KeyCode.JoystickButton14:
-			return "J14";
-		case KeyCode.JoystickButton15:
-			return "J15";
-		case KeyCode.JoystickButton16:
-			return "J16";
-		case KeyCode.JoystickButton17:
-			return "J17";
-		case KeyCode.JoystickButton18:
-			return "J18";
-		case KeyCode.JoystickButton19:
-			return "J19";
 		default:
+			switch (key - 256)
+			{
+			case 0:
+				return "K0";
+			case 1:
+				return "K1";
+			case 2:
+				return "K2";
+			case 3:
+				return "K3";
+			case 4:
+				return "K4";
+			case 5:
+				return "K5";
+			case 6:
+				return "K6";
+			case 7:
+				return "K7";
+			case 8:
+				return "K8";
+			case 9:
+				return "K9";
+			case 10:
+				return ".";
+			case 11:
+				return "/";
+			case 12:
+				return "*";
+			case 13:
+				return "-";
+			case 14:
+				return "+";
+			case 15:
+				return "NT";
+			case 16:
+				return "=";
+			case 17:
+				return "UP";
+			case 18:
+				return "DN";
+			case 19:
+				return "LT";
+			case 20:
+				return "RT";
+			case 21:
+				return "Ins";
+			case 22:
+				return "Home";
+			case 23:
+				return "End";
+			case 24:
+				return "PU";
+			case 25:
+				return "PD";
+			case 26:
+				return "F1";
+			case 27:
+				return "F2";
+			case 28:
+				return "F3";
+			case 29:
+				return "F4";
+			case 30:
+				return "F5";
+			case 31:
+				return "F6";
+			case 32:
+				return "F7";
+			case 33:
+				return "F8";
+			case 34:
+				return "F9";
+			case 35:
+				return "F10";
+			case 36:
+				return "F11";
+			case 37:
+				return "F12";
+			case 38:
+				return "F13";
+			case 39:
+				return "F14";
+			case 40:
+				return "F15";
+			case 44:
+				return "Num";
+			case 45:
+				return "Cap";
+			case 46:
+				return "Scr";
+			case 47:
+				return "RS";
+			case 48:
+				return "LS";
+			case 49:
+				return "RC";
+			case 50:
+				return "LC";
+			case 51:
+				return "RA";
+			case 52:
+				return "LA";
+			case 67:
+				return "M0";
+			case 68:
+				return "M1";
+			case 69:
+				return "M2";
+			case 70:
+				return "M3";
+			case 71:
+				return "M4";
+			case 72:
+				return "M5";
+			case 73:
+				return "M6";
+			case 74:
+				return "(A)";
+			case 75:
+				return "(B)";
+			case 76:
+				return "(X)";
+			case 77:
+				return "(Y)";
+			case 78:
+				return "(RB)";
+			case 79:
+				return "(LB)";
+			case 80:
+				return "(Back)";
+			case 81:
+				return "(Start)";
+			case 82:
+				return "(LS)";
+			case 83:
+				return "(RS)";
+			case 84:
+				return "J10";
+			case 85:
+				return "J11";
+			case 86:
+				return "J12";
+			case 87:
+				return "J13";
+			case 88:
+				return "J14";
+			case 89:
+				return "J15";
+			case 90:
+				return "J16";
+			case 91:
+				return "J17";
+			case 92:
+				return "J18";
+			case 93:
+				return "J19";
+			default:
+				return null;
+			}
+		case 0:
 			return null;
+		case 8:
+			return "BS";
+		case 9:
+			return "Tab";
+		case 12:
+			return "Clr";
+		case 13:
+			return "NT";
+		case 19:
+			return "PS";
+		case 27:
+			return "Esc";
+		case 32:
+			return "SP";
+		case 33:
+			return "!";
+		case 34:
+			return "\"";
+		case 35:
+			return "#";
+		case 36:
+			return "$";
+		case 38:
+			return "&";
+		case 39:
+			return "'";
+		case 40:
+			return "(";
+		case 41:
+			return ")";
+		case 42:
+			return "*";
+		case 43:
+			return "+";
+		case 44:
+			return ",";
+		case 45:
+			return "-";
+		case 46:
+			return ".";
+		case 47:
+			return "/";
+		case 48:
+			return "0";
+		case 49:
+			return "1";
+		case 50:
+			return "2";
+		case 51:
+			return "3";
+		case 52:
+			return "4";
+		case 53:
+			return "5";
+		case 54:
+			return "6";
+		case 55:
+			return "7";
+		case 56:
+			return "8";
+		case 57:
+			return "9";
+		case 58:
+			return ":";
+		case 59:
+			return ";";
+		case 60:
+			return "<";
+		case 61:
+			return "=";
+		case 62:
+			return ">";
+		case 63:
+			return "?";
+		case 64:
+			return "@";
+		case 91:
+			return "[";
+		case 92:
+			return "\\";
+		case 93:
+			return "]";
+		case 94:
+			return "^";
+		case 95:
+			return "_";
+		case 96:
+			return "`";
+		case 97:
+			return "A";
+		case 98:
+			return "B";
+		case 99:
+			return "C";
+		case 100:
+			return "D";
+		case 101:
+			return "E";
+		case 102:
+			return "F";
+		case 103:
+			return "G";
+		case 104:
+			return "H";
+		case 105:
+			return "I";
+		case 106:
+			return "J";
+		case 107:
+			return "K";
+		case 108:
+			return "L";
+		case 109:
+			return "M";
+		case 110:
+			return "N0";
+		case 111:
+			return "O";
+		case 112:
+			return "P";
+		case 113:
+			return "Q";
+		case 114:
+			return "R";
+		case 115:
+			return "S";
+		case 116:
+			return "T";
+		case 117:
+			return "U";
+		case 118:
+			return "V";
+		case 119:
+			return "W";
+		case 120:
+			return "X";
+		case 121:
+			return "Y";
+		case 122:
+			return "Z";
+		case 127:
+			return "Del";
 		}
 	}
 }

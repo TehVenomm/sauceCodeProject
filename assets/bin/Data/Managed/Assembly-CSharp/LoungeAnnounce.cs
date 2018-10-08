@@ -51,12 +51,12 @@ public class LoungeAnnounce : UIBehaviour
 
 	public void Play(ANNOUNCE_TYPE type, string userName, Action onComplete)
 	{
-		SetActive(UI.WGT_ANCHOR_POINT, true);
-		if ((UnityEngine.Object)widget == (UnityEngine.Object)null || (UnityEngine.Object)tweenCtrl == (UnityEngine.Object)null)
+		SetActive((Enum)UI.WGT_ANCHOR_POINT, true);
+		if (widget == null || tweenCtrl == null)
 		{
 			if (onComplete != null)
 			{
-				onComplete();
+				onComplete.Invoke();
 			}
 		}
 		else
@@ -66,31 +66,31 @@ public class LoungeAnnounce : UIBehaviour
 			case ANNOUNCE_TYPE.CREATED_PARTY:
 			{
 				string text3 = StringTable.Get(STRING_CATEGORY.LOUNGE, 0u);
-				SetLabelText(UI.LBL_ANNOUNCE, text3);
+				SetLabelText((Enum)UI.LBL_ANNOUNCE, text3);
 				break;
 			}
 			case ANNOUNCE_TYPE.JOIN_LOUNGE:
 			{
 				string text2 = StringTable.Get(STRING_CATEGORY.LOUNGE, 1u);
-				SetLabelText(UI.LBL_ANNOUNCE, text2);
+				SetLabelText((Enum)UI.LBL_ANNOUNCE, text2);
 				break;
 			}
 			case ANNOUNCE_TYPE.LEAVED_LOUNGE:
 			{
 				string text = StringTable.Get(STRING_CATEGORY.LOUNGE, 2u);
-				SetLabelText(UI.LBL_ANNOUNCE, text);
+				SetLabelText((Enum)UI.LBL_ANNOUNCE, text);
 				break;
 			}
 			}
-			SetLabelText(UI.LBL_USER_NAME, userName);
-			SetFontStyle(UI.LBL_ANNOUNCE, FontStyle.Italic);
-			SetFontStyle(UI.LBL_USER_NAME, FontStyle.Italic);
+			SetLabelText((Enum)UI.LBL_USER_NAME, userName);
+			SetFontStyle((Enum)UI.LBL_ANNOUNCE, 2);
+			SetFontStyle((Enum)UI.LBL_USER_NAME, 2);
 			tweenCtrl.Reset();
 			tweenCtrl.Play(true, delegate
 			{
 				if (onComplete != null)
 				{
-					onComplete();
+					onComplete.Invoke();
 				}
 			});
 		}
@@ -98,13 +98,14 @@ public class LoungeAnnounce : UIBehaviour
 
 	private void Start()
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_EFFECT);
-		if ((UnityEngine.Object)ctrl != (UnityEngine.Object)null)
+		if (ctrl != null)
 		{
-			ctrl.localScale = Vector3.zero;
+			ctrl.set_localScale(Vector3.get_zero());
 		}
-		widget = GetComponent<UIWidget>(UI.WGT_ANCHOR_POINT);
-		tweenCtrl = GetComponent<UITweenCtrl>(UI.OBJ_TWEENCTRL);
-		SetActive(UI.WGT_ANCHOR_POINT, false);
+		widget = base.GetComponent<UIWidget>((Enum)UI.WGT_ANCHOR_POINT);
+		tweenCtrl = base.GetComponent<UITweenCtrl>((Enum)UI.OBJ_TWEENCTRL);
+		SetActive((Enum)UI.WGT_ANCHOR_POINT, false);
 	}
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class UI_Common : UIBehaviour
@@ -61,39 +62,42 @@ public class UI_Common : UIBehaviour
 
 	public override void UpdateUI()
 	{
-		SetActive(UI.OBJ_CAPTION_1, false);
-		SetActive(UI.OBJ_CAPTION_2, false);
-		SetActive(UI.OBJ_CAPTION_3, false);
-		SetActive(UI.SPR_BADGE, false);
-		SetActive(UI.SPR_NAMEPLATE, false);
-		SetActive(UI.OBJ_QUEST_BALLOON, false);
-		SetActive(UI.OBJ_EVENT_BALLOON, false);
-		SetActive(UI.OBJ_LOUNGE_QUEST_BALLOON, false);
-		SetActive(UI.OBJ_BACK_1, false);
-		SetActive(UI.OBJ_BACK_2, false);
-		SetActive(UI.OBJ_BACK_3, false);
-		SetActive(UI.OBJ_LOUNGE_NAMEPLATE, false);
-		SetActive(UI.OBJ_CHAT_APPEAL, false);
-		SetActive(UI.OBJ_STAMP_APPEAL, false);
+		SetActive((Enum)UI.OBJ_CAPTION_1, false);
+		SetActive((Enum)UI.OBJ_CAPTION_2, false);
+		SetActive((Enum)UI.OBJ_CAPTION_3, false);
+		SetActive((Enum)UI.SPR_BADGE, false);
+		SetActive((Enum)UI.SPR_NAMEPLATE, false);
+		SetActive((Enum)UI.OBJ_QUEST_BALLOON, false);
+		SetActive((Enum)UI.OBJ_EVENT_BALLOON, false);
+		SetActive((Enum)UI.OBJ_LOUNGE_QUEST_BALLOON, false);
+		SetActive((Enum)UI.OBJ_BACK_1, false);
+		SetActive((Enum)UI.OBJ_BACK_2, false);
+		SetActive((Enum)UI.OBJ_BACK_3, false);
+		SetActive((Enum)UI.OBJ_LOUNGE_NAMEPLATE, false);
+		SetActive((Enum)UI.OBJ_CHAT_APPEAL, false);
+		SetActive((Enum)UI.OBJ_STAMP_APPEAL, false);
 	}
 
 	public void AttachBackButton(UIBehaviour target_ui, int button_index)
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		UI uI = (UI)(15 + button_index);
-		Transform transform = Attach(target_ui, GetCtrl(uI));
-		transform.gameObject.name = UI.OBJ_BACK.ToString();
+		Transform val = Attach(target_ui, GetCtrl(uI));
+		val.get_gameObject().set_name(UI.OBJ_BACK.ToString());
 	}
 
 	public void AttachCaption(UIBehaviour target_ui, int button_index, string caption)
 	{
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 		if (!string.IsNullOrEmpty(caption) && button_index != 0)
 		{
 			UI uI = (UI)(0 + button_index);
-			Transform transform = Attach(target_ui, GetCtrl(uI));
-			transform.gameObject.name = UI.OBJ_CAPTION.ToString();
-			SetLabelText(transform, UI.LBL_CAPTION, caption);
-			UITweenCtrl component = transform.gameObject.GetComponent<UITweenCtrl>();
-			if ((Object)component != (Object)null)
+			Transform val = Attach(target_ui, GetCtrl(uI));
+			val.get_gameObject().set_name(UI.OBJ_CAPTION.ToString());
+			SetLabelText(val, UI.LBL_CAPTION, caption);
+			UITweenCtrl component = val.get_gameObject().GetComponent<UITweenCtrl>();
+			if (component != null)
 			{
 				component.Reset();
 				int i = 0;
@@ -108,9 +112,20 @@ public class UI_Common : UIBehaviour
 
 	public void AttachBadge(UIWidget target_widget, int num, SpriteAlignment align, int offset_x = 5, int offset_y = 5, bool is_scale_normalize = false)
 	{
-		if (!((Object)target_widget == (Object)null))
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Expected O, but got Unknown
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+		if (!(target_widget == null))
 		{
-			Transform transform = target_widget.transform;
+			Transform root = target_widget.get_transform();
 			string text = null;
 			if (num < 0)
 			{
@@ -124,31 +139,33 @@ public class UI_Common : UIBehaviour
 			{
 				text = num.ToString();
 			}
-			Transform transform2 = FindCtrl(transform, UI.LBL_BADGE);
-			if ((Object)transform2 != (Object)null)
+			Transform val = FindCtrl(root, UI.LBL_BADGE);
+			if (val != null)
 			{
 				if (text == null)
 				{
-					Object.DestroyImmediate(FindCtrl(transform, UI.SPR_BADGE).gameObject);
+					Object.DestroyImmediate(FindCtrl(root, UI.SPR_BADGE).get_gameObject());
 				}
 				else
 				{
-					transform2.GetComponent<UILabel>().text = text;
+					val.GetComponent<UILabel>().text = text;
 				}
 			}
 			else if (text != null)
 			{
-				Transform transform3 = Attach(target_widget, GetCtrl(UI.SPR_BADGE), align, offset_x, offset_y);
-				SetLabelText(transform3, UI.LBL_BADGE, text);
+				Transform val2 = Attach(target_widget, GetCtrl(UI.SPR_BADGE), align, offset_x, offset_y);
+				SetLabelText(val2, UI.LBL_BADGE, text);
 				if (is_scale_normalize)
 				{
-					Vector3 localScale = MonoBehaviourSingleton<UIManager>.I.uiRootTransform.localScale;
+					Vector3 localScale = MonoBehaviourSingleton<UIManager>.I.uiRootTransform.get_localScale();
 					float x = localScale.x;
-					Vector3 lossyScale = transform3.lossyScale;
-					float x2 = x / lossyScale.x;
+					Vector3 lossyScale = val2.get_lossyScale();
+					float num2 = x / lossyScale.x;
 					float y = localScale.y;
-					Vector3 lossyScale2 = transform3.lossyScale;
-					Vector3 vector2 = transform3.localScale = new Vector3(x2, y / lossyScale2.y);
+					Vector3 lossyScale2 = val2.get_lossyScale();
+					Vector3 localScale2 = default(Vector3);
+					localScale2._002Ector(num2, y / lossyScale2.y);
+					val2.set_localScale(localScale2);
 				}
 			}
 		}
@@ -187,7 +204,7 @@ public class UI_Common : UIBehaviour
 		SetActive(root, UI.OBJ_EVENT_BALLOON, true);
 		SetActive(root, UI.SPR_EVENT_BALLOON, type == EVENT_BALLOON_TYPE.NEW);
 		SetActive(root, UI.SPR_EVENT_BALLOON_C, type == EVENT_BALLOON_TYPE.COMPLETABLE);
-		Transform transform = null;
+		Transform val = null;
 		switch (type)
 		{
 		default:
@@ -227,16 +244,16 @@ public class UI_Common : UIBehaviour
 
 	public Transform CreateNamePlate(string text)
 	{
-		Transform transform = Clone(GetCtrl(UI.SPR_NAMEPLATE), MonoBehaviourSingleton<UIManager>.I._transform);
-		SetLabelText(transform, UI.LBL_NAMEPLATE, text);
-		return transform;
+		Transform val = Clone(GetCtrl(UI.SPR_NAMEPLATE), MonoBehaviourSingleton<UIManager>.I._transform);
+		SetLabelText(val, UI.LBL_NAMEPLATE, text);
+		return val;
 	}
 
 	public Transform CreateLoungeNamePlate(string text)
 	{
-		Transform transform = Clone(GetCtrl(UI.OBJ_LOUNGE_NAMEPLATE), MonoBehaviourSingleton<UIManager>.I._transform);
-		SetLabelText(transform, UI.LBL_NAMEPLATE, text);
-		return transform;
+		Transform val = Clone(GetCtrl(UI.OBJ_LOUNGE_NAMEPLATE), MonoBehaviourSingleton<UIManager>.I._transform);
+		SetLabelText(val, UI.LBL_NAMEPLATE, text);
+		return val;
 	}
 
 	public Transform CreateChatAppeal()
@@ -251,43 +268,79 @@ public class UI_Common : UIBehaviour
 
 	private Transform Clone(Transform base_ui, Transform parent)
 	{
-		base_ui.gameObject.SetActive(true);
-		Transform result = ResourceUtility.Realizes(base_ui.gameObject, parent, -1);
-		base_ui.gameObject.SetActive(false);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0014: Expected O, but got Unknown
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		base_ui.get_gameObject().SetActive(true);
+		Transform result = ResourceUtility.Realizes(base_ui.get_gameObject(), parent, -1);
+		base_ui.get_gameObject().SetActive(false);
 		return result;
 	}
 
 	private Transform Attach(UIBehaviour target_ui, Transform base_ui)
 	{
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Expected O, but got Unknown
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004d: Expected O, but got Unknown
 		UIVirtualScreen component = target_ui.collectUI.GetComponent<UIVirtualScreen>();
-		if ((Object)component == (Object)null)
+		if (component == null)
 		{
 			return null;
 		}
-		Transform transform = Clone(base_ui, component.transform);
-		UIWidget component2 = transform.GetComponent<UIWidget>();
-		if ((Object)component2 != (Object)null)
+		Transform val = Clone(base_ui, component.get_transform());
+		UIWidget component2 = val.GetComponent<UIWidget>();
+		if (component2 != null)
 		{
 			if (component2.leftAnchor != null)
 			{
-				component2.SetAnchor(component.gameObject);
+				((UIRect)component2).SetAnchor(component.get_gameObject());
 			}
 			else
 			{
-				component2.SetAnchor((GameObject)null);
+				((UIRect)component2).SetAnchor(null);
 			}
 		}
-		return transform;
+		return val;
 	}
 
 	private Transform Attach(UIWidget target_widget, Transform base_ui, SpriteAlignment align, int offset_x, int offset_y)
 	{
-		if ((Object)target_widget == (Object)null)
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0016: Expected O, but got Unknown
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0065: Invalid comparison between Unknown and I4
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Invalid comparison between Unknown and I4
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Invalid comparison between Unknown and I4
+		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008b: Invalid comparison between Unknown and I4
+		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0092: Invalid comparison between Unknown and I4
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0099: Invalid comparison between Unknown and I4
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ac: Invalid comparison between Unknown and I4
+		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b3: Invalid comparison between Unknown and I4
+		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ba: Invalid comparison between Unknown and I4
+		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d2: Invalid comparison between Unknown and I4
+		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Invalid comparison between Unknown and I4
+		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e0: Invalid comparison between Unknown and I4
+		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011c: Expected O, but got Unknown
+		if (target_widget == null)
 		{
 			return null;
 		}
-		Transform transform = Clone(base_ui, target_widget.transform);
-		UISprite component = transform.GetComponent<UISprite>();
+		Transform val = Clone(base_ui, target_widget.get_transform());
+		UISprite component = val.GetComponent<UISprite>();
 		int num = target_widget.width >> 1;
 		int num2 = target_widget.height >> 1;
 		int num3 = component.width >> 1;
@@ -296,41 +349,31 @@ public class UI_Common : UIBehaviour
 		int num6 = -num + num3;
 		int num7 = num2 - num4;
 		int num8 = -num2 + num4;
-		switch (align)
+		if ((int)align == 4 || (int)align == 6 || (int)align == 1)
 		{
-		case SpriteAlignment.TopLeft:
-		case SpriteAlignment.LeftCenter:
-		case SpriteAlignment.BottomLeft:
 			num5 -= num;
 			num6 -= num;
-			break;
-		case SpriteAlignment.TopRight:
-		case SpriteAlignment.RightCenter:
-		case SpriteAlignment.BottomRight:
+		}
+		else if ((int)align == 5 || (int)align == 8 || (int)align == 3)
+		{
 			num5 += num;
 			num6 += num;
-			break;
 		}
-		switch (align)
+		if ((int)align == 2 || (int)align == 1 || (int)align == 3)
 		{
-		case SpriteAlignment.TopLeft:
-		case SpriteAlignment.TopCenter:
-		case SpriteAlignment.TopRight:
 			num8 += num2;
 			num7 += num2;
-			break;
-		case SpriteAlignment.BottomLeft:
-		case SpriteAlignment.BottomCenter:
-		case SpriteAlignment.BottomRight:
+		}
+		else if ((int)align == 7 || (int)align == 6 || (int)align == 8)
+		{
 			num8 -= num2;
 			num7 -= num2;
-			break;
 		}
 		num5 += offset_x;
 		num6 += offset_x;
 		num8 += offset_y;
 		num7 += offset_y;
-		component.SetAnchor(target_widget.gameObject, num5, num7, num6, num8);
-		return transform;
+		component.SetAnchor(target_widget.get_gameObject(), num5, num7, num6, num8);
+		return val;
 	}
 }

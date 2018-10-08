@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EffectColorCtrl : MonoBehaviour
+public class EffectColorCtrl
 {
 	[Serializable]
 	public class ColorSet
@@ -30,9 +30,18 @@ public class EffectColorCtrl : MonoBehaviour
 
 	private Material[] materials;
 
+	public EffectColorCtrl()
+		: this()
+	{
+	}
+
 	private void Start()
 	{
-		transforms = base.transform.GetComponentsInChildren<Transform>();
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007b: Expected O, but got Unknown
+		transforms = this.get_transform().GetComponentsInChildren<Transform>();
 		List<Material> list = new List<Material>();
 		List<Renderer> list2 = new List<Renderer>();
 		if (!transforms.IsNullOrEmpty())
@@ -41,12 +50,12 @@ public class EffectColorCtrl : MonoBehaviour
 			for (int num = transforms.Length; i < num; i++)
 			{
 				Renderer component = transforms[i].GetComponent<Renderer>();
-				if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+				if (component != null)
 				{
-					component.enabled = true;
-					if ((UnityEngine.Object)component.material != (UnityEngine.Object)null)
+					component.set_enabled(true);
+					if (component.get_material() != null)
 					{
-						list.Add(component.material);
+						list.Add(component.get_material());
 					}
 				}
 			}
@@ -56,6 +65,16 @@ public class EffectColorCtrl : MonoBehaviour
 
 	public void UpdateColor(float rate)
 	{
+		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
 		if (!colorVariation.IsNullOrEmpty() && colorVariation.Length > 1)
 		{
 			float num = 1f / (float)(colorVariation.Length - 1);
@@ -74,19 +93,19 @@ public class EffectColorCtrl : MonoBehaviour
 				}
 				num3++;
 			}
-			float t = (num * (float)num3 - num2) / num;
+			float num5 = (num * (float)num3 - num2) / num;
 			int i = 0;
-			for (int num5 = materials.Length; i < num5; i++)
+			for (int num6 = materials.Length; i < num6; i++)
 			{
 				if (materials[i].HasProperty(ID_RIM_COLOR))
 				{
-					Color color = Color.Lerp(colorVariation[num3].rimColor, colorVariation[num3 - 1].rimColor, t);
-					materials[i].SetColor(ID_RIM_COLOR, color);
+					Color val = Color.Lerp(colorVariation[num3].rimColor, colorVariation[num3 - 1].rimColor, num5);
+					materials[i].SetColor(ID_RIM_COLOR, val);
 				}
 				if (materials[i].HasProperty(ID_INNER_COLOR))
 				{
-					Color color2 = Color.Lerp(colorVariation[num3].innerColor, colorVariation[num3 - 1].innerColor, t);
-					materials[i].SetColor(ID_INNER_COLOR, color2);
+					Color val2 = Color.Lerp(colorVariation[num3].innerColor, colorVariation[num3 - 1].innerColor, num5);
+					materials[i].SetColor(ID_INNER_COLOR, val2);
 				}
 			}
 		}
@@ -94,15 +113,18 @@ public class EffectColorCtrl : MonoBehaviour
 
 	public void PlayHitEffect()
 	{
-		if (!((UnityEngine.Object)hitEffectTrans == (UnityEngine.Object)null))
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Expected O, but got Unknown
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		if (!(hitEffectTrans == null))
 		{
-			StartCoroutine(PlayHitEffect(hitEffectTrans.gameObject));
+			this.StartCoroutine(PlayHitEffect(hitEffectTrans.get_gameObject()));
 		}
 	}
 
 	private IEnumerator PlayHitEffect(GameObject obj)
 	{
-		if (!((UnityEngine.Object)obj == (UnityEngine.Object)null))
+		if (!(obj == null))
 		{
 			obj.SetActive(true);
 			yield return (object)new WaitForSeconds(effectCoolTime);

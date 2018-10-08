@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AttackDig : MonoBehaviour
+public class AttackDig
 {
 	private enum Function
 	{
@@ -60,8 +60,32 @@ public class AttackDig : MonoBehaviour
 
 	public bool IsDeleted => m_isDeleted;
 
+	public AttackDig()
+		: this()
+	{
+	}
+
 	public void Initialize(StageObject attacker, AttackInfo atkInfo, StageObject targetObj, Transform launchTrans, Vector3 offsetPos, Quaternion offsetRot)
 	{
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Expected O, but got Unknown
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0122: Expected O, but got Unknown
+		//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0161: Expected O, but got Unknown
 		m_attacker = attacker;
 		m_atkInfo = atkInfo;
 		AttackHitInfo attackHitInfo = atkInfo as AttackHitInfo;
@@ -77,16 +101,16 @@ public class AttackDig : MonoBehaviour
 		m_aimAngleSpeed = dataDig.lookAtAngle * 0.0174532924f;
 		m_digData = dataDig;
 		m_isDeleted = false;
-		m_cachedTransform = base.transform;
-		m_cachedTransform.parent = ((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
-		m_cachedTransform.position = launchTrans.position + launchTrans.rotation * offsetPos;
-		m_cachedTransform.rotation = launchTrans.rotation * offsetRot;
-		m_cachedTransform.localScale = bulletData.data.timeStartScale;
-		Transform effect = EffectManager.GetEffect(bulletData.data.effectName, base.transform);
-		effect.localPosition = bulletData.data.dispOffset;
-		effect.localRotation = Quaternion.Euler(bulletData.data.dispRotation);
-		effect.localScale = Vector3.one;
-		m_effectObj = effect.gameObject;
+		m_cachedTransform = this.get_transform();
+		m_cachedTransform.set_parent((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
+		m_cachedTransform.set_position(launchTrans.get_position() + launchTrans.get_rotation() * offsetPos);
+		m_cachedTransform.set_rotation(launchTrans.get_rotation() * offsetRot);
+		m_cachedTransform.set_localScale(bulletData.data.timeStartScale);
+		Transform effect = EffectManager.GetEffect(bulletData.data.effectName, this.get_transform());
+		effect.set_localPosition(bulletData.data.dispOffset);
+		effect.set_localRotation(Quaternion.Euler(bulletData.data.dispRotation));
+		effect.set_localScale(Vector3.get_one());
+		m_effectObj = effect.get_gameObject();
 		m_effectAnimator = m_effectObj.GetComponent<Animator>();
 		m_targetObject = targetObj;
 		RequestMain();
@@ -112,14 +136,29 @@ public class AttackDig : MonoBehaviour
 
 	private void FuncMain()
 	{
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
 		if (!m_isDeleted)
 		{
-			m_aliveTimer -= Time.deltaTime;
+			m_aliveTimer -= Time.get_deltaTime();
 			if (m_aliveTimer <= 0f)
 			{
 				RequestDestroy(false);
 			}
-			else if ((Object)m_targetObject == (Object)null)
+			else if (m_targetObject == null)
 			{
 				RequestDestroy(false);
 			}
@@ -129,20 +168,20 @@ public class AttackDig : MonoBehaviour
 			}
 			else
 			{
-				Vector3 position = m_targetObject.transform.position;
+				Vector3 position = m_targetObject.get_transform().get_position();
 				position.y = 0f;
 				switch (m_state)
 				{
 				case State.TRACKING:
 				{
 					LookAtTarget(position);
-					Vector3 forward = m_cachedTransform.forward;
-					Vector3 vector = m_cachedTransform.position + forward * m_moveSpeed * Time.deltaTime;
-					vector.y = m_digData.floatingHeight;
-					m_cachedTransform.position = vector;
+					Vector3 forward = m_cachedTransform.get_forward();
+					Vector3 val = m_cachedTransform.get_position() + forward * m_moveSpeed * Time.get_deltaTime();
+					val.y = m_digData.floatingHeight;
+					m_cachedTransform.set_position(val);
 					position.y = 0f;
-					vector.y = 0f;
-					if (Vector3.Distance(position, vector) <= m_digData.attackRange)
+					val.y = 0f;
+					if (Vector3.Distance(position, val) <= m_digData.attackRange)
 					{
 						m_attackTimer = m_digData.attackDelay;
 						ForwardState();
@@ -150,11 +189,11 @@ public class AttackDig : MonoBehaviour
 					break;
 				}
 				case State.ATTACK:
-					m_attackTimer -= Time.deltaTime;
+					m_attackTimer -= Time.get_deltaTime();
 					if (!(m_attackTimer > 0f))
 					{
 						Player player = m_targetObject as Player;
-						if ((Object)player == (Object)null || player.isDead)
+						if (player == null || player.isDead)
 						{
 							RequestDestroy(false);
 						}
@@ -171,8 +210,14 @@ public class AttackDig : MonoBehaviour
 
 	private AnimEventShot CreateBullet()
 	{
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 		BulletData bulletData = m_atkInfo.bulletData;
-		if ((Object)bulletData == (Object)null)
+		if (bulletData == null)
 		{
 			return null;
 		}
@@ -181,14 +226,14 @@ public class AttackDig : MonoBehaviour
 		{
 			return null;
 		}
-		if ((Object)m_attacker == (Object)null)
+		if (m_attacker == null)
 		{
 			return null;
 		}
-		Quaternion rotation = m_cachedTransform.rotation;
-		Vector3 position = m_cachedTransform.position;
+		Quaternion rotation = m_cachedTransform.get_rotation();
+		Vector3 position = m_cachedTransform.get_position();
 		AnimEventShot animEventShot = AnimEventShot.CreateByExternalBulletData(dataDig.flyOutBullet, m_attacker, m_atkInfo, position, rotation, null, Player.ATTACK_MODE.NONE, null);
-		if ((Object)animEventShot == (Object)null)
+		if (animEventShot == null)
 		{
 			Log.Error("Failed to create AnimEventShot for Dig!!");
 			return null;
@@ -199,12 +244,36 @@ public class AttackDig : MonoBehaviour
 
 	private void LookAtTarget(Vector3 targetPos)
 	{
-		Vector3 forward = m_cachedTransform.forward;
-		Vector3 position = m_cachedTransform.position;
-		Vector3 vector = targetPos - position;
-		vector.Normalize();
-		float num = m_aimAngleSpeed * Time.deltaTime;
-		float num2 = Vector3.Dot(forward, vector);
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+		Vector3 forward = m_cachedTransform.get_forward();
+		Vector3 position = m_cachedTransform.get_position();
+		Vector3 val = targetPos - position;
+		val.Normalize();
+		float num = m_aimAngleSpeed * Time.get_deltaTime();
+		float num2 = Vector3.Dot(forward, val);
 		float num3 = Mathf.Acos(num2);
 		if (num2 < 1f && num < num3 && num3 >= 0.00174532924f)
 		{
@@ -212,15 +281,15 @@ public class AttackDig : MonoBehaviour
 			Quaternion rotation;
 			if (num4 >= 1f)
 			{
-				rotation = Quaternion.LookRotation(vector);
+				rotation = Quaternion.LookRotation(val);
 			}
 			else
 			{
-				Quaternion a = Quaternion.LookRotation(forward);
-				Quaternion b = Quaternion.LookRotation(vector);
-				rotation = Quaternion.Slerp(a, b, num4);
+				Quaternion val2 = Quaternion.LookRotation(forward);
+				Quaternion val3 = Quaternion.LookRotation(val);
+				rotation = Quaternion.Slerp(val2, val3, num4);
 			}
-			m_cachedTransform.rotation = rotation;
+			m_cachedTransform.set_rotation(rotation);
 		}
 	}
 
@@ -229,7 +298,7 @@ public class AttackDig : MonoBehaviour
 		if (m_func != Function.DELETE && !m_isDeleted)
 		{
 			RequestFunction(Function.DELETE);
-			if ((Object)m_effectAnimator == (Object)null)
+			if (m_effectAnimator == null)
 			{
 				Destroy();
 			}
@@ -250,7 +319,7 @@ public class AttackDig : MonoBehaviour
 				}
 				else
 				{
-					Debug.LogWarning("Not found delete animation!!");
+					Debug.LogWarning((object)"Not found delete animation!!");
 					Destroy();
 				}
 			}
@@ -259,16 +328,22 @@ public class AttackDig : MonoBehaviour
 
 	private void FuncDelete()
 	{
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		switch (m_state)
 		{
 		case State.TRACKING:
-			if ((Object)m_effectAnimator == (Object)null)
+			if (m_effectAnimator == null)
 			{
 				ForwardState();
 			}
-			else if (m_effectAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+			else
 			{
-				ForwardState();
+				AnimatorStateInfo currentAnimatorStateInfo = m_effectAnimator.GetCurrentAnimatorStateInfo(0);
+				if (currentAnimatorStateInfo.get_normalizedTime() >= 1f)
+				{
+					ForwardState();
+				}
 			}
 			break;
 		case State.ATTACK:
@@ -280,25 +355,28 @@ public class AttackDig : MonoBehaviour
 
 	private void Destroy()
 	{
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 		if (!m_isDeleted)
 		{
 			m_isDeleted = true;
 			if (!string.IsNullOrEmpty(m_landHitEffectName))
 			{
 				Transform effect = EffectManager.GetEffect(m_landHitEffectName, null);
-				if ((Object)effect != (Object)null)
+				if (effect != null)
 				{
-					effect.position = m_cachedTransform.position;
-					effect.rotation = m_cachedTransform.rotation;
+					effect.set_position(m_cachedTransform.get_position());
+					effect.set_rotation(m_cachedTransform.get_rotation());
 				}
 			}
-			Object.Destroy(base.gameObject);
+			Object.Destroy(this.get_gameObject());
 		}
 	}
 
 	private void OnDestroy()
 	{
-		if ((Object)m_effectObj != (Object)null)
+		if (m_effectObj != null)
 		{
 			EffectManager.ReleaseEffect(m_effectObj, true, false);
 			m_effectObj = null;

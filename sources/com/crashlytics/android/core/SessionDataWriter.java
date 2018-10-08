@@ -184,12 +184,12 @@ class SessionDataWriter {
     }
 
     private int getThreadSize(Thread thread, StackTraceElement[] stackTraceElementArr, int i, boolean z) {
-        int computeUInt32Size = CodedOutputStream.computeUInt32Size(2, i) + CodedOutputStream.computeBytesSize(1, ByteString.copyFromUtf8(thread.getName()));
+        int computeBytesSize = CodedOutputStream.computeBytesSize(1, ByteString.copyFromUtf8(thread.getName())) + CodedOutputStream.computeUInt32Size(2, i);
         for (StackTraceElement frameSize : stackTraceElementArr) {
             int frameSize2 = getFrameSize(frameSize, z);
-            computeUInt32Size += frameSize2 + (CodedOutputStream.computeTagSize(3) + CodedOutputStream.computeRawVarint32Size(frameSize2));
+            computeBytesSize += frameSize2 + (CodedOutputStream.computeTagSize(3) + CodedOutputStream.computeRawVarint32Size(frameSize2));
         }
-        return computeUInt32Size;
+        return computeBytesSize;
     }
 
     private ByteString stringToByteString(String str) {

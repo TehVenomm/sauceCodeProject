@@ -4,7 +4,7 @@ public class Coop_Model_CharacterMoveVelocity : Coop_Model_ObjectBase
 {
 	public float time;
 
-	public Vector3 pos = Vector3.zero;
+	public Vector3 pos = Vector3.get_zero();
 
 	public int motion_id;
 
@@ -12,11 +12,14 @@ public class Coop_Model_CharacterMoveVelocity : Coop_Model_ObjectBase
 
 	public Coop_Model_CharacterMoveVelocity()
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		base.packetType = PACKET_TYPE.CHARACTER_MOVE_VELOCITY;
 	}
 
 	public override Vector3 GetObjectPosition()
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		return pos;
 	}
 

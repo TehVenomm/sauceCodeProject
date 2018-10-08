@@ -7,7 +7,7 @@ public class LoadAndInstantiateObject : LoadObject
 	public LoadAndInstantiateObject(MonoBehaviour mono_behaviour, RESOURCE_CATEGORY category, string resource_name)
 	{
 		Load(mono_behaviour, category, resource_name, false);
-		if (MonoBehaviourSingleton<InstantiateManager>.IsValid() && !base.isLoading && loadedObject != (Object)null)
+		if (MonoBehaviourSingleton<InstantiateManager>.IsValid() && !base.isLoading && loadedObject != null)
 		{
 			base.isLoading = true;
 			InstantiateManager.Request(resLoad, loadedObject, OnInstantiate, true);
@@ -42,7 +42,7 @@ public class LoadAndInstantiateObject : LoadObject
 
 	public override Transform Realizes(Transform parent = null, int layer = -1)
 	{
-		if ((Object)instantiatedObject == (Object)null)
+		if (instantiatedObject == null)
 		{
 			return base.Realizes(parent, layer);
 		}
@@ -58,6 +58,6 @@ public class LoadAndInstantiateObject : LoadObject
 
 	public override bool HasInstantiatedGameObject()
 	{
-		return (Object)instantiatedObject != (Object)null;
+		return instantiatedObject != null;
 	}
 }

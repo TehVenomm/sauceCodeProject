@@ -865,8 +865,8 @@ public class SlidingPaneLayout extends ViewGroup {
         r15.mSlideableView = r3;
         r3 = 0;
         r8 = r3;
-        r4 = r10;
-        r3 = r0;
+        r4 = r0;
+        r3 = r10;
     L_0x0048:
         if (r8 >= r12) goto L_0x012e;
     L_0x004a:
@@ -969,12 +969,12 @@ public class SlidingPaneLayout extends ViewGroup {
         r14 = -2147483648; // 0xffffffff80000000 float:-0.0 double:NaN;
         if (r9 != r14) goto L_0x00ed;
     L_0x00e7:
-        if (r7 <= r3) goto L_0x00ed;
+        if (r7 <= r4) goto L_0x00ed;
     L_0x00e9:
-        r3 = java.lang.Math.min(r7, r1);
+        r4 = java.lang.Math.min(r7, r1);
     L_0x00ed:
-        r4 = r4 - r6;
-        if (r4 >= 0) goto L_0x012c;
+        r3 = r3 - r6;
+        if (r3 >= 0) goto L_0x012c;
     L_0x00f0:
         r6 = 1;
     L_0x00f1:
@@ -1166,7 +1166,7 @@ public class SlidingPaneLayout extends ViewGroup {
         goto L_0x01d5;
     L_0x020b:
         r8 = 0;
-        r8 = java.lang.Math.max(r8, r4);
+        r8 = java.lang.Math.max(r8, r3);
         r0 = r0.weight;
         r8 = (float) r8;
         r0 = r0 * r8;
@@ -1179,7 +1179,7 @@ public class SlidingPaneLayout extends ViewGroup {
         goto L_0x0149;
     L_0x0222:
         r0 = r15.getPaddingTop();
-        r0 = r0 + r3;
+        r0 = r0 + r4;
         r1 = r15.getPaddingBottom();
         r0 = r0 + r1;
         r15.setMeasuredDimension(r11, r0);

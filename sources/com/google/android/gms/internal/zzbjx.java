@@ -13,6 +13,6 @@ final class zzbjx extends zzbkb {
     }
 
     protected final /* synthetic */ void zza(zzb zzb) throws RemoteException {
-        ((zzblb) ((zzbiw) zzb).zzajj()).zzb(new zzbjz(this.zzgic, this, null));
+        ((zzblb) ((zzbiw) zzb).zzajj()).zzb(new zzbjz(this.zzgic, this));
     }
 }

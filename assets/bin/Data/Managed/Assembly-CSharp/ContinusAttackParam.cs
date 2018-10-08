@@ -17,9 +17,11 @@ public class ContinusAttackParam
 
 		public void Release()
 		{
-			if ((UnityEngine.Object)effectTrans != (UnityEngine.Object)null)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Expected O, but got Unknown
+			if (effectTrans != null)
 			{
-				EffectManager.ReleaseEffect(effectTrans.gameObject, true, false);
+				EffectManager.ReleaseEffect(effectTrans.get_gameObject(), true, false);
 				effectTrans = null;
 			}
 			if (eventCollider != null)
@@ -74,7 +76,7 @@ public class ContinusAttackParam
 		for (int num = m_continusAtkDataList.Count - 1; num >= 0; num--)
 		{
 			ContinusAtkData continusAtkData = m_continusAtkDataList[num];
-			continusAtkData.endTime -= Time.deltaTime;
+			continusAtkData.endTime -= Time.get_deltaTime();
 			if (continusAtkData.endTime <= 0f)
 			{
 				continusAtkData.Release();

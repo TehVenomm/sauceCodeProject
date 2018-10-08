@@ -30,9 +30,12 @@ public abstract class HomePlayerCharacterBase : HomeCharacterBase
 	{
 		get
 		{
-			if ((Object)head == (Object)null && (Object)animator != (Object)null)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Expected O, but got Unknown
+			if (head == null && animator != null)
 			{
-				head = animator.transform.Find("PLC_Origin/Move/Root/Hip/Spine00/Spine01/Neck/Head");
+				head = animator.get_transform().Find("PLC_Origin/Move/Root/Hip/Spine00/Spine01/Neck/Head");
 			}
 			return head;
 		}
@@ -57,21 +60,23 @@ public abstract class HomePlayerCharacterBase : HomeCharacterBase
 	{
 		if (anim == PLCA.WALK)
 		{
-			animator.applyRootMotion = true;
+			animator.set_applyRootMotion(true);
 		}
 		else
 		{
-			animator.applyRootMotion = ((anim == anim_ctrl.moveAnim) ? true : false);
+			animator.set_applyRootMotion((anim == anim_ctrl.moveAnim) ? true : false);
 		}
 	}
 
 	protected override void OnDestroy()
 	{
-		if ((Object)chatAppeal != (Object)null && MonoBehaviourSingleton<ChatManager>.IsValid())
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		if (chatAppeal != null && MonoBehaviourSingleton<ChatManager>.IsValid())
 		{
-			Object.DestroyImmediate(chatAppeal.gameObject);
+			Object.DestroyImmediate(chatAppeal.get_gameObject());
 			chatAppeal = null;
-			Object.DestroyImmediate(stampAppeal.gameObject);
+			Object.DestroyImmediate(stampAppeal.get_gameObject());
 			stampAppeal = null;
 			MonoBehaviourSingleton<ChatManager>.I.OnCreateLoungeChat -= RegistOnRecvChat;
 			MonoBehaviourSingleton<ChatManager>.I.OnDestroyLoungeChat -= UnRegistOnRecvChat;
@@ -87,33 +92,40 @@ public abstract class HomePlayerCharacterBase : HomeCharacterBase
 	{
 		isPlayingSitAnimation = true;
 		chairPoint.SetSittingCharacter(this);
-		Vector3 sitPos = chairPoint.transform.position;
+		Vector3 sitPos = chairPoint.get_transform().get_position();
 		while (true)
 		{
 			animCtrl.Play(PLCA.WALK, false);
-			Vector3 pos = base._transform.position;
+			Vector3 pos = base._transform.get_position();
 			Vector3 diff = sitPos - pos;
-			Vector2 dir = diff.ToVector2XZ().normalized;
-			Vector3 eulerAngles = Quaternion.LookRotation(dir.ToVector3XZ()).eulerAngles;
+			Vector2 val = diff.ToVector2XZ();
+			Vector2 dir = val.get_normalized();
+			Quaternion val2 = Quaternion.LookRotation(dir.ToVector3XZ());
+			Vector3 eulerAngles = val2.get_eulerAngles();
 			float rot2 = eulerAngles.y;
 			float vel = 0f;
-			Vector3 eulerAngles2 = base._transform.eulerAngles;
+			Vector3 eulerAngles2 = base._transform.get_eulerAngles();
 			rot2 = Mathf.SmoothDampAngle(eulerAngles2.y, rot2, ref vel, 0.1f);
-			base._transform.eulerAngles = new Vector3(0f, rot2, 0f);
-			if (diff.magnitude < 0.15f)
+			base._transform.set_eulerAngles(new Vector3(0f, rot2, 0f));
+			if (diff.get_magnitude() < 0.15f)
 			{
 				break;
 			}
 			yield return (object)null;
 		}
-		Vector3 dirPoint = chairPoint.dir.transform.position;
+		Vector3 dirPoint = chairPoint.dir.get_transform().get_position();
 		Vector3 sitDir = dirPoint - sitPos;
 		Quaternion sitRot = Quaternion.LookRotation(sitDir);
-		base._transform.rotation = sitRot;
+		base._transform.set_rotation(sitRot);
 		PLCA sitMotion = (sexType != 0) ? PLCA.SIT_F : PLCA.SIT;
 		animCtrl.Play(sitMotion, false);
-		while (1f > animCtrl.animator.GetCurrentAnimatorStateInfo(0).normalizedTime)
+		while (true)
 		{
+			AnimatorStateInfo currentAnimatorStateInfo = animCtrl.animator.GetCurrentAnimatorStateInfo(0);
+			if (!(1f > currentAnimatorStateInfo.get_normalizedTime()))
+			{
+				break;
+			}
 			yield return (object)null;
 		}
 		isPlayingSitAnimation = false;
@@ -121,16 +133,18 @@ public abstract class HomePlayerCharacterBase : HomeCharacterBase
 
 	public void SetChatEvent()
 	{
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 		RegistOnRecvChat(MonoBehaviourSingleton<ChatManager>.I.loungeChat);
 		MonoBehaviourSingleton<ChatManager>.I.OnCreateLoungeChat += RegistOnRecvChat;
 		MonoBehaviourSingleton<ChatManager>.I.OnDestroyLoungeChat += UnRegistOnRecvChat;
-		Transform transform = MonoBehaviourSingleton<UIManager>.I.common.CreateStampAppeal();
-		stampAppeal = transform.gameObject.AddComponent<StampAppeal>();
-		stampAppeal.collectUI = transform;
+		Transform val = MonoBehaviourSingleton<UIManager>.I.common.CreateStampAppeal();
+		stampAppeal = val.get_gameObject().AddComponent<StampAppeal>();
+		stampAppeal.collectUI = val;
 		stampAppeal.CreateCtrlsArray(typeof(StampAppeal.UI));
-		transform = MonoBehaviourSingleton<UIManager>.I.common.CreateChatAppeal();
-		chatAppeal = transform.gameObject.AddComponent<ChatAppeal>();
-		chatAppeal.collectUI = transform;
+		val = MonoBehaviourSingleton<UIManager>.I.common.CreateChatAppeal();
+		chatAppeal = val.get_gameObject().AddComponent<ChatAppeal>();
+		chatAppeal.collectUI = val;
 		chatAppeal.CreateCtrlsArray(typeof(ChatAppeal.UI));
 	}
 
@@ -158,7 +172,7 @@ public abstract class HomePlayerCharacterBase : HomeCharacterBase
 	{
 		if (userId == GetUserId())
 		{
-			stampAppeal.View(stampId, Head ?? base._transform, (Object)head == (Object)null);
+			stampAppeal.View(stampId, Head ?? base._transform, head == null);
 		}
 	}
 
@@ -166,7 +180,7 @@ public abstract class HomePlayerCharacterBase : HomeCharacterBase
 	{
 		if (userId == GetUserId())
 		{
-			chatAppeal.View(text, Head ?? base._transform, (Object)head == (Object)null);
+			chatAppeal.View(text, Head ?? base._transform, head == null);
 		}
 	}
 }

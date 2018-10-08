@@ -1,3 +1,5 @@
+using System;
+
 public class CrystalShopSpecialMonthlyMagi : CrystalShopSpecialStarter
 {
 	private enum UI
@@ -7,6 +9,6 @@ public class CrystalShopSpecialMonthlyMagi : CrystalShopSpecialStarter
 
 	public override void UpdateUI()
 	{
-		SetModel(UI.OBJ_MODEL, "MonthlyMagiChest_Open");
+		SetModel((Enum)UI.OBJ_MODEL, "MonthlyMagiChest_Open");
 	}
 }

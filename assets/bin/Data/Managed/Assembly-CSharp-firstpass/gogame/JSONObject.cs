@@ -348,7 +348,7 @@ namespace gogame
 				if (strict && str[0] != '[' && str[0] != '{')
 				{
 					type = Type.NULL;
-					UnityEngine.Debug.LogWarning("Improper (strict) JSON formatting.  First character must be [ or {");
+					Debug.LogWarning((object)"Improper (strict) JSON formatting.  First character must be [ or {");
 				}
 				else if (str.Length > 0)
 				{
@@ -415,7 +415,7 @@ namespace gogame
 							catch (FormatException)
 							{
 								type = Type.NULL;
-								UnityEngine.Debug.LogWarning("improper JSON formatting:" + str);
+								Debug.LogWarning((object)("improper JSON formatting:" + str));
 							}
 							return;
 						}
@@ -892,7 +892,7 @@ namespace gogame
 			{
 				if (right.Count > left.Count)
 				{
-					UnityEngine.Debug.LogError("Cannot merge arrays when right object has more elements");
+					Debug.LogError((object)"Cannot merge arrays when right object has more elements");
 				}
 				else
 				{
@@ -968,7 +968,7 @@ namespace gogame
 			depth = (num = depth) + 1;
 			if (num > 100)
 			{
-				UnityEngine.Debug.Log("reached max depth!");
+				Debug.Log((object)"reached max depth!");
 			}
 			else
 			{
@@ -1272,7 +1272,7 @@ namespace gogame
 			}
 			else
 			{
-				UnityEngine.Debug.Log("reached max depth!");
+				Debug.Log((object)"reached max depth!");
 			}
 		}
 
@@ -1306,13 +1306,13 @@ namespace gogame
 						dictionary.Add(keys[i], jSONObject.b + string.Empty);
 						break;
 					default:
-						UnityEngine.Debug.LogWarning("Omitting object: " + keys[i] + " in dictionary conversion");
+						Debug.LogWarning((object)("Omitting object: " + keys[i] + " in dictionary conversion"));
 						break;
 					}
 				}
 				return dictionary;
 			}
-			UnityEngine.Debug.Log("Tried to turn non-Object JSONObject into a dictionary");
+			Debug.Log((object)"Tried to turn non-Object JSONObject into a dictionary");
 			return null;
 		}
 
@@ -1323,22 +1323,24 @@ namespace gogame
 
 		public static implicit operator WWWForm(JSONObject obj)
 		{
-			WWWForm wWWForm = new WWWForm();
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Expected O, but got Unknown
+			WWWForm val = new WWWForm();
 			for (int i = 0; i < obj.list.Count; i++)
 			{
-				string fieldName = i + string.Empty;
+				string text = i + string.Empty;
 				if (obj.type == Type.OBJECT)
 				{
-					fieldName = obj.keys[i];
+					text = obj.keys[i];
 				}
-				string text = obj.list[i].ToString();
+				string text2 = obj.list[i].ToString();
 				if (obj.list[i].type == Type.STRING)
 				{
-					text = text.Replace("\"", string.Empty);
+					text2 = text2.Replace("\"", string.Empty);
 				}
-				wWWForm.AddField(fieldName, text);
+				val.AddField(text, text2);
 			}
-			return wWWForm;
+			return val;
 		}
 
 		public static implicit operator bool(JSONObject o)

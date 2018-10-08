@@ -3,11 +3,16 @@ using UnityEngine;
 
 namespace gogame
 {
-	public class GoWrapComponent : MonoBehaviour, IGoWrap
+	public class GoWrapComponent : IGoWrap
 	{
+		public GoWrapComponent()
+			: this()
+		{
+		}
+
 		public void handleAdsCompletedWithReward(string message)
 		{
-			Debug.Log("handleAdsCompletedWithReward called.");
+			Debug.Log((object)"handleAdsCompletedWithReward called.");
 			JSONObject jSONObject = new JSONObject(message, -2, false, false);
 			jSONObject.GetField(out string field, "rewardId", "DEFAULT");
 			jSONObject.GetField(out int field2, "rewardQuantity", -1);
@@ -16,25 +21,25 @@ namespace gogame
 
 		public void handleMenuOpened(string message)
 		{
-			Debug.Log("handleMenuOpened called.");
+			Debug.Log((object)"handleMenuOpened called.");
 			GoWrap.INSTANCE.getDelegate().onMenuOpened();
 		}
 
 		public void handleMenuClosed(string message)
 		{
-			Debug.Log("handleMenuClosed called.");
+			Debug.Log((object)"handleMenuClosed called.");
 			GoWrap.INSTANCE.getDelegate().onMenuClosed();
 		}
 
 		public void handleOnCustomUrl(string message)
 		{
-			Debug.Log("handleOnCustomUrl called.");
+			Debug.Log((object)"handleOnCustomUrl called.");
 			GoWrap.INSTANCE.getDelegate().onCustomUrl(message);
 		}
 
 		public void handleOnOffersAvailable(string message)
 		{
-			Debug.Log("handleOnOffersAvailable called.");
+			Debug.Log((object)"handleOnOffersAvailable called.");
 			GoWrap.INSTANCE.getDelegate().onOffersAvailable();
 		}
 

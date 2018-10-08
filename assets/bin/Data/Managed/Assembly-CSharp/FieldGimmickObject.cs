@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class FieldGimmickObject : MonoBehaviour, IFieldGimmickObject
+public class FieldGimmickObject : IFieldGimmickObject
 {
 	protected int m_id;
 
@@ -16,21 +16,30 @@ public class FieldGimmickObject : MonoBehaviour, IFieldGimmickObject
 		protected set;
 	}
 
+	public FieldGimmickObject()
+		: this()
+	{
+	}
+
 	public static IFieldGimmickObject Create<T>(FieldMapTable.FieldGimmickPointTableData pointData, int layer, Transform parent) where T : MonoBehaviour
 	{
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 		if (pointData == null)
 		{
 			return null;
 		}
-		Transform transform = Utility.CreateGameObject("GimmickObject", parent, layer);
-		transform.position = new Vector3(pointData.pointX, 0f, pointData.pointZ);
-		transform.rotation = Quaternion.AngleAxis(pointData.pointDir, Vector3.up);
-		IFieldGimmickObject fieldGimmickObject = transform.gameObject.AddComponent<T>() as IFieldGimmickObject;
-		fieldGimmickObject.SetTransform(transform);
+		Transform val = Utility.CreateGameObject("GimmickObject", parent, layer);
+		val.set_position(new Vector3(pointData.pointX, 0f, pointData.pointZ));
+		val.set_rotation(Quaternion.AngleAxis(pointData.pointDir, Vector3.get_up()));
+		IFieldGimmickObject fieldGimmickObject = val.get_gameObject().AddComponent<T>() as IFieldGimmickObject;
+		fieldGimmickObject.SetTransform(val);
 		string objectName = fieldGimmickObject.GetObjectName();
 		if (!string.IsNullOrEmpty(objectName))
 		{
-			transform.name = objectName;
+			val.set_name(objectName);
 		}
 		return fieldGimmickObject;
 	}
@@ -98,7 +107,8 @@ public class FieldGimmickObject : MonoBehaviour, IFieldGimmickObject
 
 	public virtual void RequestDestroy()
 	{
-		Object.Destroy(base.gameObject);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		Object.Destroy(this.get_gameObject());
 	}
 
 	public virtual void OnNotify(object value)
@@ -136,10 +146,14 @@ public class FieldGimmickObject : MonoBehaviour, IFieldGimmickObject
 
 	protected virtual void Awake()
 	{
-		Utility.SetLayerWithChildren(base.transform, 19);
-		SphereCollider sphereCollider = base.gameObject.AddComponent<SphereCollider>();
-		sphereCollider.center = new Vector3(0f, 0f, 0f);
-		sphereCollider.radius = 1.5f;
-		sphereCollider.isTrigger = true;
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0008: Expected O, but got Unknown
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		Utility.SetLayerWithChildren(this.get_transform(), 19);
+		SphereCollider val = this.get_gameObject().AddComponent<SphereCollider>();
+		val.set_center(new Vector3(0f, 0f, 0f));
+		val.set_radius(1.5f);
+		val.set_isTrigger(true);
 	}
 }

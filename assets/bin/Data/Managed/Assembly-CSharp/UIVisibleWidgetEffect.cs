@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIVisibleWidgetEffect : MonoBehaviour
+public class UIVisibleWidgetEffect
 {
 	private UIPanel panel;
 
@@ -14,23 +14,29 @@ public class UIVisibleWidgetEffect : MonoBehaviour
 
 	private int setRendererQueue = -1;
 
+	public UIVisibleWidgetEffect()
+		: this()
+	{
+	}
+
 	public static void Set(UIPanel panel, UIWidget widget, string effect_name, string current_section_name)
 	{
-		if (!((Object)widget == (Object)null))
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		if (!(widget == null))
 		{
 			UIVisibleWidgetEffect uIVisibleWidgetEffect = widget.GetComponent<UIVisibleWidgetEffect>();
 			if (effect_name == null)
 			{
-				if ((Object)uIVisibleWidgetEffect != (Object)null)
+				if (uIVisibleWidgetEffect != null)
 				{
 					Object.Destroy(uIVisibleWidgetEffect);
 				}
 			}
 			else
 			{
-				if ((Object)uIVisibleWidgetEffect == (Object)null)
+				if (uIVisibleWidgetEffect == null)
 				{
-					uIVisibleWidgetEffect = widget.gameObject.AddComponent<UIVisibleWidgetEffect>();
+					uIVisibleWidgetEffect = widget.get_gameObject().AddComponent<UIVisibleWidgetEffect>();
 				}
 				uIVisibleWidgetEffect.panel = panel;
 				uIVisibleWidgetEffect.widget = widget;
@@ -54,14 +60,15 @@ public class UIVisibleWidgetEffect : MonoBehaviour
 
 	private void LateUpdate()
 	{
-		if (sectionName == MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() && (Object)MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection() != (Object)null && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection().state == UIBehaviour.STATE.OPEN && ((Object)panel == (Object)null || panel.IsVisible(widget.cachedTransform.position)))
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		if (sectionName == MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection() != null && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection().state == UIBehaviour.STATE.OPEN && (panel == null || panel.IsVisible(widget.cachedTransform.get_position())))
 		{
-			if ((Object)effect == (Object)null)
+			if (effect == null)
 			{
 				effect = EffectManager.GetUIEffect(effectName, widget.cachedTransform, 0f, 1, widget);
-				if ((Object)effect == (Object)null)
+				if (effect == null)
 				{
-					base.enabled = false;
+					this.set_enabled(false);
 				}
 				else
 				{
@@ -77,7 +84,7 @@ public class UIVisibleWidgetEffect : MonoBehaviour
 
 	private void DeleteEffect()
 	{
-		if ((Object)effect != (Object)null)
+		if (effect != null)
 		{
 			EffectManager.ReleaseEffect(ref effect);
 		}
@@ -90,13 +97,14 @@ public class UIVisibleWidgetEffect : MonoBehaviour
 
 	private void _SetRendererQueue()
 	{
-		if ((Object)effect != (Object)null && setRendererQueue != -1)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		if (effect != null && setRendererQueue != -1)
 		{
 			Renderer[] componentsInChildren = effect.GetComponentsInChildren<Renderer>(true);
 			Renderer[] array = componentsInChildren;
-			foreach (Renderer renderer in array)
+			foreach (Renderer val in array)
 			{
-				renderer.material.renderQueue = setRendererQueue;
+				val.get_material().set_renderQueue(setRendererQueue);
 			}
 		}
 	}

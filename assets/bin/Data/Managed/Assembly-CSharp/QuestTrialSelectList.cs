@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,8 +36,11 @@ public class QuestTrialSelectList : QuestEventSelectList
 
 	protected override bool showMap => false;
 
-	protected override void UpdateTable()
+	protected unsafe override void UpdateTable()
 	{
+		//IL_026a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026f: Expected O, but got Unknown
+		//IL_027b: Unknown result type (might be due to invalid IL or missing references)
 		int num = 0;
 		int count = stories.Count;
 		if (count > 0)
@@ -46,26 +50,26 @@ public class QuestTrialSelectList : QuestEventSelectList
 		List<ShowDeliveryData> list = new List<ShowDeliveryData>();
 		if (deliveryInfo != null)
 		{
-			for (int j = 0; j < deliveryInfo.Length; j++)
+			for (int i = 0; i < deliveryInfo.Length; i++)
 			{
-				ShowDeliveryData item = new ShowDeliveryData(j, false, deliveryInfo[j]);
+				ShowDeliveryData item = new ShowDeliveryData(i, false, deliveryInfo[i]);
 				list.Add(item);
 			}
 		}
 		if (clearedDeliveries != null)
 		{
-			for (int k = 0; k < clearedDeliveries.Count; k++)
+			for (int j = 0; j < clearedDeliveries.Count; j++)
 			{
-				ShowDeliveryData item2 = new ShowDeliveryData(k, true, clearedDeliveries[k]);
+				ShowDeliveryData item2 = new ShowDeliveryData(j, true, clearedDeliveries[j]);
 				list.Add(item2);
 			}
 		}
 		pageMax = 1 + (list.Count - 1) / 10;
 		bool flag = pageMax > 1;
-		SetActive(UI.OBJ_ACTIVE_ROOT, flag);
-		SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
-		SetLabelText(UI.LBL_MAX, pageMax.ToString());
-		SetLabelText(UI.LBL_NOW, nowPage.ToString());
+		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
+		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
+		SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
+		SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
 		ShowDeliveryData[] showList = GetPagingList(list.ToArray(), 10, nowPage);
 		int num2 = showList.Length;
 		if (showStory)
@@ -74,15 +78,15 @@ public class QuestTrialSelectList : QuestEventSelectList
 		}
 		if (num2 == 0)
 		{
-			SetActive(UI.STR_DELIVERY_NON_LIST, true);
-			SetActive(UI.GRD_DELIVERY_QUEST, false);
-			SetActive(UI.TBL_DELIVERY_QUEST, false);
+			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, true);
+			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
+			SetActive((Enum)UI.TBL_DELIVERY_QUEST, false);
 		}
 		else
 		{
-			SetActive(UI.STR_DELIVERY_NON_LIST, false);
-			SetActive(UI.GRD_DELIVERY_QUEST, false);
-			SetActive(UI.TBL_DELIVERY_QUEST, true);
+			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, false);
+			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
+			SetActive((Enum)UI.TBL_DELIVERY_QUEST, true);
 			bool flag2 = false;
 			if (ShouldShowEventMapButton())
 			{
@@ -101,68 +105,21 @@ public class QuestTrialSelectList : QuestEventSelectList
 				storyStartIndex++;
 			}
 			Transform ctrl = GetCtrl(UI.TBL_DELIVERY_QUEST);
-			if ((bool)ctrl)
+			if (Object.op_Implicit(ctrl))
 			{
-				int l = 0;
-				for (int childCount = ctrl.childCount; l < childCount; l++)
+				int k = 0;
+				for (int childCount = ctrl.get_childCount(); k < childCount; k++)
 				{
-					Transform child = ctrl.GetChild(0);
-					child.parent = null;
-					Object.Destroy(child.gameObject);
+					Transform val = ctrl.GetChild(0);
+					val.set_parent(null);
+					Object.Destroy(val.get_gameObject());
 				}
 			}
 			bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, isResetUI, delegate(int i, Transform parent)
-			{
-				Transform transform = null;
-				if (i >= storyStartIndex)
-				{
-					if (!HasChapterStory() || i == storyStartIndex || !isRenewalFlag)
-					{
-						return Realizes("QuestEventStoryItem", parent, true);
-					}
-					return null;
-				}
-				if (i < borderIndex)
-				{
-					if (i < questStartIndex)
-					{
-						if (!((Object)null != (Object)mapItem))
-						{
-							return Realizes("QuestEventBorderItem", parent, true);
-						}
-						return ResourceUtility.Realizes(mapItem.gameObject, parent, -1);
-					}
-					return Realizes("QuestRequestItemTrial", parent, true);
-				}
-				return Realizes("QuestEventBorderItem", parent, true);
-			}, delegate(int i, Transform t, bool is_recycle)
-			{
-				if (!((Object)t == (Object)null))
-				{
-					SetActive(t, true);
-					if (i >= storyStartIndex)
-					{
-						int storyIndex = i - storyStartIndex;
-						InitStory(storyIndex, t);
-					}
-					else if (i < borderIndex || i >= storyStartIndex)
-					{
-						if (i >= questStartIndex && i < borderIndex)
-						{
-							int num3 = i - questStartIndex;
-							InitDelivery(showList[num3], t);
-							ChangeDeliveryFrameSprite(t);
-						}
-						else if (i < questStartIndex)
-						{
-							InitMap(t);
-						}
-					}
-				}
-			});
-			UIScrollView component = GetComponent<UIScrollView>(UI.SCR_DELIVERY_QUEST);
-			component.enabled = true;
+			_003CUpdateTable_003Ec__AnonStorey409 _003CUpdateTable_003Ec__AnonStorey;
+			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, isResetUI, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
+			component.set_enabled(true);
 			RepositionTable();
 		}
 	}

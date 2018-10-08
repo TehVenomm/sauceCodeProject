@@ -1,6 +1,5 @@
 using rhyme;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class CoopNetworkPacketReceiver : PacketReceiver
 {
@@ -10,7 +9,7 @@ public class CoopNetworkPacketReceiver : PacketReceiver
 		for (int count = base.packets.Count; i < count; i++)
 		{
 			CoopPacket coopPacket = base.packets[i];
-			if (coopPacket.destObjectId != 1000 && !((Object)MonoBehaviourSingleton<CoopManager>.I.GetPacketReceiver(coopPacket) != (Object)null))
+			if (coopPacket.destObjectId != 1000 && !(MonoBehaviourSingleton<CoopManager>.I.GetPacketReceiver(coopPacket) != null))
 			{
 				AddDeleteQueue(coopPacket);
 			}
@@ -22,24 +21,24 @@ public class CoopNetworkPacketReceiver : PacketReceiver
 	{
 		if (!base.stopPacketUpdate)
 		{
-			List<CoopPacket> obj = rymTPool<List<CoopPacket>>.Get();
-			if (obj.Capacity < base.packets.Count)
+			List<CoopPacket> list = rymTPool<List<CoopPacket>>.Get();
+			if (list.Capacity < base.packets.Count)
 			{
-				obj.Capacity = base.packets.Count;
+				list.Capacity = base.packets.Count;
 			}
 			int i = 0;
 			for (int count = base.packets.Count; i < count; i++)
 			{
-				obj.Add(base.packets[i]);
+				list.Add(base.packets[i]);
 			}
 			int j = 0;
-			for (int count2 = obj.Count; j < count2; j++)
+			for (int count2 = list.Count; j < count2; j++)
 			{
 				if (base.stopPacketUpdate)
 				{
 					break;
 				}
-				CoopPacket coopPacket = obj[j];
+				CoopPacket coopPacket = list[j];
 				if (coopPacket.destObjectId == 1000)
 				{
 					if (HandleCoopEvent(coopPacket))
@@ -52,8 +51,8 @@ public class CoopNetworkPacketReceiver : PacketReceiver
 					AddDeleteQueue(coopPacket);
 				}
 			}
-			obj.Clear();
-			rymTPool<List<CoopPacket>>.Release(ref obj);
+			list.Clear();
+			rymTPool<List<CoopPacket>>.Release(ref list);
 			EraseUsedPacket();
 		}
 	}

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/UI/Tooltip")]
-public class UITooltip : MonoBehaviour
+public class UITooltip
 {
 	protected static UITooltip mInstance;
 
@@ -26,11 +26,18 @@ public class UITooltip : MonoBehaviour
 
 	protected Vector3 mPos;
 
-	protected Vector3 mSize = Vector3.zero;
+	protected Vector3 mSize = Vector3.get_zero();
 
 	protected UIWidget[] mWidgets;
 
-	public static bool isVisible => (UnityEngine.Object)mInstance != (UnityEngine.Object)null && mInstance.mTarget == 1f;
+	public static bool isVisible => mInstance != null && mInstance.mTarget == 1f;
+
+	public UITooltip()
+		: this()
+	{
+	}//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+
 
 	private void Awake()
 	{
@@ -44,19 +51,38 @@ public class UITooltip : MonoBehaviour
 
 	protected virtual void Start()
 	{
-		mTrans = base.transform;
-		mWidgets = GetComponentsInChildren<UIWidget>();
-		mPos = mTrans.localPosition;
-		if ((UnityEngine.Object)uiCamera == (UnityEngine.Object)null)
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Expected O, but got Unknown
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		mTrans = this.get_transform();
+		mWidgets = this.GetComponentsInChildren<UIWidget>();
+		mPos = mTrans.get_localPosition();
+		if (uiCamera == null)
 		{
-			uiCamera = NGUITools.FindCameraForLayer(base.gameObject.layer);
+			uiCamera = NGUITools.FindCameraForLayer(this.get_gameObject().get_layer());
 		}
 		SetAlpha(0f);
 	}
 
 	protected virtual void Update()
 	{
-		if ((UnityEngine.Object)mTooltip != (UnityEngine.Object)UICamera.tooltipObject)
+		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+		if (mTooltip != UICamera.tooltipObject)
 		{
 			mTooltip = null;
 			mTarget = 0f;
@@ -71,18 +97,21 @@ public class UITooltip : MonoBehaviour
 			SetAlpha(mCurrent * mCurrent);
 			if (scalingTransitions)
 			{
-				Vector3 b = mSize * 0.25f;
-				b.y = 0f - b.y;
-				Vector3 localScale = Vector3.one * (1.5f - mCurrent * 0.5f);
-				Vector3 localPosition = Vector3.Lerp(mPos - b, mPos, mCurrent);
-				mTrans.localPosition = localPosition;
-				mTrans.localScale = localScale;
+				Vector3 val = mSize * 0.25f;
+				val.y = 0f - val.y;
+				Vector3 localScale = Vector3.get_one() * (1.5f - mCurrent * 0.5f);
+				Vector3 localPosition = Vector3.Lerp(mPos - val, mPos, mCurrent);
+				mTrans.set_localPosition(localPosition);
+				mTrans.set_localScale(localScale);
 			}
 		}
 	}
 
 	protected virtual void SetAlpha(float val)
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int num = mWidgets.Length; i < num; i++)
 		{
@@ -95,19 +124,41 @@ public class UITooltip : MonoBehaviour
 
 	protected virtual void SetText(string tooltipText)
 	{
-		if ((UnityEngine.Object)text != (UnityEngine.Object)null && !string.IsNullOrEmpty(tooltipText))
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Expected O, but got Unknown
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0287: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_029d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e4: Unknown result type (might be due to invalid IL or missing references)
+		if (text != null && !string.IsNullOrEmpty(tooltipText))
 		{
 			mTarget = 1f;
 			mTooltip = UICamera.tooltipObject;
 			text.text = tooltipText;
-			mPos = UICamera.lastEventPosition;
-			Transform transform = text.transform;
-			Vector3 localPosition = transform.localPosition;
-			Vector3 localScale = transform.localScale;
-			mSize = text.printedSize;
+			mPos = Vector2.op_Implicit(UICamera.lastEventPosition);
+			Transform val = text.get_transform();
+			Vector3 localPosition = val.get_localPosition();
+			Vector3 localScale = val.get_localScale();
+			mSize = Vector2.op_Implicit(text.printedSize);
 			mSize.x *= localScale.x;
 			mSize.y *= localScale.y;
-			if ((UnityEngine.Object)background != (UnityEngine.Object)null)
+			if (background != null)
 			{
 				Vector4 border = background.border;
 				mSize.x += border.x + border.z + (localPosition.x - border.x) * 2f;
@@ -115,35 +166,36 @@ public class UITooltip : MonoBehaviour
 				background.width = Mathf.RoundToInt(mSize.x);
 				background.height = Mathf.RoundToInt(mSize.y);
 			}
-			if ((UnityEngine.Object)uiCamera != (UnityEngine.Object)null)
+			if (uiCamera != null)
 			{
-				mPos.x = Mathf.Clamp01(mPos.x / (float)Screen.width);
-				mPos.y = Mathf.Clamp01(mPos.y / (float)Screen.height);
-				float orthographicSize = uiCamera.orthographicSize;
-				Vector3 lossyScale = mTrans.parent.lossyScale;
+				mPos.x = Mathf.Clamp01(mPos.x / (float)Screen.get_width());
+				mPos.y = Mathf.Clamp01(mPos.y / (float)Screen.get_height());
+				float orthographicSize = uiCamera.get_orthographicSize();
+				Vector3 lossyScale = mTrans.get_parent().get_lossyScale();
 				float num = orthographicSize / lossyScale.y;
-				float num2 = (float)Screen.height * 0.5f / num;
-				Vector2 vector = new Vector2(num2 * mSize.x / (float)Screen.width, num2 * mSize.y / (float)Screen.height);
-				mPos.x = Mathf.Min(mPos.x, 1f - vector.x);
-				mPos.y = Mathf.Max(mPos.y, vector.y);
-				mTrans.position = uiCamera.ViewportToWorldPoint(mPos);
-				mPos = mTrans.localPosition;
+				float num2 = (float)Screen.get_height() * 0.5f / num;
+				Vector2 val2 = default(Vector2);
+				val2._002Ector(num2 * mSize.x / (float)Screen.get_width(), num2 * mSize.y / (float)Screen.get_height());
+				mPos.x = Mathf.Min(mPos.x, 1f - val2.x);
+				mPos.y = Mathf.Max(mPos.y, val2.y);
+				mTrans.set_position(uiCamera.ViewportToWorldPoint(mPos));
+				mPos = mTrans.get_localPosition();
 				mPos.x = Mathf.Round(mPos.x);
 				mPos.y = Mathf.Round(mPos.y);
-				mTrans.localPosition = mPos;
+				mTrans.set_localPosition(mPos);
 			}
 			else
 			{
-				if (mPos.x + mSize.x > (float)Screen.width)
+				if (mPos.x + mSize.x > (float)Screen.get_width())
 				{
-					mPos.x = (float)Screen.width - mSize.x;
+					mPos.x = (float)Screen.get_width() - mSize.x;
 				}
 				if (mPos.y - mSize.y < 0f)
 				{
 					mPos.y = mSize.y;
 				}
-				mPos.x -= (float)Screen.width * 0.5f;
-				mPos.y -= (float)Screen.height * 0.5f;
+				mPos.x -= (float)Screen.get_width() * 0.5f;
+				mPos.y -= (float)Screen.get_height() * 0.5f;
 			}
 		}
 		else
@@ -156,7 +208,7 @@ public class UITooltip : MonoBehaviour
 	[Obsolete("Use UITooltip.Show instead")]
 	public static void ShowText(string text)
 	{
-		if ((UnityEngine.Object)mInstance != (UnityEngine.Object)null)
+		if (mInstance != null)
 		{
 			mInstance.SetText(text);
 		}
@@ -164,7 +216,7 @@ public class UITooltip : MonoBehaviour
 
 	public static void Show(string text)
 	{
-		if ((UnityEngine.Object)mInstance != (UnityEngine.Object)null)
+		if (mInstance != null)
 		{
 			mInstance.SetText(text);
 		}
@@ -172,7 +224,7 @@ public class UITooltip : MonoBehaviour
 
 	public static void Hide()
 	{
-		if ((UnityEngine.Object)mInstance != (UnityEngine.Object)null)
+		if (mInstance != null)
 		{
 			mInstance.mTooltip = null;
 			mInstance.mTarget = 0f;

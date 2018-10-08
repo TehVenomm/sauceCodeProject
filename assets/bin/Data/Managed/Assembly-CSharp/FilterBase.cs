@@ -1,9 +1,14 @@
 using UnityEngine;
 
-public class FilterBase : MonoBehaviour
+public class FilterBase
 {
 	[SerializeField]
 	private RenderTargetCacher cacher;
+
+	public FilterBase()
+		: this()
+	{
+	}
 
 	public virtual void PostEffectProc(RenderTexture src, RenderTexture dest)
 	{

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GooglePlayGames.OurUtils
 {
-	public class PlayGamesHelperObject : MonoBehaviour
+	public class PlayGamesHelperObject
 	{
 		private static PlayGamesHelperObject instance = null;
 
@@ -21,15 +21,22 @@ namespace GooglePlayGames.OurUtils
 
 		private static List<Action<bool>> sFocusCallbackList = new List<Action<bool>>();
 
+		public PlayGamesHelperObject()
+			: this()
+		{
+		}
+
 		public static void CreateObject()
 		{
-			if (!((UnityEngine.Object)instance != (UnityEngine.Object)null))
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Expected O, but got Unknown
+			if (!(instance != null))
 			{
-				if (Application.isPlaying)
+				if (Application.get_isPlaying())
 				{
-					GameObject gameObject = new GameObject("PlayGames_QueueRunner");
-					UnityEngine.Object.DontDestroyOnLoad(gameObject);
-					instance = gameObject.AddComponent<PlayGamesHelperObject>();
+					GameObject val = new GameObject("PlayGames_QueueRunner");
+					Object.DontDestroyOnLoad(val);
+					instance = val.AddComponent<PlayGamesHelperObject>();
 				}
 				else
 				{
@@ -41,25 +48,26 @@ namespace GooglePlayGames.OurUtils
 
 		public void Awake()
 		{
-			UnityEngine.Object.DontDestroyOnLoad(base.gameObject);
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			Object.DontDestroyOnLoad(this.get_gameObject());
 		}
 
 		public void OnDisable()
 		{
-			if ((UnityEngine.Object)instance == (UnityEngine.Object)this)
+			if (instance == this)
 			{
 				instance = null;
 			}
 		}
 
-		public static void RunCoroutine(IEnumerator action)
+		public unsafe static void RunCoroutine(IEnumerator action)
 		{
-			if ((UnityEngine.Object)instance != (UnityEngine.Object)null)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Expected O, but got Unknown
+			if (instance != null)
 			{
-				RunOnGameThread(delegate
-				{
-					instance.StartCoroutine(action);
-				});
+				_003CRunCoroutine_003Ec__AnonStorey7D6 _003CRunCoroutine_003Ec__AnonStorey7D;
+				RunOnGameThread(new Action((object)_003CRunCoroutine_003Ec__AnonStorey7D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 
@@ -92,7 +100,7 @@ namespace GooglePlayGames.OurUtils
 				}
 				for (int i = 0; i < localQueue.Count; i++)
 				{
-					localQueue[i]();
+					localQueue[i].Invoke();
 				}
 			}
 		}
@@ -107,7 +115,7 @@ namespace GooglePlayGames.OurUtils
 				}
 				catch (Exception ex)
 				{
-					Debug.LogError("Exception in OnApplicationFocus:" + ex.Message + "\n" + ex.StackTrace);
+					Debug.LogError((object)("Exception in OnApplicationFocus:" + ex.Message + "\n" + ex.StackTrace));
 				}
 			}
 		}
@@ -122,7 +130,7 @@ namespace GooglePlayGames.OurUtils
 				}
 				catch (Exception ex)
 				{
-					Debug.LogError("Exception in OnApplicationPause:" + ex.Message + "\n" + ex.StackTrace);
+					Debug.LogError((object)("Exception in OnApplicationPause:" + ex.Message + "\n" + ex.StackTrace));
 				}
 			}
 		}

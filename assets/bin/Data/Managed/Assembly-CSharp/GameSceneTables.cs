@@ -204,9 +204,10 @@ public class GameSceneTables
 
 	public SceneData CreateSceneData(string scene_name, TextAsset text_asset)
 	{
+		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
 		try
 		{
-			CSVReader cSVReader = new CSVReader(text_asset.text, "name,type,useRes,loadRes,appVer,evName,evTo,retBtn,strKey,strJP", true);
+			CSVReader cSVReader = new CSVReader(text_asset.get_text(), "name,type,useRes,loadRes,appVer,evName,evTo,retBtn,strKey,strJP", true);
 			SceneData sceneData = new SceneData();
 			sceneData.sceneName = scene_name;
 			SectionData sectionData = null;
@@ -347,7 +348,7 @@ public class GameSceneTables
 
 	public void CreateCommonResourceTable(TextAsset text_asset)
 	{
-		CSVReader cSVReader = new CSVReader(text_asset.text, "name,useRes", true);
+		CSVReader cSVReader = new CSVReader(text_asset.get_text(), "name,useRes", true);
 		while (cSVReader.NextLine())
 		{
 			string value = string.Empty;

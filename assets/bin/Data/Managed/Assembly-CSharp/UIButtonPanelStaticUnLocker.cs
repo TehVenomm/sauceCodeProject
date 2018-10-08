@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(UIButton))]
-public class UIButtonPanelStaticUnLocker : MonoBehaviour
+public class UIButtonPanelStaticUnLocker
 {
 	[SerializeField]
 	protected UIStaticPanelChanger panelChange;
@@ -12,9 +12,14 @@ public class UIButtonPanelStaticUnLocker : MonoBehaviour
 
 	private float timer;
 
+	public UIButtonPanelStaticUnLocker()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
-		btn = GetComponent<UIButton>();
+		btn = this.GetComponent<UIButton>();
 	}
 
 	private void OnPress(bool pressed)
@@ -31,7 +36,7 @@ public class UIButtonPanelStaticUnLocker : MonoBehaviour
 	{
 		if (isLock)
 		{
-			timer -= Time.deltaTime;
+			timer -= Time.get_deltaTime();
 			if (!(timer > 0f))
 			{
 				panelChange.Lock();

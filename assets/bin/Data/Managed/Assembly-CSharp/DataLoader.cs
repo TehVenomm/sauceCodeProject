@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using UnityEngine;
 
-public class DataLoader : MonoBehaviour
+public class DataLoader
 {
 	private const int DL_MAX = 5;
 
@@ -16,6 +16,11 @@ public class DataLoader : MonoBehaviour
 	private MultiThreadTaskRunner taskRunner;
 
 	private int downloadCount;
+
+	public DataLoader()
+		: this()
+	{
+	}
 
 	private void Awake()
 	{
@@ -48,7 +53,8 @@ public class DataLoader : MonoBehaviour
 
 	public void Request(DataLoadRequest req)
 	{
-		StartCoroutine(Load(req, req.downloadOnly, false, false));
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(Load(req, req.downloadOnly, false, false));
 	}
 
 	public void Request(List<DataLoadRequest> reqs)
@@ -57,13 +63,15 @@ public class DataLoader : MonoBehaviour
 		requestList.AddRange(reqs);
 		reqs.ForEach(delegate(DataLoadRequest o)
 		{
-			StartCoroutine(Load(o, o.downloadOnly, true, false));
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			this.StartCoroutine(Load(o, o.downloadOnly, true, false));
 		});
 	}
 
 	public void RequestManifest(DataLoadRequest req)
 	{
-		StartCoroutine(Load(req, req.downloadOnly, false, true));
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(Load(req, req.downloadOnly, false, true));
 	}
 
 	private void RemoveQueue(DataLoadRequest req)
@@ -91,10 +99,10 @@ public class DataLoader : MonoBehaviour
 		{
 			IEnumerator download = Download(req, delegate(byte[] b)
 			{
-				((_003CLoad_003Ec__Iterator26F)/*Error near IL_00f7: stateMachine*/)._003Cbytes_003E__3 = b;
+				((_003CLoad_003Ec__Iterator276)/*Error near IL_00f7: stateMachine*/)._003Cbytes_003E__3 = b;
 			}, delegate(DataTableLoadError e)
 			{
-				((_003CLoad_003Ec__Iterator26F)/*Error near IL_0103: stateMachine*/)._003Cerror_003E__2 = e;
+				((_003CLoad_003Ec__Iterator276)/*Error near IL_0103: stateMachine*/)._003Cerror_003E__2 = e;
 			});
 			while (download.MoveNext())
 			{
@@ -125,18 +133,18 @@ public class DataLoader : MonoBehaviour
 			{
 				try
 				{
-					if (((_003CLoad_003Ec__Iterator26F)/*Error near IL_01cc: stateMachine*/)._003Cbytes_003E__3 != null)
+					if (((_003CLoad_003Ec__Iterator276)/*Error near IL_01cc: stateMachine*/)._003Cbytes_003E__3 != null)
 					{
-						((_003CLoad_003Ec__Iterator26F)/*Error near IL_01cc: stateMachine*/)._003Cerror_003E__2 = ((_003CLoad_003Ec__Iterator26F)/*Error near IL_01cc: stateMachine*/)._003C_003Ef__this.Save(((_003CLoad_003Ec__Iterator26F)/*Error near IL_01cc: stateMachine*/).req, ((_003CLoad_003Ec__Iterator26F)/*Error near IL_01cc: stateMachine*/)._003Cbytes_003E__3);
+						((_003CLoad_003Ec__Iterator276)/*Error near IL_01cc: stateMachine*/)._003Cerror_003E__2 = ((_003CLoad_003Ec__Iterator276)/*Error near IL_01cc: stateMachine*/)._003C_003Ef__this.Save(((_003CLoad_003Ec__Iterator276)/*Error near IL_01cc: stateMachine*/).req, ((_003CLoad_003Ec__Iterator276)/*Error near IL_01cc: stateMachine*/)._003Cbytes_003E__3);
 					}
 				}
 				catch (Exception)
 				{
-					((_003CLoad_003Ec__Iterator26F)/*Error near IL_01cc: stateMachine*/)._003Cerror_003E__2 = DataTableLoadError.FileReadError;
+					((_003CLoad_003Ec__Iterator276)/*Error near IL_01cc: stateMachine*/)._003Cerror_003E__2 = DataTableLoadError.FileReadError;
 				}
 				finally
 				{
-					((_003CLoad_003Ec__Iterator26F)/*Error near IL_01cc: stateMachine*/)._003Cwait_003E__6 = false;
+					((_003CLoad_003Ec__Iterator276)/*Error near IL_01cc: stateMachine*/)._003Cwait_003E__6 = false;
 				}
 			});
 			while (wait)
@@ -164,7 +172,7 @@ public class DataLoader : MonoBehaviour
 			{
 				loading = LoadCompressedBinary(req, bytes, delegate(DataTableLoadError e)
 				{
-					((_003CLoad_003Ec__Iterator26F)/*Error near IL_027b: stateMachine*/)._003Cerror_003E__2 = e;
+					((_003CLoad_003Ec__Iterator276)/*Error near IL_027b: stateMachine*/)._003Cerror_003E__2 = e;
 				}, useQueue);
 				while (loading.MoveNext())
 				{
@@ -185,7 +193,7 @@ public class DataLoader : MonoBehaviour
 			{
 				loading = LoadCompressedTextWithSignature(req, bytes, delegate(DataTableLoadError e)
 				{
-					((_003CLoad_003Ec__Iterator26F)/*Error near IL_0330: stateMachine*/)._003Cerror_003E__2 = e;
+					((_003CLoad_003Ec__Iterator276)/*Error near IL_0330: stateMachine*/)._003Cerror_003E__2 = e;
 				}, useQueue);
 			}
 			while (loading.MoveNext())
@@ -208,47 +216,11 @@ public class DataLoader : MonoBehaviour
 		}
 	}
 
-	private IEnumerator LoadCompressedTextWithSignature(DataLoadRequest req, byte[] bytes, Action<DataTableLoadError> onEnd, bool useQueue)
+	private unsafe IEnumerator LoadCompressedTextWithSignature(DataLoadRequest req, byte[] bytes, Action<DataTableLoadError> onEnd, bool useQueue)
 	{
 		bool wait = true;
 		DataTableLoadError error = DataTableLoadError.None;
-		Action act = delegate
-		{
-			try
-			{
-				if (((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/).bytes != null)
-				{
-					((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/)._003Cerror_003E__1 = ((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/)._003C_003Ef__this.Save(((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/).req, ((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/).bytes);
-				}
-				else
-				{
-					((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/).bytes = ((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/)._003C_003Ef__this.cache.Load(((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/).req);
-				}
-				if (((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/).bytes != null)
-				{
-					if (((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/)._003C_003Ef__this.Verify(((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/).req, ((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/).bytes))
-					{
-						((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/)._003Cerror_003E__1 = ((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/)._003C_003Ef__this.ProcessCompressedText(((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/).req, ((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/).bytes);
-					}
-					else
-					{
-						((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/)._003Cerror_003E__1 = DataTableLoadError.VerifyError;
-					}
-				}
-				else
-				{
-					((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/)._003Cerror_003E__1 = DataTableLoadError.FileReadError;
-				}
-			}
-			catch (Exception)
-			{
-				((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/)._003Cerror_003E__1 = DataTableLoadError.FileReadError;
-			}
-			finally
-			{
-				((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0030: stateMachine*/)._003Cwait_003E__0 = false;
-			}
-		};
+		Action act = new Action((object)/*Error near IL_0030: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		if (useQueue)
 		{
 			taskRunner.Add(req.name, act);
@@ -257,7 +229,7 @@ public class DataLoader : MonoBehaviour
 		{
 			ThreadPoolWrapper.QueueUserWorkItem(delegate
 			{
-				((_003CLoadCompressedTextWithSignature_003Ec__Iterator270)/*Error near IL_0072: stateMachine*/)._003Cact_003E__2();
+				((_003CLoadCompressedTextWithSignature_003Ec__Iterator277)/*Error near IL_0072: stateMachine*/)._003Cact_003E__2.Invoke();
 			});
 		}
 		while (wait)
@@ -267,47 +239,11 @@ public class DataLoader : MonoBehaviour
 		onEnd(error);
 	}
 
-	private IEnumerator LoadCompressedBinary(DataLoadRequest req, byte[] bytes, Action<DataTableLoadError> onEnd, bool useQueue)
+	private unsafe IEnumerator LoadCompressedBinary(DataLoadRequest req, byte[] bytes, Action<DataTableLoadError> onEnd, bool useQueue)
 	{
 		bool wait = true;
 		DataTableLoadError error = DataTableLoadError.None;
-		Action act = delegate
-		{
-			try
-			{
-				if (((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/).bytes != null)
-				{
-					((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/)._003Cerror_003E__1 = ((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/)._003C_003Ef__this.Save(((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/).req, ((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/).bytes);
-				}
-				else
-				{
-					((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/).bytes = ((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/)._003C_003Ef__this.cache.Load(((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/).req);
-				}
-				if (((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/).bytes != null)
-				{
-					if (((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/)._003C_003Ef__this.Verify(((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/).req, ((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/).bytes))
-					{
-						((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/)._003Cerror_003E__1 = ((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/)._003C_003Ef__this.ProcessCompressedBinary(((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/).req, ((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/).bytes);
-					}
-					else
-					{
-						((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/)._003Cerror_003E__1 = DataTableLoadError.VerifyError;
-					}
-				}
-				else
-				{
-					((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/)._003Cerror_003E__1 = DataTableLoadError.FileReadError;
-				}
-			}
-			catch (Exception)
-			{
-				((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/)._003Cerror_003E__1 = DataTableLoadError.FileReadError;
-			}
-			finally
-			{
-				((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0030: stateMachine*/)._003Cwait_003E__0 = false;
-			}
-		};
+		Action act = new Action((object)/*Error near IL_0030: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		if (useQueue)
 		{
 			taskRunner.Add(req.name, act);
@@ -316,7 +252,7 @@ public class DataLoader : MonoBehaviour
 		{
 			ThreadPoolWrapper.QueueUserWorkItem(delegate
 			{
-				((_003CLoadCompressedBinary_003Ec__Iterator271)/*Error near IL_0072: stateMachine*/)._003Cact_003E__2();
+				((_003CLoadCompressedBinary_003Ec__Iterator278)/*Error near IL_0072: stateMachine*/)._003Cact_003E__2.Invoke();
 			});
 		}
 		while (wait)
@@ -408,13 +344,13 @@ public class DataLoader : MonoBehaviour
 		WWW www = new WWW(host + req.path);
 		float progress = 0f;
 		float timeOut = 15f;
-		while (!www.isDone)
+		while (!www.get_isDone())
 		{
 			yield return (object)null;
-			timeOut -= Time.unscaledDeltaTime;
-			if (www.progress != progress)
+			timeOut -= Time.get_unscaledDeltaTime();
+			if (www.get_progress() != progress)
 			{
-				progress = www.progress;
+				progress = www.get_progress();
 				timeOut = 15f;
 			}
 			if (timeOut < 0f)
@@ -425,9 +361,9 @@ public class DataLoader : MonoBehaviour
 				yield break;
 			}
 		}
-		if (!string.IsNullOrEmpty(www.error))
+		if (!string.IsNullOrEmpty(www.get_error()))
 		{
-			if (www.error.Contains("404"))
+			if (www.get_error().Contains("404"))
 			{
 				onError(DataTableLoadError.AssetNotFoundError);
 			}
@@ -440,7 +376,7 @@ public class DataLoader : MonoBehaviour
 		}
 		else
 		{
-			byte[] bytes = www.bytes;
+			byte[] bytes = www.get_bytes();
 			www.Dispose();
 			downloadCount--;
 			onComplete(bytes);

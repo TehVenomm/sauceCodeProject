@@ -1,3 +1,5 @@
+using System;
+
 public class HomeNPCTalk : GameSection
 {
 	private enum UI
@@ -19,6 +21,6 @@ public class HomeNPCTalk : GameSection
 
 	public override void UpdateUI()
 	{
-		SetFullScreenButton(UI.BTN_BACK);
+		SetFullScreenButton((Enum)UI.BTN_BACK);
 	}
 }

@@ -28,7 +28,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 	{
 		base.UpdateUI();
 		SetVisibleEmptySkillType(isVisibleEmptySkill, slotIndex);
-		if ((UnityEngine.Object)detailBase != (UnityEngine.Object)null)
+		if (detailBase != null)
 		{
 			SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, false);
 		}
@@ -64,7 +64,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 		return new ItemStorageTop.SkillItemInventory(SortSettings.SETTINGS_TYPE.SKILL_ITEM, equipItem.tableData.GetSkillSlot(equipItem.exceed)[slotIndex].slotType, false);
 	}
 
-	protected override void UpdateInventoryUI()
+	protected unsafe override void UpdateInventoryUI()
 	{
 		int find_index = -1;
 		if (equipSkillItem != null)
@@ -78,73 +78,8 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 		SetupEnableInventoryUI();
 		m_generatedIconList.Clear();
 		UpdateNewIconInfo();
-		SetDynamicList(inventoryUI, null, inventory.datas.Length + 2, false, delegate(int i)
-		{
-			if (i == 0)
-			{
-				return !isVisibleEmptySkill && find_index >= 0;
-			}
-			bool flag = false;
-			bool flag2 = true;
-			int num2 = i - 1;
-			if (find_index >= 0)
-			{
-				if (num2 == 0)
-				{
-					flag = true;
-				}
-				else
-				{
-					num2--;
-				}
-			}
-			if (!flag && (num2 >= inventory.datas.Length || (find_index >= 0 && num2 == find_index)))
-			{
-				flag2 = false;
-			}
-			if (flag2)
-			{
-				SortCompareData sortCompareData2 = inventory.datas[num2];
-				if (sortCompareData2 == null || !sortCompareData2.IsPriority(inventory.sortSettings.orderTypeAsc))
-				{
-					flag2 = false;
-				}
-			}
-			return flag2;
-		}, null, delegate(int i, Transform t, bool is_recycle)
-		{
-			if (i == 0)
-			{
-				if (!isVisibleEmptySkill)
-				{
-					CreateRemoveIcon(t, "SELECT", -1, 100, selectIndex == -1, base.sectionData.GetText("STR_DETACH"));
-				}
-			}
-			else
-			{
-				int num = i - 1;
-				if (find_index >= 0)
-				{
-					num = ((num != 0) ? (num - 1) : find_index);
-				}
-				SetActive(t, true);
-				SortCompareData sortCompareData = inventory.datas[num];
-				SkillItemInfo skillItemInfo = sortCompareData.GetItemData() as SkillItemInfo;
-				ITEM_ICON_TYPE iconType = sortCompareData.GetIconType();
-				bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, sortCompareData.GetUniqID());
-				ItemIcon itemIcon = CreateItemIconDetail(iconType, sortCompareData.GetIconID(), sortCompareData.GetRarity(), sortCompareData as SkillItemSortData, base.IsShowMainStatus, t, "SELECT", num, is_new, 100, selectIndex == num, skillItemInfo.IsCurrentEquipSetAttached, sortCompareData.IsExceeded(), false);
-				itemIcon.SetItemID(sortCompareData.GetTableID());
-				SetLongTouch(itemIcon.transform, "DETAIL", num);
-				if ((UnityEngine.Object)itemIcon != (UnityEngine.Object)null && sortCompareData != null)
-				{
-					itemIcon.SetInitData(sortCompareData);
-				}
-				if (!m_generatedIconList.Contains(itemIcon))
-				{
-					m_generatedIconList.Add(itemIcon);
-				}
-			}
-		});
+		_003CUpdateInventoryUI_003Ec__AnonStorey3CF _003CUpdateInventoryUI_003Ec__AnonStorey3CF;
+		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length + 2, false, new Func<int, bool>((object)_003CUpdateInventoryUI_003Ec__AnonStorey3CF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateInventoryUI_003Ec__AnonStorey3CF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override int GetInventoryFirstIndex()
@@ -250,29 +185,23 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 		return true;
 	}
 
-	private void ToNotEnableSkillTypeConfirm()
+	private unsafe void ToNotEnableSkillTypeConfirm()
 	{
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Expected O, but got Unknown
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		if (is_not_enable_skill_type)
 		{
 			is_not_enable_skill_type = false;
 			GameSection.ChangeEvent("COME_BACK", null);
-			Action action = delegate
+			Action val = new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentScreenName().Contains(this.get_name()))
 			{
-				SortCompareData sortCompareData = inventory.datas[selectIndex];
-				SkillItemInfo skillItemInfo = sortCompareData.GetItemData() as SkillItemInfo;
-				EQUIPMENT_TYPE? enableEquipType = skillItemInfo.tableData.GetEnableEquipType();
-				DispatchEvent("NOT_SKILL_ENABLE_TYPE", new object[1]
-				{
-					MonoBehaviourSingleton<StatusManager>.I.GetEquipItemGroupString(enableEquipType.Value)
-				});
-			};
-			if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentScreenName().Contains(base.name))
-			{
-				action();
+				val.Invoke();
 			}
 			else
 			{
-				StartCoroutine(DelayCall(action));
+				this.StartCoroutine(DelayCall(val));
 			}
 		}
 	}
@@ -283,7 +212,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 		{
 			yield return (object)null;
 		}
-		call();
+		call.Invoke();
 	}
 
 	private void OnQuery_ItemDetailSkillReplaceConfirm_YES()

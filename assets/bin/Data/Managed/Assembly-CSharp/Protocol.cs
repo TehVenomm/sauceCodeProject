@@ -58,7 +58,7 @@ public class Protocol
 			isTry = false;
 			return false;
 		}
-		send_callback();
+		send_callback.Invoke();
 		isTry = false;
 		return true;
 	}
@@ -66,7 +66,7 @@ public class Protocol
 	public static void Force(Action send_callback)
 	{
 		isForce = true;
-		send_callback();
+		send_callback.Invoke();
 		isForce = false;
 	}
 
@@ -76,12 +76,12 @@ public class Protocol
 		Send(url, call_back, get_param, token);
 	}
 
-	private static void Send<T>(string url, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
+	private unsafe static void Send<T>(string url, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		Action send = delegate
-		{
-			Protocol.Send<T>(url, call_back, get_param, token);
-		};
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Expected O, but got Unknown
+		_003CSend_003Ec__AnonStorey6E7<T> _003CSend_003Ec__AnonStorey6E;
+		Action send = new Action((object)_003CSend_003Ec__AnonStorey6E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		if (Begin(url, send))
 		{
 			MonoBehaviourSingleton<NetworkManager>.I.Request(CheckURL(url), delegate(T ret)
@@ -100,12 +100,12 @@ public class Protocol
 		Send(url, post_data, call_back, get_param, token);
 	}
 
-	private static void Send<T1, T2>(string url, T1 post_data, Action<T2> call_back, string get_param = "", string token = "") where T2 : BaseModel, new()
+	private unsafe static void Send<T1, T2>(string url, T1 post_data, Action<T2> call_back, string get_param = "", string token = "") where T2 : BaseModel, new()
 	{
-		Action send = delegate
-		{
-			Protocol.Send<T1, T2>(url, post_data, call_back, get_param, token);
-		};
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Expected O, but got Unknown
+		_003CSend_003Ec__AnonStorey6E8<T1, T2> _003CSend_003Ec__AnonStorey6E;
+		Action send = new Action((object)_003CSend_003Ec__AnonStorey6E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		if (Begin(url, send))
 		{
 			MonoBehaviourSingleton<NetworkManager>.I.Request(CheckURL(url), post_data, delegate(T2 ret)
@@ -124,12 +124,12 @@ public class Protocol
 		Send(url, form, call_back, get_param, token);
 	}
 
-	private static void Send<T>(string url, WWWForm form, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
+	private unsafe static void Send<T>(string url, WWWForm form, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		Action send = delegate
-		{
-			Protocol.Send<T>(url, form, call_back, get_param, token);
-		};
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Expected O, but got Unknown
+		_003CSend_003Ec__AnonStorey6E9<T> _003CSend_003Ec__AnonStorey6E;
+		Action send = new Action((object)_003CSend_003Ec__AnonStorey6E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		if (Begin(url, send))
 		{
 			MonoBehaviourSingleton<NetworkManager>.I.RequestForm(CheckURL(url), form, delegate(T ret)
@@ -199,7 +199,7 @@ public class Protocol
 		}
 	}
 
-	private static bool End<T>(T ret, Action<T> call_back, Action retry_action) where T : BaseModel
+	private unsafe static bool End<T>(T ret, Action<T> call_back, Action retry_action) where T : BaseModel
 	{
 		SetBusy(-1);
 		int code = ret.error;
@@ -282,15 +282,20 @@ public class Protocol
 				GameSceneEvent.PushStay();
 				MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, errorMessage2, null, null, null, null), delegate
 				{
+					//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0062: Expected O, but got Unknown
 					GameSceneEvent.PopStay();
 					call_back(ret);
 					if (code == 74001 || code == 74002)
 					{
-						Debug.Log("kciked");
-						MonoBehaviourSingleton<AppMain>.I.ChangeScene(string.Empty, "HomeTop", delegate
+						Debug.Log((object)"kciked");
+						AppMain i = MonoBehaviourSingleton<AppMain>.I;
+						string empty = string.Empty;
+						if (_003CEnd_003Ec__AnonStorey6EA<T>._003C_003Ef__am_0024cache4 == null)
 						{
-							MonoBehaviourSingleton<GuildManager>.I.UpdateGuild(null);
-						});
+							_003CEnd_003Ec__AnonStorey6EA<T>._003C_003Ef__am_0024cache4 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+						}
+						i.ChangeScene(empty, "HomeTop", _003CEnd_003Ec__AnonStorey6EA<T>._003C_003Ef__am_0024cache4);
 					}
 				}, true, code);
 			}
@@ -318,7 +323,7 @@ public class Protocol
 					{
 						if (btn == "YES")
 						{
-							retry_action();
+							retry_action.Invoke();
 						}
 						else
 						{
@@ -365,7 +370,7 @@ public class Protocol
 				GameSceneEvent.PopStay();
 				if (btn == "YES")
 				{
-					retry_action();
+					retry_action.Invoke();
 				}
 				else
 				{
@@ -380,7 +385,7 @@ public class Protocol
 				GameSceneEvent.PopStay();
 				if (btn == "YES")
 				{
-					retry_action();
+					retry_action.Invoke();
 				}
 				else
 				{
@@ -406,7 +411,7 @@ public class Protocol
 		}, true, ret.error);
 	}
 
-	public static string GenerateToken()
+	public unsafe static string GenerateToken()
 	{
 		string str = DateTime.Now.ToString("yyyyMMddhhmmssfff");
 		if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
@@ -416,9 +421,13 @@ public class Protocol
 			{
 				text += str;
 				byte[] bytes = Encoding.UTF8.GetBytes(text);
-				byte[] source = MD5.Create().ComputeHash(bytes);
-				return string.Concat((from i in source
-				select i.ToString("x2")).ToArray());
+				byte[] array = MD5.Create().ComputeHash(bytes);
+				byte[] source = array;
+				if (_003C_003Ef__am_0024cache4 == null)
+				{
+					_003C_003Ef__am_0024cache4 = new Func<byte, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				return string.Concat(source.Select<byte, string>(_003C_003Ef__am_0024cache4).ToArray());
 			}
 		}
 		return Guid.NewGuid().ToString("N");

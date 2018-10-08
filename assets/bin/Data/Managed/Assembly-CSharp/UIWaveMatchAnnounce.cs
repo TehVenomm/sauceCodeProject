@@ -68,9 +68,9 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 	{
 		wmInfo = info;
 		isEvent = QuestManager.IsValidInGameWaveMatch(true);
-		CutInAnim[0].enabled = false;
+		CutInAnim[0].set_enabled(false);
 		CutInAnim[0].ResetToBeginning();
-		CutInAnim[1].enabled = false;
+		CutInAnim[1].set_enabled(false);
 		CutInAnim[1].ResetToBeginning();
 		if (wmInfo.popGuardSec <= 0)
 		{
@@ -116,7 +116,7 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 
 	private void UpdateAnnounce()
 	{
-		countSec -= Time.deltaTime;
+		countSec -= Time.get_deltaTime();
 		int num = Mathf.FloorToInt(countSec);
 		if (lastInteger != num)
 		{
@@ -138,7 +138,7 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 
 	private void UpdateCountDown()
 	{
-		countSec -= Time.deltaTime;
+		countSec -= Time.get_deltaTime();
 		int num = Mathf.FloorToInt(countSec);
 		if (lastInteger != num)
 		{
@@ -161,9 +161,9 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 		}
 		SoundManager.PlayOneshotJingle(wmSetting.waveJingleId, null, null);
 		panelChange.UnLock();
-		CutInAnim[0].enabled = true;
+		CutInAnim[0].set_enabled(true);
 		CutInAnim[0].PlayForward();
-		CutInAnim[1].enabled = true;
+		CutInAnim[1].set_enabled(true);
 		CutInAnim[1].PlayForward();
 		if (!flag)
 		{
@@ -178,7 +178,7 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 		{
 			MonoBehaviourSingleton<UIQuestInfoWaveMatch>.I.SetWaveNow(wmInfo.no, wmInfo.finalNo, flag);
 		}
-		if (isEvent && MonoBehaviourSingleton<StageObjectManager>.IsValid() && (Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (Object)null)
+		if (isEvent && MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
 		{
 			MonoBehaviourSingleton<StageObjectManager>.I.self.CheckWaveMatchAutoRevive();
 		}
@@ -187,7 +187,7 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 
 	private void UpdateCutIn()
 	{
-		countSec -= Time.deltaTime;
+		countSec -= Time.get_deltaTime();
 		if (countSec <= 0f)
 		{
 			CutInFinalObj.SetActive(false);

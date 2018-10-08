@@ -23,14 +23,17 @@ public class Goal_Stop : Goal
 
 	protected override void Activate(Brain brain)
 	{
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		SetStatus(STATUS.ACTIVE);
 		brain.moveCtrl.StopOn();
-		stopPos = brain.owner._transform.position;
+		stopPos = brain.owner._transform.get_position();
 	}
 
 	protected override STATUS Process(Brain brain)
 	{
-		double num = (double)AIUtility.GetLengthWithBetweenPosition(brain.owner._transform.position, stopPos);
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		double num = (double)AIUtility.GetLengthWithBetweenPosition(brain.owner._transform.get_position(), stopPos);
 		if (num > giveupLen)
 		{
 			SetStatus(STATUS.COMPLETED);

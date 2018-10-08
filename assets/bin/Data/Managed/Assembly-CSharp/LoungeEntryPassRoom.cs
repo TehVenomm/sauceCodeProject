@@ -1,4 +1,5 @@
 using Network;
+using System;
 
 public class LoungeEntryPassRoom : QuestEntryPassRoom
 {
@@ -12,29 +13,15 @@ public class LoungeEntryPassRoom : QuestEntryPassRoom
 		STR_NON_SETTINGS
 	}
 
-	private void OnQuery_LOUNGE()
+	private unsafe void OnQuery_LOUNGE()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendApply(string.Join(string.Empty, passCode), delegate(bool is_apply, Error ret_code)
+		LoungeMatchingManager i = MonoBehaviourSingleton<LoungeMatchingManager>.I;
+		string loungeNumber = string.Join(string.Empty, passCode);
+		if (_003C_003Ef__am_0024cache0 == null)
 		{
-			if (is_apply && !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(MonoBehaviourSingleton<PartyManager>.I.GetQuestId(), true))
-			{
-				Protocol.Force(delegate
-				{
-					MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate
-					{
-					});
-				});
-			}
-			else if (ret_code == Error.WRN_PARTY_SEARCH_NOT_FOUND_PARTY || ret_code == Error.WRN_PARTY_OWNER_REJOIN)
-			{
-				GameSection.ChangeStayEvent("NOT_FOUND_PARTY", null);
-				GameSection.ResumeEvent(true, null);
-			}
-			else
-			{
-				GameSection.ResumeEvent(is_apply, null);
-			}
-		});
+			_003C_003Ef__am_0024cache0 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		i.SendApply(loungeNumber, _003C_003Ef__am_0024cache0);
 	}
 }

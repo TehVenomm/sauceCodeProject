@@ -437,31 +437,31 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 			}
 		}
 		GrowEquipItemData growEquipItemData2 = new GrowEquipItemData();
-		float t = (float)(double)(lv - (uint)under.lv) / (float)(double)((uint)over.lv - (uint)under.lv);
+		float num = (float)(double)(lv - (uint)under.lv) / (float)(double)((uint)over.lv - (uint)under.lv);
 		growEquipItemData2.id = id;
 		growEquipItemData2.lv = lv;
 		growEquipItemData2.atk = new GrowRate();
-		growEquipItemData2.atk.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.atk.rate, (float)(int)over.atk.rate, t));
-		growEquipItemData2.atk.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.atk.add, (float)(int)over.atk.add, t));
+		growEquipItemData2.atk.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.atk.rate, (float)(int)over.atk.rate, num));
+		growEquipItemData2.atk.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.atk.add, (float)(int)over.atk.add, num));
 		growEquipItemData2.def = new GrowRate();
-		growEquipItemData2.def.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.def.rate, (float)(int)over.def.rate, t));
-		growEquipItemData2.def.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.def.add, (float)(int)over.def.add, t));
+		growEquipItemData2.def.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.def.rate, (float)(int)over.def.rate, num));
+		growEquipItemData2.def.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.def.add, (float)(int)over.def.add, num));
 		growEquipItemData2.hp = new GrowRate();
-		growEquipItemData2.hp.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.hp.rate, (float)(int)over.hp.rate, t));
-		growEquipItemData2.hp.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.hp.add, (float)(int)over.hp.add, t));
+		growEquipItemData2.hp.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.hp.rate, (float)(int)over.hp.rate, num));
+		growEquipItemData2.hp.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.hp.add, (float)(int)over.hp.add, num));
 		growEquipItemData2.elemAtk = new GrowRate[6];
 		for (int k = 0; k < 6; k++)
 		{
 			growEquipItemData2.elemAtk[k] = new GrowRate();
-			growEquipItemData2.elemAtk[k].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemAtk[k].rate, (float)(int)over.elemAtk[k].rate, t));
-			growEquipItemData2.elemAtk[k].add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemAtk[k].add, (float)(int)over.elemAtk[k].add, t));
+			growEquipItemData2.elemAtk[k].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemAtk[k].rate, (float)(int)over.elemAtk[k].rate, num));
+			growEquipItemData2.elemAtk[k].add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemAtk[k].add, (float)(int)over.elemAtk[k].add, num));
 		}
 		growEquipItemData2.elemDef = new GrowRate[6];
 		for (int l = 0; l < 6; l++)
 		{
 			growEquipItemData2.elemDef[l] = new GrowRate();
-			growEquipItemData2.elemDef[l].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemDef[l].rate, (float)(int)over.elemDef[l].rate, t));
-			growEquipItemData2.elemDef[l].add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemDef[l].add, (float)(int)over.elemDef[l].add, t));
+			growEquipItemData2.elemDef[l].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemDef[l].rate, (float)(int)over.elemDef[l].rate, num));
+			growEquipItemData2.elemDef[l].add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemDef[l].add, (float)(int)over.elemDef[l].add, num));
 		}
 		return growEquipItemData2;
 	}

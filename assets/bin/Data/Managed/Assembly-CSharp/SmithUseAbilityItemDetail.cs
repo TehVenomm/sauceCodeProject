@@ -1,4 +1,5 @@
 using Network;
+using System;
 using UnityEngine;
 
 public class SmithUseAbilityItemDetail : GameSection
@@ -54,10 +55,10 @@ public class SmithUseAbilityItemDetail : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText(UI.LBL_NAME, equipItemInfo.tableData.name);
-		SetLabelText(UI.LBL_LV_NOW, equipItemInfo.level.ToString());
-		SetLabelText(UI.LBL_LV_MAX, equipItemInfo.tableData.maxLv.ToString());
-		SetEquipmentTypeIcon(UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, equipItemInfo.tableData);
+		SetLabelText((Enum)UI.LBL_NAME, equipItemInfo.tableData.name);
+		SetLabelText((Enum)UI.LBL_LV_NOW, equipItemInfo.level.ToString());
+		SetLabelText((Enum)UI.LBL_LV_MAX, equipItemInfo.tableData.maxLv.ToString());
+		SetEquipmentTypeIcon((Enum)UI.SPR_TYPE_ICON, (Enum)UI.SPR_TYPE_ICON_BG, (Enum)UI.SPR_TYPE_ICON_RARITY, equipItemInfo.tableData);
 		Transform ctrl = GetCtrl(UI.OBJ_BEFORE_ITEM_ROOT);
 		Transform ctrl2 = GetCtrl(UI.OBJ_AFTER_ITEM_ROOT);
 		AbilityItemInfo abilityItem = equipItemInfo.GetAbilityItem();
@@ -84,21 +85,29 @@ public class SmithUseAbilityItemDetail : GameSection
 		});
 	}
 
-	private void OnQuery_SmithConfirmAbilityItem_YES()
+	private unsafe void OnQuery_SmithConfirmAbilityItem_YES()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<SmithManager>.I.SendUseAbilityItem(equipItemInfo.uniqueID, abilityItemInfo.GetUniqID(), delegate(Error error, EquipItemInfo itemInfo)
+		SmithManager i = MonoBehaviourSingleton<SmithManager>.I;
+		ulong uniqueID = equipItemInfo.uniqueID;
+		ulong uniqID = abilityItemInfo.GetUniqID();
+		if (_003C_003Ef__am_0024cache2 == null)
 		{
-			GameSection.ResumeEvent(error == Error.None, null);
-		});
+			_003C_003Ef__am_0024cache2 = new Action<Error, EquipItemInfo>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		i.SendUseAbilityItem(uniqueID, uniqID, _003C_003Ef__am_0024cache2);
 	}
 
-	private void OnQuery_SEND()
+	private unsafe void OnQuery_SEND()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<SmithManager>.I.SendUseAbilityItem(equipItemInfo.uniqueID, abilityItemInfo.GetUniqID(), delegate(Error error, EquipItemInfo itemInfo)
+		SmithManager i = MonoBehaviourSingleton<SmithManager>.I;
+		ulong uniqueID = equipItemInfo.uniqueID;
+		ulong uniqID = abilityItemInfo.GetUniqID();
+		if (_003C_003Ef__am_0024cache3 == null)
 		{
-			GameSection.ResumeEvent(error != Error.None, null);
-		});
+			_003C_003Ef__am_0024cache3 = new Action<Error, EquipItemInfo>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		i.SendUseAbilityItem(uniqueID, uniqID, _003C_003Ef__am_0024cache3);
 	}
 }

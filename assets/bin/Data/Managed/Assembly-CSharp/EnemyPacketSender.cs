@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,7 +30,7 @@ public class EnemyPacketSender : CharacterPacketSender
 		SendInitialize(to_client_id);
 	}
 
-	public override void SendInitialize(int to_client_id = 0)
+	public unsafe override void SendInitialize(int to_client_id = 0)
 	{
 		if (base.enableSend && base.owner.IsOriginal())
 		{
@@ -37,19 +38,11 @@ public class EnemyPacketSender : CharacterPacketSender
 			SetupEnemyInitializeModel(model, to_client_id != 0, false);
 			if (to_client_id == 0)
 			{
-				SendBroadcast(model, true, null, delegate(Coop_Model_Base send_model)
-				{
-					SetupEnemyInitializeModel(send_model as Coop_Model_EnemyInitialize, false, true);
-					return true;
-				});
+				SendBroadcast(model, true, null, new Func<Coop_Model_Base, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			else
 			{
-				SendToExtra(to_client_id, model, true, null, delegate(Coop_Model_Base send_model)
-				{
-					SetupEnemyInitializeModel(send_model as Coop_Model_EnemyInitialize, true, true);
-					return true;
-				});
+				SendToExtra(to_client_id, model, true, null, new Func<Coop_Model_Base, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
 				{
 					MonoBehaviourSingleton<CoopManager>.I.coopStage.SendSyncPlayerRecord(to_client_id, true);
@@ -61,6 +54,8 @@ public class EnemyPacketSender : CharacterPacketSender
 
 	public void SetupEnemyInitializeModel(Coop_Model_EnemyInitialize model, bool send_to, bool resend)
 	{
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		model.id = base.owner.id;
 		if (!resend && actionHistoryData != null)
 		{
@@ -81,7 +76,7 @@ public class EnemyPacketSender : CharacterPacketSender
 		model.SetRegionWorks(enemy.regionWorks);
 		model.nowAngryId = enemy.NowAngryID;
 		model.execAngryIds = enemy.ExecAngryIDList;
-		model.target_id = ((!((Object)enemy.actionTarget != (Object)null)) ? (-1) : enemy.actionTarget.id);
+		model.target_id = ((!(enemy.actionTarget != null)) ? (-1) : enemy.actionTarget.id);
 		model.buff_sync_param = enemy.buffParam.CreateSyncParam(BuffParam.BUFFTYPE.NONE);
 		model.cntAtkSyncParam = enemy.continusAttackParam.CreateSyncParam();
 		model.barrierHp = enemy.BarrierHp;
@@ -96,7 +91,7 @@ public class EnemyPacketSender : CharacterPacketSender
 		model.changeToleranceRegionId = enemy.changeToleranceRegionId;
 		model.changeToleranceScroll = enemy.changeToleranceScroll;
 		model.shaderSyncParam = enemy.blendColorCtrl.GetShaderParamList();
-		if ((Object)enemy.tailController != (Object)null)
+		if (enemy.tailController != null)
 		{
 			model.tailPosList = enemy.tailController.PreviousPositionList;
 		}
@@ -152,27 +147,14 @@ public class EnemyPacketSender : CharacterPacketSender
 		StackActionHistory(coop_Model_EnemyStep, true);
 	}
 
-	public virtual void OnReviveRegion(int region_id)
+	public unsafe virtual void OnReviveRegion(int region_id)
 	{
 		if (base.enableSend && base.owner.IsOriginal())
 		{
 			Coop_Model_EnemyReviveRegion coop_Model_EnemyReviveRegion = new Coop_Model_EnemyReviveRegion();
 			coop_Model_EnemyReviveRegion.id = base.owner.id;
 			coop_Model_EnemyReviveRegion.region_id = region_id;
-			SendBroadcast(coop_Model_EnemyReviveRegion, true, null, delegate(Coop_Model_Base send_model)
-			{
-				if ((Object)base.owner == (Object)null)
-				{
-					return false;
-				}
-				Coop_Model_EnemyReviveRegion coop_Model_EnemyReviveRegion2 = send_model as Coop_Model_EnemyReviveRegion;
-				EnemyRegionWork enemyRegionWork = enemy.regionWorks[coop_Model_EnemyReviveRegion2.region_id];
-				if ((int)enemyRegionWork.hp <= 0)
-				{
-					return false;
-				}
-				return true;
-			});
+			SendBroadcast(coop_Model_EnemyReviveRegion, true, null, new Func<Coop_Model_Base, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		ClearActionHistory();
 	}
@@ -329,14 +311,14 @@ public class EnemyPacketSender : CharacterPacketSender
 		{
 			Coop_Model_EnemySyncTarget coop_Model_EnemySyncTarget = new Coop_Model_EnemySyncTarget();
 			coop_Model_EnemySyncTarget.id = base.owner.id;
-			coop_Model_EnemySyncTarget.targetId = ((!((Object)target != (Object)null)) ? (-1) : target.id);
+			coop_Model_EnemySyncTarget.targetId = ((!(target != null)) ? (-1) : target.id);
 			SendBroadcast(coop_Model_EnemySyncTarget, false, null, null);
 		}
 	}
 
 	public void OnEnemyRegionNodeActivate(int[] regionIDs, bool isRandom = false, int randomSelectedID = -1)
 	{
-		if (base.enabled && base.owner.IsOriginal())
+		if (this.get_enabled() && base.owner.IsOriginal())
 		{
 			Coop_Model_EnemyRegionNodeActivate coop_Model_EnemyRegionNodeActivate = new Coop_Model_EnemyRegionNodeActivate();
 			coop_Model_EnemyRegionNodeActivate.id = base.owner.id;

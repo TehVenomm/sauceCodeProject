@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class CustomEmblem : GameSection
@@ -32,23 +33,15 @@ public class CustomEmblem : GameSection
 		base.Initialize();
 	}
 
-	public void UpdateList()
+	public unsafe void UpdateList()
 	{
 		GuildItemInfoModel.EmblemInfo[] infos = GuildItemManager.I.GetEmblemLayer1Infos();
-		SetDynamicList(UI.GRD_LIST_1, "EmblemLayer1Item", infos.Length, false, null, null, delegate(int i, Transform t, bool is_recycle)
-		{
-			SetListItem(i, t, is_recycle, infos[i]);
-		});
+		_003CUpdateList_003Ec__AnonStorey319 _003CUpdateList_003Ec__AnonStorey;
+		SetDynamicList((Enum)UI.GRD_LIST_1, "EmblemLayer1Item", infos.Length, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		infos = GuildItemManager.I.GetEmblemLayer2Infos();
-		SetDynamicList(UI.GRD_LIST_2, "EmblemLayer2Item", infos.Length, false, null, null, delegate(int i, Transform t, bool is_recycle)
-		{
-			SetListItem(i, t, is_recycle, infos[i]);
-		});
+		SetDynamicList((Enum)UI.GRD_LIST_2, "EmblemLayer2Item", infos.Length, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		infos = GuildItemManager.I.GetEmblemLayer3Infos();
-		SetDynamicList(UI.GRD_LIST_3, "EmblemLayer3Item", infos.Length, false, null, null, delegate(int i, Transform t, bool is_recycle)
-		{
-			SetListItem(i, t, is_recycle, infos[i]);
-		});
+		SetDynamicList((Enum)UI.GRD_LIST_3, "EmblemLayer3Item", infos.Length, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected void SetListItem(int i, Transform t, bool is_recycle, GuildItemInfoModel.EmblemInfo data)
@@ -62,17 +55,17 @@ public class CustomEmblem : GameSection
 		{
 			mLayer1ID = GuildManager.sDefaultEmblemIDLayer1;
 		}
-		SetSprite(UI.SPR_GUILD_EMBLEM_1, GuildItemManager.I.GetItemSprite(mLayer1ID));
+		SetSprite((Enum)UI.SPR_GUILD_EMBLEM_1, GuildItemManager.I.GetItemSprite(mLayer1ID));
 		if (mLayer2ID == -1)
 		{
 			mLayer2ID = GuildManager.sDefaultEmblemIDLayer2;
 		}
-		SetSprite(UI.SPR_GUILD_EMBLEM_2, GuildItemManager.I.GetItemSprite(mLayer2ID));
+		SetSprite((Enum)UI.SPR_GUILD_EMBLEM_2, GuildItemManager.I.GetItemSprite(mLayer2ID));
 		if (mLayer3ID == -1)
 		{
 			mLayer3ID = GuildManager.sDefaultEmblemIDLayer3;
 		}
-		SetSprite(UI.SPR_GUILD_EMBLEM_3, GuildItemManager.I.GetItemSprite(mLayer3ID));
+		SetSprite((Enum)UI.SPR_GUILD_EMBLEM_3, GuildItemManager.I.GetItemSprite(mLayer3ID));
 	}
 
 	private void OnQuery_RANDOM_EMBLEM()

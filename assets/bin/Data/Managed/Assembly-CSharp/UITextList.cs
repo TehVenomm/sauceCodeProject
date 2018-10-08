@@ -3,7 +3,7 @@ using System.Text;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/UI/Text List")]
-public class UITextList : MonoBehaviour
+public class UITextList
 {
 	public enum Style
 	{
@@ -47,16 +47,16 @@ public class UITextList : MonoBehaviour
 	{
 		get
 		{
-			if (mParagraphs == null && !mHistory.TryGetValue(base.name, out mParagraphs))
+			if (mParagraphs == null && !mHistory.TryGetValue(this.get_name(), out mParagraphs))
 			{
 				mParagraphs = new BetterList<Paragraph>();
-				mHistory.Add(base.name, mParagraphs);
+				mHistory.Add(this.get_name(), mParagraphs);
 			}
 			return mParagraphs;
 		}
 	}
 
-	public bool isValid => (Object)textLabel != (Object)null && textLabel.ambigiousFont != (Object)null;
+	public bool isValid => textLabel != null && textLabel.ambigiousFont != null;
 
 	public float scrollValue
 	{
@@ -69,7 +69,7 @@ public class UITextList : MonoBehaviour
 			value = Mathf.Clamp01(value);
 			if (isValid && mScroll != value)
 			{
-				if ((Object)scrollBar != (Object)null)
+				if (scrollBar != null)
 				{
 					scrollBar.value = value;
 				}
@@ -82,7 +82,7 @@ public class UITextList : MonoBehaviour
 		}
 	}
 
-	protected float lineHeight => (!((Object)textLabel != (Object)null)) ? 20f : ((float)textLabel.fontSize + textLabel.effectiveSpacingY);
+	protected float lineHeight => (!(textLabel != null)) ? 20f : ((float)textLabel.fontSize + textLabel.effectiveSpacingY);
 
 	protected int scrollHeight
 	{
@@ -97,6 +97,11 @@ public class UITextList : MonoBehaviour
 		}
 	}
 
+	public UITextList()
+		: this()
+	{
+	}
+
 	public void Clear()
 	{
 		paragraphs.Clear();
@@ -105,11 +110,11 @@ public class UITextList : MonoBehaviour
 
 	private void Start()
 	{
-		if ((Object)textLabel == (Object)null)
+		if (textLabel == null)
 		{
-			textLabel = GetComponentInChildren<UILabel>();
+			textLabel = this.GetComponentInChildren<UILabel>();
 		}
-		if ((Object)scrollBar != (Object)null)
+		if (scrollBar != null)
 		{
 			EventDelegate.Add(scrollBar.onChange, OnScrollBar);
 		}
@@ -205,10 +210,10 @@ public class UITextList : MonoBehaviour
 			{
 				mTotalLines += mParagraphs.buffer[j].lines.Length;
 			}
-			if ((Object)scrollBar != (Object)null)
+			if (scrollBar != null)
 			{
 				UIScrollBar uIScrollBar = scrollBar as UIScrollBar;
-				if ((Object)uIScrollBar != (Object)null)
+				if (uIScrollBar != null)
 				{
 					uIScrollBar.barSize = ((mTotalLines != 0) ? (1f - (float)scrollHeight / (float)mTotalLines) : 1f);
 				}

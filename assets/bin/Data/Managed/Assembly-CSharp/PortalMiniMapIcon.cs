@@ -22,7 +22,7 @@ public class PortalMiniMapIcon : MiniMapIcon
 
 	private void Update()
 	{
-		if (!((Object)portal == (Object)null))
+		if (!(portal == null))
 		{
 			if (viewType != portal.viewType || isFull != portal.isFull)
 			{
@@ -32,7 +32,7 @@ public class PortalMiniMapIcon : MiniMapIcon
 					num = 5;
 				}
 				icon.spriteName = iconSpriteNames[num];
-				if ((Object)overIcon != (Object)null)
+				if (overIcon != null)
 				{
 					overIcon.spriteName = overIconSpriteNames[num];
 				}

@@ -1,6 +1,7 @@
 using Network;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -63,23 +64,23 @@ public class HomeMiniBingo : HomeBingo
 
 	public override string overrideBackKeyEvent => "CLOSE";
 
-	public override void Initialize()
+	public unsafe override void Initialize()
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Expected O, but got Unknown
 		if (isLocalInitialized)
 		{
 			base.Initialize();
 		}
 		else
 		{
-			InitializeOnce(delegate
-			{
-				base.Initialize();
-			});
+			InitializeOnce(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
 	protected override void InitializeOnce(Action callback)
 	{
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 		isLocalInitialized = true;
 		itemNum = ColmunNum * ColmunNum;
 		object eventData = GameSection.GetEventData();
@@ -99,13 +100,13 @@ public class HomeMiniBingo : HomeBingo
 		isFirstUpdate = true;
 		LoadingQueue load_queue = new LoadingQueue(this);
 		CacheAudio(load_queue);
-		StartCoroutine(DoInitialize(callback));
+		this.StartCoroutine(DoInitialize(callback));
 	}
 
-	protected override IEnumerator DoInitialize(Action callback)
+	protected unsafe override IEnumerator DoInitialize(Action callback)
 	{
-		eventDataList = MonoBehaviourSingleton<QuestManager>.I.GetValidBingoDataListInSection();
-		if (eventDataList == null || eventDataList.Count <= 0)
+		base.eventDataList = MonoBehaviourSingleton<QuestManager>.I.GetValidBingoDataListInSection();
+		if (base.eventDataList == null || base.eventDataList.Count <= 0)
 		{
 			RequestNotExistBingo();
 			HideAll();
@@ -113,17 +114,21 @@ public class HomeMiniBingo : HomeBingo
 		}
 		else
 		{
-			InitCardDataList(eventDataList);
-			int defaultIndex = (from ano in eventDataList.Select((Network.EventData e, int j) => new
+			InitCardDataList(base.eventDataList);
+			List<Network.EventData> eventDataList = base.eventDataList;
+			if (_003CDoInitialize_003Ec__Iterator99._003C_003Ef__am_0024cache6 == null)
 			{
-				Content = e,
-				Index = j
-			})
-			where ano.Content.eventId == ((_003CDoInitialize_003Ec__Iterator92)/*Error near IL_00c6: stateMachine*/)._003C_003Ef__this.defaultEventId
-			select ano.Index).FirstOrDefault();
+				_003CDoInitialize_003Ec__Iterator99._003C_003Ef__am_0024cache6 = new Func<Network.EventData, int, _003C_003E__AnonType0<Network.EventData, int>>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			var source = Enumerable.Select(eventDataList, _003CDoInitialize_003Ec__Iterator99._003C_003Ef__am_0024cache6).Where(new Func<_003C_003E__AnonType0<Network.EventData, int>, bool>((object)/*Error near IL_00c6: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			if (_003CDoInitialize_003Ec__Iterator99._003C_003Ef__am_0024cache7 == null)
+			{
+				_003CDoInitialize_003Ec__Iterator99._003C_003Ef__am_0024cache7 = new Func<_003C_003E__AnonType0<Network.EventData, int>, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			int defaultIndex = Enumerable.Select(source, _003CDoInitialize_003Ec__Iterator99._003C_003Ef__am_0024cache7).FirstOrDefault();
 			SetCurrentIndex(defaultIndex);
-			yield return (object)StartCoroutine(LoadBanner(GetEventDataFromList(GetCurrentIndex()), GetCurrentIndex(), null));
-			callback();
+			yield return (object)this.StartCoroutine(LoadBanner(GetEventDataFromList(GetCurrentIndex()), GetCurrentIndex(), null));
+			callback.Invoke();
 		}
 	}
 
@@ -135,7 +140,7 @@ public class HomeMiniBingo : HomeBingo
 	protected override void InitCard(int cardIndex)
 	{
 		CardData cardData = cardDataList[cardIndex];
-		Transform transform = cardData.cardTransform = GetCtrl(UI.OBJ_CARD);
+		Transform val = cardData.cardTransform = GetCtrl(UI.OBJ_CARD);
 	}
 
 	public override void UpdateUI()
@@ -146,9 +151,9 @@ public class HomeMiniBingo : HomeBingo
 			if (isFirstUpdate)
 			{
 				isFirstUpdate = false;
-				SetActive(UI.OBJ_COMPLETE, false);
+				SetActive((Enum)UI.OBJ_COMPLETE, false);
 				bool isCompleted = GetCurrentCard().allBingoData.isCompleted;
-				SetActive(UI.OBJ_COMPLETE_STAY, isCompleted);
+				SetActive((Enum)UI.OBJ_COMPLETE_STAY, isCompleted);
 				if (isCompleted)
 				{
 					Transform ctrl = GetCtrl(UI.OBJ_COMPLETE_STAY);
@@ -157,7 +162,7 @@ public class HomeMiniBingo : HomeBingo
 					component.Play(true, null);
 				}
 			}
-			SetActive(UI.OBJ_BINGO_ANIMATION, false);
+			SetActive((Enum)UI.OBJ_BINGO_ANIMATION, false);
 			UpdateLeftRightButton();
 			UpdateCard(cardDataList[currentCardIndex], currentCardIndex);
 			SetEndDateLabel();
@@ -166,14 +171,14 @@ public class HomeMiniBingo : HomeBingo
 
 	private void HideLeftRightButton()
 	{
-		SetActive(UI.BTN_RIGHT, false);
-		SetActive(UI.BTN_LEFT, false);
+		SetActive((Enum)UI.BTN_RIGHT, false);
+		SetActive((Enum)UI.BTN_LEFT, false);
 	}
 
 	private void DispLeftRightButton()
 	{
-		SetActive(UI.BTN_RIGHT, true);
-		SetActive(UI.BTN_LEFT, true);
+		SetActive((Enum)UI.BTN_RIGHT, true);
+		SetActive((Enum)UI.BTN_LEFT, true);
 	}
 
 	private void UpdateLeftRightButton()
@@ -190,6 +195,8 @@ public class HomeMiniBingo : HomeBingo
 
 	protected override void UpdateCard(CardData cardData, int cardIndex)
 	{
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Expected O, but got Unknown
 		Transform cardTransform = cardData.cardTransform;
 		UpdateBingoName(cardTransform, cardData.eventData);
 		UpdateEndData(cardTransform, cardData.eventData);
@@ -207,9 +214,9 @@ public class HomeMiniBingo : HomeBingo
 		GridData gridData = cardDataList[cardIndex].gridDataList[index];
 		gridData.SetEntity(t, string.Empty);
 		BoxCollider component = t.GetComponent<BoxCollider>();
-		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+		if (component != null)
 		{
-			component.enabled = true;
+			component.set_enabled(true);
 		}
 		SetActive(t, UI.SPR_GRID_ITEM, !gridData.isCompleted);
 		SetReachVisual(gridData, false);
@@ -233,7 +240,7 @@ public class HomeMiniBingo : HomeBingo
 			for (int i = 0; i < ColmunNum * ColmunNum; i++)
 			{
 				UI uI2 = uI + i;
-				SetActive(uI2, num == i);
+				SetActive((Enum)uI2, num == i);
 			}
 		}
 		else
@@ -242,21 +249,21 @@ public class HomeMiniBingo : HomeBingo
 		}
 	}
 
-	private void OnQuery_LEFT()
+	private unsafe void OnQuery_LEFT()
 	{
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Expected O, but got Unknown
 		currentCardIndex++;
 		currentCardIndex %= cardDataList.Count;
 		isComeFromLeftRightEvent = true;
 		GameSection.StayEvent();
-		ChangeCard(currentCardIndex, delegate
-		{
-			GameSection.ResumeEvent(true, null);
-			StartCoroutine(WaitAndStartAutoComplete());
-		});
+		ChangeCard(currentCardIndex, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
-	private void OnQuery_RIGHT()
+	private unsafe void OnQuery_RIGHT()
 	{
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004c: Expected O, but got Unknown
 		currentCardIndex--;
 		if (currentCardIndex < 0)
 		{
@@ -264,37 +271,34 @@ public class HomeMiniBingo : HomeBingo
 		}
 		isComeFromLeftRightEvent = true;
 		GameSection.StayEvent();
-		ChangeCard(currentCardIndex, delegate
-		{
-			GameSection.ResumeEvent(true, null);
-			StartCoroutine(WaitAndStartAutoComplete());
-		});
+		ChangeCard(currentCardIndex, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void ChangeCard(int cardIndex, Action callback)
 	{
-		SetActive(UI.OBJ_COMPLETE, false);
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		SetActive((Enum)UI.OBJ_COMPLETE, false);
 		bool isCompleteAll = GetCurrentCard().allBingoData.isCompleted;
-		SetActive(UI.OBJ_COMPLETE_STAY, false);
+		SetActive((Enum)UI.OBJ_COMPLETE_STAY, false);
 		if (isCompleteAll)
 		{
 			Transform ctrl = GetCtrl(UI.OBJ_COMPLETE_STAY);
 			UITweenCtrl component = ctrl.GetComponent<UITweenCtrl>();
 			component.Reset();
 		}
-		StartCoroutine(LoadBanner(GetEventDataFromList(cardIndex), cardIndex, delegate
+		this.StartCoroutine(LoadBanner(GetEventDataFromList(cardIndex), cardIndex, delegate
 		{
 			HideReward(cardDataList[cardIndex]);
 			RefreshUI();
 			if (isCompleteAll)
 			{
 				Transform ctrl2 = GetCtrl(UI.OBJ_COMPLETE_STAY);
-				SetActive(UI.OBJ_COMPLETE_STAY, true);
+				SetActive((Enum)UI.OBJ_COMPLETE_STAY, true);
 				UITweenCtrl component2 = ctrl2.GetComponent<UITweenCtrl>();
 				component2.Reset();
 				component2.Play(true, null);
 			}
-			callback();
+			callback.Invoke();
 		}));
 	}
 

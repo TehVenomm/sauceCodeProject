@@ -262,6 +262,12 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 		private set;
 	}
 
+	public FortuneWheelButton fortuneWheelButton
+	{
+		get;
+		private set;
+	}
+
 	public TutorialMessage tutorialMessage
 	{
 		get;
@@ -282,36 +288,42 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 		}
 		set
 		{
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			_enableShadow = value;
-			system.GetCtrl(SYSTEM.RENDER_LIGHT).gameObject.SetActive(_enableShadow);
+			system.GetCtrl(SYSTEM.RENDER_LIGHT).get_gameObject().SetActive(_enableShadow);
 			QualitySettings.SetQualityLevel(_enableShadow ? 1 : 0);
 		}
 	}
 
-	public static UIBehaviour CreatePrefabUI(UnityEngine.Object prefab, GameObject inactive_inctance, Type add_component_type, bool initVisible, Transform parent, int depth, GameSceneTables.SectionData section_data)
+	public static UIBehaviour CreatePrefabUI(Object prefab, GameObject inactive_inctance, Type add_component_type, bool initVisible, Transform parent, int depth, GameSceneTables.SectionData section_data)
 	{
-		if ((UnityEngine.Object)parent == (UnityEngine.Object)null && MonoBehaviourSingleton<UIManager>.IsValid())
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Expected O, but got Unknown
+		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+		if (parent == null && MonoBehaviourSingleton<UIManager>.IsValid())
 		{
 			parent = MonoBehaviourSingleton<UIManager>.I._transform;
 		}
-		string text = prefab.name;
+		string text = prefab.get_name();
 		if (text.StartsWith("internal__"))
 		{
 			text = text.Substring(text.LastIndexOf("__") + 2);
 		}
-		Transform transform = Utility.CreateGameObject(text, parent, 5);
-		transform.gameObject.AddComponent<UIPanel>();
-		Transform transform2 = null;
-		transform2 = ((!((UnityEngine.Object)inactive_inctance != (UnityEngine.Object)null)) ? ResourceUtility.Realizes(prefab, transform, 5) : InstantiateManager.Realizes(ref inactive_inctance, transform, 5));
+		Transform val = Utility.CreateGameObject(text, parent, 5);
+		val.get_gameObject().AddComponent<UIPanel>();
+		Transform val2 = null;
+		val2 = ((!(inactive_inctance != null)) ? ResourceUtility.Realizes(prefab, val, 5) : InstantiateManager.Realizes(ref inactive_inctance, val, 5));
 		if (add_component_type == null)
 		{
-			add_component_type = Type.GetType(transform2.name);
+			add_component_type = Type.GetType(val2.get_name());
 		}
-		UIBehaviour uIBehaviour = (add_component_type == null) ? transform.gameObject.AddComponent<UIBehaviour>() : (transform.gameObject.AddComponent(add_component_type) as UIBehaviour);
-		uIBehaviour.collectUI = transform2;
+		UIBehaviour uIBehaviour = (add_component_type == null) ? val.get_gameObject().AddComponent<UIBehaviour>() : (val.get_gameObject().AddComponent(add_component_type) as UIBehaviour);
+		uIBehaviour.collectUI = val2;
 		uIBehaviour.sectionData = section_data;
-		TestTransitionAnim(transform2, section_data);
-		if ((UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.common != (UnityEngine.Object)null)
+		TestTransitionAnim(val2, section_data);
+		if (MonoBehaviourSingleton<UIManager>.I.common != null)
 		{
 			int num = 0;
 			string text2 = uIBehaviour.GetCaptionText();
@@ -333,7 +345,7 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 		uIBehaviour.baseDepth = depth;
 		if (!initVisible)
 		{
-			transform2.GetComponentsInChildren(Temporary.uiWidgetList);
+			val2.GetComponentsInChildren<UIWidget>(Temporary.uiWidgetList);
 			int i = 0;
 			for (int count = Temporary.uiWidgetList.Count; i < count; i++)
 			{
@@ -355,13 +367,26 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	private static void SetDefaultTransitionAnim(Transform ui, bool need_scale)
 	{
-		if (!((UnityEngine.Object)ui.gameObject.GetComponentInChildren<UITransition>() != (UnityEngine.Object)null))
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+		if (!(ui.get_gameObject().GetComponentInChildren<UITransition>() != null))
 		{
-			UITransition uITransition = ui.gameObject.AddComponent<UITransition>();
+			UITransition uITransition = ui.get_gameObject().AddComponent<UITransition>();
 			float duration = (!MonoBehaviourSingleton<GlobalSettingsManager>.IsValid()) ? 0.25f : MonoBehaviourSingleton<GlobalSettingsManager>.I.defaultUITransitionAnimTime;
 			int num = (!need_scale) ? 1 : 2;
 			uITransition.openTweens = new UITweener[num];
-			TweenAlpha tweenAlpha = (TweenAlpha)(uITransition.openTweens[0] = ui.gameObject.AddComponent<TweenAlpha>());
+			TweenAlpha tweenAlpha = (TweenAlpha)(uITransition.openTweens[0] = ui.get_gameObject().AddComponent<TweenAlpha>());
 			tweenAlpha.value = 0f;
 			tweenAlpha.SetStartToCurrentValue();
 			tweenAlpha.to = 1f;
@@ -370,16 +395,16 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 			tweenAlpha.ignoreTimeScale = false;
 			if (need_scale)
 			{
-				TweenScale tweenScale = (TweenScale)(uITransition.openTweens[1] = ui.gameObject.AddComponent<TweenScale>());
+				TweenScale tweenScale = (TweenScale)(uITransition.openTweens[1] = ui.get_gameObject().AddComponent<TweenScale>());
 				tweenScale.value = new Vector3(1.05f, 1.05f, 1f);
 				tweenScale.SetStartToCurrentValue();
-				tweenScale.to = Vector3.one;
+				tweenScale.to = Vector3.get_one();
 				tweenScale.duration = duration;
 				tweenScale.animationCurve = Curves.easeIn;
 				tweenScale.ignoreTimeScale = false;
 			}
 			uITransition.closeTweens = new UITweener[num];
-			tweenAlpha = (TweenAlpha)(uITransition.closeTweens[0] = ui.gameObject.AddComponent<TweenAlpha>());
+			tweenAlpha = (TweenAlpha)(uITransition.closeTweens[0] = ui.get_gameObject().AddComponent<TweenAlpha>());
 			tweenAlpha.from = 1f;
 			tweenAlpha.to = 0f;
 			tweenAlpha.duration = duration;
@@ -387,8 +412,8 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 			tweenAlpha.ignoreTimeScale = false;
 			if (need_scale)
 			{
-				TweenScale tweenScale = (TweenScale)(uITransition.closeTweens[1] = ui.gameObject.AddComponent<TweenScale>());
-				tweenScale.from = Vector3.one;
+				TweenScale tweenScale = (TweenScale)(uITransition.closeTweens[1] = ui.get_gameObject().AddComponent<TweenScale>());
+				tweenScale.from = Vector3.get_one();
 				tweenScale.to = new Vector3(1.05f, 1.05f, 1f);
 				tweenScale.duration = duration;
 				tweenScale.animationCurve = Curves.easeIn;
@@ -416,12 +441,12 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	public bool IsEnableTutorialMessage()
 	{
-		return (UnityEngine.Object)tutorialMessage != (UnityEngine.Object)null && tutorialMessage.IsEnableMessage();
+		return tutorialMessage != null && tutorialMessage.IsEnableMessage();
 	}
 
 	public bool IsTutorialErrorResend()
 	{
-		if ((UnityEngine.Object)tutorialMessage != (UnityEngine.Object)null && tutorialMessage.isErrorResend)
+		if (tutorialMessage != null && tutorialMessage.isErrorResend)
 		{
 			return true;
 		}
@@ -434,7 +459,7 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 			{
 				flag = (currentSceneName == "ShopScene" || currentSceneName == "GachaScene" || currentSectionName.Contains("QuestAccept"));
 			}
-			if ((UnityEngine.Object)tutorialMessage != (UnityEngine.Object)null && tutorialMessage.isErrorResendQuestGacha && flag)
+			if (tutorialMessage != null && tutorialMessage.isErrorResendQuestGacha && flag)
 			{
 				return true;
 			}
@@ -444,62 +469,89 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	protected override void Awake()
 	{
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Expected O, but got Unknown
+		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Expected O, but got Unknown
+		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016d: Expected O, but got Unknown
+		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01be: Expected O, but got Unknown
+		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d4: Expected O, but got Unknown
+		//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f3: Expected O, but got Unknown
+		//IL_020f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0241: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0255: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025a: Expected O, but got Unknown
+		//IL_025f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0264: Expected O, but got Unknown
 		base.Awake();
-		uiRoot = GetComponent<UIRoot>();
+		uiRoot = this.GetComponent<UIRoot>();
 		UIVirtualScreen.InitUIRoot(uiRoot);
 		uiCamera = uiRoot.GetComponentInChildren<Camera>();
-		cameras = new Camera[1]
+		cameras = (Camera[])new Camera[1]
 		{
 			uiCamera
 		};
 		nguiCamera = uiCamera.GetComponent<UICamera>();
 		uiRootPanel = uiRoot.GetComponent<UIPanel>();
-		uiRootTransform = uiRoot.transform;
+		uiRootTransform = uiRoot.get_transform();
 		initUseMouse = nguiCamera.useMouse;
 		initUseTouch = nguiCamera.useTouch;
 		system = CreatePrefabUI(Resources.Load("UI/SystemUI"), null, null, true, base._transform, 0, null);
 		system.CreateCtrlsArray(typeof(SYSTEM));
 		Transform ctrl = system.GetCtrl(SYSTEM.FADER);
-		faderPanel = ctrl.parent.GetComponent<UIPanel>();
+		faderPanel = ctrl.get_parent().GetComponent<UIPanel>();
 		faderPanel.depth = 4000;
-		Vector3 position = ctrl.position;
+		Vector3 position = ctrl.get_position();
 		position.z = -1f;
-		ctrl.position = position;
+		ctrl.set_position(position);
 		Transform ctrl2 = system.GetCtrl(SYSTEM.BLOCKER);
-		ctrl2.gameObject.SetActive(false);
+		ctrl2.get_gameObject().SetActive(false);
 		Transform ctrl3 = system.GetCtrl(SYSTEM.DIALOG_BLOCKER);
 		dialogBlockerAlpha = ctrl3.GetComponent<UIRect>().alpha;
-		dialogBlockerTween = TweenAlpha.Begin(ctrl3.gameObject, 0.2f, dialogBlockerAlpha);
+		dialogBlockerTween = TweenAlpha.Begin(ctrl3.get_gameObject(), 0.2f, dialogBlockerAlpha);
 		dialogBlockerTween.value = 0f;
 		dialogBlockerTween.from = 0f;
-		dialogBlockerTween.enabled = false;
-		ctrl3.gameObject.SetActive(false);
-		string path = "InternalUI/UI_Common/LoadingUI";
-		SetLoadingUI(Resources.Load(path));
+		dialogBlockerTween.set_enabled(false);
+		ctrl3.get_gameObject().SetActive(false);
+		string text = "InternalUI/UI_Common/LoadingUI";
+		SetLoadingUI(Resources.Load(text));
 		internalUI = true;
-		GameObject gameObject = new GameObject("ButtonEffectTop");
-		UIPanel uIPanel = gameObject.AddComponent<UIPanel>();
+		GameObject val = new GameObject("ButtonEffectTop");
+		UIPanel uIPanel = val.AddComponent<UIPanel>();
 		uIPanel.depth = 10000;
-		buttonEffectTop = gameObject.transform;
+		buttonEffectTop = val.get_transform();
 		buttonEffectTop.SetParent(uiRootTransform);
-		buttonEffectTop.localPosition = Vector3.zero;
-		buttonEffectTop.localRotation = Quaternion.identity;
-		buttonEffectTop.localScale = Vector3.one;
-		gameObject.layer = uiRoot.gameObject.layer;
-		GameObject gameObject2 = new GameObject("AtlasTop");
-		atlasTop = gameObject2.transform;
+		buttonEffectTop.set_localPosition(Vector3.get_zero());
+		buttonEffectTop.set_localRotation(Quaternion.get_identity());
+		buttonEffectTop.set_localScale(Vector3.get_one());
+		val.set_layer(uiRoot.get_gameObject().get_layer());
+		GameObject val2 = new GameObject("AtlasTop");
+		atlasTop = val2.get_transform();
 		atlasTop.SetParent(buttonEffectTop);
-		gameObject2.SetActive(false);
+		val2.SetActive(false);
 		UIButtonEffect.CacheShaderPropertyId();
 		enableShadow = false;
 	}
 
-	public void SetLoadingUI(UnityEngine.Object prefab)
+	public void SetLoadingUI(Object prefab)
 	{
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		internalUI = false;
-		if ((UnityEngine.Object)loading != (UnityEngine.Object)null)
+		if (loading != null)
 		{
-			UnityEngine.Object.Destroy(loading.gameObject);
+			Object.Destroy(loading.get_gameObject());
 			loading = null;
 		}
 		loading = (CreatePrefabUI(prefab, null, null, true, base._transform, 9100, null) as LoadingUI);
@@ -525,9 +577,10 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	public void LoadUI(bool need_common, bool need_outgame, bool need_tutorial)
 	{
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 		if (!internalUI && !isLoading && (need_common || need_outgame || need_tutorial))
 		{
-			StartCoroutine(DoLoadUI(need_common, need_outgame, need_tutorial));
+			this.StartCoroutine(DoLoadUI(need_common, need_outgame, need_tutorial));
 		}
 	}
 
@@ -537,18 +590,19 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 		LoadingQueue load_queue = new LoadingQueue(this);
 		bool need_main_chat = true;
 		bool need_banner_view = need_outgame;
-		LoadObject lo_common = (!((UnityEngine.Object)common == (UnityEngine.Object)null) || !need_common) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "UI_Common", false);
-		LoadObject lo_main_menu = (!((UnityEngine.Object)mainMenu == (UnityEngine.Object)null) || !need_outgame) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "MainMenu", false);
-		LoadObject lo_main_status = (!((UnityEngine.Object)mainStatus == (UnityEngine.Object)null) || !need_outgame) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "MainStatus", false);
-		LoadObject lo_npc_msg = (!((UnityEngine.Object)npcMessage == (UnityEngine.Object)null) || !need_outgame) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "NPCMessage", false);
-		LoadObject lo_main_chat = (!((UnityEngine.Object)mainChat == (UnityEngine.Object)null) || !need_main_chat) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "MainChat", false);
-		LoadObject lo_banner_view = (!((UnityEngine.Object)bannerView == (UnityEngine.Object)null) || !need_banner_view) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "EventBannerView", false);
-		LoadObject lo_invitation = (!((UnityEngine.Object)invitationButton == (UnityEngine.Object)null) || !need_outgame) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "QuestInvitationButton", false);
-		LoadObject lo_invitation_ingame = (!((UnityEngine.Object)invitationInGameButton == (UnityEngine.Object)null) || !need_outgame) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "QuestInvitationInGameButton", false);
-		LoadObject lo_tutorial = (!((UnityEngine.Object)tutorialMessage == (UnityEngine.Object)null) || !need_tutorial) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "TutorialMessage", false);
-		LoadObject lo_taskAnnounce = (!((UnityEngine.Object)taskClearAnnouce == (UnityEngine.Object)null)) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "TaskClearAnnounce", false);
-		LoadObject lo_loungeAnnoucne = (!((UnityEngine.Object)loungeAnnounce == (UnityEngine.Object)null)) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "LoungeAnnounce", false);
-		LoadObject lo_black_market = (!((UnityEngine.Object)blackMarkeButton == (UnityEngine.Object)null) || !need_outgame) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "BlackMarketButton", false);
+		LoadObject lo_common = (!(common == null) || !need_common) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "UI_Common", false);
+		LoadObject lo_main_menu = (!(mainMenu == null) || !need_outgame) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "MainMenu", false);
+		LoadObject lo_main_status = (!(mainStatus == null) || !need_outgame) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "MainStatus", false);
+		LoadObject lo_npc_msg = (!(npcMessage == null) || !need_outgame) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "NPCMessage", false);
+		LoadObject lo_main_chat = (!(mainChat == null) || !need_main_chat) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "MainChat", false);
+		LoadObject lo_banner_view = (!(bannerView == null) || !need_banner_view) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "EventBannerView", false);
+		LoadObject lo_invitation = (!(invitationButton == null) || !need_outgame) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "QuestInvitationButton", false);
+		LoadObject lo_invitation_ingame = (!(invitationInGameButton == null) || !need_outgame) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "QuestInvitationInGameButton", false);
+		LoadObject lo_tutorial = (!(tutorialMessage == null) || !need_tutorial) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "TutorialMessage", false);
+		LoadObject lo_taskAnnounce = (!(taskClearAnnouce == null)) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "TaskClearAnnounce", false);
+		LoadObject lo_loungeAnnoucne = (!(loungeAnnounce == null)) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "LoungeAnnounce", false);
+		LoadObject lo_black_market = (!(blackMarkeButton == null) || !need_outgame) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "BlackMarketButton", false);
+		LoadObject lo_fortune_wheel = (!(fortuneWheelButton == null) || !need_outgame) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "FortuneWheelButton", false);
 		if (load_queue.IsLoading())
 		{
 			yield return (object)load_queue.Wait();
@@ -565,8 +619,8 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 		{
 			common = (CreatePrefabUI(lo_common.loadedObject, null, null, false, base._transform, 3000, null) as UI_Common);
 			common.Open(UITransition.TYPE.OPEN);
-			levelUp = common.gameObject.GetComponentInChildren<UILevelUpAnnounce>();
-			knockDownRaidBoss = common.gameObject.GetComponentInChildren<UIKnockDownRaidBossAnnounce>();
+			levelUp = common.get_gameObject().GetComponentInChildren<UILevelUpAnnounce>();
+			knockDownRaidBoss = common.get_gameObject().GetComponentInChildren<UIKnockDownRaidBossAnnounce>();
 		}
 		if (lo_npc_msg != null)
 		{
@@ -604,29 +658,37 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 		{
 			blackMarkeButton = (CreatePrefabUI(lo_black_market.loadedObject, null, null, false, base._transform, 3000, null) as BlackMarketButton);
 		}
+		if (lo_fortune_wheel != null)
+		{
+			fortuneWheelButton = (CreatePrefabUI(lo_fortune_wheel.loadedObject, null, null, false, base._transform, 3000, null) as FortuneWheelButton);
+		}
 		isLoading = false;
 	}
 
 	public void DeleteUI()
 	{
-		if ((UnityEngine.Object)mainMenu != (UnityEngine.Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		if (mainMenu != null)
 		{
-			UnityEngine.Object.DestroyImmediate(mainMenu.gameObject);
+			Object.DestroyImmediate(mainMenu.get_gameObject());
 			mainMenu = null;
 		}
-		if ((UnityEngine.Object)mainStatus != (UnityEngine.Object)null)
+		if (mainStatus != null)
 		{
-			UnityEngine.Object.DestroyImmediate(mainStatus.gameObject);
+			Object.DestroyImmediate(mainStatus.get_gameObject());
 			mainStatus = null;
 		}
-		if ((UnityEngine.Object)npcMessage != (UnityEngine.Object)null)
+		if (npcMessage != null)
 		{
-			UnityEngine.Object.DestroyImmediate(npcMessage.gameObject);
+			Object.DestroyImmediate(npcMessage.get_gameObject());
 			npcMessage = null;
 		}
-		if ((UnityEngine.Object)bannerView != (UnityEngine.Object)null)
+		if (bannerView != null)
 		{
-			UnityEngine.Object.DestroyImmediate(bannerView.gameObject);
+			Object.DestroyImmediate(bannerView.get_gameObject());
 			bannerView = null;
 		}
 	}
@@ -636,8 +698,9 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 		UIVirtualScreen.InitUIRoot(uiRoot);
 		uiList.ForEach(delegate(UIBehaviour o)
 		{
-			UIVirtualScreen componentInChildren = o.gameObject.GetComponentInChildren<UIVirtualScreen>();
-			if ((UnityEngine.Object)componentInChildren != (UnityEngine.Object)null)
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			UIVirtualScreen componentInChildren = o.get_gameObject().GetComponentInChildren<UIVirtualScreen>();
+			if (componentInChildren != null)
 			{
 				componentInChildren.InitWidget();
 			}
@@ -646,6 +709,7 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	public void SetDisable(DISABLE_FACTOR factor, bool is_disable)
 	{
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 		if (is_disable)
 		{
 			disableFlags |= factor;
@@ -654,18 +718,19 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 		{
 			disableFlags &= ~factor;
 		}
-		system.GetCtrl(SYSTEM.BLOCKER).gameObject.SetActive(disableFlags != (DISABLE_FACTOR)0);
+		system.GetCtrl(SYSTEM.BLOCKER).get_gameObject().SetActive(disableFlags != (DISABLE_FACTOR)0);
 		loading.UpdateUIDisableFactor(disableFlags);
 	}
 
-	public void SetDisableMoment()
+	public unsafe void SetDisableMoment()
 	{
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Expected O, but got Unknown
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Expected O, but got Unknown
 		SetDisable(DISABLE_FACTOR.MOMENT, true);
 		AppMain i = MonoBehaviourSingleton<AppMain>.I;
-		i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-		{
-			SetDisable(DISABLE_FACTOR.MOMENT, false);
-		});
+		i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public bool IsDisable()
@@ -690,15 +755,15 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 				if (!nguiCamera.allowMultiTouch && UICamera.CountInputSources() == 1)
 				{
 					UICamera.MouseOrTouch touch = UICamera.GetTouch(1, false);
-					if (touch != null && (UnityEngine.Object)touch.pressed != (UnityEngine.Object)null)
+					if (touch != null && touch.pressed != null)
 					{
 						UIButton component = touch.pressed.GetComponent<UIButton>();
-						if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+						if (component != null)
 						{
 							component.SetState(UIButtonColor.State.Normal, true);
 						}
 						UIScrollView componentInParent = touch.pressed.GetComponentInParent<UIScrollView>();
-						if ((UnityEngine.Object)componentInParent != (UnityEngine.Object)null)
+						if (componentInParent != null)
 						{
 							componentInParent.Press(false);
 						}
@@ -720,8 +785,8 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	public Transform Find(string name)
 	{
-		UIBehaviour uIBehaviour = uiList.FindLast((UIBehaviour o) => o.name == name);
-		if ((UnityEngine.Object)uIBehaviour != (UnityEngine.Object)null)
+		UIBehaviour uIBehaviour = uiList.FindLast((UIBehaviour o) => o.get_name() == name);
+		if (uIBehaviour != null)
 		{
 			return uIBehaviour._transform;
 		}
@@ -730,8 +795,8 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	public bool IsTransitioning()
 	{
-		UIBehaviour x = uiList.FindLast((UIBehaviour o) => IsTransitioning(o));
-		if ((UnityEngine.Object)x != (UnityEngine.Object)null)
+		UIBehaviour uIBehaviour = uiList.FindLast((UIBehaviour o) => IsTransitioning(o));
+		if (uIBehaviour != null)
 		{
 			return true;
 		}
@@ -761,7 +826,7 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	private static bool IsTransitioning(UIBehaviour ui)
 	{
-		if ((UnityEngine.Object)ui == (UnityEngine.Object)null)
+		if (ui == null)
 		{
 			return false;
 		}
@@ -770,12 +835,17 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	public void AttachScene(GameObject obj, int index = 0)
 	{
-		Utility.Attach((!((UnityEngine.Object)uiCamera != (UnityEngine.Object)null)) ? base._transform : uiCamera.transform, obj.transform);
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Expected O, but got Unknown
+		Utility.Attach((!(uiCamera != null)) ? base._transform : uiCamera.get_transform(), obj.get_transform());
 	}
 
 	public void UpdateDialogBlocker(GameSectionHierarchy hierarchy, GameSceneTables.SectionData new_section_data)
 	{
-		GameObject blocker = system.GetCtrl(SYSTEM.DIALOG_BLOCKER).gameObject;
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Expected O, but got Unknown
+		GameObject blocker = system.GetCtrl(SYSTEM.DIALOG_BLOCKER).get_gameObject();
 		int dialogDialogBlockerDepth = hierarchy.GetDialogDialogBlockerDepth(new_section_data);
 		int num = 3000;
 		if (dialogDialogBlockerDepth > -1)
@@ -792,18 +862,18 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 				blocker.SetActive(false);
 			});
 			dialogBlockerTween.PlayReverse();
-			if (blocker.activeSelf)
+			if (blocker.get_activeSelf())
 			{
 				num = -1;
 			}
 		}
 		if (num > -1)
 		{
-			if ((UnityEngine.Object)mainMenu != (UnityEngine.Object)null)
+			if (mainMenu != null)
 			{
 				mainMenu.baseDepth = num;
 			}
-			if ((UnityEngine.Object)mainStatus != (UnityEngine.Object)null)
+			if (mainStatus != null)
 			{
 				mainStatus.baseDepth = num;
 			}
@@ -831,7 +901,7 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 	public void UpdateMainUI(string scene_name, string section_name)
 	{
 		bool flag = GameSceneGlobalSettings.IsDisplayMainUI(scene_name, section_name, true);
-		if ((UnityEngine.Object)mainMenu != (UnityEngine.Object)null)
+		if (mainMenu != null)
 		{
 			if (flag)
 			{
@@ -843,7 +913,7 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 			}
 		}
 		bool flag2 = GameSceneGlobalSettings.IsDisplayMainStatusUI(scene_name, section_name);
-		if ((UnityEngine.Object)mainStatus != (UnityEngine.Object)null)
+		if (mainStatus != null)
 		{
 			if (flag2)
 			{
@@ -859,7 +929,7 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	private void Update()
 	{
-		if (Input.GetKeyUp(KeyCode.Escape))
+		if (Input.GetKeyUp(27))
 		{
 			if ((!string.IsNullOrEmpty(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialBit) && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP)) || !TutorialStep.HasAllTutorialCompleted())
 			{
@@ -875,12 +945,12 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 			}
 			else if (IsEnableTutorialMessage())
 			{
-				if (tutorialMessage.IsOnlyShowImage() && (UnityEngine.Object)TutorialMessage.GetCursor(0) == (UnityEngine.Object)null)
+				if (tutorialMessage.IsOnlyShowImage() && TutorialMessage.GetCursor(0) == null)
 				{
 					tutorialMessage.TutorialClose();
 				}
 			}
-			else if (!((UnityEngine.Object)tutorialMessage != (UnityEngine.Object)null) || !((UnityEngine.Object)TutorialMessage.GetCursor(0) != (UnityEngine.Object)null))
+			else if (!(tutorialMessage != null) || !(TutorialMessage.GetCursor(0) != null))
 			{
 				ProcessBackKey();
 			}
@@ -891,14 +961,14 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 	{
 		if (MonoBehaviourSingleton<GameSceneManager>.IsValid() && MonoBehaviourSingleton<GameSceneManager>.I.IsBackKeyEventExecutionPossible())
 		{
-			if ((bool)mainChat && mainChat.IsOpeningWindow())
+			if (Object.op_Implicit(mainChat) && mainChat.IsOpeningWindow())
 			{
 				mainChat.OnPressBackKey();
 			}
 			else
 			{
 				GameSection currentSection = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection();
-				if ((UnityEngine.Object)currentSection != (UnityEngine.Object)null && (UnityEngine.Object)currentSection.collectUI != (UnityEngine.Object)null)
+				if (currentSection != null && currentSection.collectUI != null)
 				{
 					if (currentSection.useOnPressBackKey)
 					{
@@ -935,19 +1005,21 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	public AtlasEntry ReplaceAtlas(UISprite sprite, string shader)
 	{
-		if ((UnityEngine.Object)null == (UnityEngine.Object)sprite || (UnityEngine.Object)null == (UnityEngine.Object)sprite.atlas)
+		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0100: Expected O, but got Unknown
+		if (null == sprite || null == sprite.atlas)
 		{
 			return null;
 		}
 		AtlasEntry atlasEntry = atlases.Find(delegate(AtlasEntry o)
 		{
-			if (sprite.atlas.Equals(o.orgAtlas))
+			if (sprite.atlas.Equals((object)o.orgAtlas))
 			{
 				return true;
 			}
 			return false;
 		});
-		if (atlasEntry != null && ((UnityEngine.Object)null == (UnityEngine.Object)atlasEntry.copyAtlas || (UnityEngine.Object)null == (UnityEngine.Object)atlasEntry.orgAtlas))
+		if (atlasEntry != null && (null == atlasEntry.copyAtlas || null == atlasEntry.orgAtlas))
 		{
 			atlases.Remove(atlasEntry);
 			atlasEntry = null;
@@ -955,8 +1027,8 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 		UIAtlas uIAtlas;
 		if (atlasEntry == null)
 		{
-			uIAtlas = ((!((UnityEngine.Object)sprite.atlas.replacement != (UnityEngine.Object)null)) ? ResourceUtility.Instantiate(sprite.atlas) : ResourceUtility.Instantiate(sprite.atlas.replacement));
-			if (!((UnityEngine.Object)uIAtlas == (UnityEngine.Object)null) && !((UnityEngine.Object)uIAtlas.spriteMaterial == (UnityEngine.Object)null))
+			uIAtlas = ((!(sprite.atlas.replacement != null)) ? ResourceUtility.Instantiate<UIAtlas>(sprite.atlas) : ResourceUtility.Instantiate<UIAtlas>(sprite.atlas.replacement));
+			if (!(uIAtlas == null) && !(uIAtlas.spriteMaterial == null))
 			{
 				goto IL_00f4;
 			}
@@ -969,20 +1041,21 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 		return atlasEntry;
 		IL_00f4:
 		uIAtlas.spriteMaterial = new Material(uIAtlas.spriteMaterial);
-		uIAtlas.spriteMaterial.shader = ResourceUtility.FindShader(shader);
+		uIAtlas.spriteMaterial.set_shader(ResourceUtility.FindShader(shader));
 		atlasEntry = new AtlasEntry(sprite.atlas, uIAtlas);
 		atlases.Add(atlasEntry);
-		uIAtlas.name = "_" + sprite.atlas.name;
+		uIAtlas.set_name("_" + sprite.atlas.get_name());
 		goto IL_0154;
 	}
 
 	public void ReleaseAtlas(UISprite sprite)
 	{
-		if (!((UnityEngine.Object)null == (UnityEngine.Object)sprite) && !((UnityEngine.Object)null == (UnityEngine.Object)sprite.atlas))
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		if (!(null == sprite) && !(null == sprite.atlas))
 		{
 			AtlasEntry atlasEntry = atlases.Find(delegate(AtlasEntry o)
 			{
-				if (sprite.atlas.Equals(o.orgAtlas))
+				if (sprite.atlas.Equals((object)o.orgAtlas))
 				{
 					return true;
 				}
@@ -993,10 +1066,10 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 				atlasEntry.orgSpriteList.Remove(sprite);
 				if (0 >= atlasEntry.orgSpriteList.Count)
 				{
-					if ((UnityEngine.Object)null != (UnityEngine.Object)atlasEntry.copyAtlas)
+					if (null != atlasEntry.copyAtlas)
 					{
-						UnityEngine.Object.Destroy(atlasEntry.copyAtlas.spriteMaterial);
-						UnityEngine.Object.Destroy(atlasEntry.copyAtlas.gameObject);
+						Object.Destroy(atlasEntry.copyAtlas.spriteMaterial);
+						Object.Destroy(atlasEntry.copyAtlas.get_gameObject());
 					}
 					atlases.Remove(atlasEntry);
 				}
@@ -1006,13 +1079,14 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	public void GCAtlas()
 	{
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 		int count = atlases.Count;
 		for (int i = 0; i < count; i++)
 		{
 			AtlasEntry atlasEntry = atlases[i];
 			atlasEntry.orgSpriteList.RemoveAll(delegate(UISprite o)
 			{
-				if ((UnityEngine.Object)null == (UnityEngine.Object)o)
+				if (null == o)
 				{
 					return true;
 				}
@@ -1020,17 +1094,17 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 			});
 			if (0 >= atlasEntry.orgSpriteList.Count)
 			{
-				if ((UnityEngine.Object)null != (UnityEngine.Object)atlasEntry.copyAtlas)
+				if (null != atlasEntry.copyAtlas)
 				{
-					UnityEngine.Object.Destroy(atlasEntry.copyAtlas.spriteMaterial);
-					UnityEngine.Object.Destroy(atlasEntry.copyAtlas.gameObject);
+					Object.Destroy(atlasEntry.copyAtlas.spriteMaterial);
+					Object.Destroy(atlasEntry.copyAtlas.get_gameObject());
 				}
 				atlasEntry.copyAtlas = null;
 			}
 		}
 		atlases.RemoveAll(delegate(AtlasEntry o)
 		{
-			if ((UnityEngine.Object)null == (UnityEngine.Object)o.copyAtlas)
+			if (null == o.copyAtlas)
 			{
 				return true;
 			}
@@ -1040,13 +1114,14 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	public void LoadTutorialMessage(Action callback)
 	{
-		StartCoroutine(_LoadTutorialMessage(callback));
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(_LoadTutorialMessage(callback));
 	}
 
 	private IEnumerator _LoadTutorialMessage(Action callback)
 	{
 		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_tutorial = (!((UnityEngine.Object)tutorialMessage == (UnityEngine.Object)null)) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "TutorialMessage", false);
+		LoadObject lo_tutorial = (!(tutorialMessage == null)) ? null : load_queue.Load(RESOURCE_CATEGORY.UI, "TutorialMessage", false);
 		if (load_queue.IsLoading())
 		{
 			yield return (object)load_queue.Wait();
@@ -1055,12 +1130,12 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 		{
 			tutorialMessage = (CreatePrefabUI(lo_tutorial.loadedObject, null, null, false, base._transform, 6500, null) as TutorialMessage);
 		}
-		callback();
+		callback.Invoke();
 	}
 
 	public bool canHideGGTutorialMessage(float waitTIme)
 	{
-		if (Time.time - showGGTutorialMessageTime > waitTIme)
+		if (Time.get_time() - showGGTutorialMessageTime > waitTIme)
 		{
 			return true;
 		}
@@ -1069,19 +1144,20 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	public void ShowGGTutorialMessage()
 	{
-		StartCoroutine("ShowGGTutorialMessage_");
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine("ShowGGTutorialMessage_");
 	}
 
 	public void HideGGTutorialMessage()
 	{
-		StopCoroutine("ShowGGTutorialMessage_");
+		this.StopCoroutine("ShowGGTutorialMessage_");
 		loading.HideTutorialMsg();
 		showGGTutorialMessageTime = 0f;
 	}
 
 	private IEnumerator ShowGGTutorialMessage_()
 	{
-		showGGTutorialMessageTime = Time.time;
+		showGGTutorialMessageTime = Time.get_time();
 		yield return (object)new WaitForSeconds(0.2f);
 		loading.ShowTutorialMsg(StringTable.Get(STRING_CATEGORY.TUTORIAL_LOADING_MSG, 0u), string.Empty);
 		yield return (object)new WaitForSeconds(1f);
@@ -1122,19 +1198,20 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	public void ShowEndGGTutorialMessage()
 	{
-		StartCoroutine("ShowEndGGTutorialMessage_");
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine("ShowEndGGTutorialMessage_");
 	}
 
 	public void HideEndGGTutorialMessage()
 	{
-		StopCoroutine("ShowEndGGTutorialMessage_");
+		this.StopCoroutine("ShowEndGGTutorialMessage_");
 		loading.HideTutorialMsg();
 		showGGTutorialMessageTime = 0f;
 	}
 
 	private IEnumerator ShowEndGGTutorialMessage_()
 	{
-		showGGTutorialMessageTime = Time.time;
+		showGGTutorialMessageTime = Time.get_time();
 		yield return (object)new WaitForSeconds(0.2f);
 		loading.ShowTutorialMsg(StringTable.Get(STRING_CATEGORY.TUTORIAL_LOADING_MSG, 3u), string.Empty);
 		yield return (object)new WaitForSeconds(1f);

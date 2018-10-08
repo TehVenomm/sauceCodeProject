@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SlimeController : MonoBehaviour
+public class SlimeController
 {
 	private const float MOVE_V = 0.15f;
 
@@ -49,7 +49,7 @@ public class SlimeController : MonoBehaviour
 
 	public SlimeAnimation slimeAnim;
 
-	private Vector3 targetVector = Vector3.zero;
+	private Vector3 targetVector = Vector3.get_zero();
 
 	private int subdivionsWidth;
 
@@ -71,7 +71,7 @@ public class SlimeController : MonoBehaviour
 
 	private Vector3 dragPos;
 
-	private Vector3 startPosition = Vector3.zero;
+	private Vector3 startPosition = Vector3.get_zero();
 
 	private float animTime;
 
@@ -87,19 +87,33 @@ public class SlimeController : MonoBehaviour
 		set;
 	}
 
+	public SlimeController()
+		: this()
+	{
+	}//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+	//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+
+
 	private void Awake()
 	{
-		meshFilter = GetComponent<MeshFilter>();
-		meshRenderer = GetComponent<MeshRenderer>();
+		meshFilter = this.GetComponent<MeshFilter>();
+		meshRenderer = this.GetComponent<MeshRenderer>();
 	}
 
 	private void Start()
 	{
-		Color color = meshRenderer.material.color;
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		Color color = meshRenderer.get_material().get_color();
 		color.a = 0f;
-		meshRenderer.material.color = color;
+		meshRenderer.get_material().set_color(color);
 		SetInvisible();
-		parametricPlane = GetComponent<ParametricPlane>();
+		parametricPlane = this.GetComponent<ParametricPlane>();
 		parametricPlane.CreateMesh();
 		Initialize();
 		slimeAnim = new SlimeAnimation(this);
@@ -108,6 +122,11 @@ public class SlimeController : MonoBehaviour
 
 	private void Update()
 	{
+		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
 		if (subdivionsHeight > 0 && subdivionsWidth > 0)
 		{
 			if (isMeshUpdate)
@@ -115,7 +134,7 @@ public class SlimeController : MonoBehaviour
 				if (targetVector.y < 0.5f * parametricPlane._height)
 				{
 					isDrag = false;
-					targetVector = Vector3.zero;
+					targetVector = Vector3.get_zero();
 				}
 				else
 				{
@@ -127,7 +146,7 @@ public class SlimeController : MonoBehaviour
 				{
 					vertWork[i] = nowVectors[i];
 				}
-				meshFilter.mesh.vertices = vertWork;
+				meshFilter.get_mesh().set_vertices(vertWork);
 			}
 			TouchSlimeUpdateAnim();
 		}
@@ -135,12 +154,17 @@ public class SlimeController : MonoBehaviour
 
 	private void Initialize()
 	{
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
 		subdivionsWidth = parametricPlane._subdivisionsWidth + 1;
 		subdivionsHeight = parametricPlane._subdivisionsHeight + 1;
-		firstVectors = meshFilter.mesh.vertices;
-		vertWork = new Vector3[firstVectors.Length];
+		firstVectors = meshFilter.get_mesh().get_vertices();
+		vertWork = (Vector3[])new Vector3[firstVectors.Length];
 		inv_lenghts = new float[firstVectors.Length];
-		nowVectors = new Vector3[firstVectors.Length];
+		nowVectors = (Vector3[])new Vector3[firstVectors.Length];
 		int num = subdivionsWidth / 2;
 		int num2 = 0;
 		dragPos = firstVectors[num2 * subdivionsWidth + num];
@@ -168,7 +192,9 @@ public class SlimeController : MonoBehaviour
 
 	private void SmoothingFilter()
 	{
-		if (targetVector != Vector3.zero)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		if (targetVector != Vector3.get_zero())
 		{
 			SmoothingTargetNotZero();
 		}
@@ -181,39 +207,58 @@ public class SlimeController : MonoBehaviour
 
 	private void SmoothingTargetNotZero()
 	{
+		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
 		float num = targetVector.x - dragPos.x;
 		float num2 = targetVector.y - dragPos.y;
 		int i = 0;
 		for (int num3 = nowVectors.Length; i < num3; i++)
 		{
-			Vector3 vector = firstVectors[i];
+			Vector3 val = firstVectors[i];
 			float num4 = inv_lenghts[i];
-			vector.x += num * num4;
-			vector.y += num2 * num4;
-			nowVectors[i] = vector;
+			val.x += num * num4;
+			val.y += num2 * num4;
+			nowVectors[i] = val;
 		}
 		ResetAnimTime();
-		if (startPosition == Vector3.zero)
+		if (startPosition == Vector3.get_zero())
 		{
-			startPosition = base.transform.localPosition;
+			startPosition = this.get_transform().get_localPosition();
 		}
 	}
 
 	private void SmoothingTargetZero()
 	{
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int num = nowVectors.Length; i < num; i++)
 		{
-			Vector3 vector = firstVectors[i];
-			Vector3 vector2 = nowVectors[i];
+			Vector3 val = firstVectors[i];
+			Vector3 val2 = nowVectors[i];
 			float num2 = 1f - animTime;
-			vector.x = vector.x * animTime + vector2.x * num2;
-			vector.y = vector.y * animTime + vector2.y * num2;
-			nowVectors[i] = vector;
+			val.x = val.x * animTime + val2.x * num2;
+			val.y = val.y * animTime + val2.y * num2;
+			nowVectors[i] = val;
 		}
-		if (startPosition != Vector3.zero)
+		if (startPosition != Vector3.get_zero())
 		{
-			startPosition = Vector3.zero;
+			startPosition = Vector3.get_zero();
 		}
 	}
 
@@ -234,6 +279,8 @@ public class SlimeController : MonoBehaviour
 
 	public void SetTargetPos(Vector3 target)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		targetVector = target;
 		isMeshUpdate = true;
 	}
@@ -263,15 +310,17 @@ public class SlimeController : MonoBehaviour
 
 	private void ResetTarget()
 	{
-		targetVector = Vector3.zero;
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		targetVector = Vector3.get_zero();
 		isMeshUpdate = true;
 	}
 
 	public void SetVisible()
 	{
-		if (!meshRenderer.enabled)
+		if (!meshRenderer.get_enabled())
 		{
-			meshRenderer.enabled = true;
+			meshRenderer.set_enabled(true);
 		}
 	}
 
@@ -282,20 +331,20 @@ public class SlimeController : MonoBehaviour
 			animTime = 0.99f;
 			SmoothingFilter();
 		}
-		meshRenderer.enabled = true;
+		meshRenderer.set_enabled(true);
 	}
 
 	public void SetInvisible()
 	{
-		if (meshRenderer.enabled)
+		if (meshRenderer.get_enabled())
 		{
-			meshRenderer.enabled = false;
+			meshRenderer.set_enabled(false);
 		}
 	}
 
 	public bool IsVisible()
 	{
-		return meshRenderer.enabled;
+		return meshRenderer.get_enabled();
 	}
 
 	private void ResetAnimTime()
@@ -331,6 +380,12 @@ public class SlimeController : MonoBehaviour
 
 	public void CrushPolygon()
 	{
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
 		ResetAnimTime();
 		float num = Random.Range(5f, 5.1f);
 		float num2 = Random.Range(0f, 100f);
@@ -338,36 +393,44 @@ public class SlimeController : MonoBehaviour
 		int i = 0;
 		for (int num4 = nowVectors.Length; i < num4; i++)
 		{
-			Vector3 vector = nowVectors[i];
-			Vector3 vector2 = firstVectors[i];
-			float num5 = Mathf.Atan2(vector.y, vector.x);
+			Vector3 val = nowVectors[i];
+			Vector3 val2 = firstVectors[i];
+			float num5 = Mathf.Atan2(val.y, val.x);
 			float num6 = num3 * (Mathf.Sin(num5 * num + num2) + 1f);
-			vector.x = vector2.x + Mathf.Cos(num5) * num6;
-			vector.y = vector2.y + Mathf.Sin(num5) * num6;
-			nowVectors[i] = vector;
+			val.x = val2.x + Mathf.Cos(num5) * num6;
+			val.y = val2.y + Mathf.Sin(num5) * num6;
+			nowVectors[i] = val;
 		}
 	}
 
 	private void ButtonPolygon(float rate)
 	{
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
 		ResetAnimTime();
 		float num = 4f;
 		float num2 = 45f;
 		float num3 = 0.5f * rate;
-		base.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+		this.get_transform().set_localRotation(Quaternion.Euler(0f, 0f, 0f));
 		int i = 0;
 		for (int num4 = nowVectors.Length; i < num4; i++)
 		{
-			Vector3 vector = nowVectors[i];
-			float num5 = Mathf.Atan2(vector.y, vector.x);
+			Vector3 val = nowVectors[i];
+			float num5 = Mathf.Atan2(val.y, val.x);
 			float num6 = num5 * 57.29578f;
 			if (num6 >= -45f && 135f >= num6)
 			{
-				Vector3 vector2 = firstVectors[i];
+				Vector3 val2 = firstVectors[i];
 				float num7 = num3 * (Mathf.Sin(num5 * num + num2) + 1f) / 2f;
-				vector.x = vector2.x + Mathf.Cos(num5) * num7;
-				vector.y = vector2.y + Mathf.Sin(num5) * num7;
-				nowVectors[i] = vector;
+				val.x = val2.x + Mathf.Cos(num5) * num7;
+				val.y = val2.y + Mathf.Sin(num5) * num7;
+				nowVectors[i] = val;
 			}
 		}
 		SmoothingFilter();

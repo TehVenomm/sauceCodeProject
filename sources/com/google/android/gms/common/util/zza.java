@@ -76,16 +76,17 @@ public final class zza {
         if (bArr.length == 0) {
             return new byte[0];
         }
-        int i = 0;
+        int i;
+        int i2 = 0;
         for (byte[] length : bArr) {
-            i += length.length;
+            i2 += length.length;
         }
-        Object copyOf = Arrays.copyOf(bArr[0], i);
-        i = bArr[0].length;
-        for (int i2 = 1; i2 < bArr.length; i2++) {
-            Object obj = bArr[i2];
-            System.arraycopy(obj, 0, copyOf, i, obj.length);
-            i += obj.length;
+        Object copyOf = Arrays.copyOf(bArr[0], i2);
+        int length2 = bArr[0].length;
+        for (i = 1; i < bArr.length; i++) {
+            Object obj = bArr[i];
+            System.arraycopy(obj, 0, copyOf, length2, obj.length);
+            length2 += obj.length;
         }
         return copyOf;
     }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ChatSlider : MonoBehaviour
+public class ChatSlider
 {
 	private BoxCollider m_Collider;
 
@@ -10,9 +10,9 @@ public class ChatSlider : MonoBehaviour
 	{
 		get
 		{
-			if ((Object)m_Collider == (Object)null)
+			if (m_Collider == null)
 			{
-				m_Collider = GetComponent<BoxCollider>();
+				m_Collider = this.GetComponent<BoxCollider>();
 			}
 			return m_Collider;
 		}
@@ -22,12 +22,19 @@ public class ChatSlider : MonoBehaviour
 	{
 		get
 		{
-			if ((Object)m_Trans == (Object)null)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Expected O, but got Unknown
+			if (m_Trans == null)
 			{
-				m_Trans = base.transform;
+				m_Trans = this.get_transform();
 			}
 			return m_Trans;
 		}
+	}
+
+	public ChatSlider()
+		: this()
+	{
 	}
 
 	private void OnDrag(Vector2 delta)

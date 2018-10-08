@@ -82,46 +82,46 @@ namespace GooglePlayGames.Native.PInvoke
 		[MonoPInvokeCallback(typeof(Builder.OnTurnBasedMatchEventCallback))]
 		private static void InternalOnTurnBasedMatchEventCallback(Types.MultiplayerEvent eventType, string matchId, IntPtr match, IntPtr userData)
 		{
-			Action<Types.MultiplayerEvent, string, NativeTurnBasedMatch> action = Callbacks.IntPtrToPermanentCallback<Action<Types.MultiplayerEvent, string, NativeTurnBasedMatch>>(userData);
-			using (NativeTurnBasedMatch arg = NativeTurnBasedMatch.FromPointer(match))
+			Action<Types.MultiplayerEvent, string, NativeTurnBasedMatch> val = Callbacks.IntPtrToPermanentCallback<Action<Types.MultiplayerEvent, string, NativeTurnBasedMatch>>(userData);
+			using (NativeTurnBasedMatch nativeTurnBasedMatch = NativeTurnBasedMatch.FromPointer(match))
 			{
 				try
 				{
-					action?.Invoke(eventType, matchId, arg);
+					val?.Invoke(eventType, matchId, nativeTurnBasedMatch);
 				}
-				catch (Exception arg2)
+				catch (Exception arg)
 				{
-					Logger.e("Error encountered executing InternalOnTurnBasedMatchEventCallback. Smothering to avoid passing exception into Native: " + arg2);
+					Logger.e("Error encountered executing InternalOnTurnBasedMatchEventCallback. Smothering to avoid passing exception into Native: " + arg);
 				}
 			}
 		}
 
 		internal void SetOnTurnBasedMatchEventCallback(Action<Types.MultiplayerEvent, string, NativeTurnBasedMatch> callback)
 		{
-			IntPtr callback_arg = Callbacks.ToIntPtr(callback);
+			IntPtr callback_arg = Callbacks.ToIntPtr((Delegate)callback);
 			Builder.GameServices_Builder_SetOnTurnBasedMatchEvent(SelfPtr(), InternalOnTurnBasedMatchEventCallback, callback_arg);
 		}
 
 		[MonoPInvokeCallback(typeof(Builder.OnMultiplayerInvitationEventCallback))]
 		private static void InternalOnMultiplayerInvitationEventCallback(Types.MultiplayerEvent eventType, string matchId, IntPtr match, IntPtr userData)
 		{
-			Action<Types.MultiplayerEvent, string, MultiplayerInvitation> action = Callbacks.IntPtrToPermanentCallback<Action<Types.MultiplayerEvent, string, MultiplayerInvitation>>(userData);
-			using (MultiplayerInvitation arg = MultiplayerInvitation.FromPointer(match))
+			Action<Types.MultiplayerEvent, string, MultiplayerInvitation> val = Callbacks.IntPtrToPermanentCallback<Action<Types.MultiplayerEvent, string, MultiplayerInvitation>>(userData);
+			using (MultiplayerInvitation multiplayerInvitation = MultiplayerInvitation.FromPointer(match))
 			{
 				try
 				{
-					action?.Invoke(eventType, matchId, arg);
+					val?.Invoke(eventType, matchId, multiplayerInvitation);
 				}
-				catch (Exception arg2)
+				catch (Exception arg)
 				{
-					Logger.e("Error encountered executing InternalOnMultiplayerInvitationEventCallback. Smothering to avoid passing exception into Native: " + arg2);
+					Logger.e("Error encountered executing InternalOnMultiplayerInvitationEventCallback. Smothering to avoid passing exception into Native: " + arg);
 				}
 			}
 		}
 
 		internal void SetOnMultiplayerInvitationEventCallback(Action<Types.MultiplayerEvent, string, MultiplayerInvitation> callback)
 		{
-			IntPtr callback_arg = Callbacks.ToIntPtr(callback);
+			IntPtr callback_arg = Callbacks.ToIntPtr((Delegate)callback);
 			Builder.GameServices_Builder_SetOnMultiplayerInvitationEvent(SelfPtr(), InternalOnMultiplayerInvitationEventCallback, callback_arg);
 		}
 

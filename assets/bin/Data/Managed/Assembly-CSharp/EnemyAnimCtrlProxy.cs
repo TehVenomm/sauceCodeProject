@@ -1,8 +1,11 @@
-using UnityEngine;
-
-public class EnemyAnimCtrlProxy : MonoBehaviour
+public class EnemyAnimCtrlProxy
 {
 	public EnemyAnimCtrl enemyAnimCtrl;
+
+	public EnemyAnimCtrlProxy()
+		: this()
+	{
+	}
 
 	private void OnAnimatorMove()
 	{

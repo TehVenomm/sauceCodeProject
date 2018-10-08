@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Drag and Drop Item")]
-public class UIDragDropItem : MonoBehaviour
+public class UIDragDropItem
 {
 	public enum Restriction
 	{
@@ -64,11 +64,20 @@ public class UIDragDropItem : MonoBehaviour
 
 	public static List<UIDragDropItem> draggedItems = new List<UIDragDropItem>();
 
+	public UIDragDropItem()
+		: this()
+	{
+	}
+
 	protected virtual void Awake()
 	{
-		mTrans = base.transform;
-		mCollider = base.gameObject.GetComponent<Collider>();
-		mCollider2D = base.gameObject.GetComponent<Collider2D>();
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Expected O, but got Unknown
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		mTrans = this.get_transform();
+		mCollider = this.get_gameObject().GetComponent<Collider>();
+		mCollider2D = this.get_gameObject().GetComponent<Collider2D>();
 	}
 
 	protected virtual void OnEnable()
@@ -85,8 +94,8 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void Start()
 	{
-		mButton = GetComponent<UIButton>();
-		mDragScrollView = GetComponent<UIDragScrollView>();
+		mButton = this.GetComponent<UIButton>();
+		mDragScrollView = this.GetComponent<UIDragScrollView>();
 	}
 
 	protected virtual void OnPress(bool isPressed)
@@ -120,7 +129,11 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void OnDragStart()
 	{
-		if (interactable && base.enabled && mTouch == UICamera.currentTouch)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		if (interactable && this.get_enabled() && mTouch == UICamera.currentTouch)
 		{
 			if (restriction != 0)
 			{
@@ -151,28 +164,49 @@ public class UIDragDropItem : MonoBehaviour
 
 	public virtual void StartDragging()
 	{
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Expected O, but got Unknown
+		//IL_003f: Expected O, but got Unknown
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015b: Expected O, but got Unknown
+		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0171: Expected O, but got Unknown
 		if (interactable && !mDragging)
 		{
 			if (cloneOnDrag)
 			{
 				mPressed = false;
-				GameObject gameObject = NGUITools.AddChild(base.transform.parent.gameObject, base.gameObject);
-				gameObject.transform.localPosition = base.transform.localPosition;
-				gameObject.transform.localRotation = base.transform.localRotation;
-				gameObject.transform.localScale = base.transform.localScale;
-				UIButtonColor component = gameObject.GetComponent<UIButtonColor>();
-				if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+				GameObject val = NGUITools.AddChild(this.get_transform().get_parent().get_gameObject(), this.get_gameObject());
+				val.get_transform().set_localPosition(this.get_transform().get_localPosition());
+				val.get_transform().set_localRotation(this.get_transform().get_localRotation());
+				val.get_transform().set_localScale(this.get_transform().get_localScale());
+				UIButtonColor component = val.GetComponent<UIButtonColor>();
+				if (component != null)
 				{
-					component.defaultColor = GetComponent<UIButtonColor>().defaultColor;
+					component.defaultColor = this.GetComponent<UIButtonColor>().defaultColor;
 				}
-				if (mTouch != null && (UnityEngine.Object)mTouch.pressed == (UnityEngine.Object)base.gameObject)
+				if (mTouch != null && mTouch.pressed == this.get_gameObject())
 				{
-					mTouch.current = gameObject;
-					mTouch.pressed = gameObject;
-					mTouch.dragged = gameObject;
-					mTouch.last = gameObject;
+					mTouch.current = val;
+					mTouch.pressed = val;
+					mTouch.dragged = val;
+					mTouch.last = val;
 				}
-				UIDragDropItem component2 = gameObject.GetComponent<UIDragDropItem>();
+				UIDragDropItem component2 = val.GetComponent<UIDragDropItem>();
 				component2.mTouch = mTouch;
 				component2.mPressed = true;
 				component2.mDragging = true;
@@ -183,8 +217,8 @@ public class UIDragDropItem : MonoBehaviour
 					UICamera.currentTouch = mTouch;
 				}
 				mTouch = null;
-				UICamera.Notify(base.gameObject, "OnPress", false);
-				UICamera.Notify(base.gameObject, "OnHover", false);
+				UICamera.Notify(this.get_gameObject(), "OnPress", false);
+				UICamera.Notify(this.get_gameObject(), "OnHover", false);
 			}
 			else
 			{
@@ -196,7 +230,9 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void OnDrag(Vector2 delta)
 	{
-		if (interactable && mDragging && base.enabled && mTouch == UICamera.currentTouch)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		if (interactable && mDragging && this.get_enabled() && mTouch == UICamera.currentTouch)
 		{
 			OnDragDropMove(delta * mRoot.pixelSizeAdjustment);
 		}
@@ -204,7 +240,7 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void OnDragEnd()
 	{
-		if (interactable && base.enabled && mTouch == UICamera.currentTouch)
+		if (interactable && this.get_enabled() && mTouch == UICamera.currentTouch)
 		{
 			StopDragging(UICamera.hoveredObject);
 		}
@@ -221,53 +257,60 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void OnDragDropStart()
 	{
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a5: Expected O, but got Unknown
+		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015b: Expected O, but got Unknown
 		if (!draggedItems.Contains(this))
 		{
 			draggedItems.Add(this);
 		}
-		if ((UnityEngine.Object)mDragScrollView != (UnityEngine.Object)null)
+		if (mDragScrollView != null)
 		{
-			mDragScrollView.enabled = false;
+			mDragScrollView.set_enabled(false);
 		}
-		if ((UnityEngine.Object)mButton != (UnityEngine.Object)null)
+		if (mButton != null)
 		{
 			mButton.isEnabled = false;
 		}
-		else if ((UnityEngine.Object)mCollider != (UnityEngine.Object)null)
+		else if (mCollider != null)
 		{
-			mCollider.enabled = false;
+			mCollider.set_enabled(false);
 		}
-		else if ((UnityEngine.Object)mCollider2D != (UnityEngine.Object)null)
+		else if (mCollider2D != null)
 		{
-			mCollider2D.enabled = false;
+			mCollider2D.set_enabled(false);
 		}
-		mParent = mTrans.parent;
+		mParent = mTrans.get_parent();
 		mRoot = NGUITools.FindInParents<UIRoot>(mParent);
 		mGrid = NGUITools.FindInParents<UIGrid>(mParent);
 		mTable = NGUITools.FindInParents<UITable>(mParent);
-		if ((UnityEngine.Object)UIDragDropRoot.root != (UnityEngine.Object)null)
+		if (UIDragDropRoot.root != null)
 		{
-			mTrans.parent = UIDragDropRoot.root;
+			mTrans.set_parent(UIDragDropRoot.root);
 		}
-		Vector3 localPosition = mTrans.localPosition;
+		Vector3 localPosition = mTrans.get_localPosition();
 		localPosition.z = 0f;
-		mTrans.localPosition = localPosition;
-		TweenPosition component = GetComponent<TweenPosition>();
-		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+		mTrans.set_localPosition(localPosition);
+		TweenPosition component = this.GetComponent<TweenPosition>();
+		if (component != null)
 		{
-			component.enabled = false;
+			component.set_enabled(false);
 		}
-		SpringPosition component2 = GetComponent<SpringPosition>();
-		if ((UnityEngine.Object)component2 != (UnityEngine.Object)null)
+		SpringPosition component2 = this.GetComponent<SpringPosition>();
+		if (component2 != null)
 		{
-			component2.enabled = false;
+			component2.set_enabled(false);
 		}
-		NGUITools.MarkParentAsChanged(base.gameObject);
-		if ((UnityEngine.Object)mTable != (UnityEngine.Object)null)
+		NGUITools.MarkParentAsChanged(this.get_gameObject());
+		if (mTable != null)
 		{
 			mTable.repositionNow = true;
 		}
-		if ((UnityEngine.Object)mGrid != (UnityEngine.Object)null)
+		if (mGrid != null)
 		{
 			mGrid.repositionNow = true;
 		}
@@ -275,50 +318,66 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void OnDragDropMove(Vector2 delta)
 	{
-		mTrans.localPosition += (Vector3)delta;
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		Transform obj = mTrans;
+		obj.set_localPosition(obj.get_localPosition() + Vector2.op_Implicit(delta));
 	}
 
 	protected virtual void OnDragDropRelease(GameObject surface)
 	{
+		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0103: Expected O, but got Unknown
+		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014e: Expected O, but got Unknown
+		//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019e: Expected O, but got Unknown
 		if (!cloneOnDrag)
 		{
-			if ((UnityEngine.Object)mButton != (UnityEngine.Object)null)
+			if (mButton != null)
 			{
 				mButton.isEnabled = true;
 			}
-			else if ((UnityEngine.Object)mCollider != (UnityEngine.Object)null)
+			else if (mCollider != null)
 			{
-				mCollider.enabled = true;
+				mCollider.set_enabled(true);
 			}
-			else if ((UnityEngine.Object)mCollider2D != (UnityEngine.Object)null)
+			else if (mCollider2D != null)
 			{
-				mCollider2D.enabled = true;
+				mCollider2D.set_enabled(true);
 			}
-			UIDragDropContainer uIDragDropContainer = (!(bool)surface) ? null : NGUITools.FindInParents<UIDragDropContainer>(surface);
-			if ((UnityEngine.Object)uIDragDropContainer != (UnityEngine.Object)null)
+			UIDragDropContainer uIDragDropContainer = (!Object.op_Implicit(surface)) ? null : NGUITools.FindInParents<UIDragDropContainer>(surface);
+			if (uIDragDropContainer != null)
 			{
-				mTrans.parent = ((!((UnityEngine.Object)uIDragDropContainer.reparentTarget != (UnityEngine.Object)null)) ? uIDragDropContainer.transform : uIDragDropContainer.reparentTarget);
-				Vector3 localPosition = mTrans.localPosition;
+				mTrans.set_parent((!(uIDragDropContainer.reparentTarget != null)) ? ((object)uIDragDropContainer.get_transform()) : ((object)uIDragDropContainer.reparentTarget));
+				Vector3 localPosition = mTrans.get_localPosition();
 				localPosition.z = 0f;
-				mTrans.localPosition = localPosition;
+				mTrans.set_localPosition(localPosition);
 			}
 			else
 			{
-				mTrans.parent = mParent;
+				mTrans.set_parent(mParent);
 			}
-			mParent = mTrans.parent;
+			mParent = mTrans.get_parent();
 			mGrid = NGUITools.FindInParents<UIGrid>(mParent);
 			mTable = NGUITools.FindInParents<UITable>(mParent);
-			if ((UnityEngine.Object)mDragScrollView != (UnityEngine.Object)null)
+			if (mDragScrollView != null)
 			{
-				StartCoroutine(EnableDragScrollView());
+				this.StartCoroutine(EnableDragScrollView());
 			}
-			NGUITools.MarkParentAsChanged(base.gameObject);
-			if ((UnityEngine.Object)mTable != (UnityEngine.Object)null)
+			NGUITools.MarkParentAsChanged(this.get_gameObject());
+			if (mTable != null)
 			{
 				mTable.repositionNow = true;
 			}
-			if ((UnityEngine.Object)mGrid != (UnityEngine.Object)null)
+			if (mGrid != null)
 			{
 				mGrid.repositionNow = true;
 			}
@@ -326,7 +385,7 @@ public class UIDragDropItem : MonoBehaviour
 		}
 		else
 		{
-			NGUITools.Destroy(base.gameObject);
+			NGUITools.Destroy(this.get_gameObject());
 		}
 	}
 
@@ -338,9 +397,9 @@ public class UIDragDropItem : MonoBehaviour
 	protected IEnumerator EnableDragScrollView()
 	{
 		yield return (object)new WaitForEndOfFrame();
-		if ((UnityEngine.Object)mDragScrollView != (UnityEngine.Object)null)
+		if (mDragScrollView != null)
 		{
-			mDragScrollView.enabled = true;
+			mDragScrollView.set_enabled(true);
 		}
 	}
 }

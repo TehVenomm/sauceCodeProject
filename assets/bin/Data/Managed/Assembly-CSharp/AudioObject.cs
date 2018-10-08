@@ -66,23 +66,25 @@ public class AudioObject : DisableNotifyMonoBehaviour
 
 	public static AudioObject Create(AudioClip clip, int clip_id, float volume, bool loop, AudioMixerGroup mixer_group, AudioControlGroup controlGroup, bool is3DSound = false, DisableNotifyMonoBehaviour master = null, Transform parent = null, Vector3? initPos = default(Vector3?))
 	{
-		if ((Object)clip == (Object)null)
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		if (clip == null)
 		{
 			return null;
 		}
 		AudioObject audioObject = AudioObjectPool.Borrow();
-		if (!((Object)audioObject == (Object)null))
+		if (!(audioObject == null))
 		{
 			goto IL_0020;
 		}
 		goto IL_0020;
 		IL_0020:
-		audioObject._transform.parent = MonoBehaviourSingleton<SoundManager>.I._transform;
+		audioObject._transform.set_parent(MonoBehaviourSingleton<SoundManager>.I._transform);
 		audioObject.m_masterGroup = controlGroup;
 		audioObject.m_IsSpatialSound = is3DSound;
 		if (initPos.HasValue)
 		{
-			audioObject._transform.position = ((!initPos.HasValue) ? Vector3.zero : initPos.Value);
+			audioObject._transform.set_position((!initPos.HasValue) ? Vector3.get_zero() : initPos.Value);
 			audioObject.m_IsStaticPosition = true;
 		}
 		audioObject.Play(clip, clip_id, volume, loop, mixer_group, master, parent);
@@ -110,26 +112,27 @@ public class AudioObject : DisableNotifyMonoBehaviour
 
 	private void InitAudioSource()
 	{
-		if (!((Object)audioSource == (Object)null))
+		if (!(audioSource == null))
 		{
-			audioSource.outputAudioMixerGroup = null;
-			audioSource.spatialBlend = 0f;
-			audioSource.spread = 0f;
-			audioSource.priority = 128;
-			audioSource.rolloffMode = AudioRolloffMode.Linear;
-			audioSource.minDistance = 0f;
-			audioSource.maxDistance = 999f;
-			audioSource.pitch = 1f;
-			audioSource.dopplerLevel = 0f;
-			audioSource.clip = null;
-			audioSource.loop = false;
-			audioSource.volume = 1f;
+			audioSource.set_outputAudioMixerGroup(null);
+			audioSource.set_spatialBlend(0f);
+			audioSource.set_spread(0f);
+			audioSource.set_priority(128);
+			audioSource.set_rolloffMode(1);
+			audioSource.set_minDistance(0f);
+			audioSource.set_maxDistance(999f);
+			audioSource.set_pitch(1f);
+			audioSource.set_dopplerLevel(0f);
+			audioSource.set_clip(null);
+			audioSource.set_loop(false);
+			audioSource.set_volume(1f);
 		}
 	}
 
 	private void Play(AudioClip clip, int clip_id, float volume, bool loop, AudioMixerGroup mixer_group, DisableNotifyMonoBehaviour master, Transform parent)
 	{
-		if ((Object)master != (Object)null)
+		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+		if (master != null)
 		{
 			SetNotifyMaster(master);
 		}
@@ -139,61 +142,61 @@ public class AudioObject : DisableNotifyMonoBehaviour
 		}
 		clipId = clip_id;
 		PlayPhase = Phase.PREPLAY;
-		if ((Object)audioSource != (Object)null)
+		if (audioSource != null)
 		{
-			audioSource.outputAudioMixerGroup = mixer_group;
+			audioSource.set_outputAudioMixerGroup(mixer_group);
 			if (m_IsSpatialSound)
 			{
-				audioSource.spatialBlend = 1f;
-				audioSource.spread = 360f;
+				audioSource.set_spatialBlend(1f);
+				audioSource.set_spread(360f);
 			}
 			else
 			{
-				audioSource.spatialBlend = 0f;
-				audioSource.spread = 0f;
+				audioSource.set_spatialBlend(0f);
+				audioSource.set_spread(0f);
 			}
-			audioSource.priority = 100;
-			audioSource.rolloffMode = MonoBehaviourSingleton<SoundManager>.I.CurrentPreset.rollOffMode;
-			audioSource.minDistance = MonoBehaviourSingleton<SoundManager>.I.CurrentPreset.minDistance;
-			audioSource.maxDistance = MonoBehaviourSingleton<SoundManager>.I.CurrentPreset.maxDistance;
-			audioSource.pitch = 1f;
+			audioSource.set_priority(100);
+			audioSource.set_rolloffMode(MonoBehaviourSingleton<SoundManager>.I.CurrentPreset.rollOffMode);
+			audioSource.set_minDistance(MonoBehaviourSingleton<SoundManager>.I.CurrentPreset.minDistance);
+			audioSource.set_maxDistance(MonoBehaviourSingleton<SoundManager>.I.CurrentPreset.maxDistance);
+			audioSource.set_pitch(1f);
 		}
 		float num = 1f;
 		float dopplerLevel = 0f;
 		SETable.Data seData = Singleton<SETable>.I.GetSeData((uint)clip_id);
 		if (seData != null)
 		{
-			audioSource.priority = (int)seData.priority;
+			audioSource.set_priority((int)seData.priority);
 			num = seData.volumeScale;
 			dopplerLevel = seData.dopplerLevel;
 			if (seData.minDistance > 0f)
 			{
-				audioSource.minDistance = seData.minDistance;
+				audioSource.set_minDistance(seData.minDistance);
 			}
 			if (seData.maxDistance > 0f)
 			{
-				audioSource.maxDistance = seData.maxDistance;
+				audioSource.set_maxDistance(seData.maxDistance);
 			}
 			if (seData.randomPitch > 0f)
 			{
-				audioSource.pitch = GenRandomPitch();
+				audioSource.set_pitch(GenRandomPitch());
 			}
 		}
-		audioSource.dopplerLevel = dopplerLevel;
-		audioSource.clip = clip;
-		audioSource.loop = loop;
-		audioSource.volume = volume * num;
+		audioSource.set_dopplerLevel(dopplerLevel);
+		audioSource.set_clip(clip);
+		audioSource.set_loop(loop);
+		audioSource.set_volume(volume * num);
 		parentObject = parent;
-		needParent = ((Object)parent != (Object)null);
+		needParent = (parent != null);
 		fadeoutVolume = 0f;
 		TraceParent();
 		audioSource.Play();
-		if ((Object)m_masterGroup != (Object)null)
+		if (m_masterGroup != null)
 		{
 			m_masterGroup.NotifyOnStart(this);
 		}
 		PlayPhase = Phase.PLAYING;
-		timeAtPlay = Time.time;
+		timeAtPlay = Time.get_time();
 	}
 
 	private float GenRandomPitch()
@@ -203,9 +206,9 @@ public class AudioObject : DisableNotifyMonoBehaviour
 
 	protected override void OnDisableMaster()
 	{
-		if (!((Object)audioSource == (Object)null))
+		if (!(audioSource == null))
 		{
-			if (audioSource.loop)
+			if (audioSource.get_loop())
 			{
 				Stop(0);
 			}
@@ -218,11 +221,11 @@ public class AudioObject : DisableNotifyMonoBehaviour
 	{
 		if (needParent)
 		{
-			if ((Object)parentObject != (Object)null)
+			if (parentObject != null)
 			{
 				TraceParent();
 			}
-			else if (audioSource.loop)
+			else if (audioSource.get_loop())
 			{
 				Stop(0);
 				needParent = false;
@@ -230,15 +233,15 @@ public class AudioObject : DisableNotifyMonoBehaviour
 		}
 		if (fadeoutVolume > 0f)
 		{
-			audioSource.volume = Mathf.Max(audioSource.volume - fadeoutVolume, 0f);
-			if (audioSource.volume == 0f)
+			audioSource.set_volume(Mathf.Max(audioSource.get_volume() - fadeoutVolume, 0f));
+			if (audioSource.get_volume() == 0f)
 			{
 				StopImmidiate();
 			}
 		}
-		if (!audioSource.isPlaying)
+		if (!audioSource.get_isPlaying())
 		{
-			if ((Object)m_masterGroup != (Object)null)
+			if (m_masterGroup != null)
 			{
 				m_masterGroup.NotifyOnStop(this);
 				m_masterGroup = null;
@@ -249,22 +252,23 @@ public class AudioObject : DisableNotifyMonoBehaviour
 
 	private void TraceParent()
 	{
-		if (!m_IsStaticPosition && needParent && (Object)parentObject != (Object)null)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		if (!m_IsStaticPosition && needParent && parentObject != null)
 		{
-			base._transform.position = parentObject.position;
+			base._transform.set_position(parentObject.get_position());
 		}
 	}
 
 	public void Stop(int fadeout_framecount = 0)
 	{
-		if (!((Object)audioSource == (Object)null) && !(fadeoutVolume > 0f))
+		if (!(audioSource == null) && !(fadeoutVolume > 0f))
 		{
 			if (fadeout_framecount < 4)
 			{
 				fadeout_framecount = 4;
 			}
-			fadeoutVolume = audioSource.volume / (float)fadeout_framecount;
-			if ((Object)m_masterGroup != (Object)null)
+			fadeoutVolume = audioSource.get_volume() / (float)fadeout_framecount;
+			if (m_masterGroup != null)
 			{
 				m_masterGroup.NotifyOnRelease(this);
 				m_masterGroup = null;
@@ -275,20 +279,20 @@ public class AudioObject : DisableNotifyMonoBehaviour
 
 	public void SetLoopFlag(bool flag)
 	{
-		audioSource.loop = flag;
+		audioSource.set_loop(flag);
 	}
 
 	public bool GetLoopFlag()
 	{
-		return audioSource.loop;
+		return audioSource.get_loop();
 	}
 
 	private void StopImmidiate()
 	{
-		if (!((Object)audioSource == (Object)null) && PlayPhase != 0 && PlayPhase != Phase.STOP)
+		if (!(audioSource == null) && PlayPhase != 0 && PlayPhase != Phase.STOP)
 		{
 			audioSource.Stop();
-			if ((Object)m_masterGroup != (Object)null)
+			if (m_masterGroup != null)
 			{
 				m_masterGroup.NotifyOnStop(this);
 				m_masterGroup = null;
@@ -300,12 +304,12 @@ public class AudioObject : DisableNotifyMonoBehaviour
 	private void Dispose()
 	{
 		InitParams();
-		if ((Object)audioSource != (Object)null)
+		if (audioSource != null)
 		{
 			audioSource.Stop();
 			InitAudioSource();
 		}
-		if ((Object)m_masterGroup != (Object)null)
+		if (m_masterGroup != null)
 		{
 			m_masterGroup.NotifyOnStop(this);
 			m_masterGroup = null;

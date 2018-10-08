@@ -56,7 +56,7 @@ public class EnemyPersonalityTable : Singleton<EnemyPersonalityTable>, IDataTabl
 
 	public void CreateTable(TextAsset textasset)
 	{
-		CreateTable(textasset.text);
+		CreateTable(textasset.get_text());
 	}
 
 	public void CreateTable(string csv)
@@ -67,7 +67,7 @@ public class EnemyPersonalityTable : Singleton<EnemyPersonalityTable>, IDataTabl
 
 	public void AddTable(TextAsset textasset)
 	{
-		TableUtility.AddUIntKeyTable(dataTable, textasset.text, Data.cb, "id,distanceHateRate,shortShortDistance,shortDistance,middleDistance,longDistance,lifeLowerImportance,lifeLownerVolatize,lifeLowerAttackedVolatize,shortShortDistanceDamage,shortDistanceDamage,middleDistanceDamage,longDistanceDamage,damageImportance,damageVolatize,damageAttackedVolatize,healImportance,healVolatize,healAttackedVolatize,skillImportance,skillVolatize,skillDamagedVolatize,skillHateParam,specialDamageImportance,specialDamageVolatize,specialDamageAttackedVolatize,weakPointHate", null);
+		TableUtility.AddUIntKeyTable(dataTable, textasset.get_text(), Data.cb, "id,distanceHateRate,shortShortDistance,shortDistance,middleDistance,longDistance,lifeLowerImportance,lifeLownerVolatize,lifeLowerAttackedVolatize,shortShortDistanceDamage,shortDistanceDamage,middleDistanceDamage,longDistanceDamage,damageImportance,damageVolatize,damageAttackedVolatize,healImportance,healVolatize,healAttackedVolatize,skillImportance,skillVolatize,skillDamagedVolatize,skillHateParam,specialDamageImportance,specialDamageVolatize,specialDamageAttackedVolatize,weakPointHate", null);
 	}
 
 	public Data GetData(uint id)

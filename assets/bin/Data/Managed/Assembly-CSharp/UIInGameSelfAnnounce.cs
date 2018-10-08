@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIInGameSelfAnnounce : MonoBehaviour
+public class UIInGameSelfAnnounce
 {
 	[SerializeField]
 	protected UITweenCtrl tweenCtrl;
@@ -22,6 +22,11 @@ public class UIInGameSelfAnnounce : MonoBehaviour
 
 	private float lockTimer;
 
+	public UIInGameSelfAnnounce()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
 		SetVisible(false);
@@ -29,7 +34,7 @@ public class UIInGameSelfAnnounce : MonoBehaviour
 
 	public void Play(Action callback = null)
 	{
-		if (!((UnityEngine.Object)tweenCtrl == (UnityEngine.Object)null))
+		if (!(tweenCtrl == null))
 		{
 			SetVisible(true);
 			tweenCtrl.Reset();
@@ -39,7 +44,7 @@ public class UIInGameSelfAnnounce : MonoBehaviour
 				lockTimer = lockInterval;
 				if (callback != null)
 				{
-					callback();
+					callback.Invoke();
 				}
 				SetVisible(false);
 			});
@@ -63,7 +68,7 @@ public class UIInGameSelfAnnounce : MonoBehaviour
 	{
 		if (isLockReq)
 		{
-			lockTimer -= Time.deltaTime;
+			lockTimer -= Time.get_deltaTime();
 			if (!(lockTimer > 0f))
 			{
 				panelChange.Lock();

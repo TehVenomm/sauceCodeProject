@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SceneParameter : MonoBehaviour
+public class SceneParameter
 {
 	public Texture2D[] lightmapsFar;
 
@@ -10,17 +10,25 @@ public class SceneParameter : MonoBehaviour
 
 	public LightProbes lightProbes;
 
+	public SceneParameter()
+		: this()
+	{
+	}
+
 	private void OnDisable()
 	{
-		LightmapSettings.lightmaps = null;
-		LightmapSettings.lightProbes = null;
+		LightmapSettings.set_lightmaps((LightmapData[])null);
+		LightmapSettings.set_lightProbes(null);
 	}
 
 	public void Apply()
 	{
-		if ((Object)lightProbes != (Object)null)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Expected O, but got Unknown
+		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+		if (lightProbes != null)
 		{
-			LightmapSettings.lightProbes = lightProbes;
+			LightmapSettings.set_lightProbes(lightProbes);
 			ShaderGlobal.lightProbe = true;
 		}
 		else
@@ -29,19 +37,19 @@ public class SceneParameter : MonoBehaviour
 		}
 		if (lightmapsFar != null && lightmapsFar.Length > 0)
 		{
-			LightmapData[] array = new LightmapData[lightmapsFar.Length];
+			LightmapData[] array = (LightmapData[])new LightmapData[lightmapsFar.Length];
 			int i = 0;
 			for (int num = lightmapsFar.Length; i < num; i++)
 			{
 				array[i] = new LightmapData();
-				array[i].lightmapFar = lightmapsFar[i];
+				array[i].set_lightmapFar(lightmapsFar[i]);
 				if (i < lightmapsNear.Length)
 				{
-					array[i].lightmapNear = lightmapsNear[i];
+					array[i].set_lightmapNear(lightmapsNear[i]);
 				}
 			}
-			LightmapSettings.lightmapsMode = lightmapMode;
-			LightmapSettings.lightmaps = array;
+			LightmapSettings.set_lightmapsMode(lightmapMode);
+			LightmapSettings.set_lightmaps(array);
 		}
 	}
 }

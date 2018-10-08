@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIProgressWork : MonoBehaviour
+public class UIProgressWork
 {
 	private int min;
 
@@ -64,9 +64,14 @@ public class UIProgressWork : MonoBehaviour
 		private set;
 	}
 
+	public UIProgressWork()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
-		progress = GetComponent<UIProgressBar>();
+		progress = this.GetComponent<UIProgressBar>();
 		UpdateValue();
 		EventDelegate.Add(progress.onChange, OnValueChange);
 	}
@@ -85,12 +90,12 @@ public class UIProgressWork : MonoBehaviour
 				min = max;
 			}
 			int num = max - min;
-			progress.enabled = true;
+			progress.set_enabled(true);
 			if (num == 0)
 			{
 				SetValue(1f);
 				progress.numberOfSteps = 0;
-				progress.enabled = false;
+				progress.set_enabled(false);
 			}
 			else
 			{
@@ -102,9 +107,9 @@ public class UIProgressWork : MonoBehaviour
 
 	private void SetValue(float value)
 	{
-		bool enabled = progress.enabled;
+		bool enabled = progress.get_enabled();
 		bool flag = enableUpdateValue;
-		progress.enabled = true;
+		progress.set_enabled(true);
 		enableUpdateValue = false;
 		if (progress.value == value)
 		{
@@ -112,6 +117,6 @@ public class UIProgressWork : MonoBehaviour
 		}
 		progress.value = value;
 		enableUpdateValue = flag;
-		progress.enabled = enabled;
+		progress.set_enabled(enabled);
 	}
 }

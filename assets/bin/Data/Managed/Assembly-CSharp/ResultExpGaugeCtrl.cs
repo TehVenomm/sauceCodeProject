@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [RequireComponent(typeof(UISprite))]
-public class ResultExpGaugeCtrl : MonoBehaviour
+public class ResultExpGaugeCtrl
 {
 	public AnimationCurve lvUpCurve;
 
@@ -55,9 +55,14 @@ public class ResultExpGaugeCtrl : MonoBehaviour
 		private set;
 	}
 
+	public ResultExpGaugeCtrl()
+		: this()
+	{
+	}
+
 	public void InitDirection(Action<ResultExpGaugeCtrl> initialize_call = null)
 	{
-		progress = GetComponent<UISprite>();
+		progress = this.GetComponent<UISprite>();
 		initialize_call?.Invoke(this);
 		totalExp = getExp + startExp;
 		startLevel = nowLevel;
@@ -114,17 +119,17 @@ public class ResultExpGaugeCtrl : MonoBehaviour
 		{
 			num3 = startExp;
 		}
-		float deltaTime = Time.deltaTime;
+		float deltaTime = Time.get_deltaTime();
 		time += deltaTime;
 		if (flag)
 		{
-			float max = lvUpCurve.keys[lvUpCurve.length - 1].time;
-			addCountExpValue = lvUpCurve.Evaluate(Mathf.Clamp(time, 0f, max)) * num2 + num3;
+			float num4 = lvUpCurve.get_keys()[lvUpCurve.get_length() - 1].get_time();
+			addCountExpValue = lvUpCurve.Evaluate(Mathf.Clamp(time, 0f, num4)) * num2 + num3;
 		}
 		else
 		{
-			float max2 = lastDirectionCurve.keys[lastDirectionCurve.length - 1].time;
-			addCountExpValue = lastDirectionCurve.Evaluate(Mathf.Clamp(time, 0f, max2)) * num2 + num3;
+			float num5 = lastDirectionCurve.get_keys()[lastDirectionCurve.get_length() - 1].get_time();
+			addCountExpValue = lastDirectionCurve.Evaluate(Mathf.Clamp(time, 0f, num5)) * num2 + num3;
 		}
 	}
 
@@ -135,7 +140,7 @@ public class ResultExpGaugeCtrl : MonoBehaviour
 			if (getExp > 0f)
 			{
 				bool flag = false;
-				bool arg = false;
+				bool flag2 = false;
 				beforeUpdateLevel = nowLevel;
 				UpdateCurveEvaluate();
 				float num = addCountExpValue;
@@ -148,7 +153,7 @@ public class ResultExpGaugeCtrl : MonoBehaviour
 					isEnd = true;
 					if (callBack != null)
 					{
-						callBack();
+						callBack.Invoke();
 					}
 				}
 				float num2 = 0f;
@@ -157,7 +162,7 @@ public class ResultExpGaugeCtrl : MonoBehaviour
 					num2 = (num - (float)(int)nowLevelTable.needExp) / (float)((int)levelTable.needExp - (int)nowLevelTable.needExp);
 					if (num2 >= 1f)
 					{
-						arg = true;
+						flag2 = true;
 						progress.fillAmount = 0f;
 						nowLevel++;
 						remainLevelUpCnt--;
@@ -181,7 +186,7 @@ public class ResultExpGaugeCtrl : MonoBehaviour
 				while (num2 >= 1f);
 				if (OnUpdate != null)
 				{
-					OnUpdate(arg, (int)(num - startExp), this);
+					OnUpdate.Invoke(flag2, (int)(num - startExp), this);
 				}
 			}
 			else
@@ -190,7 +195,7 @@ public class ResultExpGaugeCtrl : MonoBehaviour
 				isEnd = true;
 				if (callBack != null)
 				{
-					callBack();
+					callBack.Invoke();
 				}
 			}
 		}

@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -36,6 +37,7 @@ public class LimitedLoginBonusGet : GameSection
 
 	public override void Initialize()
 	{
+		//IL_02d4: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize();
 		texModel_ = Utility.Find(base._transform, "TEX_MODEL");
 		texModelRenderTexture_ = UIModelRenderTexture.Get(texModel_);
@@ -47,14 +49,14 @@ public class LimitedLoginBonusGet : GameSection
 		LoginBonus loginBonus = (LoginBonus)GameSection.GetEventData();
 		if (loginBonus != null)
 		{
-			SetLabelText(UI.LBL_LOGIN_DAYS, loginBonus.name);
+			SetLabelText((Enum)UI.LBL_LOGIN_DAYS, loginBonus.name);
 			if (loginBonus.reward.Count > 0)
 			{
 				reward = loginBonus.reward[0];
-				SetLabelText(UI.LBL_GET_ITEM, reward.name);
+				SetLabelText((Enum)UI.LBL_GET_ITEM, reward.name);
 				if (reward.type == 14)
 				{
-					SetRenderAccessoryModel(UI.TEX_MODEL, (uint)reward.itemId, reward.GetScale(), true, false);
+					SetRenderAccessoryModel((Enum)UI.TEX_MODEL, (uint)reward.itemId, reward.GetScale(), true, false);
 					texModelTexture_.width = 300;
 					texModelTexture_.height = 300;
 					isModel = true;
@@ -68,7 +70,7 @@ public class LimitedLoginBonusGet : GameSection
 				}
 				else if (reward.type == 4)
 				{
-					SetRenderEquipModel(UI.TEX_MODEL, (uint)reward.itemId, -1, -1, reward.GetScale());
+					SetRenderEquipModel((Enum)UI.TEX_MODEL, (uint)reward.itemId, -1, -1, reward.GetScale());
 					texModelTexture_.width = 300;
 					texModelTexture_.height = 300;
 					isModel = true;
@@ -87,7 +89,7 @@ public class LimitedLoginBonusGet : GameSection
 				}
 				if (!isModel)
 				{
-					StartCoroutine("LoadIcon");
+					this.StartCoroutine("LoadIcon");
 				}
 				float rotateSpeed = 35f;
 				texModelRenderTexture_.SetRotateSpeed(rotateSpeed);
@@ -101,8 +103,8 @@ public class LimitedLoginBonusGet : GameSection
 		yield return (object)null;
 		LoginBonus.LoginBonusReward r = reward;
 		ItemIcon icon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)r.type, (uint)r.itemId, GetCtrl(UI.OBJ_DETAIL_ROOT), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-		icon.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
-		GetCtrl(UI.OBJ_DETAIL_ROOT).localPosition = new Vector3(0f, 50f, 0f);
+		icon.transform.set_localScale(new Vector3(1.5f, 1.5f, 1.5f));
+		GetCtrl(UI.OBJ_DETAIL_ROOT).set_localPosition(new Vector3(0f, 50f, 0f));
 	}
 
 	private bool IsDispItem3D(int itemID)
@@ -134,9 +136,10 @@ public class LimitedLoginBonusGet : GameSection
 
 	private void OnQuery_CLOSE()
 	{
-		if ((Object)null != (Object)glowModel_)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		if (null != glowModel_)
 		{
-			glowModel_.gameObject.SetActive(false);
+			glowModel_.get_gameObject().SetActive(false);
 		}
 		GameSection.BackSection();
 	}

@@ -36,12 +36,12 @@ public static class JSONSerializer
 
 	private static string GetName(FieldInfo fi)
 	{
-		FormerlySerializedAsAttribute formerlySerializedAsAttribute = fi.GetCustomAttributes(typeof(FormerlySerializedAsAttribute), false).FirstOrDefault() as FormerlySerializedAsAttribute;
-		if (formerlySerializedAsAttribute == null)
+		FormerlySerializedAsAttribute val = fi.GetCustomAttributes(typeof(FormerlySerializedAsAttribute), false).FirstOrDefault() as FormerlySerializedAsAttribute;
+		if (val == null)
 		{
 			return fi.Name;
 		}
-		return formerlySerializedAsAttribute.oldName;
+		return val.get_oldName();
 	}
 
 	private static IEnumerable<FieldInfo> GetTargetFields(Type type)
@@ -63,6 +63,11 @@ public static class JSONSerializer
 
 	private static void SerializeObject(JSONOutStream stream, Type type, object message)
 	{
+		//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0270: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028e: Unknown result type (might be due to invalid IL or missing references)
 		MethodInfo method = type.GetMethod("ToJSON");
 		if (method != null)
 		{
@@ -82,7 +87,7 @@ public static class JSONSerializer
 					stream.Content(GetName(item), (string)item.GetValue(message));
 					break;
 				case "System.Single":
-					stream.Content(GetName(item), (float)item.GetValue(message));
+					stream.Content(GetName(item), (XorFloat)(float)item.GetValue(message));
 					break;
 				case "System.Double":
 					stream.Content(GetName(item), (double)item.GetValue(message));
@@ -167,6 +172,11 @@ public static class JSONSerializer
 
 	private static void SerializeListElement(JSONOutStream stream, Type type, object message, int i)
 	{
+		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
 		if (!type.IsEnum)
 		{
 			switch (type.ToString())
@@ -175,7 +185,7 @@ public static class JSONSerializer
 				stream.Content(i, (string)message);
 				break;
 			case "System.Single":
-				stream.Content(i, (float)message);
+				stream.Content(i, (XorFloat)(float)message);
 				break;
 			case "System.Double":
 				stream.Content(i, (double)message);
@@ -223,8 +233,13 @@ public static class JSONSerializer
 		}
 	}
 
-	private static object DeserializeObject(JSONInStream stream, Type type)
+	private unsafe static object DeserializeObject(JSONInStream stream, Type type)
 	{
+		//IL_0291: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_032a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_035d: Unknown result type (might be due to invalid IL or missing references)
 		MethodInfo method = type.GetMethod("FromJSON");
 		if (method != null)
 		{
@@ -345,14 +360,8 @@ public static class JSONSerializer
 						Type type2 = typeFromHandle.MakeGenericType(containedType);
 						MethodInfo addMethod = type2.GetMethod("Add");
 						object list = Activator.CreateInstance(type2);
-						stream.List(GetName(item), delegate(int i, JSONInStream stream2)
-						{
-							object obj3 = DeserializeListElement(stream2, containedType);
-							addMethod.Invoke(list, new object[1]
-							{
-								obj3
-							});
-						});
+						_003CDeserializeObject_003Ec__AnonStorey85D _003CDeserializeObject_003Ec__AnonStorey85D;
+						stream.List(GetName(item), new Action<int, JSONInStream>((object)_003CDeserializeObject_003Ec__AnonStorey85D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 						item.SetValue(obj, list);
 					}
 					else if (item.FieldType.IsArray)
@@ -363,14 +372,8 @@ public static class JSONSerializer
 						MethodInfo addMethod2 = type3.GetMethod("Add");
 						MethodInfo method2 = type3.GetMethod("ToArray");
 						object list2 = Activator.CreateInstance(type3);
-						stream.List(GetName(item), delegate(int i, JSONInStream stream2)
-						{
-							object obj2 = DeserializeListElement(stream2, containedType2);
-							addMethod2.Invoke(list2, new object[1]
-							{
-								obj2
-							});
-						});
+						_003CDeserializeObject_003Ec__AnonStorey85E _003CDeserializeObject_003Ec__AnonStorey85E;
+						stream.List(GetName(item), new Action<int, JSONInStream>((object)_003CDeserializeObject_003Ec__AnonStorey85E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 						object value2 = method2.Invoke(list2, new object[0]);
 						item.SetValue(obj, value2);
 					}
@@ -400,6 +403,11 @@ public static class JSONSerializer
 
 	private static object DeserializeListElement(JSONInStream stream, Type type)
 	{
+		//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
 		if (!type.IsEnum)
 		{
 			switch (type.ToString())

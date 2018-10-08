@@ -563,26 +563,26 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
         /*
         r7 = this;
         r0 = 0;
-        r2 = r7.getCurrentSessionId();	 Catch:{ Exception -> 0x0051, all -> 0x0088 }
+        r2 = r7.getCurrentSessionId();	 Catch:{ Exception -> 0x0051, all -> 0x0085 }
         if (r2 == 0) goto L_0x0043;
     L_0x0007:
-        com.crashlytics.android.core.CrashlyticsCore.recordFatalExceptionEvent(r2);	 Catch:{ Exception -> 0x0051, all -> 0x0088 }
-        r1 = new com.crashlytics.android.core.ClsFileOutputStream;	 Catch:{ Exception -> 0x0051, all -> 0x0088 }
-        r3 = r7.filesDir;	 Catch:{ Exception -> 0x0051, all -> 0x0088 }
-        r4 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0051, all -> 0x0088 }
-        r4.<init>();	 Catch:{ Exception -> 0x0051, all -> 0x0088 }
-        r4 = r4.append(r2);	 Catch:{ Exception -> 0x0051, all -> 0x0088 }
+        com.crashlytics.android.core.CrashlyticsCore.recordFatalExceptionEvent(r2);	 Catch:{ Exception -> 0x0051, all -> 0x0085 }
+        r1 = new com.crashlytics.android.core.ClsFileOutputStream;	 Catch:{ Exception -> 0x0051, all -> 0x0085 }
+        r3 = r7.filesDir;	 Catch:{ Exception -> 0x0051, all -> 0x0085 }
+        r4 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0051, all -> 0x0085 }
+        r4.<init>();	 Catch:{ Exception -> 0x0051, all -> 0x0085 }
+        r4 = r4.append(r2);	 Catch:{ Exception -> 0x0051, all -> 0x0085 }
         r5 = "SessionCrash";
-        r4 = r4.append(r5);	 Catch:{ Exception -> 0x0051, all -> 0x0088 }
-        r4 = r4.toString();	 Catch:{ Exception -> 0x0051, all -> 0x0088 }
-        r1.<init>(r3, r4);	 Catch:{ Exception -> 0x0051, all -> 0x0088 }
+        r4 = r4.append(r5);	 Catch:{ Exception -> 0x0051, all -> 0x0085 }
+        r4 = r4.toString();	 Catch:{ Exception -> 0x0051, all -> 0x0085 }
+        r1.<init>(r3, r4);	 Catch:{ Exception -> 0x0051, all -> 0x0085 }
         r0 = com.crashlytics.android.core.CodedOutputStream.newInstance(r1);	 Catch:{ Exception -> 0x007b, all -> 0x006f }
-        r3 = new com.crashlytics.android.core.MetaDataStore;	 Catch:{ Exception -> 0x0083, all -> 0x006f }
-        r4 = r7.filesDir;	 Catch:{ Exception -> 0x0083, all -> 0x006f }
-        r3.<init>(r4);	 Catch:{ Exception -> 0x0083, all -> 0x006f }
-        r2 = r3.readKeyData(r2);	 Catch:{ Exception -> 0x0083, all -> 0x006f }
-        r3 = r7.logFileManager;	 Catch:{ Exception -> 0x0083, all -> 0x006f }
-        com.crashlytics.android.core.NativeCrashWriter.writeNativeCrash(r8, r3, r2, r0);	 Catch:{ Exception -> 0x0083, all -> 0x006f }
+        r3 = new com.crashlytics.android.core.MetaDataStore;	 Catch:{ Exception -> 0x0080, all -> 0x006f }
+        r4 = r7.filesDir;	 Catch:{ Exception -> 0x0080, all -> 0x006f }
+        r3.<init>(r4);	 Catch:{ Exception -> 0x0080, all -> 0x006f }
+        r2 = r3.readKeyData(r2);	 Catch:{ Exception -> 0x0080, all -> 0x006f }
+        r3 = r7.logFileManager;	 Catch:{ Exception -> 0x0080, all -> 0x006f }
+        com.crashlytics.android.core.NativeCrashWriter.writeNativeCrash(r8, r3, r2, r0);	 Catch:{ Exception -> 0x0080, all -> 0x006f }
     L_0x0038:
         r2 = "Failed to flush to session begin file.";
         io.fabric.sdk.android.services.common.CommonUtils.flushOrLog(r0, r2);
@@ -591,11 +591,11 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
     L_0x0042:
         return;
     L_0x0043:
-        r1 = io.fabric.sdk.android.Fabric.getLogger();	 Catch:{ Exception -> 0x0051, all -> 0x0088 }
+        r1 = io.fabric.sdk.android.Fabric.getLogger();	 Catch:{ Exception -> 0x0051, all -> 0x0085 }
         r2 = "Fabric";
         r3 = "Tried to write a native crash while no session was open.";
         r4 = 0;
-        r1.mo4292e(r2, r3, r4);	 Catch:{ Exception -> 0x0051, all -> 0x0088 }
+        r1.mo4292e(r2, r3, r4);	 Catch:{ Exception -> 0x0051, all -> 0x0085 }
         r1 = r0;
         goto L_0x0038;
     L_0x0051:
@@ -605,15 +605,15 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
         r0 = r1;
         r1 = r6;
     L_0x0056:
-        r3 = io.fabric.sdk.android.Fabric.getLogger();	 Catch:{ all -> 0x008b }
+        r3 = io.fabric.sdk.android.Fabric.getLogger();	 Catch:{ all -> 0x0088 }
         r4 = "Fabric";
         r5 = "An error occurred in the native crash logger";
-        r3.mo4292e(r4, r5, r0);	 Catch:{ all -> 0x008b }
-        com.crashlytics.android.core.ExceptionUtils.writeStackTraceIfNotNull(r0, r2);	 Catch:{ all -> 0x008b }
+        r3.mo4292e(r4, r5, r0);	 Catch:{ all -> 0x0088 }
+        com.crashlytics.android.core.ExceptionUtils.writeStackTraceIfNotNull(r0, r1);	 Catch:{ all -> 0x0088 }
         r0 = "Failed to flush to session begin file.";
-        io.fabric.sdk.android.services.common.CommonUtils.flushOrLog(r1, r0);
+        io.fabric.sdk.android.services.common.CommonUtils.flushOrLog(r2, r0);
         r0 = "Failed to close fatal exception file output stream.";
-        io.fabric.sdk.android.services.common.CommonUtils.closeOrLog(r2, r0);
+        io.fabric.sdk.android.services.common.CommonUtils.closeOrLog(r1, r0);
         goto L_0x0042;
     L_0x006f:
         r2 = move-exception;
@@ -628,26 +628,21 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
         r6 = r2;
         r2 = r0;
         r0 = r6;
-    L_0x007f:
-        r6 = r2;
-        r2 = r1;
-        r1 = r6;
         goto L_0x0056;
-    L_0x0083:
+    L_0x0080:
         r2 = move-exception;
         r6 = r2;
         r2 = r0;
         r0 = r6;
-        goto L_0x007f;
-    L_0x0088:
+        goto L_0x0056;
+    L_0x0085:
         r2 = move-exception;
         r1 = r0;
         goto L_0x0070;
-    L_0x008b:
+    L_0x0088:
         r0 = move-exception;
         r6 = r0;
-        r0 = r1;
-        r1 = r2;
+        r0 = r2;
         r2 = r6;
         goto L_0x0070;
         */
@@ -778,83 +773,87 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
     }
 
     private void writeSessionApp(String str) throws Exception {
-        OutputStream clsFileOutputStream;
         Throwable e;
         Flushable flushable;
-        Closeable closeable = null;
+        Throwable th;
+        Closeable closeable;
+        Object obj;
+        Flushable flushable2 = null;
+        OutputStream clsFileOutputStream;
         try {
             clsFileOutputStream = new ClsFileOutputStream(this.filesDir, str + SESSION_APP_TAG);
             try {
-                closeable = CodedOutputStream.newInstance(clsFileOutputStream);
-                this.sessionDataWriter.writeSessionApp(closeable, this.crashlyticsCore.getPackageName(), this.crashlyticsCore.getVersionCode(), this.crashlyticsCore.getVersionName(), this.idManager.getAppInstallIdentifier(), DeliveryMechanism.determineFrom(this.crashlyticsCore.getInstallerPackageName()).getId());
-                CommonUtils.flushOrLog(closeable, "Failed to flush to session app file.");
+                flushable2 = CodedOutputStream.newInstance(clsFileOutputStream);
+                this.sessionDataWriter.writeSessionApp(flushable2, this.crashlyticsCore.getPackageName(), this.crashlyticsCore.getVersionCode(), this.crashlyticsCore.getVersionName(), this.idManager.getAppInstallIdentifier(), DeliveryMechanism.determineFrom(this.crashlyticsCore.getInstallerPackageName()).getId());
+                CommonUtils.flushOrLog(flushable2, "Failed to flush to session app file.");
                 CommonUtils.closeOrLog(clsFileOutputStream, "Failed to close session app file.");
             } catch (Exception e2) {
                 e = e2;
                 try {
                     ExceptionUtils.writeStackTraceIfNotNull(e, clsFileOutputStream);
                     throw e;
-                } catch (Throwable th) {
-                    e = th;
-                    flushable = closeable;
+                } catch (Throwable e3) {
+                    flushable = flushable2;
+                    th = e3;
                     closeable = clsFileOutputStream;
                     CommonUtils.flushOrLog(flushable, "Failed to flush to session app file.");
                     CommonUtils.closeOrLog(closeable, "Failed to close session app file.");
-                    throw e;
+                    throw th;
                 }
-            } catch (Throwable th2) {
-                e = th2;
-                Object obj = closeable;
-                Object obj2 = clsFileOutputStream;
+            } catch (Throwable e32) {
+                flushable = flushable2;
+                th = e32;
+                obj = clsFileOutputStream;
                 CommonUtils.flushOrLog(flushable, "Failed to flush to session app file.");
                 CommonUtils.closeOrLog(closeable, "Failed to close session app file.");
-                throw e;
+                throw th;
             }
-        } catch (Exception e3) {
-            e = e3;
+        } catch (Exception e4) {
+            e32 = e4;
             clsFileOutputStream = null;
-            ExceptionUtils.writeStackTraceIfNotNull(e, clsFileOutputStream);
-            throw e;
-        } catch (Throwable th3) {
-            e = th3;
+            ExceptionUtils.writeStackTraceIfNotNull(e32, clsFileOutputStream);
+            throw e32;
+        } catch (Throwable e322) {
             flushable = null;
+            th = e322;
+            obj = null;
             CommonUtils.flushOrLog(flushable, "Failed to flush to session app file.");
             CommonUtils.closeOrLog(closeable, "Failed to close session app file.");
-            throw e;
+            throw th;
         }
     }
 
     private void writeSessionDevice(String str) throws Exception {
+        Flushable newInstance;
         Throwable e;
         OutputStream outputStream;
-        Throwable th;
         Flushable flushable;
-        Closeable closeable;
-        Throwable th2;
+        Throwable th;
         Object obj;
-        Flushable flushable2 = null;
+        Closeable closeable = null;
         try {
             OutputStream clsFileOutputStream = new ClsFileOutputStream(this.filesDir, str + SESSION_DEVICE_TAG);
             try {
-                flushable2 = CodedOutputStream.newInstance(clsFileOutputStream);
+                newInstance = CodedOutputStream.newInstance(clsFileOutputStream);
             } catch (Exception e2) {
                 e = e2;
-                flushable2 = null;
+                newInstance = null;
                 try {
                     ExceptionUtils.writeStackTraceIfNotNull(e, outputStream);
                     throw e;
-                } catch (Throwable th3) {
-                    th = th3;
-                    flushable = flushable2;
+                } catch (Throwable e3) {
+                    flushable = newInstance;
+                    th = e3;
                     closeable = outputStream;
                     CommonUtils.flushOrLog(flushable, "Failed to flush session device info.");
                     CommonUtils.closeOrLog(closeable, "Failed to close session device file.");
                     throw th;
                 }
-            } catch (Throwable th4) {
-                th2 = th4;
-                flushable = null;
-                th = th2;
+            } catch (Throwable th2) {
+                e3 = th2;
+                newInstance = null;
+                flushable = newInstance;
+                th = e3;
                 obj = clsFileOutputStream;
                 CommonUtils.flushOrLog(flushable, "Failed to flush session device info.");
                 CommonUtils.closeOrLog(closeable, "Failed to close session device file.");
@@ -865,31 +864,30 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
                 StatFs statFs = new StatFs(Environment.getDataDirectory().getPath());
                 long blockCount = (long) statFs.getBlockCount();
                 long blockSize = (long) statFs.getBlockSize();
-                this.sessionDataWriter.writeSessionDevice(flushable2, this.idManager.getDeviceUUID(), CommonUtils.getCpuArchitectureInt(), Build.MODEL, Runtime.getRuntime().availableProcessors(), CommonUtils.getTotalRamInBytes(), blockCount * blockSize, CommonUtils.isEmulator(context), this.idManager.getDeviceIdentifiers(), CommonUtils.getDeviceState(context), Build.MANUFACTURER, Build.PRODUCT);
-                CommonUtils.flushOrLog(flushable2, "Failed to flush session device info.");
+                this.sessionDataWriter.writeSessionDevice(newInstance, this.idManager.getDeviceUUID(), CommonUtils.getCpuArchitectureInt(), Build.MODEL, Runtime.getRuntime().availableProcessors(), CommonUtils.getTotalRamInBytes(), blockCount * blockSize, CommonUtils.isEmulator(context), this.idManager.getDeviceIdentifiers(), CommonUtils.getDeviceState(context), Build.MANUFACTURER, Build.PRODUCT);
+                CommonUtils.flushOrLog(newInstance, "Failed to flush session device info.");
                 CommonUtils.closeOrLog(clsFileOutputStream, "Failed to close session device file.");
-            } catch (Exception e3) {
-                e = e3;
-                ExceptionUtils.writeStackTraceIfNotNull(e, outputStream);
-                throw e;
-            } catch (Throwable e4) {
-                Throwable th5 = e4;
-                flushable = flushable2;
-                th2 = th5;
-                th = th2;
+            } catch (Exception e4) {
+                e3 = e4;
+                ExceptionUtils.writeStackTraceIfNotNull(e3, outputStream);
+                throw e3;
+            } catch (Throwable th3) {
+                e3 = th3;
+                flushable = newInstance;
+                th = e3;
                 obj = clsFileOutputStream;
                 CommonUtils.flushOrLog(flushable, "Failed to flush session device info.");
                 CommonUtils.closeOrLog(closeable, "Failed to close session device file.");
                 throw th;
             }
         } catch (Exception e5) {
-            e4 = e5;
+            e3 = e5;
             outputStream = null;
-            ExceptionUtils.writeStackTraceIfNotNull(e4, outputStream);
-            throw e4;
-        } catch (Throwable th6) {
-            th = th6;
-            closeable = null;
+            newInstance = null;
+            ExceptionUtils.writeStackTraceIfNotNull(e3, outputStream);
+            throw e3;
+        } catch (Throwable th4) {
+            th = th4;
             flushable = null;
             CommonUtils.flushOrLog(flushable, "Failed to flush session device info.");
             CommonUtils.closeOrLog(closeable, "Failed to close session device file.");
@@ -938,49 +936,70 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
     }
 
     private void writeSessionOS(String str) throws Exception {
-        Closeable clsFileOutputStream;
+        Throwable th;
         Throwable e;
+        Throwable th2;
         Flushable flushable = null;
+        Closeable clsFileOutputStream;
+        Flushable newInstance;
         try {
             clsFileOutputStream = new ClsFileOutputStream(this.filesDir, str + SESSION_OS_TAG);
             try {
-                flushable = CodedOutputStream.newInstance((OutputStream) clsFileOutputStream);
-                this.sessionDataWriter.writeSessionOS(flushable, CommonUtils.isRooted(this.crashlyticsCore.getContext()));
-                CommonUtils.flushOrLog(flushable, "Failed to flush to session OS file.");
-                CommonUtils.closeOrLog(clsFileOutputStream, "Failed to close session OS file.");
-            } catch (Exception e2) {
-                e = e2;
+                newInstance = CodedOutputStream.newInstance((OutputStream) clsFileOutputStream);
                 try {
-                    ExceptionUtils.writeStackTraceIfNotNull(e, clsFileOutputStream);
-                    throw e;
-                } catch (Throwable th) {
-                    e = th;
-                    CommonUtils.flushOrLog(flushable, "Failed to flush to session OS file.");
+                    this.sessionDataWriter.writeSessionOS(newInstance, CommonUtils.isRooted(this.crashlyticsCore.getContext()));
+                    CommonUtils.flushOrLog(newInstance, "Failed to flush to session OS file.");
                     CommonUtils.closeOrLog(clsFileOutputStream, "Failed to close session OS file.");
-                    throw e;
+                } catch (Throwable e2) {
+                    th = e2;
+                    flushable = newInstance;
+                    th2 = th;
+                    try {
+                        ExceptionUtils.writeStackTraceIfNotNull(th2, clsFileOutputStream);
+                        throw th2;
+                    } catch (Throwable th22) {
+                        th = th22;
+                        newInstance = flushable;
+                        e2 = th;
+                        CommonUtils.flushOrLog(newInstance, "Failed to flush to session OS file.");
+                        CommonUtils.closeOrLog(clsFileOutputStream, "Failed to close session OS file.");
+                        throw e2;
+                    }
+                } catch (Throwable th3) {
+                    e2 = th3;
+                    CommonUtils.flushOrLog(newInstance, "Failed to flush to session OS file.");
+                    CommonUtils.closeOrLog(clsFileOutputStream, "Failed to close session OS file.");
+                    throw e2;
                 }
-            } catch (Throwable th2) {
-                e = th2;
-                CommonUtils.flushOrLog(flushable, "Failed to flush to session OS file.");
+            } catch (Exception e3) {
+                th22 = e3;
+                ExceptionUtils.writeStackTraceIfNotNull(th22, clsFileOutputStream);
+                throw th22;
+            } catch (Throwable th222) {
+                th = th222;
+                newInstance = null;
+                e2 = th;
+                CommonUtils.flushOrLog(newInstance, "Failed to flush to session OS file.");
                 CommonUtils.closeOrLog(clsFileOutputStream, "Failed to close session OS file.");
-                throw e;
+                throw e2;
             }
-        } catch (Exception e3) {
-            e = e3;
+        } catch (Exception e4) {
+            th222 = e4;
             clsFileOutputStream = null;
-            ExceptionUtils.writeStackTraceIfNotNull(e, clsFileOutputStream);
-            throw e;
-        } catch (Throwable th3) {
-            e = th3;
+            ExceptionUtils.writeStackTraceIfNotNull(th222, clsFileOutputStream);
+            throw th222;
+        } catch (Throwable th2222) {
             clsFileOutputStream = null;
-            CommonUtils.flushOrLog(flushable, "Failed to flush to session OS file.");
+            th = th2222;
+            newInstance = null;
+            e2 = th;
+            CommonUtils.flushOrLog(newInstance, "Failed to flush to session OS file.");
             CommonUtils.closeOrLog(clsFileOutputStream, "Failed to close session OS file.");
-            throw e;
+            throw e2;
         }
     }
 
     private void writeSessionPartsToSessionFile(File file, String str, int i) {
-        OutputStream clsFileOutputStream;
         Throwable e;
         Flushable flushable;
         Throwable th;
@@ -995,6 +1014,7 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
         boolean z2 = listFilesMatching2 != null && listFilesMatching2.length > 0;
         Fabric.getLogger().mo4289d("Fabric", String.format(Locale.US, "Session %s has non-fatal exceptions: %s", new Object[]{str, Boolean.valueOf(z2)}));
         if (z || z2) {
+            OutputStream clsFileOutputStream;
             try {
                 clsFileOutputStream = new ClsFileOutputStream(this.filesDir, str);
                 try {
@@ -1071,8 +1091,8 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
                 }
             } catch (Exception e4) {
                 e = e4;
-                flushable = null;
                 clsFileOutputStream = null;
+                flushable = null;
                 Fabric.getLogger().mo4292e("Fabric", "Failed to write session file for session ID: " + str, e);
                 ExceptionUtils.writeStackTraceIfNotNull(e, clsFileOutputStream);
                 CommonUtils.flushOrLog(flushable, "Error flushing session file stream");
@@ -1108,7 +1128,7 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
         r3 = r3.append(r4);	 Catch:{ Exception -> 0x004a, all -> 0x006f }
         r3 = r3.toString();	 Catch:{ Exception -> 0x004a, all -> 0x006f }
         r0.<init>(r2, r3);	 Catch:{ Exception -> 0x004a, all -> 0x006f }
-        r1 = com.crashlytics.android.core.CodedOutputStream.newInstance(r0);	 Catch:{ Exception -> 0x005f, all -> 0x006d }
+        r1 = com.crashlytics.android.core.CodedOutputStream.newInstance(r0);	 Catch:{ Exception -> 0x0060, all -> 0x006d }
         r2 = r7.getUserMetaData(r8);	 Catch:{ Exception -> 0x0068, all -> 0x006d }
         r3 = r2.isEmpty();	 Catch:{ Exception -> 0x0068, all -> 0x006d }
         if (r3 == 0) goto L_0x0034;
@@ -1134,28 +1154,28 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
         r0 = move-exception;
         r2 = r1;
     L_0x004c:
-        com.crashlytics.android.core.ExceptionUtils.writeStackTraceIfNotNull(r0, r2);	 Catch:{ all -> 0x0050 }
+        com.crashlytics.android.core.ExceptionUtils.writeStackTraceIfNotNull(r0, r1);	 Catch:{ all -> 0x0050 }
         throw r0;	 Catch:{ all -> 0x0050 }
     L_0x0050:
         r0 = move-exception;
         r6 = r0;
-        r0 = r2;
+        r0 = r1;
+        r1 = r2;
         r2 = r6;
-    L_0x0054:
+    L_0x0055:
         r3 = "Failed to flush session user file.";
         io.fabric.sdk.android.services.common.CommonUtils.flushOrLog(r1, r3);
         r1 = "Failed to close session user file.";
         io.fabric.sdk.android.services.common.CommonUtils.closeOrLog(r0, r1);
         throw r2;
-    L_0x005f:
+    L_0x0060:
         r2 = move-exception;
         r6 = r2;
         r2 = r1;
         r1 = r6;
-    L_0x0063:
+    L_0x0064:
         r6 = r1;
-        r1 = r2;
-        r2 = r0;
+        r1 = r0;
         r0 = r6;
         goto L_0x004c;
     L_0x0068:
@@ -1163,14 +1183,14 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
         r6 = r2;
         r2 = r1;
         r1 = r6;
-        goto L_0x0063;
+        goto L_0x0064;
     L_0x006d:
         r2 = move-exception;
-        goto L_0x0054;
+        goto L_0x0055;
     L_0x006f:
         r2 = move-exception;
         r0 = r1;
-        goto L_0x0054;
+        goto L_0x0055;
         */
         throw new UnsupportedOperationException("Method not decompiled: com.crashlytics.android.core.CrashlyticsUncaughtExceptionHandler.writeSessionUser(java.lang.String):void");
     }

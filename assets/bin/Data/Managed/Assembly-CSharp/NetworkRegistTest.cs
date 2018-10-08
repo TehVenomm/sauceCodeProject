@@ -1,7 +1,7 @@
 using Network;
 using UnityEngine;
 
-public class NetworkRegistTest : MonoBehaviour
+public class NetworkRegistTest
 {
 	public enum PROGRESS
 	{
@@ -23,9 +23,14 @@ public class NetworkRegistTest : MonoBehaviour
 
 	public bool isSending => m_isSending;
 
+	public NetworkRegistTest()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
-		Debug.Log("NetowrkTest Awake!");
+		Debug.Log((object)"NetowrkTest Awake!");
 	}
 
 	private void Start()
@@ -82,7 +87,7 @@ public class NetworkRegistTest : MonoBehaviour
 		string name = ret.GetType().Name;
 		if (ret.Error == Error.None)
 		{
-			Debug.Log(name + " result:" + result);
+			Debug.Log((object)(name + " result:" + result));
 			switch (name)
 			{
 			case "CheckRegisterModel":
@@ -115,7 +120,7 @@ public class NetworkRegistTest : MonoBehaviour
 		}
 		else
 		{
-			Debug.LogError(name + " error:" + ret.Error);
+			Debug.LogError((object)(name + " error:" + ret.Error));
 			MonoBehaviourSingleton<AccountManager>.I.ClearAccount();
 		}
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo != null)
@@ -126,7 +131,7 @@ public class NetworkRegistTest : MonoBehaviour
 		{
 			m_progress++;
 		}
-		Debug.Log("progress:" + m_progress);
+		Debug.Log((object)("progress:" + m_progress));
 		m_isSending = false;
 	}
 

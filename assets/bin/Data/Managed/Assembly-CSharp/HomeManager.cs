@@ -70,9 +70,9 @@ public class HomeManager : MonoBehaviourSingleton<HomeManager>
 		{
 			yield return (object)null;
 		}
-		HomeCamera = base.gameObject.AddComponent<HomeCamera>();
-		HomePeople = base.gameObject.AddComponent<HomePeople>();
-		HomeFeatureBanner = base.gameObject.AddComponent<HomeFeatureBanner>();
+		HomeCamera = this.get_gameObject().AddComponent<HomeCamera>();
+		HomePeople = this.get_gameObject().AddComponent<HomePeople>();
+		HomeFeatureBanner = this.get_gameObject().AddComponent<HomeFeatureBanner>();
 		while (!HomeCamera.isInitialized)
 		{
 			yield return (object)null;

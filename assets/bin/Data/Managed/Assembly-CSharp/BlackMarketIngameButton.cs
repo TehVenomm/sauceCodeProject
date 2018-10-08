@@ -1,4 +1,4 @@
-using UnityEngine;
+using System;
 
 public class BlackMarketIngameButton : UIBehaviour
 {
@@ -9,14 +9,14 @@ public class BlackMarketIngameButton : UIBehaviour
 
 	protected override void OnOpen()
 	{
-		PlayTween(UI.OBJ_TWEEN, true, null, false, 0);
+		PlayTween((Enum)UI.OBJ_TWEEN, true, (EventDelegate.Callback)null, false, 0);
 		base.OnOpen();
 	}
 
 	public void SetDisableButton(bool flag)
 	{
-		UIButton componentInChildren = GetComponentInChildren<UIButton>();
-		if ((Object)componentInChildren != (Object)null)
+		UIButton componentInChildren = this.GetComponentInChildren<UIButton>();
+		if (componentInChildren != null)
 		{
 			componentInChildren.isEnabled = !flag;
 		}

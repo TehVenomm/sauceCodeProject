@@ -447,43 +447,29 @@ public class UnityPlayer extends FrameLayout implements C0744a {
             XmlPullParser newPullParser = newInstance.newPullParser();
             newPullParser.setInput(fileInputStream, null);
             String str = null;
-            int eventType = newPullParser.getEventType();
             String str2 = null;
-            while (eventType != 1) {
-                String name;
-                String str3;
+            for (int eventType = newPullParser.getEventType(); eventType != 1; eventType = newPullParser.next()) {
                 if (eventType == 2) {
-                    name = newPullParser.getName();
-                    str3 = str;
-                    str2 = str3;
-                    for (int i = 0; i < newPullParser.getAttributeCount(); i++) {
-                        if (newPullParser.getAttributeName(i).equalsIgnoreCase("name")) {
-                            str2 = newPullParser.getAttributeValue(i);
+                    str = newPullParser.getName();
+                    for (eventType = 0; eventType < newPullParser.getAttributeCount(); eventType++) {
+                        if (newPullParser.getAttributeName(eventType).equalsIgnoreCase("name")) {
+                            str2 = newPullParser.getAttributeValue(eventType);
                         }
                     }
-                    str3 = name;
-                    name = str2;
-                    str2 = str3;
                 } else if (eventType == 3) {
-                    str2 = null;
-                    name = str;
-                } else if (eventType != 4 || str == null) {
-                    name = str;
-                } else {
-                    if (str2.equalsIgnoreCase("integer")) {
-                        this.f466x.putInt(str, Integer.parseInt(newPullParser.getText()));
-                    } else if (str2.equalsIgnoreCase("string")) {
-                        this.f466x.putString(str, newPullParser.getText());
-                    } else if (str2.equalsIgnoreCase("bool")) {
-                        this.f466x.putBoolean(str, Boolean.parseBoolean(newPullParser.getText()));
-                    } else if (str2.equalsIgnoreCase("float")) {
-                        this.f466x.putFloat(str, Float.parseFloat(newPullParser.getText()));
+                    str = null;
+                } else if (eventType == 4 && str2 != null) {
+                    if (str.equalsIgnoreCase("integer")) {
+                        this.f466x.putInt(str2, Integer.parseInt(newPullParser.getText()));
+                    } else if (str.equalsIgnoreCase("string")) {
+                        this.f466x.putString(str2, newPullParser.getText());
+                    } else if (str.equalsIgnoreCase("bool")) {
+                        this.f466x.putBoolean(str2, Boolean.parseBoolean(newPullParser.getText()));
+                    } else if (str.equalsIgnoreCase("float")) {
+                        this.f466x.putFloat(str2, Float.parseFloat(newPullParser.getText()));
                     }
-                    name = null;
+                    str2 = null;
                 }
-                str3 = name;
-                eventType = newPullParser.next();
-                str = str3;
             }
         } catch (Exception e) {
             C0768m.Log(6, "Unable to locate player settings. " + e.getLocalizedMessage());

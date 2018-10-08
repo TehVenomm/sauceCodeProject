@@ -62,31 +62,42 @@ public class SmithGrow : EquipMaterialBase
 
 	public override void UpdateUI()
 	{
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
 		base.UpdateUI();
 		int num = Mathf.Min(aimLv, GetEquipData().tableData.maxLv);
-		SetLabelText(UI.LBL_AIM_LV, num.ToString());
-		SetActive(UI.STR_ONLY_EXCEED, false);
-		Color color = Color.red;
+		SetLabelText((Enum)UI.LBL_AIM_LV, num.ToString());
+		SetActive((Enum)UI.STR_ONLY_EXCEED, false);
+		Color color = Color.get_red();
 		if (num == GetEquipData().level)
 		{
-			SetActive(UI.STR_ONLY_EXCEED, true);
-			color = Color.gray;
+			SetActive((Enum)UI.STR_ONLY_EXCEED, true);
+			color = Color.get_gray();
 		}
 		else if (IsHavingMaterialAndMoney() && num > GetEquipData().level)
 		{
-			color = Color.white;
+			color = Color.get_white();
 		}
-		SetColor(UI.LBL_AIM_LV, color);
+		SetColor((Enum)UI.LBL_AIM_LV, color);
 		bool flag = aimLv > GetEquipData().level + 1;
 		bool flag2 = aimLv < GetEquipData().tableData.maxLv;
-		SetColor(UI.SPR_AIM_L, (!flag) ? Color.clear : Color.white);
-		SetColor(UI.SPR_AIM_R, (!flag2) ? Color.clear : Color.white);
-		SetButtonEnabled(UI.BTN_AIM_L, flag);
-		SetButtonEnabled(UI.BTN_AIM_R, flag2);
-		SetActive(UI.BTN_AIM_L_INACTIVE, !flag);
-		SetActive(UI.BTN_AIM_R_INACTIVE, !flag2);
-		SetRepeatButton(UI.BTN_AIM_L, "AIM_L", null);
-		SetRepeatButton(UI.BTN_AIM_R, "AIM_R", null);
+		SetColor((Enum)UI.SPR_AIM_L, (!flag) ? Color.get_clear() : Color.get_white());
+		SetColor((Enum)UI.SPR_AIM_R, (!flag2) ? Color.get_clear() : Color.get_white());
+		SetButtonEnabled((Enum)UI.BTN_AIM_L, flag);
+		SetButtonEnabled((Enum)UI.BTN_AIM_R, flag2);
+		SetActive((Enum)UI.BTN_AIM_L_INACTIVE, !flag);
+		SetActive((Enum)UI.BTN_AIM_R_INACTIVE, !flag2);
+		SetRepeatButton((Enum)UI.BTN_AIM_L, "AIM_L", (object)null);
+		SetRepeatButton((Enum)UI.BTN_AIM_R, "AIM_R", (object)null);
 	}
 
 	protected override void InitNeedMaterialData()
@@ -201,7 +212,7 @@ public class SmithGrow : EquipMaterialBase
 		if (modelID != id)
 		{
 			modelID = id;
-			SetRenderEquipModel(UI.TEX_MODEL, id, -1, -1, 1f);
+			SetRenderEquipModel((Enum)UI.TEX_MODEL, id, -1, -1, 1f);
 		}
 	}
 
@@ -238,7 +249,7 @@ public class SmithGrow : EquipMaterialBase
 				if (terminateAimLv == aimLv && !terminating)
 				{
 					terminating = true;
-					TerminateRepeatButton(UI.BTN_AIM_R);
+					TerminateRepeatButton((Enum)UI.BTN_AIM_R);
 				}
 			}
 		}
@@ -257,7 +268,7 @@ public class SmithGrow : EquipMaterialBase
 		OnQueryConfirmYES();
 	}
 
-	protected override void Send()
+	protected unsafe override void Send()
 	{
 		SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
 		if (smithData == null)
@@ -286,21 +297,8 @@ public class SmithGrow : EquipMaterialBase
 				GameSection.SetEventData(result_data);
 				isNotifySelfUpdate = true;
 				GameSection.StayEvent();
-				MonoBehaviourSingleton<SmithManager>.I.SendGrowEquipItem(selectEquipData.uniqueID, aimLv, delegate(Error err, EquipItemInfo grow_item)
-				{
-					if (err == Error.None)
-					{
-						aimLv = grow_item.level + 1;
-						result_data.itemData = grow_item;
-						MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
-						GameSection.ResumeEvent(true, null);
-					}
-					else
-					{
-						isNotifySelfUpdate = false;
-						GameSection.ResumeEvent(false, null);
-					}
-				});
+				_003CSend_003Ec__AnonStorey465 _003CSend_003Ec__AnonStorey;
+				MonoBehaviourSingleton<SmithManager>.I.SendGrowEquipItem(selectEquipData.uniqueID, aimLv, new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}

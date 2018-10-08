@@ -1,7 +1,12 @@
 using UnityEngine;
 
-public abstract class ModelLoaderBase : MonoBehaviour
+public abstract class ModelLoaderBase
 {
+	protected ModelLoaderBase()
+		: this()
+	{
+	}
+
 	public abstract bool IsLoading();
 
 	public abstract Animator GetAnimator();
@@ -17,7 +22,7 @@ public abstract class ModelLoaderBase : MonoBehaviour
 			int i = 0;
 			for (int num = renderers.Length; i < num; i++)
 			{
-				renderers[i].enabled = is_enable;
+				renderers[i].set_enabled(is_enable);
 			}
 		}
 	}

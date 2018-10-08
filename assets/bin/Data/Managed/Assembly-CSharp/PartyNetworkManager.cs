@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 {
-	public class Pool_List_CoopPacket : rymTPool<List<CoopPacket>>
+	public class Pool_List_CoopPacket
 	{
 	}
 
@@ -67,8 +67,9 @@ public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 
 	protected override void Awake()
 	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		packetReceiver = base.gameObject.AddComponent<PartyPacketReceiver>();
+		packetReceiver = this.get_gameObject().AddComponent<PartyPacketReceiver>();
 	}
 
 	private void Update()
@@ -76,7 +77,7 @@ public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 		packetReceiver.OnUpdate();
 		if (CoopWebSocketSingleton<PartyWebSocket>.IsValidConnected())
 		{
-			float num = Time.time - MonoBehaviourSingleton<PartyWebSocket>.I.packetSendTime;
+			float num = Time.get_time() - MonoBehaviourSingleton<PartyWebSocket>.I.packetSendTime;
 			if (num >= 20f)
 			{
 				Alive();
@@ -113,12 +114,13 @@ public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 
 	public void Connect(ConnectData conn_data, Action<bool> call_back)
 	{
-		StartCoroutine(RequestCoroutineConnect(conn_data, call_back));
+		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(RequestCoroutineConnect(conn_data, call_back));
 	}
 
 	private IEnumerator RequestCoroutineConnect(ConnectData conn_data, Action<bool> call_back)
 	{
-		yield return (object)StartCoroutine(RequestCoroutineClose(1000, "Bye!", null));
+		yield return (object)this.StartCoroutine(RequestCoroutineClose(1000, "Bye!", null));
 		if (string.IsNullOrEmpty(conn_data.path))
 		{
 			Logd("Connect fail. nothing connection path...");
@@ -140,7 +142,7 @@ public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 				MonoBehaviourSingleton<PartyWebSocket>.I.Connect(connectPath, conn_data.fromId, conn_data.ackPrefix);
 				while (!MonoBehaviourSingleton<PartyWebSocket>.I.IsConnected() && 0f < timeoutTimer && MonoBehaviourSingleton<PartyWebSocket>.I.CurrentConnectionStatus != CoopWebSocketSingleton<PartyWebSocket>.CONNECTION_STATUS.ERROR)
 				{
-					timeoutTimer -= Time.deltaTime;
+					timeoutTimer -= Time.get_deltaTime();
 					yield return (object)new WaitForEndOfFrame();
 				}
 				if (MonoBehaviourSingleton<PartyWebSocket>.I.IsConnected())
@@ -156,8 +158,9 @@ public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 
 	public void Close(ushort code = 1000, string msg = "Bye!", Action call_back = null)
 	{
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		Logd("Close.");
-		StartCoroutine(RequestCoroutineClose(code, msg, call_back));
+		this.StartCoroutine(RequestCoroutineClose(code, msg, call_back));
 	}
 
 	private IEnumerator RequestCoroutineClose(ushort code = 1000, string msg = "Bye!", Action call_back = null)
@@ -171,10 +174,13 @@ public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 			}
 		}
 		Clear();
-		call_back?.Invoke();
+		if (call_back != null)
+		{
+			call_back.Invoke();
+		}
 	}
 
-	public void Regist(ConnectData conn_data, Action<bool> call_back)
+	public unsafe void Regist(ConnectData conn_data, Action<bool> call_back)
 	{
 		Party_Model_Register party_Model_Register = new Party_Model_Register();
 		party_Model_Register.roomId = conn_data.roomId;
@@ -184,21 +190,8 @@ public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 		party_Model_Register.signature = conn_data.signature;
 		Logd("Regist. roomId={0}", conn_data.roomId);
 		registerAck = null;
-		SendServer(party_Model_Register, true, delegate(Coop_Model_ACK ack)
-		{
-			bool obj = true;
-			registerAck = (ack as Party_Model_RegisterACK);
-			if (ack == null || !ack.positive)
-			{
-				obj = false;
-				MonoBehaviourSingleton<PartyWebSocket>.I.Close(1000, "Bye!");
-			}
-			if (call_back != null)
-			{
-				call_back(obj);
-			}
-			return true;
-		}, null);
+		_003CRegist_003Ec__AnonStorey54E _003CRegist_003Ec__AnonStorey54E;
+		SendServer(party_Model_Register, true, new Func<Coop_Model_ACK, bool>((object)_003CRegist_003Ec__AnonStorey54E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
 	}
 
 	public void ConnectAndRegist(ConnectData conn_data, Action<bool, bool> call_back)
@@ -210,7 +203,7 @@ public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 			{
 				if (call_back != null)
 				{
-					call_back(is_connect, false);
+					call_back.Invoke(is_connect, false);
 				}
 			}
 			else
@@ -220,7 +213,7 @@ public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 					Logd("Registed. valid={0}", is_regist);
 					if (call_back != null)
 					{
-						call_back(is_connect, is_regist);
+						call_back.Invoke(is_connect, is_regist);
 					}
 				});
 			}
@@ -268,9 +261,10 @@ public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 
 	public void SyncSend()
 	{
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		if (sendId > 0)
 		{
-			StartCoroutine(CoroutineSyncSend(sendId));
+			this.StartCoroutine(CoroutineSyncSend(sendId));
 		}
 	}
 
@@ -314,8 +308,12 @@ public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 		return Send(-2000, model, typeof(T), promise, onReceiveAck, onPreResend);
 	}
 
-	private void RegisterPacketReceiveAction()
+	private unsafe void RegisterPacketReceiveAction()
 	{
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Expected O, but got Unknown
+		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b9: Expected O, but got Unknown
 		PartyWebSocket i = MonoBehaviourSingleton<PartyWebSocket>.I;
 		i.ReceivePacketAction = (Action<CoopPacket>)Delegate.Combine(i.ReceivePacketAction, (Action<CoopPacket>)delegate(CoopPacket packet)
 		{
@@ -325,17 +323,9 @@ public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 			}
 		});
 		PartyWebSocket i2 = MonoBehaviourSingleton<PartyWebSocket>.I;
-		i2.PrepareCloseOccurred = (Action<ushort, string>)Delegate.Combine(i2.PrepareCloseOccurred, (Action<ushort, string>)delegate(ushort code, string msg)
-		{
-			Logd("PrepareCloseOccurred. code={0}, msg={1}", code, msg);
-			Disconnect(code);
-		});
+		i2.PrepareCloseOccurred = Delegate.Combine((Delegate)i2.PrepareCloseOccurred, (Delegate)new Action<ushort, string>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		PartyWebSocket i3 = MonoBehaviourSingleton<PartyWebSocket>.I;
-		i3.CloseOccurred = (Action<ushort, string>)Delegate.Combine(i3.CloseOccurred, (Action<ushort, string>)delegate(ushort code, string msg)
-		{
-			Logd("CloseOccurred. code={0}, msg={1}", code, msg);
-			LoopBackRoomLeave();
-		});
+		i3.CloseOccurred = Delegate.Combine((Delegate)i3.CloseOccurred, (Delegate)new Action<ushort, string>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		PartyWebSocket i4 = MonoBehaviourSingleton<PartyWebSocket>.I;
 		i4.ErrorOccurred = (Action<Exception>)Delegate.Combine(i4.ErrorOccurred, (Action<Exception>)delegate(Exception ex)
 		{
@@ -343,11 +333,7 @@ public class PartyNetworkManager : MonoBehaviourSingleton<PartyNetworkManager>
 			LoopBackRoomLeave();
 		});
 		PartyWebSocket i5 = MonoBehaviourSingleton<PartyWebSocket>.I;
-		i5.HeartbeatDisconnected = (Action)Delegate.Combine(i5.HeartbeatDisconnected, (Action)delegate
-		{
-			Logd("HeartbeatDisconnected.");
-			LoopBackRoomLeave();
-		});
+		i5.HeartbeatDisconnected = Delegate.Combine((Delegate)i5.HeartbeatDisconnected, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public static CoopPacket CreateLoopBackRoomLeavedPacket()

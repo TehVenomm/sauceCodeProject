@@ -33,10 +33,11 @@ public class CoopOfflineManager : MonoBehaviourSingleton<CoopOfflineManager>
 
 	protected override void Awake()
 	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		isActivate = false;
 		svSocket = new CoopLocalServerSocket();
-		packetReceiver = base.gameObject.AddComponent<CoopNetworkPacketReceiver>();
+		packetReceiver = this.get_gameObject().AddComponent<CoopNetworkPacketReceiver>();
 	}
 
 	private void Update()
@@ -130,8 +131,8 @@ public class CoopOfflineManager : MonoBehaviourSingleton<CoopOfflineManager>
 			return -1;
 		}
 		Logd("Recv. {0}", model);
-		Coop_Model_ACK arg = svSocket.Recv(model);
-		onReceiveAck?.Invoke(arg);
+		Coop_Model_ACK coop_Model_ACK = svSocket.Recv(model);
+		onReceiveAck?.Invoke(coop_Model_ACK);
 		return 0;
 	}
 

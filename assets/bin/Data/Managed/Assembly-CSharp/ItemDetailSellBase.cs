@@ -1,3 +1,5 @@
+using System;
+
 public class ItemDetailSellBase : GameSection
 {
 	protected enum UI
@@ -29,36 +31,36 @@ public class ItemDetailSellBase : GameSection
 	public override void UpdateUI()
 	{
 		string key = "TEXT_SELL";
-		SetLabelText(UI.LBL_CAPTION, base.sectionData.GetText(key));
-		SetLabelText(UI.STR_TITLE_U, base.sectionData.GetText(key));
-		SetLabelText(UI.STR_TITLE_D, base.sectionData.GetText(key));
+		SetLabelText((Enum)UI.LBL_CAPTION, base.sectionData.GetText(key));
+		SetLabelText((Enum)UI.STR_TITLE_U, base.sectionData.GetText(key));
+		SetLabelText((Enum)UI.STR_TITLE_D, base.sectionData.GetText(key));
 		string key2 = "TEXT_SELL_NUM";
-		SetLabelText(UI.STR_SALE_NUM, base.sectionData.GetText(key2));
-		SetProgressInt(UI.SLD_SALE_NUM, 1, 1, data.GetNum(), OnChagenSlider);
-		SetLabelText(UI.LBL_ITEM_NUM, data.GetNum().ToString());
-		SetLabelText(UI.LBL_MONEY, string.Format("{0, 8:#,0}", MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money));
+		SetLabelText((Enum)UI.STR_SALE_NUM, base.sectionData.GetText(key2));
+		SetProgressInt((Enum)UI.SLD_SALE_NUM, 1, 1, data.GetNum(), (EventDelegate.Callback)OnChagenSlider);
+		SetLabelText((Enum)UI.LBL_ITEM_NUM, data.GetNum().ToString());
+		SetLabelText((Enum)UI.LBL_MONEY, string.Format("{0, 8:#,0}", MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money));
 	}
 
 	private void OnChagenSlider()
 	{
-		int progressInt = GetProgressInt(UI.SLD_SALE_NUM);
+		int progressInt = GetProgressInt((Enum)UI.SLD_SALE_NUM);
 		int num = data.GetSalePrice() * progressInt;
-		SetLabelText(UI.LBL_SALE_NUM, string.Format("{0,8:#,0}", progressInt));
-		SetLabelText(UI.LBL_SALE_PRICE, string.Format("{0,8:#,0}", num));
+		SetLabelText((Enum)UI.LBL_SALE_NUM, string.Format("{0,8:#,0}", progressInt));
+		SetLabelText((Enum)UI.LBL_SALE_PRICE, string.Format("{0,8:#,0}", num));
 	}
 
 	private void OnQuery_SALE_NUM_MINUS()
 	{
-		SetProgressInt(UI.SLD_SALE_NUM, GetProgressInt(UI.SLD_SALE_NUM) - 1, -1, -1, null);
+		SetProgressInt((Enum)UI.SLD_SALE_NUM, GetProgressInt((Enum)UI.SLD_SALE_NUM) - 1, -1, -1, (EventDelegate.Callback)null);
 	}
 
 	private void OnQuery_SALE_NUM_PLUS()
 	{
-		SetProgressInt(UI.SLD_SALE_NUM, GetProgressInt(UI.SLD_SALE_NUM) + 1, -1, -1, null);
+		SetProgressInt((Enum)UI.SLD_SALE_NUM, GetProgressInt((Enum)UI.SLD_SALE_NUM) + 1, -1, -1, (EventDelegate.Callback)null);
 	}
 
 	protected int GetSliderNum()
 	{
-		return GetProgressInt(UI.SLD_SALE_NUM);
+		return GetProgressInt((Enum)UI.SLD_SALE_NUM);
 	}
 }

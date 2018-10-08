@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -70,12 +71,12 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 	public override void UpdateUI()
 	{
 		detailBase = GetCtrl(UI.OBJ_INFO_ROOT);
-		if ((Object)detailBase != (Object)null)
+		if (detailBase != null)
 		{
-			SetFontStyle(detailBase, UI.STR_TITLE, FontStyle.Italic);
-			SetFontStyle(detailBase, UI.STR_SELL, FontStyle.Italic);
-			SetFontStyle(detailBase, UI.STR_NEED, FontStyle.Italic);
-			SetFontStyle(detailBase, UI.STR_HAVE, FontStyle.Italic);
+			SetFontStyle(detailBase, UI.STR_TITLE, 2);
+			SetFontStyle(detailBase, UI.STR_SELL, 2);
+			SetFontStyle(detailBase, UI.STR_NEED, 2);
+			SetFontStyle(detailBase, UI.STR_HAVE, 2);
 			SetLabelText(detailBase, UI.LBL_NAME, data.name);
 			ItemIcon.ItemIconCreateParam itemIconCreateParam = new ItemIcon.ItemIconCreateParam();
 			itemIconCreateParam.icon_type = ItemIcon.GetItemIconType(data.type);
@@ -94,12 +95,13 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 
 	private void InitializeCaption(string caption)
 	{
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
-		if (!((Object)ctrl == (Object)null))
+		if (!(ctrl == null))
 		{
 			SetLabelText(ctrl, UI.LBL_CAPTION, caption);
-			UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
-			if ((Object)component != (Object)null)
+			UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
+			if (component != null)
 			{
 				component.Reset();
 				int i = 0;
@@ -144,71 +146,15 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 		localInventoryEquipData = sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortData>(inventory.ToArray());
 	}
 
-	protected override void LocalInventory()
+	protected unsafe override void LocalInventory()
 	{
 		SetupEnableInventoryUI();
 		if (localInventoryEquipData != null)
 		{
-			SetLabelText(UI.LBL_SORT, sortSettings.GetSortLabel());
+			SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
-			SetDynamicList(InventoryUI, null, localInventoryEquipData.Length + 1, false, delegate(int i)
-			{
-				if (i == 0)
-				{
-					return true;
-				}
-				int num2 = i - 1;
-				SortCompareData sortCompareData = localInventoryEquipData[num2];
-				if (sortCompareData == null || !sortCompareData.IsPriority(sortSettings.orderTypeAsc))
-				{
-					return false;
-				}
-				return true;
-			}, null, delegate(int i, Transform t, bool is_recycle)
-			{
-				if (i == 0)
-				{
-					CreateRemoveIcon(t, "SELECT", -1, -1, selectInventoryIndex == -1, base.sectionData.GetText("STR_DETACH"));
-				}
-				else
-				{
-					int num = i - 1;
-					uint tableID = localInventoryEquipData[num].GetTableID();
-					if (tableID == 0)
-					{
-						SetActive(t, false);
-					}
-					else
-					{
-						SetActive(t, true);
-						EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(tableID);
-						EquipItemSortData equipItemSortData = localInventoryEquipData[num] as EquipItemSortData;
-						EquipItemInfo equipItemInfo = equipItemSortData.GetItemData() as EquipItemInfo;
-						ITEM_ICON_TYPE iconType = equipItemSortData.GetIconType();
-						bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, equipItemSortData.GetUniqID());
-						SkillSlotUIData[] skillSlotData = GetSkillSlotData(equipItemInfo);
-						int equip_index = (!equipItemSortData.IsEquipping()) ? (-1) : 0;
-						ItemIcon itemIcon = CreateItemIconDetail(equipItemSortData, skillSlotData, base.IsShowMainStatus, t, "SELECT", i - 1, ItemIconDetail.ICON_STATUS.NONE, is_new, -1, false, equip_index);
-						itemIcon.SetItemID(equipItemSortData.GetTableID());
-						itemIcon.SetGrayout(equipItemInfo.level < needLv);
-						object[] event_data = new object[2]
-						{
-							ItemDetailEquip.CURRENT_SECTION.SMITH_EVOLVE,
-							equipItemInfo
-						};
-						SetLongTouch(itemIcon.transform, "DETAIL", event_data);
-						if ((Object)itemIcon != (Object)null && equipItemSortData != null)
-						{
-							itemIcon.SetInitData(equipItemSortData);
-						}
-						if ((Object)itemIcon != (Object)null && !m_generatedIconList.Contains(itemIcon))
-						{
-							m_generatedIconList.Add(itemIcon);
-						}
-					}
-				}
-			});
+			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length + 1, false, new Func<int, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 

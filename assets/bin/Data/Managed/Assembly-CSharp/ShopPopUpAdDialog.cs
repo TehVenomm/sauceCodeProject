@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -13,8 +14,9 @@ public class ShopPopUpAdDialog : GameSection
 
 	public override void Initialize()
 	{
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		textureName = (GameSection.GetEventData() as string);
-		StartCoroutine(DoInitialize());
+		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -25,11 +27,11 @@ public class ShopPopUpAdDialog : GameSection
 		{
 			yield return (object)loadQueue.Wait();
 		}
-		if (loTex.loadedObject != (Object)null)
+		if (loTex.loadedObject != null)
 		{
-			SetTexture(UI.TEX_MAIN, loTex.loadedObject as Texture);
+			SetTexture((Enum)UI.TEX_MAIN, loTex.loadedObject as Texture);
 		}
-		PlayTween(UI.OBJ_FRAME, true, null, false, 0);
+		PlayTween((Enum)UI.OBJ_FRAME, true, (EventDelegate.Callback)null, false, 0);
 		base.Initialize();
 	}
 

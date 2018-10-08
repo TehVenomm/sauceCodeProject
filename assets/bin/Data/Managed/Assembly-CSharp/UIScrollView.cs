@@ -1,10 +1,10 @@
 using System;
 using UnityEngine;
 
-[ExecuteInEditMode]
-[RequireComponent(typeof(UIPanel))]
 [AddComponentMenu("NGUI/Interaction/Scroll View")]
-public class UIScrollView : MonoBehaviour
+[RequireComponent(typeof(UIPanel))]
+[ExecuteInEditMode]
+public class UIScrollView
 {
 	public enum Movement
 	{
@@ -74,7 +74,7 @@ public class UIScrollView : MonoBehaviour
 
 	[HideInInspector]
 	[SerializeField]
-	private Vector2 relativePositionOnReset = Vector2.zero;
+	private Vector2 relativePositionOnReset = Vector2.get_zero();
 
 	protected Transform mTrans;
 
@@ -86,7 +86,7 @@ public class UIScrollView : MonoBehaviour
 
 	protected bool mPressed;
 
-	protected Vector3 mMomentum = Vector3.zero;
+	protected Vector3 mMomentum = Vector3.get_zero();
 
 	protected float mScroll;
 
@@ -100,7 +100,7 @@ public class UIScrollView : MonoBehaviour
 
 	protected int mDragID = -10;
 
-	protected Vector2 mDragStartOffset = Vector2.zero;
+	protected Vector2 mDragStartOffset = Vector2.get_zero();
 
 	protected bool mDragStarted;
 
@@ -120,10 +120,15 @@ public class UIScrollView : MonoBehaviour
 	{
 		get
 		{
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Expected O, but got Unknown
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 			if (!mCalculatedBounds)
 			{
 				mCalculatedBounds = true;
-				mTrans = base.transform;
+				mTrans = this.get_transform();
 				mBounds = NGUIMath.CalculateRelativeWidgetBounds(mTrans, mTrans);
 			}
 			return mBounds;
@@ -138,7 +143,14 @@ public class UIScrollView : MonoBehaviour
 	{
 		get
 		{
-			Vector3 size = bounds.size;
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			Bounds bounds = this.bounds;
+			Vector3 size = bounds.get_size();
 			float num = size.x;
 			if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
 			{
@@ -154,7 +166,14 @@ public class UIScrollView : MonoBehaviour
 	{
 		get
 		{
-			Vector3 size = bounds.size;
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			Bounds bounds = this.bounds;
+			Vector3 size = bounds.get_size();
 			float num = size.y;
 			if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
 			{
@@ -170,26 +189,38 @@ public class UIScrollView : MonoBehaviour
 	{
 		get
 		{
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
 			if (!disableDragIfFits)
 			{
 				return true;
 			}
-			if ((UnityEngine.Object)mPanel == (UnityEngine.Object)null)
+			if (mPanel == null)
 			{
-				mPanel = GetComponent<UIPanel>();
+				mPanel = this.GetComponent<UIPanel>();
 			}
 			Vector4 finalClipRegion = mPanel.finalClipRegion;
 			Bounds bounds = this.bounds;
-			float num = (finalClipRegion.z != 0f) ? (finalClipRegion.z * 0.5f) : ((float)Screen.width);
-			float num2 = (finalClipRegion.w != 0f) ? (finalClipRegion.w * 0.5f) : ((float)Screen.height);
+			float num = (finalClipRegion.z != 0f) ? (finalClipRegion.z * 0.5f) : ((float)Screen.get_width());
+			float num2 = (finalClipRegion.w != 0f) ? (finalClipRegion.w * 0.5f) : ((float)Screen.get_height());
 			if (canMoveHorizontally)
 			{
-				Vector3 min = bounds.min;
+				Vector3 min = bounds.get_min();
 				if (min.x < finalClipRegion.x - num)
 				{
 					return true;
 				}
-				Vector3 max = bounds.max;
+				Vector3 max = bounds.get_max();
 				if (max.x > finalClipRegion.x + num)
 				{
 					return true;
@@ -197,12 +228,12 @@ public class UIScrollView : MonoBehaviour
 			}
 			if (canMoveVertically)
 			{
-				Vector3 min2 = bounds.min;
+				Vector3 min2 = bounds.get_min();
 				if (min2.y < finalClipRegion.y - num2)
 				{
 					return true;
 				}
-				Vector3 max2 = bounds.max;
+				Vector3 max2 = bounds.get_max();
 				if (max2.y > finalClipRegion.y + num2)
 				{
 					return true;
@@ -216,24 +247,56 @@ public class UIScrollView : MonoBehaviour
 	{
 		get
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			return mMomentum;
 		}
 		set
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			mMomentum = value;
 			mShouldMove = true;
 		}
 	}
 
+	public UIScrollView()
+		: this()
+	{
+	}//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+	//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+	//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+
+
+	public bool CurrentFit()
+	{
+		return shouldMove;
+	}
+
 	private void Awake()
 	{
-		mTrans = base.transform;
-		mPanel = GetComponent<UIPanel>();
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Expected O, but got Unknown
+		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+		mTrans = this.get_transform();
+		mPanel = this.GetComponent<UIPanel>();
 		if (mPanel.clipping == UIDrawCall.Clipping.None)
 		{
 			mPanel.clipping = UIDrawCall.Clipping.ConstrainButDontClip;
 		}
-		if (movement != Movement.Custom && scale.sqrMagnitude > 0.001f)
+		if (movement != Movement.Custom && scale.get_sqrMagnitude() > 0.001f)
 		{
 			if (scale.x == 1f && scale.y == 0f)
 			{
@@ -253,19 +316,19 @@ public class UIScrollView : MonoBehaviour
 				customMovement.x = scale.x;
 				customMovement.y = scale.y;
 			}
-			scale = Vector3.zero;
+			scale = Vector3.get_zero();
 		}
-		if (contentPivot == UIWidget.Pivot.TopLeft && relativePositionOnReset != Vector2.zero)
+		if (contentPivot == UIWidget.Pivot.TopLeft && relativePositionOnReset != Vector2.get_zero())
 		{
 			contentPivot = NGUIMath.GetPivot(new Vector2(relativePositionOnReset.x, 1f - relativePositionOnReset.y));
-			relativePositionOnReset = Vector2.zero;
+			relativePositionOnReset = Vector2.get_zero();
 		}
 	}
 
 	private void OnEnable()
 	{
 		list.Add(this);
-		if (mStarted && Application.isPlaying)
+		if (mStarted && Application.get_isPlaying())
 		{
 			CheckScrollbars();
 		}
@@ -274,7 +337,7 @@ public class UIScrollView : MonoBehaviour
 	private void Start()
 	{
 		mStarted = true;
-		if (Application.isPlaying)
+		if (Application.get_isPlaying())
 		{
 			CheckScrollbars();
 		}
@@ -282,16 +345,16 @@ public class UIScrollView : MonoBehaviour
 
 	private void CheckScrollbars()
 	{
-		if ((UnityEngine.Object)horizontalScrollBar != (UnityEngine.Object)null)
+		if (horizontalScrollBar != null)
 		{
 			EventDelegate.Add(horizontalScrollBar.onChange, OnScrollBar);
-			horizontalScrollBar.BroadcastMessage("CacheDefaultColor", SendMessageOptions.DontRequireReceiver);
+			horizontalScrollBar.BroadcastMessage("CacheDefaultColor", 1);
 			horizontalScrollBar.alpha = ((showScrollBars != 0 && !shouldMoveHorizontally) ? 0f : 1f);
 		}
-		if ((UnityEngine.Object)verticalScrollBar != (UnityEngine.Object)null)
+		if (verticalScrollBar != null)
 		{
 			EventDelegate.Add(verticalScrollBar.onChange, OnScrollBar);
-			verticalScrollBar.BroadcastMessage("CacheDefaultColor", SendMessageOptions.DontRequireReceiver);
+			verticalScrollBar.BroadcastMessage("CacheDefaultColor", 1);
 			verticalScrollBar.alpha = ((showScrollBars != 0 && !shouldMoveVertically) ? 0f : 1f);
 		}
 	}
@@ -308,41 +371,57 @@ public class UIScrollView : MonoBehaviour
 
 	public bool RestrictWithinBounds(bool instant, bool horizontal, bool vertical)
 	{
-		if ((UnityEngine.Object)mPanel == (UnityEngine.Object)null)
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ce: Expected O, but got Unknown
+		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+		if (mPanel == null)
 		{
 			return false;
 		}
 		Bounds bounds = this.bounds;
-		Vector3 vector = mPanel.CalculateConstrainOffset(bounds.min, bounds.max);
+		Vector3 val = mPanel.CalculateConstrainOffset(Vector2.op_Implicit(bounds.get_min()), Vector2.op_Implicit(bounds.get_max()));
 		if (!horizontal)
 		{
-			vector.x = 0f;
+			val.x = 0f;
 		}
 		if (!vertical)
 		{
-			vector.y = 0f;
+			val.y = 0f;
 		}
-		if (vector.sqrMagnitude > 0.1f)
+		if (val.get_sqrMagnitude() > 0.1f)
 		{
 			if (!instant && dragEffect == DragEffect.MomentumAndSpring)
 			{
-				Vector3 pos = mTrans.localPosition + vector;
+				Vector3 pos = mTrans.get_localPosition() + val;
 				pos.x = Mathf.Round(pos.x);
 				pos.y = Mathf.Round(pos.y);
-				SpringPanel.Begin(mPanel.gameObject, pos, 13f).strength = 8f;
+				SpringPanel.Begin(mPanel.get_gameObject(), pos, 13f).strength = 8f;
 			}
 			else
 			{
-				MoveRelative(vector);
-				if (Mathf.Abs(vector.x) > 0.01f)
+				MoveRelative(val);
+				if (Mathf.Abs(val.x) > 0.01f)
 				{
 					mMomentum.x = 0f;
 				}
-				if (Mathf.Abs(vector.y) > 0.01f)
+				if (Mathf.Abs(val.y) > 0.01f)
 				{
 					mMomentum.y = 0f;
 				}
-				if (Mathf.Abs(vector.z) > 0.01f)
+				if (Mathf.Abs(val.z) > 0.01f)
 				{
 					mMomentum.z = 0f;
 				}
@@ -355,10 +434,10 @@ public class UIScrollView : MonoBehaviour
 
 	public void DisableSpring()
 	{
-		SpringPanel component = GetComponent<SpringPanel>();
-		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+		SpringPanel component = this.GetComponent<SpringPanel>();
+		if (component != null)
 		{
-			component.enabled = false;
+			component.set_enabled(false);
 		}
 	}
 
@@ -369,9 +448,25 @@ public class UIScrollView : MonoBehaviour
 
 	public virtual void UpdateScrollbars(bool recalculateBounds)
 	{
-		if (!((UnityEngine.Object)mPanel == (UnityEngine.Object)null))
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
+		if (!(mPanel == null))
 		{
-			if ((UnityEngine.Object)horizontalScrollBar != (UnityEngine.Object)null || (UnityEngine.Object)verticalScrollBar != (UnityEngine.Object)null)
+			if (horizontalScrollBar != null || verticalScrollBar != null)
 			{
 				if (recalculateBounds)
 				{
@@ -379,9 +474,9 @@ public class UIScrollView : MonoBehaviour
 					mShouldMove = shouldMove;
 				}
 				Bounds bounds = this.bounds;
-				Vector2 vector = bounds.min;
-				Vector2 vector2 = bounds.max;
-				if ((UnityEngine.Object)horizontalScrollBar != (UnityEngine.Object)null && vector2.x > vector.x)
+				Vector2 val = Vector2.op_Implicit(bounds.get_min());
+				Vector2 val2 = Vector2.op_Implicit(bounds.get_max());
+				if (horizontalScrollBar != null && val2.x > val.x)
 				{
 					Vector4 finalClipRegion = mPanel.finalClipRegion;
 					int num = Mathf.RoundToInt(finalClipRegion.z);
@@ -389,48 +484,48 @@ public class UIScrollView : MonoBehaviour
 					{
 						num--;
 					}
-					float f = (float)num * 0.5f;
-					f = Mathf.Round(f);
+					float num2 = (float)num * 0.5f;
+					num2 = Mathf.Round(num2);
 					if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
 					{
-						float num2 = f;
+						float num3 = num2;
 						Vector2 clipSoftness = mPanel.clipSoftness;
-						f = num2 - clipSoftness.x;
+						num2 = num3 - clipSoftness.x;
 					}
-					float contentSize = vector2.x - vector.x;
-					float viewSize = f * 2f;
-					float x = vector.x;
-					float x2 = vector2.x;
-					float num3 = finalClipRegion.x - f;
-					float num4 = finalClipRegion.x + f;
-					x = num3 - x;
-					x2 -= num4;
+					float contentSize = val2.x - val.x;
+					float viewSize = num2 * 2f;
+					float x = val.x;
+					float x2 = val2.x;
+					float num4 = finalClipRegion.x - num2;
+					float num5 = finalClipRegion.x + num2;
+					x = num4 - x;
+					x2 -= num5;
 					UpdateScrollbars(horizontalScrollBar, x, x2, contentSize, viewSize, false);
 				}
-				if ((UnityEngine.Object)verticalScrollBar != (UnityEngine.Object)null && vector2.y > vector.y)
+				if (verticalScrollBar != null && val2.y > val.y)
 				{
 					Vector4 finalClipRegion2 = mPanel.finalClipRegion;
-					int num5 = Mathf.RoundToInt(finalClipRegion2.w);
-					if ((num5 & 1) != 0)
+					int num6 = Mathf.RoundToInt(finalClipRegion2.w);
+					if ((num6 & 1) != 0)
 					{
-						num5--;
+						num6--;
 					}
-					float f2 = (float)num5 * 0.5f;
-					f2 = Mathf.Round(f2);
+					float num7 = (float)num6 * 0.5f;
+					num7 = Mathf.Round(num7);
 					if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
 					{
-						float num6 = f2;
+						float num8 = num7;
 						Vector2 clipSoftness2 = mPanel.clipSoftness;
-						f2 = num6 - clipSoftness2.y;
+						num7 = num8 - clipSoftness2.y;
 					}
-					float contentSize2 = vector2.y - vector.y;
-					float viewSize2 = f2 * 2f;
-					float y = vector.y;
-					float y2 = vector2.y;
-					float num7 = finalClipRegion2.y - f2;
-					float num8 = finalClipRegion2.y + f2;
-					y = num7 - y;
-					y2 -= num8;
+					float contentSize2 = val2.y - val.y;
+					float viewSize2 = num7 * 2f;
+					float y = val.y;
+					float y2 = val2.y;
+					float num9 = finalClipRegion2.y - num7;
+					float num10 = finalClipRegion2.y + num7;
+					y = num9 - y;
+					y2 -= num10;
 					UpdateScrollbars(verticalScrollBar, y, y2, contentSize2, viewSize2, true);
 				}
 			}
@@ -443,7 +538,7 @@ public class UIScrollView : MonoBehaviour
 
 	protected void UpdateScrollbars(UIProgressBar slider, float contentMin, float contentMax, float contentSize, float viewSize, bool inverted)
 	{
-		if (!((UnityEngine.Object)slider == (UnityEngine.Object)null))
+		if (!(slider == null))
 		{
 			mIgnoreCallbacks = true;
 			float num;
@@ -468,7 +563,7 @@ public class UIScrollView : MonoBehaviour
 				}
 			}
 			UIScrollBar uIScrollBar = slider as UIScrollBar;
-			if ((UnityEngine.Object)uIScrollBar != (UnityEngine.Object)null)
+			if (uIScrollBar != null)
 			{
 				uIScrollBar.barSize = 1f - num;
 			}
@@ -478,32 +573,66 @@ public class UIScrollView : MonoBehaviour
 
 	public virtual void SetDragAmount(float x, float y, bool updateScrollbars)
 	{
-		if ((UnityEngine.Object)mPanel == (UnityEngine.Object)null)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0239: Unknown result type (might be due to invalid IL or missing references)
+		if (mPanel == null)
 		{
-			mPanel = GetComponent<UIPanel>();
+			mPanel = this.GetComponent<UIPanel>();
 		}
 		DisableSpring();
 		Bounds bounds = this.bounds;
-		Vector3 min = bounds.min;
+		Vector3 min = bounds.get_min();
 		float x2 = min.x;
-		Vector3 max = bounds.max;
+		Vector3 max = bounds.get_max();
 		if (x2 != max.x)
 		{
-			Vector3 min2 = bounds.min;
+			Vector3 min2 = bounds.get_min();
 			float y2 = min2.y;
-			Vector3 max2 = bounds.max;
+			Vector3 max2 = bounds.get_max();
 			if (y2 != max2.y)
 			{
 				Vector4 finalClipRegion = mPanel.finalClipRegion;
 				float num = finalClipRegion.z * 0.5f;
 				float num2 = finalClipRegion.w * 0.5f;
-				Vector3 min3 = bounds.min;
+				Vector3 min3 = bounds.get_min();
 				float num3 = min3.x + num;
-				Vector3 max3 = bounds.max;
+				Vector3 max3 = bounds.get_max();
 				float num4 = max3.x - num;
-				Vector3 min4 = bounds.min;
+				Vector3 min4 = bounds.get_min();
 				float num5 = min4.y + num2;
-				Vector3 max4 = bounds.max;
+				Vector3 max4 = bounds.get_max();
 				float num6 = max4.y - num2;
 				if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
 				{
@@ -524,7 +653,7 @@ public class UIScrollView : MonoBehaviour
 				float num12 = Mathf.Lerp(num6, num5, y);
 				if (!updateScrollbars)
 				{
-					Vector3 localPosition = mTrans.localPosition;
+					Vector3 localPosition = mTrans.get_localPosition();
 					if (canMoveHorizontally)
 					{
 						localPosition.x += finalClipRegion.x - num11;
@@ -533,7 +662,7 @@ public class UIScrollView : MonoBehaviour
 					{
 						localPosition.y += finalClipRegion.y - num12;
 					}
-					mTrans.localPosition = localPosition;
+					mTrans.set_localPosition(localPosition);
 				}
 				if (canMoveHorizontally)
 				{
@@ -561,6 +690,8 @@ public class UIScrollView : MonoBehaviour
 	[ContextMenu("Reset Clipping Position")]
 	public void ResetPosition()
 	{
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		if (NGUITools.GetActive(this))
 		{
 			mCalculatedBounds = false;
@@ -572,13 +703,15 @@ public class UIScrollView : MonoBehaviour
 
 	public void UpdatePosition()
 	{
-		if (!mIgnoreCallbacks && ((UnityEngine.Object)horizontalScrollBar != (UnityEngine.Object)null || (UnityEngine.Object)verticalScrollBar != (UnityEngine.Object)null))
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+		if (!mIgnoreCallbacks && (horizontalScrollBar != null || verticalScrollBar != null))
 		{
 			mIgnoreCallbacks = true;
 			mCalculatedBounds = false;
 			Vector2 pivotOffset = NGUIMath.GetPivotOffset(contentPivot);
-			float x = (!((UnityEngine.Object)horizontalScrollBar != (UnityEngine.Object)null)) ? pivotOffset.x : horizontalScrollBar.value;
-			float y = (!((UnityEngine.Object)verticalScrollBar != (UnityEngine.Object)null)) ? (1f - pivotOffset.y) : verticalScrollBar.value;
+			float x = (!(horizontalScrollBar != null)) ? pivotOffset.x : horizontalScrollBar.value;
+			float y = (!(verticalScrollBar != null)) ? (1f - pivotOffset.y) : verticalScrollBar.value;
 			SetDragAmount(x, y, false);
 			UpdateScrollbars(true);
 			mIgnoreCallbacks = false;
@@ -590,8 +723,8 @@ public class UIScrollView : MonoBehaviour
 		if (!mIgnoreCallbacks)
 		{
 			mIgnoreCallbacks = true;
-			float x = (!((UnityEngine.Object)horizontalScrollBar != (UnityEngine.Object)null)) ? 0f : horizontalScrollBar.value;
-			float y = (!((UnityEngine.Object)verticalScrollBar != (UnityEngine.Object)null)) ? 0f : verticalScrollBar.value;
+			float x = (!(horizontalScrollBar != null)) ? 0f : horizontalScrollBar.value;
+			float y = (!(verticalScrollBar != null)) ? 0f : verticalScrollBar.value;
 			SetDragAmount(x, y, false);
 			mIgnoreCallbacks = false;
 		}
@@ -599,7 +732,14 @@ public class UIScrollView : MonoBehaviour
 
 	public virtual void MoveRelative(Vector3 relative)
 	{
-		mTrans.localPosition += relative;
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		Transform obj = mTrans;
+		obj.set_localPosition(obj.get_localPosition() + relative);
 		Vector2 clipOffset = mPanel.clipOffset;
 		clipOffset.x -= relative.x;
 		clipOffset.y -= relative.y;
@@ -609,21 +749,52 @@ public class UIScrollView : MonoBehaviour
 
 	public void MoveAbsolute(Vector3 absolute)
 	{
-		Vector3 a = mTrans.InverseTransformPoint(absolute);
-		Vector3 b = mTrans.InverseTransformPoint(Vector3.zero);
-		MoveRelative(a - b);
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		Vector3 val = mTrans.InverseTransformPoint(absolute);
+		Vector3 val2 = mTrans.InverseTransformPoint(Vector3.get_zero());
+		MoveRelative(val - val2);
 	}
 
 	public void Press(bool pressed)
 	{
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0040: Expected O, but got Unknown
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
 		if (UICamera.currentScheme != UICamera.ControlScheme.Controller)
 		{
 			if (smoothDragStart && pressed)
 			{
 				mDragStarted = false;
-				mDragStartOffset = Vector2.zero;
+				mDragStartOffset = Vector2.get_zero();
 			}
-			if (base.enabled && NGUITools.GetActive(base.gameObject))
+			if (this.get_enabled() && NGUITools.GetActive(this.get_gameObject()))
 			{
 				if (!pressed && mDragID == UICamera.currentTouchID)
 				{
@@ -636,30 +807,30 @@ public class UIScrollView : MonoBehaviour
 					mPressed = pressed;
 					if (pressed)
 					{
-						mMomentum = Vector3.zero;
+						mMomentum = Vector3.get_zero();
 						mScroll = 0f;
 						DisableSpring();
 						mLastPos = UICamera.lastWorldPosition;
-						mPlane = new Plane(mTrans.rotation * Vector3.back, mLastPos);
+						mPlane = new Plane(mTrans.get_rotation() * Vector3.get_back(), mLastPos);
 						Vector2 clipOffset = mPanel.clipOffset;
 						clipOffset.x = Mathf.Round(clipOffset.x);
 						clipOffset.y = Mathf.Round(clipOffset.y);
 						mPanel.clipOffset = clipOffset;
-						Vector3 localPosition = mTrans.localPosition;
+						Vector3 localPosition = mTrans.get_localPosition();
 						localPosition.x = Mathf.Round(localPosition.x);
 						localPosition.y = Mathf.Round(localPosition.y);
-						mTrans.localPosition = localPosition;
+						mTrans.set_localPosition(localPosition);
 						if (!smoothDragStart)
 						{
 							mDragStarted = true;
-							mDragStartOffset = Vector2.zero;
+							mDragStartOffset = Vector2.get_zero();
 							if (onDragStarted != null)
 							{
 								onDragStarted();
 							}
 						}
 					}
-					else if ((bool)centerOnChild)
+					else if (Object.op_Implicit(centerOnChild))
 					{
 						centerOnChild.Recenter();
 					}
@@ -685,7 +856,63 @@ public class UIScrollView : MonoBehaviour
 
 	public void Drag()
 	{
-		if (UICamera.currentScheme != UICamera.ControlScheme.Controller && base.enabled && NGUITools.GetActive(base.gameObject) && mShouldMove)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Expected O, but got Unknown
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0211: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0223: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0232: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0261: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0266: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0275: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0283: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0288: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
+		if (UICamera.currentScheme != UICamera.ControlScheme.Controller && this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && mShouldMove)
 		{
 			if (mDragID == -10)
 			{
@@ -701,56 +928,64 @@ public class UIScrollView : MonoBehaviour
 					onDragStarted();
 				}
 			}
-			Ray ray = (!smoothDragStart) ? UICamera.currentCamera.ScreenPointToRay(UICamera.currentTouch.pos) : UICamera.currentCamera.ScreenPointToRay(UICamera.currentTouch.pos - mDragStartOffset);
-			float enter = 0f;
-			if (mPlane.Raycast(ray, out enter))
+			Ray val = (!smoothDragStart) ? UICamera.currentCamera.ScreenPointToRay(Vector2.op_Implicit(UICamera.currentTouch.pos)) : UICamera.currentCamera.ScreenPointToRay(Vector2.op_Implicit(UICamera.currentTouch.pos - mDragStartOffset));
+			float num = 0f;
+			if (mPlane.Raycast(val, ref num))
 			{
-				Vector3 point = ray.GetPoint(enter);
-				Vector3 vector = point - mLastPos;
+				Vector3 point = val.GetPoint(num);
+				Vector3 val2 = point - mLastPos;
 				mLastPos = point;
-				if (vector.x != 0f || vector.y != 0f || vector.z != 0f)
+				if (val2.x != 0f || val2.y != 0f || val2.z != 0f)
 				{
-					vector = mTrans.InverseTransformDirection(vector);
+					val2 = mTrans.InverseTransformDirection(val2);
 					if (movement == Movement.Horizontal)
 					{
-						vector.y = 0f;
-						vector.z = 0f;
+						val2.y = 0f;
+						val2.z = 0f;
 					}
 					else if (movement == Movement.Vertical)
 					{
-						vector.x = 0f;
-						vector.z = 0f;
+						val2.x = 0f;
+						val2.z = 0f;
 					}
 					else if (movement == Movement.Unrestricted)
 					{
-						vector.z = 0f;
+						val2.z = 0f;
 					}
 					else
 					{
-						vector.Scale(customMovement);
+						val2.Scale(Vector2.op_Implicit(customMovement));
 					}
-					vector = mTrans.TransformDirection(vector);
+					val2 = mTrans.TransformDirection(val2);
 				}
 				if (dragEffect == DragEffect.None)
 				{
-					mMomentum = Vector3.zero;
+					mMomentum = Vector3.get_zero();
 				}
 				else
 				{
-					mMomentum = Vector3.Lerp(mMomentum, mMomentum + vector * (0.01f * momentumAmount), 0.67f);
+					mMomentum = Vector3.Lerp(mMomentum, mMomentum + val2 * (0.01f * momentumAmount), 0.67f);
 				}
 				if (!iOSDragEmulation || dragEffect != DragEffect.MomentumAndSpring)
 				{
-					MoveAbsolute(vector);
-				}
-				else if (mPanel.CalculateConstrainOffset(bounds.min, bounds.max).magnitude > 1f)
-				{
-					MoveAbsolute(vector * 0.5f);
-					mMomentum *= 0.5f;
+					MoveAbsolute(val2);
 				}
 				else
 				{
-					MoveAbsolute(vector);
+					UIPanel uIPanel = mPanel;
+					Bounds bounds = this.bounds;
+					Vector2 min = Vector2.op_Implicit(bounds.get_min());
+					Bounds bounds2 = this.bounds;
+					Vector3 val3 = uIPanel.CalculateConstrainOffset(min, Vector2.op_Implicit(bounds2.get_max()));
+					if (val3.get_magnitude() > 1f)
+					{
+						MoveAbsolute(val2 * 0.5f);
+						mMomentum *= 0.5f;
+					}
+					else
+					{
+						MoveAbsolute(val2);
+					}
 				}
 				if (restrictWithinPanel && mPanel.clipping != 0 && dragEffect != DragEffect.MomentumAndSpring)
 				{
@@ -762,7 +997,9 @@ public class UIScrollView : MonoBehaviour
 
 	public void Scroll(float delta)
 	{
-		if (base.enabled && NGUITools.GetActive(base.gameObject) && scrollWheelFactor != 0f)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Expected O, but got Unknown
+		if (this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && scrollWheelFactor != 0f)
 		{
 			DisableSpring();
 			mShouldMove |= shouldMove;
@@ -776,19 +1013,47 @@ public class UIScrollView : MonoBehaviour
 
 	private void LateUpdate()
 	{
-		if (Application.isPlaying)
+		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+		//IL_023e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0299: Unknown result type (might be due to invalid IL or missing references)
+		//IL_029e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0326: Unknown result type (might be due to invalid IL or missing references)
+		//IL_032b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_038b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0390: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
+		if (Application.get_isPlaying())
 		{
 			float deltaTime = RealTime.deltaTime;
-			if (showScrollBars != 0 && ((bool)verticalScrollBar || (bool)horizontalScrollBar))
+			if (showScrollBars != 0 && (Object.op_Implicit(verticalScrollBar) || Object.op_Implicit(horizontalScrollBar)))
 			{
 				bool flag = false;
 				bool flag2 = false;
-				if (showScrollBars != ShowCondition.WhenDragging || mDragID != -10 || mMomentum.magnitude > 0.01f)
+				if (showScrollBars != ShowCondition.WhenDragging || mDragID != -10 || mMomentum.get_magnitude() > 0.01f)
 				{
 					flag = shouldMoveVertically;
 					flag2 = shouldMoveHorizontally;
 				}
-				if ((bool)verticalScrollBar)
+				if (Object.op_Implicit(verticalScrollBar))
 				{
 					float alpha = verticalScrollBar.alpha;
 					alpha += ((!flag) ? ((0f - deltaTime) * 3f) : (deltaTime * 6f));
@@ -798,7 +1063,7 @@ public class UIScrollView : MonoBehaviour
 						verticalScrollBar.alpha = alpha;
 					}
 				}
-				if ((bool)horizontalScrollBar)
+				if (Object.op_Implicit(horizontalScrollBar))
 				{
 					float alpha2 = horizontalScrollBar.alpha;
 					alpha2 += ((!flag2) ? ((0f - deltaTime) * 3f) : (deltaTime * 6f));
@@ -813,7 +1078,7 @@ public class UIScrollView : MonoBehaviour
 			{
 				if (!mPressed)
 				{
-					if (mMomentum.magnitude > 0.0001f || mScroll != 0f)
+					if (mMomentum.get_magnitude() > 0.0001f || mScroll != 0f)
 					{
 						if (movement == Movement.Horizontal)
 						{
@@ -823,13 +1088,13 @@ public class UIScrollView : MonoBehaviour
 						{
 							mMomentum -= mTrans.TransformDirection(new Vector3(0f, mScroll * 0.05f, 0f));
 						}
-						else if (movement != Movement.Unrestricted)
+						else if (movement == Movement.Unrestricted)
 						{
-							mMomentum -= mTrans.TransformDirection(new Vector3(mScroll * customMovement.x * 0.05f, mScroll * customMovement.y * 0.05f, 0f));
+							mMomentum -= mTrans.TransformDirection(new Vector3(mScroll * 0.05f, mScroll * 0.05f, 0f));
 						}
 						else
 						{
-							mMomentum -= mTrans.TransformDirection(new Vector3(mScroll * 0.05f, mScroll * 0.05f, 0f));
+							mMomentum -= mTrans.TransformDirection(new Vector3(mScroll * customMovement.x * 0.05f, mScroll * customMovement.y * 0.05f, 0f));
 						}
 						mScroll = NGUIMath.SpringLerp(mScroll, 0f, 20f, deltaTime);
 						Vector3 absolute = NGUIMath.SpringDampen(ref mMomentum, dampenStrength, deltaTime);
@@ -840,7 +1105,7 @@ public class UIScrollView : MonoBehaviour
 							{
 								if (centerOnChild.nextPageThreshold != 0f)
 								{
-									mMomentum = Vector3.zero;
+									mMomentum = Vector3.get_zero();
 									mScroll = 0f;
 								}
 								else
@@ -861,9 +1126,9 @@ public class UIScrollView : MonoBehaviour
 					else
 					{
 						mScroll = 0f;
-						mMomentum = Vector3.zero;
-						SpringPanel component = GetComponent<SpringPanel>();
-						if (!((UnityEngine.Object)component != (UnityEngine.Object)null) || !component.enabled)
+						mMomentum = Vector3.get_zero();
+						SpringPanel component = this.GetComponent<SpringPanel>();
+						if (!(component != null) || !component.get_enabled())
 						{
 							mShouldMove = false;
 							if (onStoppedMoving != null)
@@ -884,15 +1149,17 @@ public class UIScrollView : MonoBehaviour
 
 	public void OnPan(Vector2 delta)
 	{
-		if ((UnityEngine.Object)horizontalScrollBar != (UnityEngine.Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		if (horizontalScrollBar != null)
 		{
 			horizontalScrollBar.OnPan(delta);
 		}
-		if ((UnityEngine.Object)verticalScrollBar != (UnityEngine.Object)null)
+		if (verticalScrollBar != null)
 		{
 			verticalScrollBar.OnPan(delta);
 		}
-		if ((UnityEngine.Object)horizontalScrollBar == (UnityEngine.Object)null && (UnityEngine.Object)verticalScrollBar == (UnityEngine.Object)null)
+		if (horizontalScrollBar == null && verticalScrollBar == null)
 		{
 			if (scale.x != 0f)
 			{

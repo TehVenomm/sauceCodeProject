@@ -33,33 +33,33 @@ public class UILabel : UIWidget
 
 	public Crispness keepCrispWhenShrunk = Crispness.OnDesktop;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Font mTrueTypeFont;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private UIFont mFont;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	[Multiline(6)]
 	private string mText = string.Empty;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private int mFontSize = 16;
 
 	[SerializeField]
 	[HideInInspector]
 	private FontStyle mFontStyle;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private NGUIText.Alignment mAlignment;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private bool mEncoding = true;
 
 	[SerializeField]
@@ -70,17 +70,17 @@ public class UILabel : UIWidget
 	[HideInInspector]
 	private Effect mEffectStyle;
 
-	[HideInInspector]
 	[SerializeField]
-	private Color mEffectColor = Color.black;
+	[HideInInspector]
+	private Color mEffectColor = Color.get_black();
 
 	[HideInInspector]
 	[SerializeField]
 	private NGUIText.SymbolStyle mSymbols = NGUIText.SymbolStyle.Normal;
 
-	[SerializeField]
 	[HideInInspector]
-	private Vector2 mEffectDistance = Vector2.one;
+	[SerializeField]
+	private Vector2 mEffectDistance = Vector2.get_one();
 
 	[SerializeField]
 	[HideInInspector]
@@ -94,12 +94,12 @@ public class UILabel : UIWidget
 	[SerializeField]
 	private bool mApplyGradient;
 
-	[SerializeField]
 	[HideInInspector]
-	private Color mGradientTop = Color.white;
+	[SerializeField]
+	private Color mGradientTop = Color.get_white();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Color mGradientBottom = new Color(0.7f, 0.7f, 0.7f);
 
 	[SerializeField]
@@ -110,36 +110,36 @@ public class UILabel : UIWidget
 	[HideInInspector]
 	private int mSpacingY;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private bool mUseFloatSpacing;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private float mFloatSpacingX;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private float mFloatSpacingY;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private bool mShrinkToFit;
 
 	[SerializeField]
 	[HideInInspector]
 	private int mMaxLineWidth;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private int mMaxLineHeight;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private float mLineWidth;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool mMultiline = true;
 
 	[NonSerialized]
@@ -153,7 +153,7 @@ public class UILabel : UIWidget
 
 	private bool mPremultiply;
 
-	private Vector2 mCalculatedSize = Vector2.zero;
+	private Vector2 mCalculatedSize = Vector2.get_zero();
 
 	private float mScale = 1f;
 
@@ -201,23 +201,25 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			if ((UnityEngine.Object)mMaterial != (UnityEngine.Object)null)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Expected O, but got Unknown
+			if (mMaterial != null)
 			{
 				return mMaterial;
 			}
-			if ((UnityEngine.Object)mFont != (UnityEngine.Object)null)
+			if (mFont != null)
 			{
 				return mFont.material;
 			}
-			if ((UnityEngine.Object)mTrueTypeFont != (UnityEngine.Object)null)
+			if (mTrueTypeFont != null)
 			{
-				return mTrueTypeFont.material;
+				return mTrueTypeFont.get_material();
 			}
 			return null;
 		}
 		set
 		{
-			if ((UnityEngine.Object)mMaterial != (UnityEngine.Object)value)
+			if (mMaterial != value)
 			{
 				RemoveFromPanel();
 				mMaterial = value;
@@ -247,7 +249,7 @@ public class UILabel : UIWidget
 		}
 		set
 		{
-			if ((UnityEngine.Object)mFont != (UnityEngine.Object)value)
+			if (mFont != value)
 			{
 				RemoveFromPanel();
 				mFont = value;
@@ -261,15 +263,15 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			if ((UnityEngine.Object)mTrueTypeFont != (UnityEngine.Object)null)
+			if (mTrueTypeFont != null)
 			{
 				return mTrueTypeFont;
 			}
-			return (!((UnityEngine.Object)mFont != (UnityEngine.Object)null)) ? null : mFont.dynamicFont;
+			return (!(mFont != null)) ? null : mFont.dynamicFont;
 		}
 		set
 		{
-			if ((UnityEngine.Object)mTrueTypeFont != (UnityEngine.Object)value)
+			if (mTrueTypeFont != value)
 			{
 				SetActiveFont(null);
 				RemoveFromPanel();
@@ -278,7 +280,7 @@ public class UILabel : UIWidget
 				mFont = null;
 				SetActiveFont(value);
 				ProcessAndRequest();
-				if ((UnityEngine.Object)mActiveTTF != (UnityEngine.Object)null)
+				if (mActiveTTF != null)
 				{
 					base.MarkAsChanged();
 				}
@@ -286,16 +288,16 @@ public class UILabel : UIWidget
 		}
 	}
 
-	public UnityEngine.Object ambigiousFont
+	public Object ambigiousFont
 	{
 		get
 		{
-			return (UnityEngine.Object)(((object)mFont) ?? ((object)mTrueTypeFont));
+			return ((object)mFont) ?? ((object)mTrueTypeFont);
 		}
 		set
 		{
 			UIFont uIFont = value as UIFont;
-			if ((UnityEngine.Object)uIFont != (UnityEngine.Object)null)
+			if (uIFont != null)
 			{
 				bitmapFont = uIFont;
 			}
@@ -315,15 +317,15 @@ public class UILabel : UIWidget
 		set
 		{
 			SetTextOnly(value);
-			UILocalize component = GetComponent<UILocalize>();
-			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+			UILocalize component = this.GetComponent<UILocalize>();
+			if (component != null)
 			{
-				component.enabled = false;
+				component.set_enabled(false);
 			}
 		}
 	}
 
-	public int defaultFontSize => ((UnityEngine.Object)trueTypeFont != (UnityEngine.Object)null) ? mFontSize : ((!((UnityEngine.Object)mFont != (UnityEngine.Object)null)) ? 16 : mFont.defaultSize);
+	public int defaultFontSize => (trueTypeFont != null) ? mFontSize : ((!(mFont != null)) ? 16 : mFont.defaultSize);
 
 	public int fontSize
 	{
@@ -347,10 +349,15 @@ public class UILabel : UIWidget
 	{
 		get
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			return mFontStyle;
 		}
 		set
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			if (mFontStyle != value)
 			{
 				mFontStyle = value;
@@ -397,10 +404,15 @@ public class UILabel : UIWidget
 	{
 		get
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			return mGradientTop;
 		}
 		set
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			if (mGradientTop != value)
 			{
 				mGradientTop = value;
@@ -416,10 +428,15 @@ public class UILabel : UIWidget
 	{
 		get
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			return mGradientBottom;
 		}
 		set
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			if (mGradientBottom != value)
 			{
 				mGradientBottom = value;
@@ -519,7 +536,7 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			if ((UnityEngine.Object)trueTypeFont != (UnityEngine.Object)null && keepCrispWhenShrunk != 0)
+			if (trueTypeFont != null && keepCrispWhenShrunk != 0)
 			{
 				return keepCrispWhenShrunk == Crispness.Always;
 			}
@@ -645,6 +662,7 @@ public class UILabel : UIWidget
 	{
 		get
 		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			if (shouldBeProcessed)
 			{
 				ProcessText();
@@ -693,10 +711,15 @@ public class UILabel : UIWidget
 	{
 		get
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			return mEffectColor;
 		}
 		set
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			if (mEffectColor != value)
 			{
 				mEffectColor = value;
@@ -712,10 +735,15 @@ public class UILabel : UIWidget
 	{
 		get
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			return mEffectDistance;
 		}
 		set
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			if (mEffectDistance != value)
 			{
 				mEffectDistance = value;
@@ -762,6 +790,7 @@ public class UILabel : UIWidget
 	{
 		get
 		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			if (shouldBeProcessed)
 			{
 				ProcessText();
@@ -774,6 +803,7 @@ public class UILabel : UIWidget
 	{
 		get
 		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			if (shouldBeProcessed)
 			{
 				ProcessText();
@@ -782,7 +812,7 @@ public class UILabel : UIWidget
 		}
 	}
 
-	private bool isValid => (UnityEngine.Object)mFont != (UnityEngine.Object)null || (UnityEngine.Object)mTrueTypeFont != (UnityEngine.Object)null;
+	private bool isValid => mFont != null || mTrueTypeFont != null;
 
 	public void SetTextOnly(string value)
 	{
@@ -813,26 +843,27 @@ public class UILabel : UIWidget
 	protected override void Awake()
 	{
 		base.Awake();
-		if (Application.isPlaying)
+		if (Application.get_isPlaying())
 		{
-			fontStyle = FontStyle.Normal;
+			fontStyle = 0;
 			supportEncoding = false;
 		}
 	}
 
 	protected override void OnInit()
 	{
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		base.OnInit();
 		mList.Add(this);
 		SetActiveFont(trueTypeFont);
-		if (Application.isPlaying)
+		if (Application.get_isPlaying())
 		{
 			if (MonoBehaviourSingleton<GameSceneManager>.IsValid())
 			{
-				GameSection componentInParent = base.transform.GetComponentInParent<GameSection>();
-				if ((UnityEngine.Object)componentInParent != (UnityEngine.Object)null && componentInParent.sectionData != (GameSceneTables.SectionData)null)
+				GameSection componentInParent = this.get_transform().GetComponentInParent<GameSection>();
+				if (componentInParent != null && componentInParent.sectionData != (GameSceneTables.SectionData)null)
 				{
-					string text = componentInParent.sectionData.GetText(base.name);
+					string text = componentInParent.sectionData.GetText(this.get_name());
 					if (text.Length > 0)
 					{
 						this.text = text;
@@ -856,9 +887,9 @@ public class UILabel : UIWidget
 
 	protected void SetActiveFont(Font fnt)
 	{
-		if ((UnityEngine.Object)mActiveTTF != (UnityEngine.Object)fnt)
+		if (mActiveTTF != fnt)
 		{
-			if ((UnityEngine.Object)mActiveTTF != (UnityEngine.Object)null && mFontUsage.TryGetValue(mActiveTTF, out int value))
+			if (mActiveTTF != null && mFontUsage.TryGetValue(mActiveTTF, out int value))
 			{
 				value = Mathf.Max(0, --value);
 				if (value == 0)
@@ -871,7 +902,7 @@ public class UILabel : UIWidget
 				}
 			}
 			mActiveTTF = fnt;
-			if ((UnityEngine.Object)mActiveTTF != (UnityEngine.Object)null)
+			if (mActiveTTF != null)
 			{
 				int num = 0;
 				num = (mFontUsage[mActiveTTF] = num + 1);
@@ -881,13 +912,14 @@ public class UILabel : UIWidget
 
 	private static void OnFontChanged(Font font)
 	{
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < mList.size; i++)
 		{
 			UILabel uILabel = mList[i];
-			if ((UnityEngine.Object)uILabel != (UnityEngine.Object)null)
+			if (uILabel != null)
 			{
 				Font trueTypeFont = uILabel.trueTypeFont;
-				if ((UnityEngine.Object)trueTypeFont == (UnityEngine.Object)font)
+				if (trueTypeFont == font)
 				{
 					trueTypeFont.RequestCharactersInTexture(uILabel.mText, uILabel.mPrintedSize, uILabel.mFontStyle);
 				}
@@ -896,10 +928,10 @@ public class UILabel : UIWidget
 		for (int j = 0; j < mList.size; j++)
 		{
 			UILabel uILabel2 = mList[j];
-			if ((UnityEngine.Object)uILabel2 != (UnityEngine.Object)null)
+			if (uILabel2 != null)
 			{
 				Font trueTypeFont2 = uILabel2.trueTypeFont;
-				if ((UnityEngine.Object)trueTypeFont2 == (UnityEngine.Object)font)
+				if (trueTypeFont2 == font)
 				{
 					uILabel2.RemoveFromPanel();
 					uILabel2.CreatePanel();
@@ -919,6 +951,8 @@ public class UILabel : UIWidget
 
 	protected override void UpgradeFrom265()
 	{
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c7: Expected O, but got Unknown
 		ProcessText(true, true);
 		if (mShrinkToFit)
 		{
@@ -938,7 +972,7 @@ public class UILabel : UIWidget
 		{
 			base.height = mMaxLineHeight;
 		}
-		if ((UnityEngine.Object)mFont != (UnityEngine.Object)null)
+		if (mFont != null)
 		{
 			int defaultSize = mFont.defaultSize;
 			if (base.height < defaultSize)
@@ -950,7 +984,7 @@ public class UILabel : UIWidget
 		mMaxLineWidth = 0;
 		mMaxLineHeight = 0;
 		mShrinkToFit = false;
-		NGUITools.UpdateWidgetCollider(base.gameObject, true);
+		NGUITools.UpdateWidgetCollider(this.get_gameObject(), true);
 	}
 
 	protected override void OnAnchor()
@@ -962,7 +996,7 @@ public class UILabel : UIWidget
 				mOverflow = Overflow.ShrinkContent;
 			}
 		}
-		else if (mOverflow == Overflow.ResizeHeight && (UnityEngine.Object)topAnchor.target != (UnityEngine.Object)null && (UnityEngine.Object)bottomAnchor.target != (UnityEngine.Object)null)
+		else if (mOverflow == Overflow.ResizeHeight && topAnchor.target != null && bottomAnchor.target != null)
 		{
 			mOverflow = Overflow.ShrinkContent;
 		}
@@ -971,7 +1005,7 @@ public class UILabel : UIWidget
 
 	private void ProcessAndRequest()
 	{
-		if (ambigiousFont != (UnityEngine.Object)null)
+		if (ambigiousFont != null)
 		{
 			ProcessText();
 		}
@@ -983,12 +1017,14 @@ public class UILabel : UIWidget
 		if (!mTexRebuildAdded)
 		{
 			mTexRebuildAdded = true;
-			Font.textureRebuilt += OnFontChanged;
+			Font.add_textureRebuilt((Action<Font>)OnFontChanged);
 		}
 	}
 
 	protected override void OnStart()
 	{
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 		base.OnStart();
 		if (mLineWidth > 0f)
 		{
@@ -1000,7 +1036,7 @@ public class UILabel : UIWidget
 			mMaxLineCount = 1;
 			mMultiline = true;
 		}
-		mPremultiply = ((UnityEngine.Object)material != (UnityEngine.Object)null && (UnityEngine.Object)material.shader != (UnityEngine.Object)null && material.shader.name.Contains("Premultiplied"));
+		mPremultiply = (material != null && material.get_shader() != null && material.get_shader().get_name().Contains("Premultiplied"));
 		ProcessAndRequest();
 	}
 
@@ -1017,6 +1053,16 @@ public class UILabel : UIWidget
 
 	private void ProcessText(bool legacyMode, bool full)
 	{
+		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02f0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_043c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0441: Unknown result type (might be due to invalid IL or missing references)
+		//IL_047e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04a6: Unknown result type (might be due to invalid IL or missing references)
 		if (isValid)
 		{
 			mChanged = true;
@@ -1027,17 +1073,17 @@ public class UILabel : UIWidget
 			NGUIText.rectHeight = ((!legacyMode) ? base.height : ((mMaxLineHeight == 0) ? 1000000 : mMaxLineHeight));
 			NGUIText.regionWidth = ((num == 1f) ? NGUIText.rectWidth : Mathf.RoundToInt((float)NGUIText.rectWidth * num));
 			NGUIText.regionHeight = ((num2 == 1f) ? NGUIText.rectHeight : Mathf.RoundToInt((float)NGUIText.rectHeight * num2));
-			int value;
+			int num3;
 			if (legacyMode)
 			{
-				Vector3 localScale = base.cachedTransform.localScale;
-				value = Mathf.RoundToInt(localScale.x);
+				Vector3 localScale = base.cachedTransform.get_localScale();
+				num3 = Mathf.RoundToInt(localScale.x);
 			}
 			else
 			{
-				value = defaultFontSize;
+				num3 = defaultFontSize;
 			}
-			mPrintedSize = Mathf.Abs(value);
+			mPrintedSize = Mathf.Abs(num3);
 			mScale = 1f;
 			if (NGUIText.regionWidth < 1 || NGUIText.regionHeight < 0)
 			{
@@ -1045,13 +1091,13 @@ public class UILabel : UIWidget
 			}
 			else
 			{
-				bool flag = (UnityEngine.Object)trueTypeFont != (UnityEngine.Object)null;
+				bool flag = trueTypeFont != null;
 				if (flag && this.keepCrisp)
 				{
 					UIRoot root = base.root;
-					if ((UnityEngine.Object)root != (UnityEngine.Object)null)
+					if (root != null)
 					{
-						mDensity = ((!((UnityEngine.Object)root != (UnityEngine.Object)null)) ? 1f : root.pixelSizeAdjustment);
+						mDensity = ((!(root != null)) ? 1f : root.pixelSizeAdjustment);
 					}
 				}
 				else
@@ -1075,17 +1121,17 @@ public class UILabel : UIWidget
 				if (mPrintedSize > 0)
 				{
 					bool keepCrisp = this.keepCrisp;
-					int num3;
-					for (num3 = mPrintedSize; num3 > 0; num3--)
+					int num4;
+					for (num4 = mPrintedSize; num4 > 0; num4--)
 					{
 						if (keepCrisp)
 						{
-							mPrintedSize = num3;
+							mPrintedSize = num4;
 							NGUIText.fontSize = mPrintedSize;
 						}
 						else
 						{
-							mScale = (float)num3 / (float)mPrintedSize;
+							mScale = (float)num4 / (float)mPrintedSize;
 							NGUIText.fontScale = ((!flag) ? ((float)mFontSize / (float)mFont.defaultSize * mScale) : mScale);
 						}
 						NGUIText.Update(false);
@@ -1135,11 +1181,11 @@ public class UILabel : UIWidget
 							{
 								base.width = Mathf.RoundToInt(mCalculatedSize.x);
 								base.height = Mathf.RoundToInt(mCalculatedSize.y);
-								base.cachedTransform.localScale = Vector3.one;
+								base.cachedTransform.set_localScale(Vector3.get_one());
 							}
 							break;
 						}
-						if (--num3 <= 1)
+						if (--num4 <= 1)
 						{
 							break;
 						}
@@ -1147,7 +1193,7 @@ public class UILabel : UIWidget
 				}
 				else
 				{
-					base.cachedTransform.localScale = Vector3.one;
+					base.cachedTransform.set_localScale(Vector3.get_one());
 					mProcessedText = string.Empty;
 					mScale = 1f;
 				}
@@ -1162,14 +1208,18 @@ public class UILabel : UIWidget
 
 	public override void MakePixelPerfect()
 	{
-		if (ambigiousFont != (UnityEngine.Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		if (ambigiousFont != null)
 		{
-			Vector3 localPosition = base.cachedTransform.localPosition;
+			Vector3 localPosition = base.cachedTransform.get_localPosition();
 			localPosition.x = (float)Mathf.RoundToInt(localPosition.x);
 			localPosition.y = (float)Mathf.RoundToInt(localPosition.y);
 			localPosition.z = (float)Mathf.RoundToInt(localPosition.z);
-			base.cachedTransform.localPosition = localPosition;
-			base.cachedTransform.localScale = Vector3.one;
+			base.cachedTransform.set_localPosition(localPosition);
+			base.cachedTransform.set_localScale(Vector3.get_one());
 			if (mOverflow == Overflow.ResizeFreely)
 			{
 				AssumeNaturalSize();
@@ -1187,20 +1237,20 @@ public class UILabel : UIWidget
 				mOverflow = Overflow.ShrinkContent;
 				ProcessText(false, true);
 				mOverflow = overflow;
-				int a = Mathf.RoundToInt(mCalculatedSize.x);
-				int a2 = Mathf.RoundToInt(mCalculatedSize.y);
-				a = Mathf.Max(a, base.minWidth);
-				a2 = Mathf.Max(a2, base.minHeight);
-				if ((a & 1) == 1)
+				int num = Mathf.RoundToInt(mCalculatedSize.x);
+				int num2 = Mathf.RoundToInt(mCalculatedSize.y);
+				num = Mathf.Max(num, base.minWidth);
+				num2 = Mathf.Max(num2, base.minHeight);
+				if ((num & 1) == 1)
 				{
-					a++;
+					num++;
 				}
-				if ((a2 & 1) == 1)
+				if ((num2 & 1) == 1)
 				{
-					a2++;
+					num2++;
 				}
-				mWidth = Mathf.Max(width, a);
-				mHeight = Mathf.Max(height, a2);
+				mWidth = Mathf.Max(width, num);
+				mHeight = Mathf.Max(height, num2);
 				MarkAsChanged();
 			}
 		}
@@ -1212,7 +1262,7 @@ public class UILabel : UIWidget
 
 	public void AssumeNaturalSize()
 	{
-		if (ambigiousFont != (UnityEngine.Object)null)
+		if (ambigiousFont != null)
 		{
 			mWidth = 100000;
 			mHeight = 100000;
@@ -1234,23 +1284,33 @@ public class UILabel : UIWidget
 	[Obsolete("Use UILabel.GetCharacterAtPosition instead")]
 	public int GetCharacterIndex(Vector3 worldPos)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		return GetCharacterIndexAtPosition(worldPos, false);
 	}
 
 	[Obsolete("Use UILabel.GetCharacterAtPosition instead")]
 	public int GetCharacterIndex(Vector2 localPos)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		return GetCharacterIndexAtPosition(localPos, false);
 	}
 
 	public int GetCharacterIndexAtPosition(Vector3 worldPos, bool precise)
 	{
-		Vector2 localPos = base.cachedTransform.InverseTransformPoint(worldPos);
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		Vector2 localPos = Vector2.op_Implicit(base.cachedTransform.InverseTransformPoint(worldPos));
 		return GetCharacterIndexAtPosition(localPos, precise);
 	}
 
 	public int GetCharacterIndexAtPosition(Vector2 localPos, bool precise)
 	{
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
 		if (isValid)
 		{
 			string processedText = this.processedText;
@@ -1285,12 +1345,14 @@ public class UILabel : UIWidget
 
 	public string GetWordAtPosition(Vector3 worldPos)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		int characterIndexAtPosition = GetCharacterIndexAtPosition(worldPos, true);
 		return GetWordAtCharacterIndex(characterIndexAtPosition);
 	}
 
 	public string GetWordAtPosition(Vector2 localPos)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		int characterIndexAtPosition = GetCharacterIndexAtPosition(localPos, true);
 		return GetWordAtCharacterIndex(characterIndexAtPosition);
 	}
@@ -1330,11 +1392,13 @@ public class UILabel : UIWidget
 
 	public string GetUrlAtPosition(Vector3 worldPos)
 	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		return GetUrlAtCharacterIndex(GetCharacterIndexAtPosition(worldPos, true));
 	}
 
 	public string GetUrlAtPosition(Vector2 localPos)
 	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		return GetUrlAtCharacterIndex(GetCharacterIndexAtPosition(localPos, true));
 	}
 
@@ -1364,6 +1428,27 @@ public class UILabel : UIWidget
 
 	public int GetCharacterIndex(int currentIndex, KeyCode key)
 	{
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0088: Invalid comparison between Unknown and I4
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Invalid comparison between Unknown and I4
+		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d6: Invalid comparison between Unknown and I4
+		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f9: Invalid comparison between Unknown and I4
+		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0181: Invalid comparison between Unknown and I4
+		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018c: Invalid comparison between Unknown and I4
+		//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0199: Invalid comparison between Unknown and I4
+		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a4: Invalid comparison between Unknown and I4
 		if (isValid)
 		{
 			string processedText = this.processedText;
@@ -1381,21 +1466,22 @@ public class UILabel : UIWidget
 				{
 					if (mTempIndices[i] == currentIndex)
 					{
-						Vector2 pos = mTempVerts[i];
-						switch (key)
+						Vector2 pos = Vector2.op_Implicit(mTempVerts[i]);
+						if ((int)key == 273)
 						{
-						case KeyCode.UpArrow:
 							pos.y += (float)defaultFontSize + effectiveSpacingY;
-							break;
-						case KeyCode.DownArrow:
+						}
+						else if ((int)key == 274)
+						{
 							pos.y -= (float)defaultFontSize + effectiveSpacingY;
-							break;
-						case KeyCode.Home:
+						}
+						else if ((int)key == 278)
+						{
 							pos.x -= 1000f;
-							break;
-						case KeyCode.End:
+						}
+						else if ((int)key == 279)
+						{
 							pos.x += 1000f;
-							break;
 						}
 						int approximateCharacterIndex = NGUIText.GetApproximateCharacterIndex(mTempVerts, mTempIndices, pos);
 						if (approximateCharacterIndex == currentIndex)
@@ -1412,13 +1498,12 @@ public class UILabel : UIWidget
 			}
 			NGUIText.bitmapFont = null;
 			NGUIText.dynamicFont = null;
-			switch (key)
+			if ((int)key == 273 || (int)key == 278)
 			{
-			case KeyCode.UpArrow:
-			case KeyCode.Home:
 				return 0;
-			case KeyCode.DownArrow:
-			case KeyCode.End:
+			}
+			if ((int)key == 274 || (int)key == 279)
+			{
 				return processedText.Length;
 			}
 		}
@@ -1427,6 +1512,18 @@ public class UILabel : UIWidget
 
 	public void PrintOverlay(int start, int end, UIGeometry caret, UIGeometry highlight, Color caretColor, Color highlightColor)
 	{
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0178: Unknown result type (might be due to invalid IL or missing references)
 		caret?.Clear();
 		highlight?.Clear();
 		if (isValid)
@@ -1434,7 +1531,8 @@ public class UILabel : UIWidget
 			string processedText = this.processedText;
 			UpdateNGUIText();
 			int size = caret.verts.size;
-			Vector2 item = new Vector2(0.5f, 0.5f);
+			Vector2 item = default(Vector2);
+			item._002Ector(0.5f, 0.5f);
 			float finalAlpha = base.finalAlpha;
 			if (highlight != null && start != end)
 			{
@@ -1443,7 +1541,7 @@ public class UILabel : UIWidget
 				if (highlight.verts.size > size2)
 				{
 					ApplyOffset(highlight.verts, size2);
-					Color32 item2 = new Color(highlightColor.r, highlightColor.g, highlightColor.b, highlightColor.a * finalAlpha);
+					Color32 item2 = Color32.op_Implicit(new Color(highlightColor.r, highlightColor.g, highlightColor.b, highlightColor.a * finalAlpha));
 					for (int i = size2; i < highlight.verts.size; i++)
 					{
 						highlight.uvs.Add(item);
@@ -1456,7 +1554,7 @@ public class UILabel : UIWidget
 				NGUIText.PrintCaretAndSelection(processedText, start, end, caret.verts, null);
 			}
 			ApplyOffset(caret.verts, size);
-			Color32 item3 = new Color(caretColor.r, caretColor.g, caretColor.b, caretColor.a * finalAlpha);
+			Color32 item3 = Color32.op_Implicit(new Color(caretColor.r, caretColor.g, caretColor.b, caretColor.a * finalAlpha));
 			for (int j = size; j < caret.verts.size; j++)
 			{
 				caret.uvs.Add(item);
@@ -1469,62 +1567,73 @@ public class UILabel : UIWidget
 
 	public override void OnFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Invalid comparison between Unknown and I4
+		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
 		if (isValid)
 		{
 			int num = verts.size;
-			Color color = base.color;
-			color.a = finalAlpha;
-			if ((UnityEngine.Object)mFont != (UnityEngine.Object)null && mFont.premultipliedAlphaShader)
+			Color val = base.color;
+			val.a = finalAlpha;
+			if (mFont != null && mFont.premultipliedAlphaShader)
 			{
-				color = NGUITools.ApplyPMA(color);
+				val = NGUITools.ApplyPMA(val);
 			}
-			if (QualitySettings.activeColorSpace == ColorSpace.Linear)
+			if ((int)QualitySettings.get_activeColorSpace() == 1)
 			{
-				color.r = Mathf.GammaToLinearSpace(color.r);
-				color.g = Mathf.GammaToLinearSpace(color.g);
-				color.b = Mathf.GammaToLinearSpace(color.b);
+				val.r = Mathf.GammaToLinearSpace(val.r);
+				val.g = Mathf.GammaToLinearSpace(val.g);
+				val.b = Mathf.GammaToLinearSpace(val.b);
 			}
 			string processedText = this.processedText;
 			int size = verts.size;
 			UpdateNGUIText();
-			NGUIText.tint = color;
+			NGUIText.tint = val;
 			NGUIText.Print(processedText, verts, uvs, cols);
 			NGUIText.bitmapFont = null;
 			NGUIText.dynamicFont = null;
-			Vector2 vector = ApplyOffset(verts, size);
-			if (!((UnityEngine.Object)mFont != (UnityEngine.Object)null) || !mFont.packedFontShader)
+			Vector2 val2 = ApplyOffset(verts, size);
+			if (!(mFont != null) || !mFont.packedFontShader)
 			{
 				if (effectStyle != 0)
 				{
 					int size2 = verts.size;
-					vector.x = mEffectDistance.x;
-					vector.y = mEffectDistance.y;
-					ApplyShadow(verts, uvs, cols, num, size2, vector.x, 0f - vector.y);
+					val2.x = mEffectDistance.x;
+					val2.y = mEffectDistance.y;
+					ApplyShadow(verts, uvs, cols, num, size2, val2.x, 0f - val2.y);
 					if (effectStyle == Effect.Outline || (effectStyle == Effect.Outline8 && !OutlineLimit))
 					{
 						num = size2;
 						size2 = verts.size;
-						ApplyShadow(verts, uvs, cols, num, size2, 0f - vector.x, vector.y);
+						ApplyShadow(verts, uvs, cols, num, size2, 0f - val2.x, val2.y);
 						num = size2;
 						size2 = verts.size;
-						ApplyShadow(verts, uvs, cols, num, size2, vector.x, vector.y);
+						ApplyShadow(verts, uvs, cols, num, size2, val2.x, val2.y);
 						num = size2;
 						size2 = verts.size;
-						ApplyShadow(verts, uvs, cols, num, size2, 0f - vector.x, 0f - vector.y);
+						ApplyShadow(verts, uvs, cols, num, size2, 0f - val2.x, 0f - val2.y);
 						if (effectStyle == Effect.Outline8)
 						{
 							num = size2;
 							size2 = verts.size;
-							ApplyShadow(verts, uvs, cols, num, size2, 0f - vector.x, 0f);
+							ApplyShadow(verts, uvs, cols, num, size2, 0f - val2.x, 0f);
 							num = size2;
 							size2 = verts.size;
-							ApplyShadow(verts, uvs, cols, num, size2, vector.x, 0f);
+							ApplyShadow(verts, uvs, cols, num, size2, val2.x, 0f);
 							num = size2;
 							size2 = verts.size;
-							ApplyShadow(verts, uvs, cols, num, size2, 0f, vector.y);
+							ApplyShadow(verts, uvs, cols, num, size2, 0f, val2.y);
 							num = size2;
 							size2 = verts.size;
-							ApplyShadow(verts, uvs, cols, num, size2, 0f, 0f - vector.y);
+							ApplyShadow(verts, uvs, cols, num, size2, 0f, 0f - val2.y);
 						}
 					}
 				}
@@ -1538,43 +1647,71 @@ public class UILabel : UIWidget
 
 	public Vector2 ApplyOffset(BetterList<Vector3> verts, int start)
 	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
 		Vector2 pivotOffset = base.pivotOffset;
-		float f = Mathf.Lerp(0f, (float)(-mWidth), pivotOffset.x);
-		float f2 = Mathf.Lerp((float)mHeight, 0f, pivotOffset.y) + Mathf.Lerp(mCalculatedSize.y - (float)mHeight, 0f, pivotOffset.y);
-		f = Mathf.Round(f);
-		f2 = Mathf.Round(f2);
+		float num = Mathf.Lerp(0f, (float)(-mWidth), pivotOffset.x);
+		float num2 = Mathf.Lerp((float)mHeight, 0f, pivotOffset.y) + Mathf.Lerp(mCalculatedSize.y - (float)mHeight, 0f, pivotOffset.y);
+		num = Mathf.Round(num);
+		num2 = Mathf.Round(num2);
 		for (int i = start; i < verts.size; i++)
 		{
-			verts.buffer[i].x += f;
-			verts.buffer[i].y += f2;
+			verts.buffer[i].x += num;
+			verts.buffer[i].y += num2;
 		}
-		return new Vector2(f, f2);
+		return new Vector2(num, num2);
 	}
 
 	public void ApplyShadow(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols, int start, int end, float x, float y)
 	{
-		Color color = mEffectColor;
-		color.a *= finalAlpha;
-		Color32 color2 = (!((UnityEngine.Object)bitmapFont != (UnityEngine.Object)null) || !bitmapFont.premultipliedAlphaShader) ? color : NGUITools.ApplyPMA(color);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+		Color val = mEffectColor;
+		val.a *= finalAlpha;
+		Color32 val2 = Color32.op_Implicit((!(bitmapFont != null) || !bitmapFont.premultipliedAlphaShader) ? val : NGUITools.ApplyPMA(val));
 		for (int i = start; i < end; i++)
 		{
 			verts.Add(verts.buffer[i]);
 			uvs.Add(uvs.buffer[i]);
 			cols.Add(cols.buffer[i]);
-			Vector3 vector = verts.buffer[i];
-			vector.x += x;
-			vector.y += y;
-			verts.buffer[i] = vector;
-			Color32 color3 = cols.buffer[i];
-			if (color3.a == 255)
+			Vector3 val3 = verts.buffer[i];
+			val3.x += x;
+			val3.y += y;
+			verts.buffer[i] = val3;
+			Color32 val4 = cols.buffer[i];
+			if (val4.a == 255)
 			{
-				cols.buffer[i] = color2;
+				cols.buffer[i] = val2;
 			}
 			else
 			{
-				Color color4 = color;
-				color4.a = (float)(int)color3.a / 255f * color.a;
-				cols.buffer[i] = ((!((UnityEngine.Object)bitmapFont != (UnityEngine.Object)null) || !bitmapFont.premultipliedAlphaShader) ? color4 : NGUITools.ApplyPMA(color4));
+				Color val5 = val;
+				val5.a = (float)(int)val4.a / 255f * val.a;
+				cols.buffer[i] = Color32.op_Implicit((!(bitmapFont != null) || !bitmapFont.premultipliedAlphaShader) ? val5 : NGUITools.ApplyPMA(val5));
 			}
 		}
 	}
@@ -1592,7 +1729,7 @@ public class UILabel : UIWidget
 
 	public void SetCurrentProgress()
 	{
-		if ((UnityEngine.Object)UIProgressBar.current != (UnityEngine.Object)null)
+		if (UIProgressBar.current != null)
 		{
 			text = UIProgressBar.current.value.ToString("F");
 		}
@@ -1600,7 +1737,7 @@ public class UILabel : UIWidget
 
 	public void SetCurrentPercent()
 	{
-		if ((UnityEngine.Object)UIProgressBar.current != (UnityEngine.Object)null)
+		if (UIProgressBar.current != null)
 		{
 			text = Mathf.RoundToInt(UIProgressBar.current.value * 100f) + "%";
 		}
@@ -1608,7 +1745,7 @@ public class UILabel : UIWidget
 
 	public void SetCurrentSelection()
 	{
-		if ((UnityEngine.Object)UIPopupList.current != (UnityEngine.Object)null)
+		if (UIPopupList.current != null)
 		{
 			text = ((!UIPopupList.current.isLocalized) ? UIPopupList.current.value : Localization.Get(UIPopupList.current.value));
 		}
@@ -1632,15 +1769,21 @@ public class UILabel : UIWidget
 
 	public void UpdateNGUIText()
 	{
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
 		Font trueTypeFont = this.trueTypeFont;
-		bool flag = (UnityEngine.Object)trueTypeFont != (UnityEngine.Object)null;
+		bool flag = trueTypeFont != null;
 		NGUIText.fontSize = mPrintedSize;
 		NGUIText.fontStyle = mFontStyle;
 		NGUIText.rectWidth = mWidth;
 		NGUIText.rectHeight = mHeight;
 		NGUIText.regionWidth = Mathf.RoundToInt((float)mWidth * (mDrawRegion.z - mDrawRegion.x));
 		NGUIText.regionHeight = Mathf.RoundToInt((float)mHeight * (mDrawRegion.w - mDrawRegion.y));
-		NGUIText.gradient = (mApplyGradient && ((UnityEngine.Object)mFont == (UnityEngine.Object)null || !mFont.packedFontShader));
+		NGUIText.gradient = (mApplyGradient && (mFont == null || !mFont.packedFontShader));
 		NGUIText.gradientTop = mGradientTop;
 		NGUIText.gradientBottom = mGradientBottom;
 		NGUIText.encoding = mEncoding;
@@ -1650,13 +1793,13 @@ public class UILabel : UIWidget
 		NGUIText.spacingX = effectiveSpacingX;
 		NGUIText.spacingY = effectiveSpacingY;
 		NGUIText.fontScale = ((!flag) ? ((float)mFontSize / (float)mFont.defaultSize * mScale) : mScale);
-		if ((UnityEngine.Object)mFont != (UnityEngine.Object)null)
+		if (mFont != null)
 		{
 			NGUIText.bitmapFont = mFont;
 			while (true)
 			{
 				UIFont replacement = NGUIText.bitmapFont.replacement;
-				if ((UnityEngine.Object)replacement == (UnityEngine.Object)null)
+				if (replacement == null)
 				{
 					break;
 				}
@@ -1680,9 +1823,9 @@ public class UILabel : UIWidget
 		if (flag && keepCrisp)
 		{
 			UIRoot root = base.root;
-			if ((UnityEngine.Object)root != (UnityEngine.Object)null)
+			if (root != null)
 			{
-				NGUIText.pixelDensity = ((!((UnityEngine.Object)root != (UnityEngine.Object)null)) ? 1f : root.pixelSizeAdjustment);
+				NGUIText.pixelDensity = ((!(root != null)) ? 1f : root.pixelSizeAdjustment);
 			}
 		}
 		else
@@ -1725,7 +1868,7 @@ public class UILabel : UIWidget
 
 	private void OnApplicationPause(bool paused)
 	{
-		if (!paused && (UnityEngine.Object)mTrueTypeFont != (UnityEngine.Object)null)
+		if (!paused && mTrueTypeFont != null)
 		{
 			Invalidate(false);
 		}

@@ -417,13 +417,13 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 		Protocol.Send(RegionCrystalNumModel.URL, requestSendForm, delegate(RegionCrystalNumModel ret)
 		{
 			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			string arg = string.Empty;
+			string text = string.Empty;
 			if (flag)
 			{
 				releaseCrystalNum = ret.result.crystalNum;
-				arg = ret.result.text;
+				text = ret.result.text;
 			}
-			call_back(flag, arg);
+			call_back.Invoke(flag, text);
 		}, string.Empty);
 	}
 

@@ -186,10 +186,12 @@ public class ItemDetailTop : GameSection
 		}
 	}
 
-	public override void Initialize()
+	public unsafe override void Initialize()
 	{
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Expected O, but got Unknown
 		data = (GameSection.GetEventData() as SortCompareData);
-		Protocol.Force(GetItemData);
+		Protocol.Force(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void GetItemData()
@@ -199,6 +201,7 @@ public class ItemDetailTop : GameSection
 		requestForm.itemId = itemId.ToString();
 		Protocol.Send("ajax/datatable/itemtoquest", requestForm, delegate(ItemToQuestTableModel res)
 		{
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			if (res.Error == Error.None)
 			{
 				Singleton<ItemToQuestTable>.I.AddTableFromAPI(data.GetTableID(), res.result.questIds);
@@ -214,31 +217,21 @@ public class ItemDetailTop : GameSection
 				{
 					GameSaveData.instance.RemoveNewIconAndSave(ITEM_ICON_TYPE.ACCESSORY, data.GetUniqID());
 				}
-				StartCoroutine(SendGetInfos());
+				this.StartCoroutine(SendGetInfos());
 			}
 		}, string.Empty);
 	}
 
-	private IEnumerator SendGetInfos()
+	private unsafe IEnumerator SendGetInfos()
 	{
 		bool isFinishChallengeInfo = false;
-		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(delegate
-		{
-			((_003CSendGetInfos_003Ec__Iterator69)/*Error near IL_0039: stateMachine*/)._003CisFinishChallengeInfo_003E__0 = true;
-		});
+		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(new Action<bool, Error>((object)/*Error near IL_0039: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (!isFinishChallengeInfo)
 		{
 			yield return (object)null;
 		}
 		bool isFinishSendPointShop = false;
-		MonoBehaviourSingleton<UserInfoManager>.I.PointShopManager.SendGetPointShops(delegate(bool isSuccess, List<PointShop> resultList)
-		{
-			if (isSuccess)
-			{
-				((_003CSendGetInfos_003Ec__Iterator69)/*Error near IL_0079: stateMachine*/)._003C_003Ef__this.pointShopList = resultList;
-				((_003CSendGetInfos_003Ec__Iterator69)/*Error near IL_0079: stateMachine*/)._003CisFinishSendPointShop_003E__1 = true;
-			}
-		});
+		MonoBehaviourSingleton<UserInfoManager>.I.PointShopManager.SendGetPointShops(new Action<bool, List<PointShop>>((object)/*Error near IL_0079: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (!isFinishSendPointShop)
 		{
 			yield return (object)null;
@@ -248,10 +241,7 @@ public class ItemDetailTop : GameSection
 		{
 			enemyLevel = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.QUEST_ITEM_LEVEL_MAX
 		};
-		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeList(sendParam, delegate
-		{
-			((_003CSendGetInfos_003Ec__Iterator69)/*Error near IL_00e4: stateMachine*/)._003CisRecvQuest_003E__2 = true;
-		}, false);
+		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeList(sendParam, new Action<bool, Error>((object)/*Error near IL_00e4: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
 		while (!isRecvQuest)
 		{
 			yield return (object)null;
@@ -260,17 +250,7 @@ public class ItemDetailTop : GameSection
 		if (GetNeedNum().HasValue && MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId != -1)
 		{
 			bool isRecvDonateFobbidList = false;
-			MonoBehaviourSingleton<GuildManager>.I.SendDonateFobbidenList(delegate(bool success, List<int> list)
-			{
-				((_003CSendGetInfos_003Ec__Iterator69)/*Error near IL_015d: stateMachine*/)._003CisRecvDonateFobbidList_003E__4 = true;
-				if (!list.Contains((int)((_003CSendGetInfos_003Ec__Iterator69)/*Error near IL_015d: stateMachine*/)._003C_003Ef__this.data.GetTableID()))
-				{
-					((_003CSendGetInfos_003Ec__Iterator69)/*Error near IL_015d: stateMachine*/)._003C_003Ef__this.m_ItemDestinations.Insert(0, new ItemDestination
-					{
-						type = ItemDestination.TYPE.GuildRequest
-					});
-				}
-			});
+			MonoBehaviourSingleton<GuildManager>.I.SendDonateFobbidenList(new Action<bool, List<int>>((object)/*Error near IL_015d: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			while (!isRecvDonateFobbidList)
 			{
 				yield return (object)null;
@@ -440,7 +420,7 @@ public class ItemDetailTop : GameSection
 		}
 	}
 
-	private int GetQuestNum(QuestTable.QuestTableData q)
+	private unsafe int GetQuestNum(QuestTable.QuestTableData q)
 	{
 		if (q.questType != QUEST_TYPE.ORDER)
 		{
@@ -450,12 +430,11 @@ public class ItemDetailTop : GameSection
 		int num2 = 0;
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
-			num2 = (from g in MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList
-			where g.questId == (int)q.questID
-			select g).Count();
+			_003CGetQuestNum_003Ec__AnonStorey349 _003CGetQuestNum_003Ec__AnonStorey;
+			num2 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CGetQuestNum_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 		}
-		int a = num - num2;
-		return Mathf.Max(a, 0);
+		int num3 = num - num2;
+		return Mathf.Max(num3, 0);
 	}
 
 	private void AddChallengeQuestIfNeed(EnemyTable.EnemyData enemyData)
@@ -543,19 +522,22 @@ public class ItemDetailTop : GameSection
 		return null;
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
+		//IL_027e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0283: Expected O, but got Unknown
+		//IL_028f: Unknown result type (might be due to invalid IL or missing references)
 		string key = "TEXT_BTN_SELL";
-		SetLabelText(UI.STR_BTN_SELL, base.sectionData.GetText(key));
-		SetLabelText(UI.STR_BTN_SELL_D, base.sectionData.GetText(key));
+		SetLabelText((Enum)UI.STR_BTN_SELL, base.sectionData.GetText(key));
+		SetLabelText((Enum)UI.STR_BTN_SELL_D, base.sectionData.GetText(key));
 		detailBase = SetPrefab(GetCtrl(UI.OBJ_DETAIL_ROOT), "ItemDetailBase", true);
-		SetActive(UI.OBJ_SCROLL_BAR, true);
-		if ((UnityEngine.Object)detailBase != (UnityEngine.Object)null)
+		SetActive((Enum)UI.OBJ_SCROLL_BAR, true);
+		if (detailBase != null)
 		{
-			SetFontStyle(detailBase, UI.STR_TITLE, FontStyle.Italic);
-			SetFontStyle(detailBase, UI.STR_SELL, FontStyle.Italic);
-			SetFontStyle(detailBase, UI.STR_NEED, FontStyle.Italic);
-			SetFontStyle(detailBase, UI.STR_HAVE, FontStyle.Italic);
+			SetFontStyle(detailBase, UI.STR_TITLE, 2);
+			SetFontStyle(detailBase, UI.STR_SELL, 2);
+			SetFontStyle(detailBase, UI.STR_NEED, 2);
+			SetFontStyle(detailBase, UI.STR_HAVE, 2);
 			SetActive(detailBase, UI.STR_SELL, data.CanSale());
 			SetDepth(detailBase, UI.SCR_HOWTO, base.baseDepth + 1);
 			SetLabelText(detailBase, UI.LBL_NAME, data.GetName());
@@ -579,17 +561,17 @@ public class ItemDetailTop : GameSection
 			itemIcon.SetEnableCollider(false);
 			int count = m_ItemDestinations.Count;
 			Transform ctrl = GetCtrl(UI.GRD_HOWTO);
-			if ((bool)ctrl)
+			if (Object.op_Implicit(ctrl))
 			{
 				int i = 0;
-				for (int childCount = ctrl.childCount; i < childCount; i++)
+				for (int childCount = ctrl.get_childCount(); i < childCount; i++)
 				{
-					Transform child = ctrl.GetChild(0);
-					child.parent = null;
-					UnityEngine.Object.Destroy(child.gameObject);
+					Transform val = ctrl.GetChild(0);
+					val.set_parent(null);
+					Object.Destroy(val.get_gameObject());
 				}
 			}
-			SetTable(detailBase, UI.GRD_HOWTO, "QuestListItem", count, true, CreateListItem, UpdateListItem);
+			SetTable(detailBase, UI.GRD_HOWTO, "QuestListItem", count, true, new Func<int, Transform, Transform>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			bool is_visible = m_ItemDestinations.Count < 1;
 			SetActive(detailBase, UI.STR_NOT_HOWTO, is_visible);
 			string empty = string.Empty;
@@ -612,7 +594,7 @@ public class ItemDetailTop : GameSection
 				UIBehaviour.SetMaterialNumText(FindCtrl(detailBase, UI.LBL_HAVE_NUM), FindCtrl(detailBase, UI.LBL_NEED_NUM), data.GetNum(), GetNeedNum().Value);
 			}
 		}
-		SetActive(UI.BTN_DETAIL_SELL, data.CanSale() && MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
+		SetActive((Enum)UI.BTN_DETAIL_SELL, data.CanSale() && MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
 	}
 
 	private Transform CreateListItem(int index, Transform t)
@@ -650,6 +632,7 @@ public class ItemDetailTop : GameSection
 
 	private void UpdateListItem(int i, Transform t, bool is_recycle)
 	{
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(t, UI.TEX_FIELD_SUB, false);
 		if (i < m_ItemDestinations.Count)
 		{
@@ -671,9 +654,9 @@ public class ItemDetailTop : GameSection
 				{
 					SetActive(t, true);
 					QuestListFieldItem questListFieldItem = t.GetComponent<QuestListFieldItem>();
-					if ((UnityEngine.Object)questListFieldItem == (UnityEngine.Object)null)
+					if (questListFieldItem == null)
 					{
-						questListFieldItem = t.gameObject.AddComponent<QuestListFieldItem>();
+						questListFieldItem = t.get_gameObject().AddComponent<QuestListFieldItem>();
 					}
 					questListFieldItem.InitUI();
 					if (itemDetailToFieldEnemyData != null)
@@ -906,15 +889,15 @@ public class ItemDetailTop : GameSection
 			case ItemDestination.TYPE.GuildRequest:
 				if (MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem != null && MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem.Length >= 3)
 				{
-					SetSprite(UI.SPR_EMBLEM_LAYER_1, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[0]));
-					SetSprite(UI.SPR_EMBLEM_LAYER_2, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[1]));
-					SetSprite(UI.SPR_EMBLEM_LAYER_3, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[2]));
+					SetSprite((Enum)UI.SPR_EMBLEM_LAYER_1, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[0]));
+					SetSprite((Enum)UI.SPR_EMBLEM_LAYER_2, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[1]));
+					SetSprite((Enum)UI.SPR_EMBLEM_LAYER_3, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[2]));
 				}
 				else
 				{
-					SetSprite(UI.SPR_EMBLEM_LAYER_1, string.Empty);
-					SetSprite(UI.SPR_EMBLEM_LAYER_2, string.Empty);
-					SetSprite(UI.SPR_EMBLEM_LAYER_3, string.Empty);
+					SetSprite((Enum)UI.SPR_EMBLEM_LAYER_1, string.Empty);
+					SetSprite((Enum)UI.SPR_EMBLEM_LAYER_2, string.Empty);
+					SetSprite((Enum)UI.SPR_EMBLEM_LAYER_3, string.Empty);
 				}
 				SetEvent(t, "OPEN_SEND_DIALOG", null);
 				break;
@@ -1131,23 +1114,10 @@ public class ItemDetailTop : GameSection
 		}
 	}
 
-	protected void OnQuery_ItemDetailJumpFieldConfirm_YES()
+	protected unsafe void OnQuery_ItemDetailJumpFieldConfirm_YES()
 	{
 		GameSection.StayEvent();
-		CoopApp.EnterField(jumpField.jumpPortalID, 0u, delegate(bool is_matching, bool is_connect, bool is_regist)
-		{
-			if (!is_connect)
-			{
-				GameSection.ChangeStayEvent("COOP_SERVER_INVALID", null);
-				GameSection.ResumeEvent(true, null);
-			}
-			else
-			{
-				jumpField = null;
-				GameSection.ChangeStayEvent("TO_FIELD", null);
-				GameSection.ResumeEvent(is_regist, null);
-			}
-		});
+		CoopApp.EnterField(jumpField.jumpPortalID, 0u, new Action<bool, bool, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected void OnQuery_ItemDetailJumpFieldConfirm_NO()
@@ -1215,7 +1185,7 @@ public class ItemDetailTop : GameSection
 		}
 	}
 
-	private void OnQuery_SELLECT_POINT_SHOP()
+	private unsafe void OnQuery_SELLECT_POINT_SHOP()
 	{
 		int index = (int)GameSection.GetEventData();
 		selectedPointShopDestination = m_ItemDestinations[index];
@@ -1224,7 +1194,7 @@ public class ItemDetailTop : GameSection
 		{
 			selectedPointShopdata.item,
 			selectedPointShopdata.shop,
-			new Action<PointShopItem, int>(OnBuy)
+			new Action<PointShopItem, int>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)
 		};
 		GameSection.SetEventData(eventData);
 		if (selectedPointShopdata.shop.userPoint < selectedPointShopdata.item.needPoint)
@@ -1282,13 +1252,14 @@ public class ItemDetailTop : GameSection
 
 	private void OnCloseDialog_GuildDonateSendDialog()
 	{
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		string s = GameSection.GetEventData() as string;
 		try
 		{
 			int num = int.Parse(s);
 			if (num > 0)
 			{
-				StartCoroutine(CRSendDonateRequest((int)data.GetTableID(), data.GetName(), string.Empty, num));
+				this.StartCoroutine(CRSendDonateRequest((int)data.GetTableID(), data.GetName(), string.Empty, num));
 			}
 		}
 		catch
@@ -1296,16 +1267,20 @@ public class ItemDetailTop : GameSection
 		}
 	}
 
-	private IEnumerator CRSendDonateRequest(int itemID, string itemName, string request, int numRequest)
+	private unsafe IEnumerator CRSendDonateRequest(int itemID, string itemName, string request, int numRequest)
 	{
-		yield return (object)new WaitUntil(() => !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible());
+		if (_003CCRSendDonateRequest_003Ec__Iterator71._003C_003Ef__am_0024cacheB == null)
+		{
+			_003CCRSendDonateRequest_003Ec__Iterator71._003C_003Ef__am_0024cacheB = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		yield return (object)new WaitUntil(_003CCRSendDonateRequest_003Ec__Iterator71._003C_003Ef__am_0024cacheB);
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest(itemID, itemName, request, numRequest, delegate(bool success)
 		{
 			GameSection.ResumeEvent(success, null);
 			if (success)
 			{
-				((_003CCRSendDonateRequest_003Ec__Iterator6A)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;
+				((_003CCRSendDonateRequest_003Ec__Iterator71)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;
 			}
 		});
 	}

@@ -44,18 +44,18 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal void SetOnDisconnectedCallback(Action<long, string> callback)
 		{
-			MessageListenerHelper.MessageListenerHelper_SetOnDisconnectedCallback(SelfPtr(), InternalOnDisconnectedCallback, Callbacks.ToIntPtr(callback));
+			MessageListenerHelper.MessageListenerHelper_SetOnDisconnectedCallback(SelfPtr(), InternalOnDisconnectedCallback, Callbacks.ToIntPtr((Delegate)callback));
 		}
 
 		[MonoPInvokeCallback(typeof(MessageListenerHelper.OnDisconnectedCallback))]
 		private static void InternalOnDisconnectedCallback(long id, string lostEndpointId, IntPtr userData)
 		{
-			Action<long, string> action = Callbacks.IntPtrToPermanentCallback<Action<long, string>>(userData);
-			if (action != null)
+			Action<long, string> val = Callbacks.IntPtrToPermanentCallback<Action<long, string>>(userData);
+			if (val != null)
 			{
 				try
 				{
-					action(id, lostEndpointId);
+					val.Invoke(id, lostEndpointId);
 				}
 				catch (Exception arg)
 				{

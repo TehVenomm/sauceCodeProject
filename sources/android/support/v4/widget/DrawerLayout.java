@@ -1233,13 +1233,13 @@ public class DrawerLayout extends ViewGroup implements DrawerLayoutImpl {
                     size = Strategy.TTL_SECONDS_DEFAULT;
                 }
                 if (mode2 == Integer.MIN_VALUE) {
-                    mode = size2;
-                    size2 = size;
+                    mode = size;
+                    size = size2;
                 } else if (mode2 == 0) {
-                    mode = Strategy.TTL_SECONDS_DEFAULT;
-                    size2 = size;
+                    mode = size;
+                    size = Strategy.TTL_SECONDS_DEFAULT;
                 }
-                setMeasuredDimension(size2, mode);
+                setMeasuredDimension(mode, size);
                 obj = (this.mLastInsets == null && ViewCompat.getFitsSystemWindows(this)) ? 1 : null;
                 layoutDirection = ViewCompat.getLayoutDirection(this);
                 obj2 = null;
@@ -1262,7 +1262,7 @@ public class DrawerLayout extends ViewGroup implements DrawerLayoutImpl {
                             }
                         }
                         if (isContentView(childAt)) {
-                            childAt.measure(MeasureSpec.makeMeasureSpec((size2 - layoutParams.leftMargin) - layoutParams.rightMargin, 1073741824), MeasureSpec.makeMeasureSpec((mode - layoutParams.topMargin) - layoutParams.bottomMargin, 1073741824));
+                            childAt.measure(MeasureSpec.makeMeasureSpec((mode - layoutParams.leftMargin) - layoutParams.rightMargin, 1073741824), MeasureSpec.makeMeasureSpec((size - layoutParams.topMargin) - layoutParams.bottomMargin, 1073741824));
                             obj4 = obj2;
                             obj2 = obj3;
                         } else if (isDrawerView(childAt)) {
@@ -1294,9 +1294,9 @@ public class DrawerLayout extends ViewGroup implements DrawerLayoutImpl {
             }
             throw new IllegalArgumentException("DrawerLayout must be measured with MeasureSpec.EXACTLY.");
         }
-        mode = size2;
-        size2 = size;
-        setMeasuredDimension(size2, mode);
+        mode = size;
+        size = size2;
+        setMeasuredDimension(mode, size);
         if (this.mLastInsets == null) {
         }
         layoutDirection = ViewCompat.getLayoutDirection(this);
@@ -1317,7 +1317,7 @@ public class DrawerLayout extends ViewGroup implements DrawerLayoutImpl {
                     }
                 }
                 if (isContentView(childAt)) {
-                    childAt.measure(MeasureSpec.makeMeasureSpec((size2 - layoutParams.leftMargin) - layoutParams.rightMargin, 1073741824), MeasureSpec.makeMeasureSpec((mode - layoutParams.topMargin) - layoutParams.bottomMargin, 1073741824));
+                    childAt.measure(MeasureSpec.makeMeasureSpec((mode - layoutParams.leftMargin) - layoutParams.rightMargin, 1073741824), MeasureSpec.makeMeasureSpec((size - layoutParams.topMargin) - layoutParams.bottomMargin, 1073741824));
                     obj4 = obj2;
                     obj2 = obj3;
                 } else if (isDrawerView(childAt)) {

@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -38,7 +39,7 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 
 	public override void Initialize()
 	{
-		SetActive(UI.OBJ_GUILD_NUMBER_ROOT, false);
+		SetActive((Enum)UI.OBJ_GUILD_NUMBER_ROOT, false);
 		base.Initialize();
 	}
 
@@ -51,26 +52,26 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 		}
 		if (array == null || array.Length == 0)
 		{
-			SetActive(UI.STR_NON_LIST, true);
-			SetActive(UI.GRD_LIST, false);
-			SetActive(UI.OBJ_ACTIVE_ROOT, false);
-			SetActive(UI.OBJ_INACTIVE_ROOT, true);
-			SetLabelText(UI.LBL_NOW, "0");
-			SetLabelText(UI.LBL_MAX, "0");
+			SetActive((Enum)UI.STR_NON_LIST, true);
+			SetActive((Enum)UI.GRD_LIST, false);
+			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, false);
+			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, true);
+			SetLabelText((Enum)UI.LBL_NOW, "0");
+			SetLabelText((Enum)UI.LBL_MAX, "0");
 		}
 		else
 		{
-			SetPageNumText(UI.LBL_NOW, nowPage + 1);
-			SetPageNumText(UI.LBL_MAX, pageNumMax);
-			SetActive(UI.STR_NON_LIST, false);
-			SetActive(UI.GRD_LIST, true);
-			SetActive(UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
-			SetActive(UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
+			SetPageNumText((Enum)UI.LBL_NOW, nowPage + 1);
+			SetPageNumText((Enum)UI.LBL_MAX, pageNumMax);
+			SetActive((Enum)UI.STR_NON_LIST, false);
+			SetActive((Enum)UI.GRD_LIST, true);
+			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
+			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
 			UpdateDynamicList();
 		}
 	}
 
-	protected virtual void UpdateDynamicList()
+	protected unsafe virtual void UpdateDynamicList()
 	{
 		FriendCharaInfo[] info = null;
 		int item_num = 0;
@@ -87,10 +88,8 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 			UIGrid component = GetCtrl(UI.GRD_LIST).GetComponent<UIGrid>();
 			component.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 		}
-		SetDynamicList(UI.GRD_LIST, GetListItemName, item_num, false, null, null, delegate(int i, Transform t, bool is_recycle)
-		{
-			SetListItem(i, t, is_recycle, info[i]);
-		});
+		_003CUpdateDynamicList_003Ec__AnonStorey330 _003CUpdateDynamicList_003Ec__AnonStorey;
+		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected virtual void SetListItem(int i, Transform t, bool is_recycle, FriendCharaInfo data)
@@ -105,6 +104,10 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 
 	protected void SetCharaInfo(FriendCharaInfo data, int i, Transform t, bool is_recycle, bool isGM)
 	{
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
 		SetEvent(t, "GUILD_INFO", i);
 		if (isGM)
 		{

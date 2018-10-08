@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class PlayerLoadTest : MonoBehaviour
+public class PlayerLoadTest
 {
 	public string body;
 
@@ -13,41 +13,45 @@ public class PlayerLoadTest : MonoBehaviour
 
 	private bool loadError;
 
+	public PlayerLoadTest()
+		: this()
+	{
+	}
+
 	private IEnumerator Start()
 	{
 		yield return (object)0;
-		yield return (object)StartCoroutine(LoadObject(RESOURCE_CATEGORY.PLAYER_BDY, "BDY00_000"));
-		GameObject body = (GameObject)Object.Instantiate(loadObject);
-		yield return (object)StartCoroutine(LoadObject(RESOURCE_CATEGORY.PLAYER_HEAD, "HED00_000"));
-		GameObject head = (GameObject)Object.Instantiate(loadObject);
-		yield return (object)StartCoroutine(LoadObject(RESOURCE_CATEGORY.PLAYER_FACE, "PLF00_000"));
-		GameObject face = (GameObject)Object.Instantiate(loadObject);
-		yield return (object)StartCoroutine(LoadObject(RESOURCE_CATEGORY.PLAYER_WEAPON, "WEP00_001"));
-		GameObject weapon = (GameObject)Object.Instantiate(loadObject);
-		yield return (object)StartCoroutine(LoadObject(RESOURCE_CATEGORY.PLAYER_ANIM, "PLC00_AnimCtrl"));
+		yield return (object)this.StartCoroutine(LoadObject(RESOURCE_CATEGORY.PLAYER_BDY, "BDY00_000"));
+		GameObject body = Object.Instantiate(loadObject);
+		yield return (object)this.StartCoroutine(LoadObject(RESOURCE_CATEGORY.PLAYER_HEAD, "HED00_000"));
+		GameObject head = Object.Instantiate(loadObject);
+		yield return (object)this.StartCoroutine(LoadObject(RESOURCE_CATEGORY.PLAYER_FACE, "PLF00_000"));
+		GameObject face = Object.Instantiate(loadObject);
+		yield return (object)this.StartCoroutine(LoadObject(RESOURCE_CATEGORY.PLAYER_WEAPON, "WEP00_001"));
+		GameObject weapon = Object.Instantiate(loadObject);
+		yield return (object)this.StartCoroutine(LoadObject(RESOURCE_CATEGORY.PLAYER_ANIM, "PLC00_AnimCtrl"));
 		RuntimeAnimatorController anim = loadObject as RuntimeAnimatorController;
-		Transform head_node = Utility.Find(body.transform, "Head");
-		Transform r_wep_node = Utility.Find(body.transform, "R_Wep");
-		Transform l_wep_node = Utility.Find(body.transform, "L_Wep");
-		Utility.Attach(head_node, head.transform);
-		Utility.Attach(head_node, face.transform);
+		Transform head_node = Utility.Find(body.get_transform(), "Head");
+		Transform r_wep_node = Utility.Find(body.get_transform(), "R_Wep");
+		Transform l_wep_node = Utility.Find(body.get_transform(), "L_Wep");
+		Utility.Attach(head_node, head.get_transform());
+		Utility.Attach(head_node, face.get_transform());
 		Renderer[] renderers = weapon.GetComponentsInChildren<Renderer>();
 		Renderer[] array = renderers;
-		for (int i = 0; i < array.Length; i++)
+		foreach (MeshRenderer renderer in array)
 		{
-			MeshRenderer renderer = (MeshRenderer)array[i];
-			if (renderer.name.EndsWith("_L"))
+			if (renderer.get_name().EndsWith("_L"))
 			{
-				Utility.Attach(l_wep_node, renderer.transform.parent);
+				Utility.Attach(l_wep_node, renderer.get_transform().get_parent());
 			}
 			else
 			{
-				Utility.Attach(r_wep_node, renderer.transform.parent);
+				Utility.Attach(r_wep_node, renderer.get_transform().get_parent());
 			}
 		}
 		Object.DestroyImmediate(weapon);
-		body.GetComponentInChildren<Animator>().runtimeAnimatorController = anim;
-		Debug.Log("End:" + anim);
+		body.GetComponentInChildren<Animator>().set_runtimeAnimatorController(anim);
+		Debug.Log((object)("End:" + anim));
 	}
 
 	private IEnumerator LoadObject(RESOURCE_CATEGORY category, string resource_name)
@@ -55,7 +59,7 @@ public class PlayerLoadTest : MonoBehaviour
 		loadObject = null;
 		loadError = false;
 		MonoBehaviourSingleton<ResourceManager>.I.Load(this, category, resource_name, OnLoadComplate, OnLoadError, false, null);
-		while (loadObject == (Object)null && !loadError)
+		while (loadObject == null && !loadError)
 		{
 			yield return (object)0;
 		}
@@ -63,13 +67,13 @@ public class PlayerLoadTest : MonoBehaviour
 
 	private void OnLoadComplate(ResourceManager.LoadRequest request, ResourceObject[] objs)
 	{
-		Debug.Log("OnLoadComplate");
+		Debug.Log((object)"OnLoadComplate");
 		loadObject = objs[0].obj;
 	}
 
 	private void OnLoadError(ResourceManager.LoadRequest request, ResourceManager.ERROR_CODE code)
 	{
-		Debug.Log("OnLoadError");
+		Debug.Log((object)"OnLoadError");
 		loadError = true;
 	}
 

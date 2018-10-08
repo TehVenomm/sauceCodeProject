@@ -8,7 +8,7 @@ public class DataTableCache : DataCache
 		string text = cachePath;
 		if (string.IsNullOrEmpty(text))
 		{
-			text = Path.Combine(Application.temporaryCachePath, "assets/tables");
+			text = Path.Combine(Application.get_temporaryCachePath(), "assets/tables");
 		}
 		SetCachePath(text);
 	}

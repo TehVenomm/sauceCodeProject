@@ -1,19 +1,20 @@
 using Firebase.Messaging;
 using Network;
+using System;
 using UnityEngine;
 
 public class FCMManager : MonoBehaviourSingleton<FCMManager>
 {
 	public void StartRegist()
 	{
-		FirebaseMessaging.TokenReceived += OnTokenReceived;
-		FirebaseMessaging.MessageReceived += OnMessageReceived;
+		FirebaseMessaging.add_TokenReceived((EventHandler<TokenReceivedEventArgs>)OnTokenReceived);
+		FirebaseMessaging.add_MessageReceived((EventHandler<MessageReceivedEventArgs>)OnMessageReceived);
 	}
 
 	public void OnTokenReceived(object sender, TokenReceivedEventArgs token)
 	{
 		PushNotificationDevicePostModel.RequestSendForm requestSendForm = new PushNotificationDevicePostModel.RequestSendForm();
-		requestSendForm.deviceToken = token.Token;
+		requestSendForm.deviceToken = token.get_Token();
 		requestSendForm.clientVer = NetworkNative.getNativeVersionNameRemoveDot();
 		MonoBehaviourSingleton<NetworkManager>.I.Request(PushNotificationDevicePostModel.URL, requestSendForm, delegate(PushNotificationDevicePostModel ret)
 		{

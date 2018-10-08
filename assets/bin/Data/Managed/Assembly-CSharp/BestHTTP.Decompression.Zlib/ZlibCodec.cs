@@ -3,9 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace BestHTTP.Decompression.Zlib
 {
-	[ComVisible(true)]
 	[Guid("ebc25cf6-9120-4283-b972-0e5520d0000D")]
 	[ClassInterface(ClassInterfaceType.AutoDispatch)]
+	[ComVisible(true)]
 	internal sealed class ZlibCodec
 	{
 		public byte[] InputBuffer;

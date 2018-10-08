@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 public class CoopClientCollector
 {
@@ -22,7 +21,7 @@ public class CoopClientCollector
 			{
 				return;
 			}
-			if ((UnityEngine.Object)clientList[num] == (UnityEngine.Object)null)
+			if (clientList[num] == null)
 			{
 				break;
 			}
@@ -41,7 +40,7 @@ public class CoopClientCollector
 			{
 				return;
 			}
-			if ((UnityEngine.Object)clientList[num] == (UnityEngine.Object)client)
+			if (clientList[num] == client)
 			{
 				break;
 			}
@@ -65,7 +64,7 @@ public class CoopClientCollector
 		for (int num = clientList.Length; i < num; i++)
 		{
 			CoopClient coopClient = clientList[i];
-			if (!((UnityEngine.Object)coopClient == (UnityEngine.Object)null) && predicate(coopClient))
+			if (!(coopClient == null) && predicate(coopClient))
 			{
 				return coopClient;
 			}
@@ -93,7 +92,7 @@ public class CoopClientCollector
 		for (int num = clientList.Length; i < num; i++)
 		{
 			CoopClient coopClient = clientList[i];
-			if (!((UnityEngine.Object)coopClient == (UnityEngine.Object)null))
+			if (!(coopClient == null))
 			{
 				action(coopClient);
 			}
@@ -106,10 +105,10 @@ public class CoopClientCollector
 		for (int num = clientList.Length; i < num; i++)
 		{
 			CoopClient coopClient = clientList[i];
-			if (!((UnityEngine.Object)coopClient == (UnityEngine.Object)null))
+			if (!(coopClient == null))
 			{
 				Player player = coopClient.GetPlayer();
-				if ((UnityEngine.Object)player != (UnityEngine.Object)null && predicate(player))
+				if (player != null && predicate(player))
 				{
 					return player;
 				}
@@ -132,7 +131,7 @@ public class CoopClientCollector
 	{
 		for (int i = 0; i < clientList.Length; i++)
 		{
-			if (!((UnityEngine.Object)clientList[i] == (UnityEngine.Object)null))
+			if (!(clientList[i] == null))
 			{
 				CoopClient coopClient = clientList[i];
 				if (coopClient.clientId == client_id)
@@ -161,7 +160,7 @@ public class CoopClientCollector
 
 	public bool HasSeriesProgress()
 	{
-		return (UnityEngine.Object)Find(delegate(CoopClient c)
+		return Find(delegate(CoopClient c)
 		{
 			if (c.isLeave)
 			{
@@ -180,11 +179,11 @@ public class CoopClientCollector
 				return false;
 			}
 			return !c.isSeriesProgressEnd;
-		}) != (UnityEngine.Object)null;
+		}) != null;
 	}
 
 	public bool HasLoadingPlayer()
 	{
-		return (UnityEngine.Object)FindPlayer((Player p) => p.isLoading) != (UnityEngine.Object)null;
+		return FindPlayer((Player p) => p.isLoading) != null;
 	}
 }

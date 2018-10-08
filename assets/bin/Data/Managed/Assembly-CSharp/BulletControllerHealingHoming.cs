@@ -17,6 +17,10 @@ public class BulletControllerHealingHoming : BulletControllerHoming
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam _skillInfoParam, Vector3 pos, Quaternion rot)
 	{
+		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004b: Expected O, but got Unknown
 		base.Initialize(bullet, _skillInfoParam, pos, rot);
 		BulletData.BulletHealingHoming dataHealingHomingBullet = bullet.dataHealingHomingBullet;
 		if (dataHealingHomingBullet != null)
@@ -25,15 +29,15 @@ public class BulletControllerHealingHoming : BulletControllerHoming
 			m_isIgnoreColliderExceptTarget = dataHealingHomingBullet.isIgnoreColliderExceptTarget;
 			m_isAlreadyDoneHitProcess = false;
 			m_buffIdList = dataHealingHomingBullet.buffIds;
-			Utility.SetLayerWithChildren(base.transform, dataHealingHomingBullet.defaultGenerateLayer);
-			m_effectAnimator = GetComponentInChildren<Animator>();
+			Utility.SetLayerWithChildren(this.get_transform(), dataHealingHomingBullet.defaultGenerateLayer);
+			m_effectAnimator = this.GetComponentInChildren<Animator>();
 		}
 	}
 
 	public override bool IsHit(Collider collider)
 	{
 		StageObject targetObject = base.targetObject;
-		if (m_isIgnoreColliderExceptTarget && (Object)targetObject != (Object)null && targetObject.name != collider.name)
+		if (m_isIgnoreColliderExceptTarget && targetObject != null && targetObject.get_name() != collider.get_name())
 		{
 			return false;
 		}
@@ -42,12 +46,13 @@ public class BulletControllerHealingHoming : BulletControllerHoming
 
 	public override void OnHit(Collider collider)
 	{
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		if (!m_isAlreadyDoneHitProcess)
 		{
 			m_isAlreadyDoneHitProcess = true;
 			PlayOnHitAnimation();
 			HealAction();
-			Player component = collider.gameObject.GetComponent<Player>();
+			Player component = collider.get_gameObject().GetComponent<Player>();
 			AddBuffAction(component);
 			base.OnHit(collider);
 		}
@@ -55,11 +60,11 @@ public class BulletControllerHealingHoming : BulletControllerHoming
 
 	protected void PlayOnHitAnimation()
 	{
-		if ((Object)bulletObject != (Object)null)
+		if (bulletObject != null)
 		{
 			bulletObject.SetDisablePlayEndAnim();
 		}
-		if (!((Object)m_effectAnimator == (Object)null))
+		if (!(m_effectAnimator == null))
 		{
 			m_effectAnimator.Play(ANIM_STATE_PICKED, 0, 0f);
 		}
@@ -70,7 +75,7 @@ public class BulletControllerHealingHoming : BulletControllerHoming
 		if (base.bulletSkillInfoParam != null)
 		{
 			StageObject targetObject = base.targetObject;
-			if (!((Object)targetObject == (Object)null) && (targetObject.IsCoopNone() || targetObject.IsOriginal()) && targetObject is Player)
+			if (!(targetObject == null) && (targetObject.IsCoopNone() || targetObject.IsOriginal()) && targetObject is Player)
 			{
 				Character.HealData healData = new Character.HealData(base.bulletSkillInfoParam.healHp, base.bulletSkillInfoParam.tableData.healType, HEAL_EFFECT_TYPE.BASIS, new List<int>
 				{
@@ -83,7 +88,7 @@ public class BulletControllerHealingHoming : BulletControllerHoming
 
 	protected void AddBuffAction(Player _player)
 	{
-		if (m_buffIdList != null && m_buffIdList.Count >= 1 && base.bulletSkillInfoParam != null && !((Object)_player == (Object)null) && !_player.isDead)
+		if (m_buffIdList != null && m_buffIdList.Count >= 1 && base.bulletSkillInfoParam != null && !(_player == null) && !_player.isDead)
 		{
 			int i = 0;
 			for (int count = m_buffIdList.Count; i < count; i++)

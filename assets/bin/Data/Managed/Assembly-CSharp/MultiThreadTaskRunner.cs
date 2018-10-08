@@ -100,7 +100,7 @@ public class MultiThreadTaskRunner
 					}
 					if (taskParam != null && taskParam.act != null)
 					{
-						taskParam.act();
+						taskParam.act.Invoke();
 					}
 				}
 			}
@@ -109,7 +109,7 @@ public class MultiThreadTaskRunner
 		{
 			if (!(ex is ThreadAbortException))
 			{
-				Debug.LogError("MultiThreadTaskRunner : " + ex.ToString());
+				Debug.LogError((object)("MultiThreadTaskRunner : " + ex.ToString()));
 			}
 		}
 	}

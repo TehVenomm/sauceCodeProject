@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -73,11 +74,11 @@ public class GuildInformationStep2 : GameSection
 		mapIndex = mCreateRequest.GuildMapID;
 		UpdateMap();
 		bool flag = MonoBehaviourSingleton<GuildManager>.I.guildData != null && MonoBehaviourSingleton<GuildManager>.I.guildData.clanId != -1;
-		SetActive(UI.BTN_NEXT, !flag);
-		SetActive(UI.BTN_NEXT_UPDATE, flag);
-		SetActive(UI.SPR_TYPE_INFO, false);
-		SetTouchAndRelease(UI.BTN_INFO, "TYPE_INFO_SHOW", "TYPE_INFO_HIDE", null);
-		SetActive(UI.SPR_TYPE_INFO, false);
+		SetActive((Enum)UI.BTN_NEXT, !flag);
+		SetActive((Enum)UI.BTN_NEXT_UPDATE, flag);
+		SetActive((Enum)UI.SPR_TYPE_INFO, false);
+		SetTouchAndRelease((Enum)UI.BTN_INFO, "TYPE_INFO_SHOW", "TYPE_INFO_HIDE", (object)null);
+		SetActive((Enum)UI.SPR_TYPE_INFO, false);
 		SetSupportEncoding(UI.STR_TYPE_INFOR, true);
 		mCreateRequest.SetGuildType(GuildManager.GUILD_TYPE.PUBLIC);
 		mCreateRequest.SetGuildMinLevel(int.Parse(levelNames[0]));
@@ -92,19 +93,19 @@ public class GuildInformationStep2 : GameSection
 	private void UpdateMinLevel()
 	{
 		int index = levelIndex;
-		SetLabelText(UI.LBL_TARGET_MIN_LEVEL, levelNames[index]);
+		SetLabelText((Enum)UI.LBL_TARGET_MIN_LEVEL, levelNames[index]);
 	}
 
 	private void UpdateLock()
 	{
 		int index = lockIndex;
-		SetLabelText(UI.LBL_TARGET_LOCK, lockNames[index]);
+		SetLabelText((Enum)UI.LBL_TARGET_LOCK, lockNames[index]);
 	}
 
 	private void UpdateMap()
 	{
-		SetSprite(UI.SPR_MAP, spriteMapNames[mapIndex]);
-		SetLabelText(UI.STR_MAP_ADDITION, additioonMapInfos[mapIndex]);
+		SetSprite((Enum)UI.SPR_MAP, spriteMapNames[mapIndex]);
+		SetLabelText((Enum)UI.STR_MAP_ADDITION, additioonMapInfos[mapIndex]);
 	}
 
 	private void OnQuery_MAP_NEXT()
@@ -121,11 +122,11 @@ public class GuildInformationStep2 : GameSection
 
 	private void OnQuery_TARGET_LOCK()
 	{
-		if ((Object)lockPopup == (Object)null)
+		if (lockPopup == null)
 		{
 			lockPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_LOCK), false);
 		}
-		if (!((Object)lockPopup == (Object)null))
+		if (!(lockPopup == null))
 		{
 			bool[] array = new bool[lockNames.Count];
 			for (int i = 0; i < array.Length; i++)
@@ -144,11 +145,11 @@ public class GuildInformationStep2 : GameSection
 
 	private void OnQuery_TARGET_LEVEL()
 	{
-		if ((Object)levelPopup == (Object)null)
+		if (levelPopup == null)
 		{
 			levelPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_MIN_LEVEL), false);
 		}
-		if (!((Object)levelPopup == (Object)null))
+		if (!(levelPopup == null))
 		{
 			bool[] array = new bool[levelNames.Count];
 			for (int i = 0; i < array.Length; i++)
@@ -165,23 +166,16 @@ public class GuildInformationStep2 : GameSection
 		}
 	}
 
-	private void OnQuery_SETTING_UPDATE()
+	private unsafe void OnQuery_SETTING_UPDATE()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildManager>.I.SendChangeSetting(mCreateRequest, delegate(bool isSuccess, Error error)
+		GuildManager i = MonoBehaviourSingleton<GuildManager>.I;
+		GuildManager.CreateGuildRequestParam requestParam = mCreateRequest;
+		if (_003C_003Ef__am_0024cacheA == null)
 		{
-			if (isSuccess)
-			{
-				MonoBehaviourSingleton<GuildManager>.I.GetClanStat(delegate
-				{
-					GameSection.ResumeEvent(true, null);
-				});
-			}
-			else
-			{
-				GameSection.ResumeEvent(true, null);
-			}
-		});
+			_003C_003Ef__am_0024cacheA = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		i.SendChangeSetting(requestParam, _003C_003Ef__am_0024cacheA);
 	}
 
 	private void OnQuery_CLOSE()
@@ -195,11 +189,11 @@ public class GuildInformationStep2 : GameSection
 
 	private void OnQuery_TYPE_INFO_SHOW()
 	{
-		SetActive(UI.SPR_TYPE_INFO, true);
+		SetActive((Enum)UI.SPR_TYPE_INFO, true);
 	}
 
 	private void OnQuery_TYPE_INFO_HIDE()
 	{
-		SetActive(UI.SPR_TYPE_INFO, false);
+		SetActive((Enum)UI.SPR_TYPE_INFO, false);
 	}
 }

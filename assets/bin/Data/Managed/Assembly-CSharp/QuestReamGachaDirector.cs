@@ -74,7 +74,7 @@ public class QuestReamGachaDirector : QuestGachaDirectorBase
 			}
 		}
 		NPCLoader npc_loader = LoadNPC();
-		npc_loader.Load(Singleton<NPCTable>.I.GetNPCData(2).npcModelID, 0, false, true, SHADER_TYPE.NORMAL, null);
+		npc_loader.Load(Singleton<NPCTable>.I.GetNPCData(2).npcModelID, 0, false, true, SHADER_TYPE.NORMAL, null, false);
 		int m = 0;
 		for (int l = 11; m < l; m++)
 		{
@@ -98,7 +98,7 @@ public class QuestReamGachaDirector : QuestGachaDirectorBase
 			}
 			enemyLoaderList[k].ApplyGachaDisplayScaleToParentNode();
 			CheckAndReplaceShader(enemyLoaderList[k]);
-			enemyLoaderList[k].gameObject.SetActive(false);
+			enemyLoaderList[k].get_gameObject().SetActive(false);
 		}
 		LoadingQueue lo_queue = new LoadingQueue(this);
 		CacheAudio(lo_queue);
@@ -117,7 +117,7 @@ public class QuestReamGachaDirector : QuestGachaDirectorBase
 		PlayerAnimCtrl npc_anim = PlayerAnimCtrl.Get(npc_loader.animator, PLCA.IDLE_01, null, null, null);
 		CreateNPCEffect(npc_loader.model);
 		yield return (object)null;
-		stageAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+		stageAnimator.set_cullingMode(0);
 		stageAnimator.Rebind();
 		stageAnimator.Play("StageAnim_Main");
 		Play("MainAnim_Start", null, 0f);
@@ -160,15 +160,15 @@ public class QuestReamGachaDirector : QuestGachaDirectorBase
 			yield return (object)null;
 		}
 		PlayEffect(startEffectPrefabs[1]);
-		Transform[] magic_effects = new Transform[11];
-		Transform[] end_effects = new Transform[11];
+		Transform[] magic_effects = (Transform[])new Transform[11];
+		Transform[] end_effects = (Transform[])new Transform[11];
 		int meteor_step = 0;
 		int magic_step = 0;
 		int max_step = 11;
-		time -= Time.deltaTime;
+		time -= Time.get_deltaTime();
 		while (meteor_step < max_step || magic_step < max_step)
 		{
-			time += Time.deltaTime;
+			time += Time.get_deltaTime();
 			if (meteor_step < max_step && meteorTimings[meteor_step] <= time)
 			{
 				PlayEffect(magicCircles[meteor_step], meteorEffectPrefabs[quest_datas[meteor_step].rarity.ToRarityExpressionID()]);
@@ -201,7 +201,7 @@ public class QuestReamGachaDirector : QuestGachaDirectorBase
 			{
 				yield return (object)null;
 			}
-			Time.timeScale = 1f;
+			Time.set_timeScale(1f);
 			skip = false;
 			time = 13.5f;
 			yield return (object)MonoBehaviourSingleton<TransitionManager>.I.In();
@@ -220,23 +220,23 @@ public class QuestReamGachaDirector : QuestGachaDirectorBase
 			if (end_step > 0)
 			{
 				int prevIndex = end_step - 1;
-				if ((Object)enemyLoaderList[prevIndex] != (Object)null)
+				if (enemyLoaderList[prevIndex] != null)
 				{
-					enemyLoaderList[prevIndex].gameObject.SetActive(false);
+					enemyLoaderList[prevIndex].get_gameObject().SetActive(false);
 				}
-				if ((Object)magic_effects[prevIndex] != (Object)null)
+				if (magic_effects[prevIndex] != null)
 				{
-					Object.Destroy(magic_effects[prevIndex].gameObject);
+					Object.Destroy(magic_effects[prevIndex].get_gameObject());
 					magic_effects[prevIndex] = null;
 				}
-				if ((Object)end_effects[prevIndex] != (Object)null)
+				if (end_effects[prevIndex] != null)
 				{
-					Object.Destroy(end_effects[prevIndex].gameObject);
+					Object.Destroy(end_effects[prevIndex].get_gameObject());
 					end_effects[prevIndex] = null;
 				}
 			}
 			EnemyLoader nowEnemyLoader = enemyLoaderList[end_step];
-			nowEnemyLoader.gameObject.SetActive(true);
+			nowEnemyLoader.get_gameObject().SetActive(true);
 			if (!skip)
 			{
 				string stateName = "Base Layer.GACHA_11";
@@ -268,7 +268,7 @@ public class QuestReamGachaDirector : QuestGachaDirectorBase
 			float waitTime = 0f;
 			while (waitTime < showRarityWaitTime)
 			{
-				waitTime += Time.deltaTime;
+				waitTime += Time.get_deltaTime();
 				if (base.IsSkipAppearEnemy)
 				{
 					waitTime = showRarityWaitTime;
@@ -309,7 +309,7 @@ public class QuestReamGachaDirector : QuestGachaDirectorBase
 			{
 				PlayEnemyAnimation(enemyLoaderList[lastIndex], "Base Layer.IDLE");
 			}
-			Time.timeScale = 1f;
+			Time.set_timeScale(1f);
 			if (MonoBehaviourSingleton<TransitionManager>.I.isTransing)
 			{
 				yield return (object)MonoBehaviourSingleton<TransitionManager>.I.In();
@@ -320,23 +320,24 @@ public class QuestReamGachaDirector : QuestGachaDirectorBase
 			skip = true;
 		}
 		sectionCommandReceiver.OnHideRarity();
-		Time.timeScale = 1f;
+		Time.set_timeScale(1f);
 		sectionCommandReceiver.OnEnd();
 	}
 
 	public override void SkipAll()
 	{
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		if (!m_isSkipAll && !skip)
 		{
 			m_isSkipAll = true;
 			skip = true;
-			StartCoroutine(DoSkipAll());
+			this.StartCoroutine(DoSkipAll());
 		}
 	}
 
 	private IEnumerator DoSkipAll()
 	{
 		yield return (object)MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.BLACK);
-		Time.timeScale = 100f;
+		Time.set_timeScale(100f);
 	}
 }

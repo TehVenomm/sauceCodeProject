@@ -56,6 +56,8 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 
 	public void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
 	{
+		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0112: Expected O, but got Unknown
 		base.Initialize();
 		param = MonoBehaviourSingleton<InGameSettingsManager>.I.GetWaveMatchParam();
 		base.objectType = OBJECT_TYPE.WAVE_TARGET;
@@ -82,7 +84,7 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 		}
 		if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid() && m_gimmickType == FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.WAVE_TARGET3)
 		{
-			MonoBehaviourSingleton<SceneSettingsManager>.I.AddWaveTarget(base.gameObject);
+			MonoBehaviourSingleton<SceneSettingsManager>.I.AddWaveTarget(this.get_gameObject());
 		}
 	}
 
@@ -124,12 +126,12 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 
 	public void SetColliderRadius(float radius)
 	{
-		if (!(radius <= 0f) && !((Object)m_modelTrans == (Object)null))
+		if (!(radius <= 0f) && !(m_modelTrans == null))
 		{
 			SphereCollider component = m_modelTrans.GetComponent<SphereCollider>();
-			if (!((Object)component == (Object)null))
+			if (!(component == null))
 			{
-				component.radius = radius;
+				component.set_radius(radius);
 			}
 		}
 	}
@@ -152,7 +154,7 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 		if (!isDead)
 		{
 			Enemy enemy = status.fromObject as Enemy;
-			if (!((Object)enemy == (Object)null))
+			if (!(enemy == null))
 			{
 				status.damage = ((!enemy.isWaveMatchBoss) ? param.enemyNormalDamage : param.enemyBossDamage);
 				status.afterHP = _nowHp - status.damage;
@@ -163,6 +165,18 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 
 	public override void OnAttackedHitFix(AttackedHitStatusFix status)
 	{
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Expected O, but got Unknown
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 		if (!isDead)
 		{
 			_nowHp = status.afterHP;
@@ -170,9 +184,9 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 			{
 				_nowHp = 0;
 				SoundManager.PlayOneShotSE(param.targetBreakSeId, status.hitPos);
-				if (!object.ReferenceEquals(base.gameObject, null))
+				if (!object.ReferenceEquals((object)this.get_gameObject(), null))
 				{
-					Object.Destroy(base.gameObject);
+					Object.Destroy(this.get_gameObject());
 				}
 			}
 			else
@@ -181,7 +195,7 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 				Vector3 hitPos = status.hitPos;
 				float x = hitPos.x;
 				Vector3 hitPos2 = status.hitPos;
-				EffectManager.OneShot(targetHitEffect, new Vector3(x, 0f, hitPos2.z), Quaternion.identity, param.targetHitEffectScale, false, null);
+				EffectManager.OneShot(targetHitEffect, new Vector3(x, 0f, hitPos2.z), Quaternion.get_identity(), param.targetHitEffectScale, false, null);
 				SoundManager.PlayOneShotSE(param.targetHitSeId, status.hitPos);
 			}
 		}
@@ -272,17 +286,17 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 		base.Update();
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.enemyList != null)
 		{
-			hateWaitSec -= Time.deltaTime;
+			hateWaitSec -= Time.get_deltaTime();
 			if (!(hateWaitSec > 0f))
 			{
 				hateWaitSec = 30f;
 				for (int i = 0; i < MonoBehaviourSingleton<StageObjectManager>.I.enemyList.Count; i++)
 				{
 					StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.enemyList[i];
-					if (!((Object)stageObject == (Object)null) && !((Object)stageObject.controller == (Object)null))
+					if (!(stageObject == null) && !(stageObject.controller == null))
 					{
 						Brain brain = stageObject.controller.brain;
-						if (!((Object)brain == (Object)null))
+						if (!(brain == null))
 						{
 							brain.HandleEvent(BRAIN_EVENT.WAVE_TARGET, this);
 						}
@@ -294,13 +308,16 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 
 	public void SetHp(int now, int max, bool changeOwner = false)
 	{
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Expected O, but got Unknown
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		_nowHp = now;
 		if (_nowHp <= 0)
 		{
 			_nowHp = 0;
-			if (!object.ReferenceEquals(base.gameObject, null))
+			if (!object.ReferenceEquals((object)this.get_gameObject(), null))
 			{
-				Object.Destroy(base.gameObject);
+				Object.Destroy(this.get_gameObject());
 			}
 		}
 		if (max > 0)

@@ -30,11 +30,15 @@ public class AbilityItemSellConfirm : ItemSellConfirm
 		return false;
 	}
 
-	public override void Initialize()
+	public unsafe override void Initialize()
 	{
-		List<AbilityItemSortData> source = GameSection.GetEventData() as List<AbilityItemSortData>;
-		sellData = (from x in (IEnumerable<AbilityItemSortData>)source
-		select (x)).ToList();
+		List<AbilityItemSortData> list = GameSection.GetEventData() as List<AbilityItemSortData>;
+		List<AbilityItemSortData> source = list;
+		if (_003C_003Ef__am_0024cache1 == null)
+		{
+			_003C_003Ef__am_0024cache1 = new Func<AbilityItemSortData, SortCompareData>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		sellData = source.Select<AbilityItemSortData, SortCompareData>(_003C_003Ef__am_0024cache1).ToList();
 		base.isRareConfirm = false;
 		int i = 0;
 		for (int count = sellData.Count; i < count; i++)
@@ -50,7 +54,7 @@ public class AbilityItemSellConfirm : ItemSellConfirm
 	protected override void DrawIcon()
 	{
 		base.DrawIcon();
-		SetActive(UI.STR_NON_REWARD, true);
+		SetActive((Enum)UI.STR_NON_REWARD, true);
 	}
 
 	private void OnQuery_NO()

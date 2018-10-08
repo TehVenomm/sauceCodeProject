@@ -18,14 +18,14 @@ class DefaultCachedSettingsIo implements CachedSettingsIo {
     }
 
     public JSONObject readCachedSettings() {
-        JSONObject jSONObject;
+        Closeable fileInputStream;
         Throwable th;
         Closeable closeable;
         Throwable th2;
-        Closeable closeable2 = null;
+        Throwable th3;
+        JSONObject jSONObject = null;
         Fabric.getLogger().mo4289d("Fabric", "Reading cached settings...");
         try {
-            Closeable fileInputStream;
             File file = new File(new FileStoreImpl(this.kit).getFilesDir(), Settings.SETTINGS_CACHE_FILENAME);
             if (file.exists()) {
                 fileInputStream = new FileInputStream(file);
@@ -39,18 +39,16 @@ class DefaultCachedSettingsIo implements CachedSettingsIo {
                         Fabric.getLogger().mo4292e("Fabric", "Failed to fetch cached settings", th2);
                         CommonUtils.closeOrLog(closeable, "Error while closing settings cache file.");
                         return jSONObject;
-                    } catch (Throwable th3) {
-                        th2 = th3;
-                        closeable2 = closeable;
-                        CommonUtils.closeOrLog(closeable2, "Error while closing settings cache file.");
-                        throw th2;
+                    } catch (Throwable th4) {
+                        th3 = th4;
+                        fileInputStream = closeable;
+                        CommonUtils.closeOrLog(fileInputStream, "Error while closing settings cache file.");
+                        throw th3;
                     }
-                } catch (Throwable th4) {
-                    th = th4;
-                    closeable2 = fileInputStream;
-                    th2 = th;
-                    CommonUtils.closeOrLog(closeable2, "Error while closing settings cache file.");
-                    throw th2;
+                } catch (Throwable th5) {
+                    th3 = th5;
+                    CommonUtils.closeOrLog(fileInputStream, "Error while closing settings cache file.");
+                    throw th3;
                 }
             }
             Fabric.getLogger().mo4289d("Fabric", "No cached settings found.");
@@ -62,10 +60,12 @@ class DefaultCachedSettingsIo implements CachedSettingsIo {
             Fabric.getLogger().mo4292e("Fabric", "Failed to fetch cached settings", th2);
             CommonUtils.closeOrLog(closeable, "Error while closing settings cache file.");
             return jSONObject;
-        } catch (Throwable th5) {
-            th2 = th5;
-            CommonUtils.closeOrLog(closeable2, "Error while closing settings cache file.");
-            throw th2;
+        } catch (Throwable th22) {
+            th = th22;
+            fileInputStream = null;
+            th3 = th;
+            CommonUtils.closeOrLog(fileInputStream, "Error while closing settings cache file.");
+            throw th3;
         }
         return jSONObject;
     }

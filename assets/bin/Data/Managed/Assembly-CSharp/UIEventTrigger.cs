@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Event Trigger")]
-public class UIEventTrigger : MonoBehaviour
+public class UIEventTrigger
 {
 	public static UIEventTrigger current;
 
@@ -36,19 +36,24 @@ public class UIEventTrigger : MonoBehaviour
 	{
 		get
 		{
-			Collider component = GetComponent<Collider>();
-			if ((Object)component != (Object)null)
+			Collider component = this.GetComponent<Collider>();
+			if (component != null)
 			{
-				return component.enabled;
+				return component.get_enabled();
 			}
-			Collider2D component2 = GetComponent<Collider2D>();
-			return (Object)component2 != (Object)null && component2.enabled;
+			Collider2D component2 = this.GetComponent<Collider2D>();
+			return component2 != null && component2.get_enabled();
 		}
+	}
+
+	public UIEventTrigger()
+		: this()
+	{
 	}
 
 	private void OnHover(bool isOver)
 	{
-		if (!((Object)current != (Object)null) && isColliderEnabled)
+		if (!(current != null) && isColliderEnabled)
 		{
 			current = this;
 			if (isOver)
@@ -65,7 +70,7 @@ public class UIEventTrigger : MonoBehaviour
 
 	private void OnPress(bool pressed)
 	{
-		if (!((Object)current != (Object)null) && isColliderEnabled)
+		if (!(current != null) && isColliderEnabled)
 		{
 			current = this;
 			if (pressed)
@@ -82,7 +87,7 @@ public class UIEventTrigger : MonoBehaviour
 
 	private void OnSelect(bool selected)
 	{
-		if (!((Object)current != (Object)null) && isColliderEnabled)
+		if (!(current != null) && isColliderEnabled)
 		{
 			current = this;
 			if (selected)
@@ -99,7 +104,7 @@ public class UIEventTrigger : MonoBehaviour
 
 	private void OnClick()
 	{
-		if (!((Object)current != (Object)null) && isColliderEnabled)
+		if (!(current != null) && isColliderEnabled)
 		{
 			current = this;
 			EventDelegate.Execute(onClick);
@@ -109,7 +114,7 @@ public class UIEventTrigger : MonoBehaviour
 
 	private void OnDoubleClick()
 	{
-		if (!((Object)current != (Object)null) && isColliderEnabled)
+		if (!(current != null) && isColliderEnabled)
 		{
 			current = this;
 			EventDelegate.Execute(onDoubleClick);
@@ -119,7 +124,7 @@ public class UIEventTrigger : MonoBehaviour
 
 	private void OnDragStart()
 	{
-		if (!((Object)current != (Object)null))
+		if (!(current != null))
 		{
 			current = this;
 			EventDelegate.Execute(onDragStart);
@@ -129,7 +134,7 @@ public class UIEventTrigger : MonoBehaviour
 
 	private void OnDragEnd()
 	{
-		if (!((Object)current != (Object)null))
+		if (!(current != null))
 		{
 			current = this;
 			EventDelegate.Execute(onDragEnd);
@@ -139,7 +144,7 @@ public class UIEventTrigger : MonoBehaviour
 
 	private void OnDragOver(GameObject go)
 	{
-		if (!((Object)current != (Object)null) && isColliderEnabled)
+		if (!(current != null) && isColliderEnabled)
 		{
 			current = this;
 			EventDelegate.Execute(onDragOver);
@@ -149,7 +154,7 @@ public class UIEventTrigger : MonoBehaviour
 
 	private void OnDragOut(GameObject go)
 	{
-		if (!((Object)current != (Object)null) && isColliderEnabled)
+		if (!(current != null) && isColliderEnabled)
 		{
 			current = this;
 			EventDelegate.Execute(onDragOut);
@@ -159,7 +164,7 @@ public class UIEventTrigger : MonoBehaviour
 
 	private void OnDrag(Vector2 delta)
 	{
-		if (!((Object)current != (Object)null))
+		if (!(current != null))
 		{
 			current = this;
 			EventDelegate.Execute(onDrag);

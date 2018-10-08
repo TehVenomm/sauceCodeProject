@@ -211,17 +211,16 @@ public class zzbdi extends zzbda {
     }
 
     private final void zza(StringBuilder stringBuilder, Map<String, zzbcy<?, ?>> map, Parcel parcel) {
-        Entry entry;
         SparseArray sparseArray = new SparseArray();
-        for (Entry entry2 : map.entrySet()) {
-            sparseArray.put(((zzbcy) entry2.getValue()).zzfwp, entry2);
+        for (Entry entry : map.entrySet()) {
+            sparseArray.put(((zzbcy) entry.getValue()).zzfwp, entry);
         }
         stringBuilder.append('{');
         int zzd = com.google.android.gms.common.internal.safeparcel.zzb.zzd(parcel);
         Object obj = null;
         while (parcel.dataPosition() < zzd) {
             int readInt = parcel.readInt();
-            entry2 = (Entry) sparseArray.get(65535 & readInt);
+            Entry entry2 = (Entry) sparseArray.get(65535 & readInt);
             if (entry2 != null) {
                 if (obj != null) {
                     stringBuilder.append(",");

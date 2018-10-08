@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UICenterOnChildCtrl : MonoBehaviour
+public class UICenterOnChildCtrl
 {
 	public UICenterOnChild.OnCenterCallback onCenter;
 
@@ -18,16 +18,21 @@ public class UICenterOnChildCtrl : MonoBehaviour
 		private set;
 	}
 
+	public UICenterOnChildCtrl()
+		: this()
+	{
+	}
+
 	public static UICenterOnChildCtrl Get(GameObject go)
 	{
 		UICenterOnChild component = go.GetComponent<UICenterOnChild>();
-		if ((Object)component == (Object)null)
+		if (component == null)
 		{
 			Log.Error("UICenterOnChild is not found.");
 			return null;
 		}
 		UICenterOnChildCtrl uICenterOnChildCtrl = go.GetComponent<UICenterOnChildCtrl>();
-		if ((Object)uICenterOnChildCtrl == (Object)null)
+		if (uICenterOnChildCtrl == null)
 		{
 			uICenterOnChildCtrl = go.AddComponent<UICenterOnChildCtrl>();
 		}
@@ -36,10 +41,10 @@ public class UICenterOnChildCtrl : MonoBehaviour
 
 	private void Start()
 	{
-		if ((Object)centerOnChild == (Object)null)
+		if (centerOnChild == null)
 		{
-			centerOnChild = GetComponent<UICenterOnChild>();
-			if ((Object)centerOnChild == (Object)null)
+			centerOnChild = this.GetComponent<UICenterOnChild>();
+			if (centerOnChild == null)
 			{
 				Object.Destroy(this);
 				return;
@@ -48,7 +53,7 @@ public class UICenterOnChildCtrl : MonoBehaviour
 			centerOnChild.onFinished = OnFinised;
 			centerOnChild.onCenter = OnCenter;
 		}
-		if ((Object)reserveTarget != (Object)null)
+		if (reserveTarget != null)
 		{
 			Centering(reserveTarget, true);
 			reserveTarget = null;
@@ -57,9 +62,12 @@ public class UICenterOnChildCtrl : MonoBehaviour
 
 	private void OnCenter(GameObject go)
 	{
-		if ((Object)go.transform != (Object)lastTarget)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Expected O, but got Unknown
+		if (go.get_transform() != lastTarget)
 		{
-			lastTarget = go.transform;
+			lastTarget = go.get_transform();
 			if (onCenter != null)
 			{
 				onCenter(go);
@@ -78,7 +86,7 @@ public class UICenterOnChildCtrl : MonoBehaviour
 
 	public void Centering(Transform target, bool is_instant = false)
 	{
-		if ((Object)centerOnChild == (Object)null)
+		if (centerOnChild == null)
 		{
 			reserveTarget = target;
 		}

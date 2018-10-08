@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class DelayUnloadAssetBundle
 {
-	private class Pool_DelayUnloadAssetBundle : rymTPool<DelayUnloadAssetBundle>
+	private class Pool_DelayUnloadAssetBundle
 	{
 	}
 
@@ -26,7 +26,7 @@ public class DelayUnloadAssetBundle
 
 	public static void Release(ref DelayUnloadAssetBundle obj)
 	{
-		if ((Object)obj.assetBundle != (Object)null)
+		if (obj.assetBundle != null)
 		{
 			obj.assetBundle.Unload(false);
 		}

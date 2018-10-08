@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class GuildRequestResult : QuestResultTop
@@ -153,102 +154,12 @@ public class GuildRequestResult : QuestResultTop
 		base.Initialize();
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
-		SetActive(UI.BTN_NEXT, false);
-		SetActive(UI.OBJ_BONUS_POINT_SHOP, false);
-		SetGrid(UI.GRD_DROP_ITEM, null, dropItemIconData.Length, true, delegate(int i, Transform o, bool is_recycle)
-		{
-			ITEM_ICON_TYPE iTEM_ICON_TYPE = ITEM_ICON_TYPE.NONE;
-			RARITY_TYPE? rarity = null;
-			ELEMENT_TYPE element = ELEMENT_TYPE.MAX;
-			EQUIPMENT_TYPE? magi_enable_icon_type = null;
-			int icon_id = -1;
-			int num = -1;
-			if (i < dropItemIconData.Length && dropItemIconData[i] != null)
-			{
-				iTEM_ICON_TYPE = dropItemIconData[i].GetIconType();
-				icon_id = dropItemIconData[i].GetIconID();
-				rarity = dropItemIconData[i].GetRarity();
-				element = dropItemIconData[i].GetIconElement();
-				magi_enable_icon_type = dropItemIconData[i].GetIconMagiEnableType();
-				num = dropItemIconData[i].GetNum();
-				if (num == 1)
-				{
-					num = -1;
-				}
-			}
-			bool is_new = false;
-			switch (iTEM_ICON_TYPE)
-			{
-			case ITEM_ICON_TYPE.ITEM:
-			case ITEM_ICON_TYPE.QUEST_ITEM:
-			{
-				ulong uniqID = dropItemIconData[i].GetUniqID();
-				if (uniqID != 0L)
-				{
-					is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, dropItemIconData[i].GetUniqID());
-				}
-				break;
-			}
-			default:
-				is_new = true;
-				break;
-			case ITEM_ICON_TYPE.NONE:
-				break;
-			}
-			int enemy_icon_id = 0;
-			if (iTEM_ICON_TYPE == ITEM_ICON_TYPE.ITEM)
-			{
-				ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(dropItemIconData[i].GetTableID());
-				enemy_icon_id = itemData.enemyIconID;
-			}
-			ItemIcon itemIcon = null;
-			if (dropItemIconData[i].GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
-			{
-				itemIcon = ItemIcon.Create(new ItemIcon.ItemIconCreateParam
-				{
-					icon_type = dropItemIconData[i].GetIconType(),
-					icon_id = dropItemIconData[i].GetIconID(),
-					rarity = new RARITY_TYPE?(dropItemIconData[i].GetRarity()),
-					parent = o,
-					element = dropItemIconData[i].GetIconElement(),
-					magi_enable_equip_type = dropItemIconData[i].GetIconMagiEnableType(),
-					num = dropItemIconData[i].GetNum(),
-					enemy_icon_id = enemy_icon_id,
-					questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST
-				});
-			}
-			else
-			{
-				GET_TYPE getType = dropItemIconData[i].GetGetType();
-				itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, o, element, magi_enable_icon_type, num, "DROP", i, is_new, -1, false, null, false, enemy_icon_id, 0, false, getType, ELEMENT_TYPE.MAX);
-			}
-			itemIcon.SetRewardBG(true);
-			itemIcon.SetRewardCategoryInfo(dropItemIconData[i].GetCategory());
-			SetMaterialInfo(itemIcon.transform, dropItemIconData[i].GetMaterialType(), dropItemIconData[i].GetTableID(), GetCtrl(UI.PNL_MATERIAL_INFO));
-			itemIcon.transform.FindChild("MaterialInfo").gameObject.SetActive(false);
-			Transform transform = SetPrefab(o, "QuestResultDropIconOpener", true);
-			QuestResultDropIconOpener.Info info2 = new QuestResultDropIconOpener.Info
-			{
-				IsRare = ResultUtility.IsRare(dropItemIconData[i]),
-				IsBroken = ResultUtility.IsBreakReward(dropItemIconData[i])
-			};
-			transform.GetComponent<QuestResultDropIconOpener>().Initialized(itemIcon, info2, delegate(Transform t, QuestResultDropIconOpener.Info info, bool is_skip)
-			{
-				string ui_effect_name = "ef_ui_dropitem_silver_01";
-				if (info.IsBroken)
-				{
-					ui_effect_name = "ef_ui_dropitem_red_01";
-				}
-				else if (info.IsRare)
-				{
-					ui_effect_name = "ef_ui_dropitem_gold_01";
-				}
-				SetVisibleWidgetOneShotEffect(GetCtrl(dropItemSCR), t, ui_effect_name);
-			});
-		});
-		GetComponent<UITable>(UI.TBL_GUILD_REQUEST_RESULT).Reposition();
+		SetActive((Enum)UI.BTN_NEXT, false);
+		SetActive((Enum)UI.OBJ_BONUS_POINT_SHOP, false);
+		SetGrid(UI.GRD_DROP_ITEM, null, dropItemIconData.Length, true, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		base.GetComponent<UITable>((Enum)UI.TBL_GUILD_REQUEST_RESULT).Reposition();
 		TreasureStart();
 	}
 
@@ -258,29 +169,28 @@ public class GuildRequestResult : QuestResultTop
 		startDropDirection = true;
 	}
 
-	protected override void AnimationEnd()
+	protected unsafe override void AnimationEnd()
 	{
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a0: Expected O, but got Unknown
 		animState = RESULT_ANIM_STATE.END;
 		animationEnd = true;
 		if (guildRequestCompleteData.bonusPointShop != null && guildRequestCompleteData.bonusPointShop.Count > 0)
 		{
-			SetLabelText(UI.LBL_BONUS_POINT_NUM, guildRequestCompleteData.bonusPointShop[0].getPoint.ToString());
-			SetActive(UI.OBJ_BONUS_POINT_SHOP, true);
-			GetComponent<UITable>(UI.TBL_GUILD_REQUEST_RESULT).Reposition();
-			SetScroll(dropItemSCR, animScrollValue);
+			SetLabelText((Enum)UI.LBL_BONUS_POINT_NUM, guildRequestCompleteData.bonusPointShop[0].getPoint.ToString());
+			SetActive((Enum)UI.OBJ_BONUS_POINT_SHOP, true);
+			base.GetComponent<UITable>((Enum)UI.TBL_GUILD_REQUEST_RESULT).Reposition();
+			SetScroll((Enum)dropItemSCR, animScrollValue);
 		}
-		OpenPointEvent(delegate
-		{
-			VisibleEndButton();
-		});
+		OpenPointEvent(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void VisibleEndButton()
 	{
-		SetActive(UI.BTN_NEXT, animationEnd);
-		SetActive(UI.BTN_SKIP_FULL_SCREEN, false);
-		SetActive(UI.BTN_SKIP_IN_SCROLL, false);
-		SetActive(UI.BTN_SKIP_IN_SCROLL_2, false);
+		SetActive((Enum)UI.BTN_NEXT, animationEnd);
+		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, false);
+		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL, false);
+		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL_2, false);
 	}
 
 	protected override string GetSceneName()

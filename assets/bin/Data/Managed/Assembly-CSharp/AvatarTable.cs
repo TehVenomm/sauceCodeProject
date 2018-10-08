@@ -167,6 +167,10 @@ public class AvatarTable : Singleton<AvatarTable>, IDataTable
 
 	public void ConvertTable()
 	{
+		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
 		List<int> list = new List<int>();
 		List<int> list2 = new List<int>();
 		List<int> list3 = new List<int>();
@@ -200,11 +204,11 @@ public class AvatarTable : Singleton<AvatarTable>, IDataTable
 			}
 			if (data.hasSkinColor)
 			{
-				list5.Add(data.skinColor);
+				list5.Add(Color32.op_Implicit(data.skinColor));
 			}
 			if (data.hasHairColor)
 			{
-				list6.Add(data.hairColor);
+				list6.Add(Color32.op_Implicit(data.hairColor));
 			}
 			if (data.defaultHasManHeadIndex >= 0)
 			{

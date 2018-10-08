@@ -197,7 +197,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 			int i = 0;
 			for (int num = tmp.Length; i < num; i++)
 			{
-				Debug.LogWarning("[" + i + "] = " + (now[i] - tmp[i]));
+				Debug.LogWarning((object)("[" + i + "] = " + (now[i] - tmp[i])));
 				tmp[i] = now[i];
 			}
 		}
@@ -678,12 +678,12 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 		requestSendForm.cid = (int)create_table_id;
 		Protocol.Send(SmithCreateModel.URL, requestSendForm, delegate(SmithCreateModel ret)
 		{
-			EquipItemInfo arg = null;
+			EquipItemInfo equipItemInfo = null;
 			if (ret.Error == Error.None)
 			{
-				arg = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(ret.result.equipUniqId));
+				equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(ret.result.equipUniqId));
 			}
-			call_back(ret.Error, arg);
+			call_back.Invoke(ret.Error, equipItemInfo);
 		}, string.Empty);
 	}
 
@@ -704,7 +704,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				}
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_GROW);
 			}
-			call_back(ret.Error, equipItemInfo);
+			call_back.Invoke(ret.Error, equipItemInfo);
 		}, string.Empty);
 	}
 
@@ -738,7 +738,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				}
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_EVOLVE);
 			}
-			call_back(ret.Error, equipItemInfo);
+			call_back.Invoke(ret.Error, equipItemInfo);
 		}, string.Empty);
 	}
 
@@ -766,7 +766,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				}
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_EVOLVE);
 			}
-			call_back(ret.Error, equipItemInfo);
+			call_back.Invoke(ret.Error, equipItemInfo);
 		}, string.Empty);
 	}
 
@@ -787,7 +787,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				}
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_GROW);
 			}
-			call_back(ret.Error, equipItemInfo);
+			call_back.Invoke(ret.Error, equipItemInfo);
 		}, string.Empty);
 	}
 
@@ -807,7 +807,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				}
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_ABILITY);
 			}
-			call_back(ret.Error, equipItemInfo);
+			call_back.Invoke(ret.Error, equipItemInfo);
 		}, string.Empty);
 	}
 
@@ -828,7 +828,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				}
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_ABILITY);
 			}
-			call_back(ret.Error, equipItemInfo);
+			call_back.Invoke(ret.Error, equipItemInfo);
 		}, string.Empty);
 	}
 
@@ -838,12 +838,12 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 		requestSendForm.euid = equipUniqueId.ToString();
 		Protocol.Send(SmithGetAbilityList.URL, requestSendForm, delegate(SmithGetAbilityList ret)
 		{
-			List<SmithGetAbilityList.Param> arg = null;
+			List<SmithGetAbilityList.Param> list = null;
 			if (ret.Error == Error.None)
 			{
-				arg = ret.result;
+				list = ret.result;
 			}
-			call_back(ret.Error, arg);
+			call_back.Invoke(ret.Error, list);
 		}, string.Empty);
 	}
 
@@ -853,12 +853,12 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 		requestSendForm.cid = createId.ToString();
 		Protocol.Send(SmithGetAbilityListForCreateModel.URL, requestSendForm, delegate(SmithGetAbilityListForCreateModel ret)
 		{
-			List<SmithGetAbilityListForCreateModel.Param> arg = null;
+			List<SmithGetAbilityListForCreateModel.Param> list = null;
 			if (ret.Error == Error.None)
 			{
-				arg = ret.result;
+				list = ret.result;
 			}
-			call_back(ret.Error, arg);
+			call_back.Invoke(ret.Error, list);
 		}, string.Empty);
 	}
 
@@ -904,10 +904,10 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 		Protocol.Send(AlchemyGrowModel.URL, requestSendForm, delegate(AlchemyGrowModel ret)
 		{
 			SkillItemInfo skillItemInfo = null;
-			bool arg = false;
+			bool flag2 = false;
 			if (ret.Error == Error.None)
 			{
-				arg = ret.result.greatSuccess;
+				flag2 = ret.result.greatSuccess;
 				skillItemInfo = MonoBehaviourSingleton<InventoryManager>.I.skillItemInventory.Find(base_skill.uniqueID);
 				if (skillItemInfo != null)
 				{
@@ -915,7 +915,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				}
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_SKILL_GROW);
 			}
-			call_back(skillItemInfo, arg);
+			call_back.Invoke(skillItemInfo, flag2);
 		}, string.Empty);
 	}
 
@@ -934,10 +934,10 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 		Protocol.Send(AlchemyExceedModel.URL, requestSendForm, delegate(AlchemyExceedModel ret)
 		{
 			SkillItemInfo skillItemInfo = null;
-			bool arg = false;
+			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				arg = ret.result.greatSuccess;
+				flag = ret.result.greatSuccess;
 				skillItemInfo = MonoBehaviourSingleton<InventoryManager>.I.skillItemInventory.Find(base_skill.uniqueID);
 				if (skillItemInfo != null)
 				{
@@ -945,7 +945,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				}
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_SKILL_GROW);
 			}
-			call_back(skillItemInfo, arg);
+			call_back.Invoke(skillItemInfo, flag);
 		}, string.Empty);
 	}
 

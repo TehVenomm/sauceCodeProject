@@ -10,6 +10,6 @@ public class UserFromAttributeData
 
 	public void printData()
 	{
-		Debug.Log("fromCode: " + fromCode + ", fromParam: " + fromParam + ", fromAffiliate: " + fromAffiliate);
+		Debug.Log((object)("fromCode: " + fromCode + ", fromParam: " + fromParam + ", fromAffiliate: " + fromAffiliate));
 	}
 }

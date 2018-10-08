@@ -1,7 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CoopRoom : MonoBehaviour
+public class CoopRoom
 {
 	public enum ROOM_STATUS
 	{
@@ -84,11 +85,18 @@ public class CoopRoom : MonoBehaviour
 		private set;
 	}
 
+	public CoopRoom()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		clients = new CoopClientCollector();
-		packetSender = base.gameObject.AddComponent<CoopRoomPacketSender>();
-		packetReceiver = base.gameObject.AddComponent<CoopRoomPacketReceiver>();
+		packetSender = this.get_gameObject().AddComponent<CoopRoomPacketSender>();
+		packetReceiver = this.get_gameObject().AddComponent<CoopRoomPacketReceiver>();
 	}
 
 	private void Update()
@@ -192,8 +200,8 @@ public class CoopRoom : MonoBehaviour
 		MonoBehaviourSingleton<CoopManager>.I.coopMyClient.StageStart();
 		if (isOwnerFirstClear)
 		{
-			CoopClient x = clients.FindPartyOwner();
-			if ((Object)x == (Object)null)
+			CoopClient coopClient = clients.FindPartyOwner();
+			if (coopClient == null)
 			{
 				Logd("Activate... party owner not found.");
 				MonoBehaviourSingleton<CoopNetworkManager>.I.Close(1000, "Bye!", null);
@@ -216,7 +224,7 @@ public class CoopRoom : MonoBehaviour
 			{
 				FieldModel.SlotInfo slotInfo = slotInfos[i];
 				CoopClient coopClient = clients.FindByClientId(slotInfo.userId);
-				if ((Object)coopClient != (Object)null)
+				if (coopClient != null)
 				{
 					coopClient.Activate(slotInfo.userId, slotInfo.token, slotInfo.userInfo, i);
 				}
@@ -241,7 +249,8 @@ public class CoopRoom : MonoBehaviour
 
 	public void DestroyClient(CoopClient client)
 	{
-		if (!((Object)client == (Object)null))
+		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+		if (!(client == null))
 		{
 			Logd("destory client:{0}", client.clientId);
 			if (CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected())
@@ -253,7 +262,7 @@ public class CoopRoom : MonoBehaviour
 			if (!(client is CoopMyClient))
 			{
 				Logd("object destory client");
-				Object.Destroy(client.gameObject);
+				Object.Destroy(client.get_gameObject());
 				client = null;
 			}
 		}
@@ -308,9 +317,11 @@ public class CoopRoom : MonoBehaviour
 
 	private CoopClient OnJoinClient(int client_id, int stgid, int stgidx, bool stghost, int counter = 0)
 	{
+		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Expected O, but got Unknown
 		CoopClient coopClient = null;
 		coopClient = clients.FindByClientId(client_id);
-		if ((Object)coopClient != (Object)null)
+		if (coopClient != null)
 		{
 			Logd("OnJoinClient: already join. client={0}", coopClient);
 			return coopClient;
@@ -322,7 +333,7 @@ public class CoopRoom : MonoBehaviour
 		}
 		else
 		{
-			coopClient = (CoopClient)Utility.CreateGameObjectAndComponent("CoopClient", base.transform, -1);
+			coopClient = (CoopClient)Utility.CreateGameObjectAndComponent("CoopClient", this.get_transform(), -1);
 			coopClient.Init(client_id);
 			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.WelcomeClient(client_id);
 			if (QuestManager.IsValidInGameExplore())
@@ -332,7 +343,7 @@ public class CoopRoom : MonoBehaviour
 					MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendSyncAllPortalPoint(MonoBehaviourSingleton<QuestManager>.I.GetExploreStatus().GetAllPortalData(), client_id);
 					MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendSyncExploreBoss(MonoBehaviourSingleton<QuestManager>.I.GetExploreStatus(), client_id);
 				}
-				if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (Object)null)
+				if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
 				{
 					MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendSyncPlayerStatus(MonoBehaviourSingleton<StageObjectManager>.I.self, client_id);
 				}
@@ -429,8 +440,14 @@ public class CoopRoom : MonoBehaviour
 		return true;
 	}
 
-	public void SwitchOfflinePlay()
+	public unsafe void SwitchOfflinePlay()
 	{
+		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009f: Expected O, but got Unknown
+		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0125: Expected O, but got Unknown
+		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015a: Expected O, but got Unknown
 		if (isOfflinePlay)
 		{
 			Logd("already offline.");
@@ -443,9 +460,12 @@ public class CoopRoom : MonoBehaviour
 			{
 				if (CoopWebSocketSingleton<KtbWebSocket>.IsValidOpen())
 				{
-					MonoBehaviourSingleton<CoopNetworkManager>.I.Close(1000, "Bye!", delegate
+					CoopNetworkManager i = MonoBehaviourSingleton<CoopNetworkManager>.I;
+					if (_003C_003Ef__am_0024cache10 == null)
 					{
-					});
+						_003C_003Ef__am_0024cache10 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					}
+					i.Close(1000, "Bye!", _003C_003Ef__am_0024cache10);
 				}
 				if (isOwnerFirstClear && !MonoBehaviourSingleton<CoopManager>.I.coopMyClient.isPartyOwner && !MonoBehaviourSingleton<CoopManager>.I.coopStage.isQuestClose)
 				{
@@ -456,13 +476,7 @@ public class CoopRoom : MonoBehaviour
 					forceRetire = true;
 					if (PartyManager.IsValidInParty())
 					{
-						Protocol.Force(delegate
-						{
-							MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate(bool is_leave)
-							{
-								Logd("PartyLeave. {0}", is_leave);
-							});
-						});
+						Protocol.Force(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					}
 				}
 				else
@@ -470,13 +484,7 @@ public class CoopRoom : MonoBehaviour
 					MonoBehaviourSingleton<CoopManager>.I.coopStage.OnSwitchOfflinePlay();
 					if (PartyManager.IsValidInParty() && !InGameManager.IsReentryNotLeaveParty())
 					{
-						Protocol.Force(delegate
-						{
-							MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate(bool is_leave)
-							{
-								Logd("PartyLeave. {0}", is_leave);
-							});
-						});
+						Protocol.Force(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					}
 					DestroyAllGuestClient();
 				}
@@ -497,7 +505,7 @@ public class CoopRoom : MonoBehaviour
 	public bool OnRecvRoomLeaved(Coop_Model_RoomLeaved model)
 	{
 		CoopClient coopClient = clients.FindByClientId(model.cid);
-		if ((Object)coopClient == (Object)null || coopClient.userToken != model.token)
+		if (coopClient == null || coopClient.userToken != model.token)
 		{
 			Logd("OnRecvRoomLeaved: client not found. clientId={0}, client={1}", model.cid, coopClient);
 			return true;
@@ -513,7 +521,7 @@ public class CoopRoom : MonoBehaviour
 			return true;
 		}
 		CoopClient coopClient = clients.FindByClientId(model.cid);
-		if ((Object)coopClient == (Object)null)
+		if (coopClient == null)
 		{
 			Logd("OnRecvRoomStageChanged: client not found. clientId={0}", model.cid);
 			return true;
@@ -550,7 +558,7 @@ public class CoopRoom : MonoBehaviour
 	public bool OnRecvRoomStageRequested(Coop_Model_RoomStageRequested model)
 	{
 		CoopClient coopClient = clients.FindByClientId(model.cid);
-		if ((Object)coopClient == (Object)null)
+		if (coopClient == null)
 		{
 			return true;
 		}
@@ -642,7 +650,7 @@ public class CoopRoom : MonoBehaviour
 	public void OnRecvExploreBossDamage(int fromClientId, Coop_Model_RoomExploreBossDamage model)
 	{
 		CoopClient coopClient = clients.FindByClientId(fromClientId);
-		if ((Object)coopClient != (Object)null)
+		if (coopClient != null)
 		{
 			MonoBehaviourSingleton<QuestManager>.I.UpdateExploreTotalDamageToBoss(coopClient, model.dmg);
 		}
@@ -662,7 +670,7 @@ public class CoopRoom : MonoBehaviour
 
 	public void OnRecvExploreAliveRequest()
 	{
-		if (!((Object)packetSender == (Object)null) && MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopMyClient.isPartyOwner)
+		if (!(packetSender == null) && MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopMyClient.isPartyOwner)
 		{
 			packetSender.SendExploreAlive();
 		}
@@ -764,7 +772,7 @@ public class CoopRoom : MonoBehaviour
 		if (QuestManager.IsValidExplore())
 		{
 			CoopClient coopClient = clients.FindByClientId(fromClientId);
-			if (model.hp <= 0 && (bool)coopClient)
+			if (model.hp <= 0 && Object.op_Implicit(coopClient))
 			{
 				ExplorePlayerStatus explorePlayerStatus = MonoBehaviourSingleton<QuestManager>.I.GetExplorePlayerStatus(coopClient.userId);
 				if (explorePlayerStatus != null && explorePlayerStatus.hp > 0 && MonoBehaviourSingleton<UIDeadAnnounce>.IsValid())
@@ -779,28 +787,28 @@ public class CoopRoom : MonoBehaviour
 	public void OnRecvChatStamp(int fromClientId, Coop_Model_RoomChatStamp model)
 	{
 		CoopClient coopClient = clients.FindByClientId(fromClientId);
-		if (!((Object)coopClient == (Object)null))
+		if (!(coopClient == null))
 		{
 			Player player = coopClient.GetPlayer();
-			if ((bool)player)
+			if (Object.op_Implicit(player))
 			{
 				player.ChatSayStamp(model.stampId);
 			}
 			else if (QuestManager.IsValidInGameExplore())
 			{
 				ExplorePlayerStatus explorePlayerStatus = MonoBehaviourSingleton<QuestManager>.I.GetExplorePlayerStatus(model.userId);
-				if (MonoBehaviourSingleton<UIInGameMessageBar>.IsValid() && MonoBehaviourSingleton<UIInGameMessageBar>.I.isActiveAndEnabled && explorePlayerStatus != null)
+				if (MonoBehaviourSingleton<UIInGameMessageBar>.IsValid() && MonoBehaviourSingleton<UIInGameMessageBar>.I.get_isActiveAndEnabled() && explorePlayerStatus != null)
 				{
 					MonoBehaviourSingleton<UIInGameMessageBar>.I.Announce(explorePlayerStatus.userName, model.stampId);
 				}
 			}
 			if (chatConnection != null)
 			{
-				if ((bool)player)
+				if (Object.op_Implicit(player))
 				{
 					chatConnection.OnReceiveStamp(coopClient.userId, player.charaName, model.stampId);
 				}
-				else if ((Object)coopClient != (Object)null)
+				else if (coopClient != null)
 				{
 					chatConnection.OnReceiveStamp(coopClient.userId, coopClient.GetPlayerName(), model.stampId);
 				}

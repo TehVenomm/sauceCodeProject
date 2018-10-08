@@ -51,11 +51,14 @@ public class Goal_KillTarget : GoalComposite
 
 	public override void HandleEvent(Brain brain, BRAIN_EVENT ev, object param = null)
 	{
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
 		base.HandleEvent(brain, ev, param);
 		switch (ev)
 		{
 		case BRAIN_EVENT.BULLET_CATCH:
-			if (!IsNowProcess(GOAL_TYPE.ENSURE_SAFETY) && (Object)brain.dangerRader != (Object)null && brain.dangerRader.AskWillHit(0.2f))
+			if (!IsNowProcess(GOAL_TYPE.ENSURE_SAFETY) && brain.dangerRader != null && brain.dangerRader.AskWillHit(0.2f))
 			{
 				RemoveAllSubGoals(brain);
 				AddSubGoal<Goal_EnsureSafety>();
@@ -64,7 +67,7 @@ public class Goal_KillTarget : GoalComposite
 		case BRAIN_EVENT.COLLIDER_CATCH:
 		{
 			Vector3 attackPosition = brain.targetCtrl.GetAttackPosition();
-			if (!IsNowProcess(GOAL_TYPE.ENSURE_SAFETY) && (Object)brain.dangerRader != (Object)null && brain.dangerRader.AskDangerPosition(attackPosition, 0.2f))
+			if (!IsNowProcess(GOAL_TYPE.ENSURE_SAFETY) && brain.dangerRader != null && brain.dangerRader.AskDangerPosition(attackPosition, 0.2f))
 			{
 				RemoveAllSubGoals(brain);
 				AddSubGoal<Goal_EnsureSafety>();

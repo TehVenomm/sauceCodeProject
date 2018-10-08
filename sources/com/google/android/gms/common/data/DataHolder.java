@@ -130,7 +130,8 @@ public final class DataHolder extends com.google.android.gms.common.internal.saf
     }
 
     private static CursorWindow[] zza(zza zza, int i) {
-        int i2 = 0;
+        int i2;
+        int i3 = 0;
         if (zza.zzfqf.length == 0) {
             return new CursorWindow[0];
         }
@@ -140,17 +141,16 @@ public final class DataHolder extends com.google.android.gms.common.internal.saf
         ArrayList arrayList = new ArrayList();
         arrayList.add(cursorWindow);
         cursorWindow.setNumColumns(zza.zzfqf.length);
-        int i3 = 0;
         int i4 = 0;
-        while (i4 < size) {
-            int i5;
+        int i5 = 0;
+        while (i5 < size) {
             try {
                 CursorWindow cursorWindow2;
                 int i6;
                 if (!cursorWindow.allocRow()) {
-                    Log.d("DataHolder", "Allocating additional cursor window for large data set (row " + i4 + ")");
+                    Log.d("DataHolder", "Allocating additional cursor window for large data set (row " + i5 + ")");
                     cursorWindow = new CursorWindow(false);
-                    cursorWindow.setStartPosition(i4);
+                    cursorWindow.setStartPosition(i5);
                     cursorWindow.setNumColumns(zza.zzfqf.length);
                     arrayList.add(cursorWindow);
                     if (!cursorWindow.allocRow()) {
@@ -159,27 +159,27 @@ public final class DataHolder extends com.google.android.gms.common.internal.saf
                         return (CursorWindow[]) arrayList.toArray(new CursorWindow[arrayList.size()]);
                     }
                 }
-                Map map = (Map) zzb.get(i4);
+                Map map = (Map) zzb.get(i5);
                 boolean z = true;
                 for (int i7 = 0; i7 < zza.zzfqf.length && z; i7++) {
                     String str = zza.zzfqf[i7];
                     Object obj = map.get(str);
                     if (obj == null) {
-                        z = cursorWindow.putNull(i4, i7);
+                        z = cursorWindow.putNull(i5, i7);
                     } else if (obj instanceof String) {
-                        z = cursorWindow.putString((String) obj, i4, i7);
+                        z = cursorWindow.putString((String) obj, i5, i7);
                     } else if (obj instanceof Long) {
-                        z = cursorWindow.putLong(((Long) obj).longValue(), i4, i7);
+                        z = cursorWindow.putLong(((Long) obj).longValue(), i5, i7);
                     } else if (obj instanceof Integer) {
-                        z = cursorWindow.putLong((long) ((Integer) obj).intValue(), i4, i7);
+                        z = cursorWindow.putLong((long) ((Integer) obj).intValue(), i5, i7);
                     } else if (obj instanceof Boolean) {
-                        z = cursorWindow.putLong(((Boolean) obj).booleanValue() ? 1 : 0, i4, i7);
+                        z = cursorWindow.putLong(((Boolean) obj).booleanValue() ? 1 : 0, i5, i7);
                     } else if (obj instanceof byte[]) {
-                        z = cursorWindow.putBlob((byte[]) obj, i4, i7);
+                        z = cursorWindow.putBlob((byte[]) obj, i5, i7);
                     } else if (obj instanceof Double) {
-                        z = cursorWindow.putDouble(((Double) obj).doubleValue(), i4, i7);
+                        z = cursorWindow.putDouble(((Double) obj).doubleValue(), i5, i7);
                     } else if (obj instanceof Float) {
-                        z = cursorWindow.putDouble((double) ((Float) obj).floatValue(), i4, i7);
+                        z = cursorWindow.putDouble((double) ((Float) obj).floatValue(), i5, i7);
                     } else {
                         String valueOf = String.valueOf(obj);
                         throw new IllegalArgumentException(new StringBuilder((String.valueOf(str).length() + 32) + String.valueOf(valueOf).length()).append("Unsupported object for column ").append(str).append(": ").append(valueOf).toString());
@@ -187,29 +187,29 @@ public final class DataHolder extends com.google.android.gms.common.internal.saf
                 }
                 if (z) {
                     cursorWindow2 = cursorWindow;
-                    i6 = i4;
-                    i5 = 0;
-                } else if (i3 != 0) {
+                    i6 = i5;
+                    i2 = 0;
+                } else if (i4 != 0) {
                     throw new zzb("Could not add the value to a new CursorWindow. The size of value may be larger than what a CursorWindow can handle.");
                 } else {
-                    Log.d("DataHolder", "Couldn't populate window data for row " + i4 + " - allocating new window.");
+                    Log.d("DataHolder", "Couldn't populate window data for row " + i5 + " - allocating new window.");
                     cursorWindow.freeLastRow();
                     cursorWindow2 = new CursorWindow(false);
-                    cursorWindow2.setStartPosition(i4);
+                    cursorWindow2.setStartPosition(i5);
                     cursorWindow2.setNumColumns(zza.zzfqf.length);
                     arrayList.add(cursorWindow2);
-                    i6 = i4 - 1;
-                    i5 = 1;
+                    i6 = i5 - 1;
+                    i2 = 1;
                 }
-                i4 = i6 + 1;
-                i3 = i5;
+                i5 = i6 + 1;
+                i4 = i2;
                 cursorWindow = cursorWindow2;
             } catch (RuntimeException e) {
                 RuntimeException runtimeException = e;
-                i5 = arrayList.size();
-                while (i2 < i5) {
-                    ((CursorWindow) arrayList.get(i2)).close();
-                    i2++;
+                i2 = arrayList.size();
+                while (i3 < i2) {
+                    ((CursorWindow) arrayList.get(i3)).close();
+                    i3++;
                 }
                 throw runtimeException;
             }
@@ -302,11 +302,13 @@ public final class DataHolder extends com.google.android.gms.common.internal.saf
             this.zzfqg.putInt(this.zzfqf[i], i);
         }
         this.zzfqj = new int[this.zzfqh.length];
-        for (i = 0; i < this.zzfqh.length; i++) {
-            this.zzfqj[i] = i2;
-            i2 += this.zzfqh[i].getNumRows() - (i2 - this.zzfqh[i].getStartPosition());
+        i = 0;
+        while (i2 < this.zzfqh.length) {
+            this.zzfqj[i2] = i;
+            i += this.zzfqh[i2].getNumRows() - (i - this.zzfqh[i2].getStartPosition());
+            i2++;
         }
-        this.zzfqk = i2;
+        this.zzfqk = i;
     }
 
     public final long zzb(String str, int i, int i2) {

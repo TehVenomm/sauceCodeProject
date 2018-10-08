@@ -1,3 +1,5 @@
+using System;
+
 public class InGameNoticeNewDelivery : InGameDeliveryDetailBase
 {
 	private new enum UI
@@ -87,8 +89,8 @@ public class InGameNoticeNewDelivery : InGameDeliveryDetailBase
 
 	public override void UpdateUI()
 	{
-		ResetTween(UI.TWN_NEW_DELIVERY_ANIM, 0);
-		PlayTween(UI.TWN_NEW_DELIVERY_ANIM, true, null, false, 0);
+		ResetTween((Enum)UI.TWN_NEW_DELIVERY_ANIM, 0);
+		PlayTween((Enum)UI.TWN_NEW_DELIVERY_ANIM, true, (EventDelegate.Callback)null, false, 0);
 		base.UpdateUI();
 	}
 }

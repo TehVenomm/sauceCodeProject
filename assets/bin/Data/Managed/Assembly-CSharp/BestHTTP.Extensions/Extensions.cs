@@ -162,9 +162,10 @@ namespace BestHTTP.Extensions
 			return stringBuilder.ToString();
 		}
 
-		internal static string Read(this string str, ref int pos, char block, bool needResult = true)
+		internal unsafe static string Read(this string str, ref int pos, char block, bool needResult = true)
 		{
-			return str.Read(ref pos, (char ch) => ch != block, needResult);
+			_003CRead_003Ec__AnonStorey7C6 _003CRead_003Ec__AnonStorey7C;
+			return str.Read(ref pos, new Func<char, bool>((object)_003CRead_003Ec__AnonStorey7C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), needResult);
 		}
 
 		internal static string Read(this string str, ref int pos, Func<char, bool> block, bool needResult = true)
@@ -175,7 +176,7 @@ namespace BestHTTP.Extensions
 			}
 			str.SkipWhiteSpace(ref pos);
 			int num = pos;
-			while (pos < str.Length && block(str[pos]))
+			while (pos < str.Length && block.Invoke(str[pos]))
 			{
 				pos++;
 			}
@@ -233,7 +234,7 @@ namespace BestHTTP.Extensions
 			return new string(array, 0, num);
 		}
 
-		internal static List<KeyValuePair> ParseOptionalHeader(this string str)
+		internal unsafe static List<KeyValuePair> ParseOptionalHeader(this string str)
 		{
 			List<KeyValuePair> list = new List<KeyValuePair>();
 			if (str == null)
@@ -243,7 +244,11 @@ namespace BestHTTP.Extensions
 			int pos = 0;
 			while (pos < str.Length)
 			{
-				string key = str.Read(ref pos, (char ch) => ch != '=' && ch != ',', true).TrimAndLower();
+				if (_003C_003Ef__am_0024cache0 == null)
+				{
+					_003C_003Ef__am_0024cache0 = new Func<char, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				string key = str.Read(ref pos, _003C_003Ef__am_0024cache0, true).TrimAndLower();
 				KeyValuePair keyValuePair = new KeyValuePair(key);
 				if (str[pos - 1] == '=')
 				{
@@ -254,7 +259,7 @@ namespace BestHTTP.Extensions
 			return list;
 		}
 
-		internal static List<KeyValuePair> ParseQualityParams(this string str)
+		internal unsafe static List<KeyValuePair> ParseQualityParams(this string str)
 		{
 			List<KeyValuePair> list = new List<KeyValuePair>();
 			if (str == null)
@@ -264,7 +269,11 @@ namespace BestHTTP.Extensions
 			int pos = 0;
 			while (pos < str.Length)
 			{
-				string key = str.Read(ref pos, (char ch) => ch != ',' && ch != ';', true).TrimAndLower();
+				if (_003C_003Ef__am_0024cache1 == null)
+				{
+					_003C_003Ef__am_0024cache1 = new Func<char, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				string key = str.Read(ref pos, _003C_003Ef__am_0024cache1, true).TrimAndLower();
 				KeyValuePair keyValuePair = new KeyValuePair(key);
 				if (str[pos - 1] == ';')
 				{

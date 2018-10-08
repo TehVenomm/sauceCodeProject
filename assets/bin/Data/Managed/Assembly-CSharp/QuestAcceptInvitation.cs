@@ -136,7 +136,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 
 	protected override void SendSearchRequest(Action onFinish, Action<bool> cb)
 	{
-		StartCoroutine(GetInvitedList(onFinish, cb));
+		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(GetInvitedList(onFinish, cb));
 	}
 
 	private IEnumerator GetInvitedList(Action onFinish, Action<bool> cb)
@@ -149,8 +150,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		bool waitGetData5 = true;
 		MonoBehaviourSingleton<PartyManager>.I.SendInvitedParty(delegate(bool partySuccess)
 		{
-			((_003CGetInvitedList_003Ec__IteratorC8)/*Error near IL_0060: stateMachine*/)._003CpartySuccess__003E__0 = partySuccess;
-			((_003CGetInvitedList_003Ec__IteratorC8)/*Error near IL_0060: stateMachine*/)._003CwaitGetData_003E__5 = false;
+			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_0060: stateMachine*/)._003CpartySuccess__003E__0 = partySuccess;
+			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_0060: stateMachine*/)._003CwaitGetData_003E__5 = false;
 		}, false);
 		while (waitGetData5)
 		{
@@ -159,8 +160,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		waitGetData5 = true;
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInvitedLounge(delegate(bool loungeSuccess)
 		{
-			((_003CGetInvitedList_003Ec__IteratorC8)/*Error near IL_00a1: stateMachine*/)._003CloungeSuccess__003E__1 = loungeSuccess;
-			((_003CGetInvitedList_003Ec__IteratorC8)/*Error near IL_00a1: stateMachine*/)._003CwaitGetData_003E__5 = false;
+			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_00a1: stateMachine*/)._003CloungeSuccess__003E__1 = loungeSuccess;
+			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_00a1: stateMachine*/)._003CwaitGetData_003E__5 = false;
 		});
 		while (waitGetData5)
 		{
@@ -169,8 +170,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		waitGetData5 = true;
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.GetRallyList(delegate(bool rallySuccess)
 		{
-			((_003CGetInvitedList_003Ec__IteratorC8)/*Error near IL_00e1: stateMachine*/)._003CrallySuccess__003E__2 = rallySuccess;
-			((_003CGetInvitedList_003Ec__IteratorC8)/*Error near IL_00e1: stateMachine*/)._003CwaitGetData_003E__5 = false;
+			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_00e1: stateMachine*/)._003CrallySuccess__003E__2 = rallySuccess;
+			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_00e1: stateMachine*/)._003CwaitGetData_003E__5 = false;
 		});
 		while (waitGetData5)
 		{
@@ -179,8 +180,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		waitGetData5 = true;
 		MonoBehaviourSingleton<GuildManager>.I.SendInvitedGuild(delegate(bool guildSuccess)
 		{
-			((_003CGetInvitedList_003Ec__IteratorC8)/*Error near IL_0121: stateMachine*/)._003CguildInviteSuccess__003E__3 = guildSuccess;
-			((_003CGetInvitedList_003Ec__IteratorC8)/*Error near IL_0121: stateMachine*/)._003CwaitGetData_003E__5 = false;
+			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_0121: stateMachine*/)._003CguildInviteSuccess__003E__3 = guildSuccess;
+			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_0121: stateMachine*/)._003CwaitGetData_003E__5 = false;
 		}, false);
 		while (waitGetData5)
 		{
@@ -189,14 +190,14 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		waitGetData5 = true;
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateInvitationList(delegate(bool guildDonateInviteSuccess)
 		{
-			((_003CGetInvitedList_003Ec__IteratorC8)/*Error near IL_0162: stateMachine*/)._003CguildDonateInviteSuccess__003E__4 = guildDonateInviteSuccess;
-			((_003CGetInvitedList_003Ec__IteratorC8)/*Error near IL_0162: stateMachine*/)._003CwaitGetData_003E__5 = false;
+			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_0162: stateMachine*/)._003CguildDonateInviteSuccess__003E__4 = guildDonateInviteSuccess;
+			((_003CGetInvitedList_003Ec__IteratorCF)/*Error near IL_0162: stateMachine*/)._003CwaitGetData_003E__5 = false;
 		}, false);
 		while (waitGetData5)
 		{
 			yield return (object)null;
 		}
-		onFinish();
+		onFinish.Invoke();
 		cb?.Invoke(partySuccess_ && loungeSuccess_ && rallySuccess_ && guildInviteSuccess_ && guildDonateInviteSuccess_);
 	}
 
@@ -210,9 +211,9 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		}
 		if (!PartyManager.IsValidNotEmptyList() && !LoungeMatchingManager.IsValidNotEmptyList() && !LoungeMatchingManager.IsValidNotEmptyRallyList() && !GuildManager.IsValidNotEmptyInviteList() && !GuildManager.IsValidNotEmptyDonateInviteList())
 		{
-			SetActive(UI.GRD_QUEST, false);
-			SetActive(UI.TBL_QUEST, false);
-			SetActive(UI.STR_NON_LIST, true);
+			SetActive((Enum)UI.GRD_QUEST, false);
+			SetActive((Enum)UI.TBL_QUEST, false);
+			SetActive((Enum)UI.STR_NON_LIST, true);
 		}
 		else
 		{
@@ -221,15 +222,18 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			rallyInvites = MonoBehaviourSingleton<LoungeMatchingManager>.I.rallyInvite.ToArray();
 			guildInvites = MonoBehaviourSingleton<GuildManager>.I.guildInviteList.ToArray();
 			guildDonateInvites = MonoBehaviourSingleton<GuildManager>.I.donateInviteList.ToArray();
-			SetActive(UI.TBL_QUEST, true);
-			SetActive(UI.GRD_QUEST, true);
-			SetActive(UI.STR_NON_LIST, false);
+			SetActive((Enum)UI.TBL_QUEST, true);
+			SetActive((Enum)UI.GRD_QUEST, true);
+			SetActive((Enum)UI.STR_NON_LIST, false);
 			UpdateTable();
 		}
 	}
 
-	protected void UpdateTable()
+	protected unsafe void UpdateTable()
 	{
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00aa: Expected O, but got Unknown
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 		int num = parties.Length;
 		int num2 = lounges.Length;
 		int num3 = rallyInvites.Length;
@@ -241,72 +245,24 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		int guildInviteStartIndex = num + num2 + num3;
 		int guildDonateInviteStartIndex = num + num2 + num3 + num4;
 		Transform ctrl = GetCtrl(UI.TBL_QUEST);
-		if ((UnityEngine.Object)ctrl != (UnityEngine.Object)null)
+		if (ctrl != null)
 		{
-			int j = 0;
-			for (int childCount = ctrl.childCount; j < childCount; j++)
+			int i = 0;
+			for (int childCount = ctrl.get_childCount(); i < childCount; i++)
 			{
-				Transform child = ctrl.GetChild(0);
-				child.parent = null;
-				UnityEngine.Object.Destroy(child.gameObject);
+				Transform val = ctrl.GetChild(0);
+				val.set_parent(null);
+				Object.Destroy(val.get_gameObject());
 			}
 		}
-		SetTable(UI.TBL_QUEST, string.Empty, item_num, true, delegate(int i, Transform parent)
-		{
-			Transform transform = null;
-			if (i < guildDonateInviteStartIndex)
-			{
-				if (i < guildInviteStartIndex)
-				{
-					if (i < rallyStartIndex)
-					{
-						if (i < partyStartIndex)
-						{
-							return Realizes("LoungeSearchListItem", parent, true);
-						}
-						return Realizes("QuestInvitationListItem", parent, true);
-					}
-					return Realizes("LoungeMemberListItem", parent, true);
-				}
-				return Realizes("GuildInvitedListItem", parent, true);
-			}
-			int index5 = i - guildDonateInviteStartIndex;
-			string prefab_name = InitGuildDonateInviteObject(index5);
-			return Realizes(prefab_name, parent, true);
-		}, delegate(int i, Transform t, bool is_recycle)
-		{
-			SetActive(t, true);
-			if (i >= guildDonateInviteStartIndex)
-			{
-				int index = i - guildDonateInviteStartIndex;
-				InitGuildDonateInvite(index, t);
-			}
-			else if (i >= guildInviteStartIndex)
-			{
-				int index2 = i - guildInviteStartIndex;
-				InitGuild(index2, t);
-			}
-			else if (i >= rallyStartIndex)
-			{
-				int index3 = i - rallyStartIndex;
-				InitRally(index3, t);
-			}
-			else if (i >= partyStartIndex)
-			{
-				int index4 = i - partyStartIndex;
-				InitParty(index4, t);
-			}
-			else
-			{
-				InitLounge(i, t);
-			}
-		});
-		UIScrollView component = GetComponent<UIScrollView>(UI.SCR_QUEST);
-		component.enabled = true;
+		_003CUpdateTable_003Ec__AnonStorey3AF _003CUpdateTable_003Ec__AnonStorey3AF;
+		SetTable(UI.TBL_QUEST, string.Empty, item_num, true, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey3AF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey3AF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_QUEST);
+		component.set_enabled(true);
 		RepositionTable();
 	}
 
-	private void InitLounge(int index, Transform t)
+	private unsafe void InitLounge(int index, Transform t)
 	{
 		SetEvent(t, "SELECT_LOUNGE", index);
 		LoungeModel.Lounge lounge = lounges[index];
@@ -326,7 +282,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		SetLabelText(t, UI.LBL_LABEL, text);
 		SetStamp(t, lounge.stampId);
 		int num = lounge.num + 1;
-		int num2 = lounge.slotInfos.Count((LoungeModel.SlotInfo slotInfo) => slotInfo != null && slotInfo.userInfo != null && slotInfo.userInfo.userId != lounge.ownerUserId);
+		_003CInitLounge_003Ec__AnonStorey3B0 _003CInitLounge_003Ec__AnonStorey3B;
+		int num2 = lounge.slotInfos.Count(new Func<LoungeModel.SlotInfo, bool>((object)_003CInitLounge_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		for (int j = 0; j < 7; j++)
 		{
 			bool is_visible = j < num - 1;
@@ -356,9 +313,9 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 				SetToggle(t, UI.OBJ_ORDER_QUEST_INFO_ROOT, false);
 			}
 			SetEvent(t, "SELECT_ROOM", index);
-			Transform transform = FindCtrl(t, uI);
-			SetEnemyIconGradeFrame(transform, UI.SPR_ORDER_RARITY_FRAME, questTableData);
-			SetQuestData(questTableData, transform);
+			Transform val = FindCtrl(t, uI);
+			SetEnemyIconGradeFrame(val, UI.SPR_ORDER_RARITY_FRAME, questTableData);
+			SetQuestData(questTableData, val);
 			SetPartyData(parties[index], t);
 			SetMemberIcon(t, questTableData);
 		}
@@ -366,6 +323,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 
 	private void InitRally(int index, Transform t)
 	{
+		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 		SetEvent(t, "JOIN_MAP", index);
 		LoungeModel.SlotInfo slotInfo = rallyInvites[index];
 		CharaInfo userInfo = slotInfo.userInfo;
@@ -528,7 +487,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			{
 				SetButtonEnabled(t, UI.BTN_GIFT, false);
 			}
-			Transform transform = FindCtrl(t, UI.OBJ_MATERIAL_ICON);
+			Transform val = FindCtrl(t, UI.OBJ_MATERIAL_ICON);
 			Item item = new Item();
 			item.uniqId = "0";
 			item.itemId = info.itemId;
@@ -536,7 +495,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			ItemInfo item2 = ItemInfo.CreateItemInfo(item);
 			ItemSortData itemSortData = new ItemSortData();
 			itemSortData.SetItem(item2);
-			SetItemIcon(transform, itemSortData, transform);
+			SetItemIcon(val, itemSortData, val);
 		}
 	}
 
@@ -655,7 +614,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		}
 	}
 
-	private void JoinField(int fieldMapId)
+	private unsafe void JoinField(int fieldMapId)
 	{
 		if (fieldMapId == MonoBehaviourSingleton<FieldManager>.I.currentMapID)
 		{
@@ -693,27 +652,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			else
 			{
 				GameSection.StayEvent();
-				CoopApp.EnterField(fieldMapData.jumpPortalID, 0u, delegate(bool is_matching, bool is_connect, bool is_regist)
-				{
-					if (!is_connect)
-					{
-						GameSection.ChangeStayEvent("COOP_SERVER_INVALID", null);
-						GameSection.ResumeEvent(true, null);
-						AppMain i = MonoBehaviourSingleton<AppMain>.I;
-						i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-						{
-							DispatchEvent("CLOSE", null);
-						});
-					}
-					else
-					{
-						GameSection.ResumeEvent(is_regist, null);
-						if (is_regist)
-						{
-							MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("InGame", null, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
-						}
-					}
-				});
+				CoopApp.EnterField(fieldMapData.jumpPortalID, 0u, new Action<bool, bool, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}
@@ -734,10 +673,11 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 
 	private void SetStamp(Transform root, int stampId)
 	{
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		StampTable.Data data = Singleton<StampTable>.I.GetData((uint)stampId);
 		if (data != null)
 		{
-			StartCoroutine(LoadStamp(root, stampId));
+			this.StartCoroutine(LoadStamp(root, stampId));
 		}
 	}
 
@@ -749,7 +689,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		{
 			yield return (object)null;
 		}
-		if (lo_stamp.loadedObject != (UnityEngine.Object)null)
+		if (lo_stamp.loadedObject != null)
 		{
 			Texture2D stamp = lo_stamp.loadedObject as Texture2D;
 			SetActive(root, UI.OBJ_SYMBOL, true);
@@ -759,16 +699,19 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 
 	private void RepositionTable()
 	{
-		UITable component = GetComponent<UITable>(UI.TBL_QUEST);
-		if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+		UITable component = base.GetComponent<UITable>((Enum)UI.TBL_QUEST);
+		if (!(component == null))
 		{
 			component.Reposition();
 			List<Transform> childList = component.GetChildList();
 			for (int i = 0; i < childList.Count; i++)
 			{
-				Vector3 localPosition = childList[i].localPosition;
+				Vector3 localPosition = childList[i].get_localPosition();
 				localPosition.x = 0f;
-				childList[i].localPosition = localPosition;
+				childList[i].set_localPosition(localPosition);
 			}
 		}
 	}

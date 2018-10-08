@@ -1303,12 +1303,14 @@ public static class ResourceDefine
 			"assets/ngui/resources/shaders/",
 			"assets/plugins/rhyme/eel/resources/eelshaders/"
 		},
-		new string[4]
+		new string[6]
 		{
 			"assets/app/external/externalresources/shop/image/",
 			"assets/app/external/externalresources/shop/image/bundle/",
 			"assets/app/external/externalresources/shop/image/gem/",
-			"assets/app/external/externalresources/shop/image/materialpack/"
+			"assets/app/external/externalresources/shop/image/materialpack/",
+			"assets/app/external/externalresources/shop/image/fortunewheel/",
+			"assets/app/external/externalresources/shop/image/blackmarket/"
 		},
 		new string[1]
 		{

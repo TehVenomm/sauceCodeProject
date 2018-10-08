@@ -38,11 +38,11 @@ public class WebWidgetListener extends WebViewClient {
     }
 
     public boolean shouldOverrideUrlLoading(WebView webView, String str) {
+        String decode;
         if (str == null || !str.contains(DELIMITER)) {
             Log.d(LOG_TAG, "Not interested in handling URL loading");
         } else {
             try {
-                String decode;
                 try {
                     decode = URLDecoder.decode(str.substring(str.indexOf(DELIMITER) + DELIMITER.length()), ENCODING);
                 } catch (UnsupportedEncodingException e) {

@@ -41,7 +41,7 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 
 		public bool calledLongTouch;
 
-		public bool enable => (Object)hit == (Object)null && id != -1;
+		public bool enable => hit == null && id != -1;
 
 		public void Clear()
 		{
@@ -203,6 +203,8 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 
 	public Vector2 GetStickVector()
 	{
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int num = touchInfos.Length; i < num; i++)
 		{
@@ -212,7 +214,7 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 				return touchInfo.axis;
 			}
 		}
-		return Vector2.zero;
+		return Vector2.get_zero();
 	}
 
 	public TouchInfo GetStickInfo()
@@ -302,9 +304,9 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 
 	private void Start()
 	{
-		if (Screen.dpi > 0f)
+		if (Screen.get_dpi() > 0f)
 		{
-			pxRate = Screen.dpi / 160f;
+			pxRate = Screen.get_dpi() / 160f;
 		}
 		scaledDragThresholdLength = dragThresholdLength * pxRate;
 		scaledStickMaxLength = stickMaxLength * pxRate;
@@ -333,13 +335,35 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 
 	private void Update()
 	{
-		int touchCount = Input.touchCount;
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0210: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0215: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0221: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0232: Unknown result type (might be due to invalid IL or missing references)
+		int touchCount = Input.get_touchCount();
 		if (touchCount > 0 && disableFlags == (INPUT_DISABLE_FACTOR)0)
 		{
 			for (int i = 0; i < touchCount; i++)
 			{
 				Touch touch = Input.GetTouch(i);
-				Touch(touch.fingerId, touch.phase, touch.position);
+				Touch(touch.get_fingerId(), touch.get_phase(), touch.get_position());
 			}
 		}
 		else
@@ -387,10 +411,12 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 				if (touchInfo.moveLength > 0f || touchInfo2.moveLength > 0f)
 				{
 					bool flag = false;
-					if (OnPinch != null && (touchInfo.moveLengthTotal > scaledDragThresholdLength || touchInfo2.moveLengthTotal > scaledDragThresholdLength) && (touchInfo.move == Vector2.zero || touchInfo2.move == Vector2.zero || Vector2.Angle(touchInfo.move.normalized, touchInfo2.move.normalized) > 90f))
+					if (OnPinch != null && (touchInfo.moveLengthTotal > scaledDragThresholdLength || touchInfo2.moveLengthTotal > scaledDragThresholdLength) && (touchInfo.move == Vector2.get_zero() || touchInfo2.move == Vector2.get_zero() || Vector2.Angle(touchInfo.move.get_normalized(), touchInfo2.move.get_normalized()) > 90f))
 					{
-						float magnitude = (touchInfo.position - touchInfo.move - (touchInfo2.position - touchInfo2.move)).magnitude;
-						float magnitude2 = (touchInfo.position - touchInfo2.position).magnitude;
+						Vector2 val = touchInfo.position - touchInfo.move - (touchInfo2.position - touchInfo2.move);
+						float magnitude = val.get_magnitude();
+						Vector2 val2 = touchInfo.position - touchInfo2.position;
+						float magnitude2 = val2.get_magnitude();
 						float num3 = magnitude2 - magnitude;
 						if (Mathf.Abs(num3) > scaledDragThresholdLength)
 						{
@@ -412,9 +438,73 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 
 	private void Touch(int id, TouchPhase phase, Vector2 pos)
 	{
-		switch (phase)
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0005: Expected I4, but got Unknown
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0205: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0236: Unknown result type (might be due to invalid IL or missing references)
+		//IL_023c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0241: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0246: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0275: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0276: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0290: Unknown result type (might be due to invalid IL or missing references)
+		//IL_029d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_036a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_036b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0378: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03d5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_041c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0421: Unknown result type (might be due to invalid IL or missing references)
+		//IL_045c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0476: Unknown result type (might be due to invalid IL or missing references)
+		//IL_047b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0480: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0485: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04de: Unknown result type (might be due to invalid IL or missing references)
+		switch ((int)phase)
 		{
-		case TouchPhase.Began:
+		case 0:
 			if (GetInfo(id) == null)
 			{
 				TouchInfo info2 = GetInfo(-1);
@@ -422,7 +512,7 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 				{
 					info2.id = id;
 					info2.unique = ++unique;
-					info2.hit = GetHitTransform(pos);
+					info2.hit = GetHitTransform(Vector2.op_Implicit(pos));
 					info2.touchCount = GetActiveInfoCount();
 					info2.position = pos;
 					info2.beginPosition = pos;
@@ -434,14 +524,14 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 					{
 						info2.prevPositions.Clear();
 					}
-					info2.move = Vector2.zero;
+					info2.move = Vector2.get_zero();
 					info2.moveLength = 0f;
 					info2.moveLengthTotal = 0f;
-					info2.beginTime = Time.time;
+					info2.beginTime = Time.get_time();
 					info2.endTime = 0f;
 					info2.activeAxis = false;
-					info2.axis = Vector2.zero;
-					info2.axisNoLimit = Vector2.zero;
+					info2.axis = Vector2.get_zero();
+					info2.axisNoLimit = Vector2.get_zero();
 					info2.calledTap = false;
 					info2.calledFlick = false;
 					info2.calledLongTouch = false;
@@ -460,8 +550,8 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 				}
 			}
 			break;
-		case TouchPhase.Moved:
-		case TouchPhase.Stationary:
+		case 1:
+		case 2:
 		{
 			TouchInfo info3 = GetInfo(id);
 			if (info3 != null)
@@ -470,12 +560,12 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 				if (pos != info3.position)
 				{
 					info3.move = pos - info3.position;
-					info3.moveLength = info3.move.magnitude;
+					info3.moveLength = info3.move.get_magnitude();
 					info3.moveLengthTotal += info3.moveLength;
 				}
 				else
 				{
-					info3.move = Vector3.zero;
+					info3.move = Vector2.op_Implicit(Vector3.get_zero());
 					info3.moveLength = 0f;
 				}
 				info3.position = pos;
@@ -484,20 +574,22 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 				{
 					info3.prevPositions.RemoveRange(3, info3.prevPositions.Count - 3);
 				}
-				Vector2 vector3 = info3.position - info3.beginPosition;
-				float magnitude2 = vector3.magnitude;
+				Vector2 val3 = info3.position - info3.beginPosition;
+				float magnitude2 = val3.get_magnitude();
 				if (!info3.activeAxis && magnitude2 >= scaledStickThresholdLength)
 				{
 					info3.activeAxis = true;
 				}
-				vector3.Normalize();
-				info3.axis = vector3;
-				info3.axisNoLimit = vector3;
+				val3.Normalize();
+				info3.axis = val3;
+				info3.axisNoLimit = val3;
 				if (magnitude2 < scaledStickMaxLength)
 				{
-					info3.axis *= magnitude2 / scaledStickMaxLength;
+					TouchInfo touchInfo = info3;
+					touchInfo.axis *= magnitude2 / scaledStickMaxLength;
 				}
-				info3.axisNoLimit *= magnitude2 / scaledStickMaxLength;
+				TouchInfo touchInfo2 = info3;
+				touchInfo2.axisNoLimit *= magnitude2 / scaledStickMaxLength;
 				if (info3.activeAxis)
 				{
 					if (info3.enable && OnStick != null)
@@ -505,7 +597,7 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 						OnStick(info3.axis);
 					}
 				}
-				else if (longTouchTime > 0f && !info3.calledLongTouch && Time.time - info3.beginTime >= longTouchTime && info3.enable && OnLongTouch != null)
+				else if (longTouchTime > 0f && !info3.calledLongTouch && Time.get_time() - info3.beginTime >= longTouchTime && info3.enable && OnLongTouch != null)
 				{
 					OnLongTouch(info3);
 					info3.calledLongTouch = true;
@@ -513,8 +605,8 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 			}
 			break;
 		}
-		case TouchPhase.Ended:
-		case TouchPhase.Canceled:
+		case 3:
+		case 4:
 		{
 			TouchInfo info = GetInfo(id);
 			if (info != null)
@@ -525,26 +617,26 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 				{
 					info.prevPositions.RemoveRange(3, info.prevPositions.Count - 3);
 				}
-				info.endTime = Time.time;
+				info.endTime = Time.get_time();
 				float num = info.endTime - info.beginTime;
 				if (num <= flickLimitTime)
 				{
-					Vector3 vector = pos - info.beginPosition;
-					float magnitude = vector.magnitude;
+					Vector3 val = Vector2.op_Implicit(pos - info.beginPosition);
+					float magnitude = val.get_magnitude();
 					if (magnitude >= scaledFlickThresholdLength && info.enable && OnFlick != null)
 					{
-						OnFlick(vector.normalized);
+						OnFlick(Vector2.op_Implicit(val.get_normalized()));
 						info.calledFlick = true;
 					}
 				}
 				else
 				{
 					int index = (info.prevPositions.Count > 1) ? 1 : 0;
-					Vector3 vector2 = info.prevPositions[index] - info.prevPositions[info.prevPositions.Count - 1];
-					float num2 = (!(Time.deltaTime > 0f)) ? 0f : (vector2.magnitude / Time.deltaTime);
+					Vector3 val2 = Vector2.op_Implicit(info.prevPositions[index] - info.prevPositions[info.prevPositions.Count - 1]);
+					float num2 = (!(Time.get_deltaTime() > 0f)) ? 0f : (val2.get_magnitude() / Time.get_deltaTime());
 					if (num2 >= scaledFlickThresholdSpeed && info.enable && OnFlick != null)
 					{
-						OnFlick(vector2.normalized);
+						OnFlick(Vector2.op_Implicit(val2.get_normalized()));
 						info.calledFlick = true;
 					}
 				}
@@ -553,7 +645,7 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 					OnTap(info);
 					info.calledTap = true;
 				}
-				if (Time.time - info.beginTime <= doubleTapSingleTime && !info.calledFlick)
+				if (Time.get_time() - info.beginTime <= doubleTapSingleTime && !info.calledFlick)
 				{
 					if (doubleTapCount == 0)
 					{
@@ -562,7 +654,7 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 					}
 					else if (doubleTapCount == 1)
 					{
-						if (Time.time - doubleTapBeginTime <= doubleTapEnableTime)
+						if (Time.get_time() - doubleTapBeginTime <= doubleTapEnableTime)
 						{
 							if (info.enable && OnDoubleTap != null)
 							{
@@ -618,6 +710,7 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 
 	public void Untouch()
 	{
+		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		if (touchInfos != null && !_untouch)
 		{
 			_untouch = true;
@@ -627,7 +720,7 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 				TouchInfo touchInfo = touchInfos[i];
 				if (touchInfo.id != -1)
 				{
-					Touch(touchInfo.id, TouchPhase.Ended, touchInfo.position);
+					Touch(touchInfo.id, 3, touchInfo.position);
 				}
 				touchInfo.Clear();
 			}
@@ -648,10 +741,16 @@ public class InputManager : MonoBehaviourSingleton<InputManager>
 
 	private Transform GetHitTransform(Vector3 pos)
 	{
-		if (!Physics.Raycast(MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenPointToRay(pos), out RaycastHit hitInfo, 32f))
+		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Expected O, but got Unknown
+		RaycastHit val = default(RaycastHit);
+		if (!Physics.Raycast(MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenPointToRay(pos), ref val, 32f))
 		{
 			return null;
 		}
-		return hitInfo.collider.transform;
+		return val.get_collider().get_transform();
 	}
 }

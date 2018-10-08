@@ -93,7 +93,7 @@ public class PlayingAudioList
 			int num = 0;
 			while (num < m_AudioLists.Count && needCullingNum >= 1)
 			{
-				if ((Object)m_AudioLists[num] != (Object)null)
+				if (m_AudioLists[num] != null)
 				{
 					m_AudioLists[num].Stop(0);
 				}
@@ -109,7 +109,7 @@ public class PlayingAudioList
 			int num = 0;
 			while (num < m_AudioLists.Count)
 			{
-				if ((Object)m_AudioLists[num] != (Object)null)
+				if (m_AudioLists[num] != null)
 				{
 					m_AudioLists[num].Stop(fadeout_framecount);
 				}
@@ -150,8 +150,8 @@ public class PlayingAudioList
 		}
 		int index = m_AudioLists.Count - 1;
 		AudioObject audioObject = m_AudioLists[index];
-		float time = Time.time;
-		if ((Object)audioObject != (Object)null && time - audioObject.timeAtPlay < IntervalTime)
+		float time = Time.get_time();
+		if (audioObject != null && time - audioObject.timeAtPlay < IntervalTime)
 		{
 			return false;
 		}

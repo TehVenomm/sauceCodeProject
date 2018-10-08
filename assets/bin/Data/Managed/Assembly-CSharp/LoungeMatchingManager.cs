@@ -161,9 +161,11 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 
 	protected override void Awake()
 	{
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		base.gameObject.AddComponent<LoungeWebSocket>();
-		base.gameObject.AddComponent<LoungeNetworkManager>();
+		this.get_gameObject().AddComponent<LoungeWebSocket>();
+		this.get_gameObject().AddComponent<LoungeNetworkManager>();
 	}
 
 	private void OnApplicationPause(bool pause)
@@ -252,13 +254,11 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		}
 	}
 
-	private void SetLoungeMemberesStatus()
+	private unsafe void SetLoungeMemberesStatus()
 	{
 		if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
 		{
-			List<Party_Model_RegisterACK.UserInfo> data = (from x in MonoBehaviourSingleton<LoungeNetworkManager>.I.registerAck.GetConvertUserInfo()
-			where GetSlotInfoByUserId(x.userId) != null
-			select x).ToList();
+			List<Party_Model_RegisterACK.UserInfo> data = MonoBehaviourSingleton<LoungeNetworkManager>.I.registerAck.GetConvertUserInfo().Where(new Func<Party_Model_RegisterACK.UserInfo, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList();
 			loungeMemberStatus = new LoungeMemberesStatus(data);
 		}
 	}
@@ -443,17 +443,17 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		}
 		Protocol.Send(LoungeSearchModel.URL, requestSendForm, delegate(LoungeSearchModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			Error error = ret.Error;
 			if (error == Error.None || error == Error.WRN_PARTY_SEARCH_NOT_FOUND_QUEST)
 			{
 				if (ret.Error == Error.None)
 				{
-					arg = true;
+					flag = true;
 				}
 				UpdateLoungeList(ret.result.lounges);
 			}
-			call_back(arg, ret.Error);
+			call_back.Invoke(flag, ret.Error);
 		}, string.Empty);
 	}
 
@@ -469,10 +469,10 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		SaveSearchSettings();
 		Protocol.Send(LoungeModel.RequestSearchRandomMatching.path, requestSearchRandomMatching, delegate(LoungeModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			if (ret.Error == Error.None && ret.result.lounge != null)
 			{
-				arg = true;
+				flag = true;
 				UpdateLounge(ret.result.lounge, ret.result.friend, ret.result.loungeServer, ret.result.inviteFriendInfo, ret.result.firstMetUserIds);
 				if (ret.result.randomMatchingInfo != null)
 				{
@@ -482,7 +482,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			}
 			if (call_back != null)
 			{
-				call_back(arg, ret.Error);
+				call_back.Invoke(flag, ret.Error);
 			}
 		}, string.Empty);
 	}
@@ -573,16 +573,16 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		}
 		Protocol.Send(LoungeModel.RequestCreate.path, requestCreate, delegate(LoungeModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			switch (ret.Error)
 			{
 			case Error.None:
-				arg = true;
+				flag = true;
 				UpdateLounge(ret.result.lounge, null, ret.result.loungeServer, ret.result.inviteFriendInfo, ret.result.firstMetUserIds);
 				Dirty();
 				break;
 			}
-			call_back(arg, ret.Error);
+			call_back.Invoke(flag, ret.Error);
 		}, string.Empty);
 	}
 
@@ -594,16 +594,16 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		requestApply.loungeNumber = loungeNumber;
 		Protocol.Send(LoungeModel.RequestApply.path, requestApply, delegate(LoungeModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				arg = true;
+				flag = true;
 				UpdateLounge(ret.result.lounge, ret.result.friend, ret.result.loungeServer, ret.result.inviteFriendInfo, ret.result.firstMetUserIds);
 				Dirty();
 			}
 			if (call_back != null)
 			{
-				call_back(arg, ret.Error);
+				call_back.Invoke(flag, ret.Error);
 			}
 		}, string.Empty);
 	}
@@ -627,14 +627,14 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		}, string.Empty);
 	}
 
-	public void SendInfo(Action<bool> call_back, bool force = false)
+	public unsafe void SendInfo(Action<bool> call_back, bool force = false)
 	{
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0026: Expected O, but got Unknown
 		if (force)
 		{
-			Protocol.Force(delegate
-			{
-				DoSendInfo(call_back);
-			});
+			_003CSendInfo_003Ec__AnonStorey640 _003CSendInfo_003Ec__AnonStorey;
+			Protocol.Force(new Action((object)_003CSendInfo_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		else
 		{
@@ -686,11 +686,12 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			}
 			Protocol.Send(LoungeLeaveModel.URL, requestSendForm, delegate(LoungeLeaveModel ret)
 			{
+				//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 				bool obj = false;
 				Error error = ret.Error;
 				if (error == Error.None || error == Error.ERR_PARTY_NOT_FOUND_PARTY)
 				{
-					StartCoroutine(DoLeave(call_back, ret));
+					this.StartCoroutine(DoLeave(call_back, ret));
 				}
 				else
 				{
@@ -722,7 +723,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		}
 	}
 
-	private IEnumerator DoLeave(Action<bool> call_back, LoungeLeaveModel ret)
+	private unsafe IEnumerator DoLeave(Action<bool> call_back, LoungeLeaveModel ret)
 	{
 		bool is_success = false;
 		Error error = ret.Error;
@@ -745,7 +746,13 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 				token = GenerateToken(),
 				cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
 			};
-			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(packet, false, (Coop_Model_ACK ack) => true, null);
+			LoungeNetworkManager i = MonoBehaviourSingleton<LoungeNetworkManager>.I;
+			Lounge_Model_RoomLeaved model = packet;
+			if (_003CDoLeave_003Ec__Iterator248._003C_003Ef__am_0024cacheA == null)
+			{
+				_003CDoLeave_003Ec__Iterator248._003C_003Ef__am_0024cacheA = new Func<Coop_Model_ACK, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			i.SendBroadcast(model, false, _003CDoLeave_003Ec__Iterator248._003C_003Ef__am_0024cacheA, null);
 			MonoBehaviourSingleton<ChatManager>.I.DestroyLoungeChat();
 			StopAFKCheck();
 			ClearLounge();
@@ -775,7 +782,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	{
 		if (loungeData == null)
 		{
-			call_back(false, null);
+			call_back.Invoke(false, (LoungeInviteCharaInfo[])null);
 		}
 		else
 		{
@@ -783,14 +790,14 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			requestSendForm.id = loungeData.id;
 			Protocol.Send(LoungeInviteListModel.URL, requestSendForm, delegate(LoungeInviteListModel ret)
 			{
-				bool arg = false;
-				LoungeInviteCharaInfo[] arg2 = null;
+				bool flag = false;
+				LoungeInviteCharaInfo[] array = null;
 				if (ret.Error == Error.None)
 				{
-					arg = true;
-					arg2 = ret.result.ToArray();
+					flag = true;
+					array = ret.result.ToArray();
 				}
-				call_back(arg, arg2);
+				call_back.Invoke(flag, array);
 			}, string.Empty);
 		}
 	}
@@ -799,7 +806,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	{
 		if (loungeData == null)
 		{
-			call_back(false, null);
+			call_back.Invoke(false, (int[])null);
 		}
 		else
 		{
@@ -811,15 +818,15 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			}
 			Protocol.Send(LoungeInviteModel.URL, requestSendForm, delegate(LoungeInviteModel ret)
 			{
-				bool arg = false;
+				bool flag = false;
 				if (ret.Error == Error.None)
 				{
-					arg = true;
-					call_back(arg, ret.result.ToArray());
+					flag = true;
+					call_back.Invoke(flag, ret.result.ToArray());
 				}
 				else
 				{
-					call_back(arg, null);
+					call_back.Invoke(flag, (int[])null);
 				}
 			}, string.Empty);
 		}
@@ -849,7 +856,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			Protocol.Send(LoungeRoomPartyModel.URL, requestSendForm, delegate(LoungeRoomPartyModel ret)
 			{
 				UpdateParties(ret.result.parties);
-				call_back(ret.Error == Error.None, ret.result.parties);
+				call_back.Invoke(ret.Error == Error.None, ret.result.parties);
 			}, string.Empty);
 		}
 	}
@@ -932,7 +939,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	{
 		Protocol.Send(LoungeSearchFollowerRoomModel.URL, delegate(LoungeSearchFollowerRoomModel ret)
 		{
-			call_back(ret.Error == Error.None, ret.result.lounges, ret.result.firstMetUserIds);
+			call_back.Invoke(ret.Error == Error.None, ret.result.lounges, ret.result.firstMetUserIds);
 		}, string.Empty);
 	}
 
@@ -1064,7 +1071,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		return connectData;
 	}
 
-	public void ConnectServer()
+	public unsafe void ConnectServer()
 	{
 		LoungeNetworkManager.ConnectData webSockConnectData = GetWebSockConnectData();
 		if (webSockConnectData == null)
@@ -1077,10 +1084,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		}
 		else
 		{
-			MonoBehaviourSingleton<LoungeNetworkManager>.I.ConnectAndRegist(webSockConnectData, delegate(bool is_connect, bool is_regist)
-			{
-				TryConnect(is_connect, is_regist);
-			});
+			MonoBehaviourSingleton<LoungeNetworkManager>.I.ConnectAndRegist(webSockConnectData, new Action<bool, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -1091,8 +1095,8 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		PlayerPrefs.SetInt("LOUNGE_CREATE_LEVEL_MAX_KEY", createRequest.maxLevel);
 		PlayerPrefs.SetInt("LOUNGE_CREATE_CAPACITY_KEY", createRequest.capacity);
 		PlayerPrefs.SetInt("LOUNGE_CREATE_LABEL_KEY", (int)createRequest.label);
-		int value = createRequest.isLock ? 1 : 0;
-		PlayerPrefs.SetInt("LOUNGE_CREATE_LOCK_KEY", value);
+		int num = createRequest.isLock ? 1 : 0;
+		PlayerPrefs.SetInt("LOUNGE_CREATE_LOCK_KEY", num);
 		PlayerPrefs.SetString("LOUNGE_CREATE_NAME_KEY", createRequest.loungeName);
 		PlayerPrefs.Save();
 	}
@@ -1185,47 +1189,60 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 
 	private void AFKCheck()
 	{
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0024: Expected O, but got Unknown
 		if (afkCoroutine != null)
 		{
-			StopCoroutine(afkCoroutine);
+			this.StopCoroutine(afkCoroutine);
 		}
-		afkCoroutine = StartCoroutine(DoAFKCheck());
+		afkCoroutine = this.StartCoroutine(DoAFKCheck());
 	}
 
-	private IEnumerator DoAFKCheck()
+	private unsafe IEnumerator DoAFKCheck()
 	{
 		if (IsValidInLounge() && loungeMemberStatus != null)
 		{
 			List<LoungeMemberStatus> allMember = loungeMemberStatus.GetAll();
-			if (!allMember.IsNullOrEmpty() && (from x in allMember
-			where x.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
-			select x).Any())
+			if (!allMember.IsNullOrEmpty())
 			{
-				LoungeMemberStatus fastest = (from x in allMember
-				where x.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
-				where x.GetStatus() == LoungeMemberStatus.MEMBER_STATUS.LOUNGE
-				orderby x.lastExecTime
-				select x).FirstOrDefault();
-				if (fastest != null)
+				List<LoungeMemberStatus> source = allMember;
+				if (_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache7 == null)
 				{
-					double waitTime = (AFK_KICK_TIME - (TimeManager.GetNow().ToUniversalTime() - fastest.lastExecTime)).TotalSeconds;
-					if (waitTime > 0.0)
+					_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache7 = new Func<LoungeMemberStatus, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				if (source.Where(_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache7).Any())
+				{
+					List<LoungeMemberStatus> source2 = allMember;
+					if (_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache8 == null)
 					{
-						yield return (object)new WaitForSeconds((float)waitTime);
+						_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache8 = new Func<LoungeMemberStatus, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 					}
-					bool wait = true;
-					Protocol.Force(delegate
+					IEnumerable<LoungeMemberStatus> source3 = source2.Where(_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache8);
+					if (_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache9 == null)
 					{
-						((_003CDoAFKCheck_003Ec__Iterator242)/*Error near IL_01a6: stateMachine*/)._003C_003Ef__this.SendRoomPartyAFKKick(((_003CDoAFKCheck_003Ec__Iterator242)/*Error near IL_01a6: stateMachine*/)._003Cfastest_003E__1.userId, delegate
+						_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache9 = new Func<LoungeMemberStatus, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					}
+					IEnumerable<LoungeMemberStatus> source4 = source3.Where(_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cache9);
+					if (_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cacheA == null)
+					{
+						_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cacheA = new Func<LoungeMemberStatus, DateTime>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					}
+					LoungeMemberStatus fastest = source4.OrderBy<LoungeMemberStatus, DateTime>(_003CDoAFKCheck_003Ec__Iterator249._003C_003Ef__am_0024cacheA).FirstOrDefault();
+					if (fastest != null)
+					{
+						double waitTime = (AFK_KICK_TIME - (TimeManager.GetNow().ToUniversalTime() - fastest.lastExecTime)).TotalSeconds;
+						if (waitTime > 0.0)
 						{
-							((_003CDoAFKCheck_003Ec__Iterator242)/*Error near IL_01a6: stateMachine*/)._003Cwait_003E__3 = false;
-						});
-					});
-					while (wait)
-					{
-						yield return (object)null;
+							yield return (object)new WaitForSeconds((float)waitTime);
+						}
+						bool wait = true;
+						Protocol.Force(new Action((object)/*Error near IL_01a6: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+						while (wait)
+						{
+							yield return (object)null;
+						}
+						AFKCheck();
 					}
-					AFKCheck();
 				}
 			}
 		}
@@ -1235,7 +1252,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	{
 		if (afkCoroutine != null)
 		{
-			StopCoroutine(afkCoroutine);
+			this.StopCoroutine(afkCoroutine);
 		}
 	}
 

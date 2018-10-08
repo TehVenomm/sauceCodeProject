@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -75,7 +76,7 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 	private void UpdateTopBar()
 	{
 		int num = QuestUtility.ToSecByMilliSec(arenaData.timeLimit);
-		SetLabelText(UI.LBL_LIMIT_TIME, $"{num / 60}:{num % 60:D2}");
+		SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num / 60}:{num % 60:D2}");
 		string empty = string.Empty;
 		if (deliveryData != null)
 		{
@@ -87,20 +88,18 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 			string str2 = StringTable.Format(STRING_CATEGORY.ARENA, 1u, arenaData.rank);
 			empty = str + "\u3000" + str2;
 		}
-		SetLabelText(UI.LBL_ARENA_NAME, empty);
+		SetLabelText((Enum)UI.LBL_ARENA_NAME, empty);
 		UITexture component = GetCtrl(UI.TEX_ICON).GetComponent<UITexture>();
 		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.ARENA_RANK_ICON, ResourceName.GetArenaRankIconName(arenaData.rank));
 	}
 
-	private void UpdateEnemyList()
+	private unsafe void UpdateEnemyList()
 	{
 		if (arenaData != null)
 		{
 			List<QuestTable.QuestTableData> questDataArray = arenaData.GetQuestDataArray();
-			SetTable(UI.TBL_LIST, "QuestArenaRoomEnemyListItem", questDataArray.Count, false, delegate(int i, Transform t, bool b)
-			{
-				InitEnemyItem(i, t, b, questDataArray[i]);
-			});
+			_003CUpdateEnemyList_003Ec__AnonStorey416 _003CUpdateEnemyList_003Ec__AnonStorey;
+			SetTable(UI.TBL_LIST, "QuestArenaRoomEnemyListItem", questDataArray.Count, false, new Action<int, Transform, bool>((object)_003CUpdateEnemyList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -122,19 +121,19 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 
 	private void UpdateLimitText()
 	{
-		SetLabelText(UI.LBL_LIMIT, QuestUtility.GetLimitText(arenaData));
+		SetLabelText((Enum)UI.LBL_LIMIT, QuestUtility.GetLimitText(arenaData));
 	}
 
 	private void UpdateConditionText()
 	{
-		SetLabelText(UI.LBL_CONDITION, QuestUtility.GetConditionText(arenaData));
+		SetLabelText((Enum)UI.LBL_CONDITION, QuestUtility.GetConditionText(arenaData));
 	}
 
 	private void UpdateStartButton()
 	{
 		bool flag = QuestUtility.JudgeLimit(arenaData, userInfo.equipSet);
-		SetActive(UI.BTN_START, flag);
-		SetActive(UI.BTN_NG, !flag);
+		SetActive((Enum)UI.BTN_START, flag);
+		SetActive((Enum)UI.BTN_NG, !flag);
 	}
 
 	protected void OnQuery_START()
@@ -142,17 +141,18 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 		StartQuest();
 	}
 
-	private void StartQuest()
+	private unsafe void StartQuest()
 	{
 		GameSection.StayEvent();
-		CoopApp.EnterArenaQuestOffline(delegate(bool isMatching, bool isConnect, bool isRegist, bool isStart)
+		if (_003C_003Ef__am_0024cache2 == null)
 		{
-			GameSection.ResumeEvent(isStart, null);
-		});
+			_003C_003Ef__am_0024cache2 = new Action<bool, bool, bool, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		CoopApp.EnterArenaQuestOffline(_003C_003Ef__am_0024cache2);
 	}
 
 	private void SetDifficultySprite()
 	{
-		SetActive(UI.SPR_TYPE_DIFFICULTY, (deliveryData != null && deliveryData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
+		SetActive((Enum)UI.SPR_TYPE_DIFFICULTY, (deliveryData != null && deliveryData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
 	}
 }

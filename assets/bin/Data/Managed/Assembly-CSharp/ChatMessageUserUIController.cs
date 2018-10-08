@@ -65,7 +65,7 @@ public class ChatMessageUserUIController
 
 	public IEnumerator LoadInternalResources(MonoBehaviour _coroutineExecutor)
 	{
-		if (!((UnityEngine.Object)m_userItemPrefab != (UnityEngine.Object)null))
+		if (!(m_userItemPrefab != null))
 		{
 			LoadingQueue load_queue = new LoadingQueue(_coroutineExecutor);
 			LoadObject loadObject_ListItem = load_queue.Load(RESOURCE_CATEGORY.UI, "FollowListBaseItem", false);
@@ -77,25 +77,17 @@ public class ChatMessageUserUIController
 		}
 	}
 
-	public IEnumerator SendRequestMessagingPersonList(MonoBehaviour _coroutineExecutor)
+	public unsafe IEnumerator SendRequestMessagingPersonList(MonoBehaviour _coroutineExecutor)
 	{
 		if (MonoBehaviourSingleton<FriendManager>.IsValid())
 		{
-			if ((UnityEngine.Object)m_userItemPrefab == (UnityEngine.Object)null)
+			if (m_userItemPrefab == null)
 			{
 				yield return (object)LoadInternalResources(_coroutineExecutor);
 			}
 			SetStartConnecting();
 			bool isCalledByOther = true;
-			MonoBehaviourSingleton<FriendManager>.I.SendGetUserListMessagedOnce(isCalledByOther, delegate(bool is_success, FriendMessagedMutualFollowerListModel.Param recv_data)
-			{
-				if (is_success)
-				{
-					((_003CSendRequestMessagingPersonList_003Ec__Iterator1F)/*Error near IL_008a: stateMachine*/)._003C_003Ef__this.m_apiResponce = recv_data.messageFollowList;
-					((_003CSendRequestMessagingPersonList_003Ec__Iterator1F)/*Error near IL_008a: stateMachine*/)._003C_003Ef__this.GenerateMessageUserList(recv_data.messageFollowList);
-				}
-				((_003CSendRequestMessagingPersonList_003Ec__Iterator1F)/*Error near IL_008a: stateMachine*/)._003C_003Ef__this.SetEndConnecting();
-			});
+			MonoBehaviourSingleton<FriendManager>.I.SendGetUserListMessagedOnce(isCalledByOther, new Action<bool, FriendMessagedMutualFollowerListModel.Param>((object)/*Error near IL_008a: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			while (IsConnecting)
 			{
 				yield return (object)null;
@@ -111,18 +103,27 @@ public class ChatMessageUserUIController
 	{
 	}
 
-	protected void GenerateMessageUserList(List<FriendMessageUserListModel.MessageUserInfo> recv_data)
+	protected unsafe void GenerateMessageUserList(List<FriendMessageUserListModel.MessageUserInfo> recv_data)
 	{
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014c: Expected O, but got Unknown
 		SetRootAlpha(0f);
 		RecycleItem();
 		int len = (recv_data != null) ? recv_data.Count : 0;
 		m_currentItemList = GetItemObjects(len, m_itemListParent);
 		int loadCompleteCount = 0;
+		_003CGenerateMessageUserList_003Ec__AnonStorey2CA _003CGenerateMessageUserList_003Ec__AnonStorey2CA;
 		for (int i = 0; i < len; i++)
 		{
 			HomeMutualFollowerListItem homeMutualFollowerListItem = m_currentItemList[i];
-			homeMutualFollowerListItem.transform.localPosition = Vector3.down * ((float)i * 130f);
-			homeMutualFollowerListItem.transform.localScale = Vector3.one * 0.98f;
+			homeMutualFollowerListItem.get_transform().set_localPosition(Vector3.get_down() * ((float)i * 130f));
+			homeMutualFollowerListItem.get_transform().set_localScale(Vector3.get_one() * 0.98f);
 			HomeMutualFollowerListItem.InitParam initParam = new HomeMutualFollowerListItem.InitParam();
 			initParam.CharacterInfo = recv_data[i];
 			initParam.Index = i;
@@ -132,15 +133,7 @@ public class ChatMessageUserUIController
 			initParam.IsPermittedMessage = recv_data[i].isPermitted;
 			initParam.IsUseRenderTextureCharaModel = (!FieldManager.IsValidInField() && !FieldManager.IsValidInGame() && !FieldManager.IsValidInTutorial());
 			initParam.OnClickItem = OnClickItem;
-			initParam.OnCompleteLoading = delegate
-			{
-				loadCompleteCount++;
-				int num = Mathf.Min(len, m_visibleItemCount);
-				if (loadCompleteCount >= num)
-				{
-					SetRootAlpha(1f);
-				}
-			};
+			initParam.OnCompleteLoading = new Action((object)_003CGenerateMessageUserList_003Ec__AnonStorey2CA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			homeMutualFollowerListItem.Initialize(initParam);
 		}
 	}
@@ -159,7 +152,7 @@ public class ChatMessageUserUIController
 	private List<HomeMutualFollowerListItem> GetItemObjects(int _requestCount, Transform _parentObj)
 	{
 		List<HomeMutualFollowerListItem> list = new List<HomeMutualFollowerListItem>();
-		if ((UnityEngine.Object)_parentObj == (UnityEngine.Object)null)
+		if (_parentObj == null)
 		{
 			return list;
 		}
@@ -175,18 +168,18 @@ public class ChatMessageUserUIController
 		{
 			list.Add(m_itemPool.Dequeue());
 		}
-		if ((UnityEngine.Object)m_userItemPrefab == (UnityEngine.Object)null)
+		if (m_userItemPrefab == null)
 		{
 			return list;
 		}
 		int num = _requestCount - list.Count;
 		for (int j = 0; j < num; j++)
 		{
-			Transform transform = ResourceUtility.Realizes(m_userItemPrefab, _parentObj, 5);
-			if (!((UnityEngine.Object)transform == (UnityEngine.Object)null))
+			Transform val = ResourceUtility.Realizes(m_userItemPrefab, _parentObj, 5);
+			if (!(val == null))
 			{
-				HomeMutualFollowerListItem component = transform.GetComponent<HomeMutualFollowerListItem>();
-				if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
+				HomeMutualFollowerListItem component = val.GetComponent<HomeMutualFollowerListItem>();
+				if (!(component == null))
 				{
 					list.Add(component);
 				}
@@ -215,7 +208,7 @@ public class ChatMessageUserUIController
 					{
 						if (m_OnClickItem != null)
 						{
-							m_OnClickItem();
+							m_OnClickItem.Invoke();
 						}
 					});
 				}
@@ -225,7 +218,7 @@ public class ChatMessageUserUIController
 
 	private void SetRootAlpha(float _value)
 	{
-		if (!((UnityEngine.Object)m_rootWidget == (UnityEngine.Object)null))
+		if (!(m_rootWidget == null))
 		{
 			float alpha = Mathf.Clamp01(_value);
 			m_rootWidget.alpha = alpha;
@@ -234,11 +227,12 @@ public class ChatMessageUserUIController
 
 	public void ClearList()
 	{
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int count = m_currentItemList.Count; i < count; i++)
 		{
 			m_currentItemList[i].CleanRenderTexture();
-			UnityEngine.Object.Destroy(m_currentItemList[i].gameObject);
+			Object.Destroy(m_currentItemList[i].get_gameObject());
 			m_currentItemList[i] = null;
 		}
 		m_currentItemList.Clear();

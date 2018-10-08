@@ -1,4 +1,5 @@
 using Network;
+using System;
 
 public class ConfigPPON : GameSection
 {
@@ -11,19 +12,19 @@ public class ConfigPPON : GameSection
 
 	public override void UpdateUI()
 	{
-		SetInput(UI.IPT_PW, string.Empty, 4, OnInputChange);
-		SetInput(UI.IPT_PW_CONFIRM, string.Empty, 4, OnInputChange);
+		SetInput((Enum)UI.IPT_PW, string.Empty, 4, (EventDelegate.Callback)OnInputChange);
+		SetInput((Enum)UI.IPT_PW_CONFIRM, string.Empty, 4, (EventDelegate.Callback)OnInputChange);
 	}
 
 	private void OnInputChange()
 	{
-		SetButtonEnabled(UI.BTN_OK, GetInputValue(UI.IPT_PW).Length == 4 && GetInputValue(UI.IPT_PW_CONFIRM).Length == 4);
+		SetButtonEnabled((Enum)UI.BTN_OK, GetInputValue((Enum)UI.IPT_PW).Length == 4 && GetInputValue((Enum)UI.IPT_PW_CONFIRM).Length == 4);
 	}
 
 	private void OnQuery_OK()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<UserInfoManager>.I.SendParentalPassword(GetInputValue(UI.IPT_PW), GetInputValue(UI.IPT_PW_CONFIRM), delegate(Error ret)
+		MonoBehaviourSingleton<UserInfoManager>.I.SendParentalPassword(GetInputValue((Enum)UI.IPT_PW), GetInputValue((Enum)UI.IPT_PW_CONFIRM), delegate(Error ret)
 		{
 			if (ret != 0)
 			{

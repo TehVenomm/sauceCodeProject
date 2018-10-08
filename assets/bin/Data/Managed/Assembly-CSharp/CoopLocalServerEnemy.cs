@@ -33,7 +33,7 @@ public class CoopLocalServerEnemy
 
 	public bool IsReady()
 	{
-		return popTime <= Time.time;
+		return popTime <= Time.get_time();
 	}
 
 	public void Pop(int sid)

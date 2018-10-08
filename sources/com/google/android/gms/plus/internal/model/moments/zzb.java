@@ -40,13 +40,13 @@ public class zzb implements Creator<MomentEntity> {
     }
 
     public MomentEntity zzeT(Parcel parcel) {
-        String str = null;
+        ItemScopeEntity itemScopeEntity = null;
         int zzL = zza.zzL(parcel);
         Set hashSet = new HashSet();
         int i = 0;
-        ItemScopeEntity itemScopeEntity = null;
-        String str2 = null;
+        String str = null;
         ItemScopeEntity itemScopeEntity2 = null;
+        String str2 = null;
         String str3 = null;
         while (parcel.dataPosition() < zzL) {
             int zzK = zza.zzK(parcel);

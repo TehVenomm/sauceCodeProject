@@ -28,21 +28,9 @@ public class HomeMutualFollowerListUIController : ScrollItemListControllerBase
 		m_listCtrl = _initParam.ListCtrl;
 	}
 
-	protected override IEnumerator RequestNextPageInfo(int _nextPageNum, Action<bool, int> _callback)
+	protected unsafe override IEnumerator RequestNextPageInfo(int _nextPageNum, Action<bool, int> _callback)
 	{
-		MonoBehaviourSingleton<FriendManager>.I.SendGetMessageUserList(_nextPageNum, true, delegate(bool is_success, FriendMessageUserListModel.Param recv_data)
-		{
-			if (is_success)
-			{
-				((_003CRequestNextPageInfo_003Ec__Iterator94)/*Error near IL_002d: stateMachine*/)._003C_003Ef__this.m_userDataList = recv_data.messageUser;
-				((_003CRequestNextPageInfo_003Ec__Iterator94)/*Error near IL_002d: stateMachine*/)._003C_003Ef__this.m_maxPageNum = recv_data.pageNumMax;
-				((_003CRequestNextPageInfo_003Ec__Iterator94)/*Error near IL_002d: stateMachine*/)._003C_003Ef__this.m_currentPageNum = ((((_003CRequestNextPageInfo_003Ec__Iterator94)/*Error near IL_002d: stateMachine*/)._003C_003Ef__this.MaxPageNum >= 1) ? (((_003CRequestNextPageInfo_003Ec__Iterator94)/*Error near IL_002d: stateMachine*/)._nextPageNum % ((_003CRequestNextPageInfo_003Ec__Iterator94)/*Error near IL_002d: stateMachine*/)._003C_003Ef__this.MaxPageNum) : 0);
-			}
-			if (((_003CRequestNextPageInfo_003Ec__Iterator94)/*Error near IL_002d: stateMachine*/)._callback != null)
-			{
-				((_003CRequestNextPageInfo_003Ec__Iterator94)/*Error near IL_002d: stateMachine*/)._callback(is_success, ((_003CRequestNextPageInfo_003Ec__Iterator94)/*Error near IL_002d: stateMachine*/)._nextPageNum);
-			}
-		});
+		MonoBehaviourSingleton<FriendManager>.I.SendGetMessageUserList(_nextPageNum, true, new Action<bool, FriendMessageUserListModel.Param>((object)/*Error near IL_002d: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		yield return (object)null;
 	}
 
@@ -62,8 +50,10 @@ public class HomeMutualFollowerListUIController : ScrollItemListControllerBase
 		return LIST_ITEM_PREFAB_NAME;
 	}
 
-	public override void SetListItem(int i, Transform t, bool is_recycle)
+	public unsafe override void SetListItem(int i, Transform t, bool is_recycle)
 	{
+		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0116: Expected O, but got Unknown
 		if (m_userDataList == null || m_userDataList.Count < 1 || m_userDataList.Count <= i || i < 0)
 		{
 			if (base.OnCompleteAllItemLoading != null)
@@ -75,7 +65,7 @@ public class HomeMutualFollowerListUIController : ScrollItemListControllerBase
 		{
 			FriendMessageUserListModel.MessageUserInfo messageUserInfo = m_userDataList[i];
 			HomeMutualFollowerListItem component = t.GetComponent<HomeMutualFollowerListItem>();
-			if ((UnityEngine.Object)component == (UnityEngine.Object)null)
+			if (component == null)
 			{
 				if (base.OnCompleteAllItemLoading != null)
 				{
@@ -93,14 +83,7 @@ public class HomeMutualFollowerListUIController : ScrollItemListControllerBase
 				initParam.IsPermittedMessage = messageUserInfo.isPermitted;
 				initParam.OnClickItem = OnClickItem;
 				initParam.IsUseRenderTextureCharaModel = (!FieldManager.IsValidInField() && !FieldManager.IsValidInGame() && !FieldManager.IsValidInTutorial());
-				initParam.OnCompleteLoading = delegate
-				{
-					IncrementLoadCompleteCount();
-					if (base.OnCompleteAllItemLoading != null)
-					{
-						base.OnCompleteAllItemLoading(base.ItemLoadCompleteCount);
-					}
-				};
+				initParam.OnCompleteLoading = new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 				component.Initialize(initParam);
 			}
 		}
@@ -130,7 +113,7 @@ public class HomeMutualFollowerListUIController : ScrollItemListControllerBase
 			{
 				MonoBehaviourSingleton<FriendManager>.I.SendGetMessageDetailList(m_userDataList[_itemIndex].userId, 0, true, delegate(bool flag)
 				{
-					if (flag && (UnityEngine.Object)m_listCtrl != (UnityEngine.Object)null)
+					if (flag && m_listCtrl != null)
 					{
 						m_listCtrl.OnClickItem();
 					}

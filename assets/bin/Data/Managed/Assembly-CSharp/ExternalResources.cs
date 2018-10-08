@@ -4,27 +4,27 @@ using UnityEngine;
 
 public static class ExternalResources
 {
-	public static T Load<T>(string path) where T : UnityEngine.Object
+	public static T Load<T>(string path) where T : Object
 	{
 		T val = Resources.Load<T>(path);
-		if ((UnityEngine.Object)val != (UnityEngine.Object)null)
+		if ((object)val != null)
 		{
 			return val;
 		}
-		return (T)null;
+		return (T)(object)null;
 	}
 
-	public static IEnumerator LoadAsync<T>(string path, Action<ResourceRequest> progress, Action<T> complete) where T : UnityEngine.Object
+	public static IEnumerator LoadAsync<T>(string path, Action<ResourceRequest> progress, Action<T> complete) where T : Object
 	{
 		ResourceRequest request = Resources.LoadAsync<T>(path);
-		if (!request.isDone)
+		if (!request.get_isDone())
 		{
 			progress(request);
 			yield return (object)null;
 		}
-		if (request.asset != (UnityEngine.Object)null)
+		if (request.get_asset() != null)
 		{
-			complete((T)request.asset);
+			complete((T)(object)request.get_asset());
 		}
 	}
 }

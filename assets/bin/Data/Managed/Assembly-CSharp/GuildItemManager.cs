@@ -64,13 +64,13 @@ public class GuildItemManager
 		{
 			GuildItemInfoModel.EmblemInfo[] emblemLayer1Infos = GetEmblemLayer1Infos();
 			emblemLayer1Infos = Array.FindAll(emblemLayer1Infos, (GuildItemInfoModel.EmblemInfo x) => x.price == 0);
-			array[0] = emblemLayer1Infos[UnityEngine.Random.Range(0, emblemLayer1Infos.Length)].id;
+			array[0] = emblemLayer1Infos[Random.Range(0, emblemLayer1Infos.Length)].id;
 			emblemLayer1Infos = GetEmblemLayer2Infos();
 			emblemLayer1Infos = Array.FindAll(emblemLayer1Infos, (GuildItemInfoModel.EmblemInfo x) => x.price == 0);
-			array[1] = emblemLayer1Infos[UnityEngine.Random.Range(0, emblemLayer1Infos.Length)].id;
+			array[1] = emblemLayer1Infos[Random.Range(0, emblemLayer1Infos.Length)].id;
 			emblemLayer1Infos = GetEmblemLayer3Infos();
 			emblemLayer1Infos = Array.FindAll(emblemLayer1Infos, (GuildItemInfoModel.EmblemInfo x) => x.price == 0);
-			array[2] = emblemLayer1Infos[UnityEngine.Random.Range(0, emblemLayer1Infos.Length)].id;
+			array[2] = emblemLayer1Infos[Random.Range(0, emblemLayer1Infos.Length)].id;
 		}
 		return array;
 	}
@@ -92,7 +92,7 @@ public class GuildItemManager
 			Inited = true;
 			if (callback != null)
 			{
-				callback();
+				callback.Invoke();
 			}
 		}, string.Empty);
 	}

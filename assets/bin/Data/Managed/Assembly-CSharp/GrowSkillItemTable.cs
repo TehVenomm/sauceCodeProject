@@ -293,69 +293,69 @@ public class GrowSkillItemTable : Singleton<GrowSkillItemTable>, IDataTable
 		{
 			return null;
 		}
-		float t = (float)(level - under.lv) / (float)(over.lv - under.lv);
+		float num = (float)(level - under.lv) / (float)(over.lv - under.lv);
 		GrowSkillItemData growSkillItemData2 = new GrowSkillItemData();
 		growSkillItemData2.id = skill_grow_id;
 		growSkillItemData2.lv = level;
-		growSkillItemData2.exceedCnt = Mathf.FloorToInt(Mathf.Lerp((float)under.exceedCnt, (float)over.exceedCnt, t));
+		growSkillItemData2.exceedCnt = Mathf.FloorToInt(Mathf.Lerp((float)under.exceedCnt, (float)over.exceedCnt, num));
 		growSkillItemData2.needExp = new GrowRate();
-		growSkillItemData2.needExp.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.needExp.rate, (float)(int)over.needExp.rate, t));
-		growSkillItemData2.needExp.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.needExp.add, (float)(int)over.needExp.add, t));
+		growSkillItemData2.needExp.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.needExp.rate, (float)(int)over.needExp.rate, num));
+		growSkillItemData2.needExp.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.needExp.add, (float)(int)over.needExp.add, num));
 		growSkillItemData2.giveExp = new GrowRate();
-		growSkillItemData2.giveExp.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.giveExp.rate, (float)(int)over.giveExp.rate, t));
-		growSkillItemData2.giveExp.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.giveExp.add, (float)(int)over.giveExp.add, t));
+		growSkillItemData2.giveExp.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.giveExp.rate, (float)(int)over.giveExp.rate, num));
+		growSkillItemData2.giveExp.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.giveExp.add, (float)(int)over.giveExp.add, num));
 		growSkillItemData2.atk = new GrowRate();
-		growSkillItemData2.atk.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.atk.rate, (float)(int)over.atk.rate, t));
-		growSkillItemData2.atk.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.atk.add, (float)(int)over.atk.add, t));
+		growSkillItemData2.atk.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.atk.rate, (float)(int)over.atk.rate, num));
+		growSkillItemData2.atk.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.atk.add, (float)(int)over.atk.add, num));
 		growSkillItemData2.def = new GrowRate();
-		growSkillItemData2.def.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.def.rate, (float)(int)over.def.rate, t));
-		growSkillItemData2.def.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.def.add, (float)(int)over.def.add, t));
+		growSkillItemData2.def.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.def.rate, (float)(int)over.def.rate, num));
+		growSkillItemData2.def.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.def.add, (float)(int)over.def.add, num));
 		growSkillItemData2.hp = new GrowRate();
-		growSkillItemData2.hp.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.hp.rate, (float)(int)over.hp.rate, t));
-		growSkillItemData2.hp.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.hp.add, (float)(int)over.hp.add, t));
+		growSkillItemData2.hp.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.hp.rate, (float)(int)over.hp.rate, num));
+		growSkillItemData2.hp.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.hp.add, (float)(int)over.hp.add, num));
 		growSkillItemData2.elemAtk = new GrowRate[6];
 		for (int i = 0; i < 6; i++)
 		{
 			growSkillItemData2.elemAtk[i] = new GrowRate();
-			growSkillItemData2.elemAtk[i].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemAtk[i].rate, (float)(int)over.elemAtk[i].rate, t));
-			growSkillItemData2.elemAtk[i].add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemAtk[i].add, (float)(int)over.elemAtk[i].add, t));
+			growSkillItemData2.elemAtk[i].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemAtk[i].rate, (float)(int)over.elemAtk[i].rate, num));
+			growSkillItemData2.elemAtk[i].add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemAtk[i].add, (float)(int)over.elemAtk[i].add, num));
 		}
 		growSkillItemData2.elemDef = new GrowRate[6];
 		for (int j = 0; j < 6; j++)
 		{
 			growSkillItemData2.elemDef[j] = new GrowRate();
-			growSkillItemData2.elemDef[j].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemDef[j].rate, (float)(int)over.elemDef[j].rate, t));
-			growSkillItemData2.elemDef[j].add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemDef[j].add, (float)(int)over.elemDef[j].add, t));
+			growSkillItemData2.elemDef[j].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemDef[j].rate, (float)(int)over.elemDef[j].rate, num));
+			growSkillItemData2.elemDef[j].add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemDef[j].add, (float)(int)over.elemDef[j].add, num));
 		}
 		growSkillItemData2.skillAtk = new GrowRate();
-		growSkillItemData2.skillAtk.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.skillAtk.rate, (float)(int)over.skillAtk.rate, t));
-		growSkillItemData2.skillAtk.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.skillAtk.add, (float)(int)over.skillAtk.add, t));
+		growSkillItemData2.skillAtk.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.skillAtk.rate, (float)(int)over.skillAtk.rate, num));
+		growSkillItemData2.skillAtk.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.skillAtk.add, (float)(int)over.skillAtk.add, num));
 		growSkillItemData2.skillAtkRate = new GrowRate();
-		growSkillItemData2.skillAtkRate.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.skillAtkRate.rate, (float)(int)over.skillAtkRate.rate, t));
-		growSkillItemData2.skillAtkRate.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.skillAtkRate.add, (float)(int)over.skillAtkRate.add, t));
+		growSkillItemData2.skillAtkRate.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.skillAtkRate.rate, (float)(int)over.skillAtkRate.rate, num));
+		growSkillItemData2.skillAtkRate.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.skillAtkRate.add, (float)(int)over.skillAtkRate.add, num));
 		growSkillItemData2.heal = new GrowRate();
-		growSkillItemData2.heal.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.heal.rate, (float)(int)over.heal.rate, t));
-		growSkillItemData2.heal.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.heal.add, (float)(int)over.heal.add, t));
+		growSkillItemData2.heal.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.heal.rate, (float)(int)over.heal.rate, num));
+		growSkillItemData2.heal.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.heal.add, (float)(int)over.heal.add, num));
 		growSkillItemData2.supprtValue = new GrowRate[3];
 		growSkillItemData2.supprtTime = new GrowRateFloat[3];
 		for (int k = 0; k < 3; k++)
 		{
 			growSkillItemData2.supprtValue[k] = new GrowRate();
-			growSkillItemData2.supprtValue[k].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.supprtValue[k].rate, (float)(int)over.supprtValue[k].rate, t));
-			growSkillItemData2.supprtValue[k].add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.supprtValue[k].add, (float)(int)over.supprtValue[k].add, t));
+			growSkillItemData2.supprtValue[k].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.supprtValue[k].rate, (float)(int)over.supprtValue[k].rate, num));
+			growSkillItemData2.supprtValue[k].add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.supprtValue[k].add, (float)(int)over.supprtValue[k].add, num));
 			growSkillItemData2.supprtTime[k] = new GrowRateFloat();
-			growSkillItemData2.supprtTime[k].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.supprtTime[k].rate, (float)(int)over.supprtTime[k].rate, t));
-			growSkillItemData2.supprtTime[k].add = (float)Mathf.FloorToInt(Mathf.Lerp(under.supprtTime[k].add, over.supprtTime[k].add, t));
+			growSkillItemData2.supprtTime[k].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.supprtTime[k].rate, (float)(int)over.supprtTime[k].rate, num));
+			growSkillItemData2.supprtTime[k].add = (float)Mathf.FloorToInt(Mathf.Lerp((float)under.supprtTime[k].add, (float)over.supprtTime[k].add, num));
 		}
 		growSkillItemData2.castTime = new GrowRate();
-		growSkillItemData2.castTime.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.castTime.rate, (float)(int)over.castTime.rate, t));
-		growSkillItemData2.castTime.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.castTime.add, (float)(int)over.castTime.add, t));
+		growSkillItemData2.castTime.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.castTime.rate, (float)(int)over.castTime.rate, num));
+		growSkillItemData2.castTime.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.castTime.add, (float)(int)over.castTime.add, num));
 		growSkillItemData2.useGauge = new GrowRate();
-		growSkillItemData2.useGauge.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.useGauge.rate, (float)(int)over.useGauge.rate, t));
-		growSkillItemData2.useGauge.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.useGauge.add, (float)(int)over.useGauge.add, t));
+		growSkillItemData2.useGauge.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.useGauge.rate, (float)(int)over.useGauge.rate, num));
+		growSkillItemData2.useGauge.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.useGauge.add, (float)(int)over.useGauge.add, num));
 		growSkillItemData2.useGauge2 = new GrowRate();
-		growSkillItemData2.useGauge2.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.useGauge2.rate, (float)(int)over.useGauge2.rate, t));
-		growSkillItemData2.useGauge2.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.useGauge2.add, (float)(int)over.useGauge2.add, t));
+		growSkillItemData2.useGauge2.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.useGauge2.rate, (float)(int)over.useGauge2.rate, num));
+		growSkillItemData2.useGauge2.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.useGauge2.add, (float)(int)over.useGauge2.add, num));
 		return growSkillItemData2;
 	}
 

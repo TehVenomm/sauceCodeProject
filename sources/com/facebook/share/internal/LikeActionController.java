@@ -538,10 +538,10 @@ public class LikeActionController {
     }
 
     private static LikeActionController deserializeFromDiskSynchronously(String str) {
-        Closeable closeable;
         Throwable e;
         Throwable th;
         LikeActionController likeActionController = null;
+        Closeable closeable;
         try {
             closeable = controllerDiskCache.get(getCacheKeyForObjectId(str));
             if (closeable != null) {
@@ -703,8 +703,8 @@ public class LikeActionController {
                     String access$700 = LikeActionController.this.likeCountStringWithLike;
                     String access$800 = LikeActionController.this.likeCountStringWithoutLike;
                     if (bundle.containsKey(LikeActionController.LIKE_DIALOG_RESPONSE_LIKE_COUNT_STRING_KEY)) {
-                        access$800 = bundle.getString(LikeActionController.LIKE_DIALOG_RESPONSE_LIKE_COUNT_STRING_KEY);
-                        access$700 = access$800;
+                        access$700 = bundle.getString(LikeActionController.LIKE_DIALOG_RESPONSE_LIKE_COUNT_STRING_KEY);
+                        access$800 = access$700;
                     }
                     String access$900 = LikeActionController.this.socialSentenceWithLike;
                     String access$1000 = LikeActionController.this.socialSentenceWithoutLike;
@@ -955,7 +955,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find block by offs
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115013644.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1123226989.run(Unknown Source)
 */
         /*
         r1 = 0;

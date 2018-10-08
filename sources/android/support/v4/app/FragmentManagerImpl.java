@@ -1326,12 +1326,11 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
     void doPendingDeferredStart() {
         if (this.mHavePendingDeferredStart) {
             int i = 0;
-            int i2 = 0;
-            while (i2 < this.mActive.size()) {
+            for (int i2 = 0; i2 < this.mActive.size(); i2++) {
                 Fragment fragment = (Fragment) this.mActive.get(i2);
-                int hasRunningLoaders = (fragment == null || fragment.mLoaderManager == null) ? i : i | fragment.mLoaderManager.hasRunningLoaders();
-                i2++;
-                i = hasRunningLoaders;
+                if (!(fragment == null || fragment.mLoaderManager == null)) {
+                    i |= fragment.mLoaderManager.hasRunningLoaders();
+                }
             }
             if (i == 0) {
                 this.mHavePendingDeferredStart = false;
@@ -1343,6 +1342,7 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
     public void dump(String str, FileDescriptor fileDescriptor, PrintWriter printWriter, String[] strArr) {
         int size;
         int i;
+        Fragment fragment;
         int i2 = 0;
         String str2 = str + "    ";
         if (this.mActive != null) {
@@ -1353,7 +1353,6 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
                 printWriter.print(Integer.toHexString(System.identityHashCode(this)));
                 printWriter.println(":");
                 for (i = 0; i < size; i++) {
-                    Fragment fragment;
                     fragment = (Fragment) this.mActive.get(i);
                     printWriter.print(str);
                     printWriter.print("  #");

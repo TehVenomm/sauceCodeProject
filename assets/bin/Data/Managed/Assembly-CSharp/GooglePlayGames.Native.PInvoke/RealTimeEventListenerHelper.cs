@@ -44,7 +44,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal RealTimeEventListenerHelper SetOnP2PConnectedCallback(Action<NativeRealTimeRoom, MultiplayerParticipant> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper.RealTimeEventListenerHelper_SetOnP2PConnectedCallback(SelfPtr(), InternalOnP2PConnectedCallback, Callbacks.ToIntPtr(callback));
+			GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper.RealTimeEventListenerHelper_SetOnP2PConnectedCallback(SelfPtr(), InternalOnP2PConnectedCallback, Callbacks.ToIntPtr((Delegate)callback));
 			return this;
 		}
 
@@ -56,7 +56,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal RealTimeEventListenerHelper SetOnP2PDisconnectedCallback(Action<NativeRealTimeRoom, MultiplayerParticipant> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper.RealTimeEventListenerHelper_SetOnP2PDisconnectedCallback(SelfPtr(), InternalOnP2PDisconnectedCallback, Callbacks.ToIntPtr(callback));
+			GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper.RealTimeEventListenerHelper_SetOnP2PDisconnectedCallback(SelfPtr(), InternalOnP2PDisconnectedCallback, Callbacks.ToIntPtr((Delegate)callback));
 			return this;
 		}
 
@@ -68,7 +68,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal RealTimeEventListenerHelper SetOnParticipantStatusChangedCallback(Action<NativeRealTimeRoom, MultiplayerParticipant> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper.RealTimeEventListenerHelper_SetOnParticipantStatusChangedCallback(SelfPtr(), InternalOnParticipantStatusChangedCallback, Callbacks.ToIntPtr(callback));
+			GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper.RealTimeEventListenerHelper_SetOnParticipantStatusChangedCallback(SelfPtr(), InternalOnParticipantStatusChangedCallback, Callbacks.ToIntPtr((Delegate)callback));
 			return this;
 		}
 
@@ -83,10 +83,10 @@ namespace GooglePlayGames.Native.PInvoke
 			Logger.d("Entering " + callbackName);
 			try
 			{
-				NativeRealTimeRoom arg = NativeRealTimeRoom.FromPointer(room);
-				using (MultiplayerParticipant arg2 = MultiplayerParticipant.FromPointer(participant))
+				NativeRealTimeRoom nativeRealTimeRoom = NativeRealTimeRoom.FromPointer(room);
+				using (MultiplayerParticipant multiplayerParticipant = MultiplayerParticipant.FromPointer(participant))
 				{
-					Callbacks.IntPtrToPermanentCallback<Action<NativeRealTimeRoom, MultiplayerParticipant>>(data)?.Invoke(arg, arg2);
+					Callbacks.IntPtrToPermanentCallback<Action<NativeRealTimeRoom, MultiplayerParticipant>>(data)?.Invoke(nativeRealTimeRoom, multiplayerParticipant);
 				}
 			}
 			catch (Exception ex)
@@ -97,7 +97,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal RealTimeEventListenerHelper SetOnDataReceivedCallback(Action<NativeRealTimeRoom, MultiplayerParticipant, byte[], bool> callback)
 		{
-			IntPtr callback_arg = Callbacks.ToIntPtr(callback);
+			IntPtr callback_arg = Callbacks.ToIntPtr((Delegate)callback);
 			Logger.d("OnData Callback has addr: " + callback_arg.ToInt64());
 			GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper.RealTimeEventListenerHelper_SetOnDataReceivedCallback(SelfPtr(), InternalOnDataReceived, callback_arg);
 			return this;
@@ -107,12 +107,12 @@ namespace GooglePlayGames.Native.PInvoke
 		internal static void InternalOnDataReceived(IntPtr room, IntPtr participant, IntPtr data, UIntPtr dataLength, bool isReliable, IntPtr userData)
 		{
 			Logger.d("Entering InternalOnDataReceived: " + userData.ToInt64());
-			Action<NativeRealTimeRoom, MultiplayerParticipant, byte[], bool> action = Callbacks.IntPtrToPermanentCallback<Action<NativeRealTimeRoom, MultiplayerParticipant, byte[], bool>>(userData);
-			using (NativeRealTimeRoom arg = NativeRealTimeRoom.FromPointer(room))
+			Action<NativeRealTimeRoom, MultiplayerParticipant, byte[], bool> val = Callbacks.IntPtrToPermanentCallback<Action<NativeRealTimeRoom, MultiplayerParticipant, byte[], bool>>(userData);
+			using (NativeRealTimeRoom nativeRealTimeRoom = NativeRealTimeRoom.FromPointer(room))
 			{
-				using (MultiplayerParticipant arg2 = MultiplayerParticipant.FromPointer(participant))
+				using (MultiplayerParticipant multiplayerParticipant = MultiplayerParticipant.FromPointer(participant))
 				{
-					if (action != null)
+					if (val != null)
 					{
 						byte[] array = null;
 						if (dataLength.ToUInt64() != 0L)
@@ -122,11 +122,11 @@ namespace GooglePlayGames.Native.PInvoke
 						}
 						try
 						{
-							action(arg, arg2, array, isReliable);
+							val.Invoke(nativeRealTimeRoom, multiplayerParticipant, array, isReliable);
 						}
-						catch (Exception arg3)
+						catch (Exception arg)
 						{
-							Logger.e("Error encountered executing InternalOnDataReceived. Smothering to avoid passing exception into Native: " + arg3);
+							Logger.e("Error encountered executing InternalOnDataReceived. Smothering to avoid passing exception into Native: " + arg);
 						}
 					}
 				}

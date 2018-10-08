@@ -43,7 +43,7 @@ public class Pool<ABS_T> where ABS_T : Poolable
 		Queue<ABS_T> queue = poolablesOfType.Get(GetKey(poolable.GetType()));
 		if (queue == null)
 		{
-			Debug.LogError("Pool: not alloc poolable. poolable=" + poolable);
+			Debug.LogError((object)("Pool: not alloc poolable. poolable=" + poolable));
 		}
 		else
 		{

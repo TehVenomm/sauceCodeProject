@@ -601,6 +601,12 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 
 		public static bool cb(CSVReader csv_reader, EquipItemData data, ref uint key)
 		{
+			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
 			data.id = key;
 			csv_reader.Pop(ref data.appVer);
 			csv_reader.Pop(ref data.type);

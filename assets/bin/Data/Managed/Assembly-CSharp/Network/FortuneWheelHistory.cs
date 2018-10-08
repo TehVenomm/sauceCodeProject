@@ -6,8 +6,10 @@ namespace Network
 	[Serializable]
 	public class FortuneWheelHistory
 	{
+		public int jackpot;
+
 		public List<FortuneWheelServerLog> server;
 
-		public List<FortuneWheelRewardLog> user;
+		public List<FortuneWheelUserLog> user;
 	}
 }

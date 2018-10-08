@@ -21,13 +21,14 @@ public class DeliveryBattleChecker : BattleCheckerBase
 		deliveryBattleInfo = new DeliveryBattleInfo();
 	}
 
-	public void AddSkillCount(int skillId, int count = 1)
+	public unsafe void AddSkillCount(int skillId, int count = 1)
 	{
 		if (deliveryBattleInfo.totalSkillCountList == null)
 		{
 			deliveryBattleInfo.totalSkillCountList = new List<DeliveryBattleInfo.SkillCount>();
 		}
-		DeliveryBattleInfo.SkillCount skillCount = deliveryBattleInfo.totalSkillCountList.FirstOrDefault((DeliveryBattleInfo.SkillCount skill) => skill.skillId == skillId);
+		_003CAddSkillCount_003Ec__AnonStorey4E9 _003CAddSkillCount_003Ec__AnonStorey4E;
+		DeliveryBattleInfo.SkillCount skillCount = deliveryBattleInfo.totalSkillCountList.FirstOrDefault(new Func<DeliveryBattleInfo.SkillCount, bool>((object)_003CAddSkillCount_003Ec__AnonStorey4E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (skillCount == null || skillCount.skillId <= 0)
 		{
 			deliveryBattleInfo.totalSkillCountList.Add(new DeliveryBattleInfo.SkillCount(skillId, count));

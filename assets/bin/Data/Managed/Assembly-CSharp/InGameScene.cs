@@ -9,7 +9,7 @@ public class InGameScene : GameSection
 		{
 			Object.DestroyImmediate(MonoBehaviourSingleton<InGameRecorder>.I);
 		}
-		if ((Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (Object)null)
+		if (MonoBehaviourSingleton<UIManager>.I.mainChat != null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.mainChat.Open(UITransition.TYPE.OPEN);
 		}

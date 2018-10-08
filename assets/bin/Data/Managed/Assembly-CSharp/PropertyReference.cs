@@ -46,18 +46,18 @@ public class PropertyReference
 		}
 	}
 
-	public bool isValid => (UnityEngine.Object)mTarget != (UnityEngine.Object)null && !string.IsNullOrEmpty(mName);
+	public bool isValid => mTarget != null && !string.IsNullOrEmpty(mName);
 
 	public bool isEnabled
 	{
 		get
 		{
-			if ((UnityEngine.Object)mTarget == (UnityEngine.Object)null)
+			if (mTarget == null)
 			{
 				return false;
 			}
-			MonoBehaviour monoBehaviour = mTarget as MonoBehaviour;
-			return (UnityEngine.Object)monoBehaviour == (UnityEngine.Object)null || monoBehaviour.enabled;
+			MonoBehaviour val = mTarget as MonoBehaviour;
+			return val == null || val.get_enabled();
 		}
 	}
 
@@ -97,7 +97,7 @@ public class PropertyReference
 		if (obj is PropertyReference)
 		{
 			PropertyReference propertyReference = obj as PropertyReference;
-			return (UnityEngine.Object)mTarget == (UnityEngine.Object)propertyReference.mTarget && string.Equals(mName, propertyReference.mName);
+			return mTarget == propertyReference.mTarget && string.Equals(mName, propertyReference.mName);
 		}
 		return false;
 	}
@@ -132,9 +132,9 @@ public class PropertyReference
 
 	public static string ToString(Component comp, string property)
 	{
-		if ((UnityEngine.Object)comp != (UnityEngine.Object)null)
+		if (comp != null)
 		{
-			string text = comp.GetType().ToString();
+			string text = ((object)comp).GetType().ToString();
 			int num = text.LastIndexOf('.');
 			if (num > 0)
 			{
@@ -149,8 +149,8 @@ public class PropertyReference
 		return null;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public object Get()
 	{
 		if (mProperty == null && mField == null && isValid)
@@ -171,8 +171,8 @@ public class PropertyReference
 		return null;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public bool Set(object value)
 	{
 		if (mProperty == null && mField == null && isValid)
@@ -206,9 +206,9 @@ public class PropertyReference
 		}
 		if (!Convert(ref value))
 		{
-			if (Application.isPlaying)
+			if (Application.get_isPlaying())
 			{
-				UnityEngine.Debug.LogError("Unable to convert " + value.GetType() + " to " + GetPropertyType());
+				Debug.LogError((object)("Unable to convert " + value.GetType() + " to " + GetPropertyType()));
 			}
 		}
 		else
@@ -227,13 +227,13 @@ public class PropertyReference
 		return false;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	private bool Cache()
 	{
-		if ((UnityEngine.Object)mTarget != (UnityEngine.Object)null && !string.IsNullOrEmpty(mName))
+		if (mTarget != null && !string.IsNullOrEmpty(mName))
 		{
-			Type type = mTarget.GetType();
+			Type type = ((object)mTarget).GetType();
 			mField = type.GetField(mName);
 			mProperty = type.GetProperty(mName);
 		}
@@ -247,7 +247,7 @@ public class PropertyReference
 
 	private bool Convert(ref object value)
 	{
-		if ((UnityEngine.Object)mTarget == (UnityEngine.Object)null)
+		if (mTarget == null)
 		{
 			return false;
 		}

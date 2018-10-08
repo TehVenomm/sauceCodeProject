@@ -63,8 +63,8 @@ public abstract class zzegi<M extends zzegi<M>> extends zzego {
         }
         int i2 = 0;
         while (i < this.zzncu.size()) {
-            i2 += this.zzncu.zzhg(i).zzn();
             i++;
+            i2 += this.zzncu.zzhg(i).zzn();
         }
         return i2;
     }

@@ -87,11 +87,11 @@ public class ItemExchangeManager : MonoBehaviourSingleton<ItemExchangeManager>
 		requestSendForm.nums = nums;
 		Protocol.Send(InventorySellQuestModel.URL, requestSendForm, delegate(InventorySellQuestModel ret)
 		{
-			bool arg = false;
+			bool flag = false;
 			List<uint> is_nothing_remains_quest = new List<uint>();
 			if (ret.Error == Error.None)
 			{
-				arg = true;
+				flag = true;
 				List<QuestData> orderQuestList = MonoBehaviourSingleton<QuestManager>.I.orderQuestList;
 				if (orderQuestList != null && orderQuestList.Count > 0)
 				{
@@ -124,7 +124,7 @@ public class ItemExchangeManager : MonoBehaviourSingleton<ItemExchangeManager>
 					}
 				});
 			}
-			call_back(arg, ret.result.reward, is_nothing_remains_quest);
+			call_back.Invoke(flag, ret.result.reward, is_nothing_remains_quest);
 		}, string.Empty);
 	}
 

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SimplePingPongAlpha : MonoBehaviour
+public class SimplePingPongAlpha
 {
 	private enum eState
 	{
@@ -36,8 +36,18 @@ public class SimplePingPongAlpha : MonoBehaviour
 
 	private Color color = default(Color);
 
+	public SimplePingPongAlpha()
+		: this()
+	{
+	}//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+	//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+
+
 	public void Initialize()
 	{
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
 		if (state == eState.None)
 		{
 			from = LimitValue(from);
@@ -50,6 +60,7 @@ public class SimplePingPongAlpha : MonoBehaviour
 
 	public void Play(bool startDefaultValue)
 	{
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		if (state == eState.None)
 		{
 			Initialize();
@@ -64,14 +75,15 @@ public class SimplePingPongAlpha : MonoBehaviour
 		}
 		nowCount = 0;
 		state = eState.Forward;
-		target.gameObject.SetActive(true);
+		target.get_gameObject().SetActive(true);
 	}
 
 	private void Update()
 	{
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 		if (state != 0 && state != eState.Idle)
 		{
-			float value = addValue * Time.deltaTime;
+			float value = addValue * Time.get_deltaTime();
 			if (state == eState.Forward)
 			{
 				if (AddValue(value))
@@ -85,7 +97,7 @@ public class SimplePingPongAlpha : MonoBehaviour
 				{
 					if (endDisable)
 					{
-						target.gameObject.SetActive(false);
+						target.get_gameObject().SetActive(false);
 					}
 					state = eState.Idle;
 				}
@@ -99,12 +111,14 @@ public class SimplePingPongAlpha : MonoBehaviour
 
 	private void SetValue(float value)
 	{
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		color.a = value;
 		target.color = color;
 	}
 
 	private bool AddValue(float value)
 	{
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		bool result = false;
 		color.a += value;
 		if (color.a >= to)
@@ -118,6 +132,7 @@ public class SimplePingPongAlpha : MonoBehaviour
 
 	private bool SubValue(float value)
 	{
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		bool result = false;
 		color.a -= value;
 		if (color.a <= from)

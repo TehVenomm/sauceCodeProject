@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,39 +36,24 @@ public class PresentTop : GameSection
 		base.Initialize();
 	}
 
-	public override void UpdateUI()
+	public unsafe override void UpdateUI()
 	{
-		SetLabelText(UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText(UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText((Enum)UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText((Enum)UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
 		int count = MonoBehaviourSingleton<PresentManager>.I.presentData.presents.Count;
 		bool flag = count > 0;
-		SetActive(UI.BTN_ALL, flag);
-		SetActive(UI.BTN_ALL_DISABLE, !flag);
-		SetLabelText(UI.STR_ALL_DISABLE, base.sectionData.GetText("STR_ALL"));
-		SetActive(UI.STR_NON_LIST, !flag);
-		SetGrid(UI.GRD_LIST, "PresentListItem", count, false, delegate(int i, Transform t, bool b)
-		{
-			Present present = MonoBehaviourSingleton<PresentManager>.I.presentData.presents[i];
-			SetLabelText(t, UI.LBL_NAME, present.name);
-			SetLabelText(t, UI.LBL_COMMENT, present.comment);
-			SetLabelText(t, UI.LBL_DESC, present.desc);
-			string text = (!string.IsNullOrEmpty(present.expire)) ? present.expire : base.sectionData.GetText("NON_EXPIRE");
-			SetLabelText(t, UI.LBL_EXPIRE, text);
-			SetLabelText(t, UI.LBL_TIME, present.timeInfo);
-			SetEvent(t, UI.BTN_SELECT, "SELECT", i);
-			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)present.type, (uint)present.itemId, FindCtrl(t, UI.OBJ_ICON_ROOT), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-			if ((Object)itemIcon != (Object)null)
-			{
-				itemIcon.SetEnableCollider(false);
-			}
-		});
+		SetActive((Enum)UI.BTN_ALL, flag);
+		SetActive((Enum)UI.BTN_ALL_DISABLE, !flag);
+		SetLabelText((Enum)UI.STR_ALL_DISABLE, base.sectionData.GetText("STR_ALL"));
+		SetActive((Enum)UI.STR_NON_LIST, !flag);
+		SetGrid(UI.GRD_LIST, "PresentListItem", count, false, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		int num = 1;
 		int page_num = MonoBehaviourSingleton<PresentManager>.I.page + num;
 		int num2 = Mathf.Max(MonoBehaviourSingleton<PresentManager>.I.pageMax, num);
-		SetPageNumText(UI.LBL_NOW, page_num);
-		SetPageNumText(UI.LBL_MAX, num2);
-		SetActive(UI.OBJ_ACTIVE_ROOT, num != num2);
-		SetActive(UI.OBJ_INACTIVE_ROOT, num == num2);
+		SetPageNumText((Enum)UI.LBL_NOW, page_num);
+		SetPageNumText((Enum)UI.LBL_MAX, num2);
+		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, num != num2);
+		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, num == num2);
 	}
 
 	public override void StartSection()
@@ -144,50 +130,10 @@ public class PresentTop : GameSection
 		SendReceivePresent(uniqIds);
 	}
 
-	private void SendReceivePresent(List<string> ids)
+	private unsafe void SendReceivePresent(List<string> ids)
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<PresentManager>.I.SendReceivePresent(ids, delegate(bool is_success, Error network_err, int num)
-		{
-			bool is_resume = is_success;
-			if (is_success)
-			{
-				selectEventData[2] = num;
-				SoundManager.PlaySystemSE(SoundID.UISE.GET_PRIZE, 1f);
-			}
-			else
-			{
-				is_resume = true;
-				switch (network_err)
-				{
-				default:
-					is_resume = false;
-					break;
-				case Error.WRN_PRESENT_OVER_MONEY:
-					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_MONEY", null);
-					break;
-				case Error.WRN_PRESENT_OVER_ITEM:
-					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_ITEM", null);
-					break;
-				case Error.WRN_PRESENT_OVER_EQUIP_ITEM:
-					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_EQUIP_ITEM", null);
-					break;
-				case Error.WRN_PRESENT_OVER_SKILL_ITEM:
-					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_SKILL_ITEM", null);
-					break;
-				case Error.WRN_PRESENT_OVER_QUEST_ITEM:
-					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_QUEST_ITEM", null);
-					break;
-				case Error.WRN_PRESENT_OVER_EQUIP_AND_SKILL:
-					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_EQUIP_AND_SKILL", null);
-					break;
-				case Error.WRN_PRESENT_OVER_ETC:
-					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_ETC", null);
-					break;
-				}
-			}
-			GameSection.ResumeEvent(is_resume, null);
-		});
+		MonoBehaviourSingleton<PresentManager>.I.SendReceivePresent(ids, new Action<bool, Error, int>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnQuery_PresentOneMessage_OK()
@@ -257,8 +203,8 @@ public class PresentTop : GameSection
 	{
 		if ((notify_flags & NOTIFY_FLAG.UPDATE_PRESENT_NUM) != (NOTIFY_FLAG)0L && (notify_flags & NOTIFY_FLAG.UPDATE_PRESENT_LIST) == (NOTIFY_FLAG)0L)
 		{
-			int a = (MonoBehaviourSingleton<PresentManager>.I.presentNum > 0) ? ((MonoBehaviourSingleton<PresentManager>.I.presentNum - 1) / MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.LIST_NUM_PER_PAGE) : 0;
-			int page = Mathf.Min(a, MonoBehaviourSingleton<PresentManager>.I.page);
+			int num = (MonoBehaviourSingleton<PresentManager>.I.presentNum > 0) ? ((MonoBehaviourSingleton<PresentManager>.I.presentNum - 1) / MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.LIST_NUM_PER_PAGE) : 0;
+			int page = Mathf.Min(num, MonoBehaviourSingleton<PresentManager>.I.page);
 			SetDirty(UI.GRD_LIST);
 			MovePage(page, false);
 		}

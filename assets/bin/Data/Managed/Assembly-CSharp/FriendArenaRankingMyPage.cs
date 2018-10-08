@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -79,6 +80,7 @@ public class FriendArenaRankingMyPage : GameSection
 
 	public override void Initialize()
 	{
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		eventData = (GameSection.GetEventData() as Network.EventData);
 		IsFinishRecieveDelivery = true;
 		if (eventData == null)
@@ -88,7 +90,7 @@ public class FriendArenaRankingMyPage : GameSection
 		}
 		else if (IsRankingJoin())
 		{
-			StartCoroutine(SendGetMyRcord());
+			this.StartCoroutine(SendGetMyRcord());
 		}
 		else
 		{
@@ -96,19 +98,14 @@ public class FriendArenaRankingMyPage : GameSection
 		}
 	}
 
-	private IEnumerator SendGetMyRcord()
+	private unsafe IEnumerator SendGetMyRcord()
 	{
 		while (!IsFinishRecieveDelivery)
 		{
 			yield return (object)null;
 		}
 		bool isFinishGetRecord = false;
-		MonoBehaviourSingleton<QuestManager>.I.SendGetArenaUserRecord(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, eventData.eventId, delegate(bool b, ArenaUserRecordModel.Param result)
-		{
-			((_003CSendGetMyRcord_003Ec__Iterator43)/*Error near IL_0078: stateMachine*/)._003CisFinishGetRecord_003E__0 = true;
-			((_003CSendGetMyRcord_003Ec__Iterator43)/*Error near IL_0078: stateMachine*/)._003C_003Ef__this.record = result;
-			((_003CSendGetMyRcord_003Ec__Iterator43)/*Error near IL_0078: stateMachine*/)._003C_003Ef__this.userRank = ((_003CSendGetMyRcord_003Ec__Iterator43)/*Error near IL_0078: stateMachine*/)._003C_003Ef__this.record.userRank;
-		});
+		MonoBehaviourSingleton<QuestManager>.I.SendGetArenaUserRecord(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, eventData.eventId, new Action<bool, ArenaUserRecordModel.Param>((object)/*Error near IL_0078: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		while (!isFinishGetRecord)
 		{
 			yield return (object)null;
@@ -127,33 +124,33 @@ public class FriendArenaRankingMyPage : GameSection
 	{
 		if (!isExistArena)
 		{
-			SetLabelText(UI.LBL_ARENA_NAME, string.Empty);
-			SetLabelText(UI.LBL_END_DATE, string.Empty);
+			SetLabelText((Enum)UI.LBL_ARENA_NAME, string.Empty);
+			SetLabelText((Enum)UI.LBL_END_DATE, string.Empty);
 		}
 		else
 		{
-			SetLabelText(UI.LBL_ARENA_NAME, eventData.name);
+			SetLabelText((Enum)UI.LBL_ARENA_NAME, eventData.name);
 			string endDateString = QuestUtility.GetEndDateString(eventData);
-			SetLabelText(UI.LBL_END_DATE, endDateString);
+			SetLabelText((Enum)UI.LBL_END_DATE, endDateString);
 		}
 	}
 
 	private void UpdateRecord()
 	{
-		SetActive(UI.OBJ_NO_SCORE, !IsRankingJoin());
-		SetActive(UI.OBJ_SCORE, IsRankingJoin());
-		SetActive(UI.OBJ_MY_RANK, IsRankingJoin());
-		SetActive(UI.OBJ_NOT_EXIST, false);
+		SetActive((Enum)UI.OBJ_NO_SCORE, !IsRankingJoin());
+		SetActive((Enum)UI.OBJ_SCORE, IsRankingJoin());
+		SetActive((Enum)UI.OBJ_MY_RANK, IsRankingJoin());
+		SetActive((Enum)UI.OBJ_NOT_EXIST, false);
 		if (!isExistArena)
 		{
-			SetActive(UI.OBJ_NO_SCORE, false);
-			SetActive(UI.OBJ_SCORE, false);
-			SetActive(UI.OBJ_MY_RANK, false);
-			SetActive(UI.OBJ_NOT_EXIST, true);
+			SetActive((Enum)UI.OBJ_NO_SCORE, false);
+			SetActive((Enum)UI.OBJ_SCORE, false);
+			SetActive((Enum)UI.OBJ_MY_RANK, false);
+			SetActive((Enum)UI.OBJ_NOT_EXIST, true);
 		}
 		else if (!IsRankingJoin())
 		{
-			SetLabelText(UI.LBL_NO_TOTAL, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 29u), ARENA_RANK.S.ToString()));
+			SetLabelText((Enum)UI.LBL_NO_TOTAL, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 29u), ARENA_RANK.S.ToString()));
 		}
 		else
 		{
@@ -187,17 +184,17 @@ public class FriendArenaRankingMyPage : GameSection
 		string text = num.ToString();
 		for (int i = 0; i < RankingNumUIs.Length; i++)
 		{
-			SetActive(RankingNumUIs[i], false);
+			SetActive((Enum)RankingNumUIs[i], false);
 		}
 		if (num <= 0)
 		{
-			SetActive(UI.SPR_RANK, false);
-			SetActive(UI.SPR_OUT_OF_RANK, true);
+			SetActive((Enum)UI.SPR_RANK, false);
+			SetActive((Enum)UI.SPR_OUT_OF_RANK, true);
 		}
 		else
 		{
-			SetActive(UI.SPR_RANK, true);
-			SetActive(UI.SPR_OUT_OF_RANK, false);
+			SetActive((Enum)UI.SPR_RANK, true);
+			SetActive((Enum)UI.SPR_OUT_OF_RANK, false);
 			int num2 = (RankingNumUIs.Length - text.Length) / 2;
 			for (int j = 0; j < text.Length; j++)
 			{
@@ -208,7 +205,7 @@ public class FriendArenaRankingMyPage : GameSection
 				}
 				int num4 = j + num2;
 				SetSprite(GetCtrl(RankingNumUIs[num4]), RankingNumbers[num3]);
-				SetActive(RankingNumUIs[num4], true);
+				SetActive((Enum)RankingNumUIs[num4], true);
 			}
 		}
 	}

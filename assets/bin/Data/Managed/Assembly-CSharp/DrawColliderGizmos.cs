@@ -1,5 +1,7 @@
-using UnityEngine;
-
-public class DrawColliderGizmos : MonoBehaviour
+public class DrawColliderGizmos
 {
+	public DrawColliderGizmos()
+		: this()
+	{
+	}
 }

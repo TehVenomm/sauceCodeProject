@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -131,37 +132,38 @@ public class QuestAcceptArenaDetail : QuestDeliveryDetail
 
 	public override void Initialize()
 	{
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize();
 		arenaData = info.GetArenaData();
 		UITexture component = GetCtrl(UI.TEX_RUSH_IMAGE).GetComponent<UITexture>();
 		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.ARENA_RANK_ICON, ResourceName.GetArenaRankIconName(arenaData.rank));
 		if ((base.isComplete || isNotice) && !isCompletedEventDelivery)
 		{
-			SetActive(UI.BTN_CREATE, false);
-			SetActive(UI.BTN_CREATE_OFF, false);
+			SetActive((Enum)UI.BTN_CREATE, false);
+			SetActive((Enum)UI.BTN_CREATE_OFF, false);
 		}
 		else if (info.GetConditionType(0u) != DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
 		{
-			StartCoroutine(StartPredownload());
+			this.StartCoroutine(StartPredownload());
 		}
 	}
 
 	public override void UpdateUI()
 	{
-		SetActive(UI.OBJ_DROP_REWARD, true);
-		SetActive(UI.OBJ_CLEAR_REWARD, true);
-		SetActive(UI.OBJ_RANK_UP_ROOT, false);
-		SetActive(UI.BTN_COMPLETE_RANK_UP, false);
+		SetActive((Enum)UI.OBJ_DROP_REWARD, true);
+		SetActive((Enum)UI.OBJ_CLEAR_REWARD, true);
+		SetActive((Enum)UI.OBJ_RANK_UP_ROOT, false);
+		SetActive((Enum)UI.BTN_COMPLETE_RANK_UP, false);
 		base.UpdateUI();
-		SetActive(UI.BTN_CREATE_OFF, false);
+		SetActive((Enum)UI.BTN_CREATE_OFF, false);
 		UpdateTime();
 		SetSprite(baseRoot, UI.SPR_WINDOW, "RequestWindowBase_Arena");
 		SetDifficultySprite();
 		UpdateRewardInfo();
 		if (info.GetConditionType(0u) == DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
 		{
-			SetActive(UI.BTN_CREATE, false);
-			SetActive(UI.BTN_CREATE_OFF, false);
+			SetActive((Enum)UI.BTN_CREATE, false);
+			SetActive((Enum)UI.BTN_CREATE_OFF, false);
 		}
 	}
 
@@ -174,20 +176,20 @@ public class QuestAcceptArenaDetail : QuestDeliveryDetail
 			{
 				have = need;
 			}
-			SetLabelText(UI.LBL_LIMIT_TIME, $"{have}/{need}");
-			SetLabelText(UI.LBL_LIMIT_TIME_NAME, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 17u));
+			SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{have}/{need}");
+			SetLabelText((Enum)UI.LBL_LIMIT_TIME_NAME, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 17u));
 		}
 		else
 		{
 			int num = QuestUtility.ToSecByMilliSec(arenaData.timeLimit);
-			SetLabelText(UI.LBL_LIMIT_TIME, $"{num / 60}:{num % 60:D2}");
+			SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num / 60}:{num % 60:D2}");
 		}
-		SetLabelText(UI.LBL_RUSH_LEVEL, string.Empty);
+		SetLabelText((Enum)UI.LBL_RUSH_LEVEL, string.Empty);
 	}
 
 	protected override void UpdateNPC(string map_name, string enemy_name)
 	{
-		SetActive(UI.CHARA_ALL, false);
+		SetActive((Enum)UI.CHARA_ALL, false);
 	}
 
 	protected override void SetBaseFrame()
@@ -210,31 +212,37 @@ public class QuestAcceptArenaDetail : QuestDeliveryDetail
 		base.OnEndCompletetween(is_unlock_portal, effectName);
 	}
 
-	private IEnumerator PlayRankUpEffect(bool is_unlock_portal, string effectName)
+	private unsafe IEnumerator PlayRankUpEffect(bool is_unlock_portal, string effectName)
 	{
 		ParticleSystem particle = GetCtrl(UI.OBJ_PARTICLE).GetComponent<ParticleSystem>();
-		particle.GetComponent<ParticleSystemRenderer>().sharedMaterial.renderQueue = 4000;
+		particle.GetComponent<ParticleSystemRenderer>().get_sharedMaterial().set_renderQueue(4000);
 		yield return (object)new WaitForSeconds(1f);
-		SetActive(UI.OBJ_BASE_FRAME, false);
-		SetActive(UI.BTN_COMPLETE_RANK_UP, true);
-		PlayTween(UI.OBJ_RANK_UP, true, delegate
+		SetActive((Enum)UI.OBJ_BASE_FRAME, false);
+		SetActive((Enum)UI.BTN_COMPLETE_RANK_UP, true);
+		PlayTween((Enum)UI.OBJ_RANK_UP, true, (EventDelegate.Callback)delegate
 		{
-			if (((_003CPlayRankUpEffect_003Ec__Iterator122)/*Error near IL_00a8: stateMachine*/).is_unlock_portal)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Expected O, but got Unknown
+			if (((_003CPlayRankUpEffect_003Ec__Iterator129)/*Error near IL_00a8: stateMachine*/).is_unlock_portal)
 			{
-				((_003CPlayRankUpEffect_003Ec__Iterator122)/*Error near IL_00a8: stateMachine*/)._003C_003Ef__this.PlayUnlockPortalTween(((_003CPlayRankUpEffect_003Ec__Iterator122)/*Error near IL_00a8: stateMachine*/).effectName, delegate
+				QuestAcceptArenaDetail _003C_003Ef__this = ((_003CPlayRankUpEffect_003Ec__Iterator129)/*Error near IL_00a8: stateMachine*/)._003C_003Ef__this;
+				string effectName2 = ((_003CPlayRankUpEffect_003Ec__Iterator129)/*Error near IL_00a8: stateMachine*/).effectName;
+				if (_003CPlayRankUpEffect_003Ec__Iterator129._003C_003Ef__am_0024cache8 == null)
 				{
-				});
+					_003CPlayRankUpEffect_003Ec__Iterator129._003C_003Ef__am_0024cache8 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				_003C_003Ef__this.PlayUnlockPortalTween(effectName2, _003CPlayRankUpEffect_003Ec__Iterator129._003C_003Ef__am_0024cache8);
 			}
 		}, false, 0);
 	}
 
 	private void UpdateRewardInfo()
 	{
-		SetActive(UI.OBJ_CLEAR_ICON_ROOT, !isShowDropInfo);
-		SetActive(UI.OBJ_DROP_ICON_ROOT, isShowDropInfo);
-		SetActive(UI.OBJ_CLEAR_REWARD, !isShowDropInfo);
-		SetActive(UI.OBJ_DROP_REWARD, isShowDropInfo);
-		SetActive(UI.OBJ_COMPLETE_ROOT, !isShowDropInfo);
+		SetActive((Enum)UI.OBJ_CLEAR_ICON_ROOT, !isShowDropInfo);
+		SetActive((Enum)UI.OBJ_DROP_ICON_ROOT, isShowDropInfo);
+		SetActive((Enum)UI.OBJ_CLEAR_REWARD, !isShowDropInfo);
+		SetActive((Enum)UI.OBJ_DROP_REWARD, isShowDropInfo);
+		SetActive((Enum)UI.OBJ_COMPLETE_ROOT, !isShowDropInfo);
 	}
 
 	private void OnQuery_CREATE()
@@ -246,8 +254,8 @@ public class QuestAcceptArenaDetail : QuestDeliveryDetail
 
 	private IEnumerator StartPredownload()
 	{
-		SetActive(UI.BTN_CREATE, false);
-		SetActive(UI.BTN_CREATE_OFF, false);
+		SetActive((Enum)UI.BTN_CREATE, false);
+		SetActive((Enum)UI.BTN_CREATE_OFF, false);
 		List<ResourceInfo> list = new List<ResourceInfo>();
 		List<QuestTable.QuestTableData> questDataArray = arenaData.GetQuestDataArray();
 		if (!questDataArray.IsNullOrEmpty())
@@ -316,7 +324,7 @@ public class QuestAcceptArenaDetail : QuestDeliveryDetail
 			if (list.Find((ResourceInfo x) => !MonoBehaviourSingleton<ResourceManager>.I.IsCached(x.category, x.packageName)) != null)
 			{
 				RequestEvent("ASSET_DOWNLOAD", StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 3000u));
-				SetActive(UI.BTN_CREATE_OFF, true);
+				SetActive((Enum)UI.BTN_CREATE_OFF, true);
 				LoadingQueue loadQueue = new LoadingQueue(this);
 				foreach (ResourceInfo item in list)
 				{
@@ -330,14 +338,14 @@ public class QuestAcceptArenaDetail : QuestDeliveryDetail
 				}
 			}
 			bool pushEnable = true;
-			SetActive(UI.BTN_CREATE, pushEnable);
-			SetActive(UI.BTN_CREATE_OFF, !pushEnable);
+			SetActive((Enum)UI.BTN_CREATE, pushEnable);
+			SetActive((Enum)UI.BTN_CREATE_OFF, !pushEnable);
 		}
 	}
 
 	private void SetDifficultySprite()
 	{
 		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryID);
-		SetActive(UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
+		SetActive((Enum)UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
 	}
 }

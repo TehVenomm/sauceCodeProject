@@ -10,12 +10,12 @@ namespace GooglePlayGames
 	{
 		internal static IPlayGamesClient GetPlatformPlayGamesClient(PlayGamesClientConfiguration config)
 		{
-			if (Application.isEditor)
+			if (Application.get_isEditor())
 			{
-				GooglePlayGames.OurUtils.Logger.d("Creating IPlayGamesClient in editor, using DummyClient.");
+				Logger.d("Creating IPlayGamesClient in editor, using DummyClient.");
 				return new DummyClient();
 			}
-			GooglePlayGames.OurUtils.Logger.d("Creating Android IPlayGamesClient Client");
+			Logger.d("Creating Android IPlayGamesClient Client");
 			return new NativeClient(config, new AndroidClient());
 		}
 	}

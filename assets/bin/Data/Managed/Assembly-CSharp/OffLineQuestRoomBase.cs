@@ -80,18 +80,9 @@ public class OffLineQuestRoomBase : GameSection
 		UpdateUser();
 	}
 
-	protected void UpdateUser()
+	protected unsafe void UpdateUser()
 	{
-		SetGrid(UI.GRD_PLAYER_INFO, string.Empty, 1, false, delegate(int i, Transform t)
-		{
-			string prefab_name = "QuestRoomUserInfoSelf";
-			return Realizes(prefab_name, t, false);
-		}, delegate(int i, Transform t, bool is_recycle)
-		{
-			UpdateRoomUserInfo(t, i);
-			SetEvent(t, UI.BTN_NAME_BG, "CHANGE_EQUIP", i);
-			SetEvent(t, UI.BTN_FRAME, "CHANGE_EQUIP", i);
-		});
+		SetGrid(UI.GRD_PLAYER_INFO, string.Empty, 1, false, new Func<int, Transform, Transform>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected void UpdateRoomUserInfo(Transform trans, int index)
@@ -102,7 +93,7 @@ public class OffLineQuestRoomBase : GameSection
 		SetActive(trans, UI.SPR_USER_READY_WAIT, false);
 		SetActive(trans, UI.OBJ_CHAT, false);
 		QuestRoomUserInfo component = trans.GetComponent<QuestRoomUserInfo>();
-		if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
+		if (!(component == null))
 		{
 			userInfo = MonoBehaviourSingleton<StatusManager>.I.GetCreatePlayerInfo().charaInfo;
 			if (userInfo == null)

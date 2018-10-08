@@ -60,14 +60,18 @@ public class Party_Model_RegisterACK : Coop_Model_ACK
 		base.packetType = PACKET_TYPE.PARTY_REGISTER_ACK;
 	}
 
-	public List<UserInfo> GetConvertUserInfo()
+	public unsafe List<UserInfo> GetConvertUserInfo()
 	{
 		if (userinfo == null)
 		{
 			return null;
 		}
-		return (from x in userinfo
-		select new UserInfo(x)).ToList();
+		List<string> source = userinfo;
+		if (_003C_003Ef__am_0024cache2 == null)
+		{
+			_003C_003Ef__am_0024cache2 = new Func<string, UserInfo>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		return source.Select<string, UserInfo>(_003C_003Ef__am_0024cache2).ToList();
 	}
 
 	public override string ToString()

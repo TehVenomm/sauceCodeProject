@@ -42,7 +42,7 @@ public class ConverteElementToleranceTable
 		}
 		if (num < 0)
 		{
-			Debug.LogError("GetElement Not No");
+			Debug.LogError((object)"GetElement Not No");
 		}
 		return num;
 	}

@@ -72,10 +72,10 @@ public class AchievementIdTable : Singleton<AchievementIdTable>, IDataTable
 	public void CreateTable(TextAsset csv = null)
 	{
 		bool flag = false;
-		if ((UnityEngine.Object)csv == (UnityEngine.Object)null)
+		if (csv == null)
 		{
 			csv = Resources.Load<TextAsset>("Internal/internal__TABLE__AchievementIdTable");
 		}
-		CreateTable(csv.text);
+		CreateTable(csv.get_text());
 	}
 }

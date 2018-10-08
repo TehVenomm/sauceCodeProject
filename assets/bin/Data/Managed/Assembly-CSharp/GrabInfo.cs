@@ -36,6 +36,8 @@ public class GrabInfo
 
 	public void Copy(GrabInfo src)
 	{
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 		enable = src.enable;
 		duration = src.duration;
 		releaseAttackId = src.releaseAttackId;

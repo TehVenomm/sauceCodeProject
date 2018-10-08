@@ -117,11 +117,12 @@ public class RegionMap : GameSection
 
 	public override void Initialize()
 	{
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		isInGame = (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene");
-		StartCoroutine("DoInitialize");
+		this.StartCoroutine("DoInitialize");
 	}
 
-	private IEnumerator DoInitialize()
+	private unsafe IEnumerator DoInitialize()
 	{
 		int eventId = (int)GameSection.GetEventData();
 		FieldMapTable.FieldMapTableData mapData = null;
@@ -189,62 +190,59 @@ public class RegionMap : GameSection
 			redCircle = spots.spotRootTransform.Find("RedCircle");
 			portalGuideTxt = spots.spotRootTransform.Find("PortalGuideTxt");
 			UIPanel spotPanel = spots.spotRootTransform.GetComponent<UIPanel>();
-			if ((UnityEngine.Object)spotPanel != (UnityEngine.Object)null)
+			if (spotPanel != null)
 			{
 				spotPanel.depth = base.baseDepth + 1;
 			}
-			regionMapRoot = ResourceUtility.Realizes(loadObj.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform, -1).gameObject.GetComponent<RegionMapRoot>();
-			if ((UnityEngine.Object)regionMapRoot != (UnityEngine.Object)null)
+			regionMapRoot = ResourceUtility.Realizes(loadObj.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform, -1).get_gameObject().GetComponent<RegionMapRoot>();
+			if (regionMapRoot != null)
 			{
 				bool wait = true;
-				regionMapRoot.InitPortalStatus(delegate
-				{
-					((_003CDoInitialize_003Ec__Iterator17E)/*Error near IL_0470: stateMachine*/)._003Cwait_003E__11 = false;
-				});
+				regionMapRoot.InitPortalStatus(new Action((object)/*Error near IL_0470: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				while (wait)
 				{
 					yield return (object)null;
 				}
 			}
 			rootTransform = spots.SetRoot(base._transform);
-			rootTransform.gameObject.SetActive(true);
+			rootTransform.get_gameObject().SetActive(true);
 			rootPanel = rootTransform.GetComponent<UIPanel>();
-			if ((UnityEngine.Object)rootPanel != (UnityEngine.Object)null)
+			if (rootPanel != null)
 			{
 				defaultDepth = rootPanel.depth;
 			}
-			uiMapSprite = rootTransform.FindChild("Map").gameObject.GetComponent<UITexture>();
-			uiParentMapSprite = rootTransform.FindChild("ParentMap").gameObject.GetComponent<UITexture>();
+			uiMapSprite = rootTransform.FindChild("Map").get_gameObject().GetComponent<UITexture>();
+			uiParentMapSprite = rootTransform.FindChild("ParentMap").get_gameObject().GetComponent<UITexture>();
 			InitMapSprite(false);
 			if (!directOpen)
 			{
 				StartShowingTween();
 			}
-			windEffect = ResourceUtility.Realizes(loadedEffect.loadedObject, parent.worldMapCamera.transform, -1).gameObject.GetComponent<rymFX>();
-			windEffect.Cameras = new Camera[1]
+			windEffect = ResourceUtility.Realizes(loadedEffect.loadedObject, parent.worldMapCamera.get_transform(), -1).get_gameObject().GetComponent<rymFX>();
+			windEffect.Cameras = (Camera[])new Camera[1]
 			{
 				parent.worldMapCamera._camera
 			};
-			windEffect.gameObject.layer = LayerMask.NameToLayer("WorldMap");
+			windEffect.get_gameObject().set_layer(LayerMask.NameToLayer("WorldMap"));
 			spots.spotRootTransform.GetComponent<UIPanel>().RebuildAllDrawCalls();
 			tweenAnimations = spots.spotRootTransform.GetComponentsInChildren<UITweenCtrl>();
 			playerMarker = ResourceUtility.Realizes(loadedPlayerMarker.loadedObject, -1);
 			PlayerMarker playerMarkerCom = playerMarker.GetComponent<PlayerMarker>();
-			if ((UnityEngine.Object)null != (UnityEngine.Object)playerMarkerCom)
+			if (null != playerMarkerCom)
 			{
-				playerMarkerCom.SetCamera(parent.worldMapCamera._camera.transform);
+				playerMarkerCom.SetCamera(parent.worldMapCamera._camera.get_transform());
 			}
 			SetFirstCameraPos();
 			base.collectUI = base._transform;
 			Transform closeButtonTransform = base._transform.FindChild("LocationSpotRoot/CLOSE_BTN");
-			if ((UnityEngine.Object)closeButtonTransform != (UnityEngine.Object)null)
+			if (closeButtonTransform != null)
 			{
 				closeButton = closeButtonTransform.GetComponent<UIWidget>();
 			}
 			Transform announceTapTransform = base._transform.FindChild("LocationSpotRoot/AnnounceTap");
-			if ((UnityEngine.Object)announceTapTransform != (UnityEngine.Object)null)
+			if (announceTapTransform != null)
 			{
-				announceTap = announceTapTransform.gameObject;
+				announceTap = announceTapTransform.get_gameObject();
 			}
 			if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
 			{
@@ -258,7 +256,8 @@ public class RegionMap : GameSection
 
 	private void UpdateDifficultyButton(bool forceOff = false)
 	{
-		Transform transform = null;
+		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+		Transform val = null;
 		Transform spotRootTransform = spots.spotRootTransform;
 		if (forceOff)
 		{
@@ -291,9 +290,9 @@ public class RegionMap : GameSection
 				SetActive(spotRootTransform, UI.BTN_CURRENT_DIFFICULTY_NORMAL, data.difficulty == REGION_DIFFICULTY_TYPE.NORMAL);
 				SetActive(spotRootTransform, UI.BTN_CURRENT_DIFFICULTY_HARD, data.difficulty == REGION_DIFFICULTY_TYPE.HARD);
 				UIWidget component = FindCtrl(spotRootTransform, UI.OBJ_SELECT_DIFFICULTY).GetComponent<UIWidget>();
-				if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
+				if (!(component == null))
 				{
-					StartCoroutine(FadeWidget(component, 0, 1, 0.3f));
+					this.StartCoroutine(FadeWidget(component, 0, 1, 0.3f));
 				}
 			}
 		}
@@ -322,7 +321,7 @@ public class RegionMap : GameSection
 		float time = 0f;
 		while (time < duration)
 		{
-			time += Time.deltaTime;
+			time += Time.get_deltaTime();
 			float prog = time / duration;
 			float a = target.alpha = Mathf.Lerp((float)start, (float)end, prog);
 			yield return (object)null;
@@ -331,36 +330,53 @@ public class RegionMap : GameSection
 
 	private void StartShowingTween()
 	{
-		if ((UnityEngine.Object)uiMapSprite != (UnityEngine.Object)null)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Expected O, but got Unknown
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Expected O, but got Unknown
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b6: Expected O, but got Unknown
+		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d1: Expected O, but got Unknown
+		if (uiMapSprite != null)
 		{
 			uiMapSprite.alpha = 0f;
-			TweenAlpha.Begin(uiMapSprite.gameObject, 0.3f, 1f);
-			uiMapSprite.transform.localScale = Vector3.one * 0.8f;
-			TweenScale.Begin(uiMapSprite.gameObject, 0.3f, Vector3.one);
+			TweenAlpha.Begin(uiMapSprite.get_gameObject(), 0.3f, 1f);
+			uiMapSprite.get_transform().set_localScale(Vector3.get_one() * 0.8f);
+			TweenScale.Begin(uiMapSprite.get_gameObject(), 0.3f, Vector3.get_one());
 		}
-		if ((UnityEngine.Object)uiParentMapSprite != (UnityEngine.Object)null)
+		if (uiParentMapSprite != null)
 		{
 			uiParentMapSprite.alpha = 1f;
-			TweenScale.Begin(uiParentMapSprite.gameObject, 0.3f, Vector3.one * 1.2f);
-			TweenAlpha.Begin(uiParentMapSprite.gameObject, 0.3f, 0f);
+			TweenScale.Begin(uiParentMapSprite.get_gameObject(), 0.3f, Vector3.get_one() * 1.2f);
+			TweenAlpha.Begin(uiParentMapSprite.get_gameObject(), 0.3f, 0f);
 		}
 	}
 
 	private void InitMapSprite(bool isPortrait)
 	{
-		if ((UnityEngine.Object)uiMapSprite != (UnityEngine.Object)null)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005c: Expected O, but got Unknown
+		if (uiMapSprite != null)
 		{
-			if ((UnityEngine.Object)null == (UnityEngine.Object)parent.worldMapCamera._camera.targetTexture)
+			if (null == parent.worldMapCamera._camera.get_targetTexture())
 			{
 				parent.worldMapCamera.Restore();
 			}
-			uiMapSprite.mainTexture = parent.worldMapCamera._camera.targetTexture;
+			uiMapSprite.mainTexture = parent.worldMapCamera._camera.get_targetTexture();
 			uiMapSprite.width = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth;
 			uiMapSprite.height = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
 		}
-		if ((UnityEngine.Object)uiParentMapSprite != (UnityEngine.Object)null)
+		if (uiParentMapSprite != null)
 		{
-			if ((UnityEngine.Object)null == (UnityEngine.Object)parent.blurFilter.filteredTexture)
+			if (null == parent.blurFilter.filteredTexture)
 			{
 				parent.blurFilter.Restore();
 			}
@@ -378,7 +394,7 @@ public class RegionMap : GameSection
 			OutGameSettingsManager.QuestMap questMap = MonoBehaviourSingleton<OutGameSettingsManager>.I.questMap;
 			MonoBehaviourSingleton<FilterManager>.I.StopBlur(questMap.cameraMoveTime, 0f);
 			spotMapIdDic = new Dictionary<SpotManager.Spot, uint>();
-			if (!((UnityEngine.Object)regionMapRoot == (UnityEngine.Object)null))
+			if (!(regionMapRoot == null))
 			{
 				for (int i = 0; i < regionMapRoot.locations.Length; i++)
 				{
@@ -414,7 +430,7 @@ public class RegionMap : GameSection
 								}
 								if (!flag)
 								{
-									int[] locationNumbers = GetLocationNumbers(regionMapPortal.name);
+									int[] locationNumbers = GetLocationNumbers(regionMapPortal.get_name());
 									if (i == locationNumbers[0] && GameSaveData.instance.isNewReleasePortal((uint)regionMapPortal.entranceId))
 									{
 										if (regionMapPortal.IsVisited())
@@ -533,9 +549,14 @@ public class RegionMap : GameSection
 
 	private void CreateLocationSpot(RegionMapLocation location, SpotManager.ICON_TYPE iconStatus = SpotManager.ICON_TYPE.CLEARED, bool attach_new_release_portal = false, bool isExistDelivery = false, SpotManager.HAPPEN_CONDITION happen = SpotManager.HAPPEN_CONDITION.NONE)
 	{
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
 		if (location.mapId == 0)
 		{
-			spots.AddSpot(0, MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionTextList().Find((GameSceneTables.TextData textData) => textData.key == "STR_HOME").text, location.transform.position, SpotManager.ICON_TYPE.HOME, "HOME", false, false, false, 0, null, false, SpotManager.HAPPEN_CONDITION.NONE, 0);
+			spots.AddSpot(0, MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionTextList().Find((GameSceneTables.TextData textData) => textData.key == "STR_HOME").text, location.get_transform().get_position(), SpotManager.ICON_TYPE.HOME, "HOME", false, false, false, 0, null, false, SpotManager.HAPPEN_CONDITION.NONE, 0);
 		}
 		else
 		{
@@ -555,10 +576,10 @@ public class RegionMap : GameSection
 				SpotEventData spotEventData = new SpotEventData();
 				spotEventData.mapId = fieldMapData.mapID;
 				spotEventData.childRegionId = fieldMapData.childRegionId;
-				SpotManager.Spot spot = spots.AddSpot((int)spotEventData.mapId, fieldMapData.mapName, location.transform.position, iconStatus, event_name, false, attach_new_release_portal, viewEnemyPopBallon, spotEventData, location.icon, isExistDelivery, happen, 0);
+				SpotManager.Spot spot = spots.AddSpot((int)spotEventData.mapId, fieldMapData.mapName, location.get_transform().get_position(), iconStatus, event_name, false, attach_new_release_portal, viewEnemyPopBallon, spotEventData, location.icon, isExistDelivery, happen, 0);
 				if (iconStatus == SpotManager.ICON_TYPE.INVISIBLE)
 				{
-					spot._transform.gameObject.SetActive(false);
+					spot._transform.get_gameObject().SetActive(false);
 				}
 				if (iconStatus != SpotManager.ICON_TYPE.NOT_OPENED && iconStatus != SpotManager.ICON_TYPE.INVISIBLE)
 				{
@@ -570,51 +591,67 @@ public class RegionMap : GameSection
 
 	private void SetFirstCameraPos()
 	{
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
 		FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
-		playerMarker.gameObject.SetActive(true);
+		playerMarker.get_gameObject().SetActive(true);
 		if (fieldMapData == null)
 		{
-			parent.worldMapCamera.targetPos = regionMapRoot.locations[0].transform.position;
+			parent.worldMapCamera.targetPos = regionMapRoot.locations[0].get_transform().get_position();
 			if (regionId == 0)
 			{
-				playerMarker.SetParent(regionMapRoot.locations[0].transform);
+				playerMarker.SetParent(regionMapRoot.locations[0].get_transform());
 			}
 			else
 			{
-				playerMarker.gameObject.SetActive(false);
-				playerMarker.SetParent(base.transform);
+				playerMarker.get_gameObject().SetActive(false);
+				playerMarker.SetParent(this.get_transform());
 			}
 		}
 		else if (!FieldManager.HasWorldMap(MonoBehaviourSingleton<FieldManager>.I.currentMapID) || fieldMapData.regionId != (uint)regionId)
 		{
-			parent.worldMapCamera.targetPos = regionMapRoot.locations[0].transform.position;
-			playerMarker.gameObject.SetActive(false);
-			playerMarker.SetParent(base.transform);
+			parent.worldMapCamera.targetPos = regionMapRoot.locations[0].get_transform().get_position();
+			playerMarker.get_gameObject().SetActive(false);
+			playerMarker.SetParent(this.get_transform());
 		}
 		else
 		{
 			RegionMapLocation regionMapLocation = regionMapRoot.FindLocation((int)fieldMapData.mapID);
-			if ((UnityEngine.Object)regionMapLocation != (UnityEngine.Object)null)
+			if (regionMapLocation != null)
 			{
-				parent.worldMapCamera.targetPos = regionMapLocation.transform.position;
-				playerMarker.SetParent(regionMapLocation.transform);
+				parent.worldMapCamera.targetPos = regionMapLocation.get_transform().get_position();
+				playerMarker.SetParent(regionMapLocation.get_transform());
 			}
 		}
-		playerMarker.localPosition = MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerOffset;
+		playerMarker.set_localPosition(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerOffset);
 	}
 
 	private void PlayTween(TWEEN_ANIMATION type, EventDelegate.Callback onComplete = null)
 	{
 		UITweenCtrl uITweenCtrl = Array.Find(tweenAnimations, (UITweenCtrl t) => t.id == (int)type);
-		if ((UnityEngine.Object)uITweenCtrl != (UnityEngine.Object)null)
+		if (uITweenCtrl != null)
 		{
 			uITweenCtrl.Reset();
 			uITweenCtrl.Play(true, onComplete);
 		}
 	}
 
-	protected override void OnOpen()
+	protected unsafe override void OnOpen()
 	{
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005c: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<WorldMapManager>.I.NeedDirectionOpenRegion(regionId))
 		{
 			isOpened = true;
@@ -622,14 +659,11 @@ public class RegionMap : GameSection
 		}
 		else
 		{
-			if ((UnityEngine.Object)parent != (UnityEngine.Object)null && !isOpened)
+			if (parent != null && !isOpened)
 			{
 				if (!directOpen)
 				{
-					parent.EnterRegionMapEvent(delegate
-					{
-						CreateVisitedLocationSpotIfNeed();
-					});
+					parent.EnterRegionMapEvent(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 				else
 				{
@@ -689,6 +723,12 @@ public class RegionMap : GameSection
 
 	private void SetButtonsAlpha()
 	{
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Expected O, but got Unknown
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008d: Expected O, but got Unknown
 		RegionTable.Data data = Singleton<RegionTable>.I.GetData((uint)regionId);
 		if (isEventMap)
 		{
@@ -696,20 +736,20 @@ public class RegionMap : GameSection
 		}
 		else if (data != null)
 		{
-			Transform transform = base.transform.FindChild("LocationSpotRoot/BACK_REGION_BTN");
-			if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
+			Transform val = this.get_transform().FindChild("LocationSpotRoot/BACK_REGION_BTN");
+			if (val != null)
 			{
-				UIWidget component = transform.GetComponent<UIWidget>();
-				if ((UnityEngine.Object)component != (UnityEngine.Object)null)
+				UIWidget component = val.GetComponent<UIWidget>();
+				if (component != null)
 				{
 					component.alpha = ((!data.hasParentRegion()) ? 0f : 1f);
 				}
 			}
-			transform = base.transform.FindChild("LocationSpotRoot/BACK_BTN");
-			if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
+			val = this.get_transform().FindChild("LocationSpotRoot/BACK_BTN");
+			if (val != null)
 			{
-				UIWidget component2 = transform.GetComponent<UIWidget>();
-				if ((UnityEngine.Object)component2 != (UnityEngine.Object)null)
+				UIWidget component2 = val.GetComponent<UIWidget>();
+				if (component2 != null)
 				{
 					component2.alpha = ((!data.hasParentRegion()) ? 1f : 0f);
 				}
@@ -719,17 +759,21 @@ public class RegionMap : GameSection
 
 	private void HideButtons()
 	{
-		Transform[] array = new Transform[2]
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Expected O, but got Unknown
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002b: Expected O, but got Unknown
+		Transform[] array = (Transform[])new Transform[2]
 		{
 			base._transform.FindChild("LocationSpotRoot/BACK_REGION_BTN"),
 			base._transform.FindChild("LocationSpotRoot/BACK_BTN")
 		};
-		foreach (Transform transform in array)
+		foreach (Transform val in array)
 		{
-			if (!((UnityEngine.Object)null == (UnityEngine.Object)transform))
+			if (!(null == val))
 			{
-				UIWidget component = transform.GetComponent<UIWidget>();
-				if ((UnityEngine.Object)null != (UnityEngine.Object)component)
+				UIWidget component = val.GetComponent<UIWidget>();
+				if (null != component)
 				{
 					component.alpha = 0f;
 				}
@@ -739,9 +783,9 @@ public class RegionMap : GameSection
 
 	protected override void OnCloseStart()
 	{
-		StopAllCoroutines();
+		this.StopAllCoroutines();
 		base.collectUI = null;
-		if (!isToDescription && (UnityEngine.Object)parent != (UnityEngine.Object)null)
+		if (!isToDescription && parent != null)
 		{
 			parent.worldMapCamera.isInteractive = true;
 		}
@@ -752,9 +796,11 @@ public class RegionMap : GameSection
 
 	public override void Exit()
 	{
-		if ((UnityEngine.Object)windEffect != (UnityEngine.Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001e: Expected O, but got Unknown
+		if (windEffect != null)
 		{
-			EffectManager.ReleaseEffect(windEffect.gameObject, true, false);
+			EffectManager.ReleaseEffect(windEffect.get_gameObject(), true, false);
 		}
 		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
 		{
@@ -766,7 +812,7 @@ public class RegionMap : GameSection
 		}
 		FadeOutMap();
 		MonoBehaviourSingleton<FilterManager>.I.StopBlur();
-		if ((UnityEngine.Object)parent != (UnityEngine.Object)null)
+		if (parent != null)
 		{
 			parent.worldMapCamera.isInteractive = true;
 		}
@@ -790,16 +836,16 @@ public class RegionMap : GameSection
 
 	private void HideInTheBack()
 	{
-		if ((UnityEngine.Object)rootPanel != (UnityEngine.Object)null)
+		if (rootPanel != null)
 		{
 			rootPanel.depth = 4000;
 		}
 		HideButtons();
-		if ((UnityEngine.Object)closeButton != (UnityEngine.Object)null)
+		if (closeButton != null)
 		{
 			closeButton.alpha = 0f;
 		}
-		if ((UnityEngine.Object)announceTap != (UnityEngine.Object)null)
+		if (announceTap != null)
 		{
 			announceTap.SetActive(false);
 		}
@@ -816,20 +862,21 @@ public class RegionMap : GameSection
 
 	private void PutOutInFront()
 	{
-		if ((UnityEngine.Object)rootPanel != (UnityEngine.Object)null)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		if (rootPanel != null)
 		{
 			rootPanel.depth = defaultDepth;
 		}
 		SetButtonsAlpha();
-		if ((UnityEngine.Object)closeButton != (UnityEngine.Object)null)
+		if (closeButton != null)
 		{
 			closeButton.alpha = 1f;
 		}
-		if ((UnityEngine.Object)announceTap != (UnityEngine.Object)null)
+		if (announceTap != null)
 		{
 			announceTap.SetActive(true);
 		}
-		parent.worldMapCamera.gameObject.SetActive(true);
+		parent.worldMapCamera.get_gameObject().SetActive(true);
 	}
 
 	private void OnQuery_TO_FIELD_OR_HOME()
@@ -838,8 +885,10 @@ public class RegionMap : GameSection
 		MoveIngameMapOrHome();
 	}
 
-	private void MoveIngameMapOrHome()
+	private unsafe void MoveIngameMapOrHome()
 	{
+		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<FilterManager>.I.IsEnabledBlur())
 		{
 			GameSection.StopEvent();
@@ -855,11 +904,11 @@ public class RegionMap : GameSection
 				{
 					UIInGameFieldMenu.I.OnClickPopMenu();
 				}
-				Transform transform = Utility.Find(base._transform, "CLOSE_BACK");
-				if ((UnityEngine.Object)null != (UnityEngine.Object)transform)
+				Transform val = Utility.Find(base._transform, "CLOSE_BACK");
+				if (null != val)
 				{
-					UIButton component = transform.GetComponent<UIButton>();
-					if ((UnityEngine.Object)null != (UnityEngine.Object)component)
+					UIButton component = val.GetComponent<UIButton>();
+					if (null != component)
 					{
 						component.onClick.ForEach(delegate(EventDelegate o)
 						{
@@ -892,30 +941,10 @@ public class RegionMap : GameSection
 					if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() != "InGameScene")
 					{
 						spots.ClearAllSpot();
-						spots.spotRootTransform.gameObject.SetActive(false);
-						MonoBehaviourSingleton<UIManager>.I.system.GetCtrl(UIManager.SYSTEM.DIALOG_BLOCKER).gameObject.SetActive(false);
+						spots.spotRootTransform.get_gameObject().SetActive(false);
+						MonoBehaviourSingleton<UIManager>.I.system.GetCtrl(UIManager.SYSTEM.DIALOG_BLOCKER).get_gameObject().SetActive(false);
 						GameSection.StayEvent();
-						CoopApp.EnterField(fieldMapData.jumpPortalID, 0u, delegate(bool is_matching, bool is_connect, bool is_regist)
-						{
-							if (!is_connect)
-							{
-								GameSection.ChangeStayEvent("COOP_SERVER_INVALID", null);
-								GameSection.ResumeEvent(true, null);
-								AppMain i = MonoBehaviourSingleton<AppMain>.I;
-								i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-								{
-									DispatchEvent("CLOSE", null);
-								});
-							}
-							else
-							{
-								GameSection.ResumeEvent(is_regist, null);
-								if (is_regist)
-								{
-									MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("InGame", null, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
-								}
-							}
-						});
+						CoopApp.EnterField(fieldMapData.jumpPortalID, 0u, new Action<bool, bool, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					}
 					else if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<FieldManager>.I.currentMapID != mapId)
 					{
@@ -933,6 +962,7 @@ public class RegionMap : GameSection
 
 	private void OnQuery_SELECT_CHILD()
 	{
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		SpotEventData spotEventData = GameSection.GetEventData() as SpotEventData;
 		GameSection.StayEvent();
 		if (spotEventData == null)
@@ -942,37 +972,34 @@ public class RegionMap : GameSection
 		else
 		{
 			regionId = (int)spotEventData.childRegionId;
-			StartCoroutine(DoChangeRegion(true));
+			this.StartCoroutine(DoChangeRegion(true));
 		}
 	}
 
 	private void OnQuery_BACK_REGION()
 	{
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		RegionTable.Data data = Singleton<RegionTable>.I.GetData((uint)regionId);
 		if (data != null)
 		{
-			if ((UnityEngine.Object)redCircle != (UnityEngine.Object)null)
+			if (redCircle != null)
 			{
-				redCircle.gameObject.SetActive(false);
+				redCircle.get_gameObject().SetActive(false);
 			}
 			displayQuestTargetMode = false;
 			regionId = (int)data.parentRegionId;
-			StartCoroutine(DoChangeRegion(false));
+			this.StartCoroutine(DoChangeRegion(false));
 		}
 	}
 
-	private IEnumerator DoChangeRegion(bool withBlur)
+	private unsafe IEnumerator DoChangeRegion(bool withBlur)
 	{
 		bool wait2 = false;
 		if (withBlur)
 		{
 			wait2 = true;
-			parent.blurFilter.CacheRenderTarget(delegate
-			{
-				((_003CDoChangeRegion_003Ec__Iterator180)/*Error near IL_0056: stateMachine*/)._003Cwait_003E__0 = false;
-				((_003CDoChangeRegion_003Ec__Iterator180)/*Error near IL_0056: stateMachine*/)._003C_003Ef__this.uiParentMapSprite.alpha = 1f;
-				((_003CDoChangeRegion_003Ec__Iterator180)/*Error near IL_0056: stateMachine*/)._003C_003Ef__this.spots.ClearAllSpot();
-			}, true);
+			parent.blurFilter.CacheRenderTarget(new Action((object)/*Error near IL_0056: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), true);
 		}
 		else
 		{
@@ -988,15 +1015,12 @@ public class RegionMap : GameSection
 		{
 			yield return (object)null;
 		}
-		UnityEngine.Object.Destroy(regionMapRoot.gameObject);
-		regionMapRoot = ResourceUtility.Realizes(loadObj.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform, -1).gameObject.GetComponent<RegionMapRoot>();
-		if ((UnityEngine.Object)regionMapRoot != (UnityEngine.Object)null)
+		Object.Destroy(regionMapRoot.get_gameObject());
+		regionMapRoot = ResourceUtility.Realizes(loadObj.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform, -1).get_gameObject().GetComponent<RegionMapRoot>();
+		if (regionMapRoot != null)
 		{
 			wait2 = true;
-			regionMapRoot.InitPortalStatus(delegate
-			{
-				((_003CDoChangeRegion_003Ec__Iterator180)/*Error near IL_017e: stateMachine*/)._003Cwait_003E__0 = false;
-			});
+			regionMapRoot.InitPortalStatus(new Action((object)/*Error near IL_017e: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			while (wait2)
 			{
 				yield return (object)null;
@@ -1006,13 +1030,10 @@ public class RegionMap : GameSection
 		{
 			float blurTime = 0.25f;
 			Vector2 blurCenter = new Vector2(0.5f, 0.5f);
-			parent.blurFilter.StartBlurFilter(0.01f, 0.25f, blurTime, blurCenter, delegate
-			{
-				((_003CDoChangeRegion_003Ec__Iterator180)/*Error near IL_020a: stateMachine*/)._003Cwait_003E__0 = false;
-			});
+			parent.blurFilter.StartBlurFilter(0.01f, 0.25f, blurTime, blurCenter, new Action((object)/*Error near IL_020a: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			uiMapSprite.alpha = 0f;
-			TweenAlpha.Begin(uiMapSprite.gameObject, blurTime, 1f);
-			TweenAlpha.Begin(uiParentMapSprite.gameObject, blurTime, 0f);
+			TweenAlpha.Begin(uiMapSprite.get_gameObject(), blurTime, 1f);
+			TweenAlpha.Begin(uiParentMapSprite.get_gameObject(), blurTime, 0f);
 		}
 		SetFirstCameraPos();
 		isOpened = false;
@@ -1048,15 +1069,18 @@ public class RegionMap : GameSection
 		}
 	}
 
-	private void OnQuery_SECTION_BACK()
+	private unsafe void OnQuery_SECTION_BACK()
 	{
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0025: Expected O, but got Unknown
 		if (!IsCalledExit)
 		{
 			GameSection.StayEvent();
-			DoExitUIEvent(delegate
+			if (_003C_003Ef__am_0024cache24 == null)
 			{
-				GameSection.ResumeEvent(true, null);
-			});
+				_003C_003Ef__am_0024cache24 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			DoExitUIEvent(_003C_003Ef__am_0024cache24);
 			parent.worldMapCamera.isInteractive = true;
 			MonoBehaviourSingleton<WorldMapManager>.I.ignoreTutorial = false;
 		}
@@ -1068,7 +1092,7 @@ public class RegionMap : GameSection
 		{
 			if (onComplete != null)
 			{
-				onComplete();
+				onComplete.Invoke();
 			}
 		});
 		spots.ClearAllSpot();
@@ -1082,19 +1106,27 @@ public class RegionMap : GameSection
 
 	private void LateUpdate()
 	{
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
 		if (spots != null)
 		{
 			spots.Update();
 		}
-		if ((UnityEngine.Object)null != (UnityEngine.Object)redCircle && redCircle.gameObject.activeSelf)
+		if (null != redCircle && redCircle.get_gameObject().get_activeSelf())
 		{
 			Camera camera = parent.worldMapCamera._camera;
-			if ((UnityEngine.Object)null != (UnityEngine.Object)camera)
+			if (null != camera)
 			{
-				Vector3 position = camera.WorldToScreenPoint(redCircleOrgPos);
-				position = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(position);
-				position.z = 0f;
-				redCircle.position = position;
+				Vector3 val = camera.WorldToScreenPoint(redCircleOrgPos);
+				val = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
+				val.z = 0f;
+				redCircle.set_position(val);
 			}
 		}
 		if (isUpdateRenderTexture)
@@ -1104,50 +1136,50 @@ public class RegionMap : GameSection
 		}
 	}
 
-	public void FadeOutMap()
+	public unsafe void FadeOutMap()
 	{
-		StartCoroutine(DoFadeMap(1f, 0f, 0.3f, delegate
-		{
-			if ((UnityEngine.Object)regionMapRoot != (UnityEngine.Object)null)
-			{
-				UnityEngine.Object.Destroy(regionMapRoot.gameObject);
-				regionMapRoot = null;
-			}
-		}));
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Expected O, but got Unknown
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoFadeMap(1f, 0f, 0.3f, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 
-	public void FadeInMap()
+	public unsafe void FadeInMap()
 	{
-		StartCoroutine(DoFadeMap(0f, 1f, 0.5f, delegate
-		{
-			CreateVisitedLocationSpotIfNeed();
-		}));
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Expected O, but got Unknown
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoFadeMap(0f, 1f, 0.5f, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 
 	private IEnumerator DoFadeMap(float from, float to, float time, Action onComplete)
 	{
-		if (!((UnityEngine.Object)regionMapRoot == (UnityEngine.Object)null))
+		if (!(regionMapRoot == null))
 		{
 			Renderer r = regionMapRoot.GetComponentInChildren<Renderer>();
-			if (!((UnityEngine.Object)r == (UnityEngine.Object)null))
+			if (!(r == null))
 			{
-				for (float timer = 0f; timer < time; timer += Time.deltaTime)
+				for (float timer = 0f; timer < time; timer += Time.get_deltaTime())
 				{
 					float alpha = Mathf.Lerp(from, to, timer / time);
-					r.material.SetFloat("_Alpha", alpha);
+					r.get_material().SetFloat("_Alpha", alpha);
 					yield return (object)null;
 				}
-				r.material.SetFloat("_Alpha", to);
-				onComplete?.Invoke();
+				r.get_material().SetFloat("_Alpha", to);
+				if (onComplete != null)
+				{
+					onComplete.Invoke();
+				}
 			}
 		}
 	}
 
 	protected override void OnDestroy()
 	{
-		if ((UnityEngine.Object)regionMapRoot != (UnityEngine.Object)null)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		if (regionMapRoot != null)
 		{
-			UnityEngine.Object.Destroy(regionMapRoot.gameObject);
+			Object.Destroy(regionMapRoot.get_gameObject());
 			regionMapRoot = null;
 		}
 		base.OnDestroy();
@@ -1155,27 +1187,46 @@ public class RegionMap : GameSection
 
 	private void DisplayQuestTarget()
 	{
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 		FieldMapTable.PortalTableData portalData = GetPortalData();
 		FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint)questTargetMapID);
 		bool isStepOver = IsStepOver(portalData);
 		bool flag = IsSameRegionPlayer();
 		Vector3 targetPosition = GetTargetPosition(fieldMapData, portalData, isStepOver);
-		Vector3 vector = targetPosition;
+		Vector3 val = targetPosition;
 		if (flag)
 		{
 			RegionMapLocation playerLocation = GetPlayerLocation();
-			if ((UnityEngine.Object)null != (UnityEngine.Object)playerLocation)
+			if (null != playerLocation)
 			{
-				vector = playerLocation.transform.position;
+				val = playerLocation.get_transform().get_position();
 			}
 		}
 		SetRedCirclePosition(fieldMapData, portalData, isStepOver);
-		parent.worldMapCamera.targetPos = vector;
-		StartCoroutine(DoDisplayQuestTarget(vector, targetPosition));
+		parent.worldMapCamera.targetPos = val;
+		this.StartCoroutine(DoDisplayQuestTarget(val, targetPosition));
 	}
 
 	private IEnumerator DoDisplayQuestTarget(Vector3 from, Vector3 to)
 	{
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		yield return (object)new WaitForSeconds(0.8f);
 		Vector3Interpolator ip = new Vector3Interpolator();
 		if (0.1f < Vector3.Distance(from, to))
@@ -1193,14 +1244,14 @@ public class RegionMap : GameSection
 			parent.worldMapCamera.targetPos = ip.Get();
 			yield return (object)null;
 		}
-		if ((UnityEngine.Object)null != (UnityEngine.Object)redCircle)
+		if (null != redCircle)
 		{
 			yield return (object)new WaitForSeconds(0.5f);
-			redCircle.gameObject.SetActive(true);
+			redCircle.get_gameObject().SetActive(true);
 			TweenAlpha tweenAlpha = redCircle.GetComponent<TweenAlpha>();
-			if ((UnityEngine.Object)null != (UnityEngine.Object)tweenAlpha)
+			if (null != tweenAlpha)
 			{
-				while (tweenAlpha.isActiveAndEnabled)
+				while (tweenAlpha.get_isActiveAndEnabled())
 				{
 					yield return (object)null;
 				}
@@ -1212,40 +1263,76 @@ public class RegionMap : GameSection
 
 	private void DisplayQuestTargetTutorial()
 	{
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010d: Expected O, but got Unknown
+		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0125: Expected O, but got Unknown
+		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0138: Expected O, but got Unknown
+		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
 		FieldMapTable.PortalTableData portalData = GetPortalData();
 		FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint)questTargetMapID);
 		bool isStepOver = IsStepOver(portalData);
 		Vector3 targetPosition = GetTargetPosition(fieldMapData, portalData, isStepOver);
-		Vector3 vector = targetPosition;
+		Vector3 val = targetPosition;
 		RegionMapLocation playerLocation = GetPlayerLocation();
-		if ((UnityEngine.Object)null != (UnityEngine.Object)playerLocation)
+		if (null != playerLocation)
 		{
-			vector = playerLocation.transform.position;
+			val = playerLocation.get_transform().get_position();
 		}
-		Vector3 neighbor = Vector3.zero;
+		Vector3 neighbor = Vector3.get_zero();
 		int neighborMapID = GetNeighborMapID();
 		RegionMapLocation regionMapLocation = regionMapRoot.FindLocation(neighborMapID);
-		if ((UnityEngine.Object)null != (UnityEngine.Object)regionMapLocation)
+		if (null != regionMapLocation)
 		{
-			neighbor = regionMapLocation.transform.position;
+			neighbor = regionMapLocation.get_transform().get_position();
 		}
 		SetRedCirclePosition(fieldMapData, portalData, isStepOver);
 		Transform icon = null;
 		Transform button = null;
 		SpotManager.Spot spot = spots.FindSpot(neighborMapID);
-		if ((UnityEngine.Object)null != (UnityEngine.Object)portalGuideTxt && spot != null)
+		if (null != portalGuideTxt && spot != null)
 		{
 			portalGuideTxt.SetParent(spot._transform);
-			portalGuideTxt.localPosition = new Vector3(0f, -60f, 0f);
+			portalGuideTxt.set_localPosition(new Vector3(0f, -60f, 0f));
 			icon = ((spot.type != 0) ? spot._transform.Find("SPR_ICON_CLEARED") : spot._transform.Find("SPR_ICON_NEW"));
 			button = spot._transform.Find("SPR_BUTTON");
 		}
-		parent.worldMapCamera.targetPos = vector;
-		StartCoroutine(DoDisplayQuestTargetTutorial(vector, targetPosition, neighbor, icon, button));
+		parent.worldMapCamera.targetPos = val;
+		this.StartCoroutine(DoDisplayQuestTargetTutorial(val, targetPosition, neighbor, icon, button));
 	}
 
 	private IEnumerator DoDisplayQuestTargetTutorial(Vector3 from, Vector3 to, Vector3 neighbor, Transform icon, Transform button)
 	{
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		Vector3Interpolator ip = new Vector3Interpolator();
 		if (0.1f < Vector3.Distance(from, to))
 		{
@@ -1263,14 +1350,14 @@ public class RegionMap : GameSection
 			parent.worldMapCamera.targetPos = ip.Get();
 			yield return (object)null;
 		}
-		if ((UnityEngine.Object)null != (UnityEngine.Object)redCircle)
+		if (null != redCircle)
 		{
 			yield return (object)new WaitForSeconds(0.5f);
-			redCircle.gameObject.SetActive(true);
+			redCircle.get_gameObject().SetActive(true);
 			TweenAlpha tweenAlpha2 = redCircle.GetComponent<TweenAlpha>();
-			if ((UnityEngine.Object)null != (UnityEngine.Object)tweenAlpha2)
+			if (null != tweenAlpha2)
 			{
-				while (tweenAlpha2.isActiveAndEnabled)
+				while (tweenAlpha2.get_isActiveAndEnabled())
 				{
 					yield return (object)null;
 				}
@@ -1285,33 +1372,33 @@ public class RegionMap : GameSection
 			parent.worldMapCamera.targetPos = ip.Get();
 			yield return (object)null;
 		}
-		if ((UnityEngine.Object)null != (UnityEngine.Object)portalGuideTxt)
+		if (null != portalGuideTxt)
 		{
 			yield return (object)new WaitForSeconds(0.5f);
-			portalGuideTxt.gameObject.SetActive(true);
+			portalGuideTxt.get_gameObject().SetActive(true);
 			TweenAlpha tweenAlpha = portalGuideTxt.GetComponent<TweenAlpha>();
-			if ((UnityEngine.Object)null != (UnityEngine.Object)tweenAlpha)
+			if (null != tweenAlpha)
 			{
-				while (tweenAlpha.isActiveAndEnabled)
+				while (tweenAlpha.get_isActiveAndEnabled())
 				{
 					yield return (object)null;
 				}
 			}
 		}
-		if ((UnityEngine.Object)null != (UnityEngine.Object)icon)
+		if (null != icon)
 		{
 			yield return (object)new WaitForSeconds(0.5f);
 			UITweenCtrl tweenCtrl = icon.GetComponent<UITweenCtrl>();
-			if ((UnityEngine.Object)null != (UnityEngine.Object)tweenCtrl)
+			if (null != tweenCtrl)
 			{
 				tweenCtrl.Play(true, null);
 			}
 		}
 		Transform cursor = TutorialMessage.AttachCursor(button, null);
-		if ((UnityEngine.Object)null != (UnityEngine.Object)cursor)
+		if (null != cursor)
 		{
-			Vector3 cursorPos = cursor.localPosition;
-			cursor.localPosition = cursorPos + new Vector3(0f, -10f, 0f);
+			Vector3 cursorPos = cursor.get_localPosition();
+			cursor.set_localPosition(cursorPos + new Vector3(0f, -10f, 0f));
 		}
 		parent.worldMapCamera.isInteractive = true;
 		MonoBehaviourSingleton<WorldMapManager>.I.ignoreTutorial = false;
@@ -1405,46 +1492,78 @@ public class RegionMap : GameSection
 
 	private Vector3 GetTargetPosition(FieldMapTable.FieldMapTableData map, FieldMapTable.PortalTableData portal, bool isStepOver)
 	{
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018d: Unknown result type (might be due to invalid IL or missing references)
 		if (map == null && portal == null)
 		{
-			return Vector3.zero;
+			return Vector3.get_zero();
 		}
-		Vector3 result = Vector3.zero;
+		Vector3 result = Vector3.get_zero();
 		if (portal == null)
 		{
 			RegionMapLocation regionMapLocation = regionMapRoot.FindLocation((int)map.mapID);
-			if ((UnityEngine.Object)null != (UnityEngine.Object)regionMapLocation)
+			if (null != regionMapLocation)
 			{
-				result = regionMapLocation.transform.position;
+				result = regionMapLocation.get_transform().get_position();
 			}
 		}
 		else if (portal.mapX < 1E+10f)
 		{
 			RegionMapLocation regionMapLocation2 = regionMapRoot.FindLocation((int)portal.srcMapID);
-			if ((UnityEngine.Object)null != (UnityEngine.Object)regionMapLocation2)
+			if (null != regionMapLocation2)
 			{
-				Vector3 b = new Vector3(portal.mapX, portal.mapY, 0f);
-				result = regionMapLocation2.transform.position + b;
+				Vector3 val = default(Vector3);
+				val._002Ector(portal.mapX, portal.mapY, 0f);
+				result = regionMapLocation2.get_transform().get_position() + val;
 			}
 		}
 		else if (!isStepOver)
 		{
 			RegionMapLocation regionMapLocation3 = regionMapRoot.FindLocation((int)portal.srcMapID);
 			RegionMapLocation regionMapLocation4 = regionMapRoot.FindLocation((int)portal.dstMapID);
-			if ((UnityEngine.Object)null != (UnityEngine.Object)regionMapLocation3 && (UnityEngine.Object)null != (UnityEngine.Object)regionMapLocation4)
+			if (null != regionMapLocation3 && null != regionMapLocation4)
 			{
-				result = Vector3.Lerp(regionMapLocation3.transform.position, regionMapLocation4.transform.position, 0.5f);
+				result = Vector3.Lerp(regionMapLocation3.get_transform().get_position(), regionMapLocation4.get_transform().get_position(), 0.5f);
 			}
 		}
 		else
 		{
 			RegionMapLocation regionMapLocation5 = regionMapRoot.FindLocation((int)portal.srcMapID);
-			if ((UnityEngine.Object)null != (UnityEngine.Object)regionMapLocation5)
+			if (null != regionMapLocation5)
 			{
-				Vector3 point = new Vector3(0f, -1f, 0f);
-				point = Quaternion.Euler(0f, 0f, 0f - portal.dstDir) * point;
-				result = regionMapLocation5.transform.position;
-				result += point * 2f;
+				Vector3 val2 = default(Vector3);
+				val2._002Ector(0f, -1f, 0f);
+				val2 = Quaternion.Euler(0f, 0f, 0f - portal.dstDir) * val2;
+				result = regionMapLocation5.get_transform().get_position();
+				result += val2 * 2f;
 			}
 		}
 		return result;
@@ -1499,6 +1618,29 @@ public class RegionMap : GameSection
 
 	private void SetRedCirclePosition(FieldMapTable.FieldMapTableData map, FieldMapTable.PortalTableData portal, bool isStepOver)
 	{
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Expected O, but got Unknown
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
 		if (map != null || portal != null)
 		{
 			if (portal == null)
@@ -1507,10 +1649,10 @@ public class RegionMap : GameSection
 				if (spot != null)
 				{
 					redCircleOrgPos = spot.originalPos;
-					Transform transform = spot._transform.Find("LBL_NAME");
-					if ((UnityEngine.Object)null != (UnityEngine.Object)transform)
+					Transform val = spot._transform.Find("LBL_NAME");
+					if (null != val)
 					{
-						transform.transform.gameObject.SetActive(true);
+						val.get_transform().get_gameObject().SetActive(true);
 					}
 				}
 			}
@@ -1519,8 +1661,9 @@ public class RegionMap : GameSection
 				SpotManager.Spot spot2 = spots.FindSpot((int)portal.srcMapID);
 				if (spot2 != null)
 				{
-					Vector3 b = new Vector3(portal.mapX, portal.mapY, 0f);
-					redCircleOrgPos = spot2.originalPos + b;
+					Vector3 val2 = default(Vector3);
+					val2._002Ector(portal.mapX, portal.mapY, 0f);
+					redCircleOrgPos = spot2.originalPos + val2;
 				}
 			}
 			else if (!isStepOver)
@@ -1537,9 +1680,10 @@ public class RegionMap : GameSection
 				SpotManager.Spot spot5 = spots.FindSpot((int)portal.srcMapID);
 				if (spot5 != null)
 				{
-					Vector3 point = new Vector3(0f, -1f, 0f);
-					point = Quaternion.Euler(0f, 0f, 0f - portal.dstDir) * point;
-					redCircleOrgPos = spot5.originalPos + point * 2f;
+					Vector3 val3 = default(Vector3);
+					val3._002Ector(0f, -1f, 0f);
+					val3 = Quaternion.Euler(0f, 0f, 0f - portal.dstDir) * val3;
+					redCircleOrgPos = spot5.originalPos + val3 * 2f;
 				}
 			}
 		}

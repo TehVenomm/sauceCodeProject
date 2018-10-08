@@ -23,6 +23,6 @@ public class ChatUIFadeGroup : ChatUITweenGroup<TweenAlpha>
 		tween.to = to_alpha;
 		tween.method = UITweener.Method.EaseOut;
 		tween.duration = 0.25f;
-		tween.enabled = false;
+		tween.set_enabled(false);
 	}
 }

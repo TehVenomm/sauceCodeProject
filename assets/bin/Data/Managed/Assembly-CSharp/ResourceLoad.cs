@@ -13,7 +13,7 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 
 	public void SetReference(ResourceObject resobj)
 	{
-		if (resobj != null && !(resobj.obj == (UnityEngine.Object)null))
+		if (resobj != null && !(resobj.obj == null))
 		{
 			resobj.refCount++;
 			if (list != null)
@@ -84,17 +84,19 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 
 	public static ResourceLoad GetResourceLoad(MonoBehaviour mono_behaviour, bool destroy_notify = false)
 	{
-		ResourceLoad resourceLoad = mono_behaviour.gameObject.GetComponent<ResourceLoad>();
-		if ((UnityEngine.Object)resourceLoad == (UnityEngine.Object)null)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		ResourceLoad resourceLoad = mono_behaviour.get_gameObject().GetComponent<ResourceLoad>();
+		if (resourceLoad == null)
 		{
-			resourceLoad = mono_behaviour.gameObject.AddComponent<ResourceLoad>();
+			resourceLoad = mono_behaviour.get_gameObject().AddComponent<ResourceLoad>();
 			resourceLoad.SetNotifyMaster(MonoBehaviourSingleton<ResourceManager>.I);
 			resourceLoad.destroyNotify = destroy_notify;
 		}
 		return resourceLoad;
 	}
 
-	public static void LoadIconTexture(MonoBehaviour mono_behaviour, RESOURCE_CATEGORY category, string name, Action load_start_callback, Action<Texture> loaded_callback)
+	public static void LoadIconTexture(MonoBehaviour mono_behaviour, RESOURCE_CATEGORY category, string name, Action load_start_callback, Action<Texture> loaded_callback, bool isEventAsset = false)
 	{
 		ResourceObject cachedResourceObject = MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedResourceObject(category, name);
 		if (cachedResourceObject != null)
@@ -103,136 +105,139 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 		}
 		else
 		{
-			load_start_callback?.Invoke();
+			if (load_start_callback != null)
+			{
+				load_start_callback.Invoke();
+			}
 			if (string.IsNullOrEmpty(name))
 			{
 				loaded_callback(null);
 			}
 			else if (ResourceDefine.types[(int)category] == ResourceManager.CATEGORY_TYPE.HASH256)
 			{
-				MonoBehaviourSingleton<ResourceManager>.I.Load(GetResourceLoad(mono_behaviour, true), category, category.ToHash256String(name), new string[1]
+				MonoBehaviourSingleton<ResourceManager>.I.Load(isEventAsset, GetResourceLoad(mono_behaviour, true), category, category.ToHash256String(name), new string[1]
 				{
 					name
 				}, OnLoadIconTextureComplate, OnLoadIconTextureError, false, loaded_callback);
 			}
 			else
 			{
-				MonoBehaviourSingleton<ResourceManager>.I.Load(GetResourceLoad(mono_behaviour, true), category, name, OnLoadIconTextureComplate, OnLoadIconTextureError, false, loaded_callback);
+				MonoBehaviourSingleton<ResourceManager>.I.Load(isEventAsset, GetResourceLoad(mono_behaviour, true), category, name, OnLoadIconTextureComplate, OnLoadIconTextureError, false, loaded_callback);
 			}
 		}
 	}
 
-	public static void LoadRushResultIconTexture(UITexture ui_tex, int quest_id)
+	public unsafe static void LoadRushResultIconTexture(UITexture ui_tex, int quest_id)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.RUSH_RESULT_IMAGE, ResourceName.GetRushResultIconName(quest_id), delegate
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Expected O, but got Unknown
+		_003CLoadRushResultIconTexture_003Ec__AnonStorey70F _003CLoadRushResultIconTexture_003Ec__AnonStorey70F;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.RUSH_RESULT_IMAGE, ResourceName.GetRushResultIconName(quest_id), new Action((object)_003CLoadRushResultIconTexture_003Ec__AnonStorey70F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, false);
 	}
 
-	public static void LoadRushResultTitleTexture(UITexture ui_tex, int quest_id)
+	public unsafe static void LoadRushResultTitleTexture(UITexture ui_tex, int quest_id)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.RUSH_RESULT_IMAGE, ResourceName.GetRushResultTitleName(quest_id), delegate
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Expected O, but got Unknown
+		_003CLoadRushResultTitleTexture_003Ec__AnonStorey710 _003CLoadRushResultTitleTexture_003Ec__AnonStorey;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.RUSH_RESULT_IMAGE, ResourceName.GetRushResultTitleName(quest_id), new Action((object)_003CLoadRushResultTitleTexture_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, false);
 	}
 
-	public static void LoadItemIconTexture(UITexture ui_tex, int icon_id)
+	public unsafe static void LoadItemIconTexture(UITexture ui_tex, int icon_id)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.ICON_ITEM, ResourceName.GetItemIcon(icon_id), delegate
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Expected O, but got Unknown
+		_003CLoadItemIconTexture_003Ec__AnonStorey711 _003CLoadItemIconTexture_003Ec__AnonStorey;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.ICON_ITEM, ResourceName.GetItemIcon(icon_id), new Action((object)_003CLoadItemIconTexture_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, false);
 	}
 
-	public static void LoadNPCIconTexture(UITexture ui_tex, int icon_id, bool is_smile)
+	public unsafe static void LoadNPCIconTexture(UITexture ui_tex, int icon_id, bool is_smile)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.NPC_ICON, ResourceName.GetNPCIcon(icon_id, is_smile), delegate
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0035: Expected O, but got Unknown
+		_003CLoadNPCIconTexture_003Ec__AnonStorey712 _003CLoadNPCIconTexture_003Ec__AnonStorey;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.NPC_ICON, ResourceName.GetNPCIcon(icon_id, is_smile), new Action((object)_003CLoadNPCIconTexture_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, false);
 	}
 
-	public static void LoadEnemyIconTexture(UITexture ui_tex, int icon_id)
+	public unsafe static void LoadEnemyIconTexture(UITexture ui_tex, int icon_id)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.ENEMY_ICON, ResourceName.GetEnemyIcon(icon_id), delegate
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Expected O, but got Unknown
+		_003CLoadEnemyIconTexture_003Ec__AnonStorey713 _003CLoadEnemyIconTexture_003Ec__AnonStorey;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.ENEMY_ICON, ResourceName.GetEnemyIcon(icon_id), new Action((object)_003CLoadEnemyIconTexture_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, false);
 	}
 
-	public static void LoadFieldIconTexture(UITexture ui_tex, FieldMapTable.FieldMapTableData fieldData)
+	public unsafe static void LoadFieldIconTexture(UITexture ui_tex, FieldMapTable.FieldMapTableData fieldData)
 	{
+		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Expected O, but got Unknown
 		string empty = string.Empty;
-		LoadIconTexture(name: (!fieldData.IsExistQuestIconId()) ? ResourceName.GetQuestIcon(fieldData.stageName) : ResourceName.GetQuestIcon((int)fieldData.questIconId), mono_behaviour: ui_tex, category: RESOURCE_CATEGORY.QUEST_ICON, load_start_callback: delegate
+		_003CLoadFieldIconTexture_003Ec__AnonStorey714 _003CLoadFieldIconTexture_003Ec__AnonStorey;
+		LoadIconTexture(name: (!fieldData.IsExistQuestIconId()) ? ResourceName.GetQuestIcon(fieldData.stageName) : ResourceName.GetQuestIcon((int)fieldData.questIconId), mono_behaviour: ui_tex, category: RESOURCE_CATEGORY.QUEST_ICON, load_start_callback: new Action((object)_003CLoadFieldIconTexture_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), loaded_callback: delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, loaded_callback: delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, isEventAsset: false);
 	}
 
-	public static void LoadGatherPointIconTexture(UITexture ui_tex, uint icon_id)
+	public unsafe static void LoadGatherPointIconTexture(UITexture ui_tex, uint icon_id)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.INGAME_GATHER_POINT, ResourceName.GetGatherPointIcon(icon_id), delegate
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Expected O, but got Unknown
+		_003CLoadGatherPointIconTexture_003Ec__AnonStorey715 _003CLoadGatherPointIconTexture_003Ec__AnonStorey;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.INGAME_GATHER_POINT, ResourceName.GetGatherPointIcon(icon_id), new Action((object)_003CLoadGatherPointIconTexture_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, false);
 	}
 
-	public static void LoadCommonImageTexture(UITexture ui_tex, uint image_id)
+	public unsafe static void LoadCommonImageTexture(UITexture ui_tex, uint image_id)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.COMMON, ResourceName.GetCommmonImageName((int)image_id), delegate
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Expected O, but got Unknown
+		_003CLoadCommonImageTexture_003Ec__AnonStorey716 _003CLoadCommonImageTexture_003Ec__AnonStorey;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.COMMON, ResourceName.GetCommmonImageName((int)image_id), new Action((object)_003CLoadCommonImageTexture_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, false);
 	}
 
 	public static void LoadShopImageTexture(UITexture ui_tex, uint image_id, Action<Texture> callback)
@@ -243,7 +248,7 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 			{
 				callback(tex);
 			}
-		});
+		}, false);
 	}
 
 	public static void LoadShopImageOfferTexture(UITexture ui_tex, uint image_id, Action<Texture> callback)
@@ -254,7 +259,7 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 			{
 				callback(tex);
 			}
-		});
+		}, false);
 	}
 
 	public static void LoadShopImageGemOfferTexture(UITexture ui_tex, uint image_id, Action<Texture> callback)
@@ -265,7 +270,7 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 			{
 				callback(tex);
 			}
-		});
+		}, false);
 	}
 
 	public static void LoadShopImageMaterialTexture(UITexture ui_tex, string name, Action<Texture> callback)
@@ -276,119 +281,119 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 			{
 				callback(tex);
 			}
-		});
+		}, false);
 	}
 
-	public static void LoadPointIconImageTexture(UITexture ui_tex, uint image_id)
+	public unsafe static void LoadPointIconImageTexture(UITexture ui_tex, uint image_id)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName((int)image_id), delegate
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Expected O, but got Unknown
+		_003CLoadPointIconImageTexture_003Ec__AnonStorey71B _003CLoadPointIconImageTexture_003Ec__AnonStorey71B;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName((int)image_id), new Action((object)_003CLoadPointIconImageTexture_003Ec__AnonStorey71B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, false);
 	}
 
-	public static void LoadGrayPointIconImageTexture(UITexture ui_tex, uint image_id)
+	public unsafe static void LoadGrayPointIconImageTexture(UITexture ui_tex, uint image_id)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.COMMON, ResourceName.GetGrayPointIconImageName((int)image_id), delegate
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Expected O, but got Unknown
+		_003CLoadGrayPointIconImageTexture_003Ec__AnonStorey71C _003CLoadGrayPointIconImageTexture_003Ec__AnonStorey71C;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.COMMON, ResourceName.GetGrayPointIconImageName((int)image_id), new Action((object)_003CLoadGrayPointIconImageTexture_003Ec__AnonStorey71C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, false);
 	}
 
-	public static void LoadPointShopBannerTexture(UITexture ui_tex, uint image_id)
+	public unsafe static void LoadPointShopBannerTexture(UITexture ui_tex, uint image_id)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.COMMON, ResourceName.GetPointShopBannerImageName((int)image_id), delegate
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Expected O, but got Unknown
+		_003CLoadPointShopBannerTexture_003Ec__AnonStorey71D _003CLoadPointShopBannerTexture_003Ec__AnonStorey71D;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.COMMON, ResourceName.GetPointShopBannerImageName((int)image_id), new Action((object)_003CLoadPointShopBannerTexture_003Ec__AnonStorey71D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, true);
 	}
 
-	public static void LoadPointShopBGTexture(UITexture ui_tex, uint image_id)
+	public unsafe static void LoadPointShopBGTexture(UITexture ui_tex, uint image_id)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.COMMON, ResourceName.GetPointSHopBGImageName((int)image_id), delegate
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Expected O, but got Unknown
+		_003CLoadPointShopBGTexture_003Ec__AnonStorey71E _003CLoadPointShopBGTexture_003Ec__AnonStorey71E;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.COMMON, ResourceName.GetPointSHopBGImageName((int)image_id), new Action((object)_003CLoadPointShopBGTexture_003Ec__AnonStorey71E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, true);
 	}
 
-	public static void LoadHomePointSHopBannerTexture(UITexture ui_tex, uint image_id)
+	public unsafe static void LoadHomePointSHopBannerTexture(UITexture ui_tex, uint image_id)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.COMMON, ResourceName.GetHomePointSHopBannerImageName((int)image_id), delegate
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Expected O, but got Unknown
+		_003CLoadHomePointSHopBannerTexture_003Ec__AnonStorey71F _003CLoadHomePointSHopBannerTexture_003Ec__AnonStorey71F;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.COMMON, ResourceName.GetHomePointSHopBannerImageName((int)image_id), new Action((object)_003CLoadHomePointSHopBannerTexture_003Ec__AnonStorey71F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, false);
 	}
 
-	public static void LoadEventBannerResultTexture(UITexture ui_tex, uint event_id)
+	public unsafe static void LoadEventBannerResultTexture(UITexture ui_tex, uint event_id)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.EVENT_BANNER_RESULT, ResourceName.GetQuestEventBannerResult((int)event_id), delegate
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Expected O, but got Unknown
+		_003CLoadEventBannerResultTexture_003Ec__AnonStorey720 _003CLoadEventBannerResultTexture_003Ec__AnonStorey;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.EVENT_BANNER_RESULT, ResourceName.GetQuestEventBannerResult((int)event_id), new Action((object)_003CLoadEventBannerResultTexture_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, false);
 	}
 
-	public static void LoadEventBannerResultBGTexture(UITexture ui_tex, uint event_id)
+	public unsafe static void LoadEventBannerResultBGTexture(UITexture ui_tex, uint event_id)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.EVENT_BANNER_RESULT, ResourceName.GetQuestEventBannerResultBG((int)event_id), delegate
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Expected O, but got Unknown
+		_003CLoadEventBannerResultBGTexture_003Ec__AnonStorey721 _003CLoadEventBannerResultBGTexture_003Ec__AnonStorey;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.EVENT_BANNER_RESULT, ResourceName.GetQuestEventBannerResultBG((int)event_id), new Action((object)_003CLoadEventBannerResultBGTexture_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, false);
 	}
 
-	public static void LoadWithSetUITexture(UITexture ui_tex, RESOURCE_CATEGORY category, string name)
+	public unsafe static void LoadWithSetUITexture(UITexture ui_tex, RESOURCE_CATEGORY category, string name)
 	{
-		LoadIconTexture(ui_tex, category, name, delegate
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Expected O, but got Unknown
+		_003CLoadWithSetUITexture_003Ec__AnonStorey722 _003CLoadWithSetUITexture_003Ec__AnonStorey;
+		LoadIconTexture(ui_tex, category, name, new Action((object)_003CLoadWithSetUITexture_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, false);
 	}
 
 	public static void LoadBlackMarketOfferTexture(UITexture ui_tex, string imageName, Action<Texture> callback)
@@ -399,7 +404,7 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 			{
 				callback(tex);
 			}
-		});
+		}, false);
 	}
 
 	public static void LoadBlackMarketIconTexture(UITexture ui_tex, string imageName, Action<Texture> callback)
@@ -410,7 +415,18 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 			{
 				callback(tex);
 			}
-		});
+		}, false);
+	}
+
+	public static void LoadFortuneWheelIconTexture(UITexture ui_tex, string imageName, Action<Texture> callback)
+	{
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.SHOP_IMG, imageName, null, delegate(Texture tex)
+		{
+			if (callback != null)
+			{
+				callback(tex);
+			}
+		}, false);
 	}
 
 	public static void ItemIconLoadItemIconTexture(ItemIcon item_icon, int icon_id, Action<ItemIcon, Texture, int> callback)
@@ -419,9 +435,9 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 		{
 			if (callback != null)
 			{
-				callback(item_icon, tex, icon_id);
+				callback.Invoke(item_icon, tex, icon_id);
 			}
-		});
+		}, false);
 	}
 
 	public static void ItemIconLoadAccessoryIconTexture(ItemIcon item_icon, int icon_id, Action<ItemIcon, Texture, int> callback)
@@ -430,9 +446,9 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 		{
 			if (callback != null)
 			{
-				callback(item_icon, tex, icon_id);
+				callback.Invoke(item_icon, tex, icon_id);
 			}
-		});
+		}, false);
 	}
 
 	public static void ItemIconLoadIconBGTexture(ItemIcon item_icon, int icon_id, Action<ItemIcon, Texture, int> callback)
@@ -441,9 +457,9 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 		{
 			if (callback != null)
 			{
-				callback(item_icon, tex, icon_id);
+				callback.Invoke(item_icon, tex, icon_id);
 			}
-		});
+		}, false);
 	}
 
 	public static void ItemIconLoadQuestItemIconTexture(ItemIcon item_icon, int icon_id, Action<ItemIcon, Texture, int> callback)
@@ -452,9 +468,9 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 		{
 			if (callback != null)
 			{
-				callback(item_icon, tex, icon_id);
+				callback.Invoke(item_icon, tex, icon_id);
 			}
-		});
+		}, false);
 	}
 
 	public static void ItemIconLoadEnemyIconItemTexture(ItemIcon item_icon, int icon_id, Action<ItemIcon, Texture, int> callback)
@@ -463,9 +479,9 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 		{
 			if (callback != null)
 			{
-				callback(item_icon, tex, icon_id);
+				callback.Invoke(item_icon, tex, icon_id);
 			}
-		});
+		}, false);
 	}
 
 	public static void ItemIconLoadCommonTexture(ItemIcon item_icon, int icon_id, Action<ItemIcon, Texture, int> callback)
@@ -474,9 +490,9 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 		{
 			if (callback != null)
 			{
-				callback(item_icon, tex, icon_id);
+				callback.Invoke(item_icon, tex, icon_id);
 			}
-		});
+		}, false);
 	}
 
 	public static void ItemIconLoadStampTexture(ItemIcon item_icon, int icon_id, Action<ItemIcon, Texture, int> callback)
@@ -485,9 +501,9 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 		{
 			if (callback != null)
 			{
-				callback(item_icon, tex, icon_id);
+				callback.Invoke(item_icon, tex, icon_id);
 			}
-		});
+		}, false);
 	}
 
 	public static void ItemIconLoadDegreeIconTexture(ItemIcon item_icon, DEGREE_TYPE type, Action<ItemIcon, Texture, DEGREE_TYPE> callback)
@@ -496,9 +512,9 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 		{
 			if (callback != null)
 			{
-				callback(item_icon, tex, type);
+				callback.Invoke(item_icon, tex, type);
 			}
-		});
+		}, false);
 	}
 
 	public static void ItemIconLoadPointShopPointIconTexture(ItemIcon item_icon, int icon_id, Action<ItemIcon, Texture, int> callback)
@@ -507,23 +523,23 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 		{
 			if (callback != null)
 			{
-				callback(item_icon, tex, icon_id);
+				callback.Invoke(item_icon, tex, icon_id);
 			}
-		});
+		}, false);
 	}
 
-	public static void LoadEvolveIconTexture(UITexture ui_tex, uint evolveId)
+	public unsafe static void LoadEvolveIconTexture(UITexture ui_tex, uint evolveId)
 	{
-		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.EVOLVE_ICON, ResourceName.GetEvolveIcon(evolveId), delegate
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Expected O, but got Unknown
+		_003CLoadEvolveIconTexture_003Ec__AnonStorey72F _003CLoadEvolveIconTexture_003Ec__AnonStorey72F;
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.EVOLVE_ICON, ResourceName.GetEvolveIcon(evolveId), new Action((object)_003CLoadEvolveIconTexture_003Ec__AnonStorey72F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), delegate(Texture tex)
 		{
-			ui_tex.mainTexture = null;
-		}, delegate(Texture tex)
-		{
-			if ((UnityEngine.Object)ui_tex != (UnityEngine.Object)null)
+			if (ui_tex != null)
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, false);
 	}
 
 	private static void OnLoadIconTextureComplate(ResourceManager.LoadRequest request, ResourceObject[] objs)

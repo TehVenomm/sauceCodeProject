@@ -1,6 +1,7 @@
 using Network;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class ExplorePlayerStatus
@@ -13,7 +14,7 @@ public class ExplorePlayerStatus
 
 	private CharaInfo charaInfo;
 
-	public bool isInitialized => weaponEquipItemData != null && (UnityEngine.Object)coopClient != (UnityEngine.Object)null;
+	public bool isInitialized => weaponEquipItemData != null && coopClient != null;
 
 	public int hp
 	{
@@ -79,13 +80,77 @@ public class ExplorePlayerStatus
 		private set;
 	}
 
-	public event Action onInitialize;
+	public event Action onInitialize
+	{
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		add
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Expected O, but got Unknown
+			this.onInitialize = Delegate.Combine((Delegate)this.onInitialize, (Delegate)value);
+		}
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		remove
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Expected O, but got Unknown
+			this.onInitialize = Delegate.Remove((Delegate)this.onInitialize, (Delegate)value);
+		}
+	}
 
-	public event Action onUpdateWeapon;
+	public event Action onUpdateWeapon
+	{
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		add
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Expected O, but got Unknown
+			this.onUpdateWeapon = Delegate.Combine((Delegate)this.onUpdateWeapon, (Delegate)value);
+		}
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		remove
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Expected O, but got Unknown
+			this.onUpdateWeapon = Delegate.Remove((Delegate)this.onUpdateWeapon, (Delegate)value);
+		}
+	}
 
-	public event Action onUpdateBuff;
+	public event Action onUpdateBuff
+	{
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		add
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Expected O, but got Unknown
+			this.onUpdateBuff = Delegate.Combine((Delegate)this.onUpdateBuff, (Delegate)value);
+		}
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		remove
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Expected O, but got Unknown
+			this.onUpdateBuff = Delegate.Remove((Delegate)this.onUpdateBuff, (Delegate)value);
+		}
+	}
 
-	public event Action onUpdateHp;
+	public event Action onUpdateHp
+	{
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		add
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Expected O, but got Unknown
+			this.onUpdateHp = Delegate.Combine((Delegate)this.onUpdateHp, (Delegate)value);
+		}
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		remove
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Expected O, but got Unknown
+			this.onUpdateHp = Delegate.Remove((Delegate)this.onUpdateHp, (Delegate)value);
+		}
+	}
 
 	public ExplorePlayerStatus(CharaInfo charaInfo, bool isSelf)
 	{
@@ -114,7 +179,7 @@ public class ExplorePlayerStatus
 		{
 			if (this.onUpdateBuff != null)
 			{
-				this.onUpdateBuff();
+				this.onUpdateBuff.Invoke();
 			}
 		}
 		else
@@ -135,14 +200,14 @@ public class ExplorePlayerStatus
 			}
 			if (this.onUpdateBuff != null)
 			{
-				this.onUpdateBuff();
+				this.onUpdateBuff.Invoke();
 			}
 		}
 	}
 
 	public void SyncFromPlayer(Player player)
 	{
-		if ((bool)player && player.isInitialized)
+		if (Object.op_Implicit(player) && player.isInitialized)
 		{
 			UpdatePlayerStatus(player.hp, player.buffParam.CreateSyncParam(BuffParam.BUFFTYPE.NONE), player.weaponData.eId);
 			List<int> list = null;
@@ -170,7 +235,7 @@ public class ExplorePlayerStatus
 				extraStatus = list;
 				if (this.onUpdateBuff != null)
 				{
-					this.onUpdateBuff();
+					this.onUpdateBuff.Invoke();
 				}
 			}
 		}
@@ -187,7 +252,7 @@ public class ExplorePlayerStatus
 			}
 			if (this.onUpdateHp != null)
 			{
-				this.onUpdateHp();
+				this.onUpdateHp.Invoke();
 			}
 		}
 		if (buffSyncParam != null)
@@ -195,7 +260,7 @@ public class ExplorePlayerStatus
 			buff.SetSyncParamForExplorePlayerStatus(buffSyncParam);
 			if (this.onUpdateBuff != null)
 			{
-				this.onUpdateBuff();
+				this.onUpdateBuff.Invoke();
 			}
 		}
 		if (this.weaponEquipmentId != weaponEquipmentId)
@@ -205,11 +270,11 @@ public class ExplorePlayerStatus
 			weaponEquipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)weaponEquipmentId);
 			if (flag && this.onInitialize != null)
 			{
-				this.onInitialize();
+				this.onInitialize.Invoke();
 			}
 			if (this.onUpdateWeapon != null)
 			{
-				this.onUpdateWeapon();
+				this.onUpdateWeapon.Invoke();
 			}
 		}
 	}

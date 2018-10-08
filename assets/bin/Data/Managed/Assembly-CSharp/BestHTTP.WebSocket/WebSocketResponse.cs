@@ -299,7 +299,7 @@ namespace BestHTTP.WebSocket
 						case WebSocketFrameTypes.Continuation:
 							if (OnIncompleteFrame != null)
 							{
-								OnIncompleteFrame(this, webSocketFrameReader);
+								OnIncompleteFrame.Invoke(this, webSocketFrameReader);
 							}
 							break;
 						case WebSocketFrameTypes.Text:
@@ -307,7 +307,7 @@ namespace BestHTTP.WebSocket
 							{
 								if (OnText != null)
 								{
-									OnText(this, Encoding.UTF8.GetString(webSocketFrameReader.Data, 0, webSocketFrameReader.Data.Length));
+									OnText.Invoke(this, Encoding.UTF8.GetString(webSocketFrameReader.Data, 0, webSocketFrameReader.Data.Length));
 								}
 								break;
 							}
@@ -317,7 +317,7 @@ namespace BestHTTP.WebSocket
 							{
 								if (OnBinary != null)
 								{
-									OnBinary(this, webSocketFrameReader.Data);
+									OnBinary.Invoke(this, webSocketFrameReader.Data);
 								}
 								break;
 							}
@@ -325,7 +325,7 @@ namespace BestHTTP.WebSocket
 						case WebSocketFrameTypes.Pong:
 							if (OnPong != null)
 							{
-								OnPong(this, webSocketFrameReader.Data);
+								OnPong.Invoke(this, webSocketFrameReader.Data);
 							}
 							break;
 						}
@@ -340,21 +340,21 @@ namespace BestHTTP.WebSocket
 			{
 				try
 				{
-					ushort arg = 0;
-					string arg2 = string.Empty;
+					ushort num = 0;
+					string text = string.Empty;
 					if (CloseFrame != null && CloseFrame.Data != null && CloseFrame.Data.Length >= 2)
 					{
 						if (BitConverter.IsLittleEndian)
 						{
 							Array.Reverse(CloseFrame.Data, 0, 2);
 						}
-						arg = BitConverter.ToUInt16(CloseFrame.Data, 0);
+						num = BitConverter.ToUInt16(CloseFrame.Data, 0);
 						if (CloseFrame.Data.Length > 2)
 						{
-							arg2 = Encoding.UTF8.GetString(CloseFrame.Data, 2, CloseFrame.Data.Length - 2);
+							text = Encoding.UTF8.GetString(CloseFrame.Data, 2, CloseFrame.Data.Length - 2);
 						}
 					}
-					OnClosed(this, arg, arg2);
+					OnClosed.Invoke(this, num, text);
 				}
 				catch
 				{

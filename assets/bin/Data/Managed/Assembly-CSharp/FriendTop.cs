@@ -1,4 +1,4 @@
-using UnityEngine;
+using System;
 
 public class FriendTop : GameSection
 {
@@ -18,11 +18,11 @@ public class FriendTop : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText(UI.LBL_FOLLOW_NUM, MonoBehaviourSingleton<FriendManager>.I.followNum.ToString() + "/" + MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxFollow.ToString());
+		SetLabelText((Enum)UI.LBL_FOLLOW_NUM, MonoBehaviourSingleton<FriendManager>.I.followNum.ToString() + "/" + MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxFollow.ToString());
 		ServerConstDefine constDefine = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine;
-		SetLabelText(UI.LBL_FOLLOWER_NUM, MonoBehaviourSingleton<FriendManager>.I.followerNum.ToString() + "/" + constDefine.FRIEND_MAX_FOLLOWER.ToString());
-		SetLabelText(UI.LBL_BLACK_LIST_NUM, MonoBehaviourSingleton<BlackListManager>.I.GetBlackListUserNum().ToString() + "/" + constDefine.BLACKLIST_MAX.ToString());
-		SetBadge(UI.BTN_MUTUAL_FOLLOW_LIST, MonoBehaviourSingleton<FriendManager>.I.noReadMessageNum, SpriteAlignment.TopRight, -4, -4, true);
+		SetLabelText((Enum)UI.LBL_FOLLOWER_NUM, MonoBehaviourSingleton<FriendManager>.I.followerNum.ToString() + "/" + constDefine.FRIEND_MAX_FOLLOWER.ToString());
+		SetLabelText((Enum)UI.LBL_BLACK_LIST_NUM, MonoBehaviourSingleton<BlackListManager>.I.GetBlackListUserNum().ToString() + "/" + constDefine.BLACKLIST_MAX.ToString());
+		SetBadge((Enum)UI.BTN_MUTUAL_FOLLOW_LIST, MonoBehaviourSingleton<FriendManager>.I.noReadMessageNum, 3, -4, -4, true);
 	}
 
 	private void OnQuery_MUTUAL_FOLLOW()

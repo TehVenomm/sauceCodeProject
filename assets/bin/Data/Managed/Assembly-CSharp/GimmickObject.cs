@@ -16,8 +16,11 @@ public class GimmickObject : StageObject
 
 	protected override void Awake()
 	{
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Expected O, but got Unknown
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		Utility.SetLayerWithChildren(base.transform, 18);
-		id = GetID(base.gameObject.name);
+		Utility.SetLayerWithChildren(this.get_transform(), 18);
+		id = GetID(this.get_gameObject().get_name());
 	}
 }

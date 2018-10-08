@@ -1,27 +1,34 @@
 using UnityEngine;
 
-public class UIBlurWindow : MonoBehaviour
+public class UIBlurWindow
 {
 	private Material mat;
 
+	public UIBlurWindow()
+		: this()
+	{
+	}
+
 	private void Start()
 	{
-		if ((Object)mat == (Object)null)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Expected O, but got Unknown
+		if (mat == null)
 		{
-			Renderer component = GetComponent<Renderer>();
-			if ((Object)component == (Object)null)
+			Renderer component = this.GetComponent<Renderer>();
+			if (component == null)
 			{
 				return;
 			}
-			mat = component.material;
+			mat = component.get_material();
 		}
 		Camera mainCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
-		if (!((Object)mainCamera == (Object)null))
+		if (!(mainCamera == null))
 		{
 			RenderTargetCacher component2 = mainCamera.GetComponent<RenderTargetCacher>();
-			if (!((Object)component2 == (Object)null))
+			if (!(component2 == null))
 			{
-				mat.mainTexture = component2.GetTexture();
+				mat.set_mainTexture(component2.GetTexture());
 			}
 		}
 	}

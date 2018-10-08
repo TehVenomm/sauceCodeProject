@@ -97,6 +97,10 @@ public class EnemyBrain : Brain
 
 	private void SetNearWaveMatchTarget()
 	{
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 		if (base.fsm != null && base.targetCtrl != null)
 		{
 			StageObject stageObject = null;
@@ -104,9 +108,10 @@ public class EnemyBrain : Brain
 			for (int i = 0; i < MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList.Count; i++)
 			{
 				FieldWaveTargetObject fieldWaveTargetObject = MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList[i] as FieldWaveTargetObject;
-				if (!((Object)fieldWaveTargetObject == (Object)null) && !fieldWaveTargetObject.isDead)
+				if (!(fieldWaveTargetObject == null) && !fieldWaveTargetObject.isDead)
 				{
-					float sqrMagnitude = (fieldWaveTargetObject._position - enemy._position).sqrMagnitude;
+					Vector3 val = fieldWaveTargetObject._position - enemy._position;
+					float sqrMagnitude = val.get_sqrMagnitude();
 					if (sqrMagnitude < num)
 					{
 						num = sqrMagnitude;
@@ -114,7 +119,7 @@ public class EnemyBrain : Brain
 					}
 				}
 			}
-			if (!((Object)stageObject == (Object)null))
+			if (!(stageObject == null))
 			{
 				base.fsm.ChangeState(STATE_TYPE.SELECT);
 				base.targetCtrl.SetCurrentTarget(stageObject);
@@ -125,6 +130,14 @@ public class EnemyBrain : Brain
 
 	public override void HandleEvent(BRAIN_EVENT ev, object param = null)
 	{
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
 		switch (ev)
 		{
 		case BRAIN_EVENT.END_ACTION:
@@ -148,7 +161,9 @@ public class EnemyBrain : Brain
 			AttackedHitStatusOwner attackedHitStatusOwner2 = (AttackedHitStatusOwner)param;
 			if (base.opponentMem != null)
 			{
-				DISTANCE distance2 = base.opponentMem.GetDistance((attackedHitStatusOwner2.fromPos - attackedHitStatusOwner2.hitPos).sqrMagnitude);
+				OpponentMemory opponentMem2 = base.opponentMem;
+				Vector3 val2 = attackedHitStatusOwner2.fromPos - attackedHitStatusOwner2.hitPos;
+				DISTANCE distance2 = opponentMem2.GetDistance(val2.get_sqrMagnitude());
 				int num = (int)((float)attackedHitStatusOwner2.damage * base.opponentMem.hateParam.distanceAttackRatio[(int)distance2]);
 				if (isNPC(attackedHitStatusOwner2.fromObject))
 				{
@@ -164,7 +179,9 @@ public class EnemyBrain : Brain
 			if (base.opponentMem != null)
 			{
 				int attackedWeakPointHate = base.opponentMem.hateParam.attackedWeakPointHate;
-				DISTANCE distance = base.opponentMem.GetDistance((attackedHitStatusOwner.fromPos - attackedHitStatusOwner.hitPos).sqrMagnitude);
+				OpponentMemory opponentMem = base.opponentMem;
+				Vector3 val = attackedHitStatusOwner.fromPos - attackedHitStatusOwner.hitPos;
+				DISTANCE distance = opponentMem.GetDistance(val.get_sqrMagnitude());
 				attackedWeakPointHate = (int)((float)attackedWeakPointHate * base.opponentMem.hateParam.distanceAttackRatio[(int)distance]);
 				if (isNPC(attackedHitStatusOwner.fromObject))
 				{
@@ -213,6 +230,6 @@ public class EnemyBrain : Brain
 	private bool isNPC(StageObject obj)
 	{
 		Player player = obj as Player;
-		return (Object)player != (Object)null && player.isNpc;
+		return player != null && player.isNpc;
 	}
 }

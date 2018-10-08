@@ -1,8 +1,11 @@
-using UnityEngine;
-
-public class yoshida : MonoBehaviour
+public class yoshida
 {
 	public InputManager inputMgr;
+
+	public yoshida()
+		: this()
+	{
+	}
 
 	private void Start()
 	{

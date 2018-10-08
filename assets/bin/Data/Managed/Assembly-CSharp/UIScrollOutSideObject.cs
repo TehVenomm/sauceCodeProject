@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIScrollOutSideObject : MonoBehaviour
+public class UIScrollOutSideObject
 {
 	private Transform target;
 
@@ -12,10 +12,16 @@ public class UIScrollOutSideObject : MonoBehaviour
 		private set;
 	}
 
+	public UIScrollOutSideObject()
+		: this()
+	{
+	}
+
 	public void SetActive(bool is_active)
 	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		enaleUpdate = is_active;
-		base.gameObject.SetActive(is_active);
+		this.get_gameObject().SetActive(is_active);
 	}
 
 	public void SetTargetTransform(Transform _t)
@@ -32,14 +38,18 @@ public class UIScrollOutSideObject : MonoBehaviour
 
 	private void Start()
 	{
-		_transform = base.transform;
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Expected O, but got Unknown
+		_transform = this.get_transform();
 	}
 
 	private void LateUpdate()
 	{
-		if (enaleUpdate && (Object)_transform != (Object)null && (Object)target != (Object)null)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		if (enaleUpdate && _transform != null && target != null)
 		{
-			base.transform.position = target.position;
+			this.get_transform().set_position(target.get_position());
 		}
 	}
 }

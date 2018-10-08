@@ -38,7 +38,7 @@ public class EnemyAngryTable : Singleton<EnemyAngryTable>, IDataTable
 
 	public void CreateTable(TextAsset textasset)
 	{
-		CreateTable(textasset.text);
+		CreateTable(textasset.get_text());
 	}
 
 	public void CreateTable(string text)
@@ -49,7 +49,7 @@ public class EnemyAngryTable : Singleton<EnemyAngryTable>, IDataTable
 
 	public void AddTable(TextAsset textasset)
 	{
-		TableUtility.AddUIntKeyTable(dataTable, textasset.text, Data.cb, "id,condition,value1,value2,value3,value4", null);
+		TableUtility.AddUIntKeyTable(dataTable, textasset.get_text(), Data.cb, "id,condition,value1,value2,value3,value4", null);
 	}
 
 	public Data GetData(uint id)

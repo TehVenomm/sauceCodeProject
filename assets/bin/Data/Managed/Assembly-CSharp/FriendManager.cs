@@ -166,8 +166,8 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		}
 		Protocol.Send(HomeGetCharaModel.URL, requestSendForm, delegate(HomeGetCharaModel ret)
 		{
-			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
-			callback(arg, ret.result);
+			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+			callback.Invoke(flag, ret.result);
 		}, string.Empty);
 	}
 
@@ -183,7 +183,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				recvFollowList = ret.result;
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
-			callback(flag, recvFollowList);
+			callback.Invoke(flag, recvFollowList);
 		}, string.Empty);
 	}
 
@@ -200,7 +200,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				recvFollowerList = ret.result;
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
-			callback(flag, ret.result);
+			callback.Invoke(flag, ret.result);
 		}, string.Empty);
 	}
 
@@ -224,17 +224,17 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		requestSendForm.ids = id_list;
 		Protocol.Send(FriendFollowModel.URL, requestSendForm, delegate(FriendFollowModel ret)
 		{
-			List<int> arg = new List<int>();
+			List<int> list = new List<int>();
 			if (ErrorCodeChecker.IsSuccess(ret.Error))
 			{
-				arg = ret.result.success;
+				list = ret.result.success;
 				if (MonoBehaviourSingleton<QuestManager>.IsValid())
 				{
 					MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.SetResultFollowInfo(ret.result);
 				}
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
 			}
-			callback(ret.Error, arg);
+			callback.Invoke(ret.Error, list);
 		}, string.Empty);
 		MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Friend_request", "Social");
 	}
@@ -291,18 +291,18 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		}, string.Empty);
 	}
 
-	public void SendGetUserListMessagedOnce(bool isCalledByOther, Action<bool, FriendMessagedMutualFollowerListModel.Param> _callback)
+	public unsafe void SendGetUserListMessagedOnce(bool isCalledByOther, Action<bool, FriendMessagedMutualFollowerListModel.Param> _callback)
 	{
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Expected O, but got Unknown
 		if (!isCalledByOther)
 		{
 			SendGetUserListMessagedOnce(_callback);
 		}
 		else
 		{
-			Protocol.Try(delegate
-			{
-				SendGetUserListMessagedOnce(_callback);
-			});
+			_003CSendGetUserListMessagedOnce_003Ec__AnonStorey5B6 _003CSendGetUserListMessagedOnce_003Ec__AnonStorey5B;
+			Protocol.Try(new Action((object)_003CSendGetUserListMessagedOnce_003Ec__AnonStorey5B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -316,7 +316,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 			{
 				recvUserListAtLeastGetMessageOnce = ret.result.messageFollowList;
 			}
-			callback(flag, ret.result);
+			callback.Invoke(flag, ret.result);
 		}, string.Empty);
 	}
 
@@ -332,37 +332,37 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				recvMessageUserList = ret.result;
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
-			callback(flag, recvMessageUserList);
+			callback.Invoke(flag, recvMessageUserList);
 		}, string.Empty);
 	}
 
-	public void SendGetMessageUserList(int page, bool isCalledByOther, Action<bool, FriendMessageUserListModel.Param> callback)
+	public unsafe void SendGetMessageUserList(int page, bool isCalledByOther, Action<bool, FriendMessageUserListModel.Param> callback)
 	{
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0044: Expected O, but got Unknown
 		if (!isCalledByOther)
 		{
 			SendGetMessageUserList(page, callback);
 		}
 		else
 		{
-			Protocol.Try(delegate
-			{
-				SendGetMessageUserList(page, callback);
-			});
+			_003CSendGetMessageUserList_003Ec__AnonStorey5B9 _003CSendGetMessageUserList_003Ec__AnonStorey5B;
+			Protocol.Try(new Action((object)_003CSendGetMessageUserList_003Ec__AnonStorey5B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
-	public void SendGetMessageDetailList(int user_id, int page, bool isCalledByOther, Action<bool> callback)
+	public unsafe void SendGetMessageDetailList(int user_id, int page, bool isCalledByOther, Action<bool> callback)
 	{
+		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Expected O, but got Unknown
 		if (!isCalledByOther)
 		{
 			SendGetMessageDetailList(user_id, page, callback);
 		}
 		else
 		{
-			Protocol.Try(delegate
-			{
-				SendGetMessageDetailList(user_id, page, callback);
-			});
+			_003CSendGetMessageDetailList_003Ec__AnonStorey5BA _003CSendGetMessageDetailList_003Ec__AnonStorey5BA;
+			Protocol.Try(new Action((object)_003CSendGetMessageDetailList_003Ec__AnonStorey5BA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -414,18 +414,18 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		return null;
 	}
 
-	public void SendFriendMessage(int user_id, string message, bool isCalledByOther, Action<bool> callback)
+	public unsafe void SendFriendMessage(int user_id, string message, bool isCalledByOther, Action<bool> callback)
 	{
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Expected O, but got Unknown
 		if (!isCalledByOther)
 		{
 			SendFriendMessage(user_id, message, callback);
 		}
 		else
 		{
-			Protocol.Try(delegate
-			{
-				SendFriendMessage(user_id, message, callback);
-			});
+			_003CSendFriendMessage_003Ec__AnonStorey5BD _003CSendFriendMessage_003Ec__AnonStorey5BD;
+			Protocol.Try(new Action((object)_003CSendFriendMessage_003Ec__AnonStorey5BD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -445,18 +445,18 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		}, string.Empty);
 	}
 
-	public void SendGetNoreadMessage(bool isCalledByOther, Action<bool> callback)
+	public unsafe void SendGetNoreadMessage(bool isCalledByOther, Action<bool> callback)
 	{
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Expected O, but got Unknown
 		if (!isCalledByOther)
 		{
 			SendGetNoreadMessage(callback);
 		}
 		else
 		{
-			Protocol.Try(delegate
-			{
-				SendGetNoreadMessage(callback);
-			});
+			_003CSendGetNoreadMessage_003Ec__AnonStorey5BF _003CSendGetNoreadMessage_003Ec__AnonStorey5BF;
+			Protocol.Try(new Action((object)_003CSendGetNoreadMessage_003Ec__AnonStorey5BF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -491,7 +491,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				recvSearchList = ret.result;
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
-			callback(flag, recvSearchList);
+			callback.Invoke(flag, recvSearchList);
 		}, string.Empty);
 	}
 
@@ -507,7 +507,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				recvSearchList = ret.result;
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
-			callback(flag, recvSearchList);
+			callback.Invoke(flag, recvSearchList);
 		}, string.Empty);
 	}
 
@@ -523,7 +523,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				recvSearchList = ret.result;
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
-			callback(flag, recvSearchList);
+			callback.Invoke(flag, recvSearchList);
 		}, string.Empty);
 	}
 
@@ -540,7 +540,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 			{
 				rankingDataList = ret.result;
 			}
-			callback(flag, rankingDataList);
+			callback.Invoke(flag, rankingDataList);
 		}, string.Empty);
 	}
 
@@ -557,7 +557,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 			{
 				result = ret.result;
 			}
-			callback(flag, result);
+			callback.Invoke(flag, result);
 		}, string.Empty);
 	}
 
@@ -574,7 +574,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 			{
 				rankingDataList = ret.result;
 			}
-			callback(flag, rankingDataList);
+			callback.Invoke(flag, rankingDataList);
 		}, string.Empty);
 	}
 
@@ -588,7 +588,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 			{
 				result = ret.result;
 			}
-			callback(flag, result);
+			callback.Invoke(flag, result);
 		}, string.Empty);
 	}
 

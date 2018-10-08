@@ -15,7 +15,8 @@ public class UIQuestInfoRush : MonoBehaviourSingleton<UIQuestInfoRush>
 
 	private void Start()
 	{
-		base.gameObject.SetActive(IsEnable());
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().SetActive(IsEnable());
 		if (IsEnable())
 		{
 			int num = QuestTable.GetSameRushQuestData((uint)MonoBehaviourSingleton<InGameManager>.I.rushId).Count - 1;

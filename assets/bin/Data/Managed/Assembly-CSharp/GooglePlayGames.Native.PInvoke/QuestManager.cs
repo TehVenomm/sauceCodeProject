@@ -67,9 +67,9 @@ namespace GooglePlayGames.Native.PInvoke
 				return ResponseStatus() > (CommonErrorStatus.ResponseStatus)0;
 			}
 
-			internal IEnumerable<NativeQuest> Data()
+			internal unsafe IEnumerable<NativeQuest> Data()
 			{
-				return PInvokeUtilities.ToEnumerable(GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_FetchListResponse_GetData_Length(SelfPtr()), (UIntPtr index) => new NativeQuest(GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_FetchListResponse_GetData_GetElement(SelfPtr(), index)));
+				return PInvokeUtilities.ToEnumerable<NativeQuest>(GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_FetchListResponse_GetData_Length(SelfPtr()), new Func<UIntPtr, NativeQuest>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 
 			protected override void CallDispose(HandleRef selfPointer)
@@ -259,9 +259,9 @@ namespace GooglePlayGames.Native.PInvoke
 			mServices = Misc.CheckNotNull(services);
 		}
 
-		internal void Fetch(Types.DataSource source, string questId, Action<FetchResponse> callback)
+		internal unsafe void Fetch(Types.DataSource source, string questId, Action<FetchResponse> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_Fetch(mServices.AsHandle(), source, questId, InternalFetchCallback, Callbacks.ToIntPtr(callback, FetchResponse.FromPointer));
+			GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_Fetch(mServices.AsHandle(), source, questId, InternalFetchCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, FetchResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.QuestManager.FetchCallback))]
@@ -270,9 +270,9 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("QuestManager#FetchCallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal void FetchList(Types.DataSource source, int fetchFlags, Action<FetchListResponse> callback)
+		internal unsafe void FetchList(Types.DataSource source, int fetchFlags, Action<FetchListResponse> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_FetchList(mServices.AsHandle(), source, fetchFlags, InternalFetchListCallback, Callbacks.ToIntPtr(callback, FetchListResponse.FromPointer));
+			GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_FetchList(mServices.AsHandle(), source, fetchFlags, InternalFetchListCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, FetchListResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.QuestManager.FetchListCallback))]
@@ -281,14 +281,14 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("QuestManager#FetchListCallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal void ShowAllQuestUI(Action<QuestUIResponse> callback)
+		internal unsafe void ShowAllQuestUI(Action<QuestUIResponse> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_ShowAllUI(mServices.AsHandle(), InternalQuestUICallback, Callbacks.ToIntPtr(callback, QuestUIResponse.FromPointer));
+			GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_ShowAllUI(mServices.AsHandle(), InternalQuestUICallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, QuestUIResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 
-		internal void ShowQuestUI(NativeQuest quest, Action<QuestUIResponse> callback)
+		internal unsafe void ShowQuestUI(NativeQuest quest, Action<QuestUIResponse> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_ShowUI(mServices.AsHandle(), quest.AsPointer(), InternalQuestUICallback, Callbacks.ToIntPtr(callback, QuestUIResponse.FromPointer));
+			GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_ShowUI(mServices.AsHandle(), quest.AsPointer(), InternalQuestUICallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, QuestUIResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.QuestManager.QuestUICallback))]
@@ -297,9 +297,9 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("QuestManager#QuestUICallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal void Accept(NativeQuest quest, Action<AcceptResponse> callback)
+		internal unsafe void Accept(NativeQuest quest, Action<AcceptResponse> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_Accept(mServices.AsHandle(), quest.AsPointer(), InternalAcceptCallback, Callbacks.ToIntPtr(callback, AcceptResponse.FromPointer));
+			GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_Accept(mServices.AsHandle(), quest.AsPointer(), InternalAcceptCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, AcceptResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.QuestManager.AcceptCallback))]
@@ -308,9 +308,9 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("QuestManager#AcceptCallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal void ClaimMilestone(NativeQuestMilestone milestone, Action<ClaimMilestoneResponse> callback)
+		internal unsafe void ClaimMilestone(NativeQuestMilestone milestone, Action<ClaimMilestoneResponse> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_ClaimMilestone(mServices.AsHandle(), milestone.AsPointer(), InternalClaimMilestoneCallback, Callbacks.ToIntPtr(callback, ClaimMilestoneResponse.FromPointer));
+			GooglePlayGames.Native.Cwrapper.QuestManager.QuestManager_ClaimMilestone(mServices.AsHandle(), milestone.AsPointer(), InternalClaimMilestoneCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, ClaimMilestoneResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.QuestManager.ClaimMilestoneCallback))]

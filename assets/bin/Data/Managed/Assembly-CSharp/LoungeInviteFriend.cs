@@ -51,22 +51,10 @@ public class LoungeInviteFriend : QuestAcceptRoomInviteFriend
 		OBJ_IN_LOUNGE
 	}
 
-	protected override void SendGetList(int page, Action<bool> callback)
+	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInviteList(delegate(bool is_success, LoungeInviteCharaInfo[] recv_data)
-		{
-			if (is_success)
-			{
-				nowPage = 0;
-				pageNumMax = ((recv_data == null) ? 1 : Mathf.CeilToInt((float)recv_data.Length / 10f));
-				inviteUsers = recv_data;
-				SortArray();
-			}
-			if (callback != null)
-			{
-				callback(is_success);
-			}
-		});
+		_003CSendGetList_003Ec__AnonStorey3DE _003CSendGetList_003Ec__AnonStorey3DE;
+		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInviteList(new Action<bool, LoungeInviteCharaInfo[]>((object)_003CSendGetList_003Ec__AnonStorey3DE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override NOTIFY_FLAG GetUpdateUINotifyFlags()
@@ -74,13 +62,16 @@ public class LoungeInviteFriend : QuestAcceptRoomInviteFriend
 		return base.GetUpdateUINotifyFlags() | NOTIFY_FLAG.RECEIVE_COOP_ROOM_UPDATE;
 	}
 
-	private void OnQuery_OK()
+	private unsafe void OnQuery_OK()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInvite(selectedUserIdList.ToArray(), delegate(bool is_success, int[] invited_users)
+		LoungeMatchingManager i = MonoBehaviourSingleton<LoungeMatchingManager>.I;
+		int[] userIds = selectedUserIdList.ToArray();
+		if (_003C_003Ef__am_0024cache0 == null)
 		{
-			GameSection.ResumeEvent(is_success, null);
-		});
+			_003C_003Ef__am_0024cache0 = new Action<bool, int[]>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		i.SendInvite(userIds, _003C_003Ef__am_0024cache0);
 	}
 
 	protected override void SetupListItem(PartyInviteCharaInfo info, int i, Transform t, bool is_recycle)

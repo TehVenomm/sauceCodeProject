@@ -384,10 +384,12 @@ public final class ArraySet<E> implements Collection<E>, Set<E> {
     public int hashCode() {
         int i = 0;
         int[] iArr = this.mHashes;
-        for (int i2 = 0; i2 < this.mSize; i2++) {
-            i += iArr[i2];
+        int i2 = 0;
+        while (i < this.mSize) {
+            i2 += iArr[i];
+            i++;
         }
-        return i;
+        return i2;
     }
 
     public int indexOf(Object obj) {

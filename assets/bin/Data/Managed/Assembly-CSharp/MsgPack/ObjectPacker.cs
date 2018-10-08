@@ -228,6 +228,8 @@ namespace MsgPack
 
 		private object Unpack(MsgPackReader reader, Type t)
 		{
+			//IL_0591: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0596: Expected O, but got Unknown
 			if (t.IsPrimitive)
 			{
 				if (!reader.Read())
@@ -414,7 +416,7 @@ namespace MsgPack
 			{
 				throw new FormatException();
 			}
-			object obj = (!typeof(ScriptableObject).IsAssignableFrom(t)) ? FormatterServices.GetUninitializedObject(t) : ScriptableObject.CreateInstance(t);
+			object obj = (!typeof(ScriptableObject).IsAssignableFrom(t)) ? FormatterServices.GetUninitializedObject(t) : ((object)ScriptableObject.CreateInstance(t));
 			ReflectionCacheEntry reflectionCacheEntry = ReflectionCache.Lookup(t);
 			int length = (int)reader.Length;
 			for (int j = 0; j < length; j++)

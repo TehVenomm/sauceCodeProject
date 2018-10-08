@@ -79,21 +79,25 @@ public class ChatChannelInputPanel
 		this.onClose = onClose;
 	}
 
-	public void Open()
+	public unsafe void Open()
 	{
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0025: Expected O, but got Unknown
 		UpdateOKButton();
 		UpdateNumberLabels();
-		rootPanelTween.Open(delegate
+		ChatUITweenGroup chatUITweenGroup = rootPanelTween;
+		if (_003C_003Ef__am_0024cache8 == null)
 		{
-		});
+			_003C_003Ef__am_0024cache8 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		chatUITweenGroup.Open(_003C_003Ef__am_0024cache8);
 	}
 
-	public void Close()
+	public unsafe void Close()
 	{
-		rootPanelTween.Close(delegate
-		{
-			ClearNumbers();
-		});
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Expected O, but got Unknown
+		rootPanelTween.Close(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnNumber(int num)
@@ -137,7 +141,7 @@ public class ChatChannelInputPanel
 	{
 		if (onClose != null)
 		{
-			onClose();
+			onClose.Invoke();
 		}
 		Close();
 	}

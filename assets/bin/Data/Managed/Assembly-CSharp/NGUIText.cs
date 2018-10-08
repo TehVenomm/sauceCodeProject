@@ -51,11 +51,11 @@ public static class NGUIText
 
 	public static float pixelDensity = 1f;
 
-	public static FontStyle fontStyle = FontStyle.Normal;
+	public static FontStyle fontStyle = 0;
 
 	public static Alignment alignment = Alignment.Left;
 
-	public static Color tint = Color.white;
+	public static Color tint = Color.get_white();
 
 	public static int rectWidth = 1000000;
 
@@ -69,9 +69,9 @@ public static class NGUIText
 
 	public static bool gradient = false;
 
-	public static Color gradientBottom = Color.white;
+	public static Color gradientBottom = Color.get_white();
 
-	public static Color gradientTop = Color.white;
+	public static Color gradientTop = Color.get_white();
 
 	public static bool encoding = false;
 
@@ -126,31 +126,36 @@ public static class NGUIText
 
 	public static void Update(bool request)
 	{
+		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
 		finalSize = Mathf.RoundToInt((float)fontSize / pixelDensity);
 		finalSpacingX = spacingX * fontScale;
 		finalLineHeight = ((float)fontSize + spacingY) * fontScale;
-		useSymbols = ((Object)bitmapFont != (Object)null && bitmapFont.hasSymbols && encoding && symbolStyle != SymbolStyle.None);
-		if ((Object)dynamicFont != (Object)null && request)
+		useSymbols = (bitmapFont != null && bitmapFont.hasSymbols && encoding && symbolStyle != SymbolStyle.None);
+		if (dynamicFont != null && request)
 		{
 			dynamicFont.RequestCharactersInTexture(")_-", finalSize, fontStyle);
-			if (!dynamicFont.GetCharacterInfo(')', out mTempChar, finalSize, fontStyle) || (float)mTempChar.maxY == 0f)
+			if (!dynamicFont.GetCharacterInfo(')', ref mTempChar, finalSize, fontStyle) || (float)mTempChar.get_maxY() == 0f)
 			{
 				dynamicFont.RequestCharactersInTexture("A", finalSize, fontStyle);
-				if (!dynamicFont.GetCharacterInfo('A', out mTempChar, finalSize, fontStyle))
+				if (!dynamicFont.GetCharacterInfo('A', ref mTempChar, finalSize, fontStyle))
 				{
 					baseline = 0f;
 					return;
 				}
 			}
-			float num = (float)mTempChar.maxY;
-			float num2 = (float)mTempChar.minY;
+			float num = (float)mTempChar.get_maxY();
+			float num2 = (float)mTempChar.get_minY();
 			baseline = Mathf.Round(num + ((float)finalSize - num + num2) * 0.5f);
 		}
 	}
 
 	public static void Prepare(string text)
 	{
-		if ((Object)dynamicFont != (Object)null)
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		if (dynamicFont != null)
 		{
 			dynamicFont.RequestCharactersInTexture(text, finalSize, fontStyle);
 		}
@@ -158,12 +163,13 @@ public static class NGUIText
 
 	public static BMSymbol GetSymbol(string text, int index, int textLength)
 	{
-		return (!((Object)bitmapFont != (Object)null)) ? null : bitmapFont.MatchSymbol(text, index, textLength);
+		return (!(bitmapFont != null)) ? null : bitmapFont.MatchSymbol(text, index, textLength);
 	}
 
 	public static float GetGlyphWidth(int ch, int prev)
 	{
-		if ((Object)bitmapFont != (Object)null)
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		if (bitmapFont != null)
 		{
 			bool flag = false;
 			if (ch == 8201)
@@ -182,16 +188,37 @@ public static class NGUIText
 				return fontScale * (float)((prev == 0) ? bMGlyph.advance : (num + bMGlyph.GetKerning(prev)));
 			}
 		}
-		else if ((Object)dynamicFont != (Object)null && dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, fontStyle))
+		else if (dynamicFont != null && dynamicFont.GetCharacterInfo((char)ch, ref mTempChar, finalSize, fontStyle))
 		{
-			return (float)mTempChar.advance * fontScale * pixelDensity;
+			return (float)mTempChar.get_advance() * fontScale * pixelDensity;
 		}
 		return 0f;
 	}
 
 	public static GlyphInfo GetGlyph(int ch, int prev)
 	{
-		if ((Object)bitmapFont != (Object)null)
+		//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_030d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0312: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0321: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0326: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0335: Unknown result type (might be due to invalid IL or missing references)
+		//IL_033a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_040a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0411: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0416: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0421: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0428: Unknown result type (might be due to invalid IL or missing references)
+		//IL_042d: Unknown result type (might be due to invalid IL or missing references)
+		if (bitmapFont != null)
 		{
 			bool flag = false;
 			if (ch == 8201)
@@ -224,24 +251,26 @@ public static class NGUIText
 				glyph.channel = bMGlyph.channel;
 				if (fontScale != 1f)
 				{
-					glyph.v0 *= fontScale;
-					glyph.v1 *= fontScale;
+					GlyphInfo glyphInfo = glyph;
+					glyphInfo.v0 *= fontScale;
+					GlyphInfo glyphInfo2 = glyph;
+					glyphInfo2.v1 *= fontScale;
 					glyph.advance *= fontScale;
 				}
 				return glyph;
 			}
 		}
-		else if ((Object)dynamicFont != (Object)null && dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, fontStyle))
+		else if (dynamicFont != null && dynamicFont.GetCharacterInfo((char)ch, ref mTempChar, finalSize, fontStyle))
 		{
-			glyph.v0.x = (float)mTempChar.minX;
-			glyph.v1.x = (float)mTempChar.maxX;
-			glyph.v0.y = (float)mTempChar.maxY - baseline;
-			glyph.v1.y = (float)mTempChar.minY - baseline;
-			glyph.u0 = mTempChar.uvTopLeft;
-			glyph.u1 = mTempChar.uvBottomLeft;
-			glyph.u2 = mTempChar.uvBottomRight;
-			glyph.u3 = mTempChar.uvTopRight;
-			glyph.advance = (float)mTempChar.advance;
+			glyph.v0.x = (float)mTempChar.get_minX();
+			glyph.v1.x = (float)mTempChar.get_maxX();
+			glyph.v0.y = (float)mTempChar.get_maxY() - baseline;
+			glyph.v1.y = (float)mTempChar.get_minY() - baseline;
+			glyph.u0 = mTempChar.get_uvTopLeft();
+			glyph.u1 = mTempChar.get_uvBottomLeft();
+			glyph.u2 = mTempChar.get_uvBottomRight();
+			glyph.u3 = mTempChar.get_uvTopRight();
+			glyph.advance = (float)mTempChar.get_advance();
 			glyph.channel = 0;
 			glyph.v0.x = Mathf.Round(glyph.v0.x);
 			glyph.v0.y = Mathf.Round(glyph.v0.y);
@@ -250,8 +279,10 @@ public static class NGUIText
 			float num3 = fontScale * pixelDensity;
 			if (num3 != 1f)
 			{
-				glyph.v0 *= num3;
-				glyph.v1 *= num3;
+				GlyphInfo glyphInfo3 = glyph;
+				glyphInfo3.v0 *= num3;
+				GlyphInfo glyphInfo4 = glyph;
+				glyphInfo4.v1 *= num3;
 				glyph.advance *= num3;
 			}
 			return glyph;
@@ -259,8 +290,8 @@ public static class NGUIText
 		return null;
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static float ParseAlpha(string text, int index)
 	{
 		int num = (NGUIMath.HexToDecimal(text[index + 1]) << 4) | NGUIMath.HexToDecimal(text[index + 2]);
@@ -271,13 +302,15 @@ public static class NGUIText
 	[DebuggerHidden]
 	public static Color ParseColor(string text, int offset)
 	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		return ParseColor24(text, offset);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static Color ParseColor24(string text, int offset)
 	{
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
 		int num = (NGUIMath.HexToDecimal(text[offset]) << 4) | NGUIMath.HexToDecimal(text[offset + 1]);
 		int num2 = (NGUIMath.HexToDecimal(text[offset + 2]) << 4) | NGUIMath.HexToDecimal(text[offset + 3]);
 		int num3 = (NGUIMath.HexToDecimal(text[offset + 4]) << 4) | NGUIMath.HexToDecimal(text[offset + 5]);
@@ -285,10 +318,11 @@ public static class NGUIText
 		return new Color(num4 * (float)num, num4 * (float)num2, num4 * (float)num3);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static Color ParseColor32(string text, int offset)
 	{
+		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
 		int num = (NGUIMath.HexToDecimal(text[offset]) << 4) | NGUIMath.HexToDecimal(text[offset + 1]);
 		int num2 = (NGUIMath.HexToDecimal(text[offset + 2]) << 4) | NGUIMath.HexToDecimal(text[offset + 3]);
 		int num3 = (NGUIMath.HexToDecimal(text[offset + 4]) << 4) | NGUIMath.HexToDecimal(text[offset + 5]);
@@ -301,6 +335,7 @@ public static class NGUIText
 	[DebuggerStepThrough]
 	public static string EncodeColor(Color c)
 	{
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 		return EncodeColor24(c);
 	}
 
@@ -308,21 +343,23 @@ public static class NGUIText
 	[DebuggerHidden]
 	public static string EncodeColor(string text, Color c)
 	{
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 		return "[c][" + EncodeColor24(c) + "]" + text + "[-][/c]";
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static string EncodeAlpha(float a)
 	{
 		int num = Mathf.Clamp(Mathf.RoundToInt(a * 255f), 0, 255);
 		return NGUIMath.DecimalToHex8(num);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static string EncodeColor24(Color c)
 	{
+		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 		int num = 0xFFFFFF & (NGUIMath.ColorToInt(c) >> 8);
 		return NGUIMath.DecimalToHex24(num);
 	}
@@ -331,6 +368,7 @@ public static class NGUIText
 	[DebuggerStepThrough]
 	public static string EncodeColor32(Color c)
 	{
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 		int num = NGUIMath.ColorToInt(c);
 		return NGUIMath.DecimalToHex32(num);
 	}
@@ -355,6 +393,24 @@ public static class NGUIText
 
 	public static bool ParseSymbol(string text, ref int index, BetterList<Color> colors, bool premultiply, ref int sub, ref bool bold, ref bool italic, ref bool underline, ref bool strike, ref bool ignoreColor)
 	{
+		//IL_048f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0494: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0496: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0502: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0507: Unknown result type (might be due to invalid IL or missing references)
+		//IL_050a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_053d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0542: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0544: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0584: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0589: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0592: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0597: Unknown result type (might be due to invalid IL or missing references)
+		//IL_059a: Unknown result type (might be due to invalid IL or missing references)
 		int length = text.Length;
 		if (index + 3 > length || text[index] != '[')
 		{
@@ -494,20 +550,20 @@ public static class NGUIText
 		}
 		if (text[index + 7] == ']')
 		{
-			Color color = ParseColor24(text, index + 1);
-			if (EncodeColor24(color) != text.Substring(index + 1, 6).ToUpper())
+			Color val = ParseColor24(text, index + 1);
+			if (EncodeColor24(val) != text.Substring(index + 1, 6).ToUpper())
 			{
 				return false;
 			}
 			if (colors != null)
 			{
-				Color color2 = colors[colors.size - 1];
-				color.a = color2.a;
-				if (premultiply && color.a != 1f)
+				Color val2 = colors[colors.size - 1];
+				val.a = val2.a;
+				if (premultiply && val.a != 1f)
 				{
-					color = Color.Lerp(mInvisible, color, color.a);
+					val = Color.Lerp(mInvisible, val, val.a);
 				}
-				colors.Add(color);
+				colors.Add(val);
 			}
 			index += 8;
 			return true;
@@ -518,18 +574,18 @@ public static class NGUIText
 		}
 		if (text[index + 9] == ']')
 		{
-			Color color3 = ParseColor32(text, index + 1);
-			if (EncodeColor32(color3) != text.Substring(index + 1, 8).ToUpper())
+			Color val3 = ParseColor32(text, index + 1);
+			if (EncodeColor32(val3) != text.Substring(index + 1, 8).ToUpper())
 			{
 				return false;
 			}
 			if (colors != null)
 			{
-				if (premultiply && color3.a != 1f)
+				if (premultiply && val3.a != 1f)
 				{
-					color3 = Color.Lerp(mInvisible, color3, color3.a);
+					val3 = Color.Lerp(mInvisible, val3, val3.a);
 				}
-				colors.Add(color3);
+				colors.Add(val3);
 			}
 			index += 10;
 			return true;
@@ -574,32 +630,32 @@ public static class NGUIText
 		{
 		case Alignment.Right:
 		{
-			float num20 = (float)rectWidth - printedWidth;
-			if (!(num20 < 0f))
+			float num23 = (float)rectWidth - printedWidth;
+			if (!(num23 < 0f))
 			{
 				for (int j = indexOffset; j < verts.size; j++)
 				{
-					verts.buffer[j].x += num20;
+					verts.buffer[j].x += num23;
 				}
 			}
 			break;
 		}
 		case Alignment.Center:
 		{
-			float num17 = ((float)rectWidth - printedWidth) * 0.5f;
-			if (!(num17 < 0f))
+			float num20 = ((float)rectWidth - printedWidth) * 0.5f;
+			if (!(num20 < 0f))
 			{
-				int num18 = Mathf.RoundToInt((float)rectWidth - printedWidth);
-				int num19 = Mathf.RoundToInt((float)rectWidth);
-				bool flag = (num18 & 1) == 1;
-				bool flag2 = (num19 & 1) == 1;
+				int num21 = Mathf.RoundToInt((float)rectWidth - printedWidth);
+				int num22 = Mathf.RoundToInt((float)rectWidth);
+				bool flag = (num21 & 1) == 1;
+				bool flag2 = (num22 & 1) == 1;
 				if ((flag && !flag2) || (!flag && flag2))
 				{
-					num17 += 0.5f * fontScale;
+					num20 += 0.5f * fontScale;
 				}
 				for (int i = indexOffset; i < verts.size; i++)
 				{
-					verts.buffer[i].x += num17;
+					verts.buffer[i].x += num20;
 				}
 			}
 			break;
@@ -623,12 +679,12 @@ public static class NGUIText
 							float x2 = verts.buffer[num5 + elements / 2].x;
 							float num7 = x2 - x;
 							float num8 = x * num4;
-							float a = num8 + num7;
-							float num9 = x2 * num4;
-							float b = num9 - num7;
-							float t = (float)num6 * num3;
-							x2 = Mathf.Lerp(a, num9, t);
-							x = Mathf.Lerp(num8, b, t);
+							float num9 = num8 + num7;
+							float num10 = x2 * num4;
+							float num11 = num10 - num7;
+							float num12 = (float)num6 * num3;
+							x2 = Mathf.Lerp(num9, num10, num12);
+							x = Mathf.Lerp(num8, num11, num12);
 							x = Mathf.Round(x);
 							x2 = Mathf.Round(x2);
 							switch (elements)
@@ -658,24 +714,32 @@ public static class NGUIText
 
 	public static int GetExactCharacterIndex(BetterList<Vector3> verts, BetterList<int> indices, Vector2 pos)
 	{
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < indices.size; i++)
 		{
 			int num = i << 1;
 			int i2 = num + 1;
-			Vector3 vector = verts[num];
-			float x = vector.x;
+			Vector3 val = verts[num];
+			float x = val.x;
 			if (!(pos.x < x))
 			{
-				Vector3 vector2 = verts[i2];
-				float x2 = vector2.x;
+				Vector3 val2 = verts[i2];
+				float x2 = val2.x;
 				if (!(pos.x > x2))
 				{
-					Vector3 vector3 = verts[num];
-					float y = vector3.y;
+					Vector3 val3 = verts[num];
+					float y = val3.y;
 					if (!(pos.y < y))
 					{
-						Vector3 vector4 = verts[i2];
-						float y2 = vector4.y;
+						Vector3 val4 = verts[i2];
+						float y2 = val4.y;
 						if (!(pos.y > y2))
 						{
 							return indices[i];
@@ -689,19 +753,23 @@ public static class NGUIText
 
 	public static int GetApproximateCharacterIndex(BetterList<Vector3> verts, BetterList<int> indices, Vector2 pos)
 	{
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 		float num = 3.40282347E+38f;
 		float num2 = 3.40282347E+38f;
 		int i = 0;
 		for (int j = 0; j < verts.size; j++)
 		{
 			float y = pos.y;
-			Vector3 vector = verts[j];
-			float num3 = Mathf.Abs(y - vector.y);
+			Vector3 val = verts[j];
+			float num3 = Mathf.Abs(y - val.y);
 			if (!(num3 > num2))
 			{
 				float x = pos.x;
-				Vector3 vector2 = verts[j];
-				float num4 = Mathf.Abs(x - vector2.x);
+				Vector3 val2 = verts[j];
+				float num4 = Mathf.Abs(x - val2.x);
 				if (num3 < num2)
 				{
 					num2 = num3;
@@ -718,8 +786,8 @@ public static class NGUIText
 		return indices[i];
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	private static bool IsSpace(int ch)
 	{
 		return ch == 32 || ch == 8202 || ch == 8203 || ch == 8201;
@@ -753,7 +821,10 @@ public static class NGUIText
 
 	public static Vector2 CalculatePrintedSize(string text)
 	{
-		Vector2 zero = Vector2.zero;
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+		Vector2 zero = Vector2.get_zero();
 		if (!string.IsNullOrEmpty(text))
 		{
 			if (encoding)
@@ -895,6 +966,20 @@ public static class NGUIText
 
 	public static bool WrapText(string text, out string finalText, bool keepCharCount, bool wrapLineColors)
 	{
+		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_030e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0313: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0520: Unknown result type (might be due to invalid IL or missing references)
+		//IL_061b: Unknown result type (might be due to invalid IL or missing references)
 		if (regionWidth < 1 || regionHeight < 1 || finalLineHeight < 1f)
 		{
 			finalText = string.Empty;
@@ -1006,8 +1091,8 @@ public static class NGUIText
 						for (int num6 = mColors.size - 2; l < num6; l++)
 						{
 							float a = item.a;
-							Color color = mColors[l];
-							item.a = a * color.a;
+							Color val = mColors[l];
+							item.a = a * val.a;
 						}
 						i--;
 						continue;
@@ -1155,11 +1240,128 @@ public static class NGUIText
 
 	public static void Print(string text, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0202: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0207: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0223: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0277: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0283: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0285: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0291: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0407: Unknown result type (might be due to invalid IL or missing references)
+		//IL_040c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0437: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0446: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0455: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0464: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0488: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0865: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0872: Unknown result type (might be due to invalid IL or missing references)
+		//IL_087f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_088c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_090b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_090d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0911: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0916: Unknown result type (might be due to invalid IL or missing references)
+		//IL_091b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0920: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0922: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0926: Unknown result type (might be due to invalid IL or missing references)
+		//IL_092b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0930: Unknown result type (might be due to invalid IL or missing references)
+		//IL_094e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0959: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0964: Unknown result type (might be due to invalid IL or missing references)
+		//IL_096f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_09a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_09c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_09c4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_09c9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_09cb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_09d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_09d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a70: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a72: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a77: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a93: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0abc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0acb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ada: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ae9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b1b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b2d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b3f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b51: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0bbc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0bd4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0bec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0c04: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0d38: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0d51: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0d6a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0d83: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0e37: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0e4c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0e60: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0e74: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0e96: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ea5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0eb3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ec1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0f11: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0f13: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0f17: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0f1c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0f21: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0f26: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0f28: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0f2c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0f31: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0f36: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0f54: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0f5f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0f6a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0f75: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0fad: Unknown result type (might be due to invalid IL or missing references)
 		if (!string.IsNullOrEmpty(text))
 		{
 			int size = verts.size;
 			Prepare(text);
-			mColors.Add(Color.white);
+			mColors.Add(Color.get_white());
 			mAlpha = 1f;
 			int num = 0;
 			int prev = 0;
@@ -1167,11 +1369,11 @@ public static class NGUIText
 			float num3 = 0f;
 			float num4 = 0f;
 			float num5 = (float)finalSize;
-			Color a = tint * gradientBottom;
-			Color b = tint * gradientTop;
-			Color32 color = tint;
+			Color val = tint * gradientBottom;
+			Color val2 = tint * gradientTop;
+			Color32 val3 = Color32.op_Implicit(tint);
 			int length = text.Length;
-			Rect rect = default(Rect);
+			Rect val4 = default(Rect);
 			float num6 = 0f;
 			float num7 = 0f;
 			float num8 = num5 * pixelDensity;
@@ -1183,11 +1385,11 @@ public static class NGUIText
 			bool strike = false;
 			bool ignoreColor = false;
 			float num9 = 0f;
-			if ((Object)bitmapFont != (Object)null)
+			if (bitmapFont != null)
 			{
-				rect = bitmapFont.uvRect;
-				num6 = rect.width / (float)bitmapFont.texWidth;
-				num7 = rect.height / (float)bitmapFont.texHeight;
+				val4 = bitmapFont.uvRect;
+				num6 = val4.get_width() / (float)bitmapFont.texWidth;
+				num7 = val4.get_height() / (float)bitmapFont.texHeight;
 			}
 			for (int i = 0; i < length; i++)
 			{
@@ -1214,29 +1416,29 @@ public static class NGUIText
 				}
 				else if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref sub, ref bold, ref italic, ref underline, ref strike, ref ignoreColor))
 				{
-					Color color2;
+					Color val5;
 					if (ignoreColor)
 					{
-						color2 = mColors[mColors.size - 1];
-						color2.a *= mAlpha * tint.a;
+						val5 = mColors[mColors.size - 1];
+						val5.a *= mAlpha * tint.a;
 					}
 					else
 					{
-						color2 = tint * mColors[mColors.size - 1];
-						color2.a *= mAlpha;
+						val5 = tint * mColors[mColors.size - 1];
+						val5.a *= mAlpha;
 					}
-					color = color2;
+					val3 = Color32.op_Implicit(val5);
 					int j = 0;
 					for (int num10 = mColors.size - 2; j < num10; j++)
 					{
-						float a2 = color2.a;
-						Color color3 = mColors[j];
-						color2.a = a2 * color3.a;
+						float a = val5.a;
+						Color val6 = mColors[j];
+						val5.a = a * val6.a;
 					}
 					if (gradient)
 					{
-						a = gradientBottom * color2;
-						b = gradientTop * color2;
+						val = gradientBottom * val5;
+						val2 = gradientTop * val5;
 					}
 					i--;
 				}
@@ -1278,10 +1480,10 @@ public static class NGUIText
 						if (uvs != null)
 						{
 							Rect uvRect = bMSymbol.uvRect;
-							float xMin = uvRect.xMin;
-							float yMin = uvRect.yMin;
-							float xMax = uvRect.xMax;
-							float yMax = uvRect.yMax;
+							float xMin = uvRect.get_xMin();
+							float yMin = uvRect.get_yMin();
+							float xMax = uvRect.get_xMax();
+							float yMax = uvRect.get_yMax();
 							uvs.Add(new Vector2(xMin, yMin));
 							uvs.Add(new Vector2(xMin, yMax));
 							uvs.Add(new Vector2(xMax, yMax));
@@ -1293,13 +1495,13 @@ public static class NGUIText
 							{
 								for (int k = 0; k < 4; k++)
 								{
-									cols.Add(color);
+									cols.Add(val3);
 								}
 							}
 							else
 							{
-								Color32 item = Color.white;
-								item.a = color.a;
+								Color32 item = Color32.op_Implicit(Color.get_white());
+								item.a = val3.a;
 								for (int l = 0; l < 4; l++)
 								{
 									cols.Add(item);
@@ -1374,12 +1576,12 @@ public static class NGUIText
 							{
 								if (uvs != null)
 								{
-									if ((Object)bitmapFont != (Object)null)
+									if (bitmapFont != null)
 									{
-										glyphInfo.u0.x = rect.xMin + num6 * glyphInfo.u0.x;
-										glyphInfo.u2.x = rect.xMin + num6 * glyphInfo.u2.x;
-										glyphInfo.u0.y = rect.yMax - num7 * glyphInfo.u0.y;
-										glyphInfo.u2.y = rect.yMax - num7 * glyphInfo.u2.y;
+										glyphInfo.u0.x = val4.get_xMin() + num6 * glyphInfo.u0.x;
+										glyphInfo.u2.x = val4.get_xMin() + num6 * glyphInfo.u2.x;
+										glyphInfo.u0.y = val4.get_yMax() - num7 * glyphInfo.u0.y;
+										glyphInfo.u2.y = val4.get_yMax() - num7 * glyphInfo.u2.y;
 										glyphInfo.u1.x = glyphInfo.u0.x;
 										glyphInfo.u1.y = glyphInfo.u2.y;
 										glyphInfo.u3.x = glyphInfo.u2.x;
@@ -1404,8 +1606,8 @@ public static class NGUIText
 											float num18 = num8 + glyphInfo.v1.y / fontScale;
 											num17 /= num8;
 											num18 /= num8;
-											s_c0 = Color.Lerp(a, b, num17);
-											s_c1 = Color.Lerp(a, b, num18);
+											s_c0 = Color32.op_Implicit(Color.Lerp(val, val2, num17));
+											s_c1 = Color32.op_Implicit(Color.Lerp(val, val2, num18));
 											int n = 0;
 											for (int num19 = (!bold) ? 1 : 4; n < num19; n++)
 											{
@@ -1420,30 +1622,30 @@ public static class NGUIText
 											int num20 = 0;
 											for (int num21 = (!bold) ? 4 : 16; num20 < num21; num20++)
 											{
-												cols.Add(color);
+												cols.Add(val3);
 											}
 										}
 									}
 									else
 									{
-										Color color4 = color;
-										color4 *= 0.49f;
+										Color val7 = Color32.op_Implicit(val3);
+										val7 *= 0.49f;
 										switch (glyphInfo.channel)
 										{
 										case 1:
-											color4.b += 0.51f;
+											val7.b += 0.51f;
 											break;
 										case 2:
-											color4.g += 0.51f;
+											val7.g += 0.51f;
 											break;
 										case 4:
-											color4.r += 0.51f;
+											val7.r += 0.51f;
 											break;
 										case 8:
-											color4.a += 0.51f;
+											val7.a += 0.51f;
 											break;
 										}
-										Color32 item2 = color4;
+										Color32 item2 = Color32.op_Implicit(val7);
 										int num22 = 0;
 										for (int num23 = (!bold) ? 4 : 16; num22 < num23; num22++)
 										{
@@ -1489,21 +1691,21 @@ public static class NGUIText
 									{
 										if (uvs != null)
 										{
-											if ((Object)bitmapFont != (Object)null)
+											if (bitmapFont != null)
 											{
-												glyphInfo2.u0.x = rect.xMin + num6 * glyphInfo2.u0.x;
-												glyphInfo2.u2.x = rect.xMin + num6 * glyphInfo2.u2.x;
-												glyphInfo2.u0.y = rect.yMax - num7 * glyphInfo2.u0.y;
-												glyphInfo2.u2.y = rect.yMax - num7 * glyphInfo2.u2.y;
+												glyphInfo2.u0.x = val4.get_xMin() + num6 * glyphInfo2.u0.x;
+												glyphInfo2.u2.x = val4.get_xMin() + num6 * glyphInfo2.u2.x;
+												glyphInfo2.u0.y = val4.get_yMax() - num7 * glyphInfo2.u0.y;
+												glyphInfo2.u2.y = val4.get_yMax() - num7 * glyphInfo2.u2.y;
 											}
-											float x = (glyphInfo2.u0.x + glyphInfo2.u2.x) * 0.5f;
-											int num29 = 0;
-											for (int num30 = (!bold) ? 1 : 4; num29 < num30; num29++)
+											float num29 = (glyphInfo2.u0.x + glyphInfo2.u2.x) * 0.5f;
+											int num30 = 0;
+											for (int num31 = (!bold) ? 1 : 4; num30 < num31; num30++)
 											{
-												uvs.Add(new Vector2(x, glyphInfo2.u0.y));
-												uvs.Add(new Vector2(x, glyphInfo2.u2.y));
-												uvs.Add(new Vector2(x, glyphInfo2.u2.y));
-												uvs.Add(new Vector2(x, glyphInfo2.u0.y));
+												uvs.Add(new Vector2(num29, glyphInfo2.u0.y));
+												uvs.Add(new Vector2(num29, glyphInfo2.u2.y));
+												uvs.Add(new Vector2(num29, glyphInfo2.u2.y));
+												uvs.Add(new Vector2(num29, glyphInfo2.u0.y));
 											}
 										}
 										if (flag && strike)
@@ -1518,14 +1720,14 @@ public static class NGUIText
 										}
 										if (bold)
 										{
-											for (int num31 = 0; num31 < 4; num31++)
+											for (int num32 = 0; num32 < 4; num32++)
 											{
-												float num32 = mBoldOffset[num31 * 2];
-												float num33 = mBoldOffset[num31 * 2 + 1];
-												verts.Add(new Vector3(num9 + num32, num14 + num33));
-												verts.Add(new Vector3(num9 + num32, num13 + num33));
-												verts.Add(new Vector3(num2 + num32, num13 + num33));
-												verts.Add(new Vector3(num2 + num32, num14 + num33));
+												float num33 = mBoldOffset[num32 * 2];
+												float num34 = mBoldOffset[num32 * 2 + 1];
+												verts.Add(new Vector3(num9 + num33, num14 + num34));
+												verts.Add(new Vector3(num9 + num33, num13 + num34));
+												verts.Add(new Vector3(num2 + num33, num13 + num34));
+												verts.Add(new Vector3(num2 + num33, num14 + num34));
 											}
 										}
 										else
@@ -1537,14 +1739,14 @@ public static class NGUIText
 										}
 										if (gradient)
 										{
-											float num34 = num8 + glyphInfo2.v0.y / fontScale;
-											float num35 = num8 + glyphInfo2.v1.y / fontScale;
-											num34 /= num8;
+											float num35 = num8 + glyphInfo2.v0.y / fontScale;
+											float num36 = num8 + glyphInfo2.v1.y / fontScale;
 											num35 /= num8;
-											s_c0 = Color.Lerp(a, b, num34);
-											s_c1 = Color.Lerp(a, b, num35);
-											int num36 = 0;
-											for (int num37 = (!bold) ? 1 : 4; num36 < num37; num36++)
+											num36 /= num8;
+											s_c0 = Color32.op_Implicit(Color.Lerp(val, val2, num35));
+											s_c1 = Color32.op_Implicit(Color.Lerp(val, val2, num36));
+											int num37 = 0;
+											for (int num38 = (!bold) ? 1 : 4; num37 < num38; num37++)
 											{
 												cols.Add(s_c0);
 												cols.Add(s_c1);
@@ -1554,10 +1756,10 @@ public static class NGUIText
 										}
 										else
 										{
-											int num38 = 0;
-											for (int num39 = (!bold) ? 4 : 16; num38 < num39; num38++)
+											int num39 = 0;
+											for (int num40 = (!bold) ? 4 : 16; num39 < num40; num39++)
 											{
-												cols.Add(color);
+												cols.Add(val3);
 											}
 										}
 									}
@@ -1578,6 +1780,9 @@ public static class NGUIText
 
 	public static void PrintApproximateCharacterPositions(string text, BetterList<Vector3> verts, BetterList<int> indices)
 	{
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0246: Unknown result type (might be due to invalid IL or missing references)
 		if (string.IsNullOrEmpty(text))
 		{
 			text = " ";
@@ -1687,6 +1892,10 @@ public static class NGUIText
 
 	public static void PrintExactCharacterPositions(string text, BetterList<Vector3> verts, BetterList<int> indices)
 	{
+		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0263: Unknown result type (might be due to invalid IL or missing references)
 		if (string.IsNullOrEmpty(text))
 		{
 			text = " ";
@@ -1800,6 +2009,48 @@ public static class NGUIText
 
 	public static void PrintCaretAndSelection(string text, int start, int end, BetterList<Vector3> caret, BetterList<Vector3> highlight)
 	{
+		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0327: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0329: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0335: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0337: Unknown result type (might be due to invalid IL or missing references)
+		//IL_035e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_036d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0382: Unknown result type (might be due to invalid IL or missing references)
+		//IL_039a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0433: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0435: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0441: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0443: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0462: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0472: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0533: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0535: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0541: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0543: Unknown result type (might be due to invalid IL or missing references)
+		//IL_056a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0579: Unknown result type (might be due to invalid IL or missing references)
+		//IL_058e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05a6: Unknown result type (might be due to invalid IL or missing references)
 		if (string.IsNullOrEmpty(text))
 		{
 			text = " ";
@@ -1823,8 +2074,8 @@ public static class NGUIText
 		int prev = 0;
 		bool flag = false;
 		bool flag2 = false;
-		Vector2 v = Vector2.zero;
-		Vector2 v2 = Vector2.zero;
+		Vector2 zero = Vector2.get_zero();
+		Vector2 zero2 = Vector2.get_zero();
 		for (; i < length; i++)
 		{
 			if (caret != null && !flag2 && num <= i)
@@ -1855,8 +2106,8 @@ public static class NGUIText
 					if (flag)
 					{
 						flag = false;
-						highlight.Add(v2);
-						highlight.Add(v);
+						highlight.Add(Vector2.op_Implicit(zero2));
+						highlight.Add(Vector2.op_Implicit(zero));
 					}
 					else if (start <= i && end > i)
 					{
@@ -1916,8 +2167,8 @@ public static class NGUIText
 							if (flag)
 							{
 								flag = false;
-								highlight.Add(v2);
-								highlight.Add(v);
+								highlight.Add(Vector2.op_Implicit(zero2));
+								highlight.Add(Vector2.op_Implicit(zero));
 							}
 							else if (start <= i && end > i)
 							{
@@ -1947,8 +2198,8 @@ public static class NGUIText
 							if (flag)
 							{
 								flag = false;
-								highlight.Add(v2);
-								highlight.Add(v);
+								highlight.Add(Vector2.op_Implicit(zero2));
+								highlight.Add(Vector2.op_Implicit(zero));
 							}
 						}
 						else if (!flag)
@@ -1958,8 +2209,8 @@ public static class NGUIText
 							highlight.Add(new Vector3(num9, num12));
 						}
 					}
-					v = new Vector2(num10, num11);
-					v2 = new Vector2(num10, num12);
+					zero._002Ector(num10, num11);
+					zero2._002Ector(num10, num12);
 					prev = num7;
 				}
 			}
@@ -1982,8 +2233,8 @@ public static class NGUIText
 		{
 			if (flag)
 			{
-				highlight.Add(v2);
-				highlight.Add(v);
+				highlight.Add(Vector2.op_Implicit(zero2));
+				highlight.Add(Vector2.op_Implicit(zero));
 			}
 			else if (start < i && end == i)
 			{

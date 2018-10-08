@@ -1,6 +1,7 @@
 using MsgPack;
 using MsgPack.Serialization;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -8,25 +9,35 @@ public class CoopPacketMsgpackUnitySerializer : CoopPacketSerializer
 {
 	public int version = int.Parse("10");
 
-	private SerializationContext context = SerializationContext.Default;
+	private SerializationContext context = SerializationContext.get_Default();
 
 	private ObjectPacker packer = new ObjectPacker();
 
 	public CoopPacketMsgpackUnitySerializer()
 	{
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0016: Expected O, but got Unknown
 		RegisterOverrideCommon(context);
 	}
 
 	public static void RegisterOverrideCommon(SerializationContext context)
 	{
-		context.Serializers.RegisterOverride(new Vector3Serializer(context));
-		context.Serializers.RegisterOverride(new QuaternionSerializer(context));
-		context.Serializers.RegisterOverride(new ListSerializer<int>(context));
-		context.Serializers.RegisterOverride(new ListSerializer<float>(context));
-		context.Serializers.RegisterOverride(new ListSerializer<bool>(context));
-		context.Serializers.RegisterOverride(new ListSerializer<string>(context));
-		context.Serializers.RegisterOverride(new ListSerializer<Vector3>(context));
-		context.Serializers.RegisterOverride(new ListSerializer<SkillInfo.SkillBaseInfo>(context));
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+		context.get_Serializers().RegisterOverride<Vector3>(new Vector3Serializer(context));
+		context.get_Serializers().RegisterOverride<Quaternion>(new QuaternionSerializer(context));
+		context.get_Serializers().RegisterOverride<List<int>>(new ListSerializer<int>(context));
+		context.get_Serializers().RegisterOverride<List<float>>(new ListSerializer<float>(context));
+		context.get_Serializers().RegisterOverride<List<bool>>(new ListSerializer<bool>(context));
+		context.get_Serializers().RegisterOverride<List<string>>(new ListSerializer<string>(context));
+		context.get_Serializers().RegisterOverride<List<Vector3>>(new ListSerializer<Vector3>(context));
+		context.get_Serializers().RegisterOverride<List<SkillInfo.SkillBaseInfo>>(new ListSerializer<SkillInfo.SkillBaseInfo>(context));
 	}
 
 	public override PacketStream Serialize(CoopPacket packet)

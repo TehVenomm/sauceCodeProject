@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIEvolveGauge : MonoBehaviour
+public class UIEvolveGauge
 {
 	public GameObject longTouchTarget;
 
@@ -18,14 +18,27 @@ public class UIEvolveGauge : MonoBehaviour
 
 	private Vector3 effectScale = new Vector3(0.85f, 0.85f, 0f);
 
+	public UIEvolveGauge()
+		: this()
+	{
+	}//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+	//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+	//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+
+
 	protected void Awake()
 	{
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Expected O, but got Unknown
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 		UILongTouch.Set(longTouchTarget, "EVOLVE", null);
 		UITouchAndRelease.Set(longTouchTarget, "EVOLVE_TOUCH", null, null);
-		effectTrans = EffectManager.GetUIEffect("ef_ui_skillgauge_blue_01", gauge.transform.parent, 0f, 1, gauge);
+		effectTrans = EffectManager.GetUIEffect("ef_ui_skillgauge_blue_01", gauge.get_transform().get_parent(), 0f, 1, gauge);
 		if (!object.ReferenceEquals(effectTrans, null))
 		{
-			effectTrans.gameObject.SetActive(false);
+			effectTrans.get_gameObject().SetActive(false);
 		}
 	}
 
@@ -56,27 +69,31 @@ public class UIEvolveGauge : MonoBehaviour
 
 	public void EnableEvolveIcon(bool isEnable)
 	{
-		weaponIcon.enabled = !isEnable;
-		evolveIcon.gameObject.SetActive(isEnable);
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		weaponIcon.set_enabled(!isEnable);
+		evolveIcon.get_gameObject().SetActive(isEnable);
 	}
 
 	private void _CalcGaugeEffect(float rate)
 	{
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 		if (!object.ReferenceEquals(effectTrans, null))
 		{
-			float y = -28f + 60f * rate;
-			effectTrans.localPosition = new Vector3(-4f, y, 0f);
-			float num = 0.85f * Mathf.Sin(rate * 3.14159274f) + 0.2f;
-			if (num >= 0.8f)
+			float num = -28f + 60f * rate;
+			effectTrans.set_localPosition(new Vector3(-4f, num, 0f));
+			float num2 = 0.85f * Mathf.Sin(rate * 3.14159274f) + 0.2f;
+			if (num2 >= 0.8f)
 			{
-				num = 0.8f;
+				num2 = 0.8f;
 			}
-			if (num <= 0f)
+			if (num2 <= 0f)
 			{
-				num = 0f;
+				num2 = 0f;
 			}
-			effectTrans.localScale = new Vector3(num, num, 1f);
-			effectTrans.gameObject.SetActive(rate > 0f && rate < 1f);
+			effectTrans.set_localScale(new Vector3(num2, num2, 1f));
+			effectTrans.get_gameObject().SetActive(rate > 0f && rate < 1f);
 		}
 	}
 }

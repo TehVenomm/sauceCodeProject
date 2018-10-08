@@ -47,17 +47,23 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 
 	private void LateUpdate()
 	{
+		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
 		if (GameSaveData.instance.headName && MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			Vector3 a = Vector3.zero;
-			StageObject x = null;
-			if ((Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (Object)null)
+			Vector3 val = Vector3.get_zero();
+			StageObject stageObject = null;
+			if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
 			{
-				a = MonoBehaviourSingleton<StageObjectManager>.I.self.GetCameraTargetPos();
-				a.y = 0f;
-				if ((Object)MonoBehaviourSingleton<StageObjectManager>.I.self.targetingPoint != (Object)null)
+				val = MonoBehaviourSingleton<StageObjectManager>.I.self.GetCameraTargetPos();
+				val.y = 0f;
+				if (MonoBehaviourSingleton<StageObjectManager>.I.self.targetingPoint != null)
 				{
-					x = MonoBehaviourSingleton<StageObjectManager>.I.self.targetingPoint.owner;
+					stageObject = MonoBehaviourSingleton<StageObjectManager>.I.self.targetingPoint.owner;
 				}
 			}
 			List<StageObject> list = MonoBehaviourSingleton<StageObjectManager>.I.enemyList;
@@ -74,12 +80,12 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 				enemy = (list[num] as Enemy);
 				if (!enemy.isDead && enemy.isInitialized)
 				{
-					num2 = Vector3.Distance(a, list[num]._position);
+					num2 = Vector3.Distance(val, list[num]._position);
 					if (enemy.uiShowDistance > 0f)
 					{
 						break;
 					}
-					if (num2 < enemy.enemyParameter.showStatusUIRange || (Object)x == (Object)enemy)
+					if (num2 < enemy.enemyParameter.showStatusUIRange || stageObject == enemy)
 					{
 						enemy.CreateStatusGizmo();
 					}
@@ -90,7 +96,7 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 				}
 				num++;
 			}
-			if (num2 < enemy.uiShowDistance || (Object)x == (Object)enemy)
+			if (num2 < enemy.uiShowDistance || stageObject == enemy)
 			{
 				enemy.CreateStatusGizmo();
 			}
@@ -103,164 +109,183 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 
 	public UIPlayerStatusGizmo Create(Player owner)
 	{
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Expected O, but got Unknown
 		UIPlayerStatusGizmo uIPlayerStatusGizmo = null;
 		int i = 0;
 		for (int count = playerList.Count; i < count; i++)
 		{
-			if (!playerList[i].gameObject.activeSelf)
+			if (!playerList[i].get_gameObject().get_activeSelf())
 			{
 				uIPlayerStatusGizmo = playerList[i];
 				break;
 			}
 		}
-		if ((Object)uIPlayerStatusGizmo == (Object)null)
+		if (uIPlayerStatusGizmo == null)
 		{
-			Transform transform = ResourceUtility.Realizes(playerStatusGizmo, base._transform, -1);
-			if ((Object)transform == (Object)null)
+			Transform val = ResourceUtility.Realizes(playerStatusGizmo, base._transform, -1);
+			if (val == null)
 			{
 				return null;
 			}
-			uIPlayerStatusGizmo = transform.GetComponent<UIPlayerStatusGizmo>();
-			if ((Object)uIPlayerStatusGizmo == (Object)null)
+			uIPlayerStatusGizmo = val.GetComponent<UIPlayerStatusGizmo>();
+			if (uIPlayerStatusGizmo == null)
 			{
-				Object.Destroy(transform);
+				Object.Destroy(val);
 				return null;
 			}
 			playerList.Add(uIPlayerStatusGizmo);
 		}
 		uIPlayerStatusGizmo.targetPlayer = owner;
-		SetDepth(uIPlayerStatusGizmo.gameObject);
+		SetDepth(uIPlayerStatusGizmo.get_gameObject());
 		return uIPlayerStatusGizmo;
 	}
 
 	public UIEnemyStatusGizmo Create(Enemy owner)
 	{
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Expected O, but got Unknown
 		UIEnemyStatusGizmo uIEnemyStatusGizmo = null;
 		int i = 0;
 		for (int count = enemyList.Count; i < count; i++)
 		{
-			if (!enemyList[i].gameObject.activeSelf)
+			if (!enemyList[i].get_gameObject().get_activeSelf())
 			{
 				uIEnemyStatusGizmo = enemyList[i];
 				break;
 			}
 		}
-		if ((Object)uIEnemyStatusGizmo == (Object)null)
+		if (uIEnemyStatusGizmo == null)
 		{
-			Transform transform = ResourceUtility.Realizes(enemyStatusGizmo, base._transform, -1);
-			if ((Object)transform == (Object)null)
+			Transform val = ResourceUtility.Realizes(enemyStatusGizmo, base._transform, -1);
+			if (val == null)
 			{
 				return null;
 			}
-			uIEnemyStatusGizmo = transform.GetComponent<UIEnemyStatusGizmo>();
-			if ((Object)uIEnemyStatusGizmo == (Object)null)
+			uIEnemyStatusGizmo = val.GetComponent<UIEnemyStatusGizmo>();
+			if (uIEnemyStatusGizmo == null)
 			{
-				Object.Destroy(transform);
+				Object.Destroy(val);
 				return null;
 			}
 			enemyList.Add(uIEnemyStatusGizmo);
 		}
 		uIEnemyStatusGizmo.targetEnemy = owner;
-		SetDepth(uIEnemyStatusGizmo.gameObject);
+		SetDepth(uIEnemyStatusGizmo.get_gameObject());
 		return uIEnemyStatusGizmo;
 	}
 
 	public UIPortalStatusGizmo Create(PortalObject owner)
 	{
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Expected O, but got Unknown
 		UIPortalStatusGizmo uIPortalStatusGizmo = null;
 		int i = 0;
 		for (int count = portalList.Count; i < count; i++)
 		{
-			if (!portalList[i].gameObject.activeSelf)
+			if (!portalList[i].get_gameObject().get_activeSelf())
 			{
 				uIPortalStatusGizmo = portalList[i];
 				break;
 			}
 		}
-		if ((Object)uIPortalStatusGizmo == (Object)null)
+		if (uIPortalStatusGizmo == null)
 		{
-			Transform transform = ResourceUtility.Realizes(portalStatusGizmo, base._transform, -1);
-			if ((Object)transform == (Object)null)
+			Transform val = ResourceUtility.Realizes(portalStatusGizmo, base._transform, -1);
+			if (val == null)
 			{
 				return null;
 			}
-			uIPortalStatusGizmo = transform.GetComponent<UIPortalStatusGizmo>();
-			if ((Object)uIPortalStatusGizmo == (Object)null)
+			uIPortalStatusGizmo = val.GetComponent<UIPortalStatusGizmo>();
+			if (uIPortalStatusGizmo == null)
 			{
-				Object.Destroy(transform);
+				Object.Destroy(val);
 				return null;
 			}
 			portalList.Add(uIPortalStatusGizmo);
 		}
 		uIPortalStatusGizmo.portal = owner;
-		SetDepth(uIPortalStatusGizmo.gameObject);
+		SetDepth(uIPortalStatusGizmo.get_gameObject());
 		return uIPortalStatusGizmo;
 	}
 
 	public UICannonGizmo Create(FieldGimmickCannonObject owner)
 	{
-		UICannonGizmo orCreate = GetOrCreate(cannonList, cannonGizmo);
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Expected O, but got Unknown
+		UICannonGizmo orCreate = this.GetOrCreate<UICannonGizmo>(cannonList, cannonGizmo);
 		orCreate.owner = owner;
-		SetDepth(orCreate.gameObject);
+		SetDepth(orCreate.get_gameObject());
 		return orCreate;
 	}
 
 	public UISonarGizmo CreateSonar(FieldSonarObject sonar)
 	{
-		UISonarGizmo orCreate = GetOrCreate(sonarList, sonarGizmo);
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Expected O, but got Unknown
+		UISonarGizmo orCreate = this.GetOrCreate<UISonarGizmo>(sonarList, sonarGizmo);
 		orCreate.sonar = sonar;
-		SetDepth(orCreate.gameObject);
+		SetDepth(orCreate.get_gameObject());
 		return orCreate;
 	}
 
 	public UIGrabStatusGizmo CreateGrab()
 	{
-		UIGrabStatusGizmo orCreate = GetOrCreate(grabList, grabStatusGizmo);
-		SetDepth(orCreate.gameObject);
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Expected O, but got Unknown
+		UIGrabStatusGizmo orCreate = this.GetOrCreate<UIGrabStatusGizmo>(grabList, grabStatusGizmo);
+		SetDepth(orCreate.get_gameObject());
 		return orCreate;
 	}
 
 	public UIWaveTargetGizmo CreateWaveTarget(FieldWaveTargetObject wt)
 	{
-		UIWaveTargetGizmo orCreate = GetOrCreate(waveTargetList, waveTargetGizmo);
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Expected O, but got Unknown
+		UIWaveTargetGizmo orCreate = this.GetOrCreate<UIWaveTargetGizmo>(waveTargetList, waveTargetGizmo);
 		orCreate.waveTarget = wt;
 		orCreate.Initialize();
-		SetDepth(orCreate.gameObject);
+		SetDepth(orCreate.get_gameObject());
 		return orCreate;
 	}
 
 	public UIChatGimmickGizmo CreateGimmick(FieldChatGimmickObject cg)
 	{
-		UIChatGimmickGizmo orCreate = GetOrCreate(chatGimmickList, chatGimmickGizmo);
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0021: Expected O, but got Unknown
+		UIChatGimmickGizmo orCreate = this.GetOrCreate<UIChatGimmickGizmo>(chatGimmickList, chatGimmickGizmo);
 		orCreate.Initialize(cg);
-		SetDepth(orCreate.gameObject);
+		SetDepth(orCreate.get_gameObject());
 		return orCreate;
 	}
 
 	protected T GetOrCreate<T>(List<T> objects, GameObject obj) where T : MonoBehaviour
 	{
-		T val = (T)null;
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		T val = (T)(object)null;
 		for (int i = 0; i < objects.Count; i++)
 		{
-			T val2 = objects[i];
-			if (!val2.gameObject.activeSelf)
+			if (!objects[i].get_gameObject().get_activeSelf())
 			{
 				val = objects[i];
 				break;
 			}
 		}
-		if ((Object)val == (Object)null)
+		if ((object)val == null)
 		{
-			Transform transform = ResourceUtility.Realizes(obj, base._transform, -1);
-			if ((Object)transform == (Object)null)
+			Transform val2 = ResourceUtility.Realizes(obj, base._transform, -1);
+			if (val2 == null)
 			{
-				return (T)null;
+				return (T)(object)null;
 			}
-			val = transform.GetComponent<T>();
-			if ((Object)val == (Object)null)
+			val = val2.GetComponent<T>();
+			if ((object)val == null)
 			{
-				Object.Destroy(transform);
-				return (T)null;
+				Object.Destroy(val2);
+				return (T)(object)null;
 			}
 			objects.Add(val);
 		}
@@ -270,7 +295,7 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 	private void SetDepth(GameObject go)
 	{
 		UIPanel component = go.GetComponent<UIPanel>();
-		if ((Object)component != (Object)null)
+		if (component != null)
 		{
 			component.depth = depth;
 			depth++;

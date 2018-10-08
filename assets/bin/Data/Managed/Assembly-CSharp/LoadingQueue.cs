@@ -29,6 +29,16 @@ public class LoadingQueue
 		}
 	}
 
+	public LoadObject Load(bool isEventAsset, RESOURCE_CATEGORY category, string resource_name, bool cache_package = false)
+	{
+		LoadObject loadObject = new LoadObject(isEventAsset, monoBehaviour, category, resource_name, cache_package);
+		if (loadObject.isLoading)
+		{
+			loadQueue.Enqueue(loadObject);
+		}
+		return loadObject;
+	}
+
 	public LoadObject Load(RESOURCE_CATEGORY category, string resource_name, bool cache_package = false)
 	{
 		LoadObject loadObject = new LoadObject(monoBehaviour, category, resource_name, cache_package);
@@ -146,7 +156,7 @@ public class LoadingQueue
 
 	public void CacheAnimDataUseResource(AnimEventData animEventData, EffectNameAnalyzer name_analyzer = null, List<AnimEventData.EventData> cntAtkDataList = null)
 	{
-		if (!((UnityEngine.Object)animEventData == (UnityEngine.Object)null))
+		if (!(animEventData == null))
 		{
 			animEventData.Initialize();
 			AnimEventData.AnimData[] animations = animEventData.animations;
@@ -310,7 +320,7 @@ public class LoadingQueue
 
 	public void CacheAnimDataUseResourceDependPlayer(Player player, AnimEventData animEventData)
 	{
-		if (!((UnityEngine.Object)player == (UnityEngine.Object)null) && !((UnityEngine.Object)animEventData == (UnityEngine.Object)null))
+		if (!(player == null) && !(animEventData == null))
 		{
 			animEventData.Initialize();
 			AnimEventData.AnimData[] animations = animEventData.animations;
@@ -372,7 +382,7 @@ public class LoadingQueue
 
 	public void CacheBulletDataUseResource(BulletData bulletData, Player player = null)
 	{
-		if (!((UnityEngine.Object)bulletData == (UnityEngine.Object)null))
+		if (!(bulletData == null))
 		{
 			BulletData.BulletBase data = bulletData.data;
 			string effectName = data.GetEffectName(player);
@@ -381,37 +391,37 @@ public class LoadingQueue
 				CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, effectName);
 			}
 			CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, data.landHiteffectName);
-			if ((UnityEngine.Object)data.endBullet != (UnityEngine.Object)null)
+			if (data.endBullet != null)
 			{
 				CacheBulletDataUseResource(data.endBullet, null);
 			}
 			BulletData.BulletFunnel dataFunnel = bulletData.dataFunnel;
-			if (dataFunnel != null && (UnityEngine.Object)dataFunnel.bitBullet != (UnityEngine.Object)null)
+			if (dataFunnel != null && dataFunnel.bitBullet != null)
 			{
 				CacheBulletDataUseResource(dataFunnel.bitBullet, null);
 			}
 			BulletData.BulletMine dataMine = bulletData.dataMine;
-			if (dataMine != null && (UnityEngine.Object)dataMine.explodeBullet != (UnityEngine.Object)null)
+			if (dataMine != null && dataMine.explodeBullet != null)
 			{
 				CacheBulletDataUseResource(dataMine.explodeBullet, null);
 			}
 			BulletData.BulletTracking dataTracking = bulletData.dataTracking;
-			if (dataTracking != null && (UnityEngine.Object)dataTracking.emissionBullet != (UnityEngine.Object)null)
+			if (dataTracking != null && dataTracking.emissionBullet != null)
 			{
 				CacheBulletDataUseResource(dataTracking.emissionBullet, null);
 			}
 			BulletData.BulletUndead dataUndead = bulletData.dataUndead;
-			if (dataUndead != null && (UnityEngine.Object)dataUndead.closeBullet != (UnityEngine.Object)null)
+			if (dataUndead != null && dataUndead.closeBullet != null)
 			{
 				CacheBulletDataUseResource(dataUndead.closeBullet, null);
 			}
 			BulletData.BulletDig dataDig = bulletData.dataDig;
-			if (dataDig != null && (UnityEngine.Object)dataDig.flyOutBullet != (UnityEngine.Object)null)
+			if (dataDig != null && dataDig.flyOutBullet != null)
 			{
 				CacheBulletDataUseResource(dataDig.flyOutBullet, null);
 			}
 			BulletData.BulletActionMine dataActionMine = bulletData.dataActionMine;
-			if (dataActionMine != null && (UnityEngine.Object)dataActionMine.explodeBullet != (UnityEngine.Object)null && (UnityEngine.Object)dataActionMine.actionBullet != (UnityEngine.Object)null)
+			if (dataActionMine != null && dataActionMine.explodeBullet != null && dataActionMine.actionBullet != null)
 			{
 				CacheBulletDataUseResource(dataActionMine.explodeBullet, null);
 				CacheBulletDataUseResource(dataActionMine.actionBullet, null);
@@ -460,6 +470,8 @@ public class LoadingQueue
 
 	public Coroutine Wait()
 	{
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Expected O, but got Unknown
 		return monoBehaviour.StartCoroutine(DoWait());
 	}
 

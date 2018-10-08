@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -77,7 +78,7 @@ public class TaskTop : GameSection
 	public override void Initialize()
 	{
 		gridTransform = GetCtrl(UI.GRD_INVENTORY);
-		scrollView = GetComponent<UIScrollView>(UI.SCR_INVENTORY);
+		scrollView = base.GetComponent<UIScrollView>((Enum)UI.SCR_INVENTORY);
 		InitTaskDataLists();
 		SendTaskList();
 		base.Initialize();
@@ -145,30 +146,30 @@ public class TaskTop : GameSection
 	public override void UpdateUI()
 	{
 		pageMaxNum = taskDataLists[(int)showType].Count / 10 + 1;
-		SetLabelText(UI.LBL_PAGE_MAX, pageMaxNum.ToString());
-		SetLabelText(UI.LBL_CURRENT_NUM, taskDataLists[1].Count.ToString());
+		SetLabelText((Enum)UI.LBL_PAGE_MAX, pageMaxNum.ToString());
+		SetLabelText((Enum)UI.LBL_CURRENT_NUM, taskDataLists[1].Count.ToString());
 		bool flag = currentPageIndex != 0;
-		SetActive(UI.BTN_ACHIEVE_LIST_L, flag);
-		SetActive(UI.BTN_ACHIEVE_LIST_L_ADD, flag);
-		SetActive(UI.BTN_INACTIVE_ACHIEVE_LIST_L, !flag);
+		SetActive((Enum)UI.BTN_ACHIEVE_LIST_L, flag);
+		SetActive((Enum)UI.BTN_ACHIEVE_LIST_L_ADD, flag);
+		SetActive((Enum)UI.BTN_INACTIVE_ACHIEVE_LIST_L, !flag);
 		bool flag2 = currentPageIndex + 1 < pageMaxNum;
-		SetActive(UI.BTN_ACHIEVE_LIST_R, flag2);
-		SetActive(UI.BTN_ACHIEVE_LIST_R_ADD, flag2);
-		SetActive(UI.BTN_INACTIVE_ACHIEVE_LIST_R, !flag2);
+		SetActive((Enum)UI.BTN_ACHIEVE_LIST_R, flag2);
+		SetActive((Enum)UI.BTN_ACHIEVE_LIST_R_ADD, flag2);
+		SetActive((Enum)UI.BTN_INACTIVE_ACHIEVE_LIST_R, !flag2);
 		string text = base.sectionData.GetText(STRING_KEY[(int)showType]);
-		SetLabelText(UI.LBL_SHOW_TYPE, text);
-		SetLabelText(UI.LBL_PAGE_NOW, (currentPageIndex + 1).ToString());
+		SetLabelText((Enum)UI.LBL_SHOW_TYPE, text);
+		SetLabelText((Enum)UI.LBL_PAGE_NOW, (currentPageIndex + 1).ToString());
 		UpdateInventory();
-		if ((Object)scrollView != (Object)null)
+		if (scrollView != null)
 		{
 			scrollView.ResetPosition();
 		}
 		base.UpdateUI();
 	}
 
-	private void UpdateInventory()
+	private unsafe void UpdateInventory()
 	{
-		if ((Object)gridTransform == (Object)null)
+		if (gridTransform == null)
 		{
 			gridTransform = GetCtrl(UI.GRD_INVENTORY);
 		}
@@ -178,20 +179,27 @@ public class TaskTop : GameSection
 		{
 			item_num = taskDataLists[(int)showType].Count - start;
 		}
-		SetDynamicList(gridTransform, LIST_ITEM_PREFAB_NAME, item_num, true, null, null, delegate(int i, Transform t, bool isRecycle)
-		{
-			InitListItem(taskDataLists[(int)showType][start + i], t);
-		});
+		_003CUpdateInventory_003Ec__AnonStorey482 _003CUpdateInventory_003Ec__AnonStorey;
+		SetDynamicList(gridTransform, LIST_ITEM_PREFAB_NAME, item_num, true, null, null, new Action<int, Transform, bool>((object)_003CUpdateInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void InitListItem(TaskData data, Transform root)
 	{
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c7: Expected O, but got Unknown
+		//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e6: Expected O, but got Unknown
+		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fe: Expected O, but got Unknown
+		//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0212: Expected O, but got Unknown
 		SetActive(root, UI.OBJ_CLEARED_ITEM, data.info.status == 2 || data.info.status == 3);
 		SetActive(root, UI.OBJ_NOT_CLEARED_ITEM, data.info.status == 1);
-		Transform transform = FindCtrl(root, UI.SPR_GAUGE);
-		if ((Object)transform != (Object)null)
+		Transform val = FindCtrl(root, UI.SPR_GAUGE);
+		if (val != null)
 		{
-			transform.localScale = new Vector3(Mathf.Clamp((float)data.info.progress / (float)data.tableData.goalNum, 0f, 1f), 1f, 1f);
+			val.set_localScale(new Vector3(Mathf.Clamp((float)data.info.progress / (float)data.tableData.goalNum, 0f, 1f), 1f, 1f));
 		}
 		SetLabelText(root, UI.LBL_GAUGE, data.info.progress.ToString() + "/" + data.tableData.goalNum.ToString());
 		SetLabelText(root, UI.LBL_CONDITION, data.tableData.title);
@@ -206,26 +214,26 @@ public class TaskTop : GameSection
 			SetLabelText(root, UI.LBL_ITEM, "x" + data.tableData.rewardNum.ToString());
 		}
 		ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(data.tableData.rewardType, (uint)data.tableData.itemId, FindCtrl(root, UI.OBJ_ICON_ROOT), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-		SetMaterialInfo(itemIcon._transform, data.tableData.rewardType, (uint)data.tableData.itemId, scrollView.transform);
+		SetMaterialInfo(itemIcon._transform, data.tableData.rewardType, (uint)data.tableData.itemId, scrollView.get_transform());
 		UIButton component = root.GetComponent<UIButton>();
-		if ((Object)component != (Object)null)
+		if (component != null)
 		{
-			component.tweenTarget = itemIcon.gameObject;
+			component.tweenTarget = itemIcon.get_gameObject();
 		}
-		GameObject gameObject = FindCtrl(root, UI.SPR_NOT_RECIEVED).gameObject;
-		GameObject gameObject2 = FindCtrl(root, UI.SPR_RECIEVED).gameObject;
+		GameObject val2 = FindCtrl(root, UI.SPR_NOT_RECIEVED).get_gameObject();
+		GameObject val3 = FindCtrl(root, UI.SPR_RECIEVED).get_gameObject();
 		if (data.info.status == 2)
 		{
 			SetButtonEnabled(root, true);
 			SetEvent(root, "RECEIVE_REWARD", data);
-			gameObject.SetActive(true);
-			gameObject2.SetActive(false);
+			val2.SetActive(true);
+			val3.SetActive(false);
 		}
 		else if (data.info.status == 3)
 		{
 			SetButtonEnabled(root, false);
-			gameObject.SetActive(false);
-			gameObject2.SetActive(true);
+			val2.SetActive(false);
+			val3.SetActive(true);
 		}
 		else
 		{

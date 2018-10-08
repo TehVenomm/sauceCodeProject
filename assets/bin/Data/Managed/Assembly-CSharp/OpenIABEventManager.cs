@@ -1,10 +1,27 @@
 using OnePF;
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public class OpenIABEventManager : MonoBehaviour
+public class OpenIABEventManager
 {
-	public static event Action billingSupportedEvent;
+	public static event Action billingSupportedEvent
+	{
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		add
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Expected O, but got Unknown
+			OpenIABEventManager.billingSupportedEvent = Delegate.Combine((Delegate)OpenIABEventManager.billingSupportedEvent, (Delegate)value);
+		}
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		remove
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Expected O, but got Unknown
+			OpenIABEventManager.billingSupportedEvent = Delegate.Remove((Delegate)OpenIABEventManager.billingSupportedEvent, (Delegate)value);
+		}
+	}
 
 	public static event Action<string> billingNotSupportedEvent;
 
@@ -14,7 +31,19 @@ public class OpenIABEventManager : MonoBehaviour
 
 	public static event Action<Purchase> purchaseSucceededEvent;
 
-	public static event Action<int, string> purchaseFailedEvent;
+	public static event Action<int, string> purchaseFailedEvent
+	{
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		add
+		{
+			OpenIABEventManager.purchaseFailedEvent = Delegate.Combine((Delegate)OpenIABEventManager.purchaseFailedEvent, (Delegate)value);
+		}
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		remove
+		{
+			OpenIABEventManager.purchaseFailedEvent = Delegate.Remove((Delegate)OpenIABEventManager.purchaseFailedEvent, (Delegate)value);
+		}
+	}
 
 	public static event Action<Purchase> consumePurchaseSucceededEvent;
 
@@ -24,24 +53,46 @@ public class OpenIABEventManager : MonoBehaviour
 
 	public static event Action<string> restoreFailedEvent;
 
-	public static event Action restoreSucceededEvent;
+	public static event Action restoreSucceededEvent
+	{
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		add
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Expected O, but got Unknown
+			OpenIABEventManager.restoreSucceededEvent = Delegate.Combine((Delegate)OpenIABEventManager.restoreSucceededEvent, (Delegate)value);
+		}
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		remove
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Expected O, but got Unknown
+			OpenIABEventManager.restoreSucceededEvent = Delegate.Remove((Delegate)OpenIABEventManager.restoreSucceededEvent, (Delegate)value);
+		}
+	}
+
+	public OpenIABEventManager()
+		: this()
+	{
+	}
 
 	private void Awake()
 	{
-		base.gameObject.name = GetType().ToString();
-		UnityEngine.Object.DontDestroyOnLoad(this);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().set_name(GetType().ToString());
+		Object.DontDestroyOnLoad(this);
 	}
 
 	private void OnMapSkuFailed(string exception)
 	{
-		Debug.LogError("SKU mapping failed: " + exception);
+		Debug.LogError((object)("SKU mapping failed: " + exception));
 	}
 
 	private void OnBillingSupported(string empty)
 	{
 		if (OpenIABEventManager.billingSupportedEvent != null)
 		{
-			OpenIABEventManager.billingSupportedEvent();
+			OpenIABEventManager.billingSupportedEvent.Invoke();
 		}
 	}
 
@@ -81,23 +132,23 @@ public class OpenIABEventManager : MonoBehaviour
 	private void OnPurchaseFailed(string message)
 	{
 		int result = -1;
-		string arg = "Unknown error";
+		string text = "Unknown error";
 		if (!string.IsNullOrEmpty(message))
 		{
 			string[] array = message.Split('|');
 			if (array.Length >= 2)
 			{
 				int.TryParse(array[0], out result);
-				arg = array[1];
+				text = array[1];
 			}
 			else
 			{
-				arg = message;
+				text = message;
 			}
 		}
 		if (OpenIABEventManager.purchaseFailedEvent != null)
 		{
-			OpenIABEventManager.purchaseFailedEvent(result, arg);
+			OpenIABEventManager.purchaseFailedEvent.Invoke(result, text);
 		}
 	}
 
@@ -137,7 +188,7 @@ public class OpenIABEventManager : MonoBehaviour
 	{
 		if (OpenIABEventManager.restoreSucceededEvent != null)
 		{
-			OpenIABEventManager.restoreSucceededEvent();
+			OpenIABEventManager.restoreSucceededEvent.Invoke();
 		}
 	}
 }

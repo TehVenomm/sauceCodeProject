@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ZoneBulletObject : MonoBehaviour
+public class ZoneBulletObject
 {
 	private readonly string OBJ_NAME = "ZoneBullet:";
 
@@ -39,8 +39,32 @@ public class ZoneBulletObject : MonoBehaviour
 
 	private Dictionary<int, float> validSecCollection = new Dictionary<int, float>();
 
+	public ZoneBulletObject()
+		: this()
+	{
+	}//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+	//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+	//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+
+
 	public void Initialize(Player player, BulletData bullet, Vector3 position, SkillInfo.SkillParam skill, bool isHealDamgeEnemy, bool isOwner)
 	{
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c0: Expected O, but got Unknown
+		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Expected O, but got Unknown
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+		//IL_023d: Expected O, but got Unknown
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			Log.Error(LOG.INGAME, "StageObjectManager is invalid. Can't initialize PresentBulletObject.");
@@ -54,34 +78,34 @@ public class ZoneBulletObject : MonoBehaviour
 			healValue = ((bulletData.dataZone.type == BulletData.BulletZone.TYPE.HEAL) ? skill.supportValue[0] : 0);
 			lifeTime = skill.supportTime[0];
 			intervalTime = bullet.dataZone.intervalTime;
-			base.gameObject.name = OBJ_NAME + skill.tableData.id;
-			cachedPlayerTransform = player.transform;
-			cachedTransform = base.transform;
+			this.get_gameObject().set_name(OBJ_NAME + skill.tableData.id);
+			cachedPlayerTransform = player.get_transform();
+			cachedTransform = this.get_transform();
 			cachedTransform.SetParent(MonoBehaviourSingleton<StageObjectManager>.I._transform);
-			cachedTransform.position = position;
-			cachedTransform.localScale = Vector3.one;
+			cachedTransform.set_position(position);
+			cachedTransform.set_localScale(Vector3.get_one());
 			if (MonoBehaviourSingleton<EffectManager>.IsValid())
 			{
 				cachedEffectTransform = EffectManager.GetEffect(bulletData.data.effectName, MonoBehaviourSingleton<EffectManager>.I._transform);
 				if (!object.ReferenceEquals(cachedEffectTransform, null))
 				{
-					cachedEffectTransform.position = cachedTransform.position + bulletData.data.dispOffset;
-					cachedEffectTransform.localRotation = Quaternion.Euler(bulletData.data.dispRotation);
+					cachedEffectTransform.set_position(cachedTransform.get_position() + bulletData.data.dispOffset);
+					cachedEffectTransform.set_localRotation(Quaternion.Euler(bulletData.data.dispRotation));
 				}
 			}
-			base.gameObject.layer = 31;
+			this.get_gameObject().set_layer(31);
 			ignoreLayerMask |= 41984;
 			ignoreLayerMask |= 20480;
 			ignoreLayerMask |= 2490880;
-			cachedCollider = base.gameObject.AddComponent<SphereCollider>();
-			cachedCollider.radius = bulletData.data.radius;
-			cachedCollider.isTrigger = true;
-			cachedCollider.enabled = true;
+			cachedCollider = this.get_gameObject().AddComponent<SphereCollider>();
+			cachedCollider.set_radius(bulletData.data.radius);
+			cachedCollider.set_isTrigger(true);
+			cachedCollider.set_enabled(true);
 			validSecCollection.Clear();
 			if (isHealDamgeEnemy && healValue > 0)
 			{
-				GameObject gameObject = new GameObject(HEALATK_NAME);
-				HealAttackZoneObject healAttackZoneObject = gameObject.AddComponent<HealAttackZoneObject>();
+				GameObject val = new GameObject(HEALATK_NAME);
+				HealAttackZoneObject healAttackZoneObject = val.AddComponent<HealAttackZoneObject>();
 				healAttackZoneObject.Setup(ownerPlayer, cachedTransform, bullet, skill);
 			}
 			healData = new Character.HealData(healValue, bulletData.dataZone.healType, HEAL_EFFECT_TYPE.BASIS, new List<int>
@@ -99,23 +123,27 @@ public class ZoneBulletObject : MonoBehaviour
 
 	private void Update()
 	{
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 		if (isInitialized)
 		{
 			if (bulletData.dataZone.isCarry)
 			{
-				if ((Object)usePlayer != (Object)null && !usePlayer.isDead)
+				if (usePlayer != null && !usePlayer.isDead)
 				{
-					tmpVector = cachedPlayerTransform.position;
+					tmpVector = cachedPlayerTransform.get_position();
 					tmpVector.y = bulletData.data.dispOffset.y;
-					cachedTransform.position = tmpVector;
-					cachedEffectTransform.position = tmpVector;
+					cachedTransform.set_position(tmpVector);
+					cachedEffectTransform.set_position(tmpVector);
 				}
 				else
 				{
 					lifeTime = 0f;
 				}
 			}
-			lifeTime -= Time.deltaTime;
+			lifeTime -= Time.get_deltaTime();
 			if (lifeTime <= 0f)
 			{
 				OnDisappear();
@@ -125,6 +153,12 @@ public class ZoneBulletObject : MonoBehaviour
 
 	private void OnDisappear()
 	{
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Expected O, but got Unknown
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0095: Expected O, but got Unknown
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 		ownerPlayer = null;
 		usePlayer = null;
 		bulletData = null;
@@ -133,17 +167,17 @@ public class ZoneBulletObject : MonoBehaviour
 		cachedTransform = null;
 		if (!object.ReferenceEquals(cachedCollider, null))
 		{
-			cachedCollider.enabled = false;
+			cachedCollider.set_enabled(false);
 		}
 		cachedCollider = null;
-		if ((Object)cachedEffectTransform != (Object)null && (Object)cachedEffectTransform.gameObject != (Object)null)
+		if (cachedEffectTransform != null && cachedEffectTransform.get_gameObject() != null)
 		{
-			EffectManager.ReleaseEffect(cachedEffectTransform.gameObject, true, false);
+			EffectManager.ReleaseEffect(cachedEffectTransform.get_gameObject(), true, false);
 		}
 		cachedEffectTransform = null;
-		if (!object.ReferenceEquals(base.gameObject, null))
+		if (!object.ReferenceEquals((object)this.get_gameObject(), null))
 		{
-			Object.Destroy(base.gameObject);
+			Object.Destroy(this.get_gameObject());
 		}
 		isInitialized = false;
 	}
@@ -178,7 +212,7 @@ public class ZoneBulletObject : MonoBehaviour
 			int id;
 			int key = id = player.id;
 			float num = dictionary[id];
-			dictionary2[key] = num + Time.deltaTime;
+			dictionary2[key] = num + Time.get_deltaTime();
 			if (validSecCollection[player.id] >= intervalTime)
 			{
 				Dictionary<int, float> dictionary3;
@@ -209,12 +243,14 @@ public class ZoneBulletObject : MonoBehaviour
 
 	private Player _GetValidPlayer(Collider collider)
 	{
-		int layer = collider.gameObject.layer;
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		int layer = collider.get_gameObject().get_layer();
 		if (((1 << layer) & ignoreLayerMask) > 0)
 		{
 			return null;
 		}
-		Player component = collider.gameObject.GetComponent<Player>();
+		Player component = collider.get_gameObject().GetComponent<Player>();
 		if (object.ReferenceEquals(component, null))
 		{
 			return null;

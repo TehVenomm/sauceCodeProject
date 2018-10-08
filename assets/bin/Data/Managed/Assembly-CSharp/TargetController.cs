@@ -24,7 +24,7 @@ public class TargetController
 
 	public bool IsTargetingOfAlly()
 	{
-		return (Object)GetAllyTarget() != (Object)null;
+		return GetAllyTarget() != null;
 	}
 
 	public bool IsAliveTargetOfAlly()
@@ -35,7 +35,7 @@ public class TargetController
 	public bool CanReviveOfTargetAlly()
 	{
 		StageObject stageObject = GetAllyTarget();
-		if ((Object)stageObject == (Object)null)
+		if (stageObject == null)
 		{
 			return false;
 		}
@@ -54,7 +54,7 @@ public class TargetController
 	public bool IsOtherPlayerReviveOfTarget()
 	{
 		Player player = GetAllyTarget() as Player;
-		if ((Object)player != (Object)null)
+		if (player != null)
 		{
 			for (int i = 0; i < player.prayerIds.Count; i++)
 			{
@@ -73,10 +73,10 @@ public class TargetController
 
 	public StageObject GetCurrentTarget()
 	{
-		if ((Object)brain.owner.actionTarget == (Object)null)
+		if (brain.owner.actionTarget == null)
 		{
 			Self self = brain.owner as Self;
-			if ((Object)self != (Object)null && self.isAutoMode)
+			if (self != null && self.isAutoMode)
 			{
 				return GetTargetObjectOfNearest();
 			}
@@ -98,7 +98,7 @@ public class TargetController
 
 	public bool IsTargeting()
 	{
-		return (Object)GetCurrentTarget() != (Object)null;
+		return GetCurrentTarget() != null;
 	}
 
 	public void UpdateTarget()
@@ -195,7 +195,7 @@ public class TargetController
 	public bool IsPlaceTarget(PLACE place)
 	{
 		StageObject currentTarget = GetCurrentTarget();
-		if ((Object)currentTarget == (Object)null)
+		if (currentTarget == null)
 		{
 			return false;
 		}
@@ -214,7 +214,7 @@ public class TargetController
 	public bool IsAttackableTarget()
 	{
 		StageObject currentTarget = GetCurrentTarget();
-		if ((Object)currentTarget == (Object)null)
+		if (currentTarget == null)
 		{
 			return false;
 		}
@@ -232,7 +232,7 @@ public class TargetController
 	public bool IsSpecialAttackableTarget()
 	{
 		StageObject currentTarget = GetCurrentTarget();
-		if ((Object)currentTarget == (Object)null)
+		if (currentTarget == null)
 		{
 			return false;
 		}
@@ -242,7 +242,7 @@ public class TargetController
 	public bool IsAvoidAttackableTarget()
 	{
 		StageObject currentTarget = GetCurrentTarget();
-		if ((Object)currentTarget == (Object)null)
+		if (currentTarget == null)
 		{
 			return false;
 		}
@@ -283,7 +283,7 @@ public class TargetController
 	public bool IsArrivalTarget()
 	{
 		StageObject currentTarget = GetCurrentTarget();
-		if ((Object)currentTarget == (Object)null)
+		if (currentTarget == null)
 		{
 			return false;
 		}
@@ -293,7 +293,7 @@ public class TargetController
 	public bool IsArrivalAttackPosition()
 	{
 		StageObject currentTarget = GetCurrentTarget();
-		if ((Object)currentTarget == (Object)null)
+		if (currentTarget == null)
 		{
 			return false;
 		}
@@ -307,18 +307,21 @@ public class TargetController
 
 	public Vector3 GetTargetPosition()
 	{
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 		return GetOpponent().record.pos;
 	}
 
 	public Vector3 GetAttackPosition()
 	{
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 		return GetOpponent().record.attackPos;
 	}
 
 	public float GetLengthWithAttackPos(Vector3 check_pos)
 	{
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		StageObject currentTarget = GetCurrentTarget();
-		if ((Object)currentTarget == (Object)null)
+		if (currentTarget == null)
 		{
 			return 0f;
 		}
@@ -328,7 +331,7 @@ public class TargetController
 	public bool IsTargetInterestLoseOfHate()
 	{
 		StageObject currentTarget = GetCurrentTarget();
-		if ((Object)currentTarget == (Object)null)
+		if (currentTarget == null)
 		{
 			return true;
 		}

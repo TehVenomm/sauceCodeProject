@@ -69,10 +69,10 @@ public class SmithGrowSkillSelect : SkillSelectBaseSecond
 	{
 		base.UpdateUI();
 		SetVisibleEmptySkillType(false, 0);
-		SetActive(UI.BTN_DECISION, false);
-		SetActive(UI.BTN_SKILL_DECISION, true);
-		SetLabelText(UI.STR_SKILL_DECISION, base.sectionData.GetText("STR_DECISION"));
-		SetLabelText(UI.STR_SKILL_DECISION_R, base.sectionData.GetText("STR_DECISION"));
+		SetActive((Enum)UI.BTN_DECISION, false);
+		SetActive((Enum)UI.BTN_SKILL_DECISION, true);
+		SetLabelText((Enum)UI.STR_SKILL_DECISION, base.sectionData.GetText("STR_DECISION"));
+		SetLabelText((Enum)UI.STR_SKILL_DECISION_R, base.sectionData.GetText("STR_DECISION"));
 	}
 
 	protected override void SetInventoryIsEmptyParam()
@@ -99,7 +99,7 @@ public class SmithGrowSkillSelect : SkillSelectBaseSecond
 		base.OnClose();
 	}
 
-	protected override void UpdateInventoryUI()
+	protected unsafe override void UpdateInventoryUI()
 	{
 		SetupEnableInventoryUI();
 		bool reset = false;
@@ -111,61 +111,18 @@ public class SmithGrowSkillSelect : SkillSelectBaseSecond
 		}
 		m_generatedIconList.Clear();
 		UpdateNewIconInfo();
-		SetDynamicList(inventoryUI, null, num, reset, delegate(int i)
-		{
-			SortCompareData sortCompareData2 = inventory.datas[i];
-			if (sortCompareData2 == null || !sortCompareData2.IsPriority(inventory.sortSettings.orderTypeAsc))
-			{
-				return false;
-			}
-			SkillItemInfo skillItemInfo2 = sortCompareData2.GetItemData() as SkillItemInfo;
-			if (skillItemInfo2 == null)
-			{
-				return false;
-			}
-			if (!skillItemInfo2.IsLevelMax())
-			{
-				return true;
-			}
-			return skillItemInfo2.IsEnableExceed();
-		}, null, delegate(int i, Transform t, bool is_recycle)
-		{
-			SortCompareData sortCompareData = inventory.datas[i];
-			if (sortCompareData != null && sortCompareData.IsPriority(inventory.sortSettings.orderTypeAsc))
-			{
-				SkillItemInfo skillItemInfo = sortCompareData.GetItemData() as SkillItemInfo;
-				if (skillItemInfo != null && (!skillItemInfo.IsLevelMax() || skillItemInfo.IsExistNextExceed()))
-				{
-					ITEM_ICON_TYPE iconType = sortCompareData.GetIconType();
-					bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, sortCompareData.GetUniqID());
-					bool isShowEnableExceed = skillItemInfo.IsEnableExceed() && skillItemInfo.exceedCnt == 0;
-					bool isValidExceed = skillItemInfo.IsEnableExceed();
-					ItemIcon itemIcon = CreateItemIconDetail(iconType, sortCompareData.GetIconID(), sortCompareData.GetRarity(), sortCompareData as SkillItemSortData, base.IsShowMainStatus, t, "SELECT", i, is_new, 100, selectIndex == i, sortCompareData.IsEquipping(), isValidExceed, isShowEnableExceed);
-					itemIcon.SetItemID(sortCompareData.GetTableID());
-					itemIcon.SetButtonColor(inventory.datas[i].IsPriority(inventory.sortSettings.orderTypeAsc), true);
-					SetLongTouch(itemIcon.transform, "DETAIL", i);
-					if ((UnityEngine.Object)itemIcon != (UnityEngine.Object)null && sortCompareData != null)
-					{
-						itemIcon.SetInitData(sortCompareData);
-					}
-					if (!m_generatedIconList.Contains(itemIcon))
-					{
-						m_generatedIconList.Add(itemIcon);
-					}
-				}
-			}
-		});
+		SetDynamicList((Enum)inventoryUI, (string)null, num, reset, new Func<int, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void SetEnabledUIModelRenderTexture(Enum ctrl_enum, bool enabled)
 	{
 		Transform ctrl = GetCtrl(ctrl_enum);
-		if ((bool)ctrl)
+		if (Object.op_Implicit(ctrl))
 		{
 			UIModelRenderTexture component = ctrl.GetComponent<UIModelRenderTexture>();
-			if ((bool)component)
+			if (Object.op_Implicit(component))
 			{
-				component.enabled = enabled;
+				component.set_enabled(enabled);
 				if (!enabled)
 				{
 					component.Clear();

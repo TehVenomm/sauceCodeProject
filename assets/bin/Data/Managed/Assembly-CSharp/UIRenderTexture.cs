@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class UIRenderTexture : MonoBehaviour
+public class UIRenderTexture
 {
 	public const int BEGIN_LAYER = 24;
 
@@ -110,7 +110,7 @@ public class UIRenderTexture : MonoBehaviour
 	{
 		get
 		{
-			return (UnityEngine.Object)renderCamera != (UnityEngine.Object)null;
+			return renderCamera != null;
 		}
 		set
 		{
@@ -126,6 +126,7 @@ public class UIRenderTexture : MonoBehaviour
 	}
 
 	private UIRenderTexture()
+		: this()
 	{
 		nearClipPlane = -1f;
 		farClipPlane = 500f;
@@ -134,8 +135,8 @@ public class UIRenderTexture : MonoBehaviour
 
 	public static bool ToRealSize(ref int w, ref int h)
 	{
-		float num = (float)Screen.width;
-		float num2 = (float)Screen.height;
+		float num = (float)Screen.get_width();
+		float num2 = (float)Screen.get_height();
 		float num3 = num / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth * (float)w;
 		float num4 = num2 / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight * (float)h;
 		bool result = false;
@@ -158,14 +159,15 @@ public class UIRenderTexture : MonoBehaviour
 
 	public static UIRenderTexture Get(UITexture ui_texture, float fov = -1f, bool link_main_camera = false, int layer = -1)
 	{
-		if ((UnityEngine.Object)ui_texture == (UnityEngine.Object)null)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		if (ui_texture == null)
 		{
 			return null;
 		}
 		UIRenderTexture uIRenderTexture = ui_texture.GetComponent<UIRenderTexture>();
-		if ((UnityEngine.Object)uIRenderTexture == (UnityEngine.Object)null)
+		if (uIRenderTexture == null)
 		{
-			uIRenderTexture = ui_texture.gameObject.AddComponent<UIRenderTexture>();
+			uIRenderTexture = ui_texture.get_gameObject().AddComponent<UIRenderTexture>();
 		}
 		uIRenderTexture.uiTexture = ui_texture;
 		uIRenderTexture.fov = fov;
@@ -177,7 +179,14 @@ public class UIRenderTexture : MonoBehaviour
 
 	private void Init()
 	{
-		if (!((UnityEngine.Object)this.renderTransform != (UnityEngine.Object)null))
+		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+		if (!(this.renderTransform != null))
 		{
 			if (layer == -1)
 			{
@@ -203,35 +212,36 @@ public class UIRenderTexture : MonoBehaviour
 			this.renderTransform = Utility.CreateGameObject("RenderTextureNode:" + id, null, renderLayer);
 			int num2 = id >> 2;
 			int num3 = (id + 1) & 3;
-			Transform renderTransform = this.renderTransform;
-			Vector3 localPosition;
+			object renderTransform = (object)this.renderTransform;
+			_003F localPosition;
 			if (!linkMainCamera && layer == -1)
 			{
-				float x = (float)(num2 * 50);
-				float num4 = (float)(num3 * -50);
-				Vector3 position = MonoBehaviourSingleton<UIManager>.I._transform.position;
-				localPosition = new Vector3(x, num4 + position.y, 0f);
+				float num4 = (float)(num2 * 50);
+				float num5 = (float)(num3 * -50);
+				Vector3 position = MonoBehaviourSingleton<UIManager>.I._transform.get_position();
+				localPosition = new Vector3(num4, num5 + position.y, 0f);
 			}
 			else
 			{
-				localPosition = Vector3.zero;
+				localPosition = Vector3.get_zero();
 			}
-			renderTransform.localPosition = localPosition;
-			this.renderTransform.parent = MonoBehaviourSingleton<UIManager>.I._transform;
-			this.renderTransform.localScale = Vector3.one;
+			renderTransform.set_localPosition(localPosition);
+			this.renderTransform.set_parent(MonoBehaviourSingleton<UIManager>.I._transform);
+			this.renderTransform.set_localScale(Vector3.get_one());
 			modelTransform = Utility.CreateGameObject("ModelNode", null, renderLayer);
-			modelTransform.parent = this.renderTransform;
-			modelTransform.localPosition = Vector3.zero;
-			modelTransform.localEulerAngles = Vector3.zero;
+			modelTransform.set_parent(this.renderTransform);
+			modelTransform.set_localPosition(Vector3.get_zero());
+			modelTransform.set_localEulerAngles(Vector3.get_zero());
 		}
 	}
 
 	public void Release()
 	{
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		Disable();
-		if (!AppMain.isApplicationQuit && (UnityEngine.Object)renderTransform != (UnityEngine.Object)null)
+		if (!AppMain.isApplicationQuit && renderTransform != null)
 		{
-			UnityEngine.Object.Destroy(renderTransform.gameObject);
+			Object.Destroy(renderTransform.get_gameObject());
 			renderTransform = null;
 		}
 		if (id != -1)
@@ -243,56 +253,65 @@ public class UIRenderTexture : MonoBehaviour
 
 	private void OnEnable()
 	{
-		if ((UnityEngine.Object)renderCamera != (UnityEngine.Object)null)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Expected O, but got Unknown
+		if (renderCamera != null)
 		{
-			renderCamera.enabled = true;
-			Utility.SetLayerWithChildren(renderCamera.transform, renderLayer);
+			renderCamera.set_enabled(true);
+			Utility.SetLayerWithChildren(renderCamera.get_transform(), renderLayer);
 		}
 	}
 
 	private void OnDisable()
 	{
-		if ((UnityEngine.Object)renderCamera != (UnityEngine.Object)null)
+		if (renderCamera != null)
 		{
-			renderCamera.enabled = false;
+			renderCamera.set_enabled(false);
 		}
 	}
 
 	private void OnDestroy()
 	{
-		StopAllCoroutines();
+		this.StopAllCoroutines();
 		Release();
 	}
 
 	private void CreateRenderTexture()
 	{
-		if ((UnityEngine.Object)renderCamera.targetTexture == (UnityEngine.Object)null)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Expected O, but got Unknown
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		if (renderCamera.get_targetTexture() == null)
 		{
-			RenderTexture renderTexture = new RenderTexture(texW, texH, 24);
-			renderTexture.name = "(UIRenderTexture)";
-			renderTexture.filterMode = filterMode;
-			renderTexture.Create();
-			renderCamera.targetTexture = renderTexture;
-			uiTexture.mainTexture = renderTexture;
+			RenderTexture val = new RenderTexture(texW, texH, 24);
+			val.set_name("(UIRenderTexture)");
+			val.set_filterMode(filterMode);
+			val.Create();
+			renderCamera.set_targetTexture(val);
+			uiTexture.mainTexture = val;
 		}
 	}
 
 	private void DeleteRenderTexture()
 	{
-		if ((UnityEngine.Object)renderCamera.targetTexture != (UnityEngine.Object)null)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		if (renderCamera.get_targetTexture() != null)
 		{
-			renderCamera.targetTexture.DiscardContents();
-			UnityEngine.Object.Destroy(renderCamera.targetTexture);
-			renderCamera.targetTexture = null;
+			renderCamera.get_targetTexture().DiscardContents();
+			Object.Destroy(renderCamera.get_targetTexture());
+			renderCamera.set_targetTexture(null);
 			UIPanel panel = uiTexture.panel;
 			uiTexture.mainTexture = null;
-			if ((UnityEngine.Object)uiTexture.drawCall != (UnityEngine.Object)null)
+			if (uiTexture.drawCall != null)
 			{
 				uiTexture.drawCall.panel.drawCalls.Remove(uiTexture.drawCall);
 				UIDrawCall.Destroy(uiTexture.drawCall);
 				uiTexture.drawCall = null;
 			}
-			else if ((UnityEngine.Object)panel != (UnityEngine.Object)null)
+			else if (panel != null)
 			{
 				panel.ForceUpDate();
 			}
@@ -301,55 +320,60 @@ public class UIRenderTexture : MonoBehaviour
 
 	public void Enable(float fadeTime = 0.25f)
 	{
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
 		Init();
-		if ((layer != -1 || id != -1) && !((UnityEngine.Object)renderCamera != (UnityEngine.Object)null))
+		if ((layer != -1 || id != -1) && !(renderCamera != null))
 		{
-			renderCamera = renderTransform.gameObject.AddComponent<Camera>();
-			renderCamera.depth = 50f;
-			renderCamera.clearFlags = CameraClearFlags.Color;
-			renderCamera.backgroundColor = new Color(0f, 0f, 0f, 0f);
-			renderCamera.renderingPath = RenderingPath.Forward;
-			renderCamera.cullingMask = 1 << renderLayer;
+			renderCamera = renderTransform.get_gameObject().AddComponent<Camera>();
+			renderCamera.set_depth(50f);
+			renderCamera.set_clearFlags(2);
+			renderCamera.set_backgroundColor(new Color(0f, 0f, 0f, 0f));
+			renderCamera.set_renderingPath(1);
+			renderCamera.set_cullingMask(1 << renderLayer);
 			if (orthographicSize == 0f)
 			{
 				if (fov <= 0f)
 				{
 					fov = 10f;
 				}
-				renderCamera.fieldOfView = fov;
+				renderCamera.set_fieldOfView(fov);
 			}
 			else
 			{
-				renderCamera.orthographic = true;
-				renderCamera.orthographicSize = orthographicSize;
+				renderCamera.set_orthographic(true);
+				renderCamera.set_orthographicSize(orthographicSize);
 			}
 			if (nearClipPlane == -1f)
 			{
 				nearClipPlane = 0.01f;
 			}
-			renderCamera.nearClipPlane = nearClipPlane;
-			renderCamera.farClipPlane = farClipPlane;
-			if ((UnityEngine.Object)postEffectFilter != (UnityEngine.Object)null)
+			renderCamera.set_nearClipPlane(nearClipPlane);
+			renderCamera.set_farClipPlane(farClipPlane);
+			if (postEffectFilter != null)
 			{
-				postEffector = renderTransform.gameObject.AddComponent<PostEffector>();
+				postEffector = renderTransform.get_gameObject().AddComponent<PostEffector>();
 				postEffector.SetFilter(postEffectFilter);
 			}
-			if ((UnityEngine.Object)uiTexture != (UnityEngine.Object)null)
+			if (uiTexture != null)
 			{
 				texW = uiTexture.width;
 				texH = uiTexture.height;
 				if (ToRealSize(ref texW, ref texH))
 				{
-					filterMode = FilterMode.Bilinear;
+					filterMode = 1;
 				}
 				else
 				{
-					filterMode = FilterMode.Point;
+					filterMode = 0;
 				}
 			}
 			else
 			{
-				texW = (texH = Mathf.Min(Screen.width, Screen.height));
+				texW = (texH = Mathf.Min(Screen.get_width(), Screen.get_height()));
 			}
 			CreateRenderTexture();
 			uiTexture.alpha = 0f;
@@ -362,12 +386,12 @@ public class UIRenderTexture : MonoBehaviour
 
 	public void Disable()
 	{
-		if ((layer != -1 || id != -1) && !((UnityEngine.Object)renderCamera == (UnityEngine.Object)null))
+		if ((layer != -1 || id != -1) && !(renderCamera == null))
 		{
 			DeleteRenderTexture();
-			UnityEngine.Object.Destroy(renderCamera);
+			Object.Destroy(renderCamera);
 			renderCamera = null;
-			UnityEngine.Object.Destroy(postEffector);
+			Object.Destroy(postEffector);
 			postEffector = null;
 			alpha = null;
 			uiTexture.alpha = 0f;
@@ -376,7 +400,8 @@ public class UIRenderTexture : MonoBehaviour
 
 	public void FadeOutDisable(float fadeTime = 0.25f)
 	{
-		StartCoroutine(DoFadeOutDisable(fadeTime));
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoFadeOutDisable(fadeTime));
 	}
 
 	private IEnumerator DoFadeOutDisable(float fadeTime)
@@ -398,6 +423,8 @@ public class UIRenderTexture : MonoBehaviour
 
 	private void LateUpdate()
 	{
+		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
 		if (layer != -1 || id != -1)
 		{
 			if (alpha != null)
@@ -408,34 +435,38 @@ public class UIRenderTexture : MonoBehaviour
 					alpha = null;
 				}
 			}
-			if (linkMainCamera && (UnityEngine.Object)renderCamera != (UnityEngine.Object)null)
+			if (linkMainCamera && renderCamera != null)
 			{
-				modelTransform.parent = null;
-				renderTransform.position = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.position;
-				renderTransform.rotation = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.rotation;
-				modelTransform.parent = renderTransform;
-				renderCamera.fieldOfView = MonoBehaviourSingleton<AppMain>.I.mainCamera.fieldOfView;
+				modelTransform.set_parent(null);
+				renderTransform.set_position(MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_position());
+				renderTransform.set_rotation(MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_rotation());
+				modelTransform.set_parent(renderTransform);
+				renderCamera.set_fieldOfView(MonoBehaviourSingleton<AppMain>.I.mainCamera.get_fieldOfView());
 			}
 		}
 	}
 
-	private void OnApplicationPause(bool pauseStatus)
+	private unsafe void OnApplicationPause(bool pauseStatus)
 	{
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Expected O, but got Unknown
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Expected O, but got Unknown
 		if (!pauseStatus && MonoBehaviourSingleton<AppMain>.IsValid())
 		{
 			AppMain i = MonoBehaviourSingleton<AppMain>.I;
-			i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, new Action(CheckRenderCameraTarget));
+			i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
 	private void CheckRenderCameraTarget()
 	{
-		if ((UnityEngine.Object)uiTexture != (UnityEngine.Object)null && (UnityEngine.Object)renderCamera != (UnityEngine.Object)null && (UnityEngine.Object)uiTexture.mainTexture != (UnityEngine.Object)null)
+		if (uiTexture != null && renderCamera != null && uiTexture.mainTexture != null)
 		{
-			RenderTexture renderTexture = uiTexture.mainTexture as RenderTexture;
-			if ((UnityEngine.Object)renderTexture != (UnityEngine.Object)null)
+			RenderTexture val = uiTexture.mainTexture as RenderTexture;
+			if (val != null)
 			{
-				renderCamera.targetTexture = renderTexture;
+				renderCamera.set_targetTexture(val);
 			}
 		}
 	}

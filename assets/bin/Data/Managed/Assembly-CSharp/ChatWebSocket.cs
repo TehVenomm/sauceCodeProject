@@ -1,6 +1,7 @@
 using BestHTTP.WebSocket;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class ChatWebSocket : MonoBehaviourSingleton<ChatWebSocket>
@@ -111,7 +112,23 @@ public class ChatWebSocket : MonoBehaviourSingleton<ChatWebSocket>
 
 	public event EventHandler ErrorOccurred;
 
-	public event Action OnClosed;
+	public event Action OnClosed
+	{
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		add
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Expected O, but got Unknown
+			this.OnClosed = Delegate.Combine((Delegate)this.OnClosed, (Delegate)value);
+		}
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		remove
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Expected O, but got Unknown
+			this.OnClosed = Delegate.Remove((Delegate)this.OnClosed, (Delegate)value);
+		}
+	}
 
 	public event Action<double> OnPong;
 
@@ -133,7 +150,7 @@ public class ChatWebSocket : MonoBehaviourSingleton<ChatWebSocket>
 		NativeConnect(relayServer);
 	}
 
-	private void NativeConnect(string relayServer)
+	private unsafe void NativeConnect(string relayServer)
 	{
 		sock = new WebSocket(new Uri(relayServer));
 		CurrentConnectionStatus = CONNECTION_STATUS.OPENING;
@@ -146,48 +163,15 @@ public class ChatWebSocket : MonoBehaviourSingleton<ChatWebSocket>
 			CurrentConnectionStatus = CONNECTION_STATUS.CONNECTED;
 		});
 		WebSocket webSocket2 = sock;
-		webSocket2.OnBinary = (Action<WebSocket, byte[]>)Delegate.Combine(webSocket2.OnBinary, (Action<WebSocket, byte[]>)delegate(WebSocket ws, byte[] binary)
-		{
-			LogDebug("OnBinary {0}", binary.Length);
-			ClearLastPacketReceivedTime();
-			temporaryQueue.Enqueue(new PacketStream(binary));
-		});
+		webSocket2.OnBinary = Delegate.Combine((Delegate)webSocket2.OnBinary, (Delegate)new Action<WebSocket, byte[]>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		WebSocket webSocket3 = sock;
-		webSocket3.OnMessage = (Action<WebSocket, string>)Delegate.Combine(webSocket3.OnMessage, (Action<WebSocket, string>)delegate(WebSocket ws, string message)
-		{
-			LogDebug("OnMessage {0}", message);
-			ClearLastPacketReceivedTime();
-			temporaryQueue.Enqueue(new PacketStream(message));
-		});
+		webSocket3.OnMessage = Delegate.Combine((Delegate)webSocket3.OnMessage, (Delegate)new Action<WebSocket, string>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		WebSocket webSocket4 = sock;
-		webSocket4.OnClosed = (Action<WebSocket, ushort, string>)Delegate.Combine(webSocket4.OnClosed, (Action<WebSocket, ushort, string>)delegate(WebSocket ws, ushort code, string message)
-		{
-			OnPrepareClose();
-			temporaryQueue.Clear();
-			if (this.OnClosed != null)
-			{
-				this.OnClosed();
-			}
-			LogDebug("OnClosed Code {0}", code);
-			LogDebug("OnClosed Message {0}", message);
-		});
+		webSocket4.OnClosed = Delegate.Combine((Delegate)webSocket4.OnClosed, (Delegate)new Action<WebSocket, ushort, string>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		WebSocket webSocket5 = sock;
-		webSocket5.OnError = (Action<WebSocket, Exception>)Delegate.Combine(webSocket5.OnError, (Action<WebSocket, Exception>)delegate(WebSocket ws, Exception ex)
-		{
-			CurrentConnectionStatus = CONNECTION_STATUS.ERROR;
-			OnErrorOccurred(EventArgs.Empty, ex);
-			LogDebug("OnError Message {0}", ex.Message);
-			LogDebug("OnError StackTrace {0}", ex.StackTrace);
-		});
+		webSocket5.OnError = Delegate.Combine((Delegate)webSocket5.OnError, (Delegate)new Action<WebSocket, Exception>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		WebSocket webSocket6 = sock;
-		webSocket6.OnPong = (Action<WebSocket, byte[]>)Delegate.Combine(webSocket6.OnPong, (Action<WebSocket, byte[]>)delegate
-		{
-			if (this.OnPong != null)
-			{
-				this.OnPong((DateTime.Now - lastPacketReceivedTime).TotalMilliseconds - 3000.0);
-			}
-			ClearLastPacketReceivedTime();
-		});
+		webSocket6.OnPong = Delegate.Combine((Delegate)webSocket6.OnPong, (Delegate)new Action<WebSocket, byte[]>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		sock.StartPingThread = true;
 		sock.PingFrequency = 3000;
 		sock.Open();

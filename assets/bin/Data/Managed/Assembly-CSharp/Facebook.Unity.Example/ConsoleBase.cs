@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace Facebook.Unity.Example
 {
-	internal class ConsoleBase : MonoBehaviour
+	internal class ConsoleBase
 	{
 		private const int DpiScalingFactor = 160;
 
@@ -16,7 +16,7 @@ namespace Facebook.Unity.Example
 
 		private string lastResponse = string.Empty;
 
-		private Vector2 scrollPosition = Vector2.zero;
+		private Vector2 scrollPosition = Vector2.get_zero();
 
 		private float? scaleFactor;
 
@@ -28,13 +28,13 @@ namespace Facebook.Unity.Example
 
 		private GUIStyle labelStyle;
 
-		protected static int ButtonHeight => (!Constants.IsMobile) ? 24 : 60;
+		protected static int ButtonHeight => (!Constants.get_IsMobile()) ? 24 : 60;
 
-		protected static int MainWindowWidth => (!Constants.IsMobile) ? 700 : (Screen.width - 30);
+		protected static int MainWindowWidth => (!Constants.get_IsMobile()) ? 700 : (Screen.get_width() - 30);
 
-		protected static int MainWindowFullWidth => (!Constants.IsMobile) ? 760 : Screen.width;
+		protected static int MainWindowFullWidth => (!Constants.get_IsMobile()) ? 760 : Screen.get_width();
 
-		protected static int MarginFix => (!Constants.IsMobile) ? 48 : 0;
+		protected static int MarginFix => (!Constants.get_IsMobile()) ? 48 : 0;
 
 		protected static Stack<string> MenuStack
 		{
@@ -82,10 +82,13 @@ namespace Facebook.Unity.Example
 		{
 			get
 			{
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return scrollPosition;
 			}
 			set
 			{
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 				scrollPosition = value;
 			}
 		}
@@ -96,7 +99,7 @@ namespace Facebook.Unity.Example
 			{
 				if (!scaleFactor.HasValue)
 				{
-					scaleFactor = Screen.dpi / 160f;
+					scaleFactor = Screen.get_dpi() / 160f;
 				}
 				return scaleFactor.Value;
 			}
@@ -108,15 +111,20 @@ namespace Facebook.Unity.Example
 		{
 			get
 			{
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001b: Expected O, but got Unknown
+				//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 				if (textStyle == null)
 				{
-					textStyle = new GUIStyle(GUI.skin.textArea);
-					textStyle.alignment = TextAnchor.UpperLeft;
-					textStyle.wordWrap = true;
-					textStyle.padding = new RectOffset(10, 10, 10, 10);
-					textStyle.stretchHeight = true;
-					textStyle.stretchWidth = false;
-					textStyle.fontSize = FontSize;
+					textStyle = new GUIStyle(GUI.get_skin().get_textArea());
+					textStyle.set_alignment(0);
+					textStyle.set_wordWrap(true);
+					textStyle.set_padding(new RectOffset(10, 10, 10, 10));
+					textStyle.set_stretchHeight(true);
+					textStyle.set_stretchWidth(false);
+					textStyle.set_fontSize(FontSize);
 				}
 				return textStyle;
 			}
@@ -126,10 +134,14 @@ namespace Facebook.Unity.Example
 		{
 			get
 			{
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001b: Expected O, but got Unknown
 				if (buttonStyle == null)
 				{
-					buttonStyle = new GUIStyle(GUI.skin.button);
-					buttonStyle.fontSize = FontSize;
+					buttonStyle = new GUIStyle(GUI.get_skin().get_button());
+					buttonStyle.set_fontSize(FontSize);
 				}
 				return buttonStyle;
 			}
@@ -139,10 +151,14 @@ namespace Facebook.Unity.Example
 		{
 			get
 			{
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001b: Expected O, but got Unknown
 				if (textInputStyle == null)
 				{
-					textInputStyle = new GUIStyle(GUI.skin.textField);
-					textInputStyle.fontSize = FontSize;
+					textInputStyle = new GUIStyle(GUI.get_skin().get_textField());
+					textInputStyle.set_fontSize(FontSize);
 				}
 				return textInputStyle;
 			}
@@ -152,36 +168,67 @@ namespace Facebook.Unity.Example
 		{
 			get
 			{
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001b: Expected O, but got Unknown
 				if (labelStyle == null)
 				{
-					labelStyle = new GUIStyle(GUI.skin.label);
-					labelStyle.fontSize = FontSize;
+					labelStyle = new GUIStyle(GUI.get_skin().get_label());
+					labelStyle.set_fontSize(FontSize);
 				}
 				return labelStyle;
 			}
 		}
 
+		public ConsoleBase()
+			: this()
+		{
+		}//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+
+
 		protected virtual void Awake()
 		{
-			Application.targetFrameRate = 60;
+			Application.set_targetFrameRate(60);
 		}
 
 		protected bool Button(string label)
 		{
-			return GUILayout.Button(label, ButtonStyle, GUILayout.MinHeight((float)ButtonHeight * ScaleFactor), GUILayout.MaxWidth((float)MainWindowWidth));
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Expected O, but got Unknown
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Expected O, but got Unknown
+			return GUILayout.Button(label, ButtonStyle, (GUILayoutOption[])new GUILayoutOption[2]
+			{
+				GUILayout.MinHeight((float)ButtonHeight * ScaleFactor),
+				GUILayout.MaxWidth((float)MainWindowWidth)
+			});
 		}
 
 		protected void LabelAndTextField(string label, ref string text)
 		{
-			GUILayout.BeginHorizontal();
-			GUILayout.Label(label, LabelStyle, GUILayout.MaxWidth(200f * ScaleFactor));
-			text = GUILayout.TextField(text, TextInputStyle, GUILayout.MaxWidth((float)(MainWindowWidth - 150)));
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Expected O, but got Unknown
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Expected O, but got Unknown
+			GUILayout.BeginHorizontal((GUILayoutOption[])new GUILayoutOption[0]);
+			GUILayout.Label(label, LabelStyle, (GUILayoutOption[])new GUILayoutOption[1]
+			{
+				GUILayout.MaxWidth(200f * ScaleFactor)
+			});
+			text = GUILayout.TextField(text, TextInputStyle, (GUILayoutOption[])new GUILayoutOption[1]
+			{
+				GUILayout.MaxWidth((float)(MainWindowWidth - 150))
+			});
 			GUILayout.EndHorizontal();
 		}
 
 		protected bool IsHorizontalLayout()
 		{
-			return Screen.orientation == ScreenOrientation.LandscapeLeft;
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Invalid comparison between Unknown and I4
+			return (int)Screen.get_orientation() == 3;
 		}
 
 		protected void SwitchMenu(Type menuClass)

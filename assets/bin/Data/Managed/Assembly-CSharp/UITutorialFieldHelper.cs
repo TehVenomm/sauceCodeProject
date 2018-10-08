@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UITutorialFieldHelper : MonoBehaviour
+public class UITutorialFieldHelper
 {
 	public enum MessageState
 	{
@@ -39,14 +39,19 @@ public class UITutorialFieldHelper : MonoBehaviour
 
 	public static UITutorialFieldHelper I => instance;
 
+	public UITutorialFieldHelper()
+		: this()
+	{
+	}
+
 	public static bool IsValid()
 	{
-		return (Object)instance != (Object)null;
+		return instance != null;
 	}
 
 	public static bool IsCollectedFieldItem()
 	{
-		return (Object)instance != (Object)null && m_State == MessageState.BackHome;
+		return instance != null && m_State == MessageState.BackHome;
 	}
 
 	private void Awake()
@@ -56,7 +61,7 @@ public class UITutorialFieldHelper : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		if (!AppMain.isApplicationQuit && (Object)instance == (Object)this)
+		if (!AppMain.isApplicationQuit && instance == this)
 		{
 			instance = null;
 		}
@@ -82,6 +87,9 @@ public class UITutorialFieldHelper : MonoBehaviour
 
 	private void UpdateMessage()
 	{
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 		switch (m_State)
 		{
 		case MessageState.CollectItemImg:
@@ -89,15 +97,15 @@ public class UITutorialFieldHelper : MonoBehaviour
 			if (UIInGameFieldMenu.IsValid())
 			{
 				UIInGameFieldMenu.I.SetDisableButtons(true);
-				UIInGameFieldMenu.I.gameObject.SetActive(false);
+				UIInGameFieldMenu.I.get_gameObject().SetActive(false);
 			}
 			break;
 		case MessageState.BackHome:
 			if (UIInGameFieldMenu.IsValid())
 			{
-				tweenEndCtrl.gameObject.SetActive(true);
+				tweenEndCtrl.get_gameObject().SetActive(true);
 				UIInGameFieldMenu.I.SetDisableButtons(true);
-				UIInGameFieldMenu.I.gameObject.SetActive(true);
+				UIInGameFieldMenu.I.get_gameObject().SetActive(true);
 				UIInGameFieldMenu.I.SetEnableButton("BTN_REQUEST", true);
 			}
 			break;
@@ -113,8 +121,10 @@ public class UITutorialFieldHelper : MonoBehaviour
 			SetState(MessageState.CollectItemImg);
 			tweenEndCtrl.Play(true, delegate
 			{
-				tweenStratCtrl.gameObject.SetActive(false);
-				tweenEndCtrl.gameObject.SetActive(false);
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+				tweenStratCtrl.get_gameObject().SetActive(false);
+				tweenEndCtrl.get_gameObject().SetActive(false);
 			});
 		});
 		skilBtn.onClick.Clear();

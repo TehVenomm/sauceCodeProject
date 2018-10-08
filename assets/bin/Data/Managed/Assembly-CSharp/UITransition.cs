@@ -1,7 +1,6 @@
 using System;
-using UnityEngine;
 
-public class UITransition : MonoBehaviour
+public class UITransition
 {
 	public enum TYPE
 	{
@@ -26,6 +25,11 @@ public class UITransition : MonoBehaviour
 
 	public bool isBusy => busyCount != 0;
 
+	public UITransition()
+		: this()
+	{
+	}
+
 	private void Awake()
 	{
 		InitTweens();
@@ -38,7 +42,7 @@ public class UITransition : MonoBehaviour
 			int i = 0;
 			for (int num = tweens.Length; i < num; i++)
 			{
-				tweens[i].enabled = false;
+				tweens[i].set_enabled(false);
 				tweens[i].AddOnFinished(new EventDelegate(OnFinished));
 			}
 		}
@@ -57,13 +61,17 @@ public class UITransition : MonoBehaviour
 		busyCount--;
 		if (busyCount == 0 && callback != null)
 		{
-			callback();
+			callback.Invoke();
 			callback = null;
 		}
 	}
 
-	private void StartAnim(UITweener[] tweens, Action _callback)
+	private unsafe void StartAnim(UITweener[] tweens, Action _callback)
 	{
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Expected O, but got Unknown
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Expected O, but got Unknown
 		if (busyCount == 0)
 		{
 			callback = _callback;
@@ -71,10 +79,7 @@ public class UITransition : MonoBehaviour
 			{
 				busyCount = 1;
 				AppMain i = MonoBehaviourSingleton<AppMain>.I;
-				i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-				{
-					OnFinished();
-				});
+				i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			else
 			{
@@ -82,7 +87,7 @@ public class UITransition : MonoBehaviour
 				int j = 0;
 				for (int num = tweens.Length; j < num; j++)
 				{
-					tweens[j].enabled = true;
+					tweens[j].set_enabled(true);
 					tweens[j].ResetToBeginning();
 				}
 				if (GameSceneManager.isAutoEventSkip && isBusy)
@@ -90,7 +95,7 @@ public class UITransition : MonoBehaviour
 					int k = 0;
 					for (int num2 = tweens.Length; k < num2; k++)
 					{
-						if ((UnityEngine.Object)tweens[k] != (UnityEngine.Object)null)
+						if (tweens[k] != null)
 						{
 							tweens[k].tweenFactor = 1f;
 							tweens[k].Sample(1f, false);

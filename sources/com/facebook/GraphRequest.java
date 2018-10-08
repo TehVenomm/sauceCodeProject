@@ -1103,10 +1103,10 @@ public class GraphRequest {
     }
 
     public static HttpURLConnection toHttpConnection(GraphRequestBatch graphRequestBatch) {
-        URLConnection createConnection;
         Throwable e;
         validateFieldsParamForGetRequests(graphRequestBatch);
         try {
+            URLConnection createConnection;
             try {
                 createConnection = createConnection(graphRequestBatch.size() == 1 ? new URL(graphRequestBatch.get(0).getUrlForSingleRequest()) : new URL(ServerProtocol.getGraphUrlBase()));
                 try {

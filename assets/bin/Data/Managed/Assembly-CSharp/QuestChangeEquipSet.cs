@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -151,6 +152,8 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 
 	protected override void UpdateEquipIcon(List<CharaInfo.EquipItem> equip_set_info)
 	{
+		//IL_0300: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0398: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(transRoot, UI.LBL_CHANGE_MODE, isVisualMode);
 		int i = 0;
 		for (int num = 7; i < num; i++)
@@ -211,21 +214,21 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 					string text = string.Format(StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 1u), equipItemInfo.level.ToString());
 					SetLabelText(FindCtrl(transRoot, icons_level[j]), text);
 				}
-				Transform transform = FindCtrl(transRoot, icons[j]);
-				transform.GetComponentsInChildren(true, Temporary.itemIconList);
+				Transform val = FindCtrl(transRoot, icons[j]);
+				val.GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
 				int k = 0;
 				for (int count = Temporary.itemIconList.Count; k < count; k++)
 				{
-					Temporary.itemIconList[k].gameObject.SetActive(true);
+					Temporary.itemIconList[k].get_gameObject().SetActive(true);
 				}
 				Temporary.itemIconList.Clear();
-				ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, transform, null, -1, "EQUIP", j, false, -1, false, null, false, false);
+				ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, val, null, -1, "EQUIP", j, false, -1, false, null, false, false);
 				SetLongTouch(itemIcon.transform, "DETAIL", j);
 				SetEvent(FindCtrl(transRoot, icons_btn[j]), "DETAIL", j);
-				itemIcon.gameObject.SetActive(num3 != -1);
+				itemIcon.get_gameObject().SetActive(num3 != -1);
 				if (num3 != -1)
 				{
-					itemIcon.SetEquipExtInvertedColor(equipItemInfo, GetComponent<UILabel>(icons_level[j]));
+					itemIcon.SetEquipExtInvertedColor(equipItemInfo, base.GetComponent<UILabel>((Enum)icons_level[j]));
 				}
 				UpdateEquipSkillButton(equipItemInfo, j);
 			}
@@ -293,24 +296,26 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 
 	protected void OnQuery_EQUIP_SET_L()
 	{
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 		selfCharaEquipSetNo--;
 		if (selfCharaEquipSetNo < 0)
 		{
 			selfCharaEquipSetNo = equipSetMax - 1;
 		}
 		RefreshUI();
-		StartCoroutine(ReloadModelCoroutine());
+		this.StartCoroutine(ReloadModelCoroutine());
 	}
 
 	protected void OnQuery_EQUIP_SET_R()
 	{
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		selfCharaEquipSetNo++;
 		if (selfCharaEquipSetNo >= equipSetMax)
 		{
 			selfCharaEquipSetNo = 0;
 		}
 		RefreshUI();
-		StartCoroutine(ReloadModelCoroutine());
+		this.StartCoroutine(ReloadModelCoroutine());
 	}
 
 	protected override void OnQuery_CHANGE_MODE()

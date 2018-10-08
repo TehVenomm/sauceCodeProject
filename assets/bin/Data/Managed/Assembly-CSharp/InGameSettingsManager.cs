@@ -607,12 +607,12 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 			[Tooltip("[Burst] 距離減衰の最小減衰距離")]
 			private float MinAttenuationDistance = 10f;
 
-			[Tooltip("[Burst] 距離減衰の最大減衰距離")]
 			[SerializeField]
+			[Tooltip("[Burst] 距離減衰の最大減衰距離")]
 			private float MaxAttenuationDistance = 1000f;
 
-			[SerializeField]
 			[Tooltip("[Burst] 距離減衰の最小ダメ\u30fcジレ\u30fcト")]
+			[SerializeField]
 			private float MinAttenuationDmgRate = 0.01f;
 
 			[Tooltip("[Burst] 距離減衰の最大ダメ\u30fcジレ\u30fcト")]
@@ -623,20 +623,20 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 			[SerializeField]
 			private AnimationCurve AnimCurve = Curves.CreateEaseInCurve();
 
-			[SerializeField]
 			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
+			[SerializeField]
 			public float SingleShotBaseDmgRate = 1f;
 
-			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			[SerializeField]
+			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			public float SingleShotElementDmgRate = 2f;
 
 			[SerializeField]
 			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			public float FullBurstBaseDmgRate = 2f;
 
-			[SerializeField]
 			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
+			[SerializeField]
 			public float FullBurstElementDmgRate = 4f;
 
 			[Tooltip("単発ショットのヒットエフェクト(属性差分あり")]
@@ -659,9 +659,9 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 				{
 					return MinAttenuationDmgRate;
 				}
-				float time = (_distance - MinAttenuationDistance) / (MaxAttenuationDistance - MinAttenuationDistance);
-				float num = Mathf.Round(AnimCurve.Evaluate(time) * 100f) / 100f;
-				return (MaxAttenuationDmgRate - MinAttenuationDmgRate) * num + MinAttenuationDmgRate;
+				float num = (_distance - MinAttenuationDistance) / (MaxAttenuationDistance - MinAttenuationDistance);
+				float num2 = Mathf.Round(AnimCurve.Evaluate(num) * 100f) / 100f;
+				return (MaxAttenuationDmgRate - MinAttenuationDmgRate) * num2 + MinAttenuationDmgRate;
 			}
 		}
 
@@ -784,13 +784,13 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 		public class ArrowActionInfo
 		{
 			[Tooltip("弓のライン色：通常")]
-			public Color bulletLineColor = Color.yellow;
+			public Color bulletLineColor = Color.get_yellow();
 
 			[Tooltip("弓のライン色：ソウル")]
-			public Color bulletLineColorSoul = Color.magenta;
+			public Color bulletLineColorSoul = Color.get_magenta();
 
 			[Tooltip("弓のライン色：ソウル(Max)")]
-			public Color bulletLineColorSoulFull = Color.red;
+			public Color bulletLineColorSoulFull = Color.get_red();
 
 			[Tooltip("弓のライン参照のattackInfoの名前")]
 			public string[] attackInfoNames;
@@ -1298,8 +1298,8 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 		[Tooltip("GetAnimatorSpeedの最大TimeRate")]
 		public float animatorSpeedMaxTimeRate = 0.9f;
 
-		[Range(0f, 1f)]
 		[Tooltip("MaxDamageDownRate")]
+		[Range(0f, 1f)]
 		public float maxDamageDownRate = 0.6f;
 
 		[Tooltip("武器固有アクション情報")]
@@ -1650,7 +1650,7 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 		public float confirmUITime = 30f;
 
 		[Tooltip("モンスタ\u30fc初期位置")]
-		public Vector3 enemyInitPos = Vector3.zero;
+		public Vector3 enemyInitPos = Vector3.get_zero();
 
 		[Tooltip("モンスタ\u30fc初期向き（角度")]
 		public float enemyInitDir;

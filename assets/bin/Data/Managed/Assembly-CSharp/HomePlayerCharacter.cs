@@ -57,7 +57,9 @@ public class HomePlayerCharacter : HomePlayerCharacterBase
 
 	protected override ModelLoaderBase LoadModel()
 	{
-		return Load(this, base.gameObject, charaInfo, null);
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Expected O, but got Unknown
+		return Load(this, this.get_gameObject(), charaInfo, null);
 	}
 
 	protected override void InitAnim()
@@ -67,12 +69,14 @@ public class HomePlayerCharacter : HomePlayerCharacterBase
 		{
 			animCtrl.SetMoveRunAnim(sexType);
 		}
-		animator.speed = Random.Range(0.8f, 1.2f);
+		animator.set_speed(Random.Range(0.8f, 1.2f));
 	}
 
 	public override bool DispatchEvent()
 	{
-		if (!TutorialStep.HasAllTutorialCompleted() || MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() || (Object)TutorialMessage.GetCursor(0) != (Object)null)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0060: Expected O, but got Unknown
+		if (!TutorialStep.HasAllTutorialCompleted() || MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() || TutorialMessage.GetCursor(0) != null)
 		{
 			return false;
 		}
@@ -82,7 +86,7 @@ public class HomePlayerCharacter : HomePlayerCharacterBase
 		}
 		if (GetFriendCharaInfo() != null)
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomePlayerCharacter", base.gameObject, "HOME_FRIENDS", GetFriendCharaInfo(), null, true);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomePlayerCharacter", this.get_gameObject(), "HOME_FRIENDS", GetFriendCharaInfo(), null, true);
 			return true;
 		}
 		return false;

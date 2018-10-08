@@ -90,7 +90,7 @@ public class TwoHandSwordController : IObserver, IWeaponController
 				m_thsCtrls[i].Init(_player);
 			}
 		}
-		if ((Object)m_owner != (Object)null && m_owner.playerParameter != null)
+		if (m_owner != null && m_owner.playerParameter != null)
 		{
 			m_actionInfo = m_owner.playerParameter.twoHandSwordActionInfo;
 		}
@@ -152,7 +152,7 @@ public class TwoHandSwordController : IObserver, IWeaponController
 
 	private int GetValidControllerIndex()
 	{
-		if ((Object)m_owner == (Object)null || m_owner.attackMode != Player.ATTACK_MODE.TWO_HAND_SWORD)
+		if (m_owner == null || m_owner.attackMode != Player.ATTACK_MODE.TWO_HAND_SWORD)
 		{
 			return -1;
 		}
@@ -166,7 +166,7 @@ public class TwoHandSwordController : IObserver, IWeaponController
 
 	public bool GetNormalAttackId(SP_ATTACK_TYPE _spAtktype, EXTRA_ATTACK_TYPE _exAtkType, ref int _attackId, ref string _motionLayerName)
 	{
-		if ((Object)m_owner == (Object)null || m_actionInfo == null)
+		if (m_owner == null || m_actionInfo == null)
 		{
 			return false;
 		}
@@ -192,7 +192,7 @@ public class TwoHandSwordController : IObserver, IWeaponController
 
 	public bool GetSpActionInfo(SP_ATTACK_TYPE _spAtkType, EXTRA_ATTACK_TYPE _exType, ref int _attackId, ref string _motionLayerName)
 	{
-		if ((Object)m_owner == (Object)null)
+		if (m_owner == null)
 		{
 			return false;
 		}
@@ -227,7 +227,9 @@ public class TwoHandSwordController : IObserver, IWeaponController
 
 	public bool GetSpGaugeIncreaseValue(AttackHitInfo.ATTACK_TYPE _atkType, int _attackId, float _attackRate, SoulEnergyController _soulEnergyCtrl, Vector3 _hitPosition, float _chargeRate, ref float _gaugeMax, ref float _increaseValue)
 	{
-		if ((Object)m_owner == (Object)null)
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+		if (m_owner == null)
 		{
 			return false;
 		}
@@ -297,7 +299,7 @@ public class TwoHandSwordController : IObserver, IWeaponController
 
 	public float GetAtkRate(Enemy _enemy, Player _player)
 	{
-		if ((Object)_enemy == (Object)null || (Object)_player == (Object)null)
+		if (_enemy == null || _player == null)
 		{
 			return 1f;
 		}

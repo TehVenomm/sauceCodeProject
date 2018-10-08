@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Button Keys (Legacy)")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/Interaction/Button Keys (Legacy)")]
 public class UIButtonKeys : UIKeyNavigation
 {
 	public UIButtonKeys selectOnClick;
@@ -22,33 +22,43 @@ public class UIButtonKeys : UIKeyNavigation
 
 	public void Upgrade()
 	{
-		if ((Object)onClick == (Object)null && (Object)selectOnClick != (Object)null)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Expected O, but got Unknown
+		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Expected O, but got Unknown
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Expected O, but got Unknown
+		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ee: Expected O, but got Unknown
+		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012e: Expected O, but got Unknown
+		if (onClick == null && selectOnClick != null)
 		{
-			onClick = selectOnClick.gameObject;
+			onClick = selectOnClick.get_gameObject();
 			selectOnClick = null;
 			NGUITools.SetDirty(this);
 		}
-		if ((Object)onLeft == (Object)null && (Object)selectOnLeft != (Object)null)
+		if (onLeft == null && selectOnLeft != null)
 		{
-			onLeft = selectOnLeft.gameObject;
+			onLeft = selectOnLeft.get_gameObject();
 			selectOnLeft = null;
 			NGUITools.SetDirty(this);
 		}
-		if ((Object)onRight == (Object)null && (Object)selectOnRight != (Object)null)
+		if (onRight == null && selectOnRight != null)
 		{
-			onRight = selectOnRight.gameObject;
+			onRight = selectOnRight.get_gameObject();
 			selectOnRight = null;
 			NGUITools.SetDirty(this);
 		}
-		if ((Object)onUp == (Object)null && (Object)selectOnUp != (Object)null)
+		if (onUp == null && selectOnUp != null)
 		{
-			onUp = selectOnUp.gameObject;
+			onUp = selectOnUp.get_gameObject();
 			selectOnUp = null;
 			NGUITools.SetDirty(this);
 		}
-		if ((Object)onDown == (Object)null && (Object)selectOnDown != (Object)null)
+		if (onDown == null && selectOnDown != null)
 		{
-			onDown = selectOnDown.gameObject;
+			onDown = selectOnDown.get_gameObject();
 			selectOnDown = null;
 			NGUITools.SetDirty(this);
 		}

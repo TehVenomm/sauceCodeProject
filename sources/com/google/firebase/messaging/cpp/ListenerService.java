@@ -75,12 +75,12 @@ public class ListenerService extends FirebaseMessagingService {
             if (titleLocalizationArgs != null) {
                 int[] iArr3 = new int[titleLocalizationArgs.length];
                 int length2 = titleLocalizationArgs.length;
-                i3 = 0;
                 i = 0;
-                while (i3 < length2) {
-                    iArr3[i] = flatBufferBuilder.createString((CharSequence) titleLocalizationArgs[i3]);
-                    i3++;
+                i3 = 0;
+                while (i < length2) {
+                    iArr3[i3] = flatBufferBuilder.createString((CharSequence) titleLocalizationArgs[i]);
                     i++;
+                    i3++;
                 }
                 i3 = SerializedNotification.createTitleLocArgsVector(flatBufferBuilder, iArr3);
             }

@@ -1,13 +1,11 @@
-using UnityEngine;
-
 public class StatusScene : GameSection
 {
 	public override void Initialize()
 	{
 		RenderTargetCacher component = MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>();
-		if ((Object)component != (Object)null)
+		if (component != null)
 		{
-			component.enabled = true;
+			component.set_enabled(true);
 		}
 		MonoBehaviourSingleton<StatusManager>.I.CreateLocalEquipSetData();
 		MonoBehaviourSingleton<StatusManager>.I.CreateLocalVisualEquipData();

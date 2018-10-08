@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -25,7 +26,8 @@ public class StatusEquipListPageDialog : GameSection
 
 	public override void Initialize()
 	{
-		StartCoroutine(DoInitialize());
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -36,9 +38,9 @@ public class StatusEquipListPageDialog : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText(UI.LBL_INPUT_PASS_1, pageNo[0]);
-		SetLabelText(UI.LBL_INPUT_PASS_2, pageNo[1]);
-		SetLabelText(UI.LBL_INPUT_PASS_3, pageNo[2]);
+		SetLabelText((Enum)UI.LBL_INPUT_PASS_1, pageNo[0]);
+		SetLabelText((Enum)UI.LBL_INPUT_PASS_2, pageNo[1]);
+		SetLabelText((Enum)UI.LBL_INPUT_PASS_3, pageNo[2]);
 		base.UpdateUI();
 	}
 
@@ -112,7 +114,7 @@ public class StatusEquipListPageDialog : GameSection
 		else
 		{
 			StatusEquipList statusEquipList = MonoBehaviourSingleton<GameSceneManager>.I.FindSection("StatusEquipList") as StatusEquipList;
-			if ((Object)statusEquipList != (Object)null)
+			if (statusEquipList != null)
 			{
 				int maxPageNum = statusEquipList.GetMaxPageNum();
 				if (maxPageNum < result)

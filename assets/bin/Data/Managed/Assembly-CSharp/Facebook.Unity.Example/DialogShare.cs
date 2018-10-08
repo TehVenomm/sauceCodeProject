@@ -32,17 +32,17 @@ namespace Facebook.Unity.Example
 			return true;
 		}
 
-		protected override void GetGui()
+		protected unsafe override void GetGui()
 		{
-			bool enabled = GUI.enabled;
+			bool enabled = GUI.get_enabled();
 			if (Button("Share - Link"))
 			{
-				FacebookDelegate<IShareResult> callback = base.HandleResult;
-				FB.ShareLink(new Uri("https://developers.facebook.com/"), string.Empty, string.Empty, null, callback);
+				FacebookDelegate<IShareResult> val = new FacebookDelegate<IShareResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				FB.ShareLink(new Uri("https://developers.facebook.com/"), string.Empty, string.Empty, (Uri)null, val);
 			}
 			if (Button("Share - Link Photo"))
 			{
-				FB.ShareLink(new Uri("https://developers.facebook.com/"), "Link Share", "Look I'm sharing a link", new Uri("http://i.imgur.com/j4M7vCO.jpg"), base.HandleResult);
+				FB.ShareLink(new Uri("https://developers.facebook.com/"), "Link Share", "Look I'm sharing a link", new Uri("http://i.imgur.com/j4M7vCO.jpg"), new FacebookDelegate<IShareResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			LabelAndTextField("Link", ref shareLink);
 			LabelAndTextField("Title", ref shareTitle);
@@ -50,12 +50,12 @@ namespace Facebook.Unity.Example
 			LabelAndTextField("Image", ref shareImage);
 			if (Button("Share - Custom"))
 			{
-				FB.ShareLink(new Uri(shareLink), shareTitle, shareDescription, new Uri(shareImage), base.HandleResult);
+				FB.ShareLink(new Uri(shareLink), shareTitle, shareDescription, new Uri(shareImage), new FacebookDelegate<IShareResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
-			GUI.enabled = (enabled && (!Constants.IsEditor || (Constants.IsEditor && FB.IsLoggedIn)));
+			GUI.set_enabled(enabled && (!Constants.get_IsEditor() || (Constants.get_IsEditor() && FB.get_IsLoggedIn())));
 			if (Button("Feed Share - No To"))
 			{
-				FB.FeedShare(string.Empty, new Uri("https://developers.facebook.com/"), "Test Title", "Test caption", "Test Description", new Uri("http://i.imgur.com/zkYlB.jpg"), string.Empty, base.HandleResult);
+				FB.FeedShare(string.Empty, new Uri("https://developers.facebook.com/"), "Test Title", "Test caption", "Test Description", new Uri("http://i.imgur.com/zkYlB.jpg"), string.Empty, new FacebookDelegate<IShareResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			LabelAndTextField("To", ref feedTo);
 			LabelAndTextField("Link", ref feedLink);
@@ -66,9 +66,9 @@ namespace Facebook.Unity.Example
 			LabelAndTextField("Media Source", ref feedMediaSource);
 			if (Button("Feed Share - Custom"))
 			{
-				FB.FeedShare(feedTo, (!string.IsNullOrEmpty(feedLink)) ? new Uri(feedLink) : null, feedTitle, feedCaption, feedDescription, (!string.IsNullOrEmpty(feedImage)) ? new Uri(feedImage) : null, feedMediaSource, base.HandleResult);
+				FB.FeedShare(feedTo, (!string.IsNullOrEmpty(feedLink)) ? new Uri(feedLink) : null, feedTitle, feedCaption, feedDescription, (!string.IsNullOrEmpty(feedImage)) ? new Uri(feedImage) : null, feedMediaSource, new FacebookDelegate<IShareResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
-			GUI.enabled = enabled;
+			GUI.set_enabled(enabled);
 		}
 	}
 }

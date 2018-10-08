@@ -1,9 +1,14 @@
 using UnityEngine;
 
-public class GrowMagiMaterialAnimation : MonoBehaviour
+public class GrowMagiMaterialAnimation
 {
 	[SerializeField]
 	public float rotate = 5f;
+
+	public GrowMagiMaterialAnimation()
+		: this()
+	{
+	}
 
 	private void Start()
 	{
@@ -11,11 +16,12 @@ public class GrowMagiMaterialAnimation : MonoBehaviour
 
 	private void Anim()
 	{
-		GetComponentInChildren<Animation>().Play("MaterialAnim_1");
+		this.GetComponentInChildren<Animation>().Play("MaterialAnim_1");
 	}
 
 	private void Update()
 	{
-		base.transform.Rotate(0f, rotate, 0f);
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		this.get_transform().Rotate(0f, rotate, 0f);
 	}
 }

@@ -26,8 +26,8 @@ public class GuildStageManager : MonoBehaviourSingleton<GuildStageManager>
 		{
 			yield return (object)null;
 		}
-		HomeCamera = base.gameObject.AddComponent<HomeCamera>();
-		HomePeople = base.gameObject.AddComponent<HomePeople>();
+		HomeCamera = this.get_gameObject().AddComponent<HomeCamera>();
+		HomePeople = this.get_gameObject().AddComponent<HomePeople>();
 		while (!HomeCamera.isInitialized || !HomePeople.isInitialized)
 		{
 			yield return (object)null;

@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -289,10 +290,10 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 		}
 	}
 
-	private IEnumerator DispTaskAnnounce()
+	private unsafe IEnumerator DispTaskAnnounce()
 	{
 		TaskClearAnnounce taskClearAnnounce = MonoBehaviourSingleton<UIManager>.I.taskClearAnnouce;
-		if (!((Object)taskClearAnnounce == (Object)null))
+		if (!(taskClearAnnounce == null))
 		{
 			while (achievedTask.Count != 0)
 			{
@@ -301,10 +302,7 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 				if (tableData != null)
 				{
 					bool wait = true;
-					taskClearAnnounce.Play(tableData.title, tableData.GetRewardString(), delegate
-					{
-						((_003CDispTaskAnnounce_003Ec__Iterator222)/*Error near IL_00b8: stateMachine*/)._003Cwait_003E__3 = false;
-					});
+					taskClearAnnounce.Play(tableData.title, tableData.GetRewardString(), new Action((object)/*Error near IL_00b8: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					while (wait)
 					{
 						yield return (object)null;

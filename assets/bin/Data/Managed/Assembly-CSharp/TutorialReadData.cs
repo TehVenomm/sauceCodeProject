@@ -102,14 +102,14 @@ public class TutorialReadData
 
 	public static void SaveAsEmptyData()
 	{
-		string value = JSONSerializer.Serialize(new SaveData());
-		PlayerPrefs.SetString("TutorialProgress", value);
+		string text = JSONSerializer.Serialize(new SaveData());
+		PlayerPrefs.SetString("TutorialProgress", text);
 	}
 
 	public void Save()
 	{
-		string value = JSONSerializer.Serialize(m_SaveData);
-		PlayerPrefs.SetString("TutorialProgress", value);
+		string text = JSONSerializer.Serialize(m_SaveData);
+		PlayerPrefs.SetString("TutorialProgress", text);
 	}
 
 	public static bool HasSave()

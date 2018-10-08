@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Collections;
 using System.Text;
 using UnityEngine;
@@ -25,17 +26,18 @@ public class MutualFollowDialog : GameSection
 
 	public override void Initialize()
 	{
+		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
 		followLinkResult = MonoBehaviourSingleton<FriendManager>.I.followLinkResult;
-		SetLabelText(UI.LBL_FOLLOWER_NUM, followLinkResult.followCnt.ToString() + "/" + followLinkResult.followMaxCnt.ToString());
+		SetLabelText((Enum)UI.LBL_FOLLOWER_NUM, followLinkResult.followCnt.ToString() + "/" + followLinkResult.followMaxCnt.ToString());
 		string text = base.sectionData.GetText("REMAIN");
 		string text2 = base.sectionData.GetText("PEOPLE");
-		SetLabelText(UI.LBL_REMAIN_NUM, text + " " + followLinkResult.remainedCampaignNum.ToString() + " " + text2);
+		SetLabelText((Enum)UI.LBL_REMAIN_NUM, text + " " + followLinkResult.remainedCampaignNum.ToString() + " " + text2);
 		string empty = string.Empty;
 		SetLabelText(text: (followLinkResult.remainedLoungeFirstMetNum >= 0) ? (text + " " + followLinkResult.remainedLoungeFirstMetNum.ToString() + " " + text2) : base.sectionData.GetText("NON_CAMPAIN"), label_enum: UI.LBL_LOUNGE_REMAIN_NUM);
 		string message = followLinkResult.message;
 		linkMessage = string.Format(message, followLinkResult.link);
 		linkMessage = linkMessage.Replace("<BR>", "\n");
-		StartCoroutine(LoadTopBanner());
+		this.StartCoroutine(LoadTopBanner());
 		base.Initialize();
 	}
 
@@ -50,7 +52,7 @@ public class MutualFollowDialog : GameSection
 		{
 			yield return (object)loadQueue.Wait();
 		}
-		if (!(lo_image.loadedObject == (Object)null))
+		if (!(lo_image.loadedObject == null))
 		{
 			Texture bannerImg = lo_image.loadedObject as Texture;
 			Transform banner = GetCtrl(UI.SPR_MUTUAL_FOLLOW_BANNER);
@@ -69,17 +71,19 @@ public class MutualFollowDialog : GameSection
 		Native.OpenURL("https://twitter.com/intent/tweet?text=" + WWW.EscapeURL(linkMessage));
 	}
 
-	private void OnQuery_FACEBOOK()
+	private unsafe void OnQuery_FACEBOOK()
 	{
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUserFacebook)
 		{
 			if (!MonoBehaviourSingleton<FBManager>.I.isLoggedIn)
 			{
 				GameSection.StayEvent();
-				MonoBehaviourSingleton<FBManager>.I.LoginWithReadPermission(delegate(bool success, string r)
+				FBManager i = MonoBehaviourSingleton<FBManager>.I;
+				if (_003C_003Ef__am_0024cache3 == null)
 				{
-					GameSection.ResumeEvent(success, null);
-				});
+					_003C_003Ef__am_0024cache3 = new Action<bool, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				}
+				i.LoginWithReadPermission(_003C_003Ef__am_0024cache3);
 			}
 		}
 		else

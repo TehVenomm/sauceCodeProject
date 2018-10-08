@@ -1,3 +1,5 @@
+using System;
+
 public class ConfigName : GameSection
 {
 	private enum UI
@@ -38,22 +40,22 @@ public class ConfigName : GameSection
 
 	public override void UpdateUI()
 	{
-		SetActive(UI.SPR_TITLE_CHANGE_NAME, sectionType == SECTION_TYPE.CHANGE_NAME);
-		SetActive(UI.SPR_TITLE_CHANGE_COMMENT, sectionType == SECTION_TYPE.CHANGE_COMMENT);
-		SetActive(UI.SPR_TITLE_SEARCH_NAME, sectionType == SECTION_TYPE.SEARCH_NAME);
-		SetActive(UI.SPR_TITLE_SEARCH_ID, sectionType == SECTION_TYPE.SEARCH_ID);
-		SetInput(UI.IPT_TEXT, before_text, inputMaxLength, UpdateButton);
+		SetActive((Enum)UI.SPR_TITLE_CHANGE_NAME, sectionType == SECTION_TYPE.CHANGE_NAME);
+		SetActive((Enum)UI.SPR_TITLE_CHANGE_COMMENT, sectionType == SECTION_TYPE.CHANGE_COMMENT);
+		SetActive((Enum)UI.SPR_TITLE_SEARCH_NAME, sectionType == SECTION_TYPE.SEARCH_NAME);
+		SetActive((Enum)UI.SPR_TITLE_SEARCH_ID, sectionType == SECTION_TYPE.SEARCH_ID);
+		SetInput((Enum)UI.IPT_TEXT, before_text, inputMaxLength, (EventDelegate.Callback)UpdateButton);
 	}
 
 	private void UpdateButton()
 	{
-		string inputValue = GetInputValue(UI.IPT_TEXT);
-		SetButtonEnabled(UI.BTN_OK, inputValue != before_text && inputValue.Length > 0);
+		string inputValue = GetInputValue((Enum)UI.IPT_TEXT);
+		SetButtonEnabled((Enum)UI.BTN_OK, inputValue != before_text && inputValue.Length > 0);
 	}
 
 	private void OnQuery_OK()
 	{
-		string inputValue = GetInputValue(UI.IPT_TEXT);
+		string inputValue = GetInputValue((Enum)UI.IPT_TEXT);
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<UserInfoManager>.I.SendChangeName(inputValue, delegate(bool is_success)
 		{

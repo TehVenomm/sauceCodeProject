@@ -228,7 +228,7 @@ public class EnemyActionController
 				}
 				if (data.startWaitInterval > 0f)
 				{
-					data.startWaitTime = Time.time;
+					data.startWaitTime = Time.get_time();
 				}
 				if ((int)m_enemyData.level >= data.useLvLimit)
 				{
@@ -333,7 +333,7 @@ public class EnemyActionController
 			if (flag)
 			{
 				canUseCount++;
-				if (canActionWithAliveRegion(actionInfo) && CheckActionByAngryCondition(actionInfo) && (!(actionInfo.data.startWaitInterval > 0f) || !(Time.time - actionInfo.data.startWaitTime < actionInfo.data.startWaitInterval)) && (!(actionInfo.data.lotteryWaitInterval > 0f) || !(Time.time - actionInfo.data.lotteryWaitTime < actionInfo.data.lotteryWaitInterval)))
+				if (canActionWithAliveRegion(actionInfo) && CheckActionByAngryCondition(actionInfo) && (!(actionInfo.data.startWaitInterval > 0f) || !(Time.get_time() - actionInfo.data.startWaitTime < actionInfo.data.startWaitInterval)) && (!(actionInfo.data.lotteryWaitInterval > 0f) || !(Time.get_time() - actionInfo.data.lotteryWaitTime < actionInfo.data.lotteryWaitInterval)))
 				{
 					int num = 0;
 					OpponentMemory.OpponentRecord opponent = brain.targetCtrl.GetOpponent();
@@ -363,7 +363,7 @@ public class EnemyActionController
 			else
 			{
 				int num2 = 0;
-				int num3 = UnityEngine.Random.Range(0, totalWeight) + 1;
+				int num3 = Random.Range(0, totalWeight) + 1;
 				int j = 0;
 				for (int count2 = actions.Count; j < count2; j++)
 				{
@@ -479,7 +479,7 @@ public class EnemyActionController
 
 	public void OnReviveRegion(int regionId)
 	{
-		if (!((UnityEngine.Object)enemy == (UnityEngine.Object)null))
+		if (!(enemy == null))
 		{
 			EnemyRegionWork enemyRegionWork = enemy.SearchRegionWork(regionId);
 			if (enemyRegionWork != null && m_angryDataList != null)

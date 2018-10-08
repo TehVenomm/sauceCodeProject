@@ -432,11 +432,11 @@ public final class NativeProtocol {
     }
 
     private static TreeSet<Integer> fetchAllAvailableProtocolVersionsForAppInfo(NativeAppInfo nativeAppInfo) {
-        Cursor query;
         Throwable th;
         TreeSet<Integer> treeSet = new TreeSet();
         ContentResolver contentResolver = FacebookSdk.getApplicationContext().getContentResolver();
         Uri buildPlatformProviderVersionURI = buildPlatformProviderVersionURI(nativeAppInfo);
+        Cursor query;
         try {
             if (FacebookSdk.getApplicationContext().getPackageManager().resolveContentProvider(nativeAppInfo.getPackage() + PLATFORM_PROVIDER, 0) != null) {
                 try {
