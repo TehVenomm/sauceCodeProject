@@ -163,7 +163,7 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 			bool _is_pickup = tYPE == SortBase.TYPE.WEAPON_ALL || tYPE == SortBase.TYPE.ARMOR_ALL;
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
-			_003CLocalInventory_003Ec__AnonStorey460 _003CLocalInventory_003Ec__AnonStorey;
+			_003CLocalInventory_003Ec__AnonStorey468 _003CLocalInventory_003Ec__AnonStorey;
 			SetDynamicList((Enum)InventoryUI, string.Empty, localInventoryEquipData.Length, false, new Func<int, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

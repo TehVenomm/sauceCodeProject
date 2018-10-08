@@ -50,7 +50,6 @@ public abstract class AbstractLeaderboardService<T extends LeaderboardResponse> 
     }
 
     private T getLeaderboard(String str) throws IOException, HttpException {
-        JsonReader jsonReader;
         HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(str).openConnection();
         try {
             httpURLConnection.setRequestMethod(HttpRequest.METHOD_GET);
@@ -59,6 +58,7 @@ public abstract class AbstractLeaderboardService<T extends LeaderboardResponse> 
             if (HttpUtils.isSuccessful(httpURLConnection.getResponseCode())) {
                 InputStream inputStream = httpURLConnection.getInputStream();
                 T inputStreamReader;
+                JsonReader jsonReader;
                 try {
                     inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
                     jsonReader = new JsonReader(inputStreamReader);

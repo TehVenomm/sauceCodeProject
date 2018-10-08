@@ -139,6 +139,19 @@ public class LoadingUI : UIBehaviour
 			UpdateConnecting();
 		}
 		TouchScreen();
+		if (Input.GetKeyUp(27) && SupportEscape())
+		{
+			Native.applicationQuit();
+		}
+	}
+
+	private bool SupportEscape()
+	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		return GetCtrl(UI.OBJ_CHANGE_PERMISSION_MASSAGE).get_gameObject().get_activeSelf() || GetCtrl(UI.OBJ_DELLY_MASSAGE).get_gameObject().get_activeSelf() || GetCtrl(UI.OBJ_FIRSTLOAD).get_gameObject().get_activeSelf() || GetCtrl(UI.OBJ_WELLCOME_MASSAGE).get_gameObject().get_activeSelf();
 	}
 
 	private void TouchScreen()
@@ -225,8 +238,8 @@ public class LoadingUI : UIBehaviour
 			QuestRushProgressData.RushTimeBonus[] bonus = MonoBehaviourSingleton<InGameProgress>.I.rushTimeBonus.ToArray();
 			int plusSec = 0;
 			List<Transform> t_timeBonusItem = new List<Transform>();
-			_003CShowRushTimeBonus_003Ec__AnonStorey7AD _003CShowRushTimeBonus_003Ec__AnonStorey7AD;
-			SetGrid(UI.GRD_TIME_BONUS_ROOT, null, bonus.Length, true, new Action<int, Transform, bool>((object)_003CShowRushTimeBonus_003Ec__AnonStorey7AD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CShowRushTimeBonus_003Ec__AnonStorey7B7 _003CShowRushTimeBonus_003Ec__AnonStorey7B;
+			SetGrid(UI.GRD_TIME_BONUS_ROOT, null, bonus.Length, true, new Action<int, Transform, bool>((object)_003CShowRushTimeBonus_003Ec__AnonStorey7B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 			{
 				MonoBehaviourSingleton<InGameProgress>.I.PlayTimeBonusSE();
@@ -302,8 +315,8 @@ public class LoadingUI : UIBehaviour
 			QuestArenaProgressData.ArenaTimeBonus[] bonus = MonoBehaviourSingleton<InGameProgress>.I.arenaTimeBonus.ToArray();
 			int plusSec = 0;
 			List<Transform> timeBonusItemTransList = new List<Transform>();
-			_003CShowArenaTimeBonus_003Ec__AnonStorey7AF _003CShowArenaTimeBonus_003Ec__AnonStorey7AF;
-			SetGrid(UI.GRD_TIME_BONUS_ROOT, null, bonus.Length, true, new Action<int, Transform, bool>((object)_003CShowArenaTimeBonus_003Ec__AnonStorey7AF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CShowArenaTimeBonus_003Ec__AnonStorey7B9 _003CShowArenaTimeBonus_003Ec__AnonStorey7B;
+			SetGrid(UI.GRD_TIME_BONUS_ROOT, null, bonus.Length, true, new Action<int, Transform, bool>((object)_003CShowArenaTimeBonus_003Ec__AnonStorey7B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 			{
 				MonoBehaviourSingleton<InGameProgress>.I.PlayTimeBonusSE();

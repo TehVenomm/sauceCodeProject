@@ -23,7 +23,10 @@ public class FortuneWheelTop : GameSection
 		BTN_SPIN_X1_DISABLE,
 		BTN_SPIN_X10_ENABLE,
 		BTN_SPIN_X10_DISABLE,
-		BTN_X10_SPIN,
+		BTN_SPIN_X50_ENABLE,
+		BTN_SPIN_X50_DISABLE,
+		BTN_SPIN_X100_ENABLE,
+		BTN_SPIN_X100_DISABLE,
 		OBJ_COUNT_GROUP,
 		OBJ_COUNTS,
 		OBJ_COUNT_DAY_1,
@@ -48,8 +51,6 @@ public class FortuneWheelTop : GameSection
 		REWARD_ADDED = 10000063
 	}
 
-	private const int SPINX10 = 10;
-
 	private const int MAX_DAY_ACTIVE = 7;
 
 	private const float INTERVAL_UPDATE_TIME = 10f;
@@ -68,15 +69,15 @@ public class FortuneWheelTop : GameSection
 
 	private GameObject m_SpinItemPrefab;
 
+	private FortuneWheelManager.SPIN_TYPE spinType;
+
 	private bool isX10Spin;
 
 	private int spinX10Count;
 
 	private bool isUserSkip;
 
-	private FortuneWheelManager.SpinType currentSpinType = FortuneWheelManager.SpinType.One;
-
-	private int spinX10RewardAddedIndex;
+	private int spinMultiRewardAddedIndex;
 
 	private int spinX10ServerAddedIndex;
 
@@ -92,7 +93,11 @@ public class FortuneWheelTop : GameSection
 
 	private float delay10Spin = 2f;
 
-	private int countX10;
+	private float delayMuliSpin = 0.7f;
+
+	private int countMultipleSpin;
+
+	private bool spinMultiple;
 
 	private float timeUpdate;
 
@@ -104,7 +109,7 @@ public class FortuneWheelTop : GameSection
 
 	private unsafe IEnumerator DoInitialize()
 	{
-		isX10Spin = false;
+		spinType = FortuneWheelManager.SPIN_TYPE.X1;
 		jackportNumber = GetCtrl(UI.JACKPOT_NUMBER).GetComponent<JackportNumber>();
 		spinTicketNumber = GetCtrl(UI.SPIN_TICKET_NUM).GetComponent<SpinTicketNumber>();
 		spinHandle = GetCtrl(UI.SPIN_ICON_POINT_GROUP).GetComponent<FortuneWheelSpinHandle>();
@@ -201,18 +206,45 @@ public class FortuneWheelTop : GameSection
 	{
 		if (!isFree)
 		{
-			SetActive((Enum)UI.BTN_SPIN_X1_ENABLE, !isX10Spin);
-			SetActive((Enum)UI.BTN_SPIN_X1_DISABLE, isX10Spin);
-			SetActive((Enum)UI.BTN_SPIN_X10_ENABLE, isX10Spin);
-			SetActive((Enum)UI.BTN_SPIN_X10_DISABLE, !isX10Spin);
+			DisableAllButton();
+			switch (spinType)
+			{
+			case FortuneWheelManager.SPIN_TYPE.X1:
+				EnableSpinTypeButton(UI.BTN_SPIN_X1_ENABLE, UI.BTN_SPIN_X1_DISABLE);
+				break;
+			case FortuneWheelManager.SPIN_TYPE.X10:
+				EnableSpinTypeButton(UI.BTN_SPIN_X10_ENABLE, UI.BTN_SPIN_X10_DISABLE);
+				break;
+			case FortuneWheelManager.SPIN_TYPE.X50:
+				EnableSpinTypeButton(UI.BTN_SPIN_X50_ENABLE, UI.BTN_SPIN_X50_DISABLE);
+				break;
+			case FortuneWheelManager.SPIN_TYPE.X100:
+				EnableSpinTypeButton(UI.BTN_SPIN_X100_ENABLE, UI.BTN_SPIN_X100_DISABLE);
+				break;
+			}
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_SPIN_X1_ENABLE, false);
-			SetActive((Enum)UI.BTN_SPIN_X1_DISABLE, true);
-			SetActive((Enum)UI.BTN_SPIN_X10_ENABLE, false);
-			SetActive((Enum)UI.BTN_SPIN_X10_DISABLE, true);
+			DisableAllButton();
 		}
+	}
+
+	private void DisableAllButton()
+	{
+		SetActive((Enum)UI.BTN_SPIN_X1_ENABLE, false);
+		SetActive((Enum)UI.BTN_SPIN_X1_DISABLE, true);
+		SetActive((Enum)UI.BTN_SPIN_X10_ENABLE, false);
+		SetActive((Enum)UI.BTN_SPIN_X10_DISABLE, true);
+		SetActive((Enum)UI.BTN_SPIN_X50_ENABLE, false);
+		SetActive((Enum)UI.BTN_SPIN_X50_DISABLE, true);
+		SetActive((Enum)UI.BTN_SPIN_X100_ENABLE, false);
+		SetActive((Enum)UI.BTN_SPIN_X100_DISABLE, true);
+	}
+
+	private void EnableSpinTypeButton(UI btnEnable, UI btnDisable)
+	{
+		SetActive((Enum)btnEnable, true);
+		SetActive((Enum)btnDisable, false);
 	}
 
 	public override void UpdateUI()
@@ -276,18 +308,18 @@ public class FortuneWheelTop : GameSection
 
 	private IEnumerator IEUpdateView()
 	{
-		if (spinX10RewardAddedIndex < MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.spinRewards.Count)
+		if (spinMultiRewardAddedIndex < MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.spinRewards.Count)
 		{
 			if (isUserSkip)
 			{
-				if (spinX10RewardAddedIndex < MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.spinRewards.Count && isX10Spin)
+				if (spinMultiRewardAddedIndex < MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.spinRewards.Count && spinType != FortuneWheelManager.SPIN_TYPE.X1)
 				{
-					for (int i = spinX10RewardAddedIndex; i < MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.spinRewards.Count; i++)
+					for (int i = spinMultiRewardAddedIndex; i < MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.spinRewards.Count; i++)
 					{
 						FortuneWheelUserLog newLog2 = GenerateRewardItem();
 						userLogList.Add(newLog2);
-						CheckWinJackpot(MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.spinRewards[spinX10RewardAddedIndex]);
-						spinX10RewardAddedIndex++;
+						CheckWinJackpot(MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.spinRewards[spinMultiRewardAddedIndex]);
+						spinMultiRewardAddedIndex++;
 					}
 					if (MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.history.server != null && MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.history.server.Count > 0)
 					{
@@ -307,9 +339,9 @@ public class FortuneWheelTop : GameSection
 					FortuneWheelUserLog newLog = GenerateRewardItem();
 					userLogList.Add(newLog);
 					isAddItem = true;
-					CheckWinJackpot(MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.spinRewards[spinX10RewardAddedIndex]);
-					spinX10RewardAddedIndex++;
-					if (MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.history.server != null && MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.history.server.Count > 0 && ((isX10Spin && countX10 == 10) || !isX10Spin))
+					CheckWinJackpot(MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.spinRewards[spinMultiRewardAddedIndex]);
+					spinMultiRewardAddedIndex++;
+					if (MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.history.server != null && MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.history.server.Count > 0 && ((spinType != FortuneWheelManager.SPIN_TYPE.X1 && countMultipleSpin == (int)spinType) || spinType == FortuneWheelManager.SPIN_TYPE.X1))
 					{
 						serverLogList.InsertRange(0, MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.history.server);
 						MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.history.server.Clear();
@@ -376,8 +408,8 @@ public class FortuneWheelTop : GameSection
 				int count = userLogList.Count - 30;
 				userLogList.RemoveRange(0, count);
 			}
-			_003CReloadUserRewardLog_003Ec__AnonStorey2F5 _003CReloadUserRewardLog_003Ec__AnonStorey2F;
-			SetGrid(UI.GRD_REWARD_LOG, "FortuneWheelRewardLogItem", userLogList.Count, true, new Action<int, Transform, bool>((object)_003CReloadUserRewardLog_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CReloadUserRewardLog_003Ec__AnonStorey2FD _003CReloadUserRewardLog_003Ec__AnonStorey2FD;
+			SetGrid(UI.GRD_REWARD_LOG, "FortuneWheelRewardLogItem", userLogList.Count, true, new Action<int, Transform, bool>((object)_003CReloadUserRewardLog_003Ec__AnonStorey2FD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			UIScrollView component = GetCtrl(UI.SCR_USER_REWARD).GetComponent<UIScrollView>();
 			if (component.CurrentFit())
 			{
@@ -403,10 +435,10 @@ public class FortuneWheelTop : GameSection
 
 	private void OnQuery_SPIN()
 	{
-		if (!isSpinning && countX10 == 0)
+		if (!isSpinning && countMultipleSpin == 0)
 		{
 			isUserSkip = false;
-			if ((isX10Spin && IsX10Available()) || (!isX10Spin && IsX1Available()))
+			if (IsSpinAvailable(spinType))
 			{
 				HandleSpin();
 			}
@@ -415,7 +447,7 @@ public class FortuneWheelTop : GameSection
 				GameSection.ChangeEvent("CONFIRM_BUY_JACKPOT", base.sectionData.GetText("STR_CONFIRM_BUY"));
 			}
 		}
-		else if (isX10Spin)
+		else if (spinType != FortuneWheelManager.SPIN_TYPE.X1)
 		{
 			GameSection.ChangeEvent("SKIP_SPIN_X10", "Skip?");
 		}
@@ -423,41 +455,47 @@ public class FortuneWheelTop : GameSection
 
 	private void OnQuery_SPIN_X1()
 	{
+		SetSpinType(FortuneWheelManager.SPIN_TYPE.X1);
+	}
+
+	private void OnQuery_SPIN_X10()
+	{
+		SetSpinType(FortuneWheelManager.SPIN_TYPE.X10);
+	}
+
+	private void OnQuery_SPIN_X50()
+	{
+		SetSpinType(FortuneWheelManager.SPIN_TYPE.X50);
+	}
+
+	private void OnQuery_SPIN_X100()
+	{
+		SetSpinType(FortuneWheelManager.SPIN_TYPE.X100);
+	}
+
+	private void SetSpinType(FortuneWheelManager.SPIN_TYPE spinType)
+	{
 		if (!MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.vaultInfo.freeSpin)
 		{
-			if (!isSpinning && countX10 == 0)
+			if (!isSpinning && !spinMultiple)
 			{
-				isX10Spin = false;
+				Debug.Log((object)("Change Spintype = " + spinType));
+				this.spinType = spinType;
 				SetButtonState(false);
 			}
-			else if (isX10Spin)
+			else if (this.spinType != FortuneWheelManager.SPIN_TYPE.X1)
 			{
 				GameSection.ChangeEvent("SKIP_SPIN_X10", "Skip?");
 			}
 		}
 	}
 
-	private void OnQuery_SPIN_X10()
-	{
-		if (!MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.vaultInfo.freeSpin)
-		{
-			if (!isSpinning && countX10 == 0)
-			{
-				isX10Spin = true;
-				SetButtonState(false);
-			}
-			else
-			{
-				GameSection.ChangeEvent("SKIP_SPIN_X10", StringTable.Get(STRING_CATEGORY.DRAGON_VAULT, 5u));
-			}
-		}
-	}
-
 	private void OnQuery_SkipX10Dialog_YES()
 	{
-		if (isX10Spin)
+		if (spinType != FortuneWheelManager.SPIN_TYPE.X1)
 		{
-			this.StopCoroutine(IESpinX10(MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData));
+			spinHandle.Skip();
+			this.StopCoroutine(IESpinMultiIMP(MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData));
 			isUserSkip = true;
 			isSpinning = false;
 			UpdateView();
@@ -480,6 +518,11 @@ public class FortuneWheelTop : GameSection
 		return MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.vaultInfo.curTicket >= 10;
 	}
 
+	private bool IsSpinAvailable(FortuneWheelManager.SPIN_TYPE type)
+	{
+		return MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.vaultInfo.curTicket >= (int)type;
+	}
+
 	private bool IsX1Available()
 	{
 		return MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.vaultInfo.curTicket >= 1;
@@ -490,33 +533,14 @@ public class FortuneWheelTop : GameSection
 		spinX10Count++;
 	}
 
-	private void Spin(FortuneWheelManager.SpinType spinType, Action endSpinAct = null)
+	private unsafe void Spin(FortuneWheelManager.SPIN_TYPE spinType, Action endSpinAct = null)
 	{
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Expected O, but got Unknown
 		if (!isSpinning)
 		{
-			GameSection.StayEvent();
-			MonoBehaviourSingleton<FortuneWheelManager>.I.SendSpin(spinType, delegate(bool success)
-			{
-				if (success)
-				{
-					spinHandle.StartSpin(MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData, delegate(bool b)
-					{
-						isSpinning = b;
-						if (!isSpinning)
-						{
-							if (endSpinAct != null)
-							{
-								endSpinAct.Invoke();
-							}
-							UpdateView();
-						}
-						PlayAudio(AUDIO.GEAR_STOP, 1f, false);
-					}, 0, true);
-					UpdateAfterSpin();
-					PlayAudio(AUDIO.GEAR_SPIN, 1f, false);
-				}
-				GameSection.ResumeEvent(true, null);
-			});
+			_003CSpin_003Ec__AnonStorey2FE _003CSpin_003Ec__AnonStorey2FE;
+			Protocol.Force(new Action((object)_003CSpin_003Ec__AnonStorey2FE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -530,36 +554,37 @@ public class FortuneWheelTop : GameSection
 
 	private void HandleSpin()
 	{
-		if (!isX10Spin)
+		if (spinType == FortuneWheelManager.SPIN_TYPE.X1)
 		{
-			spinX10RewardAddedIndex = 0;
-			Spin(FortuneWheelManager.SpinType.One, null);
+			spinMultiRewardAddedIndex = 0;
+			Spin(FortuneWheelManager.SPIN_TYPE.X1, null);
 		}
-		else if (IsX10Available())
+		else if (IsSpinAvailable(spinType))
 		{
-			countX10 = 0;
-			spinX10RewardAddedIndex = 0;
-			HandleSpinX10();
+			countMultipleSpin = 0;
+			spinMultiRewardAddedIndex = 0;
+			HandleSpinMulti();
 		}
 		else
 		{
 			GameSection.ChangeEvent("CAN_NOT_SPIN_X10", base.sectionData.GetText("STR_SPIN_X10_ERROR_MESSAGE"));
 			isX10Spin = false;
+			spinType = FortuneWheelManager.SPIN_TYPE.X1;
 			SetButtonState(false);
 		}
 	}
 
-	private void HandleSpinX10()
+	private void HandleSpinMulti()
 	{
 		if (!isSpinning)
 		{
 			GameSection.StayEvent();
-			MonoBehaviourSingleton<FortuneWheelManager>.I.SendSpin(FortuneWheelManager.SpinType.Ten, delegate(bool success)
+			MonoBehaviourSingleton<FortuneWheelManager>.I.SendSpin(spinType, delegate(bool success)
 			{
 				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 				if (success)
 				{
-					this.StartCoroutine(IESpinX10(MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData));
+					this.StartCoroutine(IESpinMultiIMP(MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData));
 				}
 				UpdateAfterSpin();
 				GameSection.ResumeEvent(true, null);
@@ -567,9 +592,10 @@ public class FortuneWheelTop : GameSection
 		}
 	}
 
-	private IEnumerator IESpinX10(FortuneWheelData data)
+	private IEnumerator IESpinMultiIMP(FortuneWheelData data)
 	{
-		while (countX10 < 10)
+		spinMultiple = true;
+		while (countMultipleSpin < (int)spinType)
 		{
 			if (isUserSkip)
 			{
@@ -579,33 +605,34 @@ public class FortuneWheelTop : GameSection
 			{
 				yield return (object)null;
 			}
-			if (countX10 >= 10 || isUserSkip)
+			if (countMultipleSpin >= (int)spinType || isUserSkip)
 			{
 				break;
 			}
-			SpinX10(data, countX10, Spin10EndAction);
-			yield return (object)new WaitForSeconds(delay10Spin);
+			SpinMulti(data, countMultipleSpin, SpinMultiEndAct);
+			yield return (object)new WaitForSeconds((spinType != FortuneWheelManager.SPIN_TYPE.X10) ? delayMuliSpin : delay10Spin);
 		}
-		countX10 = 0;
+		countMultipleSpin = 0;
+		spinMultiple = false;
 	}
 
-	private void Spin10EndAction(bool b)
+	private void SpinMultiEndAct(bool b)
 	{
 		isSpinning = b;
 		if (!isSpinning && !isUserSkip)
 		{
-			countX10++;
+			countMultipleSpin++;
 		}
 		else if (isUserSkip)
 		{
-			countX10 = 0;
+			countMultipleSpin = 0;
 		}
 	}
 
-	private void SpinX10(FortuneWheelData data, int rewardIndex, Action<bool> endSpinAct)
+	private void SpinMulti(FortuneWheelData data, int rewardIndex, Action<bool> endSpinAct)
 	{
 		updatingView = true;
-		spinHandle.StartSpin(data, delegate(bool b)
+		spinHandle.StartSpin(data, spinType, delegate(bool b)
 		{
 			isSpinning = b;
 			if (!isSpinning)
@@ -617,27 +644,21 @@ public class FortuneWheelTop : GameSection
 				UpdateView();
 			}
 			PlayAudio(AUDIO.GEAR_STOP, 1f, false);
-		}, rewardIndex, false);
+		}, rewardIndex);
 		PlayAudio(AUDIO.GEAR_SPIN, 1f, false);
 	}
 
-	private void Update()
+	private unsafe void Update()
 	{
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Expected O, but got Unknown
 		timeUpdate += Time.get_deltaTime();
 		if (timeUpdate >= 10f)
 		{
 			timeUpdate = 0f;
-			if (!isSpinning && countX10 == 0 && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "FortuneWheelTop" && !skipUpdate)
+			if (!isSpinning && countMultipleSpin == 0 && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "FortuneWheelTop" && !skipUpdate)
 			{
-				GameSection.StayEvent();
-				MonoBehaviourSingleton<FortuneWheelManager>.I.UpdateData(delegate(bool b)
-				{
-					GameSection.ResumeEvent(false, null);
-					if (b)
-					{
-						UpdateJackpot();
-					}
-				});
+				Protocol.Force(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			skipUpdate = false;
 		}

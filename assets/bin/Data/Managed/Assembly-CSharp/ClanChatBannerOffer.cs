@@ -1,3 +1,7 @@
-public class ClanChatBannerOffer : GameSection
+public class ClanChatBannerOffer : BaseBanner
 {
+	private enum UI
+	{
+		BANNER
+	}
 }

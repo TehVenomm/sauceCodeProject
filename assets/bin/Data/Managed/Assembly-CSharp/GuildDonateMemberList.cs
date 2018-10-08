@@ -46,8 +46,8 @@ public class GuildDonateMemberList : GuildMemberList
 
 	protected unsafe override void GetListItem(Action<bool, object> callback)
 	{
-		_003CGetListItem_003Ec__AnonStorey322 _003CGetListItem_003Ec__AnonStorey;
-		base.GetListItem(new Action<bool, object>((object)_003CGetListItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CGetListItem_003Ec__AnonStorey32A _003CGetListItem_003Ec__AnonStorey32A;
+		base.GetListItem(new Action<bool, object>((object)_003CGetListItem_003Ec__AnonStorey32A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void SetListItem(int i, Transform t, string event_name, FriendCharaInfo member)

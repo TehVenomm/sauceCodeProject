@@ -73,10 +73,10 @@ public class ISO8601Utils {
     }
 
     public static Date parse(String str, ParsePosition parsePosition) throws ParseException {
+        String substring;
         Throwable th;
         String message;
         ParseException parseException;
-        String substring;
         try {
             int index = parsePosition.getIndex();
             int i = index + 4;

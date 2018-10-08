@@ -773,13 +773,13 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
     }
 
     private void writeSessionApp(String str) throws Exception {
-        OutputStream clsFileOutputStream;
         Throwable e;
         Flushable flushable;
         Throwable th;
         Closeable closeable;
         Object obj;
         Flushable flushable2 = null;
+        OutputStream clsFileOutputStream;
         try {
             clsFileOutputStream = new ClsFileOutputStream(this.filesDir, str + SESSION_APP_TAG);
             try {

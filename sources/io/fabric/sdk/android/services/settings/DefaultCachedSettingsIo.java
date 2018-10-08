@@ -18,13 +18,13 @@ class DefaultCachedSettingsIo implements CachedSettingsIo {
     }
 
     public JSONObject readCachedSettings() {
-        Closeable fileInputStream;
         Throwable th;
         Closeable closeable;
         Throwable th2;
         Throwable th3;
         JSONObject jSONObject = null;
         Fabric.getLogger().mo4289d("Fabric", "Reading cached settings...");
+        Closeable fileInputStream;
         try {
             File file = new File(new FileStoreImpl(this.kit).getFilesDir(), Settings.SETTINGS_CACHE_FILENAME);
             if (file.exists()) {

@@ -4,10 +4,12 @@ using System.Runtime.CompilerServices;
 
 public class FortuneWheelManager : MonoBehaviourSingleton<FortuneWheelManager>
 {
-	public enum SpinType
+	public enum SPIN_TYPE
 	{
-		One = 1,
-		Ten = 10
+		X1 = 1,
+		X10 = 10,
+		X50 = 50,
+		X100 = 100
 	}
 
 	public class JackpotWinData
@@ -67,7 +69,15 @@ public class FortuneWheelManager : MonoBehaviourSingleton<FortuneWheelManager>
 		}
 		if ((MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "HomeScene" || MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "LoungeScene" || MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene") && !MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName().Contains("FortuneWheel") && !MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName().Contains("Jackpot"))
 		{
-			MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce($"{data.userName} just won {data.jackpot} from Dragon's Vault", string.Empty);
+			long num = 0L;
+			try
+			{
+				num = long.Parse(data.jackpot);
+				MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(string.Format(StringTable.Get(STRING_CATEGORY.DRAGON_VAULT, 1u), data.userName, num.ToString()), string.Empty);
+			}
+			catch
+			{
+			}
 		}
 	}
 
@@ -96,7 +106,7 @@ public class FortuneWheelManager : MonoBehaviourSingleton<FortuneWheelManager>
 		}, string.Empty);
 	}
 
-	public void SendSpin(SpinType spinType, Action<bool> call_back)
+	public void SendSpin(SPIN_TYPE spinType, Action<bool> call_back)
 	{
 		FortuneRequestForm fortuneRequestForm = new FortuneRequestForm();
 		fortuneRequestForm.number = (int)spinType;

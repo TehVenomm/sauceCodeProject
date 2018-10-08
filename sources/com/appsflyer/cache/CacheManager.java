@@ -27,10 +27,10 @@ public class CacheManager {
     }
 
     public void cacheRequest(RequestCacheData requestCacheData, Context context) {
-        Writer outputStreamWriter;
         Throwable th;
         Throwable th2;
         Writer writer = null;
+        Writer outputStreamWriter;
         try {
             File file = new File(context.getFilesDir(), AF_CACHE_DIR);
             if (file.exists()) {
@@ -128,9 +128,9 @@ public class CacheManager {
 
     /* renamed from: ˎ */
     private static RequestCacheData m285(File file) {
-        Reader fileReader;
         Reader reader;
         Throwable th;
+        Reader fileReader;
         try {
             fileReader = new FileReader(file);
             try {

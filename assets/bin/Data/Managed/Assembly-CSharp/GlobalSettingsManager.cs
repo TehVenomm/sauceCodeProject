@@ -656,6 +656,96 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 	public bool enableFortuneWheelBanner = true;
 
+	public List<int> bossIdqQuest = new List<int>
+	{
+		994419202,
+		994417601,
+		994412511
+	};
+
+	public int AndroidMemoryClearDivider = 6;
+
+	public int IosMemoryClearDivider = 4;
+
+	public List<string> stageCache = new List<string>
+	{
+		"HP001D_01",
+		"HP001D_02",
+		"HP001D_03",
+		"HP001D_04",
+		"HP001D_05",
+		"HP001D_06",
+		"HP001D_07",
+		"HP001D_08",
+		"HP001D_09",
+		"HP001D_10",
+		"HP001D_11",
+		"HP001D_12",
+		"HP001N_02",
+		"HP001N_03",
+		"HP001N_04",
+		"HP001N_05",
+		"HP001N_06",
+		"HP001N_07",
+		"HP001N_08",
+		"HP001N_09",
+		"HP001N_10",
+		"HP002D_01",
+		"HP003D_01",
+		"HP004D_01",
+		"HP005D_01",
+		"HP006D_01",
+		"HP006D_02",
+		"HP007D_01",
+		"HP007D_02",
+		"HP001D_55"
+	};
+
+	public List<string> skyboxCaches = new List<string>
+	{
+		"SK011D_01",
+		"SK062D_01",
+		"SK001D_01",
+		"SK011D_01",
+		"SK001D_02",
+		"SK022D_02",
+		"SK028D_01",
+		"SK062D_01",
+		"SK001D_01",
+		"SK001D_01",
+		"SK011D_01",
+		"SK011D_01",
+		"SK022N_01",
+		"SK022N_01",
+		"SK001N_01",
+		"SK001N_01",
+		"SK022N_01",
+		"SK092N_02",
+		"SK092N_01",
+		"SK092N_01",
+		"SK092N_03",
+		"SK006D_01",
+		"SK006D_01",
+		"SK001D_01",
+		"SK001D_01",
+		"SK021N_02"
+	};
+
+	public List<string> stageEffectCaches = new List<string>
+	{
+		"ef_btl_bg_hp001_01",
+		"ef_btl_bg_questboard_01",
+		"ef_btl_bg_hp001_02",
+		"ef_btl_bg_questboard_02"
+	};
+
+	public List<string> stageShouldPreOpenCamera = new List<string>
+	{
+		"HomeTop",
+		"StatusTop",
+		"ShopTop"
+	};
+
 	private Quaternion initLightRot;
 
 	private Quaternion initNpcLightRot;
@@ -679,6 +769,7 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 		initLightRot = lightDirection.get_localRotation();
 		initNpcLightRot = npcLightDirection.get_localRotation();
 		initAmbientColor = defaultAmbientColor;
+		AppMain.amountMemoryClear = SystemInfo.get_systemMemorySize() / AndroidMemoryClearDivider;
 	}
 
 	public void ResetLightRot()

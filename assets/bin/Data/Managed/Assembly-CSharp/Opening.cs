@@ -185,7 +185,7 @@ public class Opening : GameSection
 		DataTableManager dataTableManager = MonoBehaviourSingleton<DataTableManager>.I;
 		Protocol.Send<CheckRegisterModel>(CheckRegisterModel.URL, delegate
 		{
-			((_003CDoInitialzie_003Ec__Iterator10B)/*Error near IL_0399: stateMachine*/)._003CupdatedTableIndex_003E__15 = true;
+			((_003CDoInitialzie_003Ec__Iterator10A)/*Error near IL_0399: stateMachine*/)._003CupdatedTableIndex_003E__15 = true;
 		}, string.Empty);
 		yield return (object)new WaitUntil(new Func<bool>((object)/*Error near IL_03b0: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		isDownloading = true;

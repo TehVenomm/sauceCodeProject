@@ -110,7 +110,7 @@ public class StatusEquipList : GameSection
 		if (items != null)
 		{
 			SetPageNumText((Enum)UI.LBL_PAGE_NOW, currentPageIndex + 1);
-			_003CUpdateInventory_003Ec__AnonStorey481 _003CUpdateInventory_003Ec__AnonStorey;
+			_003CUpdateInventory_003Ec__AnonStorey489 _003CUpdateInventory_003Ec__AnonStorey;
 			SetDynamicList((Enum)UI.GRD_INVENTORY, string.Empty, items.Length, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

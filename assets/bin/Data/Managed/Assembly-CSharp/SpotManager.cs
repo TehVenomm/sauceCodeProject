@@ -202,50 +202,52 @@ public class SpotManager
 		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0052: Expected O, but got Unknown
 		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Expected O, but got Unknown
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Expected O, but got Unknown
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Expected O, but got Unknown
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Expected O, but got Unknown
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Expected O, but got Unknown
-		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0199: Expected O, but got Unknown
-		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c6: Expected O, but got Unknown
-		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0201: Expected O, but got Unknown
-		//IL_0212: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Expected O, but got Unknown
-		//IL_023b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0257: Expected O, but got Unknown
-		//IL_0265: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0281: Expected O, but got Unknown
-		//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d1: Expected O, but got Unknown
-		//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fb: Expected O, but got Unknown
-		//IL_0309: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0323: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0328: Expected O, but got Unknown
-		//IL_0336: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0350: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008b: Expected O, but got Unknown
+		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Expected O, but got Unknown
+		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011a: Expected O, but got Unknown
+		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0144: Expected O, but got Unknown
+		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0171: Expected O, but got Unknown
+		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019e: Expected O, but got Unknown
+		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cb: Expected O, but got Unknown
+		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f8: Expected O, but got Unknown
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0233: Expected O, but got Unknown
+		//IL_0244: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025f: Expected O, but got Unknown
+		//IL_026d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0284: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0289: Expected O, but got Unknown
+		//IL_0297: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b3: Expected O, but got Unknown
+		//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0303: Expected O, but got Unknown
+		//IL_0311: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0328: Unknown result type (might be due to invalid IL or missing references)
+		//IL_032d: Expected O, but got Unknown
+		//IL_033b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0355: Unknown result type (might be due to invalid IL or missing references)
+		//IL_035a: Expected O, but got Unknown
+		//IL_0368: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0382: Unknown result type (might be due to invalid IL or missing references)
+		//IL_039c: Unknown result type (might be due to invalid IL or missing references)
 		CreateSpotRoot();
 		Spot spot = new Spot();
 		spot.id = id;
@@ -259,6 +261,12 @@ public class SpotManager
 			UILabel component = val.GetComponent<UILabel>();
 			component.text = name;
 			component.get_gameObject().SetActive(icon != ICON_TYPE.NOT_OPENED);
+			Transform val2 = val.Find("SPR_NAME_BASE");
+			if (val2 != null)
+			{
+				UITexture component2 = val2.GetComponent<UITexture>();
+				component2.width = component.width + 45;
+			}
 		}
 		if (mapNo > 0)
 		{
@@ -266,8 +274,8 @@ public class SpotManager
 			if (val != null)
 			{
 				val.get_gameObject().SetActive(true);
-				UILabel component2 = val.get_gameObject().GetComponent<UILabel>();
-				component2.text = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 25u) + mapNo.ToString();
+				UILabel component3 = val.get_gameObject().GetComponent<UILabel>();
+				component3.text = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 25u) + mapNo.ToString();
 			}
 		}
 		val = spot._transform.FindChild("SPR_TWN_NEW");
@@ -301,10 +309,10 @@ public class SpotManager
 			val.get_gameObject().SetActive(icon == ICON_TYPE.HARD || icon == ICON_TYPE.HARD_NEW);
 			if (icon == ICON_TYPE.HARD)
 			{
-				Transform val2 = val.FindChild("DODAIADD");
-				if (null != val2)
+				Transform val3 = val.FindChild("DODAIADD");
+				if (null != val3)
 				{
-					val2.get_gameObject().SetActive(false);
+					val3.get_gameObject().SetActive(false);
 				}
 			}
 		}
@@ -321,10 +329,10 @@ public class SpotManager
 		val = spot._transform.FindChild("SPR_ICON_DUNGEON");
 		if (val != null)
 		{
-			UITexture component3 = val.GetComponent<UITexture>();
-			if (component3 != null && dungeon_icon != null && icon == ICON_TYPE.CHILD_REGION)
+			UITexture component4 = val.GetComponent<UITexture>();
+			if (component4 != null && dungeon_icon != null && icon == ICON_TYPE.CHILD_REGION)
 			{
-				component3.mainTexture = dungeon_icon;
+				component4.mainTexture = dungeon_icon;
 			}
 		}
 		val = spot._transform.FindChild("SPR_DELIVERY_TARGET");
@@ -342,15 +350,15 @@ public class SpotManager
 		{
 			val.get_gameObject().SetActive(happenQuestCondition == HAPPEN_CONDITION.NOT_CLEAR);
 		}
-		UIGameSceneEventSender component4 = spot._transform.FindChild("SPR_BUTTON").GetComponent<UIGameSceneEventSender>();
+		UIGameSceneEventSender component5 = spot._transform.FindChild("SPR_BUTTON").GetComponent<UIGameSceneEventSender>();
 		if (string.IsNullOrEmpty(event_name))
 		{
-			Object.Destroy(component4.get_gameObject());
+			Object.Destroy(component5.get_gameObject());
 		}
 		else
 		{
-			component4.eventName = event_name;
-			component4.eventData = _event;
+			component5.eventName = event_name;
+			component5.eventData = _event;
 		}
 		spots.Add(spot);
 		return spot;

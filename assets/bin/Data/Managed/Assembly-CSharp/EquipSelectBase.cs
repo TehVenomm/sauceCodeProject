@@ -225,7 +225,7 @@ public abstract class EquipSelectBase : SmithEquipBase
 			if (item.ability != null && item.ability.Length > 0)
 			{
 				bool empty_ability = true;
-				_003CEquipParam_003Ec__AnonStorey349 _003CEquipParam_003Ec__AnonStorey;
+				_003CEquipParam_003Ec__AnonStorey351 _003CEquipParam_003Ec__AnonStorey;
 				SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", item.ability.Length, false, new Action<int, Transform, bool>((object)_003CEquipParam_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				if (empty_ability)
 				{

@@ -424,8 +424,8 @@ public class RushResultTop : QuestResultTop
 			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)MonoBehaviourSingleton<InGameManager>.I.GetRushQuestId(wave));
 			string text2 = "Lv" + questData.GetMainEnemyLv().ToString() + Singleton<EnemyTable>.I.GetEnemyName((uint)questData.GetMainEnemyID());
 			SetLabelText(t_grid, UI.LBL_BOSS_NAME, text2);
-			_003CSetDropItemIcon_003Ec__AnonStorey43E _003CSetDropItemIcon_003Ec__AnonStorey43E;
-			SetGrid(t_grid, UI.GRD_DROP_ITEM, null, dropItemList.Length, true, new Action<int, Transform, bool>((object)_003CSetDropItemIcon_003Ec__AnonStorey43E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSetDropItemIcon_003Ec__AnonStorey446 _003CSetDropItemIcon_003Ec__AnonStorey;
+			SetGrid(t_grid, UI.GRD_DROP_ITEM, null, dropItemList.Length, true, new Action<int, Transform, bool>((object)_003CSetDropItemIcon_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -857,8 +857,8 @@ public class RushResultTop : QuestResultTop
 				followBonusCallback = end_callback;
 				if (!QuestResultTop.IsExecuteNowSceneEvent(GetSceneName()))
 				{
-					_003COpenMutualFollowBonusDialog_003Ec__AnonStorey43F _003COpenMutualFollowBonusDialog_003Ec__AnonStorey43F;
-					this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenMutualFollowBonusDialog_003Ec__AnonStorey43F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+					_003COpenMutualFollowBonusDialog_003Ec__AnonStorey447 _003COpenMutualFollowBonusDialog_003Ec__AnonStorey;
+					this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenMutualFollowBonusDialog_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 				}
 				else
 				{

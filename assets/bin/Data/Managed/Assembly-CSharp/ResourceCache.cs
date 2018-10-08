@@ -5,7 +5,7 @@ public class ResourceCache
 {
 	public const int MAX_DELETE_PACKAGE = 32;
 
-	public StringKeyTable<ResourceObject>[] objectCaches = new StringKeyTable<ResourceObject>[86];
+	public StringKeyTable<ResourceObject>[] objectCaches = new StringKeyTable<ResourceObject>[87];
 
 	public HashSet<string> IgnoreCategorySpecifiedReleaseList = new HashSet<string>();
 

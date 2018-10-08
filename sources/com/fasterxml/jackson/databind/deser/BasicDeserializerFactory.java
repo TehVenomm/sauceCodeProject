@@ -179,34 +179,34 @@ public abstract class BasicDeserializerFactory extends DeserializerFactory imple
     }
 
     public ValueInstantiator findValueInstantiator(DeserializationContext deserializationContext, BeanDescription beanDescription) throws JsonMappingException {
+        ValueInstantiator valueInstantiator;
         DeserializationConfig config = deserializationContext.getConfig();
-        ValueInstantiator valueInstantiator = null;
+        ValueInstantiator valueInstantiator2 = null;
         Annotated classInfo = beanDescription.getClassInfo();
         Object findValueInstantiator = deserializationContext.getAnnotationIntrospector().findValueInstantiator(classInfo);
         if (findValueInstantiator != null) {
-            valueInstantiator = _valueInstantiatorInstance(config, classInfo, findValueInstantiator);
+            valueInstantiator2 = _valueInstantiatorInstance(config, classInfo, findValueInstantiator);
         }
-        if (valueInstantiator == null) {
-            valueInstantiator = _findStdValueInstantiator(config, beanDescription);
-            if (valueInstantiator == null) {
-                valueInstantiator = _constructDefaultValueInstantiator(deserializationContext, beanDescription);
+        if (valueInstantiator2 == null) {
+            valueInstantiator2 = _findStdValueInstantiator(config, beanDescription);
+            if (valueInstantiator2 == null) {
+                valueInstantiator2 = _constructDefaultValueInstantiator(deserializationContext, beanDescription);
             }
         }
-        ValueInstantiator valueInstantiator2;
         if (this._factoryConfig.hasValueInstantiators()) {
-            valueInstantiator2 = valueInstantiator;
+            valueInstantiator = valueInstantiator2;
             for (ValueInstantiators valueInstantiators : this._factoryConfig.valueInstantiators()) {
-                valueInstantiator2 = valueInstantiators.findValueInstantiator(config, beanDescription, valueInstantiator2);
-                if (valueInstantiator2 == null) {
+                valueInstantiator = valueInstantiators.findValueInstantiator(config, beanDescription, valueInstantiator);
+                if (valueInstantiator == null) {
                     throw JsonMappingException.from(deserializationContext.getParser(), "Broken registered ValueInstantiators (of type " + valueInstantiators.getClass().getName() + "): returned null ValueInstantiator");
                 }
             }
         }
-        valueInstantiator2 = valueInstantiator;
-        if (valueInstantiator2.getIncompleteParameter() == null) {
-            return valueInstantiator2;
+        valueInstantiator = valueInstantiator2;
+        if (valueInstantiator.getIncompleteParameter() == null) {
+            return valueInstantiator;
         }
-        AnnotatedParameter incompleteParameter = valueInstantiator2.getIncompleteParameter();
+        AnnotatedParameter incompleteParameter = valueInstantiator.getIncompleteParameter();
         throw new IllegalArgumentException("Argument #" + incompleteParameter.getIndex() + " of constructor " + incompleteParameter.getOwner() + " has no property name annotation; must have name when multiple-parameter constructor annotated as Creator");
     }
 

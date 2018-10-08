@@ -126,6 +126,30 @@ public class LoadingQueue
 		los?.Add(item);
 	}
 
+	public void CacheStage(RESOURCE_CATEGORY category, string name)
+	{
+		LoadStage(category, name, true, true);
+	}
+
+	public LoadObject LoadStage(RESOURCE_CATEGORY category, string name, bool cache_package, bool check_cache = false)
+	{
+		if (string.IsNullOrEmpty(name))
+		{
+			return null;
+		}
+		if (check_cache)
+		{
+			ResourceObject cachedResourceObject = MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedResourceObject(category, name);
+			if (cachedResourceObject != null)
+			{
+				ResourceLoad resourceLoad = ResourceLoad.GetResourceLoad(monoBehaviour, false);
+				resourceLoad.SetReference(cachedResourceObject);
+				return null;
+			}
+		}
+		return Load(category, name, cache_package);
+	}
+
 	public void CacheEffect(RESOURCE_CATEGORY category, string name)
 	{
 		if (!MonoBehaviourSingleton<InGameManager>.IsValid() || !MonoBehaviourSingleton<InGameManager>.I.IsDisableEffectGraphicLow(name))

@@ -700,6 +700,10 @@ public class Player : Character
 			{
 				return 8f;
 			}
+			if (CheckAttackModeAndSpType(ATTACK_MODE.ARROW, SP_ATTACK_TYPE.SOUL))
+			{
+				return 10f;
+			}
 			return attackReachs[(int)attackMode] * 0.8f;
 		}
 	}
@@ -719,6 +723,10 @@ public class Player : Character
 			if (CheckAttackModeAndSpType(ATTACK_MODE.TWO_HAND_SWORD, SP_ATTACK_TYPE.BURST))
 			{
 				return 8f;
+			}
+			if (CheckAttackModeAndSpType(ATTACK_MODE.ARROW, SP_ATTACK_TYPE.SOUL))
+			{
+				return 10f;
 			}
 			return specialReachs[(int)attackMode];
 		}
@@ -1621,8 +1629,8 @@ public class Player : Character
 		{
 			return false;
 		}
-		_003CIsBoostByType_003Ec__AnonStorey51A _003CIsBoostByType_003Ec__AnonStorey51A;
-		if (boostPrayedInfoList.Count(new Func<BoostPrayInfo, bool>((object)_003CIsBoostByType_003Ec__AnonStorey51A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)) > 0)
+		_003CIsBoostByType_003Ec__AnonStorey523 _003CIsBoostByType_003Ec__AnonStorey;
+		if (boostPrayedInfoList.Count(new Func<BoostPrayInfo, bool>((object)_003CIsBoostByType_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)) > 0)
 		{
 			return true;
 		}
@@ -5627,7 +5635,7 @@ public class Player : Character
 	private unsafe void DetachRootEffectTemporary()
 	{
 		Transform attachTrans = (!MonoBehaviourSingleton<EffectManager>.IsValid()) ? MonoBehaviourSingleton<StageObjectManager>.I._transform : MonoBehaviourSingleton<EffectManager>.I._transform;
-		_003CDetachRootEffectTemporary_003Ec__AnonStorey520 _003CDetachRootEffectTemporary_003Ec__AnonStorey;
+		_003CDetachRootEffectTemporary_003Ec__AnonStorey529 _003CDetachRootEffectTemporary_003Ec__AnonStorey;
 		effectTransTable.ForEachKeyAndValue(new Action<string, Transform>((object)_003CDetachRootEffectTemporary_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -11986,8 +11994,8 @@ public class Player : Character
 					}
 				}
 			}
-			_003CShotSoulArrow_003Ec__AnonStorey522 _003CShotSoulArrow_003Ec__AnonStorey;
-			this.StartCoroutine(_ShotSoulArrow(shotPos, bowRot, list, arrowActionInfo.soulShotInterval, new Action((object)_003CShotSoulArrow_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			_003CShotSoulArrow_003Ec__AnonStorey52B _003CShotSoulArrow_003Ec__AnonStorey52B;
+			this.StartCoroutine(_ShotSoulArrow(shotPos, bowRot, list, arrowActionInfo.soulShotInterval, new Action((object)_003CShotSoulArrow_003Ec__AnonStorey52B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 	}
 

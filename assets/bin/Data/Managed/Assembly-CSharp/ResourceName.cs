@@ -635,6 +635,11 @@ public static class ResourceName
 		return $"PIG_{imageId:d8}";
 	}
 
+	public static string GetBannerImageName(int imageId)
+	{
+		return $"BNI_{imageId:d8}";
+	}
+
 	public static string GetPointShopBannerImageName(int imageId)
 	{
 		return $"PBI_{imageId:d8}";

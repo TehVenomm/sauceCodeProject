@@ -9,6 +9,7 @@ public class ServerConfigHandler {
     /* renamed from: ˋ */
     static JSONObject m273(String str) {
         JSONObject jSONObject;
+        Throwable th;
         try {
             jSONObject = new JSONObject(str);
             try {
@@ -22,8 +23,8 @@ public class ServerConfigHandler {
                 C0300y.m378().m392();
                 C0300y.m378().m394();
                 return jSONObject;
-            } catch (Throwable th) {
-                th = th;
+            } catch (Throwable th2) {
+                th = th2;
                 AFLogger.afErrorLog(th.getMessage(), th);
                 C0300y.m378().m392();
                 C0300y.m378().m394();
@@ -34,12 +35,11 @@ public class ServerConfigHandler {
             C0300y.m378().m392();
             C0300y.m378().m394();
             return jSONObject;
-        } catch (Throwable th2) {
-            Throwable th3;
-            Throwable th4 = th2;
+        } catch (Throwable th3) {
+            Throwable th4 = th3;
             jSONObject = null;
-            th3 = th4;
-            AFLogger.afErrorLog(th3.getMessage(), th3);
+            th = th4;
+            AFLogger.afErrorLog(th.getMessage(), th);
             C0300y.m378().m392();
             C0300y.m378().m394();
             return jSONObject;

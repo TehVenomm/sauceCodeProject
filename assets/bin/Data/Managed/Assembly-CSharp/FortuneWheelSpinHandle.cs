@@ -1,5 +1,6 @@
 using Network;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,25 +11,35 @@ public class FortuneWheelSpinHandle
 
 	public float DEFAULT_INACTIVE_SCALE = 0.8f;
 
-	public float DEFAULT_SPIN_TIME_x1 = 2.5f;
+	public float DEFAULT_SPIN_TIME_x1 = 5f;
 
 	public float DEFAULT_SPIN_TIME_x10 = 1f;
+
+	public float DEFAULT_SPIN_TIME_MULTI = 0.2f;
 
 	public float DEFINE_REWARD_TIME_x1 = 1f;
 
 	public float DEFINE_REWARD_TIME_x10 = 0.4f;
 
+	public float DEFINE_REWARD_TIME_MULTI;
+
 	public float MIN_AJUST_TIME_x1 = 0.8f;
 
 	public float MIN_AJUST_TIME_x10 = 0.4f;
+
+	public float MIN_AJUST_TIME_MULTI;
 
 	public float SPIN_SPEED_MAX_x1 = 500f;
 
 	public float SPIN_SPEED_MAX_x10 = 800f;
 
+	public float SPIN_SPEED_MAX_MULTI = 1000f;
+
 	public int SPIN_SPEED_MIN_X1 = 200;
 
 	public int SPIN_SPEED_MIN_X10 = 200;
+
+	public int SPIN_SPEED_MIN_MULTI = 1000;
 
 	private float spinTimeDur;
 
@@ -88,11 +99,15 @@ public class FortuneWheelSpinHandle
 
 	private float defaultDistaceScale;
 
+	private FortuneWheelManager.SPIN_TYPE spinType;
+
+	private int oppositeIndex;
+
 	public FortuneWheelSpinHandle()
 		: this()
 	{
-	}//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-	//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+	}//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+	//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
 
 
 	private void InitPosition()
@@ -152,15 +167,106 @@ public class FortuneWheelSpinHandle
 		pinItem.AddRange(initialSpinItem);
 	}
 
-	public void StartSpin(FortuneWheelData reward, Action<bool> onEndAction, int rewardIndex = 0, bool spinX1 = true)
+	public void Skip()
+	{
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(IESkip());
+	}
+
+	private IEnumerator IESkip()
+	{
+		while (!isAjustSpeed)
+		{
+			yield return (object)null;
+		}
+		yield return (object)new WaitForEndOfFrame();
+		if (isStartSpin)
+		{
+			_trans.set_localEulerAngles(new Vector3(0f, 0f, 0f - expectedDegree));
+			ScaleItemFinal(expectedDegree);
+			isStartSpin = false;
+			if (spinEndAction != null)
+			{
+				spinEndAction(false);
+			}
+		}
+	}
+
+	public void StartSpin(FortuneWheelData reward, FortuneWheelManager.SPIN_TYPE spinType, Action<bool> onEndAction, int rewardIndex = 0)
 	{
 		if (!isStartSpin && rewardIndex < reward.spinRewards.Count)
 		{
-			spinTimeDur = ((!spinX1) ? DEFAULT_SPIN_TIME_x10 : DEFAULT_SPIN_TIME_x1);
-			defineRewardTime = ((!spinX1) ? DEFINE_REWARD_TIME_x10 : DEFINE_REWARD_TIME_x1);
-			minAjustTime = ((!spinX1) ? MIN_AJUST_TIME_x10 : MIN_AJUST_TIME_x1);
-			spinSpeed = ((!spinX1) ? SPIN_SPEED_MAX_x10 : SPIN_SPEED_MAX_x1);
-			spinMinSpeed = (float)((!spinX1) ? SPIN_SPEED_MIN_X10 : SPIN_SPEED_MIN_X1);
+			this.spinType = spinType;
+			float num;
+			switch (spinType)
+			{
+			case FortuneWheelManager.SPIN_TYPE.X1:
+				num = DEFAULT_SPIN_TIME_x1;
+				break;
+			case FortuneWheelManager.SPIN_TYPE.X10:
+				num = DEFAULT_SPIN_TIME_x10;
+				break;
+			default:
+				num = DEFAULT_SPIN_TIME_MULTI;
+				break;
+			}
+			spinTimeDur = num;
+			float num2;
+			switch (spinType)
+			{
+			case FortuneWheelManager.SPIN_TYPE.X1:
+				num2 = DEFINE_REWARD_TIME_x1;
+				break;
+			case FortuneWheelManager.SPIN_TYPE.X10:
+				num2 = DEFINE_REWARD_TIME_x10;
+				break;
+			default:
+				num2 = DEFINE_REWARD_TIME_MULTI;
+				break;
+			}
+			defineRewardTime = num2;
+			float num3;
+			switch (spinType)
+			{
+			case FortuneWheelManager.SPIN_TYPE.X1:
+				num3 = MIN_AJUST_TIME_x1;
+				break;
+			case FortuneWheelManager.SPIN_TYPE.X10:
+				num3 = MIN_AJUST_TIME_x10;
+				break;
+			default:
+				num3 = MIN_AJUST_TIME_MULTI;
+				break;
+			}
+			minAjustTime = num3;
+			float num4;
+			switch (spinType)
+			{
+			case FortuneWheelManager.SPIN_TYPE.X1:
+				num4 = SPIN_SPEED_MAX_x1;
+				break;
+			case FortuneWheelManager.SPIN_TYPE.X10:
+				num4 = SPIN_SPEED_MAX_x10;
+				break;
+			default:
+				num4 = SPIN_SPEED_MAX_MULTI;
+				break;
+			}
+			spinSpeed = num4;
+			int num5;
+			switch (spinType)
+			{
+			case FortuneWheelManager.SPIN_TYPE.X1:
+				num5 = SPIN_SPEED_MIN_X1;
+				break;
+			case FortuneWheelManager.SPIN_TYPE.X10:
+				num5 = SPIN_SPEED_MIN_X10;
+				break;
+			default:
+				num5 = SPIN_SPEED_MIN_MULTI;
+				break;
+			}
+			spinMinSpeed = (float)num5;
 			spinEndAction = onEndAction;
 			spinEndAction(true);
 			currentReward = reward.spinRewards[rewardIndex];
@@ -172,10 +278,10 @@ public class FortuneWheelSpinHandle
 		}
 	}
 
-	private unsafe void Update()
+	private void Update()
 	{
 		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
 		if (isStartSpin)
 		{
 			currentDegree += Time.get_deltaTime() * spinSpeed;
@@ -193,14 +299,16 @@ public class FortuneWheelSpinHandle
 				{
 					spinSpeed -= Time.get_deltaTime() * DEFAULT_END_ACCELERATION;
 				}
-				else if (currentDegree >= num && currentDegree <= num2 && ajustTime >= minAjustTime)
-				{
-					_trans.set_localEulerAngles(new Vector3(0f, 0f, 0f - expectedDegree));
-					isStartSpin = false;
-					spinEndAction(false);
-				}
 				else
 				{
+					if (spinType != FortuneWheelManager.SPIN_TYPE.X1 || (currentDegree >= num && currentDegree <= num2 && ajustTime >= minAjustTime))
+					{
+						_trans.set_localEulerAngles(new Vector3(0f, 0f, 0f - expectedDegree));
+						ScaleItemFinal(expectedDegree);
+						isStartSpin = false;
+						spinEndAction(false);
+						return;
+					}
 					float num3 = spinSpeed - Time.get_deltaTime() * DEFAULT_END_ACCELERATION;
 					if (num3 > 0f)
 					{
@@ -217,24 +325,44 @@ public class FortuneWheelSpinHandle
 			{
 				spinSpeed -= Time.get_deltaTime() * DEFAULT_END_ACCELERATION;
 			}
-			int num5 = GetCurrentIndexPos();
-			FortuneWheelSpinItem fortuneWheelSpinItem = null;
-			if (currentIndexPos != num5)
-			{
-				FortuneWheelSpinItem fortuneWheelSpinItem2 = pinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
-				fortuneWheelSpinItem2.SetScale(DEFAULT_INACTIVE_SCALE);
-				currentIndexPos = num5;
-			}
-			fortuneWheelSpinItem = pinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
-			fortuneWheelSpinItem.SetScale(GetCurrentScale());
+			ScaleItem();
 			spinTime += Time.get_deltaTime();
 			if (!isAjustSpeed)
 			{
 				isAjustSpeed = true;
-				int index = (currentIndexPos + 5) % 10;
-				index = GetReplaceIndex(index);
-				expectedDegree = (float)index * 36f;
-				HandleResult(index);
+				oppositeIndex = (currentIndexPos + 5) % 10;
+				oppositeIndex = GetReplaceIndex(oppositeIndex);
+				expectedDegree = (float)oppositeIndex * 36f;
+				HandleResult(oppositeIndex);
+			}
+		}
+	}
+
+	private unsafe void ScaleItem()
+	{
+		int num = GetCurrentIndexPos();
+		FortuneWheelSpinItem fortuneWheelSpinItem = null;
+		if (currentIndexPos != num)
+		{
+			FortuneWheelSpinItem fortuneWheelSpinItem2 = pinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
+			fortuneWheelSpinItem2.SetScale(DEFAULT_INACTIVE_SCALE);
+			currentIndexPos = num;
+		}
+		fortuneWheelSpinItem = pinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
+		fortuneWheelSpinItem.SetScale(GetCurrentScale());
+	}
+
+	private unsafe void ScaleItemFinal(float deg)
+	{
+		int index = GetCurrentIndexFromDeg(deg);
+		_003CScaleItemFinal_003Ec__AnonStorey2FA _003CScaleItemFinal_003Ec__AnonStorey2FA;
+		FortuneWheelSpinItem fortuneWheelSpinItem = pinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)_003CScaleItemFinal_003Ec__AnonStorey2FA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
+		fortuneWheelSpinItem.SetScale(DEFAULT_ACTIVE_SCALE);
+		for (int i = 0; i < pinItem.Count; i++)
+		{
+			if (pinItem[i].indexPos != index)
+			{
+				pinItem[i].SetScale(DEFAULT_INACTIVE_SCALE);
 			}
 		}
 	}
@@ -242,8 +370,8 @@ public class FortuneWheelSpinHandle
 	private unsafe int GetReplaceIndex(int index)
 	{
 		index = ((index < DEFAULT_WHEEL_ITEMS_LENGTH) ? index : (index % DEFAULT_WHEEL_ITEMS_LENGTH));
-		_003CGetReplaceIndex_003Ec__AnonStorey2F3 _003CGetReplaceIndex_003Ec__AnonStorey2F;
-		FortuneWheelSpinItem fortuneWheelSpinItem = pinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)_003CGetReplaceIndex_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
+		_003CGetReplaceIndex_003Ec__AnonStorey2FB _003CGetReplaceIndex_003Ec__AnonStorey2FB;
+		FortuneWheelSpinItem fortuneWheelSpinItem = pinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)_003CGetReplaceIndex_003Ec__AnonStorey2FB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
 		if (fortuneWheelSpinItem.type == REWARD_TYPE.JACKPOT)
 		{
 			return GetReplaceIndex(++index);
@@ -274,15 +402,15 @@ public class FortuneWheelSpinHandle
 		if (currentReward != null)
 		{
 			FortuneWheelSpinItem fortuneWheelSpinItem = null;
-			_003CReplaceRewardIcon_003Ec__AnonStorey2F4 _003CReplaceRewardIcon_003Ec__AnonStorey2F;
-			IEnumerable<FortuneWheelSpinItem> enumerable = initialSpinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)_003CReplaceRewardIcon_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CReplaceRewardIcon_003Ec__AnonStorey2FC _003CReplaceRewardIcon_003Ec__AnonStorey2FC;
+			IEnumerable<FortuneWheelSpinItem> enumerable = initialSpinItem.Where(new Func<FortuneWheelSpinItem, bool>((object)_003CReplaceRewardIcon_003Ec__AnonStorey2FC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			if (enumerable != null && enumerable.Count() > 0 && hiddenSpinItemList.IndexOf(enumerable.First()) > -1)
 			{
 				fortuneWheelSpinItem = enumerable.First();
 			}
 			else if (updatedItemList != null && updatedItemList.Count > 0)
 			{
-				IEnumerable<FortuneWheelItem> enumerable2 = updatedItemList.Where(new Func<FortuneWheelItem, bool>((object)_003CReplaceRewardIcon_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				IEnumerable<FortuneWheelItem> enumerable2 = updatedItemList.Where(new Func<FortuneWheelItem, bool>((object)_003CReplaceRewardIcon_003Ec__AnonStorey2FC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				if (enumerable2 != null && enumerable2.Count() > 0)
 				{
 					FortuneWheelItem data = enumerable2.First();
@@ -294,7 +422,7 @@ public class FortuneWheelSpinHandle
 					initialSpinItem.Add(component);
 				}
 			}
-			FortuneWheelSpinItem fortuneWheelSpinItem2 = pinItem.First(new Func<FortuneWheelSpinItem, bool>((object)_003CReplaceRewardIcon_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			FortuneWheelSpinItem fortuneWheelSpinItem2 = pinItem.First(new Func<FortuneWheelSpinItem, bool>((object)_003CReplaceRewardIcon_003Ec__AnonStorey2FC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			fortuneWheelSpinItem2._trans.set_localPosition(hidePosition);
 			fortuneWheelSpinItem2.indexPos = -1;
 			fortuneWheelSpinItem._trans.set_localPosition(wayPoints[replaceIndex]);
@@ -314,6 +442,20 @@ public class FortuneWheelSpinHandle
 			float num = (float)i * 36f - 18f;
 			float num2 = (float)i * 36f + 18f;
 			if (currentDegree > num && currentDegree < num2)
+			{
+				return i;
+			}
+		}
+		return 0;
+	}
+
+	private int GetCurrentIndexFromDeg(float degree)
+	{
+		for (int i = 1; i < 10; i++)
+		{
+			float num = (float)i * 36f - 18f;
+			float num2 = (float)i * 36f + 18f;
+			if (degree > num && degree < num2)
 			{
 				return i;
 			}

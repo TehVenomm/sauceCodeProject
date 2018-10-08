@@ -634,6 +634,22 @@ public class AutoSelfController : SelfController
 
 	private void OnArrowAttack()
 	{
+		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020a: Unknown result type (might be due to invalid IL or missing references)
 		if (base.self.targetingPoint == null)
 		{
 			base.self.targetingPointList.Add(actionTargetPoint);
@@ -650,6 +666,10 @@ public class AutoSelfController : SelfController
 			{
 				base.brain.weaponCtrl.SetChargeRate(1f);
 			}
+			else if (base.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.ARROW, SP_ATTACK_TYPE.SOUL))
+			{
+				base.brain.weaponCtrl.SetChargeRate(1f);
+			}
 			else
 			{
 				base.brain.weaponCtrl.SetChargeRate(Random.get_value());
@@ -658,6 +678,27 @@ public class AutoSelfController : SelfController
 		else if (base.self.enableInputCharge && base.self.GetChargingRate() >= base.brain.weaponCtrl.chargeRate)
 		{
 			base.self.SetEnableTap(false);
+		}
+		else if (base.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.ARROW, SP_ATTACK_TYPE.SOUL))
+		{
+			if (!base.self.isArrowAimLesserMode)
+			{
+				base.self.SetArrowAimLesserMode(true);
+			}
+			Vector3 zero = Vector3.get_zero();
+			zero = ((!(base.self.targetingPoint != null)) ? actionTargetPoint.GetTargetPoint() : base.self.targetingPoint.GetTargetPoint());
+			Vector3 arrowAimLesserCursorEffect = base.self.GetArrowAimLesserCursorEffect();
+			if (Vector3.Distance(arrowAimLesserCursorEffect, zero) > 1f)
+			{
+				Vector3 val = arrowAimLesserCursorEffect - zero;
+				Vector2 val2 = default(Vector2);
+				val2._002Ector(val.x, val.z);
+				base.self.UpdateArrowAimLesserMode(val2.get_normalized());
+			}
+			else
+			{
+				base.self.UpdateArrowAimLesserMode(Vector2.get_zero());
+			}
 		}
 	}
 

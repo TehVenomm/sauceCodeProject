@@ -16,6 +16,8 @@ public class GuildEntryPassRoom : QuestEntryPassRoom
 
 	private GuildStatisticInfo _info;
 
+	public override string overrideBackKeyEvent => "[BACK]";
+
 	private unsafe IEnumerator GetClanStatistic(int clanID)
 	{
 		bool finish_get_statistic = false;

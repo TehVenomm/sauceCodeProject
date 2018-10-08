@@ -73,6 +73,7 @@ public static class Log
 
 	public static void Exception(Exception exc)
 	{
+		Debug.LogException(exc);
 	}
 
 	[Conditional("ENABLE_LOG")]
@@ -81,7 +82,7 @@ public static class Log
 	}
 
 	[Conditional("ENABLE_LOG")]
-	public static void StopWatch(string log_str)
+	public static void StopWatch(string log_str, bool show_log = true)
 	{
 	}
 
@@ -96,22 +97,32 @@ public static class Log
 	}
 
 	[Conditional("ENABLE_LOG")]
-	public static void StartWatch(string watch_name)
+	public static void StartWatch(string watch_name, bool reset = true, bool show_log = true)
 	{
 	}
 
 	[Conditional("ENABLE_LOG")]
-	public static void StopMyWatch(string watch_name)
+	public static void StopMyWatch(string watch_name, bool show_log = true)
 	{
 	}
 
 	[Conditional("ENABLE_LOG")]
-	public static void StopWatch(string watch_name, string log_str)
+	public static void StopWatch(string watch_name, string log_str, bool show_log = true)
 	{
 	}
 
 	[Conditional("ENABLE_LOG")]
 	public static void StopAndStartWatch(string watch_name, string log_str)
+	{
+	}
+
+	[Conditional("ENABLE_LOG")]
+	public static void StopAndStartWatchWithoutReset(string watch_name, string log_str)
+	{
+	}
+
+	[Conditional("ENABLE_LOG")]
+	public static void ClearAllWatch()
 	{
 	}
 }

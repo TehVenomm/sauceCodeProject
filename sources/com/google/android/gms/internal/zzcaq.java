@@ -202,13 +202,13 @@ final class zzcaq extends zzcdm {
 
     @WorkerThread
     private static boolean zza(zzcbo zzcbo, SQLiteDatabase sQLiteDatabase, String str) {
-        Cursor query;
         Object e;
         Throwable th;
         Cursor cursor = null;
         if (zzcbo == null) {
             throw new IllegalArgumentException("Monitor must not be null");
         }
+        Cursor query;
         try {
             SQLiteDatabase sQLiteDatabase2 = sQLiteDatabase;
             query = sQLiteDatabase2.query("SQLITE_MASTER", new String[]{"name"}, "name=?", new String[]{str}, null, null, null);
@@ -1318,11 +1318,11 @@ final class zzcaq extends zzcdm {
 
     @WorkerThread
     public final String zzaxh() {
+        Cursor rawQuery;
         String string;
         Object e;
         Throwable th;
         Cursor cursor = null;
-        Cursor rawQuery;
         try {
             rawQuery = getWritableDatabase().rawQuery("select app_id from queue order by has_realtime desc, rowid asc limit 1;", null);
             try {
@@ -1439,13 +1439,13 @@ final class zzcaq extends zzcdm {
     }
 
     public final String zzba(long j) {
-        Cursor rawQuery;
         String string;
         Object e;
         Throwable th;
         Cursor cursor = null;
         zzug();
         zzwh();
+        Cursor rawQuery;
         try {
             rawQuery = getWritableDatabase().rawQuery("select app_id from apps where app_id in (select distinct app_id from raw_events) and config_fetched_time < ? order by failed_config_fetch_time limit 1;", new String[]{String.valueOf(j)});
             try {
@@ -1496,13 +1496,13 @@ final class zzcaq extends zzcdm {
     }
 
     public final List<zzcan> zzc(String str, String[] strArr) {
-        Cursor query;
         Object e;
         Cursor cursor;
         Throwable th;
         zzug();
         zzwh();
         List<zzcan> arrayList = new ArrayList();
+        Cursor query;
         try {
             SQLiteDatabase writableDatabase = getWritableDatabase();
             zzcap.zzawa();
@@ -1757,7 +1757,6 @@ final class zzcaq extends zzcdm {
 
     @WorkerThread
     public final List<zzcfn> zziv(String str) {
-        Cursor query;
         Object e;
         Cursor cursor;
         Throwable th;
@@ -1765,6 +1764,7 @@ final class zzcaq extends zzcdm {
         zzug();
         zzwh();
         List<zzcfn> arrayList = new ArrayList();
+        Cursor query;
         try {
             String[] strArr = new String[]{"name", Param.ORIGIN, "set_timestamp", Param.VALUE};
             String[] strArr2 = new String[]{str};
@@ -1935,13 +1935,13 @@ final class zzcaq extends zzcdm {
 
     @WorkerThread
     public final byte[] zziy(String str) {
+        Cursor query;
         Object e;
         Throwable th;
         Cursor cursor = null;
         zzbp.zzgf(str);
         zzug();
         zzwh();
-        Cursor query;
         try {
             query = getWritableDatabase().query("apps", new String[]{"remote_config"}, "app_id=?", new String[]{str}, null, null, null);
             try {
@@ -1995,13 +1995,13 @@ final class zzcaq extends zzcdm {
     }
 
     final Map<Integer, zzcgd> zziz(String str) {
-        Cursor query;
         Object e;
         Throwable th;
         Cursor cursor = null;
         zzwh();
         zzug();
         zzbp.zzgf(str);
+        Cursor query;
         try {
             query = getWritableDatabase().query("audience_filter_values", new String[]{"audience_id", "current_results"}, "app_id=?", new String[]{str}, null, null, null);
             if (query.moveToFirst()) {
@@ -2065,6 +2065,7 @@ final class zzcaq extends zzcdm {
 
     @WorkerThread
     public final List<Pair<zzcgc, Long>> zzl(String str, int i, int i2) {
+        Cursor query;
         List<Pair<zzcgc, Long>> arrayList;
         Object e;
         Cursor cursor;
@@ -2078,7 +2079,6 @@ final class zzcaq extends zzcdm {
         }
         zzbp.zzbh(z);
         zzbp.zzgf(str);
-        Cursor query;
         try {
             query = getWritableDatabase().query("queue", new String[]{"rowid", ShareConstants.WEB_DIALOG_PARAM_DATA}, "app_id=?", new String[]{str}, null, null, "rowid", String.valueOf(i));
             try {

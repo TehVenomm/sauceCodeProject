@@ -1,6 +1,7 @@
 using Network;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 [Serializable]
 public class PlayerLoadInfo
@@ -52,6 +53,44 @@ public class PlayerLoadInfo
 	public int actionVoiceBaseID = -1;
 
 	public List<uint> accUIDs = new List<uint>();
+
+	public bool isNeedToCache;
+
+	public override string ToString()
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.AppendFormat("---- ktnt ----\n");
+		stringBuilder.AppendFormat("- isNeedToCache: {0}\n", isNeedToCache);
+		stringBuilder.AppendFormat("- faceModelID: {0}\n", faceModelID);
+		stringBuilder.AppendFormat("- hairModelID: {0}\n", hairModelID);
+		stringBuilder.AppendFormat("- headModelID: {0}\n", headModelID);
+		stringBuilder.AppendFormat("- bodyModelID: {0}\n", bodyModelID);
+		stringBuilder.AppendFormat("- armModelID: {0}\n", armModelID);
+		stringBuilder.AppendFormat("- legModelID: {0}\n", legModelID);
+		stringBuilder.AppendFormat("- weaponModelID: {0}\n", weaponModelID);
+		stringBuilder.AppendFormat("- skinColor: {0}\n", skinColor);
+		stringBuilder.AppendFormat("- hairColor: {0}\n", hairColor);
+		stringBuilder.AppendFormat("- headColor: {0}\n", headColor);
+		stringBuilder.AppendFormat("- bodyColor: {0}\n", bodyColor);
+		stringBuilder.AppendFormat("- armColor: {0}\n", armColor);
+		stringBuilder.AppendFormat("- legColor: {0}\n", legColor);
+		stringBuilder.AppendFormat("- weaponColor0: {0}\n", weaponColor0);
+		stringBuilder.AppendFormat("- weaponColor1: {0}\n", weaponColor1);
+		stringBuilder.AppendFormat("- weaponColor2: {0}\n", weaponColor2);
+		stringBuilder.AppendFormat("- weaponEffectID: {0}\n", weaponEffectID);
+		stringBuilder.AppendFormat("- weaponEffectParam: {0}\n", weaponEffectParam);
+		stringBuilder.AppendFormat("- weaponEffectColor: {0}\n", weaponEffectColor);
+		stringBuilder.AppendFormat("- weaponEvolveId: {0}\n", weaponEvolveId);
+		stringBuilder.AppendFormat("- equipType: {0}\n", equipType);
+		stringBuilder.AppendFormat("- weaponSpAttackType: {0}\n", weaponSpAttackType);
+		stringBuilder.AppendFormat("- actionVoiceBaseID: {0}\n", actionVoiceBaseID);
+		stringBuilder.AppendFormat("- accUIDs:\n");
+		foreach (uint accUID in accUIDs)
+		{
+			stringBuilder.AppendFormat("-- {0}\n", accUID);
+		}
+		return stringBuilder.ToString();
+	}
 
 	public bool Equals(PlayerLoadInfo info)
 	{
@@ -197,9 +236,10 @@ public class PlayerLoadInfo
 		playerLoadInfo.equipType = equipType;
 		playerLoadInfo.weaponSpAttackType = weaponSpAttackType;
 		playerLoadInfo.actionVoiceBaseID = actionVoiceBaseID;
-		playerLoadInfo.accUIDs.Clear();
-		playerLoadInfo.accUIDs.AddRange(accUIDs);
-		return playerLoadInfo;
+		PlayerLoadInfo playerLoadInfo2 = playerLoadInfo;
+		playerLoadInfo2.accUIDs.Clear();
+		playerLoadInfo2.accUIDs.AddRange(accUIDs);
+		return playerLoadInfo2;
 	}
 
 	public void SetFace(int sex, int face_type_id, int skin_color_id)
@@ -411,7 +451,7 @@ public class PlayerLoadInfo
 		actionVoiceBaseID = (voice_type_id * 10 + sex) * 10000;
 	}
 
-	public void ApplyUserStatus(bool need_weapon, bool is_priority_visual_equip, int set_no = -1)
+	private void ApplyUserStatus(bool need_weapon, bool is_priority_visual_equip, int set_no = -1)
 	{
 		UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
 		uint num = MonoBehaviourSingleton<StatusManager>.I.GetEquippingItemTableID(0, set_no);

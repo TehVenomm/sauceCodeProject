@@ -269,8 +269,8 @@ public class NokiaStoreHelper implements AppstoreInAppBillingService {
     }
 
     public void launchPurchaseFlow(@NotNull Activity activity, String str, @NotNull String str2, int i, @Nullable OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str3) {
-        IabResult iabResult;
         Logger.m1006i("NokiaStoreHelper.launchPurchaseFlow");
+        IabResult iabResult;
         if (str2.equals("subs")) {
             iabResult = new IabResult(-1009, "Subscriptions are not available.");
             if (onIabPurchaseFinishedListener != null) {

@@ -352,7 +352,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 
 	public unsafe void SendFollowAgency(List<int> send_follow_list, Action<bool> callback = null)
 	{
-		_003CSendFollowAgency_003Ec__AnonStorey658 _003CSendFollowAgency_003Ec__AnonStorey;
+		_003CSendFollowAgency_003Ec__AnonStorey661 _003CSendFollowAgency_003Ec__AnonStorey;
 		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(send_follow_list, new Action<Error, List<int>>((object)_003CSendFollowAgency_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -1037,8 +1037,8 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 		}
 		else
 		{
-			_003CConnectServer_003Ec__AnonStorey66D _003CConnectServer_003Ec__AnonStorey66D;
-			MonoBehaviourSingleton<PartyNetworkManager>.I.ConnectAndRegist(webSockConnectData, new Action<bool, bool>((object)_003CConnectServer_003Ec__AnonStorey66D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CConnectServer_003Ec__AnonStorey676 _003CConnectServer_003Ec__AnonStorey;
+			MonoBehaviourSingleton<PartyNetworkManager>.I.ConnectAndRegist(webSockConnectData, new Action<bool, bool>((object)_003CConnectServer_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -1055,8 +1055,8 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 		else
 		{
 			challengeInfo = null;
-			QuestChallengeInfoModel.RequestSendForm post_data = new QuestChallengeInfoModel.RequestSendForm();
-			Protocol.Send(QuestChallengeInfoModel.URL, post_data, delegate(QuestChallengeInfoModel ret)
+			QuestChallengeInfoModel.RequestSendForm postData = new QuestChallengeInfoModel.RequestSendForm();
+			Protocol.Send(QuestChallengeInfoModel.URL, postData, delegate(QuestChallengeInfoModel ret)
 			{
 				bool flag = false;
 				if (ret.Error == Error.None)

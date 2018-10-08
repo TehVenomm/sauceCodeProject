@@ -1,3 +1,4 @@
+using App.Scripts.GoGame.Optimization;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -493,12 +494,26 @@ public class PlayerLoader : ModelLoaderBase
 		}
 	}
 
+	private static void SerializePlayerLoadInfo(PlayerLoadInfo info)
+	{
+	}
+
+	private LoadObject GoGameQuickLoad(LoadingQueue loadQueue, bool needDevFrameInstantiate, RESOURCE_CATEGORY resourceCategory, string resourceName)
+	{
+		if (needDevFrameInstantiate)
+		{
+			return (resourceName == null) ? null : loadQueue.LoadAndInstantiate(resourceCategory, resourceName);
+		}
+		return (resourceName == null) ? null : loadQueue.Load(resourceCategory, resourceName, false);
+	}
+
 	private unsafe IEnumerator DoLoad(PlayerLoadInfo info, int layer, int anim_id, bool need_anim_event, bool need_foot_stamp, bool need_shadow, bool enable_light_probes, bool need_action_voice, bool need_high_reso_tex, bool need_res_ref_count, bool need_dev_frame_instantiate, SHADER_TYPE shader_type, OnCompleteLoad callback, bool enable_eye_blick, int use_hair_overlay)
 	{
 		if (info == null)
 		{
 			Log.Error(LOG.RESOURCE, "PlayerLoader:info=null");
 		}
+		SerializePlayerLoadInfo(info);
 		animObjectTable = new StringKeyTable<LoadObject>();
 		Player player = this.get_gameObject().GetComponent<Player>();
 		bool enableBone = _EnableDynamicBone(shader_type, player is Self);
@@ -556,32 +571,40 @@ public class PlayerLoader : ModelLoaderBase
 			}
 			isLoading = true;
 			LoadingQueue load_queue = new LoadingQueue(this, need_res_ref_count);
-			LoadObject lo_face;
-			LoadObject lo_hair;
-			LoadObject lo_body;
-			LoadObject lo_head;
-			LoadObject lo_arm;
-			LoadObject lo_leg;
-			LoadObject lo_wepn;
-			if (need_dev_frame_instantiate)
+			LoadObject lo_face = null;
+			LoadObject lo_hair = null;
+			LoadObject lo_body = null;
+			LoadObject lo_head = null;
+			LoadObject lo_arm = null;
+			LoadObject lo_leg = null;
+			LoadObject lo_wepn = null;
+			if (!MonoBehaviourSingleton<GoGameCacheManager>.I.IsSelfPlayerResourceCached(RESOURCE_CATEGORY.PLAYER_FACE, face_name))
 			{
-				lo_face = ((face_name == null) ? null : load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_FACE, face_name));
-				lo_hair = ((hair_name == null) ? null : load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_HEAD, hair_name));
-				lo_body = ((body_name == null) ? null : load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_BDY, body_name));
-				lo_head = ((head_name == null) ? null : load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_HEAD, head_name));
-				lo_arm = ((arm_name == null) ? null : load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_ARM, arm_name));
-				lo_leg = ((leg_name == null) ? null : load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_LEG, leg_name));
-				lo_wepn = ((wepn_name == null) ? null : load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_WEAPON, wepn_name));
+				lo_face = GoGameQuickLoad(load_queue, need_dev_frame_instantiate, RESOURCE_CATEGORY.PLAYER_FACE, face_name);
 			}
-			else
+			if (!MonoBehaviourSingleton<GoGameCacheManager>.I.IsSelfPlayerResourceCached(RESOURCE_CATEGORY.PLAYER_HEAD, hair_name))
 			{
-				lo_face = ((face_name == null) ? null : load_queue.Load(RESOURCE_CATEGORY.PLAYER_FACE, face_name, false));
-				lo_hair = ((hair_name == null) ? null : load_queue.Load(RESOURCE_CATEGORY.PLAYER_HEAD, hair_name, false));
-				lo_body = ((body_name == null) ? null : load_queue.Load(RESOURCE_CATEGORY.PLAYER_BDY, body_name, false));
-				lo_head = ((head_name == null) ? null : load_queue.Load(RESOURCE_CATEGORY.PLAYER_HEAD, head_name, false));
-				lo_arm = ((arm_name == null) ? null : load_queue.Load(RESOURCE_CATEGORY.PLAYER_ARM, arm_name, false));
-				lo_leg = ((leg_name == null) ? null : load_queue.Load(RESOURCE_CATEGORY.PLAYER_LEG, leg_name, false));
-				lo_wepn = ((wepn_name == null) ? null : load_queue.Load(RESOURCE_CATEGORY.PLAYER_WEAPON, wepn_name, false));
+				lo_hair = GoGameQuickLoad(load_queue, need_dev_frame_instantiate, RESOURCE_CATEGORY.PLAYER_HEAD, hair_name);
+			}
+			if (!MonoBehaviourSingleton<GoGameCacheManager>.I.IsSelfPlayerResourceCached(RESOURCE_CATEGORY.PLAYER_BDY, body_name))
+			{
+				lo_body = GoGameQuickLoad(load_queue, need_dev_frame_instantiate, RESOURCE_CATEGORY.PLAYER_BDY, body_name);
+			}
+			if (!MonoBehaviourSingleton<GoGameCacheManager>.I.IsSelfPlayerResourceCached(RESOURCE_CATEGORY.PLAYER_HEAD, head_name))
+			{
+				lo_head = GoGameQuickLoad(load_queue, need_dev_frame_instantiate, RESOURCE_CATEGORY.PLAYER_HEAD, head_name);
+			}
+			if (!MonoBehaviourSingleton<GoGameCacheManager>.I.IsSelfPlayerResourceCached(RESOURCE_CATEGORY.PLAYER_ARM, arm_name))
+			{
+				lo_arm = GoGameQuickLoad(load_queue, need_dev_frame_instantiate, RESOURCE_CATEGORY.PLAYER_ARM, arm_name);
+			}
+			if (!MonoBehaviourSingleton<GoGameCacheManager>.I.IsSelfPlayerResourceCached(RESOURCE_CATEGORY.PLAYER_LEG, leg_name))
+			{
+				lo_leg = GoGameQuickLoad(load_queue, need_dev_frame_instantiate, RESOURCE_CATEGORY.PLAYER_LEG, leg_name);
+			}
+			if (!MonoBehaviourSingleton<GoGameCacheManager>.I.IsSelfPlayerResourceCached(RESOURCE_CATEGORY.PLAYER_WEAPON, wepn_name))
+			{
+				lo_wepn = GoGameQuickLoad(load_queue, need_dev_frame_instantiate, RESOURCE_CATEGORY.PLAYER_WEAPON, wepn_name);
 			}
 			List<LoadObject> lo_accessories = new List<LoadObject>();
 			if (!info.accUIDs.IsNullOrEmpty())
@@ -591,14 +614,7 @@ public class PlayerLoader : ModelLoaderBase
 				{
 					AccessoryTable.AccessoryInfoData ainfo2 = Singleton<AccessoryTable>.I.GetInfoData(info.accUIDs[k]);
 					string aname = ResourceName.GetPlayerAccessory(ainfo2.accessoryId);
-					if (need_dev_frame_instantiate)
-					{
-						lo_accessories.Add(load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_ACCESSORY, aname));
-					}
-					else
-					{
-						lo_accessories.Add(load_queue.Load(RESOURCE_CATEGORY.PLAYER_ACCESSORY, aname, false));
-					}
+					lo_accessories.Add((!need_dev_frame_instantiate) ? load_queue.Load(RESOURCE_CATEGORY.PLAYER_ACCESSORY, aname, false) : load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_ACCESSORY, aname));
 				}
 			}
 			LoadObject lo_voices = null;
@@ -611,6 +627,37 @@ public class PlayerLoader : ModelLoaderBase
 			if (load_queue.IsLoading())
 			{
 				yield return (object)load_queue.Wait();
+			}
+			if (info.isNeedToCache)
+			{
+				if (lo_face != null)
+				{
+					MonoBehaviourSingleton<GoGameCacheManager>.I.CacheSelfPlayerResource(RESOURCE_CATEGORY.PLAYER_FACE, face_name, lo_face.loadedObject);
+				}
+				if (lo_hair != null)
+				{
+					MonoBehaviourSingleton<GoGameCacheManager>.I.CacheSelfPlayerResource(RESOURCE_CATEGORY.PLAYER_HEAD, hair_name, lo_hair.loadedObject);
+				}
+				if (lo_body != null)
+				{
+					MonoBehaviourSingleton<GoGameCacheManager>.I.CacheSelfPlayerResource(RESOURCE_CATEGORY.PLAYER_BDY, body_name, lo_body.loadedObject);
+				}
+				if (lo_head != null)
+				{
+					MonoBehaviourSingleton<GoGameCacheManager>.I.CacheSelfPlayerResource(RESOURCE_CATEGORY.PLAYER_HEAD, head_name, lo_head.loadedObject);
+				}
+				if (lo_arm != null)
+				{
+					MonoBehaviourSingleton<GoGameCacheManager>.I.CacheSelfPlayerResource(RESOURCE_CATEGORY.PLAYER_ARM, arm_name, lo_arm.loadedObject);
+				}
+				if (lo_leg != null)
+				{
+					MonoBehaviourSingleton<GoGameCacheManager>.I.CacheSelfPlayerResource(RESOURCE_CATEGORY.PLAYER_LEG, leg_name, lo_leg.loadedObject);
+				}
+				if (lo_wepn != null)
+				{
+					MonoBehaviourSingleton<GoGameCacheManager>.I.CacheSelfPlayerResource(RESOURCE_CATEGORY.PLAYER_WEAPON, wepn_name, lo_wepn.loadedObject);
+				}
 			}
 			LoadObject lo_anim = (anim_name == null) ? null : load_queue.Load(RESOURCE_CATEGORY.PLAYER_ANIM, anim_name, need_anim_event ? new string[2]
 			{
@@ -627,12 +674,12 @@ public class PlayerLoader : ModelLoaderBase
 			if (player != null && anim_id > -1)
 			{
 				List<string> key_list = new List<string>();
-				int skill_len = 3;
-				for (int i12 = 0; i12 < skill_len; i12++)
+				int skill_len2 = 3;
+				for (int i15 = 0; i15 < skill_len2; i15++)
 				{
 					for (int j2 = 0; j2 < 2; j2++)
 					{
-						SkillInfo.SkillParam param3 = player.skillInfo.GetSkillParam(player.skillInfo.weaponOffset + i12);
+						SkillInfo.SkillParam param3 = player.skillInfo.GetSkillParam(player.skillInfo.weaponOffset + i15);
 						if (param3 != null)
 						{
 							string anim_format_name = (j2 != 0) ? param3.tableData.actStateName : param3.tableData.castStateName;
@@ -676,9 +723,9 @@ public class PlayerLoader : ModelLoaderBase
 				int[] values = (int[])Enum.GetValues(typeof(ACTION_VOICE_ID));
 				int VOICE_NUM = values.Length;
 				string[] names = new string[VOICE_NUM];
-				for (int i11 = 0; i11 < VOICE_NUM; i11++)
+				for (int i14 = 0; i14 < VOICE_NUM; i14++)
 				{
-					names[i11] = ResourceName.GetActionVoiceName(info.actionVoiceBaseID + values[i11]);
+					names[i14] = ResourceName.GetActionVoiceName(info.actionVoiceBaseID + values[i14]);
 				}
 				lo_voices = load_queue.Load(RESOURCE_CATEGORY.SOUND_VOICE, ResourceName.GetActionVoicePackageNameFromVoiceID(info.actionVoiceBaseID), names, false);
 			}
@@ -719,15 +766,8 @@ public class PlayerLoader : ModelLoaderBase
 				{
 					animObjectTable.ForEach(delegate(LoadObject load_object)
 					{
-						((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003Cload_queue_003E__21.CacheAnimDataUseResource(load_object.loadedObjects[1].obj as AnimEventData, delegate(string effect_name)
-						{
-							if (effect_name[0] == '@')
-							{
-								return null;
-							}
-							return effect_name;
-						}, null);
-						((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003Cload_queue_003E__21.CacheAnimDataUseResourceDependPlayer(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003Cplayer_003E__0, load_object.loadedObjects[1].obj as AnimEventData);
+						((_003CDoLoad_003Ec__Iterator275)/*Error near IL_0f80: stateMachine*/)._003Cload_queue_003E__21.CacheAnimDataUseResource(load_object.loadedObjects[1].obj as AnimEventData, (string effect_name) => (effect_name[0] != '@') ? effect_name : null, null);
+						((_003CDoLoad_003Ec__Iterator275)/*Error near IL_0f80: stateMachine*/)._003Cload_queue_003E__21.CacheAnimDataUseResourceDependPlayer(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_0f80: stateMachine*/)._003Cplayer_003E__0, load_object.loadedObjects[1].obj as AnimEventData);
 						AnimEventData animEventData = load_object.loadedObjects[1].obj as AnimEventData;
 						if (animEventData != null && !animEventData.animations.IsNullOrEmpty())
 						{
@@ -754,10 +794,10 @@ public class PlayerLoader : ModelLoaderBase
 													string text2 = array[num8];
 													if (!string.IsNullOrEmpty(text2))
 													{
-														LoadObject loadObject2 = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003Cload_queue_003E__21.Load(RESOURCE_CATEGORY.INGAME_BULLET, text2, false);
-														if (loadObject2 != null && ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Get(text2) == null)
+														LoadObject loadObject2 = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_0f80: stateMachine*/)._003Cload_queue_003E__21.Load(RESOURCE_CATEGORY.INGAME_BULLET, text2, false);
+														if (loadObject2 != null && ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_0f80: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Get(text2) == null)
 														{
-															((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Add(text2, loadObject2);
+															((_003CDoLoad_003Ec__Iterator275)/*Error near IL_0f80: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Add(text2, loadObject2);
 														}
 													}
 												}
@@ -773,10 +813,10 @@ public class PlayerLoader : ModelLoaderBase
 											string text = eventData.stringArgs[num5];
 											if (!string.IsNullOrEmpty(text))
 											{
-												LoadObject loadObject = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003Cload_queue_003E__21.Load(RESOURCE_CATEGORY.INGAME_BULLET, text, false);
-												if (loadObject != null && ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Get(text) == null)
+												LoadObject loadObject = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_0f80: stateMachine*/)._003Cload_queue_003E__21.Load(RESOURCE_CATEGORY.INGAME_BULLET, text, false);
+												if (loadObject != null && ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_0f80: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Get(text) == null)
 												{
-													((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Add(text, loadObject);
+													((_003CDoLoad_003Ec__Iterator275)/*Error near IL_0f80: stateMachine*/)._003CanimEventBulletLoadObjTable_003E__60.Add(text, loadObject);
 												}
 											}
 										}
@@ -809,7 +849,7 @@ public class PlayerLoader : ModelLoaderBase
 											{
 												if (text3.StartsWith(namesNeededLoadAtkInfoFromAnimEvent[num10]))
 												{
-													((_003CDoLoad_003Ec__Iterator274)/*Error near IL_0ec2: stateMachine*/)._003CneedAtkInfoNames_003E__59.Add(text3);
+													((_003CDoLoad_003Ec__Iterator275)/*Error near IL_0f80: stateMachine*/)._003CneedAtkInfoNames_003E__59.Add(text3);
 													break;
 												}
 											}
@@ -825,40 +865,69 @@ public class PlayerLoader : ModelLoaderBase
 				AddSkillAttackInfoName(player, ref needAtkInfoNames);
 				AddFieldGimmickAttackInfoName(ref needAtkInfoNames);
 				List<LoadObject> atkInfo = new List<LoadObject>();
+				List<LoadObject> atkInfoLoaded = new List<LoadObject>();
+				Dictionary<string, LoadObject> atkInfoDict = new Dictionary<string, LoadObject>();
 				if (playerLoaderLoadedAttackInfoNames == null)
 				{
 					playerLoaderLoadedAttackInfoNames = new HashSet<string>();
 				}
-				for (int i10 = 0; i10 < needAtkInfoNames.Count; i10++)
+				for (int i13 = 0; i13 < needAtkInfoNames.Count; i13++)
 				{
-					if (!playerLoaderLoadedAttackInfoNames.Contains(needAtkInfoNames[i10]))
+					if (!playerLoaderLoadedAttackInfoNames.Contains(needAtkInfoNames[i13]))
 					{
-						LoadObject loadObj3 = load_queue.Load(RESOURCE_CATEGORY.PLAYER_ATTACK_INFO, needAtkInfoNames[i10], false);
-						atkInfo.Add(loadObj3);
-						playerLoaderLoadedAttackInfoNames.Add(needAtkInfoNames[i10]);
+						if (!MonoBehaviourSingleton<GoGameCacheManager>.I.IsSelfPlayerResourceCached(RESOURCE_CATEGORY.PLAYER_ATTACK_INFO, needAtkInfoNames[i13]))
+						{
+							LoadObject loadObj5 = load_queue.Load(RESOURCE_CATEGORY.PLAYER_ATTACK_INFO, needAtkInfoNames[i13], false);
+							atkInfo.Add(loadObj5);
+							atkInfoLoaded.Add(loadObj5);
+							atkInfoDict.Add(needAtkInfoNames[i13], loadObj5);
+						}
+						else
+						{
+							Object loadedObj = MonoBehaviourSingleton<GoGameCacheManager>.I.GetSelfPlayerResourceCache(RESOURCE_CATEGORY.PLAYER_ATTACK_INFO, needAtkInfoNames[i13]);
+							LoadObject load = new LoadObject
+							{
+								loadedObject = loadedObj
+							};
+							atkInfoLoaded.Add(load);
+							atkInfoDict.Add(needAtkInfoNames[i13], load);
+						}
+						playerLoaderLoadedAttackInfoNames.Add(needAtkInfoNames[i13]);
 					}
 				}
 				if (load_queue.IsLoading())
 				{
 					yield return (object)load_queue.Wait();
 				}
+				if (info.isNeedToCache)
+				{
+					foreach (KeyValuePair<string, LoadObject> item in atkInfoDict)
+					{
+						string key = item.Key;
+						LoadObject value = item.Value;
+						if (atkInfo.Contains(value))
+						{
+							MonoBehaviourSingleton<GoGameCacheManager>.I.CacheSelfPlayerResource(RESOURCE_CATEGORY.PLAYER_ATTACK_INFO, key, value.loadedObject);
+						}
+					}
+				}
 				if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
 				{
 					Transform _settingTransform = MonoBehaviourSingleton<InGameSettingsManager>.I._transform;
 					List<AttackInfo> hitInfos = new List<AttackInfo>();
-					for (int i9 = 0; i9 < atkInfo.Count; i9++)
+					for (int i12 = 0; i12 < atkInfoLoaded.Count; i12++)
 					{
-						GameObject infoObj = atkInfo[i9].Realizes(_settingTransform, -1).get_gameObject();
+						GameObject infoObj = LoadObject.RealizesWithGameObject(atkInfoLoaded[i12].loadedObject, _settingTransform, -1).get_gameObject();
 						SplitPlayerAttackInfo attackInfo = infoObj.GetComponent<SplitPlayerAttackInfo>();
 						hitInfos.Add(attackInfo.attackHitInfo);
 						hitInfos.Add(attackInfo.attackContinuationInfo);
 						if (!string.IsNullOrEmpty(attackInfo.attackHitInfo.nextBulletInfoName))
 						{
-							yield return (object)this.StartCoroutine(LoadNextBulletInfo(load_queue, attackInfo.attackHitInfo.nextBulletInfoName, hitInfos));
+							yield return (object)this.StartCoroutine(LoadNextBulletInfo(load_queue, attackInfo.attackHitInfo.nextBulletInfoName, hitInfos, info.isNeedToCache));
 						}
 						if (!string.IsNullOrEmpty(attackInfo.attackContinuationInfo.nextBulletInfoName))
 						{
-							yield return (object)this.StartCoroutine(LoadNextBulletInfo(load_queue, attackInfo.attackContinuationInfo.nextBulletInfoName, hitInfos));
+							yield return (object)this.StartCoroutine(LoadNextBulletInfo(load_queue, attackInfo.attackContinuationInfo.nextBulletInfoName, hitInfos, info.isNeedToCache));
 						}
 					}
 					InGameSettingsManager.Player playerSetting = MonoBehaviourSingleton<InGameSettingsManager>.I.player;
@@ -1002,11 +1071,11 @@ public class PlayerLoader : ModelLoaderBase
 						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, bulletEffect);
 						if (!pairSwordsInfo.Soul_SeIds.IsNullOrEmpty())
 						{
-							for (int i8 = 0; i8 < pairSwordsInfo.Soul_SeIds.Length; i8++)
+							for (int i11 = 0; i11 < pairSwordsInfo.Soul_SeIds.Length; i11++)
 							{
-								if (pairSwordsInfo.Soul_SeIds[i8] >= 0)
+								if (pairSwordsInfo.Soul_SeIds[i11] >= 0)
 								{
-									load_queue.CacheSE(pairSwordsInfo.Soul_SeIds[i8], null);
+									load_queue.CacheSE(pairSwordsInfo.Soul_SeIds[i11], null);
 								}
 							}
 						}
@@ -1072,14 +1141,14 @@ public class PlayerLoader : ModelLoaderBase
 					break;
 				}
 				EvolveController.Load(load_queue, info.weaponEvolveId);
-				int skill_len2 = 3;
-				LoadObject[] bullet_load = new LoadObject[skill_len2];
-				for (int i7 = 0; i7 < skill_len2; i7++)
+				int skill_len = 3;
+				LoadObject[] bullet_load = new LoadObject[skill_len];
+				for (int i10 = 0; i10 < skill_len; i10++)
 				{
-					SkillInfo.SkillParam param = player.skillInfo.GetSkillParam(player.skillInfo.weaponOffset + i7);
+					SkillInfo.SkillParam param = player.skillInfo.GetSkillParam(player.skillInfo.weaponOffset + i10);
 					if (param == null)
 					{
-						bullet_load[i7] = null;
+						bullet_load[i10] = null;
 					}
 					else
 					{
@@ -1151,7 +1220,7 @@ public class PlayerLoader : ModelLoaderBase
 								load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, efName);
 							}
 						}
-						bullet_load[i7] = load_queue.Load(RESOURCE_CATEGORY.INGAME_BULLET, tableData.bulletName, false);
+						bullet_load[i10] = load_queue.Load(RESOURCE_CATEGORY.INGAME_BULLET, tableData.bulletName, false);
 					}
 				}
 				if (is_self)
@@ -1161,12 +1230,12 @@ public class PlayerLoader : ModelLoaderBase
 				EffectPlayProcessor processor = player.effectPlayProcessor;
 				if (processor != null && processor.effectSettings != null)
 				{
-					int i6 = 0;
-					for (int len4 = processor.effectSettings.Length; i6 < len4; i6++)
+					int i9 = 0;
+					for (int len6 = processor.effectSettings.Length; i9 < len6; i9++)
 					{
-						if (!string.IsNullOrEmpty(processor.effectSettings[i6].effectName))
+						if (!string.IsNullOrEmpty(processor.effectSettings[i9].effectName))
 						{
-							string check_key = processor.effectSettings[i6].name;
+							string check_key = processor.effectSettings[i9].name;
 							if (check_key.StartsWith("BUFF_"))
 							{
 								string weapon_key = check_key.Substring(check_key.Length - "_PLC00".Length);
@@ -1180,7 +1249,7 @@ public class PlayerLoader : ModelLoaderBase
 									}
 								}
 							}
-							load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, processor.effectSettings[i6].effectName);
+							load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, processor.effectSettings[i9].effectName);
 						}
 					}
 				}
@@ -1188,50 +1257,88 @@ public class PlayerLoader : ModelLoaderBase
 				{
 					yield return (object)load_queue.Wait();
 				}
-				for (int i5 = 0; i5 < skill_len2; i5++)
+				for (int i8 = 0; i8 < skill_len; i8++)
 				{
-					SkillInfo.SkillParam param2 = player.skillInfo.GetSkillParam(player.skillInfo.weaponOffset + i5);
+					SkillInfo.SkillParam param2 = player.skillInfo.GetSkillParam(player.skillInfo.weaponOffset + i8);
 					if (param2 != null)
 					{
-						param2.bullet = (bullet_load[i5].loadedObject as BulletData);
+						param2.bullet = (bullet_load[i8].loadedObject as BulletData);
 						load_queue.CacheBulletDataUseResource(param2.bullet, player);
 					}
 				}
-				animEventBulletLoadObjTable?.ForEachKeyAndValue(new Action<string, LoadObject>((object)/*Error near IL_2294: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				animEventBulletLoadObjTable?.ForEachKeyAndValue(new Action<string, LoadObject>((object)/*Error near IL_2506: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				animEventBulletLoadObjTable.Clear();
 				if (load_queue.IsLoading())
 				{
 					yield return (object)load_queue.Wait();
 				}
 			}
-			if (lo_arm != null && lo_arm.loadedObject != null)
+			if (lo_arm != null)
 			{
-				GameObject loadObj2 = lo_arm.loadedObject as GameObject;
-				EffectPlayProcessor loadEffect2 = (!(loadObj2 != null)) ? null : loadObj2.GetComponent<EffectPlayProcessor>();
-				if (loadEffect2 != null && loadEffect2.effectSettings != null)
+				if (lo_arm.loadedObject != null)
 				{
-					int i4 = 0;
-					for (int len3 = loadEffect2.effectSettings.Length; i4 < len3; i4++)
+					GameObject loadObj4 = lo_arm.loadedObject as GameObject;
+					EffectPlayProcessor loadEffect4 = (!(loadObj4 != null)) ? null : loadObj4.GetComponent<EffectPlayProcessor>();
+					if (loadEffect4 != null && loadEffect4.effectSettings != null)
 					{
-						if (!string.IsNullOrEmpty(loadEffect2.effectSettings[i4].effectName))
+						int i7 = 0;
+						for (int len5 = loadEffect4.effectSettings.Length; i7 < len5; i7++)
 						{
-							load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, loadEffect2.effectSettings[i4].effectName);
+							if (!string.IsNullOrEmpty(loadEffect4.effectSettings[i7].effectName))
+							{
+								load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, loadEffect4.effectSettings[i7].effectName);
+							}
 						}
 					}
 				}
 			}
-			if (lo_leg != null && lo_leg.loadedObject != null)
+			else if (MonoBehaviourSingleton<GoGameCacheManager>.I.IsSelfPlayerResourceCached(RESOURCE_CATEGORY.PLAYER_ARM, arm_name))
 			{
-				GameObject loadObj = lo_leg.loadedObject as GameObject;
+				GameObject loadObj3 = MonoBehaviourSingleton<GoGameCacheManager>.I.GetSelfPlayerResourceCache(RESOURCE_CATEGORY.PLAYER_ARM, arm_name);
+				EffectPlayProcessor loadEffect3 = (!(loadObj3 != null)) ? null : loadObj3.GetComponent<EffectPlayProcessor>();
+				if (loadEffect3 != null && loadEffect3.effectSettings != null)
+				{
+					int i6 = 0;
+					for (int len4 = loadEffect3.effectSettings.Length; i6 < len4; i6++)
+					{
+						if (!string.IsNullOrEmpty(loadEffect3.effectSettings[i6].effectName))
+						{
+							load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, loadEffect3.effectSettings[i6].effectName);
+						}
+					}
+				}
+			}
+			if (lo_leg != null)
+			{
+				if (lo_leg.loadedObject != null)
+				{
+					GameObject loadObj2 = lo_leg.loadedObject as GameObject;
+					EffectPlayProcessor loadEffect2 = (!(loadObj2 != null)) ? null : loadObj2.GetComponent<EffectPlayProcessor>();
+					if (loadEffect2 != null && loadEffect2.effectSettings != null)
+					{
+						int i5 = 0;
+						for (int len3 = loadEffect2.effectSettings.Length; i5 < len3; i5++)
+						{
+							if (!string.IsNullOrEmpty(loadEffect2.effectSettings[i5].effectName))
+							{
+								load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, loadEffect2.effectSettings[i5].effectName);
+							}
+						}
+					}
+				}
+			}
+			else if (MonoBehaviourSingleton<GoGameCacheManager>.I.IsSelfPlayerResourceCached(RESOURCE_CATEGORY.PLAYER_LEG, leg_name))
+			{
+				GameObject loadObj = MonoBehaviourSingleton<GoGameCacheManager>.I.GetSelfPlayerResourceCache(RESOURCE_CATEGORY.PLAYER_LEG, leg_name);
 				EffectPlayProcessor loadEffect = (!(loadObj != null)) ? null : loadObj.GetComponent<EffectPlayProcessor>();
 				if (loadEffect != null && loadEffect.effectSettings != null)
 				{
-					int i3 = 0;
-					for (int len2 = loadEffect.effectSettings.Length; i3 < len2; i3++)
+					int i4 = 0;
+					for (int len2 = loadEffect.effectSettings.Length; i4 < len2; i4++)
 					{
-						if (!string.IsNullOrEmpty(loadEffect.effectSettings[i3].effectName))
+						if (!string.IsNullOrEmpty(loadEffect.effectSettings[i4].effectName))
 						{
-							load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, loadEffect.effectSettings[i3].effectName);
+							load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, loadEffect.effectSettings[i4].effectName);
 						}
 					}
 				}
@@ -1242,31 +1349,68 @@ public class PlayerLoader : ModelLoaderBase
 			}
 			bool div_frame_realizes = false;
 			int skin_color = info.skinColor;
-			if (!div_frame_realizes)
+			if (lo_body != null)
 			{
-				body = lo_body.Realizes(_this, -1);
-				renderersBody = body.get_gameObject().GetComponentsInChildren<Renderer>();
-				ModelLoaderBase.SetEnabled(renderersBody, false);
-				SetDynamicBones_Body(body, enableBone);
+				if (!div_frame_realizes)
+				{
+					body = lo_body.Realizes(_this, -1);
+					renderersBody = body.get_gameObject().GetComponentsInChildren<Renderer>();
+					ModelLoaderBase.SetEnabled(renderersBody, false);
+					SetDynamicBones_Body(body, enableBone);
+				}
+				else
+				{
+					bool wait15 = true;
+					InstantiateManager.Request(this, lo_body.loadedObject, delegate(InstantiateManager.InstantiateData data)
+					{
+						//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+						//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+						//IL_0016: Expected O, but got Unknown
+						((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2a4f: stateMachine*/)._003C_003Ef__this.body = data.instantiatedObject.get_transform();
+						((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2a4f: stateMachine*/)._003C_003Ef__this.body.SetParent(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2a4f: stateMachine*/)._003C_this_003E__20, false);
+						((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2a4f: stateMachine*/)._003C_003Ef__this.renderersBody = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2a4f: stateMachine*/)._003C_003Ef__this.body.GetComponentsInChildren<Renderer>();
+						((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2a4f: stateMachine*/)._003C_003Ef__this.SetDynamicBones_Body(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2a4f: stateMachine*/)._003C_003Ef__this.body, ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2a4f: stateMachine*/)._003CenableBone_003E__1);
+						SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2a4f: stateMachine*/)._003C_003Ef__this.renderersBody, false);
+						((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2a4f: stateMachine*/)._003Cwait_003E__124 = false;
+					}, false);
+					while (wait15)
+					{
+						yield return (object)null;
+					}
+				}
 			}
-			else
+			else if (MonoBehaviourSingleton<GoGameCacheManager>.I.IsSelfPlayerResourceCached(RESOURCE_CATEGORY.PLAYER_BDY, body_name))
 			{
-				bool wait8 = true;
-				InstantiateManager.Request(this, lo_body.loadedObject, delegate(InstantiateManager.InstantiateData data)
+				GameObject bodyObject = MonoBehaviourSingleton<GoGameCacheManager>.I.GetSelfPlayerResourceCache(RESOURCE_CATEGORY.PLAYER_BDY, body_name);
+				if (bodyObject != null)
 				{
-					//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0016: Expected O, but got Unknown
-					((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.body = data.instantiatedObject.get_transform();
-					((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.body.SetParent(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_this_003E__20, false);
-					((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.renderersBody = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.body.GetComponentsInChildren<Renderer>();
-					((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.SetDynamicBones_Body(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.body, ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003CenableBone_003E__1);
-					SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003C_003Ef__this.renderersBody, false);
-					((_003CDoLoad_003Ec__Iterator274)/*Error near IL_25c8: stateMachine*/)._003Cwait_003E__108 = false;
-				}, false);
-				while (wait8)
-				{
-					yield return (object)null;
+					if (!div_frame_realizes)
+					{
+						body = LoadObject.RealizesWithGameObject(bodyObject, _this, -1);
+						renderersBody = body.get_gameObject().GetComponentsInChildren<Renderer>();
+						ModelLoaderBase.SetEnabled(renderersBody, false);
+						SetDynamicBones_Body(body, enableBone);
+					}
+					else
+					{
+						bool wait15 = true;
+						InstantiateManager.Request(this, bodyObject, delegate(InstantiateManager.InstantiateData data)
+						{
+							//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0016: Expected O, but got Unknown
+							((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2b5c: stateMachine*/)._003C_003Ef__this.body = data.instantiatedObject.get_transform();
+							((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2b5c: stateMachine*/)._003C_003Ef__this.body.SetParent(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2b5c: stateMachine*/)._003C_this_003E__20, false);
+							((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2b5c: stateMachine*/)._003C_003Ef__this.renderersBody = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2b5c: stateMachine*/)._003C_003Ef__this.body.GetComponentsInChildren<Renderer>();
+							((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2b5c: stateMachine*/)._003C_003Ef__this.SetDynamicBones_Body(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2b5c: stateMachine*/)._003C_003Ef__this.body, ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2b5c: stateMachine*/)._003CenableBone_003E__1);
+							SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2b5c: stateMachine*/)._003C_003Ef__this.renderersBody, false);
+							((_003CDoLoad_003Ec__Iterator275)/*Error near IL_2b5c: stateMachine*/)._003Cwait_003E__124 = false;
+						}, false);
+						while (wait15)
+						{
+							yield return (object)null;
+						}
+					}
 				}
 			}
 			if (!(body == null))
@@ -1315,10 +1459,10 @@ public class PlayerLoader : ModelLoaderBase
 							step_ctrl = body.get_gameObject().AddComponent<CharacterStampCtrl>();
 						}
 						step_ctrl.Init(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.stampInfos, player, false);
-						int i2 = 0;
-						for (int n = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.stampInfos.Length; i2 < n; i2++)
+						int i3 = 0;
+						for (int n2 = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.stampInfos.Length; i3 < n2; i3++)
 						{
-							load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.stampInfos[i2].effectName);
+							load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.stampInfos[i3].effectName);
 						}
 						if (load_queue.IsLoading())
 						{
@@ -1335,19 +1479,19 @@ public class PlayerLoader : ModelLoaderBase
 						}
 						else
 						{
-							bool wait8 = true;
+							bool wait15 = true;
 							InstantiateManager.Request(this, lo_face.loadedObject, delegate(InstantiateManager.InstantiateData data)
 							{
 								//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 								//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 								//IL_0016: Expected O, but got Unknown
-								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.face = data.instantiatedObject.get_transform();
-								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.face.SetParent(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.socketHead, false);
-								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.renderersFace = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.face.GetComponentsInChildren<Renderer>();
-								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2a74: stateMachine*/)._003C_003Ef__this.renderersFace, false);
-								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2a74: stateMachine*/)._003Cwait_003E__108 = false;
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3008: stateMachine*/)._003C_003Ef__this.face = data.instantiatedObject.get_transform();
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3008: stateMachine*/)._003C_003Ef__this.face.SetParent(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3008: stateMachine*/)._003C_003Ef__this.socketHead, false);
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3008: stateMachine*/)._003C_003Ef__this.renderersFace = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3008: stateMachine*/)._003C_003Ef__this.face.GetComponentsInChildren<Renderer>();
+								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3008: stateMachine*/)._003C_003Ef__this.renderersFace, false);
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3008: stateMachine*/)._003Cwait_003E__124 = false;
 							}, false);
-							while (wait8)
+							while (wait15)
 							{
 								yield return (object)null;
 							}
@@ -1360,6 +1504,45 @@ public class PlayerLoader : ModelLoaderBase
 						validFaceChange = (renderersFace != null && renderersFace.Length > 0 && renderersFace[0].get_material().HasProperty("_Face_shift"));
 						eyeBlink = enable_eye_blick;
 					}
+					else
+					{
+						GameObject faceObject = MonoBehaviourSingleton<GoGameCacheManager>.I.GetSelfPlayerResourceCache(RESOURCE_CATEGORY.PLAYER_FACE, face_name);
+						if (faceObject != null)
+						{
+							if (!div_frame_realizes)
+							{
+								face = LoadObject.RealizesWithGameObject(faceObject, socketHead, -1);
+								renderersFace = face.get_gameObject().GetComponentsInChildren<Renderer>();
+								ModelLoaderBase.SetEnabled(renderersFace, false);
+							}
+							else
+							{
+								bool wait15 = true;
+								InstantiateManager.Request(this, faceObject, delegate(InstantiateManager.InstantiateData data)
+								{
+									//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+									//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+									//IL_0016: Expected O, but got Unknown
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3173: stateMachine*/)._003C_003Ef__this.face = data.instantiatedObject.get_transform();
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3173: stateMachine*/)._003C_003Ef__this.face.SetParent(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3173: stateMachine*/)._003C_003Ef__this.socketHead, false);
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3173: stateMachine*/)._003C_003Ef__this.renderersFace = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3173: stateMachine*/)._003C_003Ef__this.face.GetComponentsInChildren<Renderer>();
+									SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3173: stateMachine*/)._003C_003Ef__this.renderersFace, false);
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3173: stateMachine*/)._003Cwait_003E__124 = false;
+								}, false);
+								while (wait15)
+								{
+									yield return (object)null;
+								}
+								if (renderersFace == null)
+								{
+									yield break;
+								}
+							}
+							SetSkinColor(renderersFace, skin_color);
+							validFaceChange = (renderersFace != null && renderersFace.Length > 0 && renderersFace[0].get_material().HasProperty("_Face_shift"));
+							eyeBlink = enable_eye_blick;
+						}
+					}
 					if (lo_hair != null)
 					{
 						if (!div_frame_realizes)
@@ -1371,20 +1554,20 @@ public class PlayerLoader : ModelLoaderBase
 						}
 						else
 						{
-							bool wait8 = true;
+							bool wait15 = true;
 							InstantiateManager.Request(this, lo_hair.loadedObject, delegate(InstantiateManager.InstantiateData data)
 							{
 								//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 								//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 								//IL_0016: Expected O, but got Unknown
-								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.hair = data.instantiatedObject.get_transform();
-								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.hair.SetParent(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.socketHead, false);
-								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.renderersHair = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.hair.GetComponentsInChildren<Renderer>();
-								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.SetDynamicBones(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.body, ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.hair, ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003CenableBone_003E__1);
-								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003C_003Ef__this.renderersHair, false);
-								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2bde: stateMachine*/)._003Cwait_003E__108 = false;
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_32dd: stateMachine*/)._003C_003Ef__this.hair = data.instantiatedObject.get_transform();
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_32dd: stateMachine*/)._003C_003Ef__this.hair.SetParent(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_32dd: stateMachine*/)._003C_003Ef__this.socketHead, false);
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_32dd: stateMachine*/)._003C_003Ef__this.renderersHair = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_32dd: stateMachine*/)._003C_003Ef__this.hair.GetComponentsInChildren<Renderer>();
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_32dd: stateMachine*/)._003C_003Ef__this.SetDynamicBones(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_32dd: stateMachine*/)._003C_003Ef__this.body, ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_32dd: stateMachine*/)._003C_003Ef__this.hair, ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_32dd: stateMachine*/)._003CenableBone_003E__1);
+								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_32dd: stateMachine*/)._003C_003Ef__this.renderersHair, false);
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_32dd: stateMachine*/)._003Cwait_003E__124 = false;
 							}, false);
-							while (wait8)
+							while (wait15)
 							{
 								yield return (object)null;
 							}
@@ -1397,6 +1580,49 @@ public class PlayerLoader : ModelLoaderBase
 						if (loHairOverlay != null)
 						{
 							ApplyHairOverlay(loHairOverlay, renderersHair);
+						}
+					}
+					else
+					{
+						GameObject hairObject = MonoBehaviourSingleton<GoGameCacheManager>.I.GetSelfPlayerResourceCache(RESOURCE_CATEGORY.PLAYER_HEAD, hair_name);
+						if (hairObject != null)
+						{
+							if (!div_frame_realizes)
+							{
+								hair = LoadObject.RealizesWithGameObject(hairObject, socketHead, -1);
+								renderersHair = hair.GetComponentsInChildren<Renderer>();
+								ModelLoaderBase.SetEnabled(renderersHair, false);
+								SetDynamicBones(body, hair, enableBone);
+							}
+							else
+							{
+								bool wait15 = true;
+								InstantiateManager.Request(this, hairObject, delegate(InstantiateManager.InstantiateData data)
+								{
+									//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+									//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+									//IL_0016: Expected O, but got Unknown
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_343a: stateMachine*/)._003C_003Ef__this.hair = data.instantiatedObject.get_transform();
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_343a: stateMachine*/)._003C_003Ef__this.hair.SetParent(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_343a: stateMachine*/)._003C_003Ef__this.socketHead, false);
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_343a: stateMachine*/)._003C_003Ef__this.renderersHair = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_343a: stateMachine*/)._003C_003Ef__this.hair.GetComponentsInChildren<Renderer>();
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_343a: stateMachine*/)._003C_003Ef__this.SetDynamicBones(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_343a: stateMachine*/)._003C_003Ef__this.body, ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_343a: stateMachine*/)._003C_003Ef__this.hair, ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_343a: stateMachine*/)._003CenableBone_003E__1);
+									SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_343a: stateMachine*/)._003C_003Ef__this.renderersHair, false);
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_343a: stateMachine*/)._003Cwait_003E__124 = false;
+								}, false);
+								while (wait15)
+								{
+									yield return (object)null;
+								}
+								if (renderersHair == null)
+								{
+									yield break;
+								}
+							}
+							SetSkinAndEquipColor(renderersHair, skin_color, info.hairColor, 0f);
+							if (loHairOverlay != null)
+							{
+								ApplyHairOverlay(loHairOverlay, renderersHair);
+							}
 						}
 					}
 					if (lo_head != null)
@@ -1412,19 +1638,19 @@ public class PlayerLoader : ModelLoaderBase
 						}
 						else
 						{
-							bool wait8 = true;
+							bool wait15 = true;
 							InstantiateManager.Request(this, lo_head.loadedObject, delegate(InstantiateManager.InstantiateData data)
 							{
 								//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 								//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 								//IL_0016: Expected O, but got Unknown
-								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.head = data.instantiatedObject.get_transform();
-								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.head.SetParent(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.socketHead, false);
-								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.renderersHead = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.head.GetComponentsInChildren<Renderer>();
-								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2d07: stateMachine*/)._003C_003Ef__this.renderersHead, false);
-								((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2d07: stateMachine*/)._003Cwait_003E__108 = false;
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3563: stateMachine*/)._003C_003Ef__this.head = data.instantiatedObject.get_transform();
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3563: stateMachine*/)._003C_003Ef__this.head.SetParent(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3563: stateMachine*/)._003C_003Ef__this.socketHead, false);
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3563: stateMachine*/)._003C_003Ef__this.renderersHead = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3563: stateMachine*/)._003C_003Ef__this.head.GetComponentsInChildren<Renderer>();
+								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3563: stateMachine*/)._003C_003Ef__this.renderersHead, false);
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3563: stateMachine*/)._003Cwait_003E__124 = false;
 							}, false);
-							while (wait8)
+							while (wait15)
 							{
 								yield return (object)null;
 							}
@@ -1440,13 +1666,100 @@ public class PlayerLoader : ModelLoaderBase
 						SetEquipColor(renderersHead, info.headColor);
 						ApplyEquipHighResoTexs(lo_hr_hed_tex, renderersHead);
 					}
-					if (renderersBody != null)
+					else
 					{
-						if (lo_arm != null)
+						GameObject headObject = MonoBehaviourSingleton<GoGameCacheManager>.I.GetSelfPlayerResourceCache(RESOURCE_CATEGORY.PLAYER_HEAD, head_name);
+						if (headObject != null)
 						{
 							if (!div_frame_realizes)
 							{
-								arm = AddSkin(lo_arm);
+								head = LoadObject.RealizesWithGameObject(headObject, socketHead, -1);
+								if (head != null)
+								{
+									renderersHead = head.GetComponentsInChildren<Renderer>();
+									ModelLoaderBase.SetEnabled(renderersHead, false);
+								}
+							}
+							else
+							{
+								bool wait15 = true;
+								InstantiateManager.Request(this, headObject, delegate(InstantiateManager.InstantiateData data)
+								{
+									//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+									//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+									//IL_0016: Expected O, but got Unknown
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_36e9: stateMachine*/)._003C_003Ef__this.head = data.instantiatedObject.get_transform();
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_36e9: stateMachine*/)._003C_003Ef__this.head.SetParent(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_36e9: stateMachine*/)._003C_003Ef__this.socketHead, false);
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_36e9: stateMachine*/)._003C_003Ef__this.renderersHead = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_36e9: stateMachine*/)._003C_003Ef__this.head.GetComponentsInChildren<Renderer>();
+									SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_36e9: stateMachine*/)._003C_003Ef__this.renderersHead, false);
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_36e9: stateMachine*/)._003Cwait_003E__124 = false;
+								}, false);
+								while (wait15)
+								{
+									yield return (object)null;
+								}
+								if (renderersHead == null)
+								{
+									yield break;
+								}
+							}
+							if (head != null)
+							{
+								yield return (object)this.StartCoroutine(ItemLoader.InitRoopEffect(load_queue, head, shader_type));
+							}
+							SetEquipColor(renderersHead, info.headColor);
+							ApplyEquipHighResoTexs(lo_hr_hed_tex, renderersHead);
+						}
+					}
+					if (lo_arm != null)
+					{
+						if (!div_frame_realizes)
+						{
+							arm = AddSkin(lo_arm);
+							if (arm != null)
+							{
+								renderersArm = arm.GetComponentsInChildren<Renderer>();
+								ModelLoaderBase.SetEnabled(renderersArm, false);
+							}
+						}
+						else
+						{
+							bool wait15 = true;
+							InstantiateManager.Request(this, lo_arm.loadedObject, delegate(InstantiateManager.InstantiateData data)
+							{
+								//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+								//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+								//IL_0016: Expected O, but got Unknown
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3846: stateMachine*/)._003C_003Ef__this.arm = data.instantiatedObject.get_transform();
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3846: stateMachine*/)._003C_003Ef__this.arm = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3846: stateMachine*/)._003C_003Ef__this.AddSkin(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3846: stateMachine*/)._003C_003Ef__this.arm);
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3846: stateMachine*/)._003C_003Ef__this.renderersArm = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3846: stateMachine*/)._003C_003Ef__this.arm.GetComponentsInChildren<Renderer>();
+								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3846: stateMachine*/)._003C_003Ef__this.renderersArm, false);
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3846: stateMachine*/)._003Cwait_003E__124 = false;
+							}, false);
+							while (wait15)
+							{
+								yield return (object)null;
+							}
+							if (renderersArm == null)
+							{
+								yield break;
+							}
+						}
+						if (arm != null)
+						{
+							SetSkinAndEquipColor(renderersArm, skin_color, info.armColor, arm_model_data.GetZBias());
+							ApplyEquipHighResoTexs(lo_hr_arm_tex, renderersArm);
+							InvisibleBodyTriangles(arm_model_data.bodyDraw);
+						}
+					}
+					else
+					{
+						GameObject armObject = MonoBehaviourSingleton<GoGameCacheManager>.I.GetSelfPlayerResourceCache(RESOURCE_CATEGORY.PLAYER_ARM, arm_name);
+						if (Object.op_Implicit(armObject))
+						{
+							if (!div_frame_realizes)
+							{
+								arm = AddSkinFromCache(armObject);
 								if (arm != null)
 								{
 									renderersArm = arm.GetComponentsInChildren<Renderer>();
@@ -1455,19 +1768,19 @@ public class PlayerLoader : ModelLoaderBase
 							}
 							else
 							{
-								bool wait8 = true;
-								InstantiateManager.Request(this, lo_arm.loadedObject, delegate(InstantiateManager.InstantiateData data)
+								bool wait15 = true;
+								InstantiateManager.Request(this, armObject, delegate(InstantiateManager.InstantiateData data)
 								{
 									//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 									//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 									//IL_0016: Expected O, but got Unknown
-									((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.arm = data.instantiatedObject.get_transform();
-									((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.arm = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.AddSkin(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.arm);
-									((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.renderersArm = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.arm.GetComponentsInChildren<Renderer>();
-									SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003C_003Ef__this.renderersArm, false);
-									((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2e79: stateMachine*/)._003Cwait_003E__108 = false;
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_39b2: stateMachine*/)._003C_003Ef__this.arm = data.instantiatedObject.get_transform();
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_39b2: stateMachine*/)._003C_003Ef__this.arm = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_39b2: stateMachine*/)._003C_003Ef__this.AddSkin(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_39b2: stateMachine*/)._003C_003Ef__this.arm);
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_39b2: stateMachine*/)._003C_003Ef__this.renderersArm = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_39b2: stateMachine*/)._003C_003Ef__this.arm.GetComponentsInChildren<Renderer>();
+									SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_39b2: stateMachine*/)._003C_003Ef__this.renderersArm, false);
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_39b2: stateMachine*/)._003Cwait_003E__124 = false;
 								}, false);
-								while (wait8)
+								while (wait15)
 								{
 									yield return (object)null;
 								}
@@ -1483,304 +1796,437 @@ public class PlayerLoader : ModelLoaderBase
 								InvisibleBodyTriangles(arm_model_data.bodyDraw);
 							}
 						}
-						if (renderersBody != null)
+					}
+					if (lo_leg != null)
+					{
+						if (!div_frame_realizes)
 						{
-							if (lo_leg != null)
+							leg = AddSkin(lo_leg);
+							if (leg != null)
 							{
-								if (!div_frame_realizes)
-								{
-									leg = AddSkin(lo_leg);
-									if (leg != null)
-									{
-										renderersLeg = leg.GetComponentsInChildren<Renderer>();
-										ModelLoaderBase.SetEnabled(renderersLeg, false);
-									}
-								}
-								else
-								{
-									bool wait8 = true;
-									InstantiateManager.Request(this, lo_leg.loadedObject, delegate(InstantiateManager.InstantiateData data)
-									{
-										//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-										//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-										//IL_0016: Expected O, but got Unknown
-										((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.leg = data.instantiatedObject.get_transform();
-										((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.leg = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.AddSkin(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.leg);
-										((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.renderersLeg = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.leg.GetComponentsInChildren<Renderer>();
-										SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003C_003Ef__this.renderersLeg, false);
-										((_003CDoLoad_003Ec__Iterator274)/*Error near IL_2fd8: stateMachine*/)._003Cwait_003E__108 = false;
-									}, false);
-									while (wait8)
-									{
-										yield return (object)null;
-									}
-									if (renderersLeg == null)
-									{
-										yield break;
-									}
-								}
+								renderersLeg = leg.GetComponentsInChildren<Renderer>();
+								ModelLoaderBase.SetEnabled(renderersLeg, false);
+							}
+						}
+						else
+						{
+							bool wait15 = true;
+							InstantiateManager.Request(this, lo_leg.loadedObject, delegate(InstantiateManager.InstantiateData data)
+							{
+								//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+								//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+								//IL_0016: Expected O, but got Unknown
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3afc: stateMachine*/)._003C_003Ef__this.leg = data.instantiatedObject.get_transform();
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3afc: stateMachine*/)._003C_003Ef__this.leg = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3afc: stateMachine*/)._003C_003Ef__this.AddSkin(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3afc: stateMachine*/)._003C_003Ef__this.leg);
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3afc: stateMachine*/)._003C_003Ef__this.renderersLeg = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3afc: stateMachine*/)._003C_003Ef__this.leg.GetComponentsInChildren<Renderer>();
+								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3afc: stateMachine*/)._003C_003Ef__this.renderersLeg, false);
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3afc: stateMachine*/)._003Cwait_003E__124 = false;
+							}, false);
+							while (wait15)
+							{
+								yield return (object)null;
+							}
+							if (renderersLeg == null)
+							{
+								yield break;
+							}
+						}
+						if (leg != null)
+						{
+							SetSkinAndEquipColor(renderersLeg, skin_color, info.legColor, leg_model_data.GetZBias());
+							ApplyEquipHighResoTexs(lo_hr_leg_tex, renderersLeg);
+						}
+					}
+					else
+					{
+						GameObject legObject = MonoBehaviourSingleton<GoGameCacheManager>.I.GetSelfPlayerResourceCache(RESOURCE_CATEGORY.PLAYER_LEG, leg_name);
+						if (Object.op_Implicit(legObject))
+						{
+							if (!div_frame_realizes)
+							{
+								leg = AddSkinFromCache(legObject);
 								if (leg != null)
 								{
-									SetSkinAndEquipColor(renderersLeg, skin_color, info.legColor, leg_model_data.GetZBias());
-									ApplyEquipHighResoTexs(lo_hr_leg_tex, renderersLeg);
+									renderersLeg = leg.GetComponentsInChildren<Renderer>();
+									ModelLoaderBase.SetEnabled(renderersLeg, false);
 								}
 							}
-							bool isSoulArrowOutGameEffect = false;
-							if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid() && info.equipType == 5 && info.weaponSpAttackType == 2)
+							else
 							{
-								isSoulArrowOutGameEffect = true;
-							}
-							if (lo_wepn != null)
-							{
-								Transform weapon = null;
-								if (!div_frame_realizes)
+								bool wait15 = true;
+								InstantiateManager.Request(this, legObject, delegate(InstantiateManager.InstantiateData data)
 								{
-									weapon = lo_wepn.Realizes(null, -1);
-									if (weapon != null)
-									{
-										renderersWep = weapon.get_gameObject().GetComponentsInChildren<Renderer>();
-										ModelLoaderBase.SetEnabled(renderersWep, false);
-									}
-								}
-								else
+									//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+									//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+									//IL_0016: Expected O, but got Unknown
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3c52: stateMachine*/)._003C_003Ef__this.leg = data.instantiatedObject.get_transform();
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3c52: stateMachine*/)._003C_003Ef__this.leg = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3c52: stateMachine*/)._003C_003Ef__this.AddSkin(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3c52: stateMachine*/)._003C_003Ef__this.leg);
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3c52: stateMachine*/)._003C_003Ef__this.renderersLeg = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3c52: stateMachine*/)._003C_003Ef__this.leg.GetComponentsInChildren<Renderer>();
+									SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3c52: stateMachine*/)._003C_003Ef__this.renderersLeg, false);
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3c52: stateMachine*/)._003Cwait_003E__124 = false;
+								}, false);
+								while (wait15)
 								{
-									bool wait8 = true;
-									InstantiateManager.Request(this, lo_wepn.loadedObject, delegate(InstantiateManager.InstantiateData data)
-									{
-										//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-										//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-										//IL_0011: Expected O, but got Unknown
-										((_003CDoLoad_003Ec__Iterator274)/*Error near IL_313f: stateMachine*/)._003Cweapon_003E__118 = data.instantiatedObject.get_transform();
-										((_003CDoLoad_003Ec__Iterator274)/*Error near IL_313f: stateMachine*/)._003C_003Ef__this.renderersWep = ((_003CDoLoad_003Ec__Iterator274)/*Error near IL_313f: stateMachine*/)._003Cweapon_003E__118.GetComponentsInChildren<Renderer>();
-										SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator274)/*Error near IL_313f: stateMachine*/)._003C_003Ef__this.renderersWep, false);
-										((_003CDoLoad_003Ec__Iterator274)/*Error near IL_313f: stateMachine*/)._003Cwait_003E__108 = false;
-									}, false);
-									while (wait8)
-									{
-										yield return (object)null;
-									}
-									if (renderersWep == null)
-									{
-										yield break;
-									}
+									yield return (object)null;
 								}
-								if (weapon != null)
-								{
-									if (isSoulArrowOutGameEffect)
-									{
-										load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_wsk2_bow_01_01");
-									}
-									yield return (object)this.StartCoroutine(ItemLoader.InitRoopEffect(load_queue, weapon, shader_type));
-								}
-								if (renderersBody == null)
+								if (renderersLeg == null)
 								{
 									yield break;
 								}
-								if (weapon != null)
-								{
-									InitWeaponLinkBuffEffect(player, weapon);
-								}
-								SetWeaponShader(renderersWep, info.weaponColor0, info.weaponColor1, info.weaponColor2, info.weaponEffectID, info.weaponEffectParam, info.weaponEffectColor);
-								Material materialR = null;
-								Material materialL = null;
-								if (renderersWep != null)
-								{
-									int m = 0;
-									for (int l = renderersWep.Length; m < l; m++)
-									{
-										if (renderersWep[m].get_name().EndsWith("_L"))
-										{
-											materialL = renderersWep[m].get_material();
-											wepL = renderersWep[m].get_transform();
-											if (loadInfo.equipType == 0 && loadInfo.weaponSpAttackType == 2)
-											{
-												Utility.Attach(socketHandL, wepL);
-											}
-											else
-											{
-												Utility.Attach(socketWepL, wepL);
-											}
-										}
-										else
-										{
-											materialR = renderersWep[m].get_material();
-											wepR = renderersWep[m].get_transform();
-											Utility.Attach(socketWepR, wepR);
-										}
-									}
-								}
-								if (weapon != null)
-								{
-									Object.DestroyImmediate(weapon.get_gameObject());
-								}
-								if (lo_hr_wep_tex != null)
-								{
-									ApplyWeaponHighResoTexs(lo_hr_wep_tex, high_reso_tex_flags, materialR, materialL);
-								}
 							}
-							if (animator != null && lo_anim != null)
+							if (leg != null)
 							{
-								RuntimeAnimatorController anim_ctrl = lo_anim.loadedObjects[0].obj as RuntimeAnimatorController;
-								if (anim_ctrl != null)
-								{
-									animator.set_runtimeAnimatorController(anim_ctrl);
-									if (player != null)
-									{
-										animator.get_gameObject().AddComponent<StageObjectProxy>().stageObject = player;
-										if (need_anim_event)
-										{
-											player.animEventData = (lo_anim.loadedObjects[1].obj as AnimEventData);
-										}
-									}
-									animator.set_updateMode(1);
-									if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid() && MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.isPlaySpAttackTypeMotion)
-									{
-										SP_ATTACK_TYPE spType = (SP_ATTACK_TYPE)info.weaponSpAttackType;
-										if (spType != 0)
-										{
-											string tmpStr = spType.ToString();
-											int plen = animator.get_parameterCount();
-											for (int pidx = 0; pidx < plen; pidx++)
-											{
-												AnimatorControllerParameter ap = animator.GetParameter(pidx);
-												if (ap.get_name() == tmpStr)
-												{
-													animator.SetTrigger(tmpStr);
-													if (MonoBehaviourSingleton<EffectManager>.IsValid() && isSoulArrowOutGameEffect)
-													{
-														EffectManager.GetEffect("ef_btl_wsk2_bow_01_01", socketWepR);
-													}
-													break;
-												}
-											}
-										}
-									}
-								}
+								SetSkinAndEquipColor(renderersLeg, skin_color, info.legColor, leg_model_data.GetZBias());
+								ApplyEquipHighResoTexs(lo_hr_leg_tex, renderersLeg);
 							}
-							if (lo_voices != null)
+						}
+					}
+					bool isSoulArrowOutGameEffect = false;
+					if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid() && info.equipType == 5 && info.weaponSpAttackType == 2)
+					{
+						isSoulArrowOutGameEffect = true;
+					}
+					if (lo_wepn != null)
+					{
+						Transform weapon2 = null;
+						if (!div_frame_realizes)
+						{
+							weapon2 = lo_wepn.Realizes(null, -1);
+							if (weapon2 != null)
 							{
-								voiceAudioClips = lo_voices.loadedObjects;
-								UpdateVoiceAudioClipIds();
+								renderersWep = weapon2.get_gameObject().GetComponentsInChildren<Renderer>();
+								ModelLoaderBase.SetEnabled(renderersWep, false);
 							}
-							if (!lo_accessories.IsNullOrEmpty())
+						}
+						else
+						{
+							bool wait15 = true;
+							InstantiateManager.Request(this, lo_wepn.loadedObject, delegate(InstantiateManager.InstantiateData data)
 							{
-								List<Renderer> accRendererList = new List<Renderer>();
-								int aidx = 0;
-								for (int alen = lo_accessories.Count; aidx < alen; aidx++)
+								//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+								//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+								//IL_0011: Expected O, but got Unknown
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3db9: stateMachine*/)._003Cweapon_003E__140 = data.instantiatedObject.get_transform();
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3db9: stateMachine*/)._003C_003Ef__this.renderersWep = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3db9: stateMachine*/)._003Cweapon_003E__140.GetComponentsInChildren<Renderer>();
+								SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3db9: stateMachine*/)._003C_003Ef__this.renderersWep, false);
+								((_003CDoLoad_003Ec__Iterator275)/*Error near IL_3db9: stateMachine*/)._003Cwait_003E__124 = false;
+							}, false);
+							while (wait15)
+							{
+								yield return (object)null;
+							}
+							if (renderersWep == null)
+							{
+								yield break;
+							}
+						}
+						if (weapon2 != null)
+						{
+							if (isSoulArrowOutGameEffect)
+							{
+								load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_wsk2_bow_01_01");
+							}
+							yield return (object)this.StartCoroutine(ItemLoader.InitRoopEffect(load_queue, weapon2, shader_type));
+						}
+						if (renderersBody == null)
+						{
+							yield break;
+						}
+						if (weapon2 != null)
+						{
+							InitWeaponLinkBuffEffect(player, weapon2);
+						}
+						SetWeaponShader(renderersWep, info.weaponColor0, info.weaponColor1, info.weaponColor2, info.weaponEffectID, info.weaponEffectParam, info.weaponEffectColor);
+						Material materialR2 = null;
+						Material materialL2 = null;
+						if (renderersWep != null)
+						{
+							int i2 = 0;
+							for (int n = renderersWep.Length; i2 < n; i2++)
+							{
+								if (renderersWep[i2].get_name().EndsWith("_L"))
 								{
-									LoadObject loacc = lo_accessories[aidx];
-									Transform accTrans = null;
-									if (!div_frame_realizes)
+									materialL2 = renderersWep[i2].get_material();
+									wepL = renderersWep[i2].get_transform();
+									if (loadInfo.equipType == 0 && loadInfo.weaponSpAttackType == 2)
 									{
-										accTrans = loacc.Realizes(null, -1);
+										Utility.Attach(socketHandL, wepL);
 									}
 									else
 									{
-										bool wait8 = true;
-										InstantiateManager.Request(this, loacc.loadedObject, delegate(InstantiateManager.InstantiateData data)
-										{
-											//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-											//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-											//IL_0011: Expected O, but got Unknown
-											((_003CDoLoad_003Ec__Iterator274)/*Error near IL_36ea: stateMachine*/)._003CaccTrans_003E__133 = data.instantiatedObject.get_transform();
-											((_003CDoLoad_003Ec__Iterator274)/*Error near IL_36ea: stateMachine*/)._003Cwait_003E__108 = false;
-										}, false);
-										while (wait8)
-										{
-											yield return (object)null;
-										}
-									}
-									if (accTrans != null)
-									{
-										AccessoryTable.AccessoryInfoData ainfo = Singleton<AccessoryTable>.I.GetInfoData(info.accUIDs[aidx]);
-										accTrans.SetParent(GetNodeTrans(ainfo.node));
-										accTrans.set_localPosition(ainfo.offset);
-										accTrans.set_localRotation(ainfo.rotation);
-										accTrans.set_localScale(ainfo.scale);
-										accessory.Add(accTrans);
-										accRendererList.AddRange(accTrans.GetComponentsInChildren<Renderer>());
+										Utility.Attach(socketWepL, wepL);
 									}
 								}
-								renderersAccessory = accRendererList.ToArray();
-								ModelLoaderBase.SetEnabled(renderersAccessory, false);
-							}
-							switch (shader_type)
-							{
-							case SHADER_TYPE.LIGHTWEIGHT:
-								ShaderGlobal.ChangeWantLightweightShader(renderersWep);
-								ShaderGlobal.ChangeWantLightweightShader(renderersFace);
-								ShaderGlobal.ChangeWantLightweightShader(renderersHair);
-								ShaderGlobal.ChangeWantLightweightShader(renderersBody);
-								ShaderGlobal.ChangeWantLightweightShader(renderersHead);
-								ShaderGlobal.ChangeWantLightweightShader(renderersArm);
-								ShaderGlobal.ChangeWantLightweightShader(renderersLeg);
-								ShaderGlobal.ChangeWantLightweightShader(renderersAccessory);
-								break;
-							case SHADER_TYPE.UI:
-								ShaderGlobal.ChangeWantUIShader(renderersWep);
-								ShaderGlobal.ChangeWantUIShader(renderersFace);
-								ShaderGlobal.ChangeWantUIShader(renderersHair);
-								ShaderGlobal.ChangeWantUIShader(renderersBody);
-								ShaderGlobal.ChangeWantUIShader(renderersHead);
-								ShaderGlobal.ChangeWantUIShader(renderersArm);
-								ShaderGlobal.ChangeWantUIShader(renderersLeg);
-								ShaderGlobal.ChangeWantUIShader(renderersAccessory);
-								break;
-							}
-							SetLightProbes(enable_light_probes);
-							if (layer != -1)
-							{
-								SetLayerWithChildren_SecondaryNoChange(_this, layer);
-							}
-							SetRenderersEnabled(renderersWep, true);
-							SetRenderersEnabled(renderersFace, true);
-							SetRenderersEnabled(renderersHair, true);
-							SetRenderersEnabled(renderersBody, true);
-							SetRenderersEnabled(renderersHead, true);
-							SetRenderersEnabled(renderersArm, true);
-							SetRenderersEnabled(renderersLeg, true);
-							SetRenderersEnabled(renderersAccessory, true);
-							if (need_shadow && shadow == null)
-							{
-								shadow = CreateShadow(_this, true, -1, shader_type == SHADER_TYPE.LIGHTWEIGHT);
-							}
-							if (player != null)
-							{
-								if (player.controller != null)
+								else
 								{
-									player.controller.set_enabled(true);
-								}
-								player.OnLoadComplete();
-								if (player.packetReceiver != null)
-								{
-									player.packetReceiver.SetStopPacketUpdate(false);
+									materialR2 = renderersWep[i2].get_material();
+									wepR = renderersWep[i2].get_transform();
+									Utility.Attach(socketWepR, wepR);
 								}
 							}
-							if (player != null && is_self && MonoBehaviourSingleton<AudioListenerManager>.IsValid())
-							{
-								MonoBehaviourSingleton<AudioListenerManager>.I.SetTargetObject(player);
-							}
-							callback?.Invoke(player);
-							ResetDynamicBones(dynamicBones);
-							ResetDynamicBones(dynamicBones_Body);
-							if (is_self)
-							{
-								ResourceLoad loaded = player.get_gameObject().GetComponent<ResourceLoad>();
-								if (loaded != null && loaded.list != null)
-								{
-									List<string> resourceNames = new List<string>();
-									int j = 0;
-									for (int i = loaded.list.size; j < i; j++)
-									{
-										resourceNames.Add(loaded.list.buffer[j].name);
-									}
-									resourceNames.Distinct();
-									MonoBehaviourSingleton<ResourceManager>.I.cache.AddIgnoreCategorySpecifiedReleaseList(resourceNames);
-								}
-							}
-							isLoading = false;
+						}
+						if (weapon2 != null)
+						{
+							Object.DestroyImmediate(weapon2.get_gameObject());
+						}
+						if (lo_hr_wep_tex != null)
+						{
+							ApplyWeaponHighResoTexs(lo_hr_wep_tex, high_reso_tex_flags, materialR2, materialL2);
 						}
 					}
+					else
+					{
+						GameObject weaponObject = MonoBehaviourSingleton<GoGameCacheManager>.I.GetSelfPlayerResourceCache(RESOURCE_CATEGORY.PLAYER_WEAPON, wepn_name);
+						if (Object.op_Implicit(weaponObject))
+						{
+							Transform weapon = null;
+							if (!div_frame_realizes)
+							{
+								weapon = LoadObject.RealizesWithGameObject(weaponObject, null, -1);
+								if (weapon != null)
+								{
+									renderersWep = weapon.get_gameObject().GetComponentsInChildren<Renderer>();
+									ModelLoaderBase.SetEnabled(renderersWep, false);
+								}
+							}
+							else
+							{
+								bool wait15 = true;
+								InstantiateManager.Request(this, weaponObject, delegate(InstantiateManager.InstantiateData data)
+								{
+									//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+									//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+									//IL_0011: Expected O, but got Unknown
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_4171: stateMachine*/)._003Cweapon_003E__146 = data.instantiatedObject.get_transform();
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_4171: stateMachine*/)._003C_003Ef__this.renderersWep = ((_003CDoLoad_003Ec__Iterator275)/*Error near IL_4171: stateMachine*/)._003Cweapon_003E__146.GetComponentsInChildren<Renderer>();
+									SetRenderersEnabled(((_003CDoLoad_003Ec__Iterator275)/*Error near IL_4171: stateMachine*/)._003C_003Ef__this.renderersWep, false);
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_4171: stateMachine*/)._003Cwait_003E__124 = false;
+								}, false);
+								while (wait15)
+								{
+									yield return (object)null;
+								}
+								if (renderersWep == null)
+								{
+									yield break;
+								}
+							}
+							if (weapon != null)
+							{
+								if (isSoulArrowOutGameEffect)
+								{
+									load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_wsk2_bow_01_01");
+								}
+								yield return (object)this.StartCoroutine(ItemLoader.InitRoopEffect(load_queue, weapon, shader_type));
+							}
+							if (renderersBody == null)
+							{
+								yield break;
+							}
+							if (weapon != null)
+							{
+								InitWeaponLinkBuffEffect(player, weapon);
+							}
+							SetWeaponShader(renderersWep, info.weaponColor0, info.weaponColor1, info.weaponColor2, info.weaponEffectID, info.weaponEffectParam, info.weaponEffectColor);
+							Material materialR = null;
+							Material materialL = null;
+							if (renderersWep != null)
+							{
+								int m = 0;
+								for (int l = renderersWep.Length; m < l; m++)
+								{
+									if (renderersWep[m].get_name().EndsWith("_L"))
+									{
+										materialL = renderersWep[m].get_material();
+										wepL = renderersWep[m].get_transform();
+										if (loadInfo.equipType == 0 && loadInfo.weaponSpAttackType == 2)
+										{
+											Utility.Attach(socketHandL, wepL);
+										}
+										else
+										{
+											Utility.Attach(socketWepL, wepL);
+										}
+									}
+									else
+									{
+										materialR = renderersWep[m].get_material();
+										wepR = renderersWep[m].get_transform();
+										Utility.Attach(socketWepR, wepR);
+									}
+								}
+							}
+							if (weapon != null)
+							{
+								Object.DestroyImmediate(weapon.get_gameObject());
+							}
+							if (lo_hr_wep_tex != null)
+							{
+								ApplyWeaponHighResoTexs(lo_hr_wep_tex, high_reso_tex_flags, materialR, materialL);
+							}
+						}
+					}
+					if (animator != null && lo_anim != null)
+					{
+						RuntimeAnimatorController anim_ctrl = lo_anim.loadedObjects[0].obj as RuntimeAnimatorController;
+						if (anim_ctrl != null)
+						{
+							animator.set_runtimeAnimatorController(anim_ctrl);
+							if (player != null)
+							{
+								animator.get_gameObject().AddComponent<StageObjectProxy>().stageObject = player;
+								if (need_anim_event)
+								{
+									player.animEventData = (lo_anim.loadedObjects[1].obj as AnimEventData);
+								}
+							}
+							animator.set_updateMode(1);
+							if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid() && MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.isPlaySpAttackTypeMotion)
+							{
+								SP_ATTACK_TYPE spType = (SP_ATTACK_TYPE)info.weaponSpAttackType;
+								if (spType != 0)
+								{
+									string tmpStr = spType.ToString();
+									int plen = animator.get_parameterCount();
+									for (int pidx = 0; pidx < plen; pidx++)
+									{
+										AnimatorControllerParameter ap = animator.GetParameter(pidx);
+										if (ap.get_name() == tmpStr)
+										{
+											animator.SetTrigger(tmpStr);
+											if (MonoBehaviourSingleton<EffectManager>.IsValid() && isSoulArrowOutGameEffect)
+											{
+												EffectManager.GetEffect("ef_btl_wsk2_bow_01_01", socketWepR);
+											}
+											break;
+										}
+									}
+								}
+							}
+						}
+					}
+					if (lo_voices != null)
+					{
+						voiceAudioClips = lo_voices.loadedObjects;
+						UpdateVoiceAudioClipIds();
+					}
+					if (!lo_accessories.IsNullOrEmpty())
+					{
+						List<Renderer> accRendererList = new List<Renderer>();
+						int aidx = 0;
+						for (int alen = lo_accessories.Count; aidx < alen; aidx++)
+						{
+							LoadObject loacc = lo_accessories[aidx];
+							Transform accTrans = null;
+							if (!div_frame_realizes)
+							{
+								accTrans = loacc.Realizes(null, -1);
+							}
+							else
+							{
+								bool wait15 = true;
+								InstantiateManager.Request(this, loacc.loadedObject, delegate(InstantiateManager.InstantiateData data)
+								{
+									//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+									//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+									//IL_0011: Expected O, but got Unknown
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_471c: stateMachine*/)._003CaccTrans_003E__161 = data.instantiatedObject.get_transform();
+									((_003CDoLoad_003Ec__Iterator275)/*Error near IL_471c: stateMachine*/)._003Cwait_003E__124 = false;
+								}, false);
+								while (wait15)
+								{
+									yield return (object)null;
+								}
+							}
+							if (accTrans != null)
+							{
+								AccessoryTable.AccessoryInfoData ainfo = Singleton<AccessoryTable>.I.GetInfoData(info.accUIDs[aidx]);
+								accTrans.SetParent(GetNodeTrans(ainfo.node));
+								accTrans.set_localPosition(ainfo.offset);
+								accTrans.set_localRotation(ainfo.rotation);
+								accTrans.set_localScale(ainfo.scale);
+								accessory.Add(accTrans);
+								accRendererList.AddRange(accTrans.GetComponentsInChildren<Renderer>());
+							}
+						}
+						renderersAccessory = accRendererList.ToArray();
+						ModelLoaderBase.SetEnabled(renderersAccessory, false);
+					}
+					switch (shader_type)
+					{
+					case SHADER_TYPE.LIGHTWEIGHT:
+						ShaderGlobal.ChangeWantLightweightShader(renderersWep);
+						ShaderGlobal.ChangeWantLightweightShader(renderersFace);
+						ShaderGlobal.ChangeWantLightweightShader(renderersHair);
+						ShaderGlobal.ChangeWantLightweightShader(renderersBody);
+						ShaderGlobal.ChangeWantLightweightShader(renderersHead);
+						ShaderGlobal.ChangeWantLightweightShader(renderersArm);
+						ShaderGlobal.ChangeWantLightweightShader(renderersLeg);
+						ShaderGlobal.ChangeWantLightweightShader(renderersAccessory);
+						break;
+					case SHADER_TYPE.UI:
+						ShaderGlobal.ChangeWantUIShader(renderersWep);
+						ShaderGlobal.ChangeWantUIShader(renderersFace);
+						ShaderGlobal.ChangeWantUIShader(renderersHair);
+						ShaderGlobal.ChangeWantUIShader(renderersBody);
+						ShaderGlobal.ChangeWantUIShader(renderersHead);
+						ShaderGlobal.ChangeWantUIShader(renderersArm);
+						ShaderGlobal.ChangeWantUIShader(renderersLeg);
+						ShaderGlobal.ChangeWantUIShader(renderersAccessory);
+						break;
+					}
+					SetLightProbes(enable_light_probes);
+					if (layer != -1)
+					{
+						SetLayerWithChildren_SecondaryNoChange(_this, layer);
+					}
+					SetRenderersEnabled(renderersWep, true);
+					SetRenderersEnabled(renderersFace, true);
+					SetRenderersEnabled(renderersHair, true);
+					SetRenderersEnabled(renderersBody, true);
+					SetRenderersEnabled(renderersHead, true);
+					SetRenderersEnabled(renderersArm, true);
+					SetRenderersEnabled(renderersLeg, true);
+					SetRenderersEnabled(renderersAccessory, true);
+					if (need_shadow && shadow == null)
+					{
+						shadow = CreateShadow(_this, true, -1, shader_type == SHADER_TYPE.LIGHTWEIGHT);
+					}
+					if (player != null)
+					{
+						if (player.controller != null)
+						{
+							player.controller.set_enabled(true);
+						}
+						player.OnLoadComplete();
+						if (player.packetReceiver != null)
+						{
+							player.packetReceiver.SetStopPacketUpdate(false);
+						}
+					}
+					if (player != null && is_self && MonoBehaviourSingleton<AudioListenerManager>.IsValid())
+					{
+						MonoBehaviourSingleton<AudioListenerManager>.I.SetTargetObject(player);
+					}
+					callback?.Invoke(player);
+					ResetDynamicBones(dynamicBones);
+					ResetDynamicBones(dynamicBones_Body);
+					if (is_self)
+					{
+						ResourceLoad loaded = player.get_gameObject().GetComponent<ResourceLoad>();
+						if (loaded != null && loaded.list != null)
+						{
+							List<string> resourceNames = new List<string>();
+							int j = 0;
+							for (int i = loaded.list.size; j < i; j++)
+							{
+								resourceNames.Add(loaded.list.buffer[j].name);
+							}
+							resourceNames.Distinct();
+							MonoBehaviourSingleton<ResourceManager>.I.cache.AddIgnoreCategorySpecifiedReleaseList(resourceNames);
+						}
+					}
+					isLoading = false;
 				}
 			}
 		}
@@ -1865,22 +2311,35 @@ public class PlayerLoader : ModelLoaderBase
 		}
 	}
 
-	private IEnumerator LoadNextBulletInfo(LoadingQueue loadQueue, string infoName, List<AttackInfo> hitInfos)
+	private IEnumerator LoadNextBulletInfo(LoadingQueue loadQueue, string infoName, List<AttackInfo> hitInfos, bool isNeedToCache)
 	{
 		if (!playerLoaderLoadedAttackInfoNames.Contains(infoName))
 		{
-			LoadObject loadObj = loadQueue.Load(RESOURCE_CATEGORY.PLAYER_ATTACK_INFO, infoName, false);
-			playerLoaderLoadedAttackInfoNames.Add(infoName);
-			if (loadQueue.IsLoading())
+			GameObject infoObj;
+			if (!MonoBehaviourSingleton<GoGameCacheManager>.I.IsSelfPlayerResourceCached(RESOURCE_CATEGORY.PLAYER_ATTACK_INFO, infoName))
 			{
-				yield return (object)loadQueue.Wait();
+				LoadObject loadObj2 = loadQueue.Load(RESOURCE_CATEGORY.PLAYER_ATTACK_INFO, infoName, false);
+				playerLoaderLoadedAttackInfoNames.Add(infoName);
+				if (loadQueue.IsLoading())
+				{
+					yield return (object)loadQueue.Wait();
+				}
+				if (isNeedToCache)
+				{
+					MonoBehaviourSingleton<GoGameCacheManager>.I.CacheSelfPlayerResource(RESOURCE_CATEGORY.PLAYER_ATTACK_INFO, infoName, loadObj2.loadedObject);
+				}
+				infoObj = loadObj2.Realizes(MonoBehaviourSingleton<InGameSettingsManager>.I._transform, -1).get_gameObject();
 			}
-			GameObject infoObj = loadObj.Realizes(MonoBehaviourSingleton<InGameSettingsManager>.I._transform, -1).get_gameObject();
+			else
+			{
+				Object loadObj = MonoBehaviourSingleton<GoGameCacheManager>.I.GetSelfPlayerResourceCache(RESOURCE_CATEGORY.PLAYER_ATTACK_INFO, infoName);
+				infoObj = LoadObject.RealizesWithGameObject(loadObj, MonoBehaviourSingleton<InGameSettingsManager>.I._transform, -1).get_gameObject();
+			}
 			SplitPlayerAttackInfo attackInfo = infoObj.GetComponent<SplitPlayerAttackInfo>();
 			hitInfos.Add(attackInfo.attackHitInfo);
 			if (!string.IsNullOrEmpty(attackInfo.attackHitInfo.nextBulletInfoName))
 			{
-				yield return (object)this.StartCoroutine(LoadNextBulletInfo(loadQueue, attackInfo.attackHitInfo.nextBulletInfoName, hitInfos));
+				yield return (object)this.StartCoroutine(LoadNextBulletInfo(loadQueue, attackInfo.attackHitInfo.nextBulletInfoName, hitInfos, isNeedToCache));
 			}
 		}
 	}
@@ -2112,6 +2571,16 @@ public class PlayerLoader : ModelLoaderBase
 
 	private Transform AddSkin(Transform base_model)
 	{
+		return AddSkin(base_model, renderersBody[0] as SkinnedMeshRenderer, -1);
+	}
+
+	private Transform AddSkinFromCache(GameObject gameObj)
+	{
+		if (gameObj == null)
+		{
+			return null;
+		}
+		Transform base_model = LoadObject.RealizesWithGameObject(gameObj, null, -1);
 		return AddSkin(base_model, renderersBody[0] as SkinnedMeshRenderer, -1);
 	}
 

@@ -599,8 +599,8 @@ public class CharaMake : GameSection
 		Transform val2 = SetPrefab((Enum)ui, "CharaMakeList");
 		SetEvent(val2, UI.BTN_LIST_PREV, "LIST_PREV", (int)ui);
 		SetEvent(val2, UI.BTN_LIST_NEXT, "LIST_NEXT", (int)ui);
-		_003CSetList_003Ec__AnonStorey485 _003CSetList_003Ec__AnonStorey;
-		SetGrid(val2, UI.GRD_LIST, "CharaMakeListItem", item_num, false, new Action<int, Transform, bool>((object)_003CSetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSetList_003Ec__AnonStorey48D _003CSetList_003Ec__AnonStorey48D;
+		SetGrid(val2, UI.GRD_LIST, "CharaMakeListItem", item_num, false, new Action<int, Transform, bool>((object)_003CSetList_003Ec__AnonStorey48D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		SetCenterOnChildFunc(val2, UI.GRD_LIST, OnCenterListItem);
 		SetCenter(val2, UI.GRD_LIST, listInfo.index, false);
 		listInfo.tansform = val2.get_parent();
@@ -611,10 +611,10 @@ public class CharaMake : GameSection
 	{
 		GlobalSettingsManager.HasVisuals hasVisuals = MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals;
 		int item_num = (!IsWoman()) ? hasVisuals.hasManFaceIndexes.Length : hasVisuals.hasWomanFaceIndexes.Length;
-		_003CUpdateLists_003Ec__AnonStorey486 _003CUpdateLists_003Ec__AnonStorey;
-		SetList(LIST.FACETYPE, UI.OBJ_LIST_FACETYPE, item_num, new Action<int, Transform>((object)_003CUpdateLists_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateLists_003Ec__AnonStorey48E _003CUpdateLists_003Ec__AnonStorey48E;
+		SetList(LIST.FACETYPE, UI.OBJ_LIST_FACETYPE, item_num, new Action<int, Transform>((object)_003CUpdateLists_003Ec__AnonStorey48E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		int item_num2 = (!IsWoman()) ? hasVisuals.hasManHeadIndexes.Length : hasVisuals.hasWomanHeadIndexes.Length;
-		SetList(LIST.HAIRSTYLE, UI.OBJ_LIST_HAIRSTYLE, item_num2, new Action<int, Transform>((object)_003CUpdateLists_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetList(LIST.HAIRSTYLE, UI.OBJ_LIST_HAIRSTYLE, item_num2, new Action<int, Transform>((object)_003CUpdateLists_003Ec__AnonStorey48E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void UpdateVoiceNames()

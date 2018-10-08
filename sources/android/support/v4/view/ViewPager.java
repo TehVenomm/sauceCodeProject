@@ -1073,77 +1073,77 @@ public class ViewPager extends ViewGroup {
     }
 
     void dataSetChanged() {
+        int i;
         int count = this.mAdapter.getCount();
         this.mExpectedAdapterCount = count;
         boolean z = this.mItems.size() < (this.mOffscreenPageLimit * 2) + 1 && this.mItems.size() < count;
         boolean z2 = false;
-        int i = this.mCurItem;
+        int i2 = this.mCurItem;
         boolean z3 = z;
-        int i2 = 0;
-        while (i2 < this.mItems.size()) {
-            int i3;
-            boolean z4;
+        int i3 = 0;
+        while (i3 < this.mItems.size()) {
             int i4;
+            boolean z4;
             boolean z5;
-            ItemInfo itemInfo = (ItemInfo) this.mItems.get(i2);
+            ItemInfo itemInfo = (ItemInfo) this.mItems.get(i3);
             int itemPosition = this.mAdapter.getItemPosition(itemInfo.object);
             if (itemPosition == -1) {
-                i3 = i2;
+                i4 = i3;
                 z4 = z2;
-                i4 = i;
+                i = i2;
                 z5 = z3;
             } else if (itemPosition == -2) {
-                this.mItems.remove(i2);
-                i2--;
+                this.mItems.remove(i3);
+                i3--;
                 if (!z2) {
                     this.mAdapter.startUpdate((ViewGroup) this);
                     z2 = true;
                 }
                 this.mAdapter.destroyItem((ViewGroup) this, itemInfo.position, itemInfo.object);
                 if (this.mCurItem == itemInfo.position) {
-                    i3 = i2;
+                    i4 = i3;
                     z4 = z2;
-                    i4 = Math.max(0, Math.min(this.mCurItem, count - 1));
+                    i = Math.max(0, Math.min(this.mCurItem, count - 1));
                     z5 = true;
                 } else {
-                    i3 = i2;
+                    i4 = i3;
                     z4 = z2;
-                    i4 = i;
+                    i = i2;
                     z5 = true;
                 }
             } else if (itemInfo.position != itemPosition) {
                 if (itemInfo.position == this.mCurItem) {
-                    i = itemPosition;
+                    i2 = itemPosition;
                 }
                 itemInfo.position = itemPosition;
-                i3 = i2;
+                i4 = i3;
                 z4 = z2;
-                i4 = i;
+                i = i2;
                 z5 = true;
             } else {
-                i3 = i2;
+                i4 = i3;
                 z4 = z2;
-                i4 = i;
+                i = i2;
                 z5 = z3;
             }
             z3 = z5;
-            i = i4;
+            i2 = i;
             z2 = z4;
-            i2 = i3 + 1;
+            i3 = i4 + 1;
         }
         if (z2) {
             this.mAdapter.finishUpdate((ViewGroup) this);
         }
         Collections.sort(this.mItems, COMPARATOR);
         if (z3) {
-            i4 = getChildCount();
-            for (i2 = 0; i2 < i4; i2++) {
-                LayoutParams layoutParams = (LayoutParams) getChildAt(i2).getLayoutParams();
+            i = getChildCount();
+            for (i3 = 0; i3 < i; i3++) {
+                LayoutParams layoutParams = (LayoutParams) getChildAt(i3).getLayoutParams();
                 if (!layoutParams.isDecor) {
                     layoutParams.widthFactor = 0.0f;
                 }
             }
-            setCurrentItemInternal(i, false, true);
+            setCurrentItemInternal(i2, false, true);
             requestLayout();
         }
     }
@@ -1508,7 +1508,6 @@ public class ViewPager extends ViewGroup {
     }
 
     protected void onLayout(boolean z, int i, int i2, int i3, int i4) {
-        LayoutParams layoutParams;
         int i5;
         int childCount = getChildCount();
         int i6 = i3 - i;
@@ -1521,6 +1520,7 @@ public class ViewPager extends ViewGroup {
         int i8 = 0;
         int i9 = 0;
         while (i9 < childCount) {
+            LayoutParams layoutParams;
             int measuredWidth;
             View childAt = getChildAt(i9);
             if (childAt.getVisibility() != 8) {

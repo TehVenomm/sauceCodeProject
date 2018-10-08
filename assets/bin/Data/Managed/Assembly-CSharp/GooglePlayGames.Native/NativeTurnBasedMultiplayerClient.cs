@@ -36,7 +36,7 @@ namespace GooglePlayGames.Native
 					.SetExclusiveBitMask(exclusiveBitmask);
 				using (GooglePlayGames.Native.PInvoke.TurnBasedMatchConfig config = turnBasedMatchConfigBuilder.Build())
 				{
-					_003CCreateQuickMatch_003Ec__AnonStorey826 _003CCreateQuickMatch_003Ec__AnonStorey;
+					_003CCreateQuickMatch_003Ec__AnonStorey830 _003CCreateQuickMatch_003Ec__AnonStorey;
 					mTurnBasedManager.CreateMatch(config, BridgeMatchToUserCallback(new Action<UIStatus, GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch>((object)_003CCreateQuickMatch_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 				}
 			}
@@ -44,7 +44,7 @@ namespace GooglePlayGames.Native
 
 		public unsafe void CreateWithInvitationScreen(uint minOpponents, uint maxOpponents, uint variant, Action<bool, GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch> callback)
 		{
-			_003CCreateWithInvitationScreen_003Ec__AnonStorey827 _003CCreateWithInvitationScreen_003Ec__AnonStorey;
+			_003CCreateWithInvitationScreen_003Ec__AnonStorey831 _003CCreateWithInvitationScreen_003Ec__AnonStorey;
 			CreateWithInvitationScreen(minOpponents, maxOpponents, variant, new Action<UIStatus, GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch>((object)_003CCreateWithInvitationScreen_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
@@ -174,7 +174,7 @@ namespace GooglePlayGames.Native
 		public unsafe void AcceptInvitation(string invitationId, Action<bool, GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch> callback)
 		{
 			callback = Callbacks.AsOnGameThreadCallback<bool, GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch>(callback);
-			_003CAcceptInvitation_003Ec__AnonStorey82D _003CAcceptInvitation_003Ec__AnonStorey82D;
+			_003CAcceptInvitation_003Ec__AnonStorey837 _003CAcceptInvitation_003Ec__AnonStorey;
 			FindInvitationWithId(invitationId, delegate(GooglePlayGames.Native.PInvoke.MultiplayerInvitation invitation)
 			{
 				if (invitation == null)
@@ -184,7 +184,7 @@ namespace GooglePlayGames.Native
 				}
 				else
 				{
-					mTurnBasedManager.AcceptInvitation(invitation, BridgeMatchToUserCallback(new Action<UIStatus, GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch>((object)_003CAcceptInvitation_003Ec__AnonStorey82D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+					mTurnBasedManager.AcceptInvitation(invitation, BridgeMatchToUserCallback(new Action<UIStatus, GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch>((object)_003CAcceptInvitation_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 				}
 			});
 		}
@@ -223,8 +223,8 @@ namespace GooglePlayGames.Native
 			}
 			else
 			{
-				_003CRegisterMatchDelegate_003Ec__AnonStorey82F _003CRegisterMatchDelegate_003Ec__AnonStorey82F;
-				mMatchDelegate = Callbacks.AsOnGameThreadCallback<GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch, bool>(new Action<GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch, bool>((object)_003CRegisterMatchDelegate_003Ec__AnonStorey82F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CRegisterMatchDelegate_003Ec__AnonStorey839 _003CRegisterMatchDelegate_003Ec__AnonStorey;
+				mMatchDelegate = Callbacks.AsOnGameThreadCallback<GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch, bool>(new Action<GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch, bool>((object)_003CRegisterMatchDelegate_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 
@@ -243,8 +243,8 @@ namespace GooglePlayGames.Native
 				{
 					bool shouldAutolaunch = eventType == Types.MultiplayerEvent.UPDATED_FROM_APP_LAUNCH;
 					match.ReferToMe();
-					_003CHandleMatchEvent_003Ec__AnonStorey830 _003CHandleMatchEvent_003Ec__AnonStorey;
-					Callbacks.AsCoroutine(WaitForLogin(new Action((object)_003CHandleMatchEvent_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+					_003CHandleMatchEvent_003Ec__AnonStorey83A _003CHandleMatchEvent_003Ec__AnonStorey83A;
+					Callbacks.AsCoroutine(WaitForLogin(new Action((object)_003CHandleMatchEvent_003Ec__AnonStorey83A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 				}
 			}
 		}
@@ -262,8 +262,8 @@ namespace GooglePlayGames.Native
 		{
 			Logger.describe(data);
 			callback = Callbacks.AsOnGameThreadCallback(callback);
-			_003CTakeTurn_003Ec__AnonStorey831 _003CTakeTurn_003Ec__AnonStorey;
-			FindEqualVersionMatchWithParticipant(match, pendingParticipantId, callback, new Action<GooglePlayGames.Native.PInvoke.MultiplayerParticipant, NativeTurnBasedMatch>((object)_003CTakeTurn_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CTakeTurn_003Ec__AnonStorey83B _003CTakeTurn_003Ec__AnonStorey83B;
+			FindEqualVersionMatchWithParticipant(match, pendingParticipantId, callback, new Action<GooglePlayGames.Native.PInvoke.MultiplayerParticipant, NativeTurnBasedMatch>((object)_003CTakeTurn_003Ec__AnonStorey83B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
 		private void FindEqualVersionMatch(GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch match, Action<bool> onFailure, Action<NativeTurnBasedMatch> onVersionMatch)
@@ -403,7 +403,7 @@ namespace GooglePlayGames.Native
 		public unsafe void LeaveDuringTurn(GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch match, string pendingParticipantId, Action<bool> callback)
 		{
 			callback = Callbacks.AsOnGameThreadCallback(callback);
-			_003CLeaveDuringTurn_003Ec__AnonStorey837 _003CLeaveDuringTurn_003Ec__AnonStorey;
+			_003CLeaveDuringTurn_003Ec__AnonStorey841 _003CLeaveDuringTurn_003Ec__AnonStorey;
 			FindEqualVersionMatchWithParticipant(match, pendingParticipantId, callback, new Action<GooglePlayGames.Native.PInvoke.MultiplayerParticipant, NativeTurnBasedMatch>((object)_003CLeaveDuringTurn_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
@@ -422,7 +422,7 @@ namespace GooglePlayGames.Native
 		public unsafe void Rematch(GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch match, Action<bool, GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch> callback)
 		{
 			callback = Callbacks.AsOnGameThreadCallback<bool, GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch>(callback);
-			_003CRematch_003Ec__AnonStorey839 _003CRematch_003Ec__AnonStorey;
+			_003CRematch_003Ec__AnonStorey843 _003CRematch_003Ec__AnonStorey;
 			FindEqualVersionMatch(match, delegate
 			{
 				callback.Invoke(false, (GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch)null);

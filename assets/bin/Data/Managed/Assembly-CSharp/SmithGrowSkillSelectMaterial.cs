@@ -157,8 +157,8 @@ public class SmithGrowSkillSelectMaterial : GameSection
 		m_generatedIconList.Clear();
 		UpdateNewIconInfo();
 		int base_item_index = Array.FindIndex(inventory.datas, (SortCompareData data) => data.GetUniqID() == skillItem.uniqueID);
-		_003CUpdateInventory_003Ec__AnonStorey472 _003CUpdateInventory_003Ec__AnonStorey;
-		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, false, new Func<int, bool>((object)_003CUpdateInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateInventory_003Ec__AnonStorey47A _003CUpdateInventory_003Ec__AnonStorey47A;
+		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, false, new Func<int, bool>((object)_003CUpdateInventory_003Ec__AnonStorey47A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateInventory_003Ec__AnonStorey47A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void InitInventory()

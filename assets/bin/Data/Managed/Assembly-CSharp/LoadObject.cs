@@ -181,6 +181,11 @@ public class LoadObject
 		return ResourceUtility.Realizes(loadedObject, parent, layer);
 	}
 
+	public static Transform RealizesWithGameObject(GameObject gameObj, Transform parent = null, int layer = -1)
+	{
+		return ResourceUtility.Realizes(gameObj, parent, layer);
+	}
+
 	public virtual GameObject PopInstantiatedGameObject()
 	{
 		return null;

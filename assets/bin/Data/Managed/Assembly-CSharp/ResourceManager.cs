@@ -999,7 +999,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 					load_objects[i2] = object_cache_category.Get(res_name);
 					if (load_objects[i2] == null)
 					{
-						load_objects[i2] = cache.systemCaches.Find((ResourceObject o) => o.obj.get_name() == ((_003CDoLoad_003Ec__Iterator281)/*Error near IL_04da: stateMachine*/)._003Cres_name_003E__19);
+						load_objects[i2] = cache.systemCaches.Find((ResourceObject o) => o.obj.get_name() == ((_003CDoLoad_003Ec__Iterator282)/*Error near IL_04da: stateMachine*/)._003Cres_name_003E__19);
 					}
 					if (load_objects[i2] != null)
 					{
@@ -1420,7 +1420,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 							{
 								if (o != null)
 								{
-									((_003CDoLoad_003Ec__Iterator281)/*Error near IL_17c8: stateMachine*/)._003Cload_objects_003E__9[((_003CDoLoad_003Ec__Iterator281)/*Error near IL_17c8: stateMachine*/)._003Ci_003E__45] = ResourceObject.Get(((_003CDoLoad_003Ec__Iterator281)/*Error near IL_17c8: stateMachine*/).request.category, ((_003CDoLoad_003Ec__Iterator281)/*Error near IL_17c8: stateMachine*/).request.resourceNames[((_003CDoLoad_003Ec__Iterator281)/*Error near IL_17c8: stateMachine*/)._003Ci_003E__45], o);
+									((_003CDoLoad_003Ec__Iterator282)/*Error near IL_17bc: stateMachine*/)._003Cload_objects_003E__9[((_003CDoLoad_003Ec__Iterator282)/*Error near IL_17bc: stateMachine*/)._003Ci_003E__45] = ResourceObject.Get(((_003CDoLoad_003Ec__Iterator282)/*Error near IL_17bc: stateMachine*/).request.category, ((_003CDoLoad_003Ec__Iterator282)/*Error near IL_17bc: stateMachine*/).request.resourceNames[((_003CDoLoad_003Ec__Iterator282)/*Error near IL_17bc: stateMachine*/)._003Ci_003E__45], o);
 								}
 							}));
 							enableLoadDirect = save_enableLoadDirect;
@@ -1736,7 +1736,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	public bool IsCached(string dependency)
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		if (manifest == null)
 		{
 			return false;
@@ -1780,20 +1780,20 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		return array;
 	}
 
-	private bool IsVersionCached(string filename, Hash128 hash)
+	public static bool IsVersionCached(string filename, Hash128 hash)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		string cachePath = GetCachePath(filename, hash);
 		return File.Exists(cachePath);
 	}
 
-	private string GetCachePath(string filename, Hash128 hash)
+	public static string GetCachePath(string filename, Hash128 hash)
 	{
 		string cacheDir = GetCacheDir(filename);
 		return Path.Combine(cacheDir, filename + "." + hash.ToString());
 	}
 
-	private string GetCacheDir(string filename)
+	public static string GetCacheDir(string filename)
 	{
 		string path = ((byte)(filename.GetHashCode() % 256)).ToString("X2");
 		return Path.Combine(cacheDir, path);
@@ -1801,7 +1801,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	private Error SaveAssetBundle(string filename, Hash128 hash, byte[] bytes)
 	{
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
 		if (bytes.Length != 0)
 		{
 			Error result = Error.None;
@@ -1901,11 +1901,11 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 				{
 					yield return (object)ExternalResources.LoadAsync<Object>(path2, (Action<ResourceRequest>)delegate(ResourceRequest progress)
 					{
-						((_003CLoadDirect_003Ec__Iterator283)/*Error near IL_01c2: stateMachine*/).request.progressObject = progress;
+						((_003CLoadDirect_003Ec__Iterator284)/*Error near IL_01c2: stateMachine*/).request.progressObject = progress;
 					}, (Action<Object>)delegate(Object asset)
 					{
-						((_003CLoadDirect_003Ec__Iterator283)/*Error near IL_01ce: stateMachine*/).request.progressObject = PROGRESS_COMPLATE;
-						((_003CLoadDirect_003Ec__Iterator283)/*Error near IL_01ce: stateMachine*/)._003Cload_object_003E__1 = asset;
+						((_003CLoadDirect_003Ec__Iterator284)/*Error near IL_01ce: stateMachine*/).request.progressObject = PROGRESS_COMPLATE;
+						((_003CLoadDirect_003Ec__Iterator284)/*Error near IL_01ce: stateMachine*/)._003Cload_object_003E__1 = asset;
 					});
 				}
 				else

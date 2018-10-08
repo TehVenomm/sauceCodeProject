@@ -623,7 +623,7 @@ jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i'
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115381650.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1731295355.run(Unknown Source)
 Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in fallback mode
 	at jadx.core.codegen.InsnGen.fallbackOnlyInsn(InsnGen.java:537)
 	at jadx.core.codegen.InsnGen.makeInsnBody(InsnGen.java:509)
@@ -665,7 +665,7 @@ jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i'
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115381650.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1731295355.run(Unknown Source)
 Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in fallback mode
 	at jadx.core.codegen.InsnGen.fallbackOnlyInsn(InsnGen.java:537)
 	at jadx.core.codegen.InsnGen.makeInsnBody(InsnGen.java:509)
@@ -707,7 +707,7 @@ jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i'
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115381650.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1731295355.run(Unknown Source)
 Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in fallback mode
 	at jadx.core.codegen.InsnGen.fallbackOnlyInsn(InsnGen.java:537)
 	at jadx.core.codegen.InsnGen.makeInsnBody(InsnGen.java:509)
@@ -725,7 +725,7 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                                     for (i = 
 /*
 Method generation error in method: org.apache.commons.lang3.ArrayUtils.reverse(double[], int, int):void, dex: classes.dex
-jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r7_2 'i' int) = (r7_0 'i' int), (r7_1 'i' int) binds: {(r7_0 'i' int)=B:1:0x0003, (r7_1 'i' int)=B:2:0x0005} in method: org.apache.commons.lang3.ArrayUtils.reverse(double[], int, int):void, dex: classes.dex
+jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r7_2 'i' int) = (r7_0 'i' int), (r7_1 'i' int) binds: {(r7_1 'i' int)=B:2:0x0005, (r7_0 'i' int)=B:1:0x0003} in method: org.apache.commons.lang3.ArrayUtils.reverse(double[], int, int):void, dex: classes.dex
 	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:226)
 	at jadx.core.codegen.RegionGen.makeLoop(RegionGen.java:184)
 	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:61)
@@ -749,7 +749,7 @@ jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r7_2 'i'
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115381650.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1731295355.run(Unknown Source)
 Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in fallback mode
 	at jadx.core.codegen.InsnGen.fallbackOnlyInsn(InsnGen.java:537)
 	at jadx.core.codegen.InsnGen.makeInsnBody(InsnGen.java:509)
@@ -767,7 +767,7 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                                             for (i = 
 /*
 Method generation error in method: org.apache.commons.lang3.ArrayUtils.reverse(float[], int, int):void, dex: classes.dex
-jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i' int) = (r4_0 'i' int), (r4_1 'i' int) binds: {(r4_0 'i' int)=B:1:0x0003, (r4_1 'i' int)=B:2:0x0005} in method: org.apache.commons.lang3.ArrayUtils.reverse(float[], int, int):void, dex: classes.dex
+jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i' int) = (r4_0 'i' int), (r4_1 'i' int) binds: {(r4_1 'i' int)=B:2:0x0005, (r4_0 'i' int)=B:1:0x0003} in method: org.apache.commons.lang3.ArrayUtils.reverse(float[], int, int):void, dex: classes.dex
 	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:226)
 	at jadx.core.codegen.RegionGen.makeLoop(RegionGen.java:184)
 	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:61)
@@ -791,7 +791,7 @@ jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i'
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115381650.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1731295355.run(Unknown Source)
 Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in fallback mode
 	at jadx.core.codegen.InsnGen.fallbackOnlyInsn(InsnGen.java:537)
 	at jadx.core.codegen.InsnGen.makeInsnBody(InsnGen.java:509)
@@ -809,7 +809,7 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                                                     for (i = 
 /*
 Method generation error in method: org.apache.commons.lang3.ArrayUtils.reverse(int[], int, int):void, dex: classes.dex
-jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i' int) = (r4_0 'i' int), (r4_1 'i' int) binds: {(r4_1 'i' int)=B:2:0x0005, (r4_0 'i' int)=B:1:0x0003} in method: org.apache.commons.lang3.ArrayUtils.reverse(int[], int, int):void, dex: classes.dex
+jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i' int) = (r4_0 'i' int), (r4_1 'i' int) binds: {(r4_0 'i' int)=B:1:0x0003, (r4_1 'i' int)=B:2:0x0005} in method: org.apache.commons.lang3.ArrayUtils.reverse(int[], int, int):void, dex: classes.dex
 	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:226)
 	at jadx.core.codegen.RegionGen.makeLoop(RegionGen.java:184)
 	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:61)
@@ -833,7 +833,7 @@ jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i'
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115381650.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1731295355.run(Unknown Source)
 Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in fallback mode
 	at jadx.core.codegen.InsnGen.fallbackOnlyInsn(InsnGen.java:537)
 	at jadx.core.codegen.InsnGen.makeInsnBody(InsnGen.java:509)
@@ -851,7 +851,7 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                                                             for (i = 
 /*
 Method generation error in method: org.apache.commons.lang3.ArrayUtils.reverse(long[], int, int):void, dex: classes.dex
-jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r7_2 'i' int) = (r7_0 'i' int), (r7_1 'i' int) binds: {(r7_0 'i' int)=B:1:0x0003, (r7_1 'i' int)=B:2:0x0005} in method: org.apache.commons.lang3.ArrayUtils.reverse(long[], int, int):void, dex: classes.dex
+jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r7_2 'i' int) = (r7_0 'i' int), (r7_1 'i' int) binds: {(r7_1 'i' int)=B:2:0x0005, (r7_0 'i' int)=B:1:0x0003} in method: org.apache.commons.lang3.ArrayUtils.reverse(long[], int, int):void, dex: classes.dex
 	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:226)
 	at jadx.core.codegen.RegionGen.makeLoop(RegionGen.java:184)
 	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:61)
@@ -875,7 +875,7 @@ jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r7_2 'i'
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115381650.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1731295355.run(Unknown Source)
 Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in fallback mode
 	at jadx.core.codegen.InsnGen.fallbackOnlyInsn(InsnGen.java:537)
 	at jadx.core.codegen.InsnGen.makeInsnBody(InsnGen.java:509)
@@ -917,7 +917,7 @@ jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i'
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115381650.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1731295355.run(Unknown Source)
 Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in fallback mode
 	at jadx.core.codegen.InsnGen.fallbackOnlyInsn(InsnGen.java:537)
 	at jadx.core.codegen.InsnGen.makeInsnBody(InsnGen.java:509)
@@ -935,7 +935,7 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                                                                             for (i = 
 /*
 Method generation error in method: org.apache.commons.lang3.ArrayUtils.reverse(short[], int, int):void, dex: classes.dex
-jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i' int) = (r4_0 'i' int), (r4_1 'i' int) binds: {(r4_0 'i' int)=B:1:0x0003, (r4_1 'i' int)=B:2:0x0005} in method: org.apache.commons.lang3.ArrayUtils.reverse(short[], int, int):void, dex: classes.dex
+jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i' int) = (r4_0 'i' int), (r4_1 'i' int) binds: {(r4_1 'i' int)=B:2:0x0005, (r4_0 'i' int)=B:1:0x0003} in method: org.apache.commons.lang3.ArrayUtils.reverse(short[], int, int):void, dex: classes.dex
 	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:226)
 	at jadx.core.codegen.RegionGen.makeLoop(RegionGen.java:184)
 	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:61)
@@ -959,7 +959,7 @@ jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i'
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115381650.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1731295355.run(Unknown Source)
 Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in fallback mode
 	at jadx.core.codegen.InsnGen.fallbackOnlyInsn(InsnGen.java:537)
 	at jadx.core.codegen.InsnGen.makeInsnBody(InsnGen.java:509)
@@ -2244,23 +2244,23 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                                                                                     return clone((Object[]) tArr);
                                                                                 }
                                                                                 int i;
-                                                                                Object key;
                                                                                 HashMap hashMap = new HashMap(tArr2.length);
-                                                                                for (Object key2 : tArr2) {
-                                                                                    MutableInt mutableInt = (MutableInt) hashMap.get(key2);
+                                                                                for (Object obj : tArr2) {
+                                                                                    Object obj2;
+                                                                                    MutableInt mutableInt = (MutableInt) hashMap.get(obj2);
                                                                                     if (mutableInt == null) {
-                                                                                        hashMap.put(key2, new MutableInt(1));
+                                                                                        hashMap.put(obj2, new MutableInt(1));
                                                                                     } else {
                                                                                         mutableInt.increment();
                                                                                     }
                                                                                 }
                                                                                 BitSet bitSet = new BitSet();
                                                                                 for (Entry entry : hashMap.entrySet()) {
-                                                                                    key2 = entry.getKey();
+                                                                                    obj2 = entry.getKey();
                                                                                     int intValue = ((MutableInt) entry.getValue()).intValue();
                                                                                     i = 0;
                                                                                     for (int i2 = 0; i2 < intValue; i2++) {
-                                                                                        int indexOf = indexOf((Object[]) tArr, key2, i);
+                                                                                        int indexOf = indexOf((Object[]) tArr, obj2, i);
                                                                                         if (indexOf < 0) {
                                                                                             break;
                                                                                         }
@@ -2561,14 +2561,14 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
 
                                                                             static Object removeAll(Object obj, int... iArr) {
                                                                                 int i;
-                                                                                int length = getLength(obj);
                                                                                 int i2;
+                                                                                int length = getLength(obj);
                                                                                 int length2;
                                                                                 if (isNotEmpty(iArr)) {
                                                                                     Arrays.sort(iArr);
-                                                                                    i2 = length;
+                                                                                    i = length;
                                                                                     length2 = iArr.length;
-                                                                                    i = 0;
+                                                                                    i2 = 0;
                                                                                     while (true) {
                                                                                         int i3 = length2 - 1;
                                                                                         if (i3 < 0) {
@@ -2576,30 +2576,30 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                                                                                         }
                                                                                         length2 = iArr[i3];
                                                                                         if (length2 >= 0 && length2 < length) {
-                                                                                            if (length2 >= i2) {
+                                                                                            if (length2 >= i) {
                                                                                                 length2 = i3;
                                                                                             } else {
-                                                                                                i++;
-                                                                                                i2 = length2;
+                                                                                                i2++;
+                                                                                                i = length2;
                                                                                                 length2 = i3;
                                                                                             }
                                                                                         }
                                                                                     }
                                                                                     throw new IndexOutOfBoundsException("Index: " + length2 + ", Length: " + length);
                                                                                 }
-                                                                                i = 0;
-                                                                                Object newInstance = Array.newInstance(obj.getClass().getComponentType(), length - i);
-                                                                                if (i < length) {
-                                                                                    i = length - i;
-                                                                                    i2 = iArr.length - 1;
-                                                                                    while (i2 >= 0) {
-                                                                                        length2 = iArr[i2];
+                                                                                i2 = 0;
+                                                                                Object newInstance = Array.newInstance(obj.getClass().getComponentType(), length - i2);
+                                                                                if (i2 < length) {
+                                                                                    i2 = length - i2;
+                                                                                    i = iArr.length - 1;
+                                                                                    while (i >= 0) {
+                                                                                        length2 = iArr[i];
                                                                                         if (length - length2 > 1) {
                                                                                             length = (length - length2) - 1;
-                                                                                            i -= length;
-                                                                                            System.arraycopy(obj, length2 + 1, newInstance, i, length);
+                                                                                            i2 -= length;
+                                                                                            System.arraycopy(obj, length2 + 1, newInstance, i2, length);
                                                                                         }
-                                                                                        i2--;
+                                                                                        i--;
                                                                                         length = length2;
                                                                                     }
                                                                                     if (length > 0) {

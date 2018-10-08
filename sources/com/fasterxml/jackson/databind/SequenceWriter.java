@@ -182,9 +182,9 @@ public class SequenceWriter implements Versioned, Closeable, Flushable {
     }
 
     protected SequenceWriter _writeCloseableValue(Object obj, JavaType javaType) throws IOException {
+        Closeable closeable;
         Throwable th;
-        Closeable closeable = (Closeable) obj;
-        Closeable closeable2;
+        Closeable closeable2 = (Closeable) obj;
         try {
             JsonSerializer serializerFor = this._dynamicSerializers.serializerFor(javaType.getRawClass());
             if (serializerFor == null) {
@@ -194,21 +194,21 @@ public class SequenceWriter implements Versioned, Closeable, Flushable {
             if (this._cfgFlush) {
                 this._generator.flush();
             }
-            closeable2 = null;
+            closeable = null;
             try {
-                closeable.close();
-                if (closeable2 != null) {
+                closeable2.close();
+                if (closeable != null) {
                     try {
-                        closeable2.close();
+                        closeable.close();
                     } catch (IOException e) {
                     }
                 }
                 return this;
             } catch (Throwable th2) {
                 th = th2;
-                if (closeable2 != null) {
+                if (closeable != null) {
                     try {
-                        closeable2.close();
+                        closeable.close();
                     } catch (IOException e2) {
                     }
                 }
@@ -216,10 +216,10 @@ public class SequenceWriter implements Versioned, Closeable, Flushable {
             }
         } catch (Throwable th3) {
             Throwable th4 = th3;
-            closeable2 = closeable;
+            closeable = closeable2;
             th = th4;
-            if (closeable2 != null) {
-                closeable2.close();
+            if (closeable != null) {
+                closeable.close();
             }
             throw th;
         }

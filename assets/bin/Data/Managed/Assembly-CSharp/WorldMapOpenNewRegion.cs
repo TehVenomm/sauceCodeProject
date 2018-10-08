@@ -374,8 +374,8 @@ public class WorldMapOpenNewRegion : GameSection
 		{
 			to = data[toRegionID].iconPos;
 		}
-		_003COnOpen_003Ec__AnonStorey4A4 _003COnOpen_003Ec__AnonStorey4A;
-		FadeInMap(new Action((object)_003COnOpen_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003COnOpen_003Ec__AnonStorey4AC _003COnOpen_003Ec__AnonStorey4AC;
+		FadeInMap(new Action((object)_003COnOpen_003Ec__AnonStorey4AC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		base.collectUI = base._transform;
 		base.OnOpen();
 	}
@@ -449,8 +449,8 @@ public class WorldMapOpenNewRegion : GameSection
 		{
 			uiMapSprite.get_gameObject().SetActive(true);
 		}
-		_003CFadeInMap_003Ec__AnonStorey4A5 _003CFadeInMap_003Ec__AnonStorey4A;
-		this.StartCoroutine(DoFadeMap(0f, 1f, 0.4f, new Action((object)_003CFadeInMap_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+		_003CFadeInMap_003Ec__AnonStorey4AD _003CFadeInMap_003Ec__AnonStorey4AD;
+		this.StartCoroutine(DoFadeMap(0f, 1f, 0.4f, new Action((object)_003CFadeInMap_003Ec__AnonStorey4AD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 
 	private IEnumerator DoFadeMap(float from, float to, float time, Action onComplete)

@@ -781,45 +781,45 @@ public class HomeLoginBonusTheater : GameSection
 
 	public void PreInitialize()
 	{
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
 		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Expected O, but got Unknown
-		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0169: Expected O, but got Unknown
+		//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
 		//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
 		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c2: Expected O, but got Unknown
-		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c6: Expected O, but got Unknown
+		//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0221: Unknown result type (might be due to invalid IL or missing references)
 		HomeCamera homeCamera = null;
 		HomeNPCCharacter homeNPCCharacter = null;
 		HomeNPCCharacter homeNPCCharacter2 = null;
@@ -841,8 +841,6 @@ public class HomeLoginBonusTheater : GameSection
 			homeSelfCharacter = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara;
 			list = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.charas;
 		}
-		homeCamera.LateUpdate();
-		homeCamera.targetCamera.set_fieldOfView(19f);
 		HomeSelfCharacter.CTRL = false;
 		OutGameSettingsManager.LoginBonusScene loginBonusScene = MonoBehaviourSingleton<OutGameSettingsManager>.I.loginBonusScene;
 		Vector3 npc00CameraPos = loginBonusScene.npc00CameraPos;
@@ -851,6 +849,7 @@ public class HomeLoginBonusTheater : GameSection
 		previousCameraRotation = homeCamera.targetCamera.get_transform().get_rotation();
 		homeCamera.targetCamera.get_transform().set_localPosition(npc00CameraPos);
 		homeCamera.targetCamera.get_transform().set_localRotation(localRotation);
+		homeCamera.targetCamera.set_fieldOfView(MonoBehaviourSingleton<OutGameSettingsManager>.I.loginBonusScene.cameraFov);
 		if (null != homeNPCCharacter)
 		{
 			Transform val = homeNPCCharacter.get_transform();
@@ -918,7 +917,6 @@ public class HomeLoginBonusTheater : GameSection
 			npc0 = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.GetHomeNPCCharacter(0);
 			npc = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.GetHomeNPCCharacter(6);
 		}
-		homeCamera.targetCamera.set_fieldOfView(19f);
 		MonoBehaviourSingleton<AccountManager>.I.DisplayLogInBonusSection();
 		LoadingQueue loadQueue = new LoadingQueue(this);
 		LoadObject boardLO = loadQueue.Load(RESOURCE_CATEGORY.ITEM_MODEL, "LIB_00000001", false);
@@ -958,11 +956,11 @@ public class HomeLoginBonusTheater : GameSection
 				{
 					if (0 < o.reward.Count && 0 < o.count && 9 >= o.count)
 					{
-						GetIconName(o.reward[0], out ((_003CDoInitialize_003Ec__Iterator99)/*Error near IL_0382: stateMachine*/)._003CiconName_003E__21, out ((_003CDoInitialize_003Ec__Iterator99)/*Error near IL_0382: stateMachine*/)._003CiconBGName_003E__22);
-						((_003CDoInitialize_003Ec__Iterator99)/*Error near IL_0382: stateMachine*/)._003CitemIconLOs_003E__19[o.count - 1] = ((_003CDoInitialize_003Ec__Iterator99)/*Error near IL_0382: stateMachine*/)._003CloadQueue_003E__3.LoadItemIcon(((_003CDoInitialize_003Ec__Iterator99)/*Error near IL_0382: stateMachine*/)._003CiconName_003E__21);
-						if (string.Empty != ((_003CDoInitialize_003Ec__Iterator99)/*Error near IL_0382: stateMachine*/)._003CiconBGName_003E__22)
+						GetIconName(o.reward[0], out ((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CiconName_003E__21, out ((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CiconBGName_003E__22);
+						((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CitemIconLOs_003E__19[o.count - 1] = ((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CloadQueue_003E__3.LoadItemIcon(((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CiconName_003E__21);
+						if (string.Empty != ((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CiconBGName_003E__22)
 						{
-							((_003CDoInitialize_003Ec__Iterator99)/*Error near IL_0382: stateMachine*/)._003CitemBGIconLOs_003E__20[o.count - 1] = ((_003CDoInitialize_003Ec__Iterator99)/*Error near IL_0382: stateMachine*/)._003CloadQueue_003E__3.LoadItemIcon(((_003CDoInitialize_003Ec__Iterator99)/*Error near IL_0382: stateMachine*/)._003CiconBGName_003E__22);
+							((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CitemBGIconLOs_003E__20[o.count - 1] = ((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CloadQueue_003E__3.LoadItemIcon(((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_036d: stateMachine*/)._003CiconBGName_003E__22);
 						}
 					}
 				});
@@ -1102,7 +1100,7 @@ public class HomeLoginBonusTheater : GameSection
 				fsmList_.Add(new FSMCamera());
 				fsmList_.ForEach(delegate(FSM o)
 				{
-					o.Init(((_003CDoInitialize_003Ec__Iterator99)/*Error near IL_0e0b: stateMachine*/)._003C_003Ef__this.fsmInfo_);
+					o.Init(((_003CDoInitialize_003Ec__Iterator9A)/*Error near IL_0df6: stateMachine*/)._003C_003Ef__this.fsmInfo_);
 				});
 				mainAction_ = new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 				base.Initialize();

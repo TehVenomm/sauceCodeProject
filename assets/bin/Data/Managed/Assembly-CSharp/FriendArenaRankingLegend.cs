@@ -111,8 +111,8 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 				item_num = info.Length;
 			}
 		}
-		_003CUpdateDynamicList_003Ec__AnonStorey302 _003CUpdateDynamicList_003Ec__AnonStorey;
-		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateDynamicList_003Ec__AnonStorey30A _003CUpdateDynamicList_003Ec__AnonStorey30A;
+		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey30A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void SetArenaName(Transform t, int index)
@@ -122,8 +122,8 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey303 _003CSendGetList_003Ec__AnonStorey;
-		MonoBehaviourSingleton<FriendManager>.I.SendGetLegendRanking(new Action<bool, List<ArenaLegendRankingModel.Param>>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendGetList_003Ec__AnonStorey30B _003CSendGetList_003Ec__AnonStorey30B;
+		MonoBehaviourSingleton<FriendManager>.I.SendGetLegendRanking(new Action<bool, List<ArenaLegendRankingModel.Param>>((object)_003CSendGetList_003Ec__AnonStorey30B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public override void OnQuery_FOLLOW_INFO()

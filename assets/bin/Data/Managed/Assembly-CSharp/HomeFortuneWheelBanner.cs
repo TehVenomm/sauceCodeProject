@@ -1,3 +1,7 @@
-public class HomeFortuneWheelBanner : GameSection
+public class HomeFortuneWheelBanner : BaseBanner
 {
+	private enum UI
+	{
+		BANNER
+	}
 }

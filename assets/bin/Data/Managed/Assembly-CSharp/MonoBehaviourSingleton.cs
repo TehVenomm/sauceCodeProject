@@ -58,6 +58,19 @@ public class MonoBehaviourSingleton<T> : DisableNotifyMonoBehaviour where T : Di
 		return false;
 	}
 
+	protected void SelfInstance()
+	{
+		instance = (this as T);
+	}
+
+	protected void RemoveInstance()
+	{
+		if (instance == this as T)
+		{
+			instance = (T)null;
+		}
+	}
+
 	public static bool IsValid()
 	{
 		return instance != null;

@@ -194,6 +194,10 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 				break;
 			case TYPE.LOADING:
 				MonoBehaviourSingleton<UIManager>.I.loading.ShowTips(false);
+				if (MonoBehaviourSingleton<UIManager>.I.isShowingGGTutorialMessage)
+				{
+					MonoBehaviourSingleton<UIManager>.I.HideGGTutorialMessage();
+				}
 				FadeIn(0.25f);
 				break;
 			case TYPE.AUTO_EVENT:

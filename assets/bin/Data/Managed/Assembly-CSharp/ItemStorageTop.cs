@@ -666,8 +666,8 @@ public class ItemStorageTop : SkillInfoBase
 		SetActive((Enum)UI.BTN_CHANGE, flag2);
 		SetActive((Enum)UI.SPR_INVALID_CHANGE, !flag2);
 		int sortedItemCount = 0;
-		_003CUpdateUI_003Ec__AnonStorey38D _003CUpdateUI_003Ec__AnonStorey38D;
-		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, false, new Func<int, bool>((object)_003CUpdateUI_003Ec__AnonStorey38D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey38D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateUI_003Ec__AnonStorey395 _003CUpdateUI_003Ec__AnonStorey;
+		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, false, new Func<int, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (tab == TAB_MODE.EQUIP || tab == TAB_MODE.SKILL)
 		{
 			if (isSellMode)

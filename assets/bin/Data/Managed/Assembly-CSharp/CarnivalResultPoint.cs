@@ -371,7 +371,7 @@ public class CarnivalResultPoint : GameSection
 		SetActive((Enum)UI.BTN_OK, false);
 		InitTween((Enum)UI.OBJ_GET_REWARD_ROOT);
 		PointEventCurrentData.PointResultData data = currentData.pointRankingData;
-		_003CSetRewardUI_003Ec__AnonStorey420 _003CSetRewardUI_003Ec__AnonStorey;
+		_003CSetRewardUI_003Ec__AnonStorey428 _003CSetRewardUI_003Ec__AnonStorey;
 		SetGrid(UI.GRD_POINT_DETAIL, "CarnivalResultPointDetailItem", data.bonusPoint.Count, true, new Action<int, Transform, bool>((object)_003CSetRewardUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		MonoBehaviourSingleton<GuildRequestManager>.I.isCompleteMulti = false;
 		SetLabelText((Enum)UI.LBL_GET_POINT, data.getPoint.ToString("N0"));
@@ -444,7 +444,7 @@ public class CarnivalResultPoint : GameSection
 
 	private unsafe void SetNextItemIcon(List<PointEventCurrentData.Reward> reward)
 	{
-		_003CSetNextItemIcon_003Ec__AnonStorey421 _003CSetNextItemIcon_003Ec__AnonStorey;
+		_003CSetNextItemIcon_003Ec__AnonStorey429 _003CSetNextItemIcon_003Ec__AnonStorey;
 		SetDynamicList((Enum)UI.OBJ_NEXT_REWARD_ITEM_ICON_ROOT, "ItemIcon", reward.Count, true, null, null, new Action<int, Transform, bool>((object)_003CSetNextItemIcon_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -492,8 +492,8 @@ public class CarnivalResultPoint : GameSection
 
 	private unsafe void SetAllRewardItem(UI targetGrid, List<PointEventCurrentData.Reward> rewardList)
 	{
-		_003CSetAllRewardItem_003Ec__AnonStorey422 _003CSetAllRewardItem_003Ec__AnonStorey;
-		SetGrid(targetGrid, "ItemIconReward", rewardList.Count, true, new Action<int, Transform, bool>((object)_003CSetAllRewardItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSetAllRewardItem_003Ec__AnonStorey42A _003CSetAllRewardItem_003Ec__AnonStorey42A;
+		SetGrid(targetGrid, "ItemIconReward", rewardList.Count, true, new Action<int, Transform, bool>((object)_003CSetAllRewardItem_003Ec__AnonStorey42A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void SetPoint(UI parent, int point)

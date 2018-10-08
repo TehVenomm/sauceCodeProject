@@ -14,8 +14,8 @@ public class UIToggledComponents
 	[HideInInspector]
 	private MonoBehaviour target;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool inverse;
 
 	public UIToggledComponents()

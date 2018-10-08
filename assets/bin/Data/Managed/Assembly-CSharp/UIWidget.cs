@@ -2,8 +2,8 @@ using System;
 using System.Diagnostics;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/NGUI Widget")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/NGUI Widget")]
 public class UIWidget : UIRect
 {
 	public enum Pivot
@@ -32,24 +32,24 @@ public class UIWidget : UIRect
 
 	public delegate bool HitCheck(Vector3 worldPos);
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected Color mColor = Color.get_white();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected Pivot mPivot = Pivot.Center;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected int mWidth = 100;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected int mHeight = 100;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected int mDepth;
 
 	public OnDimensionsChanged onChange;
@@ -791,8 +791,8 @@ public class UIWidget : UIRect
 		return (num != 0) ? num : PanelCompareFunc(left, right);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static int PanelCompareFunc(UIWidget left, UIWidget right)
 	{
 		if (left.mDepth < right.mDepth)

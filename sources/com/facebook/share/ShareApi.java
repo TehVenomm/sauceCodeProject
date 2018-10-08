@@ -431,8 +431,8 @@ public final class ShareApi {
         }
         Callback anonymousClass12 = new Callback() {
             public void onCompleted(GraphResponse graphResponse) {
-                FacebookRequestError error = graphResponse.getError();
                 String errorMessage;
+                FacebookRequestError error = graphResponse.getError();
                 if (error != null) {
                     errorMessage = error.getErrorMessage();
                     if (errorMessage == null) {

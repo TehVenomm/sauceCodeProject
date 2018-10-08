@@ -2,7 +2,7 @@ using Network;
 
 public class HomeCharaListModel : BaseModel
 {
-	public static string URL = "ajax/home/charalist";
+	public const string URL = "ajax/home/charalist";
 
-	public HomeCharaInfoList result = new HomeCharaInfoList();
+	public readonly HomeCharaInfoList result = new HomeCharaInfoList();
 }

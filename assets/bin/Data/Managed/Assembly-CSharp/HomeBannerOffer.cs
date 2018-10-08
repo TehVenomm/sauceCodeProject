@@ -1,3 +1,7 @@
-public class HomeBannerOffer : GameSection
+public class HomeBannerOffer : BaseBanner
 {
+	private enum UI
+	{
+		BANNER
+	}
 }

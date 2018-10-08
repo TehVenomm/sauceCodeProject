@@ -471,13 +471,13 @@ public final class C1074c extends AdapterView {
                 }
                 if (childCount > 0) {
                     this.f1207g = i5 + this.f1207g;
-                    i6 = this.f1207g;
-                    for (i5 = 0; i5 < childCount; i5++) {
-                        View childAt = getChildAt(i5);
-                        int paddingLeft = getPaddingLeft() + i6;
+                    i5 = this.f1207g;
+                    for (i6 = 0; i6 < childCount; i6++) {
+                        View childAt = getChildAt(i6);
+                        int paddingLeft = getPaddingLeft() + i5;
                         int paddingTop = getPaddingTop();
                         childAt.layout(paddingLeft, paddingTop, childAt.getMeasuredWidth() + paddingLeft, childAt.getMeasuredHeight() + paddingTop);
-                        i6 += childAt.getMeasuredWidth() + this.f1212l;
+                        i5 += childAt.getMeasuredWidth() + this.f1212l;
                     }
                 }
                 this.f1203c = this.f1204d;

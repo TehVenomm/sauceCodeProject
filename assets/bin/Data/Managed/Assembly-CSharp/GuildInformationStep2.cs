@@ -65,6 +65,14 @@ public class GuildInformationStep2 : GameSection
 		levelNames.Add("150");
 		levelNames.Add("250");
 		levelIndex = 0;
+		for (int i = 0; i < levelNames.Count; i++)
+		{
+			if (int.Parse(levelNames[i]) == mCreateRequest.GuildMinLevel)
+			{
+				levelIndex = i;
+				break;
+			}
+		}
 		spriteMapNames = new List<string>();
 		spriteMapNames.Add("temp_map1");
 		spriteMapNames.Add("temp_map2");
@@ -80,8 +88,8 @@ public class GuildInformationStep2 : GameSection
 		SetTouchAndRelease((Enum)UI.BTN_INFO, "TYPE_INFO_SHOW", "TYPE_INFO_HIDE", (object)null);
 		SetActive((Enum)UI.SPR_TYPE_INFO, false);
 		SetSupportEncoding(UI.STR_TYPE_INFOR, true);
-		mCreateRequest.SetGuildType(GuildManager.GUILD_TYPE.PUBLIC);
-		mCreateRequest.SetGuildMinLevel(int.Parse(levelNames[0]));
+		mCreateRequest.SetGuildType(mCreateRequest.GuildType);
+		mCreateRequest.SetGuildMinLevel(int.Parse(levelNames[levelIndex]));
 	}
 
 	public override void UpdateUI()

@@ -39,8 +39,8 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal unsafe static IntPtr ToIntPtr<T, P>(Action<T, P> callback, Func<IntPtr, P> conversionFunction) where P : BaseReferenceHolder
 		{
-			_003CToIntPtr_003Ec__AnonStorey83F<T, P> _003CToIntPtr_003Ec__AnonStorey83F;
-			Action<T, IntPtr> callback2 = new Action<_003F, IntPtr>((object)_003CToIntPtr_003Ec__AnonStorey83F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CToIntPtr_003Ec__AnonStorey849<T, P> _003CToIntPtr_003Ec__AnonStorey;
+			Action<T, IntPtr> callback2 = new Action<_003F, IntPtr>((object)_003CToIntPtr_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			return ToIntPtr((Delegate)callback2);
 		}
 
@@ -163,16 +163,16 @@ namespace GooglePlayGames.Native.PInvoke
 				//IL_002c: Expected O, but got Unknown
 				if (toInvokeOnGameThread != null)
 				{
-					_003CAsOnGameThreadCallback_003Ec__AnonStorey840<T>._003CAsOnGameThreadCallback_003Ec__AnonStorey841 _003CAsOnGameThreadCallback_003Ec__AnonStorey;
-					PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CAsOnGameThreadCallback_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					_003CAsOnGameThreadCallback_003Ec__AnonStorey84A<T>._003CAsOnGameThreadCallback_003Ec__AnonStorey84B _003CAsOnGameThreadCallback_003Ec__AnonStorey84B;
+					PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CAsOnGameThreadCallback_003Ec__AnonStorey84B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 			};
 		}
 
 		internal unsafe static Action<T1, T2> AsOnGameThreadCallback<T1, T2>(Action<T1, T2> toInvokeOnGameThread)
 		{
-			_003CAsOnGameThreadCallback_003Ec__AnonStorey842<T1, T2> _003CAsOnGameThreadCallback_003Ec__AnonStorey;
-			return new Action<_003F, _003F>((object)_003CAsOnGameThreadCallback_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CAsOnGameThreadCallback_003Ec__AnonStorey84C<T1, T2> _003CAsOnGameThreadCallback_003Ec__AnonStorey84C;
+			return new Action<_003F, _003F>((object)_003CAsOnGameThreadCallback_003Ec__AnonStorey84C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 
 		internal static void AsCoroutine(IEnumerator routine)

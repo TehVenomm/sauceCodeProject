@@ -17,7 +17,6 @@ public class DefaultEquipmentCollectionService implements EquipmentCollectionSer
     public static final DefaultEquipmentCollectionService INSTANCE = new DefaultEquipmentCollectionService();
 
     public EquipmentCollectionResponse getEquipmentCollection(String str) throws IOException, HttpException {
-        JsonReader jsonReader;
         HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(String.format(Locale.ENGLISH, "%s/hunters/%s/equipmentCollection", new Object[]{ServiceConstants.BASE_URL, str})).openConnection();
         try {
             httpURLConnection.setRequestMethod(HttpRequest.METHOD_GET);
@@ -25,6 +24,7 @@ public class DefaultEquipmentCollectionService implements EquipmentCollectionSer
             httpURLConnection.setReadTimeout(30000);
             if (HttpUtils.isSuccessful(httpURLConnection.getResponseCode())) {
                 InputStream inputStream = httpURLConnection.getInputStream();
+                JsonReader jsonReader;
                 try {
                     jsonReader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
                     EquipmentCollectionResponse equipmentCollectionResponse = new EquipmentCollectionResponse(jsonReader);

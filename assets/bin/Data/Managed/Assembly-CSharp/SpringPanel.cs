@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[RequireComponent(typeof(UIPanel))]
 [AddComponentMenu("NGUI/Internal/Spring Panel")]
+[RequireComponent(typeof(UIPanel))]
 public class SpringPanel
 {
 	public delegate void OnFinished();

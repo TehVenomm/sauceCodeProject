@@ -110,6 +110,8 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	private List<AtlasEntry> atlases = new List<AtlasEntry>();
 
+	public bool isShowingGGTutorialMessage;
+
 	private float showGGTutorialMessageTime;
 
 	public bool isLoading
@@ -469,36 +471,48 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	protected override void Awake()
 	{
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Expected O, but got Unknown
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Expected O, but got Unknown
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ba: Expected O, but got Unknown
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f7: Expected O, but got Unknown
+		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016d: Expected O, but got Unknown
-		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01be: Expected O, but got Unknown
-		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d4: Expected O, but got Unknown
-		//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f3: Expected O, but got Unknown
-		//IL_020f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0241: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0255: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025a: Expected O, but got Unknown
-		//IL_025f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0264: Expected O, but got Unknown
+		//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b9: Expected O, but got Unknown
+		//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020b: Expected O, but got Unknown
+		//IL_021c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0221: Expected O, but got Unknown
+		//IL_023b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0240: Expected O, but got Unknown
+		//IL_025c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a7: Expected O, but got Unknown
+		//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b1: Expected O, but got Unknown
 		base.Awake();
 		uiRoot = this.GetComponent<UIRoot>();
-		UIVirtualScreen.InitUIRoot(uiRoot);
+		UIVirtualScreen.InitUIRoot(uiRoot, false);
 		uiCamera = uiRoot.GetComponentInChildren<Camera>();
+		if (FixedPanelNGUI.IsIphoneX())
+		{
+			float offseMoveHeightIfIphoneX = FixedPanelNGUI.GetOffseMoveHeightIfIphoneX((float)uiRoot.manualHeight);
+			Transform transform = uiCamera.get_transform();
+			transform.set_localPosition(transform.get_localPosition() + offseMoveHeightIfIphoneX / 2f * Vector3.get_up());
+		}
 		cameras = (Camera[])new Camera[1]
 		{
 			uiCamera
@@ -695,7 +709,7 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	private void OnScreenRotate(bool is_portrait)
 	{
-		UIVirtualScreen.InitUIRoot(uiRoot);
+		UIVirtualScreen.InitUIRoot(uiRoot, false);
 		uiList.ForEach(delegate(UIBehaviour o)
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
@@ -1144,12 +1158,14 @@ public class UIManager : MonoBehaviourSingleton<UIManager>
 
 	public void ShowGGTutorialMessage()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		isShowingGGTutorialMessage = true;
 		this.StartCoroutine("ShowGGTutorialMessage_");
 	}
 
 	public void HideGGTutorialMessage()
 	{
+		isShowingGGTutorialMessage = false;
 		this.StopCoroutine("ShowGGTutorialMessage_");
 		loading.HideTutorialMsg();
 		showGGTutorialMessageTime = 0f;

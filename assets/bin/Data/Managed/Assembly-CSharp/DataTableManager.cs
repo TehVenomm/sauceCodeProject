@@ -243,8 +243,8 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		int reqCount = list.Count;
 		foreach (DataLoadRequest item2 in list)
 		{
-			_003CLoadInitialTable_003Ec__AnonStorey703 _003CLoadInitialTable_003Ec__AnonStorey;
-			item2.onComplete += new Action((object)_003CLoadInitialTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CLoadInitialTable_003Ec__AnonStorey70C _003CLoadInitialTable_003Ec__AnonStorey70C;
+			item2.onComplete += new Action((object)_003CLoadInitialTable_003Ec__AnonStorey70C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 		Request(list);
 		return list;
@@ -317,8 +317,8 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		int reqCount = list.Count;
 		foreach (DataLoadRequest item2 in list)
 		{
-			_003CLoadAllTable_003Ec__AnonStorey704 _003CLoadAllTable_003Ec__AnonStorey;
-			item2.onComplete += new Action((object)_003CLoadAllTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CLoadAllTable_003Ec__AnonStorey70D _003CLoadAllTable_003Ec__AnonStorey70D;
+			item2.onComplete += new Action((object)_003CLoadAllTable_003Ec__AnonStorey70D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 		Request(list);
 		return list;
@@ -420,7 +420,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0069: Expected O, but got Unknown
 		DataLoadRequest req = new DataLoadRequest(name, hash, directory, downloadOnly);
-		_003CCreateRequest_003Ec__AnonStorey707 _003CCreateRequest_003Ec__AnonStorey;
+		_003CCreateRequest_003Ec__AnonStorey710 _003CCreateRequest_003Ec__AnonStorey;
 		req.onVerifyError += new Func<string, bool>((object)_003CCreateRequest_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		req.onError += delegate(DataTableLoadError error)
 		{

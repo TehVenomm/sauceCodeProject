@@ -83,7 +83,7 @@ public class HomeInfoModel : BaseModel
 		public bool isWheelOfFortuneOn = true;
 	}
 
-	public static string URL = "ajax/home/info";
+	public const string URL = "ajax/home/info";
 
-	public Param result = new Param();
+	public readonly Param result = new Param();
 }

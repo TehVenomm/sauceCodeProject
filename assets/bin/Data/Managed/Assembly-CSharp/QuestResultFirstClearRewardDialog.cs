@@ -33,8 +33,8 @@ public class QuestResultFirstClearRewardDialog : ItemSellConfirm
 			reward_num++;
 		}
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		_003CDrawIcon_003Ec__AnonStorey424 _003CDrawIcon_003Ec__AnonStorey;
-		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CDrawIcon_003Ec__AnonStorey42C _003CDrawIcon_003Ec__AnonStorey42C;
+		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey42C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override int GetSellGold()

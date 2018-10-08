@@ -192,8 +192,8 @@ public class QuestChallengeSelect : GameSection
 			Array.Copy(challengeList.ToArray(), num, challengeData, 0, num2);
 			bool isGuildRequest = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "GuildRequestChallengeCounter";
 			UIScrollView scrollView = GetCtrl(UI.SCR_ORDER_QUEST).GetComponent<UIScrollView>();
-			_003CShowChallenge_003Ec__AnonStorey356 _003CShowChallenge_003Ec__AnonStorey;
-			SetGrid(UI.GRD_ORDER_QUEST, "QuestListChallengeItem", challengeData.Length, isResetUI, new Func<int, Transform, Transform>((object)_003CShowChallenge_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CShowChallenge_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CShowChallenge_003Ec__AnonStorey35E _003CShowChallenge_003Ec__AnonStorey35E;
+			SetGrid(UI.GRD_ORDER_QUEST, "QuestListChallengeItem", challengeData.Length, isResetUI, new Func<int, Transform, Transform>((object)_003CShowChallenge_003Ec__AnonStorey35E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CShowChallenge_003Ec__AnonStorey35E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -215,7 +215,7 @@ public class QuestChallengeSelect : GameSection
 		//IL_0045: Expected O, but got Unknown
 		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005c: Expected O, but got Unknown
-		_003CPanelToStatic_003Ec__AnonStorey359 _003CPanelToStatic_003Ec__AnonStorey;
+		_003CPanelToStatic_003Ec__AnonStorey361 _003CPanelToStatic_003Ec__AnonStorey;
 		if (icon.isIconLoaded)
 		{
 			uiPanel.widgetsAreStatic = false;
@@ -295,11 +295,11 @@ public class QuestChallengeSelect : GameSection
 				{
 					for (int i = 0; i < challengeQuest.remainTimes.Count; i++)
 					{
-						((_003CCheckLimitQuestItem_003Ec__Iterator84)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 = challengeQuest.remainTimes[i];
-						if (!(((_003CCheckLimitQuestItem_003Ec__Iterator84)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 <= 0f) && ((_003CCheckLimitQuestItem_003Ec__Iterator84)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 > ((_003CCheckLimitQuestItem_003Ec__Iterator84)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3)
+						((_003CCheckLimitQuestItem_003Ec__Iterator85)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 = challengeQuest.remainTimes[i];
+						if (!(((_003CCheckLimitQuestItem_003Ec__Iterator85)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 <= 0f) && ((_003CCheckLimitQuestItem_003Ec__Iterator85)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 > ((_003CCheckLimitQuestItem_003Ec__Iterator85)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3)
 						{
-							((_003CCheckLimitQuestItem_003Ec__Iterator84)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 = ((_003CCheckLimitQuestItem_003Ec__Iterator84)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3;
-							((_003CCheckLimitQuestItem_003Ec__Iterator84)/*Error near IL_007f: stateMachine*/)._003CquestData_003E__2 = challengeQuest;
+							((_003CCheckLimitQuestItem_003Ec__Iterator85)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 = ((_003CCheckLimitQuestItem_003Ec__Iterator85)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3;
+							((_003CCheckLimitQuestItem_003Ec__Iterator85)/*Error near IL_007f: stateMachine*/)._003CquestData_003E__2 = challengeQuest;
 						}
 					}
 				});

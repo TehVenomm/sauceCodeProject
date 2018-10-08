@@ -45,8 +45,8 @@ public class ShopGachaEquipListTop : GameSection
 		object[] array = (object[])GameSection.GetEventData();
 		uint materialID = (uint)array[0];
 		CreateEquipItemTable.CreateEquipItemData[] equipItems = Singleton<CreateEquipItemTable>.I.GetSortedCreateEquipItemsByPart(materialID);
-		_003CUpdateUI_003Ec__AnonStorey444 _003CUpdateUI_003Ec__AnonStorey;
-		SetTable(UI.TBL_LIST, "GachaEquipItem", equipItems.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateUI_003Ec__AnonStorey44C _003CUpdateUI_003Ec__AnonStorey44C;
+		SetTable(UI.TBL_LIST, "GachaEquipItem", equipItems.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey44C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void SetItemIcon(uint itemID, Transform trans, UI target)

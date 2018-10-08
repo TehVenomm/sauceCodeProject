@@ -74,8 +74,8 @@ public final class FileUtils {
     }
 
     public static void copyFromAsset(Context context, String str, File file) throws IOException {
-        OutputStream fileOutputStream;
         Throwable th;
+        OutputStream fileOutputStream;
         try {
             fileOutputStream = new FileOutputStream(file);
             try {
@@ -118,11 +118,11 @@ public final class FileUtils {
 
     public static void gzipCopyFromAsset(Context context, String str, File file) throws IOException {
         InputStream open;
-        OutputStream fileOutputStream;
         Throwable th;
         Throwable th2;
         try {
             InputStream gZIPInputStream;
+            OutputStream fileOutputStream;
             open = context.getAssets().open(str);
             try {
                 if (str.endsWith(".gz")) {

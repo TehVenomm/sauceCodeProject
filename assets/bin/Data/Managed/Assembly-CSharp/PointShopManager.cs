@@ -12,7 +12,7 @@ public class PointShopManager
 
 	public void SendGetPointShops(Action<bool, List<PointShop>> call_back)
 	{
-		Protocol.Send(PointShopModel.URL, null, delegate(PointShopModel ret)
+		Protocol.Send("ajax/pointshop/list", null, delegate(PointShopModel ret)
 		{
 			bool flag = false;
 			if (ret.Error == Error.None)

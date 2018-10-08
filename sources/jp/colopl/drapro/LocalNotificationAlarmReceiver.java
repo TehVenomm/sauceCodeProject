@@ -23,7 +23,7 @@ public class LocalNotificationAlarmReceiver extends BroadcastReceiver {
         int intExtra = intent.getIntExtra("id", 0);
         CharSequence stringExtra = intent.getStringExtra("title");
         CharSequence stringExtra2 = intent.getStringExtra(EXTRA_BODY);
-        int intExtra2 = intent.getIntExtra(EXTRA_SMALLICON, 0);
+        int identifier = context.getResources().getIdentifier("push_icon", "drawable", context.getPackageName());
         Class cls = (Class) intent.getSerializableExtra(EXTRA_ACTIVITY);
         PendingIntent activity = PendingIntent.getActivity(context, 0, new Intent(context, StartActivity.class), 0);
         Bitmap decodeResource = BitmapFactory.decodeResource(context.getResources(), context.getResources().getIdentifier("app_icon", "drawable", context.getPackageName()));
@@ -32,6 +32,6 @@ public class LocalNotificationAlarmReceiver extends BroadcastReceiver {
         if (decodeResource.getWidth() > dimensionPixelSize || decodeResource.getHeight() > dimensionPixelSize2) {
             decodeResource = Bitmap.createScaledBitmap(decodeResource, dimensionPixelSize, dimensionPixelSize2, true);
         }
-        ((NotificationManager) context.getSystemService("notification")).notify(intExtra, new Builder(context).setTicker(stringExtra).setContentTitle(stringExtra).setContentText(stringExtra2).setSmallIcon(intExtra2).setLargeIcon(decodeResource).setContentIntent(activity).setDefaults(1).setAutoCancel(true).build());
+        ((NotificationManager) context.getSystemService("notification")).notify(intExtra, new Builder(context).setTicker(stringExtra).setContentTitle(stringExtra).setContentText(stringExtra2).setSmallIcon(identifier).setLargeIcon(decodeResource).setContentIntent(activity).setDefaults(1).setAutoCancel(true).build());
     }
 }

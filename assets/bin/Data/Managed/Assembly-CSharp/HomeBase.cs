@@ -49,6 +49,12 @@ public abstract class HomeBase : GameSection
 
 	private Transform mdlArrow;
 
+	private static bool _isHomeInfoCached;
+
+	private static int _taskBadgeNum;
+
+	private static bool _acquireLoginBonus;
+
 	private List<LoginBonus> limitedLoginBonus;
 
 	private bool triger_tutorial_gacha_1;
@@ -184,7 +190,7 @@ public abstract class HomeBase : GameSection
 		MonoBehaviourSingleton<StatusManager>.I.SetUserStatus();
 		if (MonoBehaviourSingleton<SmithManager>.IsValid())
 		{
-			MonoBehaviourSingleton<SmithManager>.I.CreateBadgeData(true);
+			MonoBehaviourSingleton<SmithManager>.I.CreateBadgeData(false);
 		}
 		SetupNotice();
 		if (MonoBehaviourSingleton<ShopManager>.IsValid() && !MonoBehaviourSingleton<ShopManager>.I.HasCheckPromotionItem)
@@ -375,15 +381,7 @@ public abstract class HomeBase : GameSection
 		{
 			if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.blackMarkeButton != null && TutorialStep.HasAllTutorialCompleted())
 			{
-				if (!MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.isOpen)
-				{
-					MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.ResetMarketTime();
-					MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.Open(UITransition.TYPE.OPEN);
-				}
-				else if (MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.isOpen)
-				{
-					MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.ResetMarketTime();
-				}
+				MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.ResetMarketTime();
 			}
 		}
 		else if ((flags & NOTIFY_FLAG.UPDATE_TASK_LIST) != (NOTIFY_FLAG)0L)
@@ -478,7 +476,7 @@ public abstract class HomeBase : GameSection
 			bool wait = true;
 			fieldRewardPool.SendFieldDrop(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator74)/*Error near IL_0112: stateMachine*/)._003Cwait_003E__1 = false;
+				((_003CDoInitialize_003Ec__Iterator74)/*Error near IL_010e: stateMachine*/)._003Cwait_003E__1 = false;
 			});
 			while (wait)
 			{
@@ -499,44 +497,29 @@ public abstract class HomeBase : GameSection
 		}
 		SetIconAndBalloon();
 		SetUpBonusTime();
-		bool wait_guild = true;
-		GuildItemManager.I.Init(new Action((object)/*Error near IL_0214: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-		bool wait_info = true;
+		bool waitGuild = true;
+		GuildItemManager.I.Init(new Action((object)/*Error near IL_0210: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		bool waitInfo = true;
 		MonoBehaviourSingleton<GuildManager>.I.SendClanInfo(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator74)/*Error near IL_0231: stateMachine*/)._003Cwait_info_003E__3 = false;
+			((_003CDoInitialize_003Ec__Iterator74)/*Error near IL_022d: stateMachine*/)._003CwaitInfo_003E__3 = false;
 		});
-		while (wait_guild || wait_info)
+		while (waitGuild || waitInfo)
 		{
 			yield return (object)null;
 		}
 		MonoBehaviourSingleton<GuildManager>.I.GetClanStat(null);
-		if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level >= 15)
-		{
-			SetActive((Enum)UI.OBJ_GUILD, true);
-		}
-		else
-		{
-			SetActive((Enum)UI.OBJ_GUILD, false);
-		}
+		SetActive((Enum)UI.OBJ_GUILD, (int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level >= 15);
 		if (!MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite)
 		{
-			bool wait_clan_invite = true;
-			MonoBehaviourSingleton<GuildManager>.I.SendInvitedGuild(delegate
-			{
-				((_003CDoInitialize_003Ec__Iterator74)/*Error near IL_02dc: stateMachine*/)._003Cwait_clan_invite_003E__4 = false;
-			}, true);
-			while (wait_clan_invite)
-			{
-				yield return (object)null;
-			}
+			MonoBehaviourSingleton<GuildManager>.I.SendInvitedGuild(null, true);
 		}
 		if (!MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite)
 		{
 			bool wait_clan_donate_invite = true;
 			MonoBehaviourSingleton<GuildManager>.I.SendDonateInvitationList(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator74)/*Error near IL_032d: stateMachine*/)._003Cwait_clan_donate_invite_003E__5 = false;
+				((_003CDoInitialize_003Ec__Iterator74)/*Error near IL_02da: stateMachine*/)._003Cwait_clan_donate_invite_003E__4 = false;
 			}, true);
 			while (wait_clan_donate_invite)
 			{
@@ -643,7 +626,42 @@ public abstract class HomeBase : GameSection
 		}
 	}
 
-	protected abstract IEnumerator SendHomeInfo();
+	protected unsafe virtual IEnumerator SendHomeInfo()
+	{
+		bool wait = true;
+		if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP))
+		{
+			if (_isHomeInfoCached)
+			{
+				SetBadge(GetCtrl(UI.BTN_MISSION), _taskBadgeNum, 1, 8, -8, false);
+				if (_acquireLoginBonus && MonoBehaviourSingleton<AccountManager>.IsValid())
+				{
+					MonoBehaviourSingleton<AccountManager>.I.SendLogInBonus(delegate
+					{
+						((_003CSendHomeInfo_003Ec__Iterator78)/*Error near IL_0081: stateMachine*/)._003Cwait_003E__0 = false;
+						MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(new Action<bool, bool, int>((object)/*Error near IL_0081: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					});
+				}
+				else
+				{
+					wait = false;
+					MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(new Action<bool, bool, int>((object)/*Error near IL_00a3: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				}
+			}
+			else
+			{
+				MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(new Action<bool, bool, int>((object)/*Error near IL_00be: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			}
+		}
+		else
+		{
+			MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(new Action<bool, bool, int>((object)/*Error near IL_00d9: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		}
+		while (wait)
+		{
+			yield return (object)null;
+		}
+	}
 
 	protected abstract IEnumerator WaitLoadHomeCharacters();
 
@@ -1009,16 +1027,16 @@ public abstract class HomeBase : GameSection
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
 			List<GuildRequestItem> guildRequestItemList = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList;
-			if (_003C_003Ef__am_0024cache3A == null)
+			if (_003C_003Ef__am_0024cache3D == null)
 			{
-				_003C_003Ef__am_0024cache3A = new Func<GuildRequestItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				_003C_003Ef__am_0024cache3D = new Func<GuildRequestItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			}
-			IEnumerable<GuildRequestItem> source = guildRequestItemList.Where(_003C_003Ef__am_0024cache3A);
-			if (_003C_003Ef__am_0024cache3B == null)
+			IEnumerable<GuildRequestItem> source = guildRequestItemList.Where(_003C_003Ef__am_0024cache3D);
+			if (_003C_003Ef__am_0024cache3E == null)
 			{
-				_003C_003Ef__am_0024cache3B = new Func<GuildRequestItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				_003C_003Ef__am_0024cache3E = new Func<GuildRequestItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			}
-			int num = source.Where(_003C_003Ef__am_0024cache3B).Count();
+			int num = source.Where(_003C_003Ef__am_0024cache3E).Count();
 			SetBadge(GetCtrl(UI.BTN_GUILD_REQUEST), num, 3, -8, -8, false);
 		}
 	}
@@ -1334,10 +1352,7 @@ public abstract class HomeBase : GameSection
 		if (MonoBehaviourSingleton<UserInfoManager>.I.needBlackMarketNotifi)
 		{
 			MonoBehaviourSingleton<UserInfoManager>.I.needBlackMarketNotifi = false;
-			if (MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.isOpen)
-			{
-				MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 37u), string.Empty);
-			}
+			MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 37u), string.Empty);
 		}
 		return false;
 	}
@@ -1435,14 +1450,7 @@ public abstract class HomeBase : GameSection
 		}
 		if (TutorialStep.HasAllTutorialCompleted())
 		{
-			if (!string.IsNullOrEmpty(GameSaveData.instance.resetMarketTime))
-			{
-				int num = (int)GoGameTimeManager.GetRemainTime(GameSaveData.instance.resetMarketTime).TotalSeconds;
-				if (num > 0)
-				{
-					MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.Open(UITransition.TYPE.OPEN);
-				}
-			}
+			MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.Open(UITransition.TYPE.OPEN);
 			if (GameSaveData.instance.canShowWheelFortune)
 			{
 				MonoBehaviourSingleton<UIManager>.I.fortuneWheelButton.Open(UITransition.TYPE.OPEN);
@@ -1976,11 +1984,11 @@ public abstract class HomeBase : GameSection
 		GameSection.StayEvent();
 		DeliveryManager i = MonoBehaviourSingleton<DeliveryManager>.I;
 		int scriptId = num;
-		if (_003C_003Ef__am_0024cache3C == null)
+		if (_003C_003Ef__am_0024cache3F == null)
 		{
-			_003C_003Ef__am_0024cache3C = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003C_003Ef__am_0024cache3F = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		i.SendReadStoryRead(scriptId, _003C_003Ef__am_0024cache3C);
+		i.SendReadStoryRead(scriptId, _003C_003Ef__am_0024cache3F);
 	}
 
 	private void OnQuery_TO_GIFTBOX()
@@ -2076,7 +2084,7 @@ public abstract class HomeBase : GameSection
 					Network.EventData firstEvent = validBingoDataListInSection[0];
 					List<DeliveryTable.DeliveryData> deliveryTableDataList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryTableDataList(false);
 					List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
-					_003COnQuery_BINGO_003Ec__AnonStorey350 _003COnQuery_BINGO_003Ec__AnonStorey;
+					_003COnQuery_BINGO_003Ec__AnonStorey358 _003COnQuery_BINGO_003Ec__AnonStorey;
 					int num = deliveryTableDataList.Where(new Func<DeliveryTable.DeliveryData, bool>((object)_003COnQuery_BINGO_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 					int num2 = 0;
 					for (int i = 0; i < clearStatusDelivery.Count; i++)

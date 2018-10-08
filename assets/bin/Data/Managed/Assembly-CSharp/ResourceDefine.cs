@@ -1,6 +1,6 @@
 public static class ResourceDefine
 {
-	public static readonly ResourceManager.CATEGORY_TYPE[] types = new ResourceManager.CATEGORY_TYPE[86]
+	public static readonly ResourceManager.CATEGORY_TYPE[] types = new ResourceManager.CATEGORY_TYPE[87]
 	{
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
@@ -77,6 +77,7 @@ public static class ResourceDefine
 		ResourceManager.CATEGORY_TYPE.FOLDER,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.FOLDER,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
@@ -90,8 +91,9 @@ public static class ResourceDefine
 		ResourceManager.CATEGORY_TYPE.SINGLE
 	};
 
-	public static readonly string[] suffix = new string[86]
+	public static readonly string[] suffix = new string[87]
 	{
+		string.Empty,
 		string.Empty,
 		string.Empty,
 		string.Empty,
@@ -180,7 +182,7 @@ public static class ResourceDefine
 		string.Empty
 	};
 
-	public static readonly string[][] rootPaths = new string[86][]
+	public static readonly string[][] rootPaths = new string[87][]
 	{
 		new string[1]
 		{
@@ -505,6 +507,10 @@ public static class ResourceDefine
 		},
 		new string[1]
 		{
+			"assets/app/external/externalresources/stage/light/"
+		},
+		new string[1]
+		{
 			"assets/app/external/externalresources/story/location/image/"
 		},
 		new string[1]
@@ -563,7 +569,7 @@ public static class ResourceDefine
 		}
 	};
 
-	public static readonly string[][] variants = new string[86][]
+	public static readonly string[][] variants = new string[87][]
 	{
 		new string[1]
 		{
@@ -914,6 +920,10 @@ public static class ResourceDefine
 		{
 			string.Empty
 		},
+		new string[1]
+		{
+			string.Empty
+		},
 		new string[8]
 		{
 			"en-sd",
@@ -946,7 +956,7 @@ public static class ResourceDefine
 		}
 	};
 
-	public static readonly string[][] subPaths = new string[86][]
+	public static readonly string[][] subPaths = new string[87][]
 	{
 		new string[1]
 		{
@@ -964,7 +974,7 @@ public static class ResourceDefine
 		{
 			"assets/app/external/externalresources/arena/aric/"
 		},
-		new string[9]
+		new string[10]
 		{
 			"assets/app/external/externalresources/common/cic/",
 			"assets/app/external/externalresources/common/dic/",
@@ -974,7 +984,8 @@ public static class ResourceDefine
 			"assets/app/external/externalresources/common/pbg/",
 			"assets/app/external/externalresources/common/pbi/",
 			"assets/app/external/externalresources/common/pic/",
-			"assets/app/external/externalresources/common/pig/"
+			"assets/app/external/externalresources/common/pig/",
+			"assets/app/external/externalresources/common/texture/"
 		},
 		new string[1]
 		{
@@ -1351,6 +1362,10 @@ public static class ResourceDefine
 		new string[1]
 		{
 			"assets/app/external/externalresources/stage/sky/"
+		},
+		new string[1]
+		{
+			"assets/app/external/externalresources/stage/light/"
 		},
 		new string[1]
 		{
@@ -1753,7 +1768,7 @@ public static class ResourceDefine
 		}
 	};
 
-	public static readonly string[][] exts = new string[86][]
+	public static readonly string[][] exts = new string[87][]
 	{
 		new string[1]
 		{
@@ -2066,6 +2081,11 @@ public static class ResourceDefine
 		new string[1]
 		{
 			".prefab"
+		},
+		new string[2]
+		{
+			".asset",
+			".exr"
 		},
 		new string[1]
 		{

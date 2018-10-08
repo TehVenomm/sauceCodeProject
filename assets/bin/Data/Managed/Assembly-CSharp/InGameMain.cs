@@ -129,11 +129,11 @@ public class InGameMain : GameSection
 			bool isWaitQuestLoad = true;
 			if (MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo())
 			{
-				CoopApp.EnterArenaQuestOffline(new Action<bool, bool, bool, bool>((object)/*Error near IL_00d3: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				CoopApp.EnterArenaQuestOffline(new Action<bool, bool, bool, bool>((object)/*Error near IL_00cf: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			else if (MonoBehaviourSingleton<StatusManager>.IsValid() && MonoBehaviourSingleton<StatusManager>.I.assignedCharaInfo != null && MonoBehaviourSingleton<StatusManager>.I.assignedEquipmentData != null)
 			{
-				CoopApp.EnterQuestOfflineAssignedEquipment(null, null, new Action<bool, bool, bool, bool>((object)/*Error near IL_0113: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				CoopApp.EnterQuestOfflineAssignedEquipment(null, null, new Action<bool, bool, bool, bool>((object)/*Error near IL_010f: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			while (isWaitQuestLoad)
 			{
@@ -234,7 +234,7 @@ public class InGameMain : GameSection
 					cutScenePlayer = questControllerObj.AddComponent<CutScenePlayer>();
 					cutScenePlayer.Init(path, delegate
 					{
-						((_003CDoInitialize_003Ec__IteratorCB)/*Error near IL_04e0: stateMachine*/)._003Cwait_003E__12 = false;
+						((_003CDoInitialize_003Ec__IteratorCB)/*Error near IL_04dc: stateMachine*/)._003Cwait_003E__12 = false;
 					});
 					while (wait)
 					{
@@ -354,10 +354,10 @@ public class InGameMain : GameSection
 		}
 		if (MonoBehaviourSingleton<StageManager>.I.isValidInside)
 		{
-			goto IL_0abe;
+			goto IL_0aba;
 		}
-		goto IL_0abe;
-		IL_0abe:
+		goto IL_0aba;
+		IL_0aba:
 		if (MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
 			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.SetLoadingPer(40);
@@ -669,18 +669,13 @@ public class InGameMain : GameSection
 		{
 			MonoBehaviourSingleton<UIPlayerStatus>.I.autoBattleButton.GetAutoPlayTime(delegate
 			{
-				((_003CDoInitialize_003Ec__IteratorCB)/*Error near IL_18ec: stateMachine*/)._003CwaitGetAutoTime_003E__70 = false;
+				((_003CDoInitialize_003Ec__IteratorCB)/*Error near IL_18e8: stateMachine*/)._003CwaitGetAutoTime_003E__70 = false;
 			});
 		}
 		while (waitGetAutoTime)
 		{
 			yield return (object)null;
 		}
-		while (!MonoBehaviourSingleton<UIManager>.I.canHideGGTutorialMessage(5f))
-		{
-			yield return (object)null;
-		}
-		MonoBehaviourSingleton<UIManager>.I.HideGGTutorialMessage();
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 3)
 		{
 			MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_mission_start, "Tutorial");
@@ -919,8 +914,8 @@ public class InGameMain : GameSection
 					Network.EventData firstEvent = validBingoDataListInSection[0];
 					List<DeliveryTable.DeliveryData> deliveryTableDataList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryTableDataList(false);
 					List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
-					_003COnQuery_BINGO_003Ec__AnonStorey398 _003COnQuery_BINGO_003Ec__AnonStorey;
-					int num = deliveryTableDataList.Where(new Func<DeliveryTable.DeliveryData, bool>((object)_003COnQuery_BINGO_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
+					_003COnQuery_BINGO_003Ec__AnonStorey3A0 _003COnQuery_BINGO_003Ec__AnonStorey3A;
+					int num = deliveryTableDataList.Where(new Func<DeliveryTable.DeliveryData, bool>((object)_003COnQuery_BINGO_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 					int num2 = 0;
 					for (int i = 0; i < clearStatusDelivery.Count; i++)
 					{
@@ -1374,8 +1369,8 @@ public class InGameMain : GameSection
 				component.bottomAnchor.Set(0f, num);
 				component.UpdateAnchors();
 				AppMain i = MonoBehaviourSingleton<AppMain>.I;
-				_003COnScreenRotate_003Ec__AnonStorey399 _003COnScreenRotate_003Ec__AnonStorey;
-				i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003COnScreenRotate_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003COnScreenRotate_003Ec__AnonStorey3A1 _003COnScreenRotate_003Ec__AnonStorey3A;
+				i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003COnScreenRotate_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}

@@ -595,7 +595,7 @@ public class SmithEvolve : EquipGenerateBase
 		if (adapterAbilityList.Count > 0 || abilityItem != null)
 		{
 			bool empty_ability = true;
-			_003CEquipTableParam_003Ec__AnonStorey461 _003CEquipTableParam_003Ec__AnonStorey;
+			_003CEquipTableParam_003Ec__AnonStorey469 _003CEquipTableParam_003Ec__AnonStorey;
 			SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", adapterAbilityList.Count + ((abilityItem != null) ? 1 : 0), false, new Action<int, Transform, bool>((object)_003CEquipTableParam_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			if (empty_ability)
 			{
@@ -689,8 +689,8 @@ public class SmithEvolve : EquipGenerateBase
 			SmithManager.ResultData result_data = new SmithManager.ResultData();
 			GameSection.SetEventData(result_data);
 			GameSection.StayEvent();
-			_003CSend_003Ec__AnonStorey463 _003CSend_003Ec__AnonStorey;
-			MonoBehaviourSingleton<SmithManager>.I.SendEvolveEquipItem(data.evolveData.evolveBeforeEquipData.uniqueID, data.evolveData.GetEvolveTable().id, selectedUniqueIdList, new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSend_003Ec__AnonStorey46B _003CSend_003Ec__AnonStorey46B;
+			MonoBehaviourSingleton<SmithManager>.I.SendEvolveEquipItem(data.evolveData.evolveBeforeEquipData.uniqueID, data.evolveData.GetEvolveTable().id, selectedUniqueIdList, new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey46B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -831,8 +831,8 @@ public class SmithEvolve : EquipGenerateBase
 			}
 		}
 		loader = itemModels[i].get_gameObject().AddComponent<ItemLoader>();
-		_003CLoadItemModelData_003Ec__AnonStorey464 _003CLoadItemModelData_003Ec__AnonStorey;
-		loader.LoadEquip(smithData.evolveData.evolveEquipDataTable[i].id, GetRenderTextureModelTransform(UI.TEX_MODEL), GetRenderTextureLayer(UI.TEX_MODEL), -1, -1, new Action((object)_003CLoadItemModelData_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CLoadItemModelData_003Ec__AnonStorey46C _003CLoadItemModelData_003Ec__AnonStorey46C;
+		loader.LoadEquip(smithData.evolveData.evolveEquipDataTable[i].id, GetRenderTextureModelTransform(UI.TEX_MODEL), GetRenderTextureLayer(UI.TEX_MODEL), -1, -1, new Action((object)_003CLoadItemModelData_003Ec__AnonStorey46C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void OnOpen()

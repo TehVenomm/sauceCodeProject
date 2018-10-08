@@ -110,7 +110,7 @@ public class HomeCountdown : GameSection
 		PlayAudio(AUDIO.START, 1.3f, false);
 		PlayTween((Enum)UI.OBJ_COUNTDOWN_ROOT, true, (EventDelegate.Callback)delegate
 		{
-			((_003CStartAnimation_003Ec__Iterator94)/*Error near IL_0062: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CStartAnimation_003Ec__Iterator95)/*Error near IL_0062: stateMachine*/)._003Cwait_003E__0 = false;
 		}, true, 0);
 		while (wait)
 		{
@@ -144,7 +144,7 @@ public class HomeCountdown : GameSection
 		bool wait = true;
 		PlayTween((Enum)UI.OBJ_COUNTDOWN_ROOT, false, (EventDelegate.Callback)delegate
 		{
-			((_003CEndAnimation_003Ec__Iterator96)/*Error near IL_0035: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CEndAnimation_003Ec__Iterator97)/*Error near IL_0035: stateMachine*/)._003Cwait_003E__0 = false;
 		}, true, 0);
 		while (wait)
 		{

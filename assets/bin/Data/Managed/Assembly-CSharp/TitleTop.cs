@@ -47,7 +47,7 @@ public class TitleTop : GameSection
 			bool wait = true;
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator179)/*Error near IL_004b: stateMachine*/)._003Cwait_003E__0 = false;
+				((_003CDoInitialize_003Ec__Iterator179)/*Error near IL_0045: stateMachine*/)._003Cwait_003E__0 = false;
 			}, false);
 			while (wait)
 			{
@@ -70,7 +70,7 @@ public class TitleTop : GameSection
 			if (director_t != null)
 			{
 				director = director_t.GetComponent<TutorialBossDirector>();
-				director.StartLogoAnimation(false, null, new Action((object)/*Error near IL_0163: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				director.StartLogoAnimation(false, null, new Action((object)/*Error near IL_015d: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>().set_enabled(false);
 			}
 			else
@@ -208,12 +208,12 @@ public class TitleTop : GameSection
 		isFirstBoot = false;
 	}
 
-	private bool CheckTitleSkip()
+	public static bool CheckTitleSkip()
 	{
-		if (MonoBehaviourSingleton<AccountManager>.I.account.IsRegist() && 1 <= MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep)
+		if (!MonoBehaviourSingleton<AccountManager>.I.account.IsRegist())
 		{
-			return true;
+			return false;
 		}
-		return false;
+		return 1 <= MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep;
 	}
 }

@@ -162,8 +162,8 @@ public class TutorialMessageTable : Singleton<TutorialMessageTable>, IDataTable
 	{
 		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0020: Expected O, but got Unknown
-		_003CSendTutorialBit_003Ec__AnonStorey7A3 _003CSendTutorialBit_003Ec__AnonStorey7A;
-		Protocol.Force(new Action((object)_003CSendTutorialBit_003Ec__AnonStorey7A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendTutorialBit_003Ec__AnonStorey7AD _003CSendTutorialBit_003Ec__AnonStorey7AD;
+		Protocol.Force(new Action((object)_003CSendTutorialBit_003Ec__AnonStorey7AD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public int[] GetTutorialIds()

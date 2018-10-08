@@ -2439,6 +2439,18 @@ public class Self : Player
 		arrowAimLesserCursorPos = vec;
 	}
 
+	public Vector3 GetArrowAimLesserCursorEffect()
+	{
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		if (arrowAimLesserCursorEffect != null)
+		{
+			return arrowAimLesserCursorEffect.get_transform().get_position();
+		}
+		return Vector3.get_zero();
+	}
+
 	public void SwitchAutoBattle(bool isTurnOn)
 	{
 		//IL_001e: Unknown result type (might be due to invalid IL or missing references)

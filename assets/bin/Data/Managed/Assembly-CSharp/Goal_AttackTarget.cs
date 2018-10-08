@@ -81,6 +81,10 @@ public class Goal_AttackTarget : GoalComposite
 				{
 					flag = (player.IsSpActionGaugeFullCharged() ? true : false);
 				}
+				else if (player.CheckAttackModeAndSpType(Player.ATTACK_MODE.ARROW, SP_ATTACK_TYPE.SOUL))
+				{
+					flag = true;
+				}
 			}
 			if (flag)
 			{

@@ -11,12 +11,12 @@ public class AtkAttribute
 	[Tooltip("炎")]
 	public float fire;
 
-	[Tooltip("氷")]
 	[FormerlySerializedAs("ice")]
+	[Tooltip("氷")]
 	public float water;
 
-	[FormerlySerializedAs("wind")]
 	[Tooltip("雷")]
+	[FormerlySerializedAs("wind")]
 	public float thunder;
 
 	[Tooltip("土")]

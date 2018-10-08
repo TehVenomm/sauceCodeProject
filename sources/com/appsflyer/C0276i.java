@@ -72,7 +72,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find block by offs
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115381650.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1731295355.run(Unknown Source)
 */
         /*
         r10 = this;
@@ -278,6 +278,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find block by offs
     /* renamed from: ॱ */
     static /* synthetic */ void m316(C0276i c0276i, Map map, Map map2, WeakReference weakReference) {
         Throwable e;
+        HttpURLConnection ॱ;
         if (weakReference.get() != null) {
             String obj = new StringBuilder().append(ServerConfigHandler.getUrl(f260)).append(((Context) weakReference.get()).getPackageName()).toString();
             SharedPreferences sharedPreferences = ((Context) weakReference.get()).getSharedPreferences("appsflyer-data", 0);
@@ -311,7 +312,6 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find block by offs
             }
             String jSONObject3 = jSONObject.toString();
             C0300y.m378().m391(obj, jSONObject3);
-            HttpURLConnection ॱ;
             try {
                 ॱ = C0276i.m315(jSONObject3, obj);
                 int i = -1;

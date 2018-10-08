@@ -173,6 +173,14 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 		ApplyStageMaterial();
 	}
 
+	public void InitializeScene()
+	{
+		ApplyScene(false);
+		ParseObjectName();
+		addWaveTargetList.Clear();
+		ApplyStageMaterial();
+	}
+
 	public void ApplyScene(bool isEditorAmbientColor)
 	{
 		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
@@ -395,5 +403,15 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 		{
 			objectsByProgress[progress].SetActive(true);
 		}
+	}
+
+	public void Self()
+	{
+		SelfInstance();
+	}
+
+	public void Remove()
+	{
+		RemoveInstance();
 	}
 }

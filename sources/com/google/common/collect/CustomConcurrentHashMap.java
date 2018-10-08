@@ -866,38 +866,38 @@ final class CustomConcurrentHashMap {
         }
 
         public boolean containsValue(Object obj) {
+            int i;
             boolean z = true;
-            int i = 0;
+            int i2 = 0;
             if (obj == null) {
                 throw new NullPointerException(Param.VALUE);
             }
-            int i2;
             Segment[] segmentArr = this.segments;
             int[] iArr = new int[segmentArr.length];
             for (int i3 = 0; i3 < 2; i3++) {
                 int i4 = 0;
-                for (i2 = 0; i2 < segmentArr.length; i2++) {
-                    int i5 = segmentArr[i2].count;
-                    i5 = segmentArr[i2].modCount;
-                    iArr[i2] = i5;
+                for (i = 0; i < segmentArr.length; i++) {
+                    int i5 = segmentArr[i].count;
+                    i5 = segmentArr[i].modCount;
+                    iArr[i] = i5;
                     i4 += i5;
-                    if (segmentArr[i2].containsValue(obj)) {
+                    if (segmentArr[i].containsValue(obj)) {
                         return true;
                     }
                 }
                 if (i4 != 0) {
-                    for (i2 = 0; i2 < segmentArr.length; i2++) {
-                        i4 = segmentArr[i2].count;
-                        if (iArr[i2] != segmentArr[i2].modCount) {
-                            i2 = 0;
+                    for (i = 0; i < segmentArr.length; i++) {
+                        i4 = segmentArr[i].count;
+                        if (iArr[i] != segmentArr[i].modCount) {
+                            i = 0;
                             break;
                         }
                     }
-                    i2 = true;
+                    i = true;
                 } else {
                     boolean z2 = true;
                 }
-                if (i2 != 0) {
+                if (i != 0) {
                     return false;
                 }
             }
@@ -911,17 +911,17 @@ final class CustomConcurrentHashMap {
                     }
                 }
                 z = false;
-                i2 = segmentArr.length;
-                while (i < i2) {
-                    segmentArr[i].unlock();
-                    i++;
+                i = segmentArr.length;
+                while (i2 < i) {
+                    segmentArr[i2].unlock();
+                    i2++;
                 }
                 return z;
             } catch (Throwable th) {
-                i2 = segmentArr.length;
-                while (i < i2) {
-                    segmentArr[i].unlock();
-                    i++;
+                i = segmentArr.length;
+                while (i2 < i) {
+                    segmentArr[i2].unlock();
+                    i2++;
                 }
             }
         }

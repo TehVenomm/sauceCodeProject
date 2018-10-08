@@ -17,8 +17,8 @@ public static class NGUIMath
 		return (val >= 0) ? ((val >= max) ? (max - 1) : val) : 0;
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static int RepeatIndex(int val, int max)
 	{
 		if (max < 1)
@@ -36,8 +36,8 @@ public static class NGUIMath
 		return val;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static float WrapAngle(float angle)
 	{
 		while (angle > 180f)
@@ -51,8 +51,8 @@ public static class NGUIMath
 		return angle;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static float Wrap01(float val)
 	{
 		return val - (float)Mathf.FloorToInt(val);
@@ -107,8 +107,8 @@ public static class NGUIMath
 		}
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static char DecimalToHexChar(int num)
 	{
 		if (num > 15)
@@ -138,15 +138,15 @@ public static class NGUIMath
 		return num.ToString("X6");
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static string DecimalToHex32(int num)
 	{
 		return num.ToString("X8");
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static int ColorToInt(Color c)
 	{
 		int num = 0;
@@ -156,8 +156,8 @@ public static class NGUIMath
 		return num | Mathf.RoundToInt(c.a * 255f);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static Color IntToColor(int val)
 	{
 		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
@@ -172,8 +172,8 @@ public static class NGUIMath
 		return black;
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static string IntToBinary(int val, int bits)
 	{
 		string text = string.Empty;

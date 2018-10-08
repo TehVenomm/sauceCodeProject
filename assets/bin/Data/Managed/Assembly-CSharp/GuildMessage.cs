@@ -1203,8 +1203,8 @@ public class GuildMessage : GameSection
 			if (!isRecycle)
 			{
 				ChatStampListItem chatStampListItem = item;
-				_003CInitStampItem_003Ec__AnonStorey337 _003CInitStampItem_003Ec__AnonStorey;
-				chatStampListItem.onButton = Delegate.Combine((Delegate)chatStampListItem.onButton, (Delegate)new Action((object)_003CInitStampItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CInitStampItem_003Ec__AnonStorey33F _003CInitStampItem_003Ec__AnonStorey33F;
+				chatStampListItem.onButton = Delegate.Combine((Delegate)chatStampListItem.onButton, (Delegate)new Action((object)_003CInitStampItem_003Ec__AnonStorey33F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}
@@ -1465,8 +1465,8 @@ public class GuildMessage : GameSection
 			RefreshUI();
 		}));
 		List<DonateInfo> donate_list = MonoBehaviourSingleton<GuildManager>.I.donateList;
-		_003CUpdateDonate_003Ec__AnonStorey33B _003CUpdateDonate_003Ec__AnonStorey33B;
-		SetGrid(UI.GRD_DONATE, "GuildMessageDonateListItem", donate_list.Count, true, new Action<int, Transform, bool>((object)_003CUpdateDonate_003Ec__AnonStorey33B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateDonate_003Ec__AnonStorey343 _003CUpdateDonate_003Ec__AnonStorey;
+		SetGrid(UI.GRD_DONATE, "GuildMessageDonateListItem", donate_list.Count, true, new Action<int, Transform, bool>((object)_003CUpdateDonate_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		SetActive((Enum)UI.LBL_NO_DONATE, donate_list.Count == 0);
 	}
 
@@ -1640,8 +1640,8 @@ public class GuildMessage : GameSection
 			stayEvent = true;
 			GameSceneEvent.Stay();
 		}
-		_003CRefreshClanPinData_003Ec__AnonStorey33D _003CRefreshClanPinData_003Ec__AnonStorey33D;
-		MonoBehaviourSingleton<GuildManager>.I.GetAllPinData(new Action<bool, GuildGetPinModel>((object)_003CRefreshClanPinData_003Ec__AnonStorey33D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CRefreshClanPinData_003Ec__AnonStorey345 _003CRefreshClanPinData_003Ec__AnonStorey;
+		MonoBehaviourSingleton<GuildManager>.I.GetAllPinData(new Action<bool, GuildGetPinModel>((object)_003CRefreshClanPinData_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnReceiveClanChatUnPin()
@@ -1904,8 +1904,8 @@ public class GuildMessage : GameSection
 		if (info != null && !(info.expired <= 0.0))
 		{
 			GameSection.StayEvent();
-			_003CSendPinDonate_003Ec__AnonStorey33F _003CSendPinDonate_003Ec__AnonStorey33F;
-			MonoBehaviourSingleton<GuildManager>.I.SendClanChatPin(0, info.id, string.Empty, 2, string.Empty, new Action<bool, GuildChatPinModel>((object)_003CSendPinDonate_003Ec__AnonStorey33F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSendPinDonate_003Ec__AnonStorey347 _003CSendPinDonate_003Ec__AnonStorey;
+			MonoBehaviourSingleton<GuildManager>.I.SendClanChatPin(0, info.id, string.Empty, 2, string.Empty, new Action<bool, GuildChatPinModel>((object)_003CSendPinDonate_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 

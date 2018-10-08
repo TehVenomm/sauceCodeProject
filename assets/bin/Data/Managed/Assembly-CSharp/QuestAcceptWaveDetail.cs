@@ -179,8 +179,8 @@ public class QuestAcceptWaveDetail : QuestDeliveryDetail
 		GameSection.StayEvent();
 		int retryCount = 0;
 		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 1);
-		_003COnQuery_MATCHING_003Ec__AnonStorey415 _003COnQuery_MATCHING_003Ec__AnonStorey;
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, false, new Action<bool, int, bool, float>((object)_003COnQuery_MATCHING_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003COnQuery_MATCHING_003Ec__AnonStorey41D _003COnQuery_MATCHING_003Ec__AnonStorey41D;
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, false, new Action<bool, int, bool, float>((object)_003COnQuery_MATCHING_003Ec__AnonStorey41D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private unsafe IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)

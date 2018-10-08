@@ -108,7 +108,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 		SetActive((Enum)UI.OBJ_FOLLOW_NUMBER_ROOT, false);
 		if (IsHideSwitchInfoButton())
 		{
-			SetActive((Enum)UI.OBJ_SWITCH_INFO, false);
+			SetActive(base._transform, UI.OBJ_SWITCH_INFO, false);
 		}
 		base.Initialize();
 	}
@@ -149,8 +149,8 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 			ScrollGrid.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 		}
 		CleanItemList();
-		_003CUpdateDynamicList_003Ec__AnonStorey2F9 _003CUpdateDynamicList_003Ec__AnonStorey2F;
-		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateDynamicList_003Ec__AnonStorey301 _003CUpdateDynamicList_003Ec__AnonStorey;
+		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected virtual void SetListItem(int i, Transform t, bool is_recycle, FriendCharaInfo data)

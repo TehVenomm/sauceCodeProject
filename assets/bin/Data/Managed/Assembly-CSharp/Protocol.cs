@@ -22,11 +22,7 @@ public class Protocol
 			{
 				return true;
 			}
-			if (MonoBehaviourSingleton<ProtocolManager>.IsValid() && MonoBehaviourSingleton<ProtocolManager>.I.isReserved)
-			{
-				return true;
-			}
-			return false;
+			return MonoBehaviourSingleton<ProtocolManager>.IsValid() && MonoBehaviourSingleton<ProtocolManager>.I.isReserved;
 		}
 	}
 
@@ -70,71 +66,89 @@ public class Protocol
 		isForce = false;
 	}
 
+	public static void SendAsync<T>(string url, Action<T> call_back, string get_param = "") where T : BaseModel, new()
+	{
+		string token = GenerateToken();
+		Send(url, call_back, get_param, token, true);
+	}
+
 	public static void Send<T>(string url, Action<T> call_back, string get_param = "") where T : BaseModel, new()
 	{
 		string token = GenerateToken();
-		Send(url, call_back, get_param, token);
+		Send(url, call_back, get_param, token, false);
 	}
 
-	private unsafe static void Send<T>(string url, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
-	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Expected O, but got Unknown
-		_003CSend_003Ec__AnonStorey6E8<T> _003CSend_003Ec__AnonStorey6E;
-		Action send = new Action((object)_003CSend_003Ec__AnonStorey6E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		if (Begin(url, send))
-		{
-			MonoBehaviourSingleton<NetworkManager>.I.Request(CheckURL(url), delegate(T ret)
-			{
-				if (Protocol.End<T>(ret, call_back, send))
-				{
-					call_back(ret);
-				}
-			}, get_param, token);
-		}
-	}
-
-	public static void Send<T1, T2>(string url, T1 post_data, Action<T2> call_back, string get_param = "") where T2 : BaseModel, new()
-	{
-		string token = GenerateToken();
-		Send(url, post_data, call_back, get_param, token);
-	}
-
-	private unsafe static void Send<T1, T2>(string url, T1 post_data, Action<T2> call_back, string get_param = "", string token = "") where T2 : BaseModel, new()
+	private unsafe static void Send<T>(string url, Action<T> callBack, string getParam, string token, bool isAsync) where T : BaseModel, new()
 	{
 		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0037: Expected O, but got Unknown
-		_003CSend_003Ec__AnonStorey6E9<T1, T2> _003CSend_003Ec__AnonStorey6E;
-		Action send = new Action((object)_003CSend_003Ec__AnonStorey6E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		if (Begin(url, send))
+		_003CSend_003Ec__AnonStorey6F1<T> _003CSend_003Ec__AnonStorey6F;
+		Action send = new Action((object)_003CSend_003Ec__AnonStorey6F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		if (Begin(url, send, isAsync))
 		{
-			MonoBehaviourSingleton<NetworkManager>.I.Request(CheckURL(url), post_data, delegate(T2 ret)
+			MonoBehaviourSingleton<NetworkManager>.I.Request(CheckURL(url), delegate(T ret)
 			{
-				if (Protocol.End<T2>(ret, call_back, send))
+				if (Protocol.End<T>(ret, callBack, send, isAsync))
 				{
-					call_back(ret);
+					callBack(ret);
 				}
-			}, get_param, token);
+			}, getParam, token);
 		}
+	}
+
+	public static void SendAsync<T1, T2>(string url, T1 postData, Action<T2> callBack, string getParam = "") where T2 : BaseModel, new()
+	{
+		string token = GenerateToken();
+		Send(url, postData, callBack, getParam, token, true);
+	}
+
+	public static void Send<T1, T2>(string url, T1 postData, Action<T2> callBack, string getParam = "") where T2 : BaseModel, new()
+	{
+		string token = GenerateToken();
+		Send(url, postData, callBack, getParam, token, false);
+	}
+
+	private unsafe static void Send<T1, T2>(string url, T1 postData, Action<T2> callBack, string getParam, string token, bool isAsync) where T2 : BaseModel, new()
+	{
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Expected O, but got Unknown
+		_003CSend_003Ec__AnonStorey6F2<T1, T2> _003CSend_003Ec__AnonStorey6F;
+		Action send = new Action((object)_003CSend_003Ec__AnonStorey6F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		if (Begin(url, send, isAsync))
+		{
+			MonoBehaviourSingleton<NetworkManager>.I.Request(CheckURL(url), postData, delegate(T2 ret)
+			{
+				if (Protocol.End<T2>(ret, callBack, send, isAsync))
+				{
+					callBack(ret);
+				}
+			}, getParam, token);
+		}
+	}
+
+	public static void SendAsync<T>(string url, WWWForm form, Action<T> callBack, string getParam = "") where T : BaseModel, new()
+	{
+		string token = GenerateToken();
+		Send(url, form, callBack, getParam, token, true);
 	}
 
 	public static void Send<T>(string url, WWWForm form, Action<T> call_back, string get_param = "") where T : BaseModel, new()
 	{
 		string token = GenerateToken();
-		Send(url, form, call_back, get_param, token);
+		Send(url, form, call_back, get_param, token, false);
 	}
 
-	private unsafe static void Send<T>(string url, WWWForm form, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
+	private unsafe static void Send<T>(string url, WWWForm form, Action<T> call_back, string get_param, string token, bool isAsync) where T : BaseModel, new()
 	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Expected O, but got Unknown
-		_003CSend_003Ec__AnonStorey6EA<T> _003CSend_003Ec__AnonStorey6EA;
-		Action send = new Action((object)_003CSend_003Ec__AnonStorey6EA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		if (Begin(url, send))
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Expected O, but got Unknown
+		_003CSend_003Ec__AnonStorey6F3<T> _003CSend_003Ec__AnonStorey6F;
+		Action send = new Action((object)_003CSend_003Ec__AnonStorey6F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		if (Begin(url, send, isAsync))
 		{
 			MonoBehaviourSingleton<NetworkManager>.I.RequestForm(CheckURL(url), form, delegate(T ret)
 			{
-				if (Protocol.End<T>(ret, call_back, send))
+				if (Protocol.End<T>(ret, call_back, send, isAsync))
 				{
 					call_back(ret);
 				}
@@ -167,7 +181,7 @@ public class Protocol
 		return true;
 	}
 
-	private static bool Begin(string url, Action send)
+	private static bool Begin(string url, Action send, bool isAsync)
 	{
 		if (!isForce)
 		{
@@ -185,7 +199,10 @@ public class Protocol
 				return false;
 			}
 		}
-		SetBusy(1);
+		if (!isAsync)
+		{
+			SetBusy(1);
+		}
 		return true;
 	}
 
@@ -199,9 +216,12 @@ public class Protocol
 		}
 	}
 
-	private unsafe static bool End<T>(T ret, Action<T> call_back, Action retry_action) where T : BaseModel
+	private unsafe static bool End<T>(T ret, Action<T> call_back, Action retry_action, bool isAsync) where T : BaseModel
 	{
-		SetBusy(-1);
+		if (!isAsync)
+		{
+			SetBusy(-1);
+		}
 		int code = ret.error;
 		bool flag = MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.IsTutorialErrorResend();
 		if (code == 0)
@@ -291,11 +311,11 @@ public class Protocol
 						Debug.Log((object)"kciked");
 						AppMain i = MonoBehaviourSingleton<AppMain>.I;
 						string empty = string.Empty;
-						if (_003CEnd_003Ec__AnonStorey6EB<T>._003C_003Ef__am_0024cache4 == null)
+						if (_003CEnd_003Ec__AnonStorey6F4<T>._003C_003Ef__am_0024cache4 == null)
 						{
-							_003CEnd_003Ec__AnonStorey6EB<T>._003C_003Ef__am_0024cache4 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+							_003CEnd_003Ec__AnonStorey6F4<T>._003C_003Ef__am_0024cache4 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 						}
-						i.ChangeScene(empty, "HomeTop", _003CEnd_003Ec__AnonStorey6EB<T>._003C_003Ef__am_0024cache4);
+						i.ChangeScene(empty, "HomeTop", _003CEnd_003Ec__AnonStorey6F4<T>._003C_003Ef__am_0024cache4);
 					}
 				}, true, code);
 			}

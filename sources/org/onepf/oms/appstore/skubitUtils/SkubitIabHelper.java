@@ -301,9 +301,9 @@ public class SkubitIabHelper implements AppstoreInAppBillingService {
     }
 
     public void launchPurchaseFlow(@NotNull Activity activity, String str, @NotNull String str2, int i, @Nullable OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str3) {
-        IabResult iabResult;
         checkSetupDone("launchPurchaseFlow");
         flagStartAsync("launchPurchaseFlow");
+        IabResult iabResult;
         if (!str2.equals("subs") || this.mSubscriptionsSupported) {
             try {
                 Logger.m1001d("Constructing buy intent for ", str, ", item type: ", str2);
@@ -511,93 +511,96 @@ public class SkubitIabHelper implements AppstoreInAppBillingService {
         r2 = r12.getPackageName();
         r0[r1] = r2;
         org.onepf.oms.util.Logger.m1001d(r0);
-        r1 = 0;
+        r3 = 0;
         r0 = 0;
-    L_0x0022:
+        r1 = r0;
+        r0 = r3;
+    L_0x0024:
         r2 = 2;
         r2 = new java.lang.Object[r2];
         r3 = 0;
         r4 = "Calling getPurchases with continuation token: ";
         r2[r3] = r4;
         r3 = 1;
-        r2[r3] = r0;
+        r2[r3] = r1;
         org.onepf.oms.util.Logger.m1001d(r2);
         r2 = r12.mService;
-        if (r2 != 0) goto L_0x003b;
-    L_0x0034:
+        if (r2 != 0) goto L_0x003d;
+    L_0x0036:
         r0 = "getPurchases() failed: service is not connected.";
         org.onepf.oms.util.Logger.m1000d(r0);
         r0 = 6;
-    L_0x003a:
+    L_0x003c:
         return r0;
-    L_0x003b:
+    L_0x003d:
         r2 = r12.mService;
         r3 = 1;
         r4 = r12.getPackageName();
-        r5 = r2.getPurchases(r3, r4, r14, r0);
-        r0 = r12.getResponseCodeFromBundle(r5);
+        r5 = r2.getPurchases(r3, r4, r14, r1);
+        r1 = r12.getResponseCodeFromBundle(r5);
         r2 = 2;
         r2 = new java.lang.Object[r2];
         r3 = 0;
         r4 = "Owned items response: ";
         r2[r3] = r4;
         r3 = 1;
-        r4 = java.lang.Integer.valueOf(r0);
+        r4 = java.lang.Integer.valueOf(r1);
         r2[r3] = r4;
         org.onepf.oms.util.Logger.m1001d(r2);
-        if (r0 == 0) goto L_0x0071;
-    L_0x005e:
-        r1 = 2;
-        r1 = new java.lang.Object[r1];
+        if (r1 == 0) goto L_0x0074;
+    L_0x0060:
+        r0 = 2;
+        r0 = new java.lang.Object[r0];
         r2 = 0;
         r3 = "getPurchases() failed: ";
-        r1[r2] = r3;
+        r0[r2] = r3;
         r2 = 1;
-        r3 = org.onepf.oms.appstore.googleUtils.IabHelper.getResponseDesc(r0);
-        r1[r2] = r3;
-        org.onepf.oms.util.Logger.m1001d(r1);
-        goto L_0x003a;
-    L_0x0071:
-        r0 = "INAPP_PURCHASE_ITEM_LIST";
-        r0 = r5.containsKey(r0);
-        if (r0 == 0) goto L_0x0089;
-    L_0x0079:
-        r0 = "INAPP_PURCHASE_DATA_LIST";
-        r0 = r5.containsKey(r0);
-        if (r0 == 0) goto L_0x0089;
-    L_0x0081:
-        r0 = "INAPP_DATA_SIGNATURE_LIST";
-        r0 = r5.containsKey(r0);
-        if (r0 != 0) goto L_0x0091;
-    L_0x0089:
+        r3 = org.onepf.oms.appstore.googleUtils.IabHelper.getResponseDesc(r1);
+        r0[r2] = r3;
+        org.onepf.oms.util.Logger.m1001d(r0);
+        r0 = r1;
+        goto L_0x003c;
+    L_0x0074:
+        r1 = "INAPP_PURCHASE_ITEM_LIST";
+        r1 = r5.containsKey(r1);
+        if (r1 == 0) goto L_0x008c;
+    L_0x007c:
+        r1 = "INAPP_PURCHASE_DATA_LIST";
+        r1 = r5.containsKey(r1);
+        if (r1 == 0) goto L_0x008c;
+    L_0x0084:
+        r1 = "INAPP_DATA_SIGNATURE_LIST";
+        r1 = r5.containsKey(r1);
+        if (r1 != 0) goto L_0x0094;
+    L_0x008c:
         r0 = "In-app billing error: Bundle returned from getPurchases() doesn't contain required fields.";
         org.onepf.oms.util.Logger.m1002e(r0);
         r0 = -1002; // 0xfffffffffffffc16 float:NaN double:NaN;
-        goto L_0x003a;
-    L_0x0091:
-        r0 = "INAPP_PURCHASE_ITEM_LIST";
-        r6 = r5.getStringArrayList(r0);
-        r0 = "INAPP_PURCHASE_DATA_LIST";
-        r7 = r5.getStringArrayList(r0);
-        r0 = "INAPP_DATA_SIGNATURE_LIST";
-        r8 = r5.getStringArrayList(r0);
-        r0 = 0;
+        goto L_0x003c;
+    L_0x0094:
+        r1 = "INAPP_PURCHASE_ITEM_LIST";
+        r6 = r5.getStringArrayList(r1);
+        r1 = "INAPP_PURCHASE_DATA_LIST";
+        r7 = r5.getStringArrayList(r1);
+        r1 = "INAPP_DATA_SIGNATURE_LIST";
+        r8 = r5.getStringArrayList(r1);
+        r1 = 0;
         r3 = r0;
         r4 = r1;
-    L_0x00a6:
+    L_0x00a9:
         r0 = r7.size();
-        if (r3 >= r0) goto L_0x013d;
-    L_0x00ac:
-        r0 = r7.get(r3);
+        if (r4 >= r0) goto L_0x0140;
+    L_0x00af:
+        r0 = r7.get(r4);
         r0 = (java.lang.String) r0;
-        r1 = r8.get(r3);
+        r1 = r8.get(r4);
         r1 = (java.lang.String) r1;
-        r2 = r6.get(r3);
+        r2 = r6.get(r4);
         r2 = (java.lang.String) r2;
         r9 = r12.mSignatureBase64;
         r9 = r12.isValidDataSignature(r9, r0, r1);
-        if (r9 == 0) goto L_0x011a;
-    L_0x00c6:
+        if (r9 == 0) goto L_0x011d;
+    L_0x00c9:
         r9 = 2;
         r9 = new java.lang.Object[r9];
         r10 = 0;
@@ -618,8 +621,8 @@ public class SkubitIabHelper implements AppstoreInAppBillingService {
         r2.setSku(r1);
         r1 = r2.getToken();
         r1 = android.text.TextUtils.isEmpty(r1);
-        if (r1 == 0) goto L_0x0111;
-    L_0x00fe:
+        if (r1 == 0) goto L_0x0114;
+    L_0x0101:
         r1 = "In-app billing warning: BUG: empty/null token!";
         org.onepf.oms.util.Logger.m1009w(r1);
         r1 = 2;
@@ -630,59 +633,60 @@ public class SkubitIabHelper implements AppstoreInAppBillingService {
         r9 = 1;
         r1[r9] = r0;
         org.onepf.oms.util.Logger.m1001d(r1);
-    L_0x0111:
+    L_0x0114:
         r13.addPurchase(r2);
-        r1 = r4;
-    L_0x0115:
-        r0 = r3 + 1;
+        r0 = r3;
+    L_0x0118:
+        r1 = r4 + 1;
         r3 = r0;
         r4 = r1;
-        goto L_0x00a6;
-    L_0x011a:
+        goto L_0x00a9;
+    L_0x011d:
         r2 = "In-app billing warning: Purchase signature verification **FAILED**. Not adding item.";
         org.onepf.oms.util.Logger.m1009w(r2);
         r2 = 2;
         r2 = new java.lang.Object[r2];
-        r4 = 0;
+        r3 = 0;
         r9 = "   Purchase data: ";
-        r2[r4] = r9;
-        r4 = 1;
-        r2[r4] = r0;
+        r2[r3] = r9;
+        r3 = 1;
+        r2[r3] = r0;
         org.onepf.oms.util.Logger.m1001d(r2);
         r0 = 2;
         r0 = new java.lang.Object[r0];
         r2 = 0;
-        r4 = "   Signature: ";
-        r0[r2] = r4;
+        r3 = "   Signature: ";
+        r0[r2] = r3;
         r2 = 1;
         r0[r2] = r1;
         org.onepf.oms.util.Logger.m1001d(r0);
-        r1 = 1;
-        goto L_0x0115;
-    L_0x013d:
+        r0 = 1;
+        goto L_0x0118;
+    L_0x0140:
         r0 = "INAPP_CONTINUATION_TOKEN";
         r0 = r5.getString(r0);
         r1 = 2;
         r1 = new java.lang.Object[r1];
         r2 = 0;
-        r3 = "Continuation token: ";
-        r1[r2] = r3;
+        r4 = "Continuation token: ";
+        r1[r2] = r4;
         r2 = 1;
         r1[r2] = r0;
         org.onepf.oms.util.Logger.m1001d(r1);
         r1 = android.text.TextUtils.isEmpty(r0);
-        if (r1 == 0) goto L_0x0160;
-    L_0x0157:
-        if (r4 == 0) goto L_0x015d;
-    L_0x0159:
+        if (r1 == 0) goto L_0x0163;
+    L_0x015a:
+        if (r3 == 0) goto L_0x0160;
+    L_0x015c:
         r0 = -1003; // 0xfffffffffffffc15 float:NaN double:NaN;
-        goto L_0x003a;
-    L_0x015d:
-        r0 = 0;
-        goto L_0x003a;
+        goto L_0x003c;
     L_0x0160:
-        r1 = r4;
-        goto L_0x0022;
+        r0 = 0;
+        goto L_0x003c;
+    L_0x0163:
+        r1 = r0;
+        r0 = r3;
+        goto L_0x0024;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.onepf.oms.appstore.skubitUtils.SkubitIabHelper.queryPurchases(org.onepf.oms.appstore.googleUtils.Inventory, java.lang.String):int");
     }

@@ -260,13 +260,13 @@ public class InGameTutorialManager
 					{
 						ctrl.get_gameObject().SetActive(true);
 						ctrl.Reset();
-						_003CGGTutorialMove_003Ec__AnonStorey526 _003CGGTutorialMove_003Ec__AnonStorey;
+						_003CGGTutorialMove_003Ec__AnonStorey52F _003CGGTutorialMove_003Ec__AnonStorey52F;
 						ctrl.Play(true, delegate
 						{
 							//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 							//IL_0027: Expected O, but got Unknown
 							//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-							tutorialManager.StartCoroutine(tutorialManager.WaitForTime(1f, new Action((object)_003CGGTutorialMove_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+							tutorialManager.StartCoroutine(tutorialManager.WaitForTime(1f, new Action((object)_003CGGTutorialMove_003Ec__AnonStorey52F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 						});
 					}
 				}

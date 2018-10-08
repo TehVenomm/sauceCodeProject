@@ -633,8 +633,8 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		//IL_0026: Expected O, but got Unknown
 		if (force)
 		{
-			_003CSendInfo_003Ec__AnonStorey641 _003CSendInfo_003Ec__AnonStorey;
-			Protocol.Force(new Action((object)_003CSendInfo_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSendInfo_003Ec__AnonStorey64A _003CSendInfo_003Ec__AnonStorey64A;
+			Protocol.Force(new Action((object)_003CSendInfo_003Ec__AnonStorey64A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		else
 		{

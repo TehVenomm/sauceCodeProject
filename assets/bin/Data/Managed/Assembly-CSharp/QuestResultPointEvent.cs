@@ -566,7 +566,7 @@ public class QuestResultPointEvent : GameSection
 
 	private unsafe void SetNextItemIcon(List<PointEventCurrentData.Reward> reward)
 	{
-		_003CSetNextItemIcon_003Ec__AnonStorey428 _003CSetNextItemIcon_003Ec__AnonStorey;
+		_003CSetNextItemIcon_003Ec__AnonStorey430 _003CSetNextItemIcon_003Ec__AnonStorey;
 		SetDynamicList((Enum)UI.OBJ_NEXT_REWARD_ITEM_ICON_ROOT, "ItemIcon", reward.Count, true, null, null, new Action<int, Transform, bool>((object)_003CSetNextItemIcon_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -604,7 +604,7 @@ public class QuestResultPointEvent : GameSection
 				rewardObjects.Add(val2);
 			}
 		}
-		_003CSetAllRewardItem_003Ec__AnonStorey429 _003CSetAllRewardItem_003Ec__AnonStorey;
+		_003CSetAllRewardItem_003Ec__AnonStorey431 _003CSetAllRewardItem_003Ec__AnonStorey;
 		SetDynamicList((Enum)UI.GRD_ANIM_ITEM_ROOT, "ItemIcon", rewardList.Count, true, null, null, new Action<int, Transform, bool>((object)_003CSetAllRewardItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

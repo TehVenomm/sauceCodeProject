@@ -343,9 +343,6 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 		{
 			((IDisposable)www)?.Dispose();
 		}
-		yield return (object)new WaitForEndOfFrame();
-		yield return (object)new WaitForEndOfFrame();
-		yield return (object)new WaitForEndOfFrame();
 		try
 		{
 			if (call_back != null)
@@ -364,7 +361,7 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 				}
 				finally
 				{
-					((_003CRequest_Impl_003Ec__Iterator225<T>)/*Error near IL_0853: stateMachine*/)._003C_003E__Finally0();
+					((_003CRequest_Impl_003Ec__Iterator225<T>)/*Error near IL_0802: stateMachine*/)._003C_003E__Finally0();
 				}
 			}
 		}

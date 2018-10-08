@@ -82,6 +82,8 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	private bool m_IsLoading;
 
+	private bool m_IsLoaded;
+
 	public UIntKeyTable<AudioClip> m_SystemSEClips;
 
 	public AudioPreset CurrentPreset
@@ -360,7 +362,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 					bool is_play_fadeout = true;
 					EventDelegate.Callback OnFinishedCallBack = delegate
 					{
-						((_003CStart_003Ec__Iterator284)/*Error near IL_00f3: stateMachine*/)._003Cis_play_fadeout_003E__1 = false;
+						((_003CStart_003Ec__Iterator286)/*Error near IL_00f3: stateMachine*/)._003Cis_play_fadeout_003E__1 = false;
 					};
 					TweenVolume fadeout = TweenVolume.Begin(this.get_gameObject(), fadeOutTime, 0f);
 					EventDelegate.Add(fadeout.onFinished, OnFinishedCallBack);
@@ -784,6 +786,15 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 		return m_IsLoading;
 	}
 
+	public bool IsLoadedAudioClip()
+	{
+		if (!MonoBehaviourSingleton<SoundManager>.IsValid())
+		{
+			return false;
+		}
+		return m_IsLoaded;
+	}
+
 	private IEnumerator DoWaitLoading()
 	{
 		while (IsLoadingAudioClip())
@@ -815,6 +826,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 		yield return (object)load_queue.Wait();
 		SetSystemSEClips(values, los);
 		m_IsLoading = false;
+		m_IsLoaded = true;
 	}
 
 	public static AudioClip GetAttachedAudio(GameObject go, string filter = null)

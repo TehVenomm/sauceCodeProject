@@ -25,8 +25,8 @@ public class UIProgressBar : UIWidgetContainer
 	[SerializeField]
 	protected UIWidget mBG;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected UIWidget mFG;
 
 	[SerializeField]

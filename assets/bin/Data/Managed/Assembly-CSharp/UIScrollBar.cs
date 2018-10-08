@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/NGUI Scroll Bar")]
+[ExecuteInEditMode]
 public class UIScrollBar : UISlider
 {
 	private enum Direction
@@ -12,8 +12,8 @@ public class UIScrollBar : UISlider
 		Upgraded
 	}
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected float mSize = 1f;
 
 	[HideInInspector]

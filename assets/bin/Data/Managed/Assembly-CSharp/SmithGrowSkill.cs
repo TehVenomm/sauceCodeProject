@@ -117,7 +117,7 @@ public class SmithGrowSkill : ItemDetailSkill
 		UpdateMaterial();
 		SetupEnableInventoryUI();
 		int base_item_index = Array.FindIndex(inventory.datas, (SortCompareData data) => data.GetUniqID() == skillItem.uniqueID);
-		_003CUpdateUI_003Ec__AnonStorey469 _003CUpdateUI_003Ec__AnonStorey;
+		_003CUpdateUI_003Ec__AnonStorey471 _003CUpdateUI_003Ec__AnonStorey;
 		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, false, new Func<int, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

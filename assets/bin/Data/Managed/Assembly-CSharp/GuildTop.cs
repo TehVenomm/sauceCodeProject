@@ -31,10 +31,10 @@ public class GuildTop : HomeBase
 		bool is_finish = false;
 		MonoBehaviourSingleton<GuildManager>.I.SendClanInfo(delegate(bool success)
 		{
-			((_003CDDoInitialize_003Ec__Iterator7A)/*Error near IL_002d: stateMachine*/)._003Cis_finish_003E__0 = true;
+			((_003CDDoInitialize_003Ec__Iterator7B)/*Error near IL_002d: stateMachine*/)._003Cis_finish_003E__0 = true;
 			if (success)
 			{
-				MonoBehaviourSingleton<ChatManager>.I.clanChat.onLeave += ((_003CDDoInitialize_003Ec__Iterator7A)/*Error near IL_002d: stateMachine*/)._003C_003Ef__this._OnLeave;
+				MonoBehaviourSingleton<ChatManager>.I.clanChat.onLeave += ((_003CDDoInitialize_003Ec__Iterator7B)/*Error near IL_002d: stateMachine*/)._003C_003Ef__this._OnLeave;
 			}
 		});
 		while (!is_finish)
@@ -74,7 +74,7 @@ public class GuildTop : HomeBase
 		bool is_finish = false;
 		MonoBehaviourSingleton<GuildManager>.I.SendClanInfo(delegate
 		{
-			((_003CSendHomeInfo_003Ec__Iterator7B)/*Error near IL_002d: stateMachine*/)._003Cis_finish_003E__0 = true;
+			((_003CSendHomeInfo_003Ec__Iterator7C)/*Error near IL_002d: stateMachine*/)._003Cis_finish_003E__0 = true;
 		});
 		while (!is_finish)
 		{

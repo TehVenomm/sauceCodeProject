@@ -446,8 +446,8 @@ public class StatusEquip : EquipSelectBase
 			created_remove_btn = IsCreateRemoveButton();
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
-			_003CLocalInventory_003Ec__AnonStorey41C _003CLocalInventory_003Ec__AnonStorey41C;
-			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length + 2, false, new Func<int, bool>((object)_003CLocalInventory_003Ec__AnonStorey41C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CLocalInventory_003Ec__AnonStorey41C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CLocalInventory_003Ec__AnonStorey424 _003CLocalInventory_003Ec__AnonStorey;
+			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length + 2, false, new Func<int, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -765,8 +765,8 @@ public class StatusEquip : EquipSelectBase
 						{
 							toSlot = migrationSelectItem.GetExceedSkillSlotNo(j);
 						}
-						_003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey41D _003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey41D;
-						if (list2.All(new Func<MigrationSkillData, bool>((object)_003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey41D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+						_003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey425 _003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey;
+						if (list2.All(new Func<MigrationSkillData, bool>((object)_003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
 						{
 							MigrationSkillData item = new MigrationSkillData(migrationSelectItem.uniqueID, toSlot, skillItem);
 							list2.Add(item);

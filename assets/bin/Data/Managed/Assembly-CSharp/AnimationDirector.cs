@@ -111,12 +111,22 @@ public class AnimationDirector
 		return val;
 	}
 
+	protected virtual void OnEnable()
+	{
+		I = this;
+	}
+
+	protected virtual void OnDisable()
+	{
+		if (I == this)
+		{
+			I = null;
+		}
+	}
+
 	protected virtual void Awake()
 	{
-		if (I == null)
-		{
-			I = this;
-		}
+		I = this;
 		_animator = this.GetComponent<Animator>();
 		if (MonoBehaviourSingleton<AppMain>.IsValid() && useCamera != null)
 		{

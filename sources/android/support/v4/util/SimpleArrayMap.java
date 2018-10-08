@@ -39,7 +39,6 @@ public class SimpleArrayMap<K, V> {
     }
 
     private void allocArrays(int i) {
-        Class cls;
         Object[] objArr;
         Object obj;
         if (i == 8) {
@@ -60,7 +59,7 @@ public class SimpleArrayMap<K, V> {
                     while (true) {
                         break;
                     }
-                    cls = ArrayMap.class;
+                    r1 = ArrayMap.class;
                 }
             }
         } else if (i == 4) {
@@ -78,6 +77,7 @@ public class SimpleArrayMap<K, V> {
                         return;
                     }
                 } finally {
+                    Class cls;
                     cls = ArrayMap.class;
                 }
             }

@@ -248,7 +248,6 @@ public class AppsFlyerLib implements C0259b {
 
         public void run() {
             HttpURLConnection httpURLConnection;
-            Map ˋ;
             Throwable e;
             if (this.f130 != null && this.f130.length() != 0 && !this.f134.isTrackingStopped()) {
                 this.f133.incrementAndGet();
@@ -272,6 +271,7 @@ public class AppsFlyerLib implements C0259b {
                     C0300y.m378().m391(append.toString(), "");
                     C02695.m293(new StringBuilder("Calling server for attribution url: ").append(append.toString()).toString());
                     httpURLConnection = (HttpURLConnection) new URL(append.toString()).openConnection();
+                    Map ˋ;
                     Map ˎ;
                     try {
                         httpURLConnection.setRequestMethod(HttpRequest.METHOD_GET);
@@ -3641,6 +3641,7 @@ public class AppsFlyerLib implements C0259b {
     /* renamed from: ˊ */
     private void m218(URL url, String str, String str2, WeakReference<Context> weakReference, String str3, boolean z) throws IOException {
         Object obj;
+        HttpURLConnection httpURLConnection;
         Throwable th;
         Writer writer;
         Context context = (Context) weakReference.get();
@@ -3649,7 +3650,6 @@ public class AppsFlyerLib implements C0259b {
         } else {
             obj = 1;
         }
-        HttpURLConnection httpURLConnection;
         try {
             C0300y.m378().m391(url.toString(), str);
             httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -3816,13 +3816,13 @@ public class AppsFlyerLib implements C0259b {
     @NonNull
     /* renamed from: ˎ */
     static String m231(HttpURLConnection httpURLConnection) {
+        Reader inputStreamReader;
         String readLine;
         Throwable th;
         Reader reader;
         JSONObject jSONObject;
         Reader reader2 = null;
         StringBuilder stringBuilder = new StringBuilder();
-        Reader inputStreamReader;
         try {
             InputStream errorStream = httpURLConnection.getErrorStream();
             if (errorStream == null) {

@@ -170,7 +170,7 @@ public class QuestOrderSelect : GameSection
 			MonoBehaviourSingleton<QuestManager>.I.SendGetQuestList(delegate
 			{
 				MonoBehaviourSingleton<QuestManager>.I.needRequestOrderQuestList = false;
-				((_003CDoInitialize_003Ec__Iterator87)/*Error near IL_0075: stateMachine*/)._003Cis_recv_quest_003E__0 = true;
+				((_003CDoInitialize_003Ec__Iterator88)/*Error near IL_0075: stateMachine*/)._003Cis_recv_quest_003E__0 = true;
 			});
 			while (!is_recv_quest)
 			{
@@ -263,8 +263,8 @@ public class QuestOrderSelect : GameSection
 					int num3 = 0;
 					if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 					{
-						_003CShowOrder_003Ec__AnonStorey362 _003CShowOrder_003Ec__AnonStorey;
-						num3 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CShowOrder_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
+						_003CShowOrder_003Ec__AnonStorey36A _003CShowOrder_003Ec__AnonStorey36A;
+						num3 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CShowOrder_003Ec__AnonStorey36A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 					}
 					int num4 = num2 - num3;
 					if (num4 > 0)
@@ -435,8 +435,8 @@ public class QuestOrderSelect : GameSection
 		int num3 = 0;
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
-			_003CUpdateGirdListItemQuest_003Ec__AnonStorey364 _003CUpdateGirdListItemQuest_003Ec__AnonStorey;
-			num3 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CUpdateGirdListItemQuest_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
+			_003CUpdateGirdListItemQuest_003Ec__AnonStorey36C _003CUpdateGirdListItemQuest_003Ec__AnonStorey36C;
+			num3 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CUpdateGirdListItemQuest_003Ec__AnonStorey36C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 		}
 		int num4 = num2 - num3;
 		SetLabelText(t, UI.LBL_ORDER_NUM, num4.ToString());
@@ -460,8 +460,8 @@ public class QuestOrderSelect : GameSection
 			}
 			else
 			{
-				_003CUpdateGirdListItemQuest_003Ec__AnonStorey365 _003CUpdateGirdListItemQuest_003Ec__AnonStorey2;
-				onScrollViewReady = Delegate.Combine((Delegate)onScrollViewReady, (Delegate)new Action((object)_003CUpdateGirdListItemQuest_003Ec__AnonStorey2, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CUpdateGirdListItemQuest_003Ec__AnonStorey36D _003CUpdateGirdListItemQuest_003Ec__AnonStorey36D;
+				onScrollViewReady = Delegate.Combine((Delegate)onScrollViewReady, (Delegate)new Action((object)_003CUpdateGirdListItemQuest_003Ec__AnonStorey36D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 		QuestItemInfo itemData = questSortData.itemData;
@@ -509,16 +509,16 @@ public class QuestOrderSelect : GameSection
 		//IL_0045: Expected O, but got Unknown
 		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005c: Expected O, but got Unknown
-		_003CPanelToStatic_003Ec__AnonStorey366 _003CPanelToStatic_003Ec__AnonStorey;
+		_003CPanelToStatic_003Ec__AnonStorey36E _003CPanelToStatic_003Ec__AnonStorey36E;
 		if (icon.isIconLoaded)
 		{
 			uiPanel.widgetsAreStatic = false;
 			AppMain i = MonoBehaviourSingleton<AppMain>.I;
-			i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003CPanelToStatic_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003CPanelToStatic_003Ec__AnonStorey36E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		else
 		{
-			icon.onIconLoaded = new Action((object)_003CPanelToStatic_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			icon.onIconLoaded = new Action((object)_003CPanelToStatic_003Ec__AnonStorey36E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 	}
 
@@ -711,11 +711,11 @@ public class QuestOrderSelect : GameSection
 				{
 					for (int i = 0; i < orderQuest.remainTimes.Count; i++)
 					{
-						((_003CCheckLimitQuestItem_003Ec__Iterator88)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 = orderQuest.remainTimes[i];
-						if (!(((_003CCheckLimitQuestItem_003Ec__Iterator88)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 <= 0f) && ((_003CCheckLimitQuestItem_003Ec__Iterator88)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 > ((_003CCheckLimitQuestItem_003Ec__Iterator88)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3)
+						((_003CCheckLimitQuestItem_003Ec__Iterator89)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 = orderQuest.remainTimes[i];
+						if (!(((_003CCheckLimitQuestItem_003Ec__Iterator89)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 <= 0f) && ((_003CCheckLimitQuestItem_003Ec__Iterator89)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 > ((_003CCheckLimitQuestItem_003Ec__Iterator89)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3)
 						{
-							((_003CCheckLimitQuestItem_003Ec__Iterator88)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 = ((_003CCheckLimitQuestItem_003Ec__Iterator88)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3;
-							((_003CCheckLimitQuestItem_003Ec__Iterator88)/*Error near IL_007f: stateMachine*/)._003CquestData_003E__2 = orderQuest;
+							((_003CCheckLimitQuestItem_003Ec__Iterator89)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 = ((_003CCheckLimitQuestItem_003Ec__Iterator89)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3;
+							((_003CCheckLimitQuestItem_003Ec__Iterator89)/*Error near IL_007f: stateMachine*/)._003CquestData_003E__2 = orderQuest;
 						}
 					}
 				});

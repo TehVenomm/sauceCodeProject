@@ -132,7 +132,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 	{
 		CheckRegisterModel.RequestSendForm requestSendForm = new CheckRegisterModel.RequestSendForm();
 		requestSendForm.data = ntc_data;
-		_003CSendCheckRegister_003Ec__AnonStorey553 _003CSendCheckRegister_003Ec__AnonStorey;
+		_003CSendCheckRegister_003Ec__AnonStorey55C _003CSendCheckRegister_003Ec__AnonStorey55C;
 		Protocol.Send(CheckRegisterModel.URL, requestSendForm, delegate(CheckRegisterModel ret)
 		{
 			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
@@ -148,7 +148,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				sendAsset = ret.result.sendAsset;
 				if (ret.result.recommendUpdate)
 				{
-					RecommendUpdateCheck(new Action((object)_003CSendCheckRegister_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					RecommendUpdateCheck(new Action((object)_003CSendCheckRegister_003Ec__AnonStorey55C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 				else if (call_back != null)
 				{
@@ -160,7 +160,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				{
 					if (ret.result.recommendUpdate)
 					{
-						RecommendUpdateCheck(new Action((object)_003CSendCheckRegister_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+						RecommendUpdateCheck(new Action((object)_003CSendCheckRegister_003Ec__AnonStorey55C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					}
 					else if (call_back != null)
 					{
@@ -298,7 +298,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 		logInBonus = null;
 		logInBonusLimitedCount = 0;
 		GameSaveData.instance.showIAPAdsPop = string.Empty;
-		Protocol.Send(LoginBonusModel.URL, delegate(LoginBonusModel ret)
+		Protocol.SendAsync(LoginBonusModel.URL, delegate(LoginBonusModel ret)
 		{
 			bool obj = false;
 			if (ret.Error == Error.None)

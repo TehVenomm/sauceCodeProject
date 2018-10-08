@@ -1,3 +1,4 @@
+using App.Scripts.GoGame.Optimization;
 using Network;
 using System;
 using System.Collections;
@@ -21,6 +22,8 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 	public const int BASE_RESOLUTION_HEIGHT = 854;
 
 	public const int BASE_RESOLUTION_HEIGHT_HIGH = 1280;
+
+	public static int amountMemoryClear = 500;
 
 	public string startScene = "Title";
 
@@ -63,6 +66,10 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		get;
 		private set;
 	}
+
+	public static int totalReservedMemory => (int)Profiler.GetTotalAllocatedMemory() / 1048576;
+
+	public static bool needClearMemory => totalReservedMemory > amountMemoryClear;
 
 	public static bool isApplicationQuit
 	{
@@ -227,21 +234,14 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		}
 	}
 
-	private unsafe void Start()
+	private void Start()
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Invalid comparison between Unknown and I4
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Invalid comparison between Unknown and I4
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Invalid comparison between Unknown and I4
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Invalid comparison between Unknown and I4
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Expected O, but got Unknown
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		this.StartCoroutine(OnDelayToInit());
+	}
+
+	private unsafe IEnumerator OnDelayToInit()
+	{
 		Screen.set_sleepTimeout(-1);
 		isInitialized = false;
 		isApplicationQuit = false;
@@ -249,6 +249,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		showingTableLoadError = false;
 		Startup();
 		InitCollideLayers();
+		yield return (object)null;
 		if ((int)Screen.get_orientation() == 0 || (int)Screen.get_orientation() == 1 || (int)Screen.get_orientation() == 3 || (int)Screen.get_orientation() == 3 || (int)Screen.get_orientation() == 4)
 		{
 			Screen.set_orientation(1);
@@ -262,36 +263,47 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		Protocol.Initialize();
 		HomeSelfCharacter.CTRL = true;
 		appVer = NetworkNative.getNativeVersionFromName();
-		GameObject val = this.get_gameObject();
-		val.AddComponent<GoWrapManager>();
-		val.AddComponent<FCMManager>();
-		val.AddComponent<DefaultTimeUpdater>();
-		val.AddComponent<ResourceManager>();
+		yield return (object)null;
+		GameObject go = this.get_gameObject();
+		go.AddComponent<GoWrapManager>();
+		go.AddComponent<FCMManager>();
+		go.AddComponent<DefaultTimeUpdater>();
+		go.AddComponent<ResourceManager>();
 		MonoBehaviourSingleton<ResourceManager>.I.onAsyncLoadQuery = new Func<bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		val.AddComponent<InstantiateManager>();
+		go.AddComponent<InstantiateManager>();
+		go.AddComponent<GoGameCacheManager>();
+		yield return (object)null;
 		DataTableManager dataTableManager = new GameObject("DataTableManager").AddComponent<DataTableManager>();
 		dataTableManager.get_transform().set_parent(base._transform);
 		dataTableManager.onError += new Action<DataTableLoadError, Action>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		ResourceManager.enableLoadDirect = false;
+		yield return (object)null;
 		CreateDefaultCamera();
-		val.AddComponent<ScreenOrientationManager>();
+		go.AddComponent<ScreenOrientationManager>();
 		MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
 		UpdateResolution(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
+		yield return (object)null;
 		Utility.CreateGameObjectAndComponent("AudioListenerManager", MonoBehaviourSingleton<AppMain>.I._transform, -1);
+		yield return (object)null;
 		Utility.CreateGameObjectAndComponent("SoundManager", base._transform, -1);
+		yield return (object)null;
 		Utility.CreateGameObjectAndComponent("AudioObjectPool", base._transform, -1);
+		yield return (object)null;
 		Utility.CreateGameObjectAndComponent("EffectManager", base._transform, -1);
-		val.AddComponent<NetworkManager>();
-		val.AddComponent<ProtocolManager>();
-		val.AddComponent<AccountManager>();
-		val.AddComponent<TimeManager>();
-		val.AddComponent<GoGameTimeManager>();
+		yield return (object)null;
+		go.AddComponent<NetworkManager>();
+		go.AddComponent<ProtocolManager>();
+		go.AddComponent<AccountManager>();
+		go.AddComponent<TimeManager>();
+		go.AddComponent<GoGameTimeManager>();
+		yield return (object)null;
 		Utility.CreateGameObjectAndComponent("NativeReceiver", base._transform, -1);
 		Utility.CreateGameObjectAndComponent("ShopReceiver", base._transform, -1);
 		Utility.CreateGameObjectAndComponent("ChatManager", base._transform, -1);
 		Utility.CreateGameObjectAndComponent("NativeShare", base._transform, -1);
-		val.AddComponent<CoopApp>();
-		val.AddComponent<BootProcess>();
+		yield return (object)null;
+		go.AddComponent<CoopApp>();
+		go.AddComponent<BootProcess>();
 	}
 
 	public void UpdateResolution(bool is_portrait)
@@ -391,11 +403,11 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 			{
 				if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "HomeTop" || MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "LoungeTop")
 				{
-					if (_003C_003Ef__am_0024cache17 == null)
+					if (_003C_003Ef__am_0024cache18 == null)
 					{
-						_003C_003Ef__am_0024cache17 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+						_003C_003Ef__am_0024cache18 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 					}
-					Protocol.Force(_003C_003Ef__am_0024cache17);
+					Protocol.Force(_003C_003Ef__am_0024cache18);
 				}
 				Native.CancelAllLocalNotification();
 			}
@@ -611,6 +623,10 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 				MonoBehaviourSingleton<ResourceManager>.I.cache.ClearObjectCaches(clearPreloaded);
 			}
 			MonoBehaviourSingleton<ResourceManager>.I.cache.ClearSENameDictionary();
+		}
+		if (MonoBehaviourSingleton<GoGameCacheManager>.IsValid())
+		{
+			MonoBehaviourSingleton<GoGameCacheManager>.I.Delete();
 		}
 		ClearPoolObjects();
 		yield return (object)UnloadUnusedAssets(true);
@@ -1005,11 +1021,11 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	private unsafe IEnumerator CRChangeScene(string scene, string section, Action callback)
 	{
-		if (_003CCRChangeScene_003Ec__Iterator254._003C_003Ef__am_0024cache8 == null)
+		if (_003CCRChangeScene_003Ec__Iterator255._003C_003Ef__am_0024cache8 == null)
 		{
-			_003CCRChangeScene_003Ec__Iterator254._003C_003Ef__am_0024cache8 = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CCRChangeScene_003Ec__Iterator255._003C_003Ef__am_0024cache8 = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		yield return (object)new WaitUntil(_003CCRChangeScene_003Ec__Iterator254._003C_003Ef__am_0024cache8);
+		yield return (object)new WaitUntil(_003CCRChangeScene_003Ec__Iterator255._003C_003Ef__am_0024cache8);
 		if (callback != null)
 		{
 			callback.Invoke();

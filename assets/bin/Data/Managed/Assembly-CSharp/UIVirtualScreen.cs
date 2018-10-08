@@ -22,19 +22,30 @@ public class UIVirtualScreen
 		InitWidget();
 	}
 
-	public static void InitUIRoot(UIRoot root)
+	public static void InitUIRoot(UIRoot root, bool isThrowIPX = false)
 	{
-		float num = (float)Screen.get_width();
-		float num2 = (float)Screen.get_height();
-		if (num > num2)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		if (isThrowIPX)
 		{
-			screenWidth = 854f;
-			screenHeight = num2 / num * 854f;
+			float num = (float)Screen.get_width();
+			float num2 = (float)Screen.get_height();
+			if (num > num2)
+			{
+				screenWidth = 854f;
+				screenHeight = num2 / num * 854f;
+			}
+			else
+			{
+				screenHeight = 854f;
+				screenWidth = num / num2 * 854f;
+			}
 		}
 		else
 		{
-			screenHeight = 854f;
-			screenWidth = num / num2 * 854f;
+			Vector2 resolutionFixed = FixedPanelNGUI.GetResolutionFixed(false);
+			screenWidth = (float)(int)resolutionFixed.x;
+			screenHeight = (float)(int)resolutionFixed.y;
 		}
 		root.scalingStyle = UIRoot.Scaling.Constrained;
 		root.manualHeight = (int)screenHeight;

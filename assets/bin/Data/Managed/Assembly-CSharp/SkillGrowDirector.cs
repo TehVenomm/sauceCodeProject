@@ -331,8 +331,8 @@ public class SkillGrowDirector : AnimationDirector
 			val.Play("CameraAnim_Start", 0, 0f);
 			val.Update(0f);
 		}
-		_003CStartDirection_003Ec__AnonStorey45E _003CStartDirection_003Ec__AnonStorey45E;
-		Play("MainAnim_Start", new Action((object)_003CStartDirection_003Ec__AnonStorey45E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), 0f);
+		_003CStartDirection_003Ec__AnonStorey466 _003CStartDirection_003Ec__AnonStorey;
+		Play("MainAnim_Start", new Action((object)_003CStartDirection_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), 0f);
 	}
 
 	private void StartCreateMagiEffects()

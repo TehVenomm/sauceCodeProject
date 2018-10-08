@@ -178,6 +178,10 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 
 		public float gachaDecoIntervalTime;
 
+		public Vector3 defaultTargetPos = new Vector3(0f, 0f, 7f);
+
+		public Vector3 defaultCameraPos = Vector3.get_zero();
+
 		public float GetSelfCameraHeight()
 		{
 			return Mathf.Lerp(selfCameraHeightMin, selfCameraHeightMax, selfCameraZoomRate);
@@ -320,6 +324,10 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 		public string[] gachaDecoIconEffectNames;
 
 		public float gachaDecoIntervalTime;
+
+		public Vector3 defaultTargetPos = new Vector3(0f, 0f, 7f);
+
+		public Vector3 defaultCameraPos = Vector3.get_zero();
 
 		public float GetSelfCameraHeight()
 		{

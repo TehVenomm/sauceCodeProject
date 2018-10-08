@@ -1,25 +1,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
 [RequireComponent(typeof(UISprite))]
 [AddComponentMenu("NGUI/UI/Sprite Animation")]
+[ExecuteInEditMode]
 public class UISpriteAnimation
 {
 	[SerializeField]
 	[HideInInspector]
 	protected int mFPS = 30;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected string mPrefix = string.Empty;
 
 	[SerializeField]
 	[HideInInspector]
 	protected bool mLoop = true;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected bool mSnap = true;
 
 	protected UISprite mSprite;

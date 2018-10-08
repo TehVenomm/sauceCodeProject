@@ -96,10 +96,10 @@
         }, {
           "title" : "I didn’t receive the items I bought. What should I do?",
           "body" : "<body> \n <p>Purchased items usually arrive once you buy them but delivery can take a while (up to 24 hours) if payment needs further verification.</p> \n <p>However, if your items are still not delivered after 24 hours, contact our <a href=\"https://support.gogame.net/hc/en-us/requests/new\">Customer Support</a> and submit the following details:</p> \n <ul> \n  <li>Name of the item(s) you bought</li> \n  <li>Transaction receipt</li> \n  <li>E-mail address you used for the transaction</li> \n </ul> \n</body>",
-          "updatedAt" : 1501559199000
+          "updatedAt" : 1531814211000
         } ],
-        "updatedAt" : 1518763860000,
-        "overallUpdatedAt" : 1518763860000
+        "updatedAt" : 1531814211000,
+        "overallUpdatedAt" : 1531814211000
       }, {
         "name" : "Basic Gameplay",
         "articles" : [ {
@@ -205,9 +205,9 @@
         "updatedAt" : 1503195404000,
         "overallUpdatedAt" : 1503195404000
       } ],
-      "updatedAt" : 1523966202000,
-      "overallUpdatedAt" : 1523966202000
+      "updatedAt" : 1531814211000,
+      "overallUpdatedAt" : 1531814211000
     }
   },
-  "overallUpdatedAt" : 1523966202000
+  "overallUpdatedAt" : 1531814211000
 }

@@ -260,27 +260,55 @@ public abstract class HomeCharacterBase
 	private IEnumerator Start()
 	{
 		loader = LoadModel();
-		while (loader.IsLoading())
+		if (!(this is HomePlayerCharacter))
 		{
-			yield return (object)null;
+			while (loader.IsLoading())
+			{
+				yield return (object)null;
+			}
+			CreateNamePlate();
+			UpdateNamePlatePos();
+			InitCollider();
+			ChangeScale();
+			interpolator = this.get_gameObject().AddComponent<TransformInterpolator>();
+			animator = loader.GetAnimator();
+			if (!(animator == null))
+			{
+				animator.get_gameObject().AddComponent<RootMotionProxy>();
+				InitAnim();
+				coroutines.Add(new ManualCoroutine(0, this, DoFreeMove(), false, null, null));
+				coroutines.Add(new ManualCoroutine(1, this, DoOutControll(), false, null, null));
+				coroutines.Add(new ManualCoroutine(2, this, DoBackPosition(), false, null, null));
+				coroutines.Add(new ManualCoroutine(3, this, DoLeave(), false, null, null));
+				coroutines.Add(new ManualCoroutine(4, this, DoStop(), false, null, null));
+				coroutines.Push(0);
+				isLoading = false;
+			}
 		}
-		CreateNamePlate();
-		UpdateNamePlatePos();
-		InitCollider();
-		ChangeScale();
-		interpolator = this.get_gameObject().AddComponent<TransformInterpolator>();
-		animator = loader.GetAnimator();
-		if (!(animator == null))
+		else
 		{
-			animator.get_gameObject().AddComponent<RootMotionProxy>();
-			InitAnim();
-			coroutines.Add(new ManualCoroutine(0, this, DoFreeMove(), false, null, null));
-			coroutines.Add(new ManualCoroutine(1, this, DoOutControll(), false, null, null));
-			coroutines.Add(new ManualCoroutine(2, this, DoBackPosition(), false, null, null));
-			coroutines.Add(new ManualCoroutine(3, this, DoLeave(), false, null, null));
-			coroutines.Add(new ManualCoroutine(4, this, DoStop(), false, null, null));
-			coroutines.Push(0);
 			isLoading = false;
+			while (loader.IsLoading())
+			{
+				yield return (object)null;
+			}
+			CreateNamePlate();
+			UpdateNamePlatePos();
+			InitCollider();
+			ChangeScale();
+			interpolator = this.get_gameObject().AddComponent<TransformInterpolator>();
+			animator = loader.GetAnimator();
+			if (!(animator == null))
+			{
+				animator.get_gameObject().AddComponent<RootMotionProxy>();
+				InitAnim();
+				coroutines.Add(new ManualCoroutine(0, this, DoFreeMove(), false, null, null));
+				coroutines.Add(new ManualCoroutine(1, this, DoOutControll(), false, null, null));
+				coroutines.Add(new ManualCoroutine(2, this, DoBackPosition(), false, null, null));
+				coroutines.Add(new ManualCoroutine(3, this, DoLeave(), false, null, null));
+				coroutines.Add(new ManualCoroutine(4, this, DoStop(), false, null, null));
+				coroutines.Push(0);
+			}
 		}
 	}
 

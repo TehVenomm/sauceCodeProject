@@ -597,6 +597,7 @@ public class zzcco {
 
     @WorkerThread
     private final void zzc(zzcbc zzcbc, zzcak zzcak) {
+        zzcdl zzaue;
         zzbp.zzu(zzcak);
         zzbp.zzgf(zzcak.packageName);
         long nanoTime = System.nanoTime();
@@ -630,7 +631,6 @@ public class zzcco {
                 zzauk().zzayi().zzj("Logging event", zzauf().zzb(zzcbc));
             }
             zzaue().beginTransaction();
-            zzcdl zzaue;
             try {
                 zzaxy = zzcbc.zzinj.zzaxy();
                 zzf(zzcak);
@@ -2327,10 +2327,10 @@ public class zzcco {
 
     @WorkerThread
     public final void zzazf() {
-        String zzaxh;
         zzauj().zzug();
         zzwh();
         this.zzits = true;
+        String zzaxh;
         String zzawt;
         try {
             zzcap.zzawj();

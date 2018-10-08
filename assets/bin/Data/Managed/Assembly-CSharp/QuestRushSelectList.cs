@@ -150,8 +150,8 @@ public class QuestRushSelectList : QuestEventSelectList
 				}
 			}
 			bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-			_003CUpdateTable_003Ec__AnonStorey407 _003CUpdateTable_003Ec__AnonStorey;
-			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num3, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateTable_003Ec__AnonStorey40F _003CUpdateTable_003Ec__AnonStorey40F;
+			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num3, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey40F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey40F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
 			component.set_enabled(true);
 			RepositionTable();
@@ -220,7 +220,7 @@ public class QuestRushSelectList : QuestEventSelectList
 			bool enable_clear_event = table.clearEventID != 0;
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-			_003COnQuery_SELECT_RUSH_003Ec__AnonStorey408 _003COnQuery_SELECT_RUSH_003Ec__AnonStorey;
+			_003COnQuery_SELECT_RUSH_003Ec__AnonStorey410 _003COnQuery_SELECT_RUSH_003Ec__AnonStorey;
 			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo[num].uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003COnQuery_SELECT_RUSH_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		else
@@ -308,14 +308,14 @@ public class QuestRushSelectList : QuestEventSelectList
 	private IEnumerator GetCurrentStatus()
 	{
 		bool isRequest = true;
-		Protocol.Send<QuestRushPointModel.RequestSendForm, QuestRushPointModel>(post_data: new QuestRushPointModel.RequestSendForm
+		Protocol.Send<QuestRushPointModel.RequestSendForm, QuestRushPointModel>(postData: new QuestRushPointModel.RequestSendForm
 		{
 			eid = eventData.eventId
-		}, url: QuestRushPointModel.URL, call_back: (Action<QuestRushPointModel>)delegate(QuestRushPointModel result)
+		}, url: QuestRushPointModel.URL, callBack: (Action<QuestRushPointModel>)delegate(QuestRushPointModel result)
 		{
 			((_003CGetCurrentStatus_003Ec__Iterator125)/*Error near IL_0059: stateMachine*/)._003CisRequest_003E__0 = false;
 			((_003CGetCurrentStatus_003Ec__Iterator125)/*Error near IL_0059: stateMachine*/)._003C_003Ef__this.currentData = result.result;
-		}, get_param: string.Empty);
+		}, getParam: string.Empty);
 		while (isRequest)
 		{
 			yield return (object)null;

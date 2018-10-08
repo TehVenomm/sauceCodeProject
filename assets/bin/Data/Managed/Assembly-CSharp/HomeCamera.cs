@@ -12,6 +12,10 @@ public class HomeCamera
 
 	private const float BaseCameraOffset = 2f;
 
+	private Vector3 targetPos;
+
+	private Vector3 cameraPos;
+
 	private float lerpRate;
 
 	private HomeSelfCharacter chara;
@@ -101,22 +105,24 @@ public class HomeCamera
 
 	public void LateUpdate()
 	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 		if (chara == null)
 		{
 			chara = GetSelfCharacter();
 		}
 		if (IsValidCameraUpdate() && viewMode == VIEW_MODE.NORMAL)
 		{
-			Vector3 targetPos = default(Vector3);
-			Vector3 cameraPos = default(Vector3);
+			targetPos = Vector3.get_zero();
+			cameraPos = Vector3.get_zero();
 			GetTargetAndNormalCameraPosition(ref targetPos, ref cameraPos);
 			cameraPos = CheckCollision(targetPos, cameraPos);
 			UpdateCameraTransform(targetPos, cameraPos);

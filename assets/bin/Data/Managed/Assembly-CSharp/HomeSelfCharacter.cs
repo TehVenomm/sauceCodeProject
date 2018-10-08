@@ -97,7 +97,9 @@ public class HomeSelfCharacter : HomePlayerCharacterBase
 		lastTargetNPCID = -1;
 		sexType = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex;
 		PlayerLoader playerLoader = this.get_gameObject().AddComponent<PlayerLoader>();
-		playerLoader.StartLoad(PlayerLoadInfo.FromUserStatus(false, true, -1), 8, 99, false, false, true, true, false, false, false, false, SHADER_TYPE.NORMAL, null, true, -1);
+		PlayerLoadInfo playerLoadInfo = PlayerLoadInfo.FromUserStatus(false, true, -1);
+		playerLoadInfo.isNeedToCache = true;
+		playerLoader.StartLoad(playerLoadInfo, 8, 99, false, false, true, true, false, false, false, false, SHADER_TYPE.NORMAL, null, true, -1);
 		return playerLoader;
 	}
 

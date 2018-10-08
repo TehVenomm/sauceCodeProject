@@ -22,8 +22,8 @@ public class DoubleUIntKeyTable<T> : UIntKeyTable<UIntKeyTable<T>>
 
 	public unsafe void ForEachDoubleKeyValue(Action<uint, uint, T> a)
 	{
-		_003CForEachDoubleKeyValue_003Ec__AnonStorey53B _003CForEachDoubleKeyValue_003Ec__AnonStorey53B;
-		ForEachKeyValue(new Action<uint, UIntKeyTable<uint>>((object)_003CForEachDoubleKeyValue_003Ec__AnonStorey53B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CForEachDoubleKeyValue_003Ec__AnonStorey544 _003CForEachDoubleKeyValue_003Ec__AnonStorey;
+		ForEachKeyValue(new Action<uint, UIntKeyTable<uint>>((object)_003CForEachDoubleKeyValue_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public unsafe override bool Equals(object obj)
@@ -42,8 +42,8 @@ public class DoubleUIntKeyTable<T> : UIntKeyTable<UIntKeyTable<T>>
 			return false;
 		}
 		bool isEqual = true;
-		_003CEquals_003Ec__AnonStorey53D _003CEquals_003Ec__AnonStorey53D;
-		ForEachDoubleKeyValue(new Action<uint, uint, uint>((object)_003CEquals_003Ec__AnonStorey53D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CEquals_003Ec__AnonStorey546 _003CEquals_003Ec__AnonStorey;
+		ForEachDoubleKeyValue(new Action<uint, uint, uint>((object)_003CEquals_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		return isEqual;
 	}
 

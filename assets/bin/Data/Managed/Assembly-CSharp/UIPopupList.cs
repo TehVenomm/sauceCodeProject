@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Popup List")]
+[ExecuteInEditMode]
 public class UIPopupList : UIWidgetContainer
 {
 	public enum Position
@@ -70,8 +70,8 @@ public class UIPopupList : UIWidgetContainer
 
 	public List<EventDelegate> onChange = new List<EventDelegate>();
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private string mSelectedItem;
 
 	[SerializeField]
@@ -82,16 +82,16 @@ public class UIPopupList : UIWidgetContainer
 	[SerializeField]
 	private UISprite mBackground;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UISprite mHighlight;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private UILabel mHighlightedLabel;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private List<UILabel> mLabelList = new List<UILabel>();
 
 	[SerializeField]
@@ -108,12 +108,12 @@ public class UIPopupList : UIWidgetContainer
 	[HideInInspector]
 	private GameObject eventReceiver;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private string functionName = "OnSelectionChange";
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private float textScale;
 
 	[HideInInspector]

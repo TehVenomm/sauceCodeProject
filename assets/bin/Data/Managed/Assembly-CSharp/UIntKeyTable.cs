@@ -198,8 +198,8 @@ public class UIntKeyTable<T> : UIntKeyTableBase
 			return false;
 		}
 		bool isEqual = true;
-		_003CEquals_003Ec__AnonStorey53A _003CEquals_003Ec__AnonStorey53A;
-		ForEachKeyValue(new Action<uint, uint>((object)_003CEquals_003Ec__AnonStorey53A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CEquals_003Ec__AnonStorey543 _003CEquals_003Ec__AnonStorey;
+		ForEachKeyValue(new Action<uint, uint>((object)_003CEquals_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		return isEqual;
 	}
 

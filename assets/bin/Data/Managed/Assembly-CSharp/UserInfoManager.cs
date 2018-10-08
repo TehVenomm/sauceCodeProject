@@ -582,11 +582,11 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		return (num + 9) / 10 * 10;
 	}
 
-	public void SendHomeInfo(Action<bool, bool, int> call_back)
+	public void SendHomeInfo(Action<bool, bool, int> callBack)
 	{
 		HomeInfoModel.SendForm sendForm = new HomeInfoModel.SendForm();
 		sendForm.appStr = AppMain.appStr;
-		Protocol.Send(HomeInfoModel.URL, sendForm, delegate(HomeInfoModel ret)
+		Protocol.SendAsync("ajax/home/info", sendForm, delegate(HomeInfoModel ret)
 		{
 			bool flag = false;
 			bool flag2 = false;
@@ -598,14 +598,7 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 				flag2 = ret.result.loginBonus;
 				oncePurchaseGachaProductId = ret.result.productId;
 				needShowOneTimesOfferSS = ret.result.isOneTimesOfferActive;
-				if (MonoBehaviourSingleton<UserInfoManager>.I.showJoinClanInGame)
-				{
-					partyInviteHome = PartyManager.IsValidNotEmptyList();
-				}
-				else
-				{
-					partyInviteHome = ret.result.party;
-				}
+				partyInviteHome = ((!showJoinClanInGame) ? ret.result.party : PartyManager.IsValidNotEmptyList());
 				if (!partyInviteHome)
 				{
 					ClearPartyInvite();
@@ -613,8 +606,8 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 				m_alertMessages.AddRange(ret.result.alertMessages);
 				SetEventBannerList(ret.result.banner);
 				SetGachaDecoList(ret.result.gachaDeco);
-				MonoBehaviourSingleton<UserInfoManager>.I.SetNewsID(ret.result.newsId);
-				MonoBehaviourSingleton<UserInfoManager>.I.SetNextDonationTime(ret.result.nextDonationTime);
+				SetNewsID(ret.result.newsId);
+				SetNextDonationTime(ret.result.nextDonationTime);
 				MonoBehaviourSingleton<GuildManager>.I.SetAskUpdate(long.Parse(ret.result.askUpdate));
 				advisory = ret.result.advisory;
 				isShowAppReviewAppeal = (ret.result.isDisplayReview >= 1);
@@ -688,7 +681,7 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 				isWheelOfFortuneOn = ret.result.isWheelOfFortuneOn;
 				GameSaveData.instance.canShowWheelFortune = isWheelOfFortuneOn;
 			}
-			call_back.Invoke(flag, flag2, num);
+			callBack.Invoke(flag, flag2, num);
 		}, string.Empty);
 	}
 

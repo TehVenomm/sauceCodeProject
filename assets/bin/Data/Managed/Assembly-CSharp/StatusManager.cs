@@ -639,10 +639,10 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 	public unsafe void UpdateEquip(EquipItemInfo equip)
 	{
 		int i = 0;
-		_003CUpdateEquip_003Ec__AnonStorey6B5 _003CUpdateEquip_003Ec__AnonStorey6B;
+		_003CUpdateEquip_003Ec__AnonStorey6BE _003CUpdateEquip_003Ec__AnonStorey6BE;
 		for (int num = equipSet.Length; i < num; i++)
 		{
-			IsEquipping(i, equip, new Action<int, int>((object)_003CUpdateEquip_003Ec__AnonStorey6B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			IsEquipping(i, equip, new Action<int, int>((object)_003CUpdateEquip_003Ec__AnonStorey6BE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 

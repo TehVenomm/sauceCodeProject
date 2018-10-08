@@ -37,12 +37,12 @@ class DocumentsContractApi21 {
     }
 
     public static Uri[] listFiles(Context context, Uri uri) {
-        AutoCloseable query;
         Object e;
         Throwable th;
         ContentResolver contentResolver = context.getContentResolver();
         Uri buildChildDocumentsUriUsingTree = DocumentsContract.buildChildDocumentsUriUsingTree(uri, DocumentsContract.getDocumentId(uri));
         ArrayList arrayList = new ArrayList();
+        AutoCloseable query;
         try {
             query = contentResolver.query(buildChildDocumentsUriUsingTree, new String[]{"document_id"}, null, null, null);
             while (query.moveToNext()) {

@@ -110,14 +110,14 @@ public class EventBannerView : UIBehaviour
 				loadingRoutines.Clear();
 				UIWidget refWidget = base._transform.GetComponentInChildren<UIWidget>();
 				bannerNum1 = ((MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count > 1) ? 1 : MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count);
-				_003CUpdateEventBannerAll_003Ec__AnonStorey2D7 _003CUpdateEventBannerAll_003Ec__AnonStorey2D;
-				SetWrapContent(UI.WRP_EVENT_BANNER1, "EventBanner", bannerNum1, true, new Action<int, Transform, bool>((object)_003CUpdateEventBannerAll_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CUpdateEventBannerAll_003Ec__AnonStorey2DE _003CUpdateEventBannerAll_003Ec__AnonStorey2DE;
+				SetWrapContent(UI.WRP_EVENT_BANNER1, "EventBanner", bannerNum1, true, new Action<int, Transform, bool>((object)_003CUpdateEventBannerAll_003Ec__AnonStorey2DE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				bannerNum2 = MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count - bannerNum1;
 				if (bannerNum2 > 5)
 				{
 					bannerNum2 = 5;
 				}
-				SetWrapContent(UI.WRP_EVENT_BANNER2, "EventBanner", bannerNum2, true, new Action<int, Transform, bool>((object)_003CUpdateEventBannerAll_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				SetWrapContent(UI.WRP_EVENT_BANNER2, "EventBanner", bannerNum2, true, new Action<int, Transform, bool>((object)_003CUpdateEventBannerAll_003Ec__AnonStorey2DE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				mCenterIndex1 = 0;
 				mCenterIndex2 = 0;
 				timer1 = 0f;
@@ -130,19 +130,36 @@ public class EventBannerView : UIBehaviour
 	{
 		LoadingQueue load = new LoadingQueue(this);
 		LoadObject lo;
-		if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest != null)
+		if (banner.LinkType == LINK_TYPE.NEWS)
 		{
-			Hash128 assetBundleHash = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.HOME_BANNER_IMAGE.ToAssetBundleName(ResourceName.GetHomeBannerImage(banner.bannerId)));
-			if (assetBundleHash.get_isValid())
+			if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest != null)
 			{
-				lo = load.Load(true, RESOURCE_CATEGORY.HOME_BANNER_IMAGE, ResourceName.GetHomeBannerImage(banner.bannerId), false);
-				goto IL_00e7;
+				Hash128 assetBundleHash = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.HOME_BANNER_IMAGE.ToAssetBundleName(ResourceName.GetHomeBannerImage(banner.bannerId) + "_result"));
+				if (assetBundleHash.get_isValid())
+				{
+					lo = load.Load(true, RESOURCE_CATEGORY.HOME_BANNER_IMAGE, ResourceName.GetHomeBannerImage(banner.bannerId) + "_result", false);
+					goto IL_01c2;
+				}
 			}
+			lo = load.Load(true, RESOURCE_CATEGORY.HOME_BANNER_IMAGE, "HBI_Default", false);
+			Log.Error("Missing HBI image: " + ResourceName.GetHomeBannerImage(banner.bannerId));
 		}
-		lo = load.Load(true, RESOURCE_CATEGORY.HOME_BANNER_IMAGE, "HBI_Default", false);
-		Log.Error("Missing HBI image: " + ResourceName.GetHomeBannerImage(banner.bannerId));
-		goto IL_00e7;
-		IL_00e7:
+		else
+		{
+			if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest != null)
+			{
+				Hash128 assetBundleHash2 = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.HOME_BANNER_IMAGE.ToAssetBundleName(ResourceName.GetHomeBannerImage(banner.bannerId)));
+				if (assetBundleHash2.get_isValid())
+				{
+					lo = load.Load(true, RESOURCE_CATEGORY.HOME_BANNER_IMAGE, ResourceName.GetHomeBannerImage(banner.bannerId), false);
+					goto IL_01c2;
+				}
+			}
+			lo = load.Load(true, RESOURCE_CATEGORY.HOME_BANNER_IMAGE, "HBI_Default", false);
+			Log.Error("Missing HBI image: " + ResourceName.GetHomeBannerImage(banner.bannerId));
+		}
+		goto IL_01c2;
+		IL_01c2:
 		yield return (object)load.Wait();
 		Transform bannerTrans = FindCtrl(t, UI.NORMAL_CLOTH);
 		Texture2D tex = lo.loadedObject as Texture2D;

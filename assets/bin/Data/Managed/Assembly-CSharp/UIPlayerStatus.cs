@@ -438,43 +438,42 @@ public class UIPlayerStatus : MonoBehaviourSingleton<UIPlayerStatus>
 	{
 		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0244: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03dd: Unknown result type (might be due to invalid IL or missing references)
 		//IL_03e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03e7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0400: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0449: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0464: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0405: Unknown result type (might be due to invalid IL or missing references)
+		//IL_044e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0469: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_046e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04b7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_04d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_050f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0504: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0514: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0516: Unknown result type (might be due to invalid IL or missing references)
-		//IL_051a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0519: Unknown result type (might be due to invalid IL or missing references)
+		//IL_051b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_051f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0530: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0524: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0535: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0655: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0667: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0674: Unknown result type (might be due to invalid IL or missing references)
-		//IL_067a: Expected O, but got Unknown
-		//IL_0681: Unknown result type (might be due to invalid IL or missing references)
-		//IL_068a: Expected O, but got Unknown
-		//IL_06d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06fd: Expected O, but got Unknown
-		//IL_0704: Unknown result type (might be due to invalid IL or missing references)
-		//IL_070d: Expected O, but got Unknown
-		//IL_074b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_075d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_076a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0770: Expected O, but got Unknown
-		//IL_0777: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0780: Expected O, but got Unknown
+		//IL_053a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_065a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_066c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0679: Unknown result type (might be due to invalid IL or missing references)
+		//IL_067f: Expected O, but got Unknown
+		//IL_0686: Unknown result type (might be due to invalid IL or missing references)
+		//IL_068f: Expected O, but got Unknown
+		//IL_06dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06fc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0702: Expected O, but got Unknown
+		//IL_0709: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0712: Expected O, but got Unknown
+		//IL_0750: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0762: Unknown result type (might be due to invalid IL or missing references)
+		//IL_076f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0775: Expected O, but got Unknown
+		//IL_077c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0785: Expected O, but got Unknown
 		if (playerName != null && !string.IsNullOrEmpty(targetPlayer.charaName))
 		{
 			playerName.text = targetPlayer.charaName;
@@ -510,7 +509,10 @@ public class UIPlayerStatus : MonoBehaviourSingleton<UIPlayerStatus>
 		{
 			float num3 = ((int)targetPlayer.ShieldHpMax <= 0) ? 0f : ((float)(int)targetPlayer.ShieldHp / (float)(int)targetPlayer.ShieldHpMax);
 			shieldHpGaugeUI.get_gameObject().SetActive(targetPlayer.IsValidShield());
-			shieldHpGaugeADD.sprite.get_gameObject().SetActive(targetPlayer.IsValidShield());
+			if (!targetPlayer.IsValidShield())
+			{
+				shieldHpGaugeADD.sprite.alpha = 0.1f;
+			}
 			if (shieldHpGaugeUI.nowPercent != num3)
 			{
 				shieldHpGaugeUI.SetPercent(num3, false);

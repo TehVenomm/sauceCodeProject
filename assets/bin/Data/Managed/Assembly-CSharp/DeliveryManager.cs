@@ -382,14 +382,14 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 
 	public unsafe int GetCompletableEventDeliveryNum(int event_id)
 	{
-		_003CGetCompletableEventDeliveryNum_003Ec__AnonStorey573 _003CGetCompletableEventDeliveryNum_003Ec__AnonStorey;
-		return CountCompletableDeliveryNum(new Func<ClearStatusDelivery, DeliveryTable.DeliveryData, bool>((object)_003CGetCompletableEventDeliveryNum_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
+		_003CGetCompletableEventDeliveryNum_003Ec__AnonStorey57C _003CGetCompletableEventDeliveryNum_003Ec__AnonStorey57C;
+		return CountCompletableDeliveryNum(new Func<ClearStatusDelivery, DeliveryTable.DeliveryData, bool>((object)_003CGetCompletableEventDeliveryNum_003Ec__AnonStorey57C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
 	}
 
 	public unsafe int GetCompletableRegionDeliveryNum(int regionId, int groupId)
 	{
-		_003CGetCompletableRegionDeliveryNum_003Ec__AnonStorey574 _003CGetCompletableRegionDeliveryNum_003Ec__AnonStorey;
-		return CountCompletableDeliveryNum(new Func<ClearStatusDelivery, DeliveryTable.DeliveryData, bool>((object)_003CGetCompletableRegionDeliveryNum_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new DELIVERY_TYPE[2]
+		_003CGetCompletableRegionDeliveryNum_003Ec__AnonStorey57D _003CGetCompletableRegionDeliveryNum_003Ec__AnonStorey57D;
+		return CountCompletableDeliveryNum(new Func<ClearStatusDelivery, DeliveryTable.DeliveryData, bool>((object)_003CGetCompletableRegionDeliveryNum_003Ec__AnonStorey57D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new DELIVERY_TYPE[2]
 		{
 			DELIVERY_TYPE.STORY,
 			DELIVERY_TYPE.ONCE

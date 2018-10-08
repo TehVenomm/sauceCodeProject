@@ -99,10 +99,10 @@ public class DataLoader
 		{
 			IEnumerator download = Download(req, delegate(byte[] b)
 			{
-				((_003CLoad_003Ec__Iterator277)/*Error near IL_00f7: stateMachine*/)._003Cbytes_003E__3 = b;
+				((_003CLoad_003Ec__Iterator278)/*Error near IL_00f7: stateMachine*/)._003Cbytes_003E__3 = b;
 			}, delegate(DataTableLoadError e)
 			{
-				((_003CLoad_003Ec__Iterator277)/*Error near IL_0103: stateMachine*/)._003Cerror_003E__2 = e;
+				((_003CLoad_003Ec__Iterator278)/*Error near IL_0103: stateMachine*/)._003Cerror_003E__2 = e;
 			});
 			while (download.MoveNext())
 			{
@@ -133,18 +133,18 @@ public class DataLoader
 			{
 				try
 				{
-					if (((_003CLoad_003Ec__Iterator277)/*Error near IL_01cc: stateMachine*/)._003Cbytes_003E__3 != null)
+					if (((_003CLoad_003Ec__Iterator278)/*Error near IL_01cc: stateMachine*/)._003Cbytes_003E__3 != null)
 					{
-						((_003CLoad_003Ec__Iterator277)/*Error near IL_01cc: stateMachine*/)._003Cerror_003E__2 = ((_003CLoad_003Ec__Iterator277)/*Error near IL_01cc: stateMachine*/)._003C_003Ef__this.Save(((_003CLoad_003Ec__Iterator277)/*Error near IL_01cc: stateMachine*/).req, ((_003CLoad_003Ec__Iterator277)/*Error near IL_01cc: stateMachine*/)._003Cbytes_003E__3);
+						((_003CLoad_003Ec__Iterator278)/*Error near IL_01cc: stateMachine*/)._003Cerror_003E__2 = ((_003CLoad_003Ec__Iterator278)/*Error near IL_01cc: stateMachine*/)._003C_003Ef__this.Save(((_003CLoad_003Ec__Iterator278)/*Error near IL_01cc: stateMachine*/).req, ((_003CLoad_003Ec__Iterator278)/*Error near IL_01cc: stateMachine*/)._003Cbytes_003E__3);
 					}
 				}
 				catch (Exception)
 				{
-					((_003CLoad_003Ec__Iterator277)/*Error near IL_01cc: stateMachine*/)._003Cerror_003E__2 = DataTableLoadError.FileReadError;
+					((_003CLoad_003Ec__Iterator278)/*Error near IL_01cc: stateMachine*/)._003Cerror_003E__2 = DataTableLoadError.FileReadError;
 				}
 				finally
 				{
-					((_003CLoad_003Ec__Iterator277)/*Error near IL_01cc: stateMachine*/)._003Cwait_003E__6 = false;
+					((_003CLoad_003Ec__Iterator278)/*Error near IL_01cc: stateMachine*/)._003Cwait_003E__6 = false;
 				}
 			});
 			while (wait)
@@ -172,7 +172,7 @@ public class DataLoader
 			{
 				loading = LoadCompressedBinary(req, bytes, delegate(DataTableLoadError e)
 				{
-					((_003CLoad_003Ec__Iterator277)/*Error near IL_027b: stateMachine*/)._003Cerror_003E__2 = e;
+					((_003CLoad_003Ec__Iterator278)/*Error near IL_027b: stateMachine*/)._003Cerror_003E__2 = e;
 				}, useQueue);
 				while (loading.MoveNext())
 				{
@@ -193,7 +193,7 @@ public class DataLoader
 			{
 				loading = LoadCompressedTextWithSignature(req, bytes, delegate(DataTableLoadError e)
 				{
-					((_003CLoad_003Ec__Iterator277)/*Error near IL_0330: stateMachine*/)._003Cerror_003E__2 = e;
+					((_003CLoad_003Ec__Iterator278)/*Error near IL_0330: stateMachine*/)._003Cerror_003E__2 = e;
 				}, useQueue);
 			}
 			while (loading.MoveNext())
@@ -229,7 +229,7 @@ public class DataLoader
 		{
 			ThreadPoolWrapper.QueueUserWorkItem(delegate
 			{
-				((_003CLoadCompressedTextWithSignature_003Ec__Iterator278)/*Error near IL_0072: stateMachine*/)._003Cact_003E__2.Invoke();
+				((_003CLoadCompressedTextWithSignature_003Ec__Iterator279)/*Error near IL_0072: stateMachine*/)._003Cact_003E__2.Invoke();
 			});
 		}
 		while (wait)
@@ -252,7 +252,7 @@ public class DataLoader
 		{
 			ThreadPoolWrapper.QueueUserWorkItem(delegate
 			{
-				((_003CLoadCompressedBinary_003Ec__Iterator279)/*Error near IL_0072: stateMachine*/)._003Cact_003E__2.Invoke();
+				((_003CLoadCompressedBinary_003Ec__Iterator27A)/*Error near IL_0072: stateMachine*/)._003Cact_003E__2.Invoke();
 			});
 		}
 		while (wait)

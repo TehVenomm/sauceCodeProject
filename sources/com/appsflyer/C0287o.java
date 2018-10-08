@@ -44,16 +44,16 @@ final class C0287o {
         String bool;
         String str;
         String str2;
+        String str3;
         Throwable th;
         boolean z;
         int isGooglePlayServicesAvailable;
         C0281a ˏ;
         String ॱ;
-        String str3;
-        String str4 = null;
+        String str4;
+        String str5 = null;
         boolean z2 = true;
         AFLogger.afInfoLog("Trying to fetch GAID..");
-        String str5;
         boolean z3;
         try {
             Class.forName("com.google.android.gms.ads.identifier.AdvertisingIdClient");
@@ -65,12 +65,12 @@ final class C0287o {
                     if (id != null) {
                         try {
                             if (id.length() != 0) {
-                                str5 = bool;
+                                str = bool;
                                 bool = id;
                             }
                         } catch (Throwable th2) {
-                            str = bool;
-                            str2 = id;
+                            str2 = bool;
+                            str3 = id;
                             th = th2;
                             z = z2;
                             AFLogger.afErrorLog(th.getMessage(), th);
@@ -89,88 +89,88 @@ final class C0287o {
                                     if (ˏ.m325()) {
                                         z2 = false;
                                     }
-                                    str5 = Boolean.toString(z2);
+                                    str = Boolean.toString(z2);
                                     if (ॱ != null) {
                                     }
-                                    str3 = "emptyOrNull (bypass)";
-                                    bool = str5;
+                                    str4 = "emptyOrNull (bypass)";
+                                    bool = str;
                                     z3 = z;
                                     id = ॱ;
                                 } catch (Throwable th3) {
                                     Throwable th4 = th3;
                                     AFLogger.afErrorLog(th4.getMessage(), th4);
-                                    str3 = new StringBuilder().append(bool).append(Constants.URL_PATH_DELIMITER).append(th4.getClass().getSimpleName()).toString();
-                                    str5 = AppsFlyerProperties.getInstance().getString(ServerParameters.ADVERTISING_ID_PARAM);
+                                    str4 = new StringBuilder().append(bool).append(Constants.URL_PATH_DELIMITER).append(th4.getClass().getSimpleName()).toString();
+                                    str = AppsFlyerProperties.getInstance().getString(ServerParameters.ADVERTISING_ID_PARAM);
                                     bool = AppsFlyerProperties.getInstance().getString("advertiserIdEnabled");
                                     boolean z4;
                                     if (th4.getLocalizedMessage() != null) {
                                         AFLogger.afInfoLog(th4.getLocalizedMessage());
                                         z4 = z;
-                                        id = str5;
+                                        id = str;
                                         z3 = z4;
                                     } else {
                                         AFLogger.afInfoLog(th4.toString());
                                         z4 = z;
-                                        id = str5;
+                                        id = str;
                                         z3 = z4;
                                     }
                                 }
                             } else {
-                                str3 = bool;
+                                str4 = bool;
                                 z3 = z;
-                                bool = str;
-                                id = str2;
+                                bool = str2;
+                                id = str3;
                             }
                             if (context.getClass().getName().equals("android.app.ReceiverRestrictedContext")) {
                                 id = AppsFlyerProperties.getInstance().getString(ServerParameters.ADVERTISING_ID_PARAM);
                                 bool = AppsFlyerProperties.getInstance().getString("advertiserIdEnabled");
-                                str3 = "context = android.app.ReceiverRestrictedContext";
+                                str4 = "context = android.app.ReceiverRestrictedContext";
                             }
-                            if (str3 != null) {
-                                map.put("gaidError", new StringBuilder().append(isGooglePlayServicesAvailable).append(": ").append(str3).toString());
+                            if (str4 != null) {
+                                map.put("gaidError", new StringBuilder().append(isGooglePlayServicesAvailable).append(": ").append(str4).toString());
                             }
                             if (id != null) {
                             }
                         }
                     }
                     z3 = z2;
-                    str3 = "emptyOrNull";
+                    str4 = "emptyOrNull";
                     isGooglePlayServicesAvailable = -1;
                 } catch (Throwable th5) {
                     th = th5;
-                    str = null;
-                    str2 = id;
+                    str2 = null;
+                    str3 = id;
                     z = false;
                     AFLogger.afErrorLog(th.getMessage(), th);
                     isGooglePlayServicesAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
                     bool = th.getClass().getSimpleName();
                     AFLogger.afInfoLog("WARNING: Google Play Services is missing.");
                     if (AppsFlyerProperties.getInstance().getBoolean(AppsFlyerProperties.ENABLE_GPS_FALLBACK, z2)) {
-                        str3 = bool;
+                        str4 = bool;
                         z3 = z;
-                        bool = str;
-                        id = str2;
+                        bool = str2;
+                        id = str3;
                     } else {
                         ˏ = C0284m.m330(context);
                         ॱ = ˏ.m326();
                         if (ˏ.m325()) {
                             z2 = false;
                         }
-                        str5 = Boolean.toString(z2);
+                        str = Boolean.toString(z2);
                         if (ॱ != null) {
                         }
-                        str3 = "emptyOrNull (bypass)";
-                        bool = str5;
+                        str4 = "emptyOrNull (bypass)";
+                        bool = str;
                         z3 = z;
                         id = ॱ;
                     }
                     if (context.getClass().getName().equals("android.app.ReceiverRestrictedContext")) {
                         id = AppsFlyerProperties.getInstance().getString(ServerParameters.ADVERTISING_ID_PARAM);
                         bool = AppsFlyerProperties.getInstance().getString("advertiserIdEnabled");
-                        str3 = "context = android.app.ReceiverRestrictedContext";
+                        str4 = "context = android.app.ReceiverRestrictedContext";
                     }
-                    if (str3 != null) {
-                        map.put("gaidError", new StringBuilder().append(isGooglePlayServicesAvailable).append(": ").append(str3).toString());
+                    if (str4 != null) {
+                        map.put("gaidError", new StringBuilder().append(isGooglePlayServicesAvailable).append(": ").append(str4).toString());
                     }
                     if (id != null) {
                     }
@@ -178,10 +178,10 @@ final class C0287o {
                 if (context.getClass().getName().equals("android.app.ReceiverRestrictedContext")) {
                     id = AppsFlyerProperties.getInstance().getString(ServerParameters.ADVERTISING_ID_PARAM);
                     bool = AppsFlyerProperties.getInstance().getString("advertiserIdEnabled");
-                    str3 = "context = android.app.ReceiverRestrictedContext";
+                    str4 = "context = android.app.ReceiverRestrictedContext";
                 }
-                if (str3 != null) {
-                    map.put("gaidError", new StringBuilder().append(isGooglePlayServicesAvailable).append(": ").append(str3).toString());
+                if (str4 != null) {
+                    map.put("gaidError", new StringBuilder().append(isGooglePlayServicesAvailable).append(": ").append(str4).toString());
                 }
                 if (id != null && bool != null) {
                     map.put(ServerParameters.ADVERTISING_ID_PARAM, id);
@@ -193,19 +193,19 @@ final class C0287o {
                 }
             }
             bool = null;
-            str5 = null;
-            str4 = "gpsAdInfo-null";
+            str = null;
+            str5 = "gpsAdInfo-null";
             z2 = false;
             id = bool;
-            bool = str5;
+            bool = str;
             z3 = z2;
-            str3 = str4;
+            str4 = str5;
             isGooglePlayServicesAvailable = -1;
         } catch (Throwable th6) {
             th = th6;
             z = false;
-            str = null;
             str2 = null;
+            str3 = null;
             AFLogger.afErrorLog(th.getMessage(), th);
             isGooglePlayServicesAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
             bool = th.getClass().getSimpleName();
@@ -216,28 +216,28 @@ final class C0287o {
                 if (ˏ.m325()) {
                     z2 = false;
                 }
-                str5 = Boolean.toString(z2);
+                str = Boolean.toString(z2);
                 if (ॱ != null || ॱ.length() == 0) {
-                    str3 = "emptyOrNull (bypass)";
+                    str4 = "emptyOrNull (bypass)";
                 } else {
-                    str3 = bool;
+                    str4 = bool;
                 }
-                bool = str5;
+                bool = str;
                 z3 = z;
                 id = ॱ;
             } else {
-                str3 = bool;
+                str4 = bool;
                 z3 = z;
-                bool = str;
-                id = str2;
+                bool = str2;
+                id = str3;
             }
             if (context.getClass().getName().equals("android.app.ReceiverRestrictedContext")) {
                 id = AppsFlyerProperties.getInstance().getString(ServerParameters.ADVERTISING_ID_PARAM);
                 bool = AppsFlyerProperties.getInstance().getString("advertiserIdEnabled");
-                str3 = "context = android.app.ReceiverRestrictedContext";
+                str4 = "context = android.app.ReceiverRestrictedContext";
             }
-            if (str3 != null) {
-                map.put("gaidError", new StringBuilder().append(isGooglePlayServicesAvailable).append(": ").append(str3).toString());
+            if (str4 != null) {
+                map.put("gaidError", new StringBuilder().append(isGooglePlayServicesAvailable).append(": ").append(str4).toString());
             }
             if (id != null) {
             }
@@ -245,10 +245,10 @@ final class C0287o {
         if (context.getClass().getName().equals("android.app.ReceiverRestrictedContext")) {
             id = AppsFlyerProperties.getInstance().getString(ServerParameters.ADVERTISING_ID_PARAM);
             bool = AppsFlyerProperties.getInstance().getString("advertiserIdEnabled");
-            str3 = "context = android.app.ReceiverRestrictedContext";
+            str4 = "context = android.app.ReceiverRestrictedContext";
         }
-        if (str3 != null) {
-            map.put("gaidError", new StringBuilder().append(isGooglePlayServicesAvailable).append(": ").append(str3).toString());
+        if (str4 != null) {
+            map.put("gaidError", new StringBuilder().append(isGooglePlayServicesAvailable).append(": ").append(str4).toString());
         }
         if (id != null) {
         }

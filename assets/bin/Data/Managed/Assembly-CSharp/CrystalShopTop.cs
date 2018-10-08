@@ -270,8 +270,8 @@ public class CrystalShopTop : GameSection
 		SetActive(materialTab, false);
 		CheckOpenedGemTab();
 		int i = 0;
-		_003C_viewGemTab_003Ec__AnonStorey2DF _003C_viewGemTab_003Ec__AnonStorey2DF;
-		SetTable(gemTab, UI.TBL_LIST, "CrystalShopListItem", _purchaseGemList.Count, false, new Func<int, Transform, Transform>((object)_003C_viewGemTab_003Ec__AnonStorey2DF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003C_viewGemTab_003Ec__AnonStorey2DF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003C_viewGemTab_003Ec__AnonStorey2E6 _003C_viewGemTab_003Ec__AnonStorey2E;
+		SetTable(gemTab, UI.TBL_LIST, "CrystalShopListItem", _purchaseGemList.Count, false, new Func<int, Transform, Transform>((object)_003C_viewGemTab_003Ec__AnonStorey2E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003C_viewGemTab_003Ec__AnonStorey2E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void _viewBundleTab()
@@ -376,8 +376,8 @@ public class CrystalShopTop : GameSection
 		SetActive(materialTab, true);
 		CheckOpenedMaterialTab();
 		int i = 0;
-		_003C_viewMaterialTab_003Ec__AnonStorey2E3 _003C_viewMaterialTab_003Ec__AnonStorey2E;
-		SetTable(materialTab, UI.TBL_LIST, "CrystalShopListItemMaterial", _purchaseMaterialList.Count, false, new Action<int, Transform, bool>((object)_003C_viewMaterialTab_003Ec__AnonStorey2E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003C_viewMaterialTab_003Ec__AnonStorey2EA _003C_viewMaterialTab_003Ec__AnonStorey2EA;
+		SetTable(materialTab, UI.TBL_LIST, "CrystalShopListItemMaterial", _purchaseMaterialList.Count, false, new Action<int, Transform, bool>((object)_003C_viewMaterialTab_003Ec__AnonStorey2EA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnGetProductDatas(StoreDataList list)
@@ -722,24 +722,24 @@ public class CrystalShopTop : GameSection
 	{
 		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0027: Expected O, but got Unknown
-		_003CGetFinishAction_003Ec__AnonStorey2E8 _003CGetFinishAction_003Ec__AnonStorey2E;
-		return new Action((object)_003CGetFinishAction_003Ec__AnonStorey2E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		_003CGetFinishAction_003Ec__AnonStorey2EF _003CGetFinishAction_003Ec__AnonStorey2EF;
+		return new Action((object)_003CGetFinishAction_003Ec__AnonStorey2EF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 	}
 
 	private unsafe Action GetFinishActionBundle(ShopReceiver.PaymentPurchaseData purchaseData)
 	{
 		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0020: Expected O, but got Unknown
-		_003CGetFinishActionBundle_003Ec__AnonStorey2E9 _003CGetFinishActionBundle_003Ec__AnonStorey2E;
-		return new Action((object)_003CGetFinishActionBundle_003Ec__AnonStorey2E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		_003CGetFinishActionBundle_003Ec__AnonStorey2F0 _003CGetFinishActionBundle_003Ec__AnonStorey2F;
+		return new Action((object)_003CGetFinishActionBundle_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 	}
 
 	private unsafe Action GetFinishActionMaterial(ShopReceiver.PaymentPurchaseData purchaseData)
 	{
 		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0019: Expected O, but got Unknown
-		_003CGetFinishActionMaterial_003Ec__AnonStorey2EA _003CGetFinishActionMaterial_003Ec__AnonStorey2EA;
-		return new Action((object)_003CGetFinishActionMaterial_003Ec__AnonStorey2EA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		_003CGetFinishActionMaterial_003Ec__AnonStorey2F1 _003CGetFinishActionMaterial_003Ec__AnonStorey2F;
+		return new Action((object)_003CGetFinishActionMaterial_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 	}
 
 	private void SendRequestCurrentCrystal(Action onFinish)
@@ -754,8 +754,8 @@ public class CrystalShopTop : GameSection
 	{
 		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001a: Expected O, but got Unknown
-		_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2EC _003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2EC;
-		SendRequestCurrentCrystal(new Action((object)_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2EC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2F3 _003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2F;
+		SendRequestCurrentCrystal(new Action((object)_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void CheckCrystalNum(OnceStatusInfoModel ret, Action onFinish)

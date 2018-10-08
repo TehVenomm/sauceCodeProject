@@ -3,9 +3,11 @@ using UnityEngine;
 
 public class HomePlayerCharacter : HomePlayerCharacterBase
 {
-	private static PlayerLoader Load(HomePlayerCharacter chara, GameObject go, FriendCharaInfo chara_info, PlayerLoader.OnCompleteLoad callback)
+	private PlayerLoader _playerLoader;
+
+	private PlayerLoader Load(HomePlayerCharacter chara, GameObject go, FriendCharaInfo chara_info, PlayerLoader.OnCompleteLoad callback)
 	{
-		PlayerLoader playerLoader = go.AddComponent<PlayerLoader>();
+		_playerLoader = go.AddComponent<PlayerLoader>();
 		PlayerLoadInfo playerLoadInfo = new PlayerLoadInfo();
 		if (chara_info != null)
 		{
@@ -51,14 +53,14 @@ public class HomePlayerCharacter : HomePlayerCharacterBase
 			playerLoadInfo.SetEquipLeg(num, equip_leg_item_id);
 			chara.sexType = num;
 		}
-		playerLoader.StartLoad(playerLoadInfo, 0, 99, false, false, true, true, false, false, true, true, SHADER_TYPE.NORMAL, callback, true, -1);
-		return playerLoader;
+		_playerLoader.StartLoad(playerLoadInfo, 0, 99, false, false, true, true, false, false, true, true, SHADER_TYPE.NORMAL, callback, true, -1);
+		return _playerLoader;
 	}
 
 	protected override ModelLoaderBase LoadModel()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Expected O, but got Unknown
+		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000f: Expected O, but got Unknown
 		return Load(this, this.get_gameObject(), charaInfo, null);
 	}
 

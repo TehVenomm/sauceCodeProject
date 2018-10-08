@@ -14,6 +14,7 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 		yield return (object)load_queue.Wait();
 		MonoBehaviourSingleton<UIManager>.I.SetLoadingUI(lo_loading_ui.loadedObject);
 		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.INITIALIZE, true);
+		yield return (object)null;
 		if (!is_tutorial)
 		{
 			yield return (object)MonoBehaviourSingleton<AppMain>.I.ClearMemory(true, true);
@@ -30,7 +31,7 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 			"OutGameSettingsManager"
 		}, false);
 		ResourceManager.enableCache = true;
-		if (MonoBehaviourSingleton<SoundManager>.IsValid())
+		if (MonoBehaviourSingleton<SoundManager>.IsValid() && !MonoBehaviourSingleton<SoundManager>.I.IsLoadedAudioClip())
 		{
 			MonoBehaviourSingleton<SoundManager>.I.LoadParmanentAudioClip();
 		}
@@ -68,6 +69,7 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 		{
 			ResourceUtility.Realizes(prefab.obj, MonoBehaviourSingleton<AppMain>.I._transform, -1);
 		}
+		yield return (object)null;
 		ResourceObject[] loadedObjects2 = lo_outgame_prefabs.loadedObjects;
 		foreach (ResourceObject prefab2 in loadedObjects2)
 		{
@@ -76,7 +78,7 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 		bool isLinkResourceLoaded = false;
 		if (MonoBehaviourSingleton<GlobalSettingsManager>.IsValid())
 		{
-			MonoBehaviourSingleton<GlobalSettingsManager>.I.LoadLinkResources(new Action((object)/*Error near IL_031e: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			MonoBehaviourSingleton<GlobalSettingsManager>.I.LoadLinkResources(new Action((object)/*Error near IL_035f: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		yield return (object)null;
 		MonoBehaviourSingleton<AppMain>.I.SetMainCamera(Camera.get_main());
@@ -86,7 +88,7 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 		bool loadmanifest = true;
 		bool dataTableLoading = true;
 		MonoBehaviourSingleton<DataTableManager>.I.Initialize();
-		MonoBehaviourSingleton<DataTableManager>.I.UpdateManifest(new Action((object)/*Error near IL_039d: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<DataTableManager>.I.UpdateManifest(new Action((object)/*Error near IL_03de: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		yield return (object)null;
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<FilterManager>();
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<InGameManager>();
@@ -121,11 +123,11 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 			yield return (object)null;
 		}
 		DataTableManager i2 = MonoBehaviourSingleton<DataTableManager>.I;
-		if (_003CStart_003Ec__Iterator1A._003C_003Ef__am_0024cache14 == null)
+		if (_003CStart_003Ec__Iterator1A._003C_003Ef__am_0024cache15 == null)
 		{
-			_003CStart_003Ec__Iterator1A._003C_003Ef__am_0024cache14 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CStart_003Ec__Iterator1A._003C_003Ef__am_0024cache15 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		i2.LoadAllTable(_003CStart_003Ec__Iterator1A._003C_003Ef__am_0024cache14, false);
+		i2.LoadAllTable(_003CStart_003Ec__Iterator1A._003C_003Ef__am_0024cache15, false);
 		MonoBehaviourSingleton<GameSceneManager>.I.Initialize();
 		while (!MonoBehaviourSingleton<GameSceneManager>.I.isInitialized)
 		{
@@ -140,6 +142,27 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 		while ((MonoBehaviourSingleton<SoundManager>.IsValid() && MonoBehaviourSingleton<SoundManager>.I.IsLoadingAudioClip()) || !isLinkResourceLoaded)
 		{
 			yield return (object)null;
+		}
+		if (MonoBehaviourSingleton<AccountManager>.I.account.IsRegist() && TitleTop.isFirstBoot && 2 <= MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep)
+		{
+			bool wait = true;
+			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
+			{
+				((_003CStart_003Ec__Iterator1A)/*Error near IL_0727: stateMachine*/)._003Cwait_003E__14 = false;
+			}, false);
+			while (wait)
+			{
+				yield return (object)null;
+			}
+			if (MonoBehaviourSingleton<LoungeMatchingManager>.IsValid() && MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData != null)
+			{
+				MonoBehaviourSingleton<AppMain>.I.startScene = "Lounge";
+			}
+			else
+			{
+				MonoBehaviourSingleton<AppMain>.I.startScene = "Home";
+			}
+			TitleTop.isFirstBoot = false;
 		}
 		if (!string.IsNullOrEmpty(MonoBehaviourSingleton<AppMain>.I.startScene))
 		{

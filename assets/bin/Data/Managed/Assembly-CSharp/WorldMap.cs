@@ -571,8 +571,8 @@ public class WorldMap : GameSection
 			}
 			selectWidget.get_gameObject().SetActive(false);
 		}
-		_003COnOpen_003Ec__AnonStorey49E _003COnOpen_003Ec__AnonStorey49E;
-		FadeInMap(new Action((object)_003COnOpen_003Ec__AnonStorey49E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003COnOpen_003Ec__AnonStorey4A6 _003COnOpen_003Ec__AnonStorey4A;
+		FadeInMap(new Action((object)_003COnOpen_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		base.collectUI = base._transform;
 		isChangingMap = false;
 		base.OnOpen();
@@ -724,7 +724,7 @@ public class WorldMap : GameSection
 		{
 			uiMapSprite.get_gameObject().SetActive(true);
 		}
-		_003CFadeInMap_003Ec__AnonStorey4A0 _003CFadeInMap_003Ec__AnonStorey4A;
+		_003CFadeInMap_003Ec__AnonStorey4A8 _003CFadeInMap_003Ec__AnonStorey4A;
 		this.StartCoroutine(DoFadeMap(0f, 1f, 0.4f, new Action((object)_003CFadeInMap_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 
@@ -840,7 +840,7 @@ public class WorldMap : GameSection
 		else
 		{
 			DisableWorldMapObject();
-			_003CEnterRegionMapEvent_003Ec__AnonStorey4A1 _003CEnterRegionMapEvent_003Ec__AnonStorey4A;
+			_003CEnterRegionMapEvent_003Ec__AnonStorey4A9 _003CEnterRegionMapEvent_003Ec__AnonStorey4A;
 			blurFilter.StartBlurFilter(0f, 0.25f, 0.25f, blurCenter, new Action((object)_003CEnterRegionMapEvent_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

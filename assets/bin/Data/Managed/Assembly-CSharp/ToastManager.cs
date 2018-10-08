@@ -80,8 +80,8 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 
 	private void Update()
 	{
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		if (!(window == null) && !MonoBehaviourSingleton<TransitionManager>.I.isTransing && !isOpenDialog && openInfoList.Count > 0)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		if (!(window == null) && (!MonoBehaviourSingleton<TransitionManager>.IsValid() || !MonoBehaviourSingleton<TransitionManager>.I.isTransing) && !isOpenDialog && openInfoList.Count > 0)
 		{
 			this.StartCoroutine(DoShowDialog(openInfoList[0]));
 			openInfoList.RemoveAt(0);
@@ -119,7 +119,7 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 		bool play_tween = true;
 		tweenCtrl.Play(true, delegate
 		{
-			((_003CDoShowDialog_003Ec__Iterator295)/*Error near IL_01c0: stateMachine*/)._003Cplay_tween_003E__4 = false;
+			((_003CDoShowDialog_003Ec__Iterator29A)/*Error near IL_01c0: stateMachine*/)._003Cplay_tween_003E__4 = false;
 		});
 		yield return (object)new WaitForSeconds(desc.showTime);
 		while (play_tween)

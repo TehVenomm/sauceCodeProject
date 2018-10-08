@@ -538,10 +538,10 @@ public class LikeActionController {
     }
 
     private static LikeActionController deserializeFromDiskSynchronously(String str) {
+        Closeable closeable;
         Throwable e;
         Throwable th;
         LikeActionController likeActionController = null;
-        Closeable closeable;
         try {
             closeable = controllerDiskCache.get(getCacheKeyForObjectId(str));
             if (closeable != null) {
@@ -955,7 +955,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find block by offs
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1115381650.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1731295355.run(Unknown Source)
 */
         /*
         r1 = 0;

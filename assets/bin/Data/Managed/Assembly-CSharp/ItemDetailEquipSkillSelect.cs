@@ -78,7 +78,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 		SetupEnableInventoryUI();
 		m_generatedIconList.Clear();
 		UpdateNewIconInfo();
-		_003CUpdateInventoryUI_003Ec__AnonStorey3D0 _003CUpdateInventoryUI_003Ec__AnonStorey3D;
+		_003CUpdateInventoryUI_003Ec__AnonStorey3D8 _003CUpdateInventoryUI_003Ec__AnonStorey3D;
 		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length + 2, false, new Func<int, bool>((object)_003CUpdateInventoryUI_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateInventoryUI_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

@@ -88,8 +88,8 @@ public class SerialCodeTop : GameSection
 		else
 		{
 			GameSection.StayEvent();
-			_003COnQuery_SEND_003Ec__AnonStorey442 _003COnQuery_SEND_003Ec__AnonStorey;
-			SendInputSerialCode(serialList.serials[index].serialId, inputValue, new Action<bool, string>((object)_003COnQuery_SEND_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003COnQuery_SEND_003Ec__AnonStorey44A _003COnQuery_SEND_003Ec__AnonStorey44A;
+			SendInputSerialCode(serialList.serials[index].serialId, inputValue, new Action<bool, string>((object)_003COnQuery_SEND_003Ec__AnonStorey44A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 }

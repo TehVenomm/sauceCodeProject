@@ -31,8 +31,8 @@ public class LoungeMemberesStatus
 
 	public unsafe LoungeMemberStatus GetMemberData(int userId)
 	{
-		_003CGetMemberData_003Ec__AnonStorey64E _003CGetMemberData_003Ec__AnonStorey64E;
-		LoungeMemberStatus loungeMemberStatus = memberes.FirstOrDefault(new Func<LoungeMemberStatus, bool>((object)_003CGetMemberData_003Ec__AnonStorey64E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CGetMemberData_003Ec__AnonStorey657 _003CGetMemberData_003Ec__AnonStorey;
+		LoungeMemberStatus loungeMemberStatus = memberes.FirstOrDefault(new Func<LoungeMemberStatus, bool>((object)_003CGetMemberData_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (object.ReferenceEquals(null, loungeMemberStatus))
 		{
 			loungeMemberStatus = new LoungeMemberStatus(userId);
@@ -84,7 +84,7 @@ public class LoungeMemberesStatus
 	{
 		List<int> list = new List<int>();
 		List<int> list2 = new List<int>();
-		_003CSyncLoungeMember_003Ec__AnonStorey650 _003CSyncLoungeMember_003Ec__AnonStorey;
+		_003CSyncLoungeMember_003Ec__AnonStorey659 _003CSyncLoungeMember_003Ec__AnonStorey;
 		IEnumerable<LoungeModel.SlotInfo> source = lounge.slotInfos.Where(new Func<LoungeModel.SlotInfo, bool>((object)_003CSyncLoungeMember_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (_003C_003Ef__am_0024cache3 == null)
 		{

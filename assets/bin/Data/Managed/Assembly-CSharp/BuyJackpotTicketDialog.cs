@@ -62,13 +62,13 @@ public class BuyJackpotTicketDialog : GameSection
 
 	private void OnChagenSlider()
 	{
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
 		int progressInt = GetProgressInt((Enum)UI.SLD_SELECT_NUM);
 		SetLabelText((Enum)UI.LBL_SELECT_NUM, string.Format("{0,8:#,0}", progressInt));
-		SetLabelText((Enum)UI.LBL_BUY_BTN, $"Buy {progressInt * jackpotTicketPrice}");
+		SetLabelText((Enum)UI.LBL_BUY_BTN, string.Format(StringTable.Get(STRING_CATEGORY.DRAGON_VAULT, 4u), progressInt * jackpotTicketPrice));
 		Transform obj = sprGem;
 		Vector2 printedSize = lblBuy.printedSize;
 		obj.set_localPosition(Vector2.op_Implicit(new Vector2(printedSize.x / 2f + 15f, 3f)));

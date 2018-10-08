@@ -87,8 +87,8 @@ public class FriendArenaRankingFriend : FriendArenaRanking
 
 	private unsafe void SendGetFriendRanking(int sendGroup, Action<bool> callback)
 	{
-		_003CSendGetFriendRanking_003Ec__AnonStorey2FC _003CSendGetFriendRanking_003Ec__AnonStorey2FC;
-		MonoBehaviourSingleton<FriendManager>.I.SendGetFriendRanking(sendGroup, 0, new Action<bool, List<ArenaRankingData>>((object)_003CSendGetFriendRanking_003Ec__AnonStorey2FC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendGetFriendRanking_003Ec__AnonStorey304 _003CSendGetFriendRanking_003Ec__AnonStorey;
+		MonoBehaviourSingleton<FriendManager>.I.SendGetFriendRanking(sendGroup, 0, new Action<bool, List<ArenaRankingData>>((object)_003CSendGetFriendRanking_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void CacheLists(List<FriendCharaInfo> charaList, List<ArenaRankingData> rankingDataList)

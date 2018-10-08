@@ -248,14 +248,22 @@ public class HomePeople
 
 	private IEnumerator GetHomePlayerCharacterList()
 	{
-		bool wait = true;
-		MonoBehaviourSingleton<FriendManager>.I.SendHomeCharaList(delegate
+		if (MonoBehaviourSingleton<FriendManager>.I.IsHomeCharaCached)
 		{
-			((_003CGetHomePlayerCharacterList_003Ec__IteratorBC)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
-		});
-		while (wait)
-		{
+			MonoBehaviourSingleton<FriendManager>.I.SendHomeCharaList(null);
 			yield return (object)null;
+		}
+		else
+		{
+			bool wait = true;
+			MonoBehaviourSingleton<FriendManager>.I.SendHomeCharaList(delegate
+			{
+				((_003CGetHomePlayerCharacterList_003Ec__IteratorBC)/*Error near IL_0063: stateMachine*/)._003Cwait_003E__0 = false;
+			});
+			while (wait)
+			{
+				yield return (object)null;
+			}
 		}
 	}
 
@@ -541,31 +549,35 @@ public class HomePeople
 		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int count = charas.Count; i < count; i++)
 		{
@@ -575,10 +587,8 @@ public class HomePeople
 				Vector2 val = homeCharacterBase._transform.get_localPosition().ToVector2XZ();
 				HomeCharacterBase homeCharacterBase2 = null;
 				float num = 9f;
-				Vector2 val2 = default(Vector2);
-				val2._002Ector(0f, 0f);
-				Vector2 val3 = default(Vector2);
-				val3._002Ector(0f, 0f);
+				Vector2 val2 = Vector2.get_zero();
+				Vector2 val3 = Vector2.get_zero();
 				for (int j = i + 1; j < count; j++)
 				{
 					HomeCharacterBase homeCharacterBase3 = charas[j];

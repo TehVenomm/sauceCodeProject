@@ -100,11 +100,17 @@ public class BootProcess
 		Transform ui_root = ResourceUtility.Realizes(Resources.Load("UI/UI_Root"), MonoBehaviourSingleton<AppMain>.I._transform, -1);
 		ui_root.get_gameObject().AddComponent<UIManager>();
 		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.INITIALIZE, true);
+		yield return (object)null;
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<GameSceneManager>();
+		yield return (object)null;
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<UserInfoManager>();
+		yield return (object)null;
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<TransitionManager>();
+		yield return (object)null;
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<FBManager>();
+		yield return (object)null;
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<NativeGameService>();
+		yield return (object)null;
 		Singleton<StringTable>.Create();
 		Singleton<StringTable>.I.CreateTable(null);
 		MonoBehaviourSingleton<GameSceneManager>.I.Initialize();
@@ -122,17 +128,6 @@ public class BootProcess
 		if (MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
 			MonoBehaviourSingleton<SoundManager>.I.LoadParmanentAudioClip();
-			while (MonoBehaviourSingleton<SoundManager>.I.IsLoadingAudioClip())
-			{
-				yield return (object)null;
-			}
-		}
-		MonoBehaviourSingleton<ResourceManager>.I.SetURL(NetworkManager.IMG_HOST);
-		MonoBehaviourSingleton<GoGameResourceManager>.I.LoadVariantManifest();
-		while (MonoBehaviourSingleton<GoGameResourceManager>.I.isLoadingVariantManifest)
-		{
-			Debug.Log((object)"Waiting LoadingVariantManifest ");
-			yield return (object)null;
 		}
 		int reset = PlayerPrefs.GetInt("AppMain.Reset", 0);
 		if (reset != 0)
@@ -160,7 +155,7 @@ public class BootProcess
 			bool wait = true;
 			MonoBehaviourSingleton<AccountManager>.I.SendCheckRegister(analyticsString, delegate
 			{
-				((_003CStart_003Ec__Iterator19)/*Error near IL_0495: stateMachine*/)._003Cwait_003E__7 = false;
+				((_003CStart_003Ec__Iterator19)/*Error near IL_04ab: stateMachine*/)._003Cwait_003E__7 = false;
 			});
 			while (wait)
 			{
@@ -227,6 +222,12 @@ public class BootProcess
 					MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible = false;
 				}
 				MonoBehaviourSingleton<ResourceManager>.I.SetURL(NetworkManager.IMG_HOST);
+				MonoBehaviourSingleton<GoGameResourceManager>.I.LoadVariantManifest();
+				while (MonoBehaviourSingleton<GoGameResourceManager>.I.isLoadingVariantManifest)
+				{
+					Debug.Log((object)"Waiting LoadingVariantManifest ");
+					yield return (object)null;
+				}
 				MonoBehaviourSingleton<ResourceManager>.I.LoadManifest();
 				while (MonoBehaviourSingleton<ResourceManager>.I.isLoadingManifest)
 				{

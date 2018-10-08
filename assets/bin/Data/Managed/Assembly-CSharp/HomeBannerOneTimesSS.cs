@@ -1,3 +1,7 @@
-public class HomeBannerOneTimesSS : GameSection
+public class HomeBannerOneTimesSS : BaseBanner
 {
+	private enum UI
+	{
+		BANNER
+	}
 }

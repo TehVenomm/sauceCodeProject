@@ -156,8 +156,8 @@ public final class DiskLruCache implements Closeable {
         }
 
         public void set(int i, String str) throws IOException {
-            Closeable outputStreamWriter;
             Throwable th;
+            Closeable outputStreamWriter;
             try {
                 outputStreamWriter = new OutputStreamWriter(newOutputStream(i), DiskLruCache.UTF_8);
                 try {

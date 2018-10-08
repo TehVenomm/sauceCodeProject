@@ -48,8 +48,8 @@ namespace GooglePlayGames.Android
 					//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 					//IL_001e: Expected O, but got Unknown
 					IntPtr intentRef = AndroidJNI.NewGlobalRef(intent);
-					_003CCreatePlatformConfiguration_003Ec__AnonStorey7D8 _003CCreatePlatformConfiguration_003Ec__AnonStorey7D;
-					PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CCreatePlatformConfiguration_003Ec__AnonStorey7D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					_003CCreatePlatformConfiguration_003Ec__AnonStorey7E2 _003CCreatePlatformConfiguration_003Ec__AnonStorey7E;
+					PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CCreatePlatformConfiguration_003Ec__AnonStorey7E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				});
 				if (!clientConfig.IsHidingPopups)
 				{
@@ -153,8 +153,8 @@ namespace GooglePlayGames.Android
 			StatsResultCallback resultCallback;
 			try
 			{
-				_003CGetPlayerStats_003Ec__AnonStorey7D9 _003CGetPlayerStats_003Ec__AnonStorey7D;
-				resultCallback = new StatsResultCallback(new Action<int, Com.Google.Android.Gms.Games.Stats.PlayerStats>((object)_003CGetPlayerStats_003Ec__AnonStorey7D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CGetPlayerStats_003Ec__AnonStorey7E3 _003CGetPlayerStats_003Ec__AnonStorey7E;
+				resultCallback = new StatsResultCallback(new Action<int, Com.Google.Android.Gms.Games.Stats.PlayerStats>((object)_003CGetPlayerStats_003Ec__AnonStorey7E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			catch (Exception ex)
 			{

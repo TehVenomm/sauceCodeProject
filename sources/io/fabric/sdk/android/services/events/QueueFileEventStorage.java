@@ -37,9 +37,9 @@ public class QueueFileEventStorage implements EventsStorage {
     }
 
     private void move(File file, File file2) throws IOException {
-        Closeable fileInputStream;
         Throwable th;
         Closeable closeable = null;
+        Closeable fileInputStream;
         try {
             fileInputStream = new FileInputStream(file);
             try {

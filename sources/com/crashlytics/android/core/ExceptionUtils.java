@@ -19,11 +19,11 @@ final class ExceptionUtils {
     }
 
     public static void writeStackTrace(Context context, Throwable th, String str) {
-        Closeable printWriter;
         Throwable th2;
         Throwable e;
         Throwable th3;
         Closeable closeable = null;
+        Closeable printWriter;
         try {
             printWriter = new PrintWriter(context.openFileOutput(str, 0));
             try {

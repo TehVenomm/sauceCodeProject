@@ -116,8 +116,8 @@ public class QuestTrialSelectList : QuestEventSelectList
 				}
 			}
 			bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-			_003CUpdateTable_003Ec__AnonStorey40A _003CUpdateTable_003Ec__AnonStorey40A;
-			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, isResetUI, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey40A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey40A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateTable_003Ec__AnonStorey412 _003CUpdateTable_003Ec__AnonStorey;
+			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, isResetUI, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
 			component.set_enabled(true);
 			RepositionTable();

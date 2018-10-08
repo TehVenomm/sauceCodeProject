@@ -197,8 +197,8 @@ public class InGameQuestAcceptInvitation : QuestAcceptInvitation
 				{
 					component.ResetPosition();
 					AppMain i = MonoBehaviourSingleton<AppMain>.I;
-					_003CReposition_003Ec__AnonStorey3B3 _003CReposition_003Ec__AnonStorey3B;
-					i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003CReposition_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					_003CReposition_003Ec__AnonStorey3BB _003CReposition_003Ec__AnonStorey3BB;
+					i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003CReposition_003Ec__AnonStorey3BB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 			}
 			UIScreenRotationHandler[] componentsInChildren = this.get_gameObject().GetComponentsInChildren<UIScreenRotationHandler>();

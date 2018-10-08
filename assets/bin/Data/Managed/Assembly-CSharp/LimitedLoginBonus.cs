@@ -242,10 +242,10 @@ public class LimitedLoginBonus : GameSection
 		lb = null;
 		if (GameSection.GetEventData() != null)
 		{
-			Protocol.Send<LoginBonusConfirmModel.RequestSendForm, LoginBonusConfirmModel>(post_data: new LoginBonusConfirmModel.RequestSendForm
+			Protocol.Send<LoginBonusConfirmModel.RequestSendForm, LoginBonusConfirmModel>(postData: new LoginBonusConfirmModel.RequestSendForm
 			{
 				loginBonusId = (int)GameSection.GetEventData()
-			}, url: LoginBonusConfirmModel.URL, call_back: (Action<LoginBonusConfirmModel>)delegate(LoginBonusConfirmModel ret)
+			}, url: LoginBonusConfirmModel.URL, callBack: (Action<LoginBonusConfirmModel>)delegate(LoginBonusConfirmModel ret)
 			{
 				if (ret.Error == Error.None)
 				{
@@ -255,7 +255,7 @@ public class LimitedLoginBonus : GameSection
 					}
 					((_003CDoInitialize_003Ec__IteratorA8)/*Error near IL_0071: stateMachine*/)._003Cconnect_003E__0 = true;
 				}
-			}, get_param: string.Empty);
+			}, getParam: string.Empty);
 			while (!connect)
 			{
 				yield return (object)null;

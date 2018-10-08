@@ -84,8 +84,8 @@ public class UIInput
 
 	public OnValidate onValidate;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected string mValue;
 
 	[NonSerialized]

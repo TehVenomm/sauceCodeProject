@@ -4089,7 +4089,7 @@ public class Enemy : Character
 						{
 							if (delay > 0f)
 							{
-								_003COnPlayAttackedHitEffect_003Ec__AnonStorey509 _003COnPlayAttackedHitEffect_003Ec__AnonStorey;
+								_003COnPlayAttackedHitEffect_003Ec__AnonStorey512 _003COnPlayAttackedHitEffect_003Ec__AnonStorey;
 								AppMain.Delay(delay, new Action((object)_003COnPlayAttackedHitEffect_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 							}
 							else
@@ -9130,7 +9130,7 @@ public class Enemy : Character
 
 	public void ActReleaseGrabbedPlayers(bool isWeakHit, bool isSpWeakhit, bool forceRelease, float angle = 0f, float power = 0f)
 	{
-		if (isBoss)
+		if (isBoss || MonoBehaviourSingleton<GlobalSettingsManager>.I.bossIdqQuest.Contains(enemyID))
 		{
 			EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
 			if (!(enemyBrain == null))

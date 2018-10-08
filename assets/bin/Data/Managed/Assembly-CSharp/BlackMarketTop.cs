@@ -652,8 +652,8 @@ public class BlackMarketTop : GameSection
 	{
 		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001a: Expected O, but got Unknown
-		_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2C9 _003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2C;
-		SendRequestCurrentCrystal(new Action((object)_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2D0 _003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2D;
+		SendRequestCurrentCrystal(new Action((object)_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void CheckCrystalNum(OnceStatusInfoModel ret, Action onFinish)
@@ -706,7 +706,7 @@ public class BlackMarketTop : GameSection
 				timeResetMarket = (int)GoGameTimeManager.GetRemainTime(GameSaveData.instance.resetMarketTime).TotalSeconds;
 			}
 			yield return (object)null;
-			MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.Close(UITransition.TYPE.CLOSE);
+			MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.UpdateDrakMarketState(false);
 			yield return (object)this.StartCoroutine(_DoCloseDialog());
 			GameSection.BackSection();
 		}

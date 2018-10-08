@@ -282,8 +282,8 @@ public class LoungeConditionSettings : GameSection
 					SetStampTextre(item.StampId);
 				}
 				ChatStampListItem chatStampListItem = item;
-				_003CInitStampItem_003Ec__AnonStorey3DE _003CInitStampItem_003Ec__AnonStorey3DE;
-				chatStampListItem.onButton = Delegate.Combine((Delegate)chatStampListItem.onButton, (Delegate)new Action((object)_003CInitStampItem_003Ec__AnonStorey3DE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CInitStampItem_003Ec__AnonStorey3E6 _003CInitStampItem_003Ec__AnonStorey3E;
+				chatStampListItem.onButton = Delegate.Combine((Delegate)chatStampListItem.onButton, (Delegate)new Action((object)_003CInitStampItem_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}

@@ -151,7 +151,7 @@ public class JackpotWinDialog : GameSection
 		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003d: Expected O, but got Unknown
 		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Expected O, but got Unknown
+		//IL_007c: Expected O, but got Unknown
 		jackportNumber.ShowNumber(jackpot);
 		Transform ctrl = GetCtrl(UI.OBJ_JACKPOT_GROUP);
 		SetActive(ctrl.get_transform(), UI.OBJ_OURS, isOurs);
@@ -159,7 +159,7 @@ public class JackpotWinDialog : GameSection
 		SetActive((Enum)UI.BTN_SHARESCREENSHOT, isOurs);
 		if (!isOurs)
 		{
-			SetLabelText(GetCtrl(UI.OBJ_THEIRS).get_transform(), UI.LBL_HUNTER_WIN, $"{hunterWinName} hit the Jackpot!");
+			SetLabelText(GetCtrl(UI.OBJ_THEIRS).get_transform(), UI.LBL_HUNTER_WIN, string.Format(StringTable.Get(STRING_CATEGORY.DRAGON_VAULT, 3u), hunterWinName));
 		}
 		else
 		{

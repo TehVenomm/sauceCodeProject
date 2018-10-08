@@ -2,8 +2,8 @@ using AnimationOrTween;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Play Animation")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/Interaction/Play Animation")]
 public class UIPlayAnimation
 {
 	public static UIPlayAnimation current;

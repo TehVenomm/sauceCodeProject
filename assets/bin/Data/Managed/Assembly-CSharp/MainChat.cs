@@ -970,7 +970,9 @@ public class MainChat : UIBehaviour
 	private IEnumerator Start()
 	{
 		Initialize();
+		yield return (object)null;
 		InitStateMachine();
+		yield return (object)null;
 		LoadingQueue load_queue = new LoadingQueue(this);
 		LoadObject lo_quest_chatitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatItem", false);
 		LoadObject lo_chat_stamp_listitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem", false);
@@ -984,6 +986,7 @@ public class MainChat : UIBehaviour
 		{
 			m_PostRequetQueue[i] = new PostRequestQueue();
 		}
+		yield return (object)null;
 		m_ChatItemPrefab = (lo_quest_chatitem.loadedObject as GameObject);
 		m_ChatStampListPrefab = (lo_chat_stamp_listitem.loadedObject as GameObject);
 		m_ChatAdvisaryItemPrefab = (lo_chatAdvisaryItem.loadedObject as GameObject);
@@ -991,9 +994,11 @@ public class MainChat : UIBehaviour
 		{
 			OnScreenRotate(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
 		}
+		yield return (object)null;
 		ChangeSliderPos(CHAT_TYPE.HOME);
 		SetSliderLimit();
 		DummyDragScroll.width = 410;
+		yield return (object)null;
 		string channelName = "0001";
 		SetChannelName(channelName);
 		ResetStampIdList();
@@ -2747,8 +2752,8 @@ public class MainChat : UIBehaviour
 			if (!isRecycle && !flag)
 			{
 				ChatStampListItem chatStampListItem = item;
-				_003CInitStampItem_003Ec__AnonStorey2D3 _003CInitStampItem_003Ec__AnonStorey2D;
-				chatStampListItem.onButton = Delegate.Combine((Delegate)chatStampListItem.onButton, (Delegate)new Action((object)_003CInitStampItem_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CInitStampItem_003Ec__AnonStorey2DA _003CInitStampItem_003Ec__AnonStorey2DA;
+				chatStampListItem.onButton = Delegate.Combine((Delegate)chatStampListItem.onButton, (Delegate)new Action((object)_003CInitStampItem_003Ec__AnonStorey2DA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}

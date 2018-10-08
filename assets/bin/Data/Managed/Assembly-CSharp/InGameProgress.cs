@@ -1399,8 +1399,8 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				InGameMain gameMain = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection() as InGameMain;
 				if (gameMain != null)
 				{
-					_003CBattleComplete_003Ec__AnonStorey611 _003CBattleComplete_003Ec__AnonStorey;
-					gameMain.cutScenePlayer.Play(new Action((object)_003CBattleComplete_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					_003CBattleComplete_003Ec__AnonStorey61A _003CBattleComplete_003Ec__AnonStorey61A;
+					gameMain.cutScenePlayer.Play(new Action((object)_003CBattleComplete_003Ec__AnonStorey61A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 				return true;
 			}
