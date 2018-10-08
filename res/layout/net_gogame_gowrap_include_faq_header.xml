@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <include layout="@layout/net_gogame_gowrap_include_contact_support" />
+    <EditText android:id="@id/net_gogame_gowrap_support_search_textfield" android:focusable="true" android:focusableInTouchMode="true" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="12.0dip" android:hint="@string/net_gogame_gowrap_support_search_hint" android:ems="9" android:inputType="text" android:imeOptions="actionDone" style="@style/net_gogame_gowrap_faq_search" />
+</LinearLayout>

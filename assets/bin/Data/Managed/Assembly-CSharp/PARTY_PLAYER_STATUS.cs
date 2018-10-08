@@ -1,0 +1,11 @@
+public enum PARTY_PLAYER_STATUS
+{
+	NONE = 0,
+	WAITING = 10,
+	JOINED = 20,
+	READY = 21,
+	PLAYING = 30,
+	FIELD = 0x1F,
+	QUEST = 0x20,
+	LEFT = 40
+}

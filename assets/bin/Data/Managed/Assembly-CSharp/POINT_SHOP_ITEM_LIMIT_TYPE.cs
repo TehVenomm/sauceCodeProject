@@ -1,0 +1,7 @@
+public enum POINT_SHOP_ITEM_LIMIT_TYPE
+{
+	NONE,
+	DAILY,
+	WEEKLY,
+	MONTHLY
+}

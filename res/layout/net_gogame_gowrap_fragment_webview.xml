@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@id/net_gogame_gowrap_webview_non_video_layout" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_alignParentTop="true" android:layout_alignParentBottom="true" style="@style/net_gogame_gowrap_webview_container">
+            <net.gogame.gowrap.ui.cpr.VideoEnabledWebView android:id="@id/net_gogame_gowrap_main_webview" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_alignParentTop="true" android:layout_alignParentBottom="true" android:overScrollMode="never" />
+        </RelativeLayout>
+        <ProgressBar android:id="@id/net_gogame_gowrap_progressBar" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="2.0dip" android:progressDrawable="@drawable/net_gogame_gowrap_progress" style="?android:attr/progressBarStyleHorizontal" />
+        <ProgressBar android:id="@id/net_gogame_gowrap_progressBar2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:indeterminate="true" android:layout_centerInParent="true" style="?android:attr/progressBarStyle" />
+    </RelativeLayout>
+    <net.gogame.gowrap.ui.layout.LandscapeFrameLayout android:id="@id/net_gogame_gowrap_webview_video_layout" android:background="@android:color/black" android:visibility="invisible" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+</RelativeLayout>

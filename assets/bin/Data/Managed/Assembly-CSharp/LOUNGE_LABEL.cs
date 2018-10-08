@@ -1,0 +1,8 @@
+public enum LOUNGE_LABEL
+{
+	NONE,
+	ANYONE,
+	BEGINNER,
+	HELPER,
+	EXPERT
+}

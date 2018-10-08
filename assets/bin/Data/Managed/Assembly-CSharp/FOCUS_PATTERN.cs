@@ -1,0 +1,6 @@
+public enum FOCUS_PATTERN
+{
+	CLEAR_COLOR,
+	GRAY_OUT,
+	TARGET_FOCUS
+}

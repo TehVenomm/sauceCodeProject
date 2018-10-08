@@ -1,0 +1,6 @@
+public enum SHOP_POINT_GET_TYPE
+{
+	NONE,
+	QUEST,
+	DELIVERY
+}

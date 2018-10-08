@@ -1,0 +1,10 @@
+public enum LOUNGE_ACTION_TYPE
+{
+	NONE,
+	SIT,
+	STAND_UP,
+	WAVE_HANDS,
+	TO_GACHA,
+	TO_EQUIP,
+	AFK
+}

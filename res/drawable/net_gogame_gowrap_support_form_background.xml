@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape android:shape="rectangle"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="@dimen/net_gogame_gowrap_border_radius" />
+    <solid android:color="@color/net_gogame_gowrap_support_form_background_color" />
+</shape>

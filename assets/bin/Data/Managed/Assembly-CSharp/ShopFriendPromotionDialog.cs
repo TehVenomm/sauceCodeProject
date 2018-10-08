@@ -1,0 +1,20 @@
+public class ShopFriendPromotionDialog : FriendPromotionBase
+{
+	private enum UI
+	{
+		LBL_TITLE,
+		LBL_TITLE_SHADOW,
+		LBL_MESSAGE,
+		LBL_DETAIL,
+		LBL_SUCCESS_NUM,
+		LBL_SUCCESS_NAME,
+		LBL_RECEIVED_NUM,
+		LBL_RECEIVED_NAME,
+		OBJ_TWITTER_ROOT,
+		OBJ_LINE_ROOT,
+		OBJ_NOT_CAMPAIN_ROOT,
+		SPR_BANNER,
+		OBJ_SNS_AREA,
+		LBL_CANT_INVITE
+	}
+}

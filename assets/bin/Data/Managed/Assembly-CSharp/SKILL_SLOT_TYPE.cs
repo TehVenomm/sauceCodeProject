@@ -1,0 +1,17 @@
+public enum SKILL_SLOT_TYPE
+{
+	NONE = 0,
+	ATTACK = 1,
+	SUPPORT = 2,
+	HEAL = 3,
+	RESTRAINT = 4,
+	SPECIAL = 5,
+	BUFF = 6,
+	SKILL_BUFF = 7,
+	PASSIVE = 8,
+	MOTION = 9,
+	LIMITED = 10,
+	GROW = 11,
+	EX_PASSIVE = 12,
+	MAX = 0x3F
+}

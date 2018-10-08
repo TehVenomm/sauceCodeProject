@@ -1,0 +1,6 @@
+public enum USER_TASK_STATUS
+{
+	TRYING = 1,
+	CLEARED,
+	REWARD_RECEIVED
+}

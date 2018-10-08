@@ -1,0 +1,5 @@
+public enum REGION_DIFFICULTY_TYPE
+{
+	NORMAL,
+	HARD
+}

@@ -1,0 +1,5 @@
+public enum PLACEABLE_MAP_TYPE
+{
+	WORLD_MAP,
+	HOUSE_MAP
+}

@@ -1,0 +1,6 @@
+public enum DYNAMICBONE_TYPE
+{
+	DISABLE,
+	ONLY_SELF,
+	DISABLE_LOW
+}

@@ -1,0 +1,118 @@
+public class ServerConstDefine
+{
+	public static readonly string CDV_KEY = "cdv";
+
+	public int cdv = 1508206700;
+
+	public int LIST_NUM_PER_PAGE = 10;
+
+	public int SELL_SELECT_MAX = 10;
+
+	public int DETACH_SKILL_ITEM_USE_CRYSTAL;
+
+	public int EQUIP_SET_MAX = 6;
+
+	public int EQUIP_SET_EXT_MAX = 20;
+
+	public int EQUIP_SET_INIT = 6;
+
+	public int INVENTORY_EXTEND_EQUIP_SET = 1;
+
+	public int ITEM_NUM_MAX = 99999;
+
+	public int QUEST_ITEM_NUM_MAX = 99;
+
+	public int CRYSTAL_NUM_MAX = 9999999;
+
+	public int MONEY_MAX = 999999999;
+
+	public int ALIVE_CHECK_SEC = 270;
+
+	public int INVENTORY_EXTEND_USE_CRYSTAL = 5;
+
+	public int INVENTORY_EXTEND_EQUIP_ITEM = 10;
+
+	public int INVENTORY_EXTEND_SKILL_ITEM = 10;
+
+	public int INVENTORY_EXTEND_EQUIP_ITEM_MAX = 700;
+
+	public int INVENTORY_EXTEND_SKILL_ITEM_MAX = 700;
+
+	public int QUEST_LOCK_SEC = 15;
+
+	public int QUEST_CONTINUE_USE_CRYSTAL = 3;
+
+	public int QUEST_ITEM_LEVEL_MAX = 150;
+
+	public int PARTY_SEARCH_QUEST_LEVEL_MAX = 300;
+
+	public float SKILL_EXCEED_NEED_RATE_PLUS_1 = 0.5f;
+
+	public float SKILL_EXCEED_NEED_RATE_PLUS_2 = 1f;
+
+	public float SKILL_EXCEED_NEED_RATE_PLUS_3 = 1.5f;
+
+	public float SKILL_EXCEED_NEED_RATE_PLUS_4 = 2f;
+
+	public float SKILL_EXCEED_NEED_RATE_PLUS_5 = 2.5f;
+
+	public float SKILL_EXCEED_NEED_RATE_PLUS_6 = 3f;
+
+	public float SKILL_EXCEED_NEED_RATE_PLUS_7 = 4f;
+
+	public float SKILL_EXCEED_NEED_RATE_PLUS_8 = 6f;
+
+	public float SKILL_EXCEED_NEED_RATE_PLUS_9 = 8f;
+
+	public float SKILL_EXCEED_NEED_RATE_PLUS_10 = 10f;
+
+	public int SKILL_EXCEED_POINT_RARITY_C = 10;
+
+	public int SKILL_EXCEED_POINT_RARITY_B = 50;
+
+	public int SKILL_EXCEED_POINT_RARITY_A = 250;
+
+	public int SKILL_EXCEED_POINT_RARITY_S = 1500;
+
+	public int SKILL_EXCEED_POINT_RARITY_SS = 9000;
+
+	public float SKILL_EXCEED_MAX_LEVEL_RATE = 1f;
+
+	public int ABILITY_CHANGE_COST_RARITY_D = 3000;
+
+	public int ABILITY_CHANGE_COST_RARITY_C = 5000;
+
+	public int ABILITY_CHANGE_COST_RARITY_B = 10000;
+
+	public int ABILITY_CHANGE_COST_RARITY_A = 20000;
+
+	public int ABILITY_CHANGE_COST_RARITY_S = 30000;
+
+	public int ABILITY_CHANGE_COST_RARITY_SS = 50000;
+
+	public int ABILITY_CHANGE_COST_RARITY_SSS = 70000;
+
+	public int FRIEND_MAX_FOLLOWER = 1000;
+
+	public int BLACKLIST_MAX = 100;
+
+	public string EXPLORE_HOST_LIMIT_RESET_TIME_1 = "4:00:00";
+
+	public string EXPLORE_HOST_LIMIT_RESET_TIME_2 = "12:00:00";
+
+	public string EXPLORE_HOST_LIMIT_RESET_TIME_3 = "20:00:00";
+
+	public int GUILD_REQUEST_NEED_POINT_SS = 2400;
+
+	public int GUILD_REQUEST_NEED_POINT_S = 1200;
+
+	public int GUILD_REQUEST_NEED_POINT_A = 400;
+
+	public int GUILD_REQUEST_NEED_POINT_B = 100;
+
+	public int GUILD_POINT_PER_MIN = 5;
+
+	public int GUILD_REQUEST_SLOT_EXTEND_MIN = 1440;
+
+	public int GUILD_REQUEST_EARLY_RECEIVE_MIN = 60;
+}

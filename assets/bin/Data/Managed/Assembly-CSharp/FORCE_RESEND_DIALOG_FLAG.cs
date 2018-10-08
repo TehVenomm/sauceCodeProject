@@ -1,0 +1,6 @@
+public enum FORCE_RESEND_DIALOG_FLAG
+{
+	NONE,
+	FLAG_UP,
+	FLAG_DOWN
+}

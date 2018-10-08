@@ -1,0 +1,100 @@
+!!brut.androlib.meta.MetaInfo
+apkFileName: DragonProject_v1.2.9_apkpure.com.apk
+compressionType: false
+doNotCompress:
+- arsc
+- MF
+- assets/META-INF/maven/com.squareup.picasso/picasso/pom.properties
+- assets/META-INF/maven/org.apache.commons/commons-lang3/pom.properties
+- assets/META-INF/services/com.fasterxml.jackson.core.JsonFactory
+- assets/META-INF/services/com.fasterxml.jackson.core.ObjectCodec
+- resource
+- png
+- res/drawable-hdpi-v4/com_facebook_tooltip_black_background.9.png
+- res/drawable-hdpi-v4/com_facebook_tooltip_blue_background.9.png
+- res/drawable-hdpi-v4/common_google_signin_btn_icon_dark_normal_background.9.png
+- res/drawable-hdpi-v4/common_google_signin_btn_icon_light_normal_background.9.png
+- res/drawable-hdpi-v4/common_google_signin_btn_text_dark_normal_background.9.png
+- res/drawable-hdpi-v4/common_google_signin_btn_text_light_normal_background.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_button_background_facebook.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_button_background_forum.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_button_background_instagram.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_button_background_twitter.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_button_background_wiki.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_button_background_youtube.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_default_button_background.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_armory_equipment_foreground.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_armory_summary_background.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_edittext_background.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_center_default.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_center_selected.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_default_background.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_left_default.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_left_selected.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_right_default.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_right_selected.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_friends_background.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_page_indicator_background.9.png
+- jpg
+- res/drawable-hdpi-v4/net_gogame_gowrap_edittext_background.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_admin_bottom.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_admin_top.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_event_bottom.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_event_top.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_important_bottom.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_important_top.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_notice_bottom.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_notice_top.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_summon_bottom.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_summon_top.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_tips_bottom.9.png
+- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_tips_top.9.png
+- res/drawable-mdpi-v4/com_facebook_tooltip_black_background.9.png
+- res/drawable-mdpi-v4/com_facebook_tooltip_blue_background.9.png
+- res/drawable-mdpi-v4/common_google_signin_btn_icon_dark_normal_background.9.png
+- res/drawable-mdpi-v4/common_google_signin_btn_icon_light_normal_background.9.png
+- res/drawable-mdpi-v4/common_google_signin_btn_text_dark_normal_background.9.png
+- res/drawable-mdpi-v4/common_google_signin_btn_text_light_normal_background.9.png
+- res/drawable-xhdpi-v4/com_facebook_tooltip_black_background.9.png
+- res/drawable-xhdpi-v4/com_facebook_tooltip_blue_background.9.png
+- res/drawable-xhdpi-v4/common_google_signin_btn_icon_dark_normal_background.9.png
+- res/drawable-xhdpi-v4/common_google_signin_btn_icon_light_normal_background.9.png
+- res/drawable-xhdpi-v4/common_google_signin_btn_text_dark_normal_background.9.png
+- res/drawable-xhdpi-v4/common_google_signin_btn_text_light_normal_background.9.png
+- res/drawable-xhdpi-v4/net_gogame_gowrap_dialog_background_bottom.9.png
+- res/drawable-xhdpi-v4/net_gogame_gowrap_dialog_background_top.9.png
+- res/drawable-xhdpi-v4/net_gogame_gowrap_dpro_equip_item_frame.9.png
+- res/drawable-xhdpi-v4/net_gogame_gowrap_sns_button_background.9.png
+- res/drawable-xxhdpi-v4/common_google_signin_btn_icon_dark_normal_background.9.png
+- res/drawable-xxhdpi-v4/common_google_signin_btn_icon_light_normal_background.9.png
+- res/drawable-xxhdpi-v4/common_google_signin_btn_text_dark_normal_background.9.png
+- res/drawable-xxhdpi-v4/common_google_signin_btn_text_light_normal_background.9.png
+- res/drawable-xxhdpi-v4/net_gogame_gowrap_button_background.9.png
+- res/drawable-xxhdpi-v4/net_gogame_gowrap_button_background_disabled.9.png
+- res/drawable-xxhdpi-v4/net_gogame_gowrap_faq_child_entry_background.9.png
+- res/drawable-xxhdpi-v4/net_gogame_gowrap_faq_section_header_background.9.png
+- res/drawable-xxhdpi-v4/net_gogame_gowrap_navbar_background.9.png
+- res/drawable-xxhdpi-v4/net_gogame_gowrap_panel_background.9.png
+- res/drawable-xxhdpi-v4/net_gogame_gowrap_panel_background_bottom.9.png
+- res/drawable-xxhdpi-v4/net_gogame_gowrap_panel_background_middle.9.png
+- res/drawable-xxhdpi-v4/net_gogame_gowrap_panel_background_top.9.png
+- res/drawable-xxhdpi-v4/net_gogame_gowrap_panel_foreground.9.png
+- res/drawable-xxhdpi-v4/net_gogame_gowrap_search_background.9.png
+isFrameworkApk: false
+packageInfo:
+  forcedPackageId: '127'
+  renameManifestPackage: null
+sdkInfo:
+  minSdkVersion: '16'
+  targetSdkVersion: '25'
+sharedLibrary: false
+sparseResources: false
+unknownFiles: {}
+usesFramework:
+  ids:
+  - 1
+  tag: null
+version: 2.3.3
+versionInfo:
+  versionCode: '2018052302'
+  versionName: 1.2.9

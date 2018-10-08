@@ -1,0 +1,6 @@
+public enum ENEMY_POP_TYPE
+{
+	NONE,
+	FIELD_BOSS,
+	RARE_SPECIES
+}

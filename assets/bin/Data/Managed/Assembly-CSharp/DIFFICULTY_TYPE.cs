@@ -1,0 +1,18 @@
+public enum DIFFICULTY_TYPE
+{
+	LV1,
+	LV2,
+	LV3,
+	LV4,
+	LV5,
+	LV6,
+	LV7,
+	LV8,
+	LV9,
+	LV10,
+	LV11,
+	LV12,
+	LV13,
+	LV14,
+	LV15
+}

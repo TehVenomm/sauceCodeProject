@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent" style="@style/net_gogame_gowrap_default_listview_item"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:id="@id/net_gogame_gowrap_text_view" android:layout_width="fill_parent" android:layout_height="wrap_content" style="@style/net_gogame_gowrap_default_listview_text_appeareance" />
+</LinearLayout>

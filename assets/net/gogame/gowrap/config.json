@@ -1,0 +1,18 @@
+{
+  "integrations" : {
+    "core" : {
+      "locales" : {
+        "default" : {
+          "whatsNewUrl" : "http://gw-sites.gogame.net/social/DragonProject/index.html",
+          "facebookUrl" : "https://www.facebook.com/groups/DragonProjectEvents/",
+          "twitterUrl" : "https://twitter.com/dragonprojectgl",
+          "youtubeUrl" : "https://www.youtube.com/c/DragonProject",
+          "instagramUrl" : "https://www.instagram.com/dragonprojectglobal/"
+        }
+      },
+      "supportedLocales" : [ "default" ],
+      "slideOut" : true,
+      "slideIn" : true
+    }
+  }
+}

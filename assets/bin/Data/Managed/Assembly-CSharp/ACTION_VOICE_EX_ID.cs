@@ -1,0 +1,6 @@
+public enum ACTION_VOICE_EX_ID
+{
+	ALLIVE_01 = 0x10,
+	ALLIVE_02,
+	ALLIVE_03
+}

@@ -1,0 +1,6 @@
+public enum SHADER_TYPE
+{
+	NORMAL,
+	LIGHTWEIGHT,
+	UI
+}

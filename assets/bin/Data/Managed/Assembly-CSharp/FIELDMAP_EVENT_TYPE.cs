@@ -1,0 +1,4 @@
+public enum FIELDMAP_EVENT_TYPE
+{
+	HAPPEN_QUEST = 1
+}

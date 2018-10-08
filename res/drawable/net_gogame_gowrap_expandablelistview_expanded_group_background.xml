@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:top="@dimen/net_gogame_gowrap_border_radius">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/net_gogame_gowrap_expandablelistview_child_background_color" />
+        </shape>
+    </item>
+    <item android:top="1.0dip">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/net_gogame_gowrap_border_radius" />
+            <solid android:color="#ff7d7d7d" />
+        </shape>
+    </item>
+    <item android:bottom="1.0dip">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/net_gogame_gowrap_border_radius" />
+            <solid android:color="@color/net_gogame_gowrap_expandablelistview_group_background_color" />
+        </shape>
+    </item>
+</layer-list>

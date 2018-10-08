@@ -1,0 +1,25 @@
+public enum ACTION_VOICE_ID
+{
+	ATK_S_01 = 1,
+	ATK_S_02 = 94,
+	ATK_M_01 = 2,
+	ATK_M_02 = 3,
+	ATK_M_03 = 95,
+	ATK_M_04 = 97,
+	ATK_M_05 = 98,
+	ATK_L_01 = 4,
+	ATK_L_02 = 5,
+	ATK_L_03 = 96,
+	HAPPY_01 = 14,
+	HAPPY_02 = 0xF,
+	ROLLING = 90,
+	SPELL_01 = 91,
+	SPELL_02 = 92,
+	DAMAGE_01 = 6,
+	DAMAGE_02 = 7,
+	DAMAGE_03 = 8,
+	DEATH_01 = 9,
+	DEATH_02 = 10,
+	REVIVE = 93,
+	THANKS = 13
+}

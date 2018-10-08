@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/net_gogame_gowrap_icon_news_admin_bottom" android:minLevel="0" android:maxLevel="0"/>
+    <item android:drawable="@drawable/net_gogame_gowrap_icon_news_event_bottom" android:minLevel="1" android:maxLevel="1"/>
+    <item android:drawable="@drawable/net_gogame_gowrap_icon_news_important_bottom" android:minLevel="2" android:maxLevel="2"/>
+    <item android:drawable="@drawable/net_gogame_gowrap_icon_news_notice_bottom" android:minLevel="3" android:maxLevel="3"/>
+    <item android:drawable="@drawable/net_gogame_gowrap_icon_news_summon_bottom" android:minLevel="4" android:maxLevel="4"/>
+    <item android:drawable="@drawable/net_gogame_gowrap_icon_news_tips_bottom" android:minLevel="5" android:maxLevel="5"/>
+</level-list>

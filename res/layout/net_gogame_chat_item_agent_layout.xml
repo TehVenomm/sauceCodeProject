@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:tag="agentMessageView" android:paddingBottom="5.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="horizontal" android:id="@id/secondMainLayout" android:paddingLeft="10.0dip" android:paddingRight="10.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <net.gogame.chat.RoundedImageView android:layout_gravity="center_horizontal" android:id="@id/profileIcon" android:background="@drawable/net_gogame_chat_agent_profile_placeholder" android:padding="2.0dip" android:layout_width="55.0dip" android:layout_height="55.0dip" android:layout_marginRight="6.0dip" android:scaleType="centerCrop" />
+        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginRight="70.0dip">
+            <TextView android:textSize="18.0dip" android:textColor="#ff000000" android:gravity="left" android:autoLink="web" android:id="@id/agentTextView" android:background="@drawable/net_gogame_chat_rounded_corner_for_agent" android:padding="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            <ImageView android:id="@id/cellImageView" android:background="@drawable/net_gogame_chat_rounded_corner_for_agent" android:padding="5.0dip" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5.0dip" android:contentDescription="@string/net_gogame_chat_attachment_thumbnail_description" />
+            <TextView android:textColor="#ff5e5d5d" android:id="@id/agentName" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:orientation="vertical" android:id="@id/optionsLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="100.0dip" android:layout_marginTop="5.0dip" />
+</LinearLayout>

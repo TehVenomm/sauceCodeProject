@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:orientation="vertical" android:background="#ffdddddd" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="horizontal" android:id="@id/net_gogame_zopim_header_bar" android:background="#ff87b856" android:padding="4.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentTop="true">
+        <ImageButton android:layout_gravity="center_vertical" android:id="@id/backButton" android:background="@drawable/net_gogame_chat_back_button_icon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:contentDescription="@string/net_gogame_chat_back_button_description" />
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:textSize="20.0sp" android:textColor="#ffffffff" android:gravity="center_vertical" android:layout_width="0.0dip" android:layout_height="fill_parent" android:text="@string/net_gogame_chat_title" android:layout_weight="1.0" />
+        <Button android:textSize="18.0sp" android:textColor="@color/net_gogame_chat_outline_button" android:layout_gravity="center_vertical" android:id="@id/switchButton" android:background="@drawable/net_gogame_chat_outline_button" android:paddingLeft="8.0dip" android:paddingRight="8.0dip" android:visibility="visible" android:layout_width="wrap_content" android:layout_height="fill_parent" android:text="@string/net_gogame_chat_switch_button_description" />
+        <ImageButton android:id="@id/closeButton" android:background="@drawable/net_gogame_chat_close_button_icon" android:visibility="visible" android:layout_width="wrap_content" android:layout_height="wrap_content" android:contentDescription="@string/net_gogame_chat_close_button_description" />
+    </LinearLayout>
+    <LinearLayout android:orientation="vertical" android:id="@id/fragment" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_below="@id/net_gogame_zopim_header_bar" />
+    <View android:background="@drawable/net_gogame_chat_shadow" android:layout_width="fill_parent" android:layout_height="6.0dip" android:layout_below="@id/net_gogame_zopim_header_bar" />
+</RelativeLayout>

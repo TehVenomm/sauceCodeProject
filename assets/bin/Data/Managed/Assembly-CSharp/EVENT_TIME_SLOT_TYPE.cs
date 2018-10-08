@@ -1,0 +1,7 @@
+public enum EVENT_TIME_SLOT_TYPE
+{
+	ALL,
+	MORNING,
+	AFTERNOON,
+	NIGHT
+}

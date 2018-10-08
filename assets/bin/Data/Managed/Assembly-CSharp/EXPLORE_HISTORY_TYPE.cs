@@ -1,0 +1,7 @@
+public enum EXPLORE_HISTORY_TYPE
+{
+	NONE,
+	CURRENT,
+	LAST,
+	SECOND_LAST
+}

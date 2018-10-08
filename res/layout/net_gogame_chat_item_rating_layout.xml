@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:tag="rating" android:paddingLeft="65.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textSize="14.0dip" android:textStyle="bold" android:textColor="#ff000000" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/net_gogame_chat_rate_message" />
+    <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <ImageView android:id="@id/rateGoodImageView" android:layout_width="35.0dip" android:layout_height="35.0dip" android:src="@drawable/net_gogame_chat_rate_good_selected" android:contentDescription="@string/net_gogame_chat_rate_good_description" />
+        <ImageView android:id="@id/rateBadImageView" android:layout_width="35.0dip" android:layout_height="35.0dip" android:layout_marginLeft="15.0dip" android:src="@drawable/net_gogame_chat_rate_bad_selected" android:contentDescription="@string/net_gogame_chat_rate_bad_description" />
+    </LinearLayout>
+</LinearLayout>

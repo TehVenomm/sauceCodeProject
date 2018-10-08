@@ -1,0 +1,7 @@
+public enum ANGRY_CONDITION
+{
+	NONE,
+	LESS_HP,
+	NUM_DOWN,
+	BREAK_PARTS
+}

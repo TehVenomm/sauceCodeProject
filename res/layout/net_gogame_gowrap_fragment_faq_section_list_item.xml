@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" style="@style/net_gogame_gowrap_expandablelistview_group_container">
+        <TextView android:id="@id/net_gogame_gowrap_faq_section_name" android:layout_width="fill_parent" android:layout_height="wrap_content" style="@style/net_gogame_gowrap_expandablelistview_group_text_appearance" />
+    </LinearLayout>
+</LinearLayout>

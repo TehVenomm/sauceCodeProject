@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:id="@id/net_gogame_gowrap_back_support_buttons" android:layout_width="wrap_content" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:custom="http://schemas.android.com/apk/res-auto">
+    <net.gogame.gowrap.ui.v2017_1.SupportCustomImageButton android:id="@id/net_gogame_gowrap_support_form_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0" custom:image="@drawable/net_gogame_gowrap_icon_support_form" custom:level="4" custom:caption="@string/net_gogame_gowrap_support_form_button_caption" custom:subcaption="@string/net_gogame_gowrap_support_form_button_subcaption" />
+    <net.gogame.gowrap.ui.v2017_1.SupportCustomImageButton android:id="@id/net_gogame_gowrap_support_chat_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="8.0dip" android:layout_weight="1.0" custom:image="@drawable/net_gogame_gowrap_icon_support_chat" custom:level="5" custom:caption="@string/net_gogame_gowrap_support_chat_button_caption" custom:subcaption="@string/net_gogame_gowrap_support_chat_button_subcaption" />
+</LinearLayout>

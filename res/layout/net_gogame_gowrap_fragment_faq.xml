@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <FrameLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" style="@style/net_gogame_gowrap_support_title_container">
+        <TextView android:layout_gravity="center" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/net_gogame_gowrap_support_faq_title" style="@style/net_gogame_gowrap_support_title" />
+        <net.gogame.gowrap.ui.view.AutoStateButton android:layout_gravity="center|left|top" android:id="@id/net_gogame_gowrap_back_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="4.0dip" style="@style/net_gogame_gowrap_back_button_new" />
+    </FrameLayout>
+    <ExpandableListView android:id="@id/net_gogame_gowrap_faq_listview" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent" android:listSelector="@android:color/transparent" android:groupIndicator="@android:color/transparent" android:divider="@null" android:dividerHeight="0.0dip" />
+</LinearLayout>
