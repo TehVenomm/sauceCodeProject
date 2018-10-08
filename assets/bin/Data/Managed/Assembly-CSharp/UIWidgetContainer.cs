@@ -1,10 +1,6 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Widget Container")]
-public class UIWidgetContainer
+public class UIWidgetContainer : MonoBehaviour
 {
-	public UIWidgetContainer()
-		: this()
-	{
-	}
 }

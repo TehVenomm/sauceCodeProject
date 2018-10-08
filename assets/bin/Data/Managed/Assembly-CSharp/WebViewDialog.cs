@@ -6,8 +6,7 @@ public class WebViewDialog : GameSection
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			if (this.get_gameObject().get_name() == "WebViewDialog")
+			if (base.gameObject.name == "WebViewDialog")
 			{
 				return "[BACK]";
 			}

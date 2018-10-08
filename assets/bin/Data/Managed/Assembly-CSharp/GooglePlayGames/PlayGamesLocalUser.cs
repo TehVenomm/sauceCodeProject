@@ -4,7 +4,7 @@ using UnityEngine.SocialPlatforms;
 
 namespace GooglePlayGames
 {
-	public class PlayGamesLocalUser : PlayGamesUserProfile
+	public class PlayGamesLocalUser : PlayGamesUserProfile, ILocalUser, IUserProfile
 	{
 		internal PlayGamesPlatform mPlatform;
 
@@ -54,7 +54,7 @@ namespace GooglePlayGames
 
 		public new bool isFriend => true;
 
-		public new UserState state => 0;
+		public new UserState state => UserState.Online;
 
 		public new string AvatarURL
 		{
@@ -124,16 +124,19 @@ namespace GooglePlayGames
 			return mPlatform.GetIdToken();
 		}
 
-		public unsafe void GetStats(Action<CommonStatusCodes, PlayerStats> callback)
+		public void GetStats(Action<CommonStatusCodes, PlayerStats> callback)
 		{
 			if (mStats == null || !mStats.Valid)
 			{
-				_003CGetStats_003Ec__AnonStorey7B7 _003CGetStats_003Ec__AnonStorey7B;
-				mPlatform.GetPlayerStats(new Action<CommonStatusCodes, PlayerStats>((object)_003CGetStats_003Ec__AnonStorey7B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				mPlatform.GetPlayerStats(delegate(CommonStatusCodes rc, PlayerStats stats)
+				{
+					mStats = stats;
+					callback(rc, stats);
+				});
 			}
 			else
 			{
-				callback.Invoke(CommonStatusCodes.Success, mStats);
+				callback(CommonStatusCodes.Success, mStats);
 			}
 		}
 	}

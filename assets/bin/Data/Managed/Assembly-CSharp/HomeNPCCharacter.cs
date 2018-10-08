@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class HomeNPCCharacter : HomeCharacterBase
@@ -31,15 +30,13 @@ public class HomeNPCCharacter : HomeCharacterBase
 
 	protected override ModelLoaderBase LoadModel()
 	{
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Expected O, but got Unknown
 		bool useSpecialModel = false;
 		HomeThemeTable.HomeThemeData homeThemeData = Singleton<HomeThemeTable>.I.GetHomeThemeData(Singleton<HomeThemeTable>.I.CurrentHomeTheme);
 		if (homeThemeData != null && (npcData.specialModelID > 0 || homeThemeData.name != "NORMAL"))
 		{
 			useSpecialModel = true;
 		}
-		return npcData.LoadModel(this.get_gameObject(), true, true, null, useSpecialModel);
+		return npcData.LoadModel(base.gameObject, true, true, null, useSpecialModel);
 	}
 
 	protected override void InitCollider()
@@ -56,20 +53,15 @@ public class HomeNPCCharacter : HomeCharacterBase
 
 	protected override void ChangeScale()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<LoungeManager>.IsValid() && npcInfo.npcID == 4)
 		{
-			Vector3 localScale = this.get_transform().get_localScale();
+			Vector3 localScale = base.transform.localScale;
 			float num = 1.3f;
-			this.get_transform().set_localScale(new Vector3(localScale.x * num, localScale.y * num, localScale.z * num));
+			base.transform.localScale = new Vector3(localScale.x * num, localScale.y * num, localScale.z * num);
 		}
 	}
 
-	protected unsafe override void InitAnim()
+	protected override void InitAnim()
 	{
 		PLCA default_anim = PLCA.IDLE_01;
 		string loopAnim = npcInfo.GetLoopAnim();
@@ -77,7 +69,7 @@ public class HomeNPCCharacter : HomeCharacterBase
 		{
 			default_anim = PlayerAnimCtrl.StringToEnum(loopAnim);
 		}
-		animCtrl = PlayerAnimCtrl.Get(animator, default_anim, new Action<PlayerAnimCtrl, PLCA>((object)this, (IntPtr)(void*)/*OpCode not supported: LdVirtFtn*/), null, new Action<PlayerAnimCtrl, PLCA>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		animCtrl = PlayerAnimCtrl.Get(animator, default_anim, OnAnimPlay, null, base.OnAnimEnd);
 		string nearAnim = npcInfo.GetNearAnim();
 		if (!string.IsNullOrEmpty(nearAnim))
 		{
@@ -91,7 +83,7 @@ public class HomeNPCCharacter : HomeCharacterBase
 
 	public void Play(PLCA anim, bool instant)
 	{
-		if (animCtrl == null)
+		if ((Object)animCtrl == (Object)null)
 		{
 			InitAnim();
 		}
@@ -100,9 +92,7 @@ public class HomeNPCCharacter : HomeCharacterBase
 
 	public override bool DispatchEvent()
 	{
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Expected O, but got Unknown
-		if (!TutorialStep.HasAllTutorialCompleted() || MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() || TutorialMessage.GetCursor(0) != null)
+		if (!TutorialStep.HasAllTutorialCompleted() || MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() || (Object)TutorialMessage.GetCursor(0) != (Object)null)
 		{
 			return false;
 		}
@@ -112,7 +102,7 @@ public class HomeNPCCharacter : HomeCharacterBase
 		}
 		if (state == STATE.FREE && npcInfo != null && !string.IsNullOrEmpty(npcInfo.eventName))
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomeNPCCharacter", this.get_gameObject(), npcInfo.eventName, null, null, true);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomeNPCCharacter", base.gameObject, npcInfo.eventName, null, null, true);
 			return true;
 		}
 		return false;
@@ -120,7 +110,7 @@ public class HomeNPCCharacter : HomeCharacterBase
 
 	public void SetQuestBalloon(Transform t)
 	{
-		t.set_name(HomeBase.QuestBalloonName);
+		t.name = HomeBase.QuestBalloonName;
 		namePlate = t;
 	}
 
@@ -140,24 +130,20 @@ public class HomeNPCCharacter : HomeCharacterBase
 
 	public void HideShadow()
 	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Expected O, but got Unknown
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		NPCLoader nPCLoader = base.loader as NPCLoader;
-		if (Object.op_Implicit(nPCLoader))
+		if ((bool)nPCLoader)
 		{
-			if (Object.op_Implicit(nPCLoader.shadow))
+			if ((bool)nPCLoader.shadow)
 			{
-				nPCLoader.shadow.get_gameObject().SetActive(false);
+				nPCLoader.shadow.gameObject.SetActive(false);
 			}
 		}
 		else
 		{
-			Transform val = base._transform.Find("CircleShadow");
-			if (null != val)
+			Transform transform = base._transform.Find("CircleShadow");
+			if ((Object)null != (Object)transform)
 			{
-				val.get_gameObject().SetActive(false);
+				transform.gameObject.SetActive(false);
 			}
 		}
 	}

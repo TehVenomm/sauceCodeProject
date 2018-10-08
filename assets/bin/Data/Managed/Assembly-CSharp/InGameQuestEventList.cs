@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class InGameQuestEventList : QuestEventList
 {
@@ -40,12 +41,8 @@ public class InGameQuestEventList : QuestEventList
 		return false;
 	}
 
-	private unsafe void Reposition(bool isPortrait)
+	private void Reposition(bool isPortrait)
 	{
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Expected O, but got Unknown
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Expected O, but got Unknown
 		UIScreenRotationHandler[] components = GetCtrl(UI.OBJ_FRAME).GetComponents<UIScreenRotationHandler>();
 		for (int i = 0; i < components.Length; i++)
 		{
@@ -57,20 +54,23 @@ public class InGameQuestEventList : QuestEventList
 		UIScrollView component = GetCtrl(UI.SCR_EVENT_QUEST).GetComponent<UIScrollView>();
 		component.ResetPosition();
 		AppMain i2 = MonoBehaviourSingleton<AppMain>.I;
-		i2.onDelayCall = Delegate.Combine((Delegate)i2.onDelayCall, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		i2.onDelayCall = (Action)Delegate.Combine(i2.onDelayCall, (Action)delegate
+		{
+			RefreshUI();
+			UIPanel component2 = GetCtrl(UI.SCR_EVENT_QUEST).GetComponent<UIPanel>();
+			component2.Refresh();
+		});
 	}
 
 	private void OnScreenRotate(bool isPortrait)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		if (base.transferUI != null)
+		if ((UnityEngine.Object)base.transferUI != (UnityEngine.Object)null)
 		{
-			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
 		}
 		else
 		{
-			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
 		}
 		if (!isInActiveRotate)
 		{

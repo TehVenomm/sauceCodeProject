@@ -65,7 +65,7 @@ public class CoopLocalServerEnemyPop
 			Action<StageObject> action = delegate(StageObject o)
 			{
 				Enemy enemy = o as Enemy;
-				if (!(enemy == null) && enemy.enemyPopIndex == popIndex)
+				if (!((UnityEngine.Object)enemy == (UnityEngine.Object)null) && enemy.enemyPopIndex == popIndex)
 				{
 					CoopLocalServerEnemy coopLocalServerEnemy = new CoopLocalServerEnemy(this, 0f);
 					coopLocalServerEnemy.Pop(enemy.id);
@@ -124,7 +124,7 @@ public class CoopLocalServerEnemyPop
 			{
 				num = 0f;
 			}
-			coopLocalServerEnemy.Out(Time.get_time() + num);
+			coopLocalServerEnemy.Out(Time.time + num);
 		}
 	}
 }

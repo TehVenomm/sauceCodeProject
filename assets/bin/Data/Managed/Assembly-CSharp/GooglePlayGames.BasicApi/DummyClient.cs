@@ -54,7 +54,7 @@ namespace GooglePlayGames.BasicApi
 		public void GetPlayerStats(Action<CommonStatusCodes, PlayerStats> callback)
 		{
 			LogUsage();
-			callback.Invoke(CommonStatusCodes.ApiNotConnected, new PlayerStats());
+			callback(CommonStatusCodes.ApiNotConnected, new PlayerStats());
 		}
 
 		public string GetUserDisplayName()
@@ -214,7 +214,7 @@ namespace GooglePlayGames.BasicApi
 		public IUserProfile[] GetFriends()
 		{
 			LogUsage();
-			return (IUserProfile[])new IUserProfile[0];
+			return new IUserProfile[0];
 		}
 
 		public IntPtr GetApiClient()

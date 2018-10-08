@@ -1,5 +1,3 @@
-using System;
-
 public class WorldMapSummaryDialog : GameSection
 {
 	protected enum UI
@@ -51,13 +49,13 @@ public class WorldMapSummaryDialog : GameSection
 		string text = splitedSummary[currentPage - 1];
 		string name = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name;
 		text = text.Replace("{USER_NAME}", name);
-		SetLabelText((Enum)UI.LBL_SUMMARY, text);
+		SetLabelText(UI.LBL_SUMMARY, text);
 	}
 
 	private void UpdatePageUI()
 	{
-		SetLabelText((Enum)UI.LBL_NOW, currentPage.ToString());
-		SetLabelText((Enum)UI.LBL_MAX, maxPage.ToString());
+		SetLabelText(UI.LBL_NOW, currentPage.ToString());
+		SetLabelText(UI.LBL_MAX, maxPage.ToString());
 		UpdatePageArrows();
 	}
 
@@ -66,24 +64,24 @@ public class WorldMapSummaryDialog : GameSection
 		if (currentPage == 1)
 		{
 			bool flag = currentPage < maxPage;
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_L, false);
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_R, flag);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_L, true);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_R, !flag);
+			SetActive(UI.OBJ_ACTIVE_ARROW_L, false);
+			SetActive(UI.OBJ_ACTIVE_ARROW_R, flag);
+			SetActive(UI.SPR_INACTIVE_ARROW_L, true);
+			SetActive(UI.SPR_INACTIVE_ARROW_R, !flag);
 		}
 		else if (currentPage >= maxPage)
 		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_L, true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_R, false);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_L, false);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_R, true);
+			SetActive(UI.OBJ_ACTIVE_ARROW_L, true);
+			SetActive(UI.OBJ_ACTIVE_ARROW_R, false);
+			SetActive(UI.SPR_INACTIVE_ARROW_L, false);
+			SetActive(UI.SPR_INACTIVE_ARROW_R, true);
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_L, true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_R, true);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_L, false);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_R, false);
+			SetActive(UI.OBJ_ACTIVE_ARROW_L, true);
+			SetActive(UI.OBJ_ACTIVE_ARROW_R, true);
+			SetActive(UI.SPR_INACTIVE_ARROW_L, false);
+			SetActive(UI.SPR_INACTIVE_ARROW_R, false);
 		}
 	}
 

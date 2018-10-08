@@ -8,7 +8,7 @@ public class EnemyDataCache : DataCache
 		string text = cachePath;
 		if (string.IsNullOrEmpty(text))
 		{
-			text = Path.Combine(Application.get_temporaryCachePath(), "assets/enemy");
+			text = Path.Combine(Application.temporaryCachePath, "assets/enemy");
 		}
 		SetCachePath(text);
 	}

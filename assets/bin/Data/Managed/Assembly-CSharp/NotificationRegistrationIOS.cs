@@ -1,7 +1,5 @@
-public class NotificationRegistrationIOS
+using UnityEngine;
+
+public class NotificationRegistrationIOS : MonoBehaviour
 {
-	public NotificationRegistrationIOS()
-		: this()
-	{
-	}
 }

@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/Sprite Animation")]
 [RequireComponent(typeof(UISprite))]
-public class UISpriteAnimation
+[AddComponentMenu("NGUI/UI/Sprite Animation")]
+[ExecuteInEditMode]
+public class UISpriteAnimation : MonoBehaviour
 {
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected int mFPS = 30;
 
 	[SerializeField]
@@ -76,11 +76,6 @@ public class UISpriteAnimation
 
 	public bool isPlaying => mActive;
 
-	public UISpriteAnimation()
-		: this()
-	{
-	}
-
 	protected virtual void Start()
 	{
 		RebuildSpriteList();
@@ -88,7 +83,7 @@ public class UISpriteAnimation
 
 	protected virtual void Update()
 	{
-		if (mActive && mSpriteNames.Count > 1 && Application.get_isPlaying() && mFPS > 0)
+		if (mActive && mSpriteNames.Count > 1 && Application.isPlaying && mFPS > 0)
 		{
 			mDelta += RealTime.deltaTime;
 			float num = 1f / (float)mFPS;
@@ -114,12 +109,12 @@ public class UISpriteAnimation
 
 	public void RebuildSpriteList()
 	{
-		if (mSprite == null)
+		if ((Object)mSprite == (Object)null)
 		{
-			mSprite = this.GetComponent<UISprite>();
+			mSprite = GetComponent<UISprite>();
 		}
 		mSpriteNames.Clear();
-		if (mSprite != null && mSprite.atlas != null)
+		if ((Object)mSprite != (Object)null && (Object)mSprite.atlas != (Object)null)
 		{
 			List<UISpriteData> spriteList = mSprite.atlas.spriteList;
 			int i = 0;
@@ -149,7 +144,7 @@ public class UISpriteAnimation
 	{
 		mActive = true;
 		mIndex = 0;
-		if (mSprite != null && mSpriteNames.Count > 0)
+		if ((Object)mSprite != (Object)null && mSpriteNames.Count > 0)
 		{
 			mSprite.spriteName = mSpriteNames[mIndex];
 			if (mSnap)

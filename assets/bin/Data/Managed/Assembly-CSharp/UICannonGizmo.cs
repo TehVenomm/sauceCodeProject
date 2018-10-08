@@ -15,8 +15,8 @@ public class UICannonGizmo : UIStatusGizmoBase
 	[SerializeField]
 	protected float screenSideOffset = 22f;
 
-	[Tooltip("スクリ\u30fcン下オフセット")]
 	[SerializeField]
+	[Tooltip("スクリ\u30fcン下オフセット")]
 	protected float screenBottomOffset = 112f;
 
 	private FieldGimmickCannonObject _owner;
@@ -39,71 +39,38 @@ public class UICannonGizmo : UIStatusGizmoBase
 		}
 		set
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Expected O, but got Unknown
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			_owner = value;
-			if (_owner != null)
+			if ((Object)_owner != (Object)null)
 			{
-				this.get_gameObject().SetActive(true);
-				targetTransform = value.get_transform();
+				base.gameObject.SetActive(true);
+				targetTransform = value.transform;
 				UpdateParam();
 			}
 			else
 			{
-				this.get_gameObject().SetActive(false);
+				base.gameObject.SetActive(false);
 			}
 		}
 	}
 
 	protected override void OnEnable()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Expected O, but got Unknown
 		base.OnEnable();
-		if (arrowSprite != null)
+		if ((Object)arrowSprite != (Object)null)
 		{
-			arrowTransform = arrowSprite.get_transform().get_parent();
+			arrowTransform = arrowSprite.transform.parent;
 		}
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.playerList != null)
 		{
 			myPlayer = (MonoBehaviourSingleton<StageObjectManager>.I.playerList.Find((StageObject x) => x is Self) as Self);
 		}
-		panel = this.GetComponent<UIPanel>();
+		panel = GetComponent<UIPanel>();
 		isPlayAnimation = false;
 	}
 
 	protected override void UpdateParam()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0223: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0226: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0243: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0288: Unknown result type (might be due to invalid IL or missing references)
-		if (owner == null || !owner.get_gameObject().get_activeSelf())
+		if ((Object)owner == (Object)null || !owner.gameObject.activeSelf)
 		{
 			SetSpriteEnable(false);
 			isPlayAnimation = false;
@@ -111,7 +78,7 @@ public class UICannonGizmo : UIStatusGizmoBase
 		else
 		{
 			Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-			if (boss != null)
+			if ((Object)boss != (Object)null)
 			{
 				if (!boss.IsValidShield())
 				{
@@ -119,7 +86,7 @@ public class UICannonGizmo : UIStatusGizmoBase
 					isPlayAnimation = false;
 					return;
 				}
-				if (myPlayer != null)
+				if ((Object)myPlayer != (Object)null)
 				{
 					if (myPlayer.IsOnCannonMode())
 					{
@@ -132,18 +99,18 @@ public class UICannonGizmo : UIStatusGizmoBase
 				if (!isPlayAnimation)
 				{
 					isPlayAnimation = true;
-					UITweenCtrl component = this.GetComponent<UITweenCtrl>();
+					UITweenCtrl component = GetComponent<UITweenCtrl>();
 					component.Reset();
 					component.Play(true, null);
 				}
 			}
-			Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, targetTransform.get_position() + offset);
+			Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, targetTransform.position + offset);
 			screenZ = screenUIPosition.z;
 			screenUIPosition.z = 0f;
 			float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
-			Vector3 val = screenUIPosition;
+			Vector3 a = screenUIPosition;
 			bool flag = false;
-			float num2 = (float)Screen.get_width();
+			float num2 = (float)Screen.width;
 			if (screenUIPosition.x < screenSideOffset * num)
 			{
 				screenUIPosition.x = screenSideOffset * num;
@@ -162,23 +129,22 @@ public class UICannonGizmo : UIStatusGizmoBase
 			if (flag)
 			{
 				SetSpriteEnable(true);
-				Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
-				Vector3 val3 = transform.get_position() - val2;
-				if (val3.get_sqrMagnitude() >= 2E-05f)
+				Vector3 vector = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
+				if ((transform.position - vector).sqrMagnitude >= 2E-05f)
 				{
-					transform.set_position(val2);
+					transform.position = vector;
 				}
-				if (arrowTransform != null)
+				if ((Object)arrowTransform != (Object)null)
 				{
-					Vector3 val4 = val - screenUIPosition;
-					if (val4 != Vector3.get_zero())
+					Vector3 vector2 = a - screenUIPosition;
+					if (vector2 != Vector3.zero)
 					{
-						float num3 = 90f - Vector3.Angle(Vector3.get_right(), val4);
-						arrowTransform.set_eulerAngles(new Vector3(0f, 0f, num3));
+						float z = 90f - Vector3.Angle(Vector3.right, vector2);
+						arrowTransform.eulerAngles = new Vector3(0f, 0f, z);
 					}
 					else
 					{
-						arrowTransform.set_eulerAngles(new Vector3(0f, 0f, 0f));
+						arrowTransform.eulerAngles = new Vector3(0f, 0f, 0f);
 					}
 				}
 			}
@@ -191,9 +157,9 @@ public class UICannonGizmo : UIStatusGizmoBase
 
 	private void SetSpriteEnable(bool enable)
 	{
-		if (panel != null)
+		if ((Object)panel != (Object)null)
 		{
-			panel.set_enabled(enable);
+			panel.enabled = enable;
 		}
 	}
 }

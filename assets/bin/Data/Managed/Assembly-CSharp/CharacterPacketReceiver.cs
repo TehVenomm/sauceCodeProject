@@ -6,37 +6,6 @@ public class CharacterPacketReceiver : ObjectPacketReceiver
 
 	protected override bool HandleCoopEvent(CoopPacket packet)
 	{
-		//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0217: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0299: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0307: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0338: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0358: Unknown result type (might be due to invalid IL or missing references)
-		//IL_039e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0418: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0450: Unknown result type (might be due to invalid IL or missing references)
-		//IL_047e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0501: Unknown result type (might be due to invalid IL or missing references)
-		//IL_051b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_054d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0599: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0630: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_071e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0723: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0779: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07bb: Unknown result type (might be due to invalid IL or missing references)
 		switch (packet.packetType)
 		{
 		case PACKET_TYPE.OBJECT_ATTACKED_HIT_OWNER:
@@ -78,8 +47,8 @@ public class CharacterPacketReceiver : ObjectPacketReceiver
 				return true;
 			}
 			Coop_Model_CharacterUpdateDirection model5 = packet.GetModel<Coop_Model_CharacterUpdateDirection>();
-			character._rotation = Quaternion.AngleAxis(model5.dir, Vector3.get_up());
-			character.SetLerpRotation(Quaternion.AngleAxis(model5.lerp_dir, Vector3.get_up()) * Vector3.get_forward());
+			character._rotation = Quaternion.AngleAxis(model5.dir, Vector3.up);
+			character.SetLerpRotation(Quaternion.AngleAxis(model5.lerp_dir, Vector3.up) * Vector3.forward);
 			character.UpdateDirection(model5.trigger);
 			break;
 		}

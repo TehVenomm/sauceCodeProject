@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class MetaAI
 {
 	private const int kPlayerNum = 4;
@@ -50,10 +52,10 @@ public class MetaAI
 	private void OnRaisePlayer(Player dead_player)
 	{
 		NonPlayer nearestAliveNpc = AIUtility.GetNearestAliveNpc(dead_player);
-		if (!(nearestAliveNpc == null) && !(nearestAliveNpc.controller == null))
+		if (!((Object)nearestAliveNpc == (Object)null) && !((Object)nearestAliveNpc.controller == (Object)null))
 		{
 			Brain brain = nearestAliveNpc.controller.brain;
-			if (!(brain == null) && brain.think != null)
+			if (!((Object)brain == (Object)null) && brain.think != null)
 			{
 				brain.targetCtrl.SetAllyTarget(dead_player);
 				if (brain.fsm != null)

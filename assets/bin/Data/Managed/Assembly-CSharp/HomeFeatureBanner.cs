@@ -2,7 +2,7 @@ using Network;
 using System.Collections;
 using UnityEngine;
 
-public class HomeFeatureBanner
+public class HomeFeatureBanner : MonoBehaviour
 {
 	private string MODEL_FORMAT = "NPC011_{0:000}";
 
@@ -28,17 +28,8 @@ public class HomeFeatureBanner
 		private set;
 	}
 
-	public HomeFeatureBanner()
-		: this()
-	{
-	}
-
 	public void Setup(Transform parent, Vector3 position, Quaternion rotation)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 		this.parent = parent;
 		this.position = position;
 		this.rotation = rotation;
@@ -47,15 +38,12 @@ public class HomeFeatureBanner
 
 	private void Reposition()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		if (Object.op_Implicit(modelTransform))
+		if ((bool)modelTransform)
 		{
-			modelTransform.set_parent(parent);
-			modelTransform.set_localPosition(position);
-			modelTransform.set_rotation(rotation);
-			modelTransform.set_localScale(Vector3.get_one());
+			modelTransform.parent = parent;
+			modelTransform.localPosition = position;
+			modelTransform.rotation = rotation;
+			modelTransform.localScale = Vector3.one;
 		}
 	}
 
@@ -69,9 +57,8 @@ public class HomeFeatureBanner
 
 	private void Load(int variation, int bannerId)
 	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 		isLoading = true;
-		this.StartCoroutine(_Load(variation, bannerId));
+		StartCoroutine(_Load(variation, bannerId));
 	}
 
 	private IEnumerator _Load(int variation, int bannerId)
@@ -96,7 +83,7 @@ public class HomeFeatureBanner
 		if (loadModel)
 		{
 			GameObject model = Object.Instantiate(lo_model.loadedObject) as GameObject;
-			modelTransform = model.get_transform();
+			modelTransform = model.transform;
 			bannerMaterial = FindBannerMaterial(model);
 			Reposition();
 			SetTouchEvent(model);
@@ -104,9 +91,9 @@ public class HomeFeatureBanner
 		}
 		if (loadTex)
 		{
-			if (Object.op_Implicit(bannerMaterial))
+			if ((bool)bannerMaterial)
 			{
-				bannerMaterial.set_mainTexture(lo_tex.loadedObject as Texture2D);
+				bannerMaterial.mainTexture = (lo_tex.loadedObject as Texture2D);
 			}
 			currentBannerId = bannerId;
 		}
@@ -115,30 +102,22 @@ public class HomeFeatureBanner
 
 	private void SetTouchEvent(GameObject go)
 	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Expected O, but got Unknown
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		GameObject val = new GameObject("BANNER_TOUCH_EVENT");
-		Transform val2 = val.get_transform();
-		val2.set_parent(go.get_transform());
-		val2.set_localPosition(Vector3.get_zero());
-		val2.set_localRotation(Quaternion.get_identity());
-		SetCollider(val);
-		touchEvent = val.AddComponent<HomeStageTouchEvent>();
+		GameObject gameObject = new GameObject("BANNER_TOUCH_EVENT");
+		Transform transform = gameObject.transform;
+		transform.parent = go.transform;
+		transform.localPosition = Vector3.zero;
+		transform.localRotation = Quaternion.identity;
+		SetCollider(gameObject);
+		touchEvent = gameObject.AddComponent<HomeStageTouchEvent>();
 	}
 
 	private void SetCollider(GameObject go)
 	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		CapsuleCollider val = go.AddComponent<CapsuleCollider>();
-		val.set_radius(0.5f);
-		val.set_height(2.2f);
-		val.set_direction(0);
-		val.set_center(new Vector3(0f, 0.1f, 0f));
+		CapsuleCollider capsuleCollider = go.AddComponent<CapsuleCollider>();
+		capsuleCollider.radius = 0.5f;
+		capsuleCollider.height = 2.2f;
+		capsuleCollider.direction = 0;
+		capsuleCollider.center = new Vector3(0f, 0.1f, 0f);
 	}
 
 	private void SetBannerEvent(HomeStageTouchEvent touchEvent, EventBanner banner)
@@ -180,11 +159,11 @@ public class HomeFeatureBanner
 	{
 		Renderer componentInChildren = go.GetComponentInChildren<Renderer>();
 		int i = 0;
-		for (int num = componentInChildren.get_sharedMaterials().Length; i < num; i++)
+		for (int num = componentInChildren.sharedMaterials.Length; i < num; i++)
 		{
-			if (componentInChildren.get_sharedMaterials()[i].get_name().ToLower().EndsWith("_banner"))
+			if (componentInChildren.sharedMaterials[i].name.ToLower().EndsWith("_banner"))
 			{
-				return componentInChildren.get_materials()[i];
+				return componentInChildren.materials[i];
 			}
 		}
 		return null;

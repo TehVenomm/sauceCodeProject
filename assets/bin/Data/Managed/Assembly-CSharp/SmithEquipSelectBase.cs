@@ -129,7 +129,7 @@ public abstract class SmithEquipSelectBase : EquipSelectBase
 		selectTypeIndex = UIBehaviour.GetEquipmentTypeIndex((EQUIPMENT_TYPE)(int)GameSection.GetEventData());
 		weaponPickupIndex = Array.FindIndex(uiTypeTab, (UI ui) => ui == UI.BTN_WEAPON_PICKUP);
 		armorPickupIndex = Array.FindIndex(uiTypeTab, (UI ui) => ui == UI.BTN_ARMOR_PICKUP);
-		SetPrefab((Enum)UI.OBJ_ROOT, "SmithEquipSelectBase_" + prefabSuffix);
+		SetPrefab(UI.OBJ_ROOT, "SmithEquipSelectBase_" + prefabSuffix);
 		base.Initialize();
 	}
 
@@ -143,16 +143,16 @@ public abstract class SmithEquipSelectBase : EquipSelectBase
 	protected virtual void SetupInventoryTypeToggole()
 	{
 		bool flag = selectTypeIndex < UIBehaviour.GetEquipmentTypeIndex(EQUIPMENT_TYPE.ARMOR) || selectTypeIndex == weaponPickupIndex;
-		SetActive((Enum)UI.OBJ_ATK_ROOT, flag);
-		SetActive((Enum)UI.OBJ_DEF_ROOT, !flag);
-		SetToggleButton((Enum)UI.TGL_BUTTON_ROOT, flag, (Action<bool>)delegate(bool is_active)
+		SetActive(UI.OBJ_ATK_ROOT, flag);
+		SetActive(UI.OBJ_DEF_ROOT, !flag);
+		SetToggleButton(UI.TGL_BUTTON_ROOT, flag, delegate(bool is_active)
 		{
 			EQUIPMENT_TYPE type = (!is_active) ? EQUIPMENT_TYPE.HELM : EQUIPMENT_TYPE.ONE_HAND_SWORD;
 			int num = (!is_active) ? 1 : 0;
-			ResetTween((Enum)tabAnimTarget[num], 0);
-			PlayTween((Enum)tabAnimTarget[num], true, (EventDelegate.Callback)null, false, 0);
-			SetActive((Enum)UI.OBJ_ATK_ROOT, is_active);
-			SetActive((Enum)UI.OBJ_DEF_ROOT, !is_active);
+			ResetTween(tabAnimTarget[num], 0);
+			PlayTween(tabAnimTarget[num], true, null, false, 0);
+			SetActive(UI.OBJ_ATK_ROOT, is_active);
+			SetActive(UI.OBJ_DEF_ROOT, !is_active);
 			selectTypeIndex = UIBehaviour.GetEquipmentTypeIndex(type);
 			sortSettings.dialogType = ((!is_active) ? SortBase.DIALOG_TYPE.ARMOR : SortBase.DIALOG_TYPE.WEAPON);
 			SortBase.SORT_REQUIREMENT sORT_REQUIREMENT = (sortSettings.dialogType != SortBase.DIALOG_TYPE.ARMOR) ? SortBase.SORT_REQUIREMENT.REQUIREMENT_WEAPON_BIT : SortBase.SORT_REQUIREMENT.REQUIREMENT_ARMORS_BIT;
@@ -203,9 +203,9 @@ public abstract class SmithEquipSelectBase : EquipSelectBase
 		int i = 0;
 		for (int num = uiTypeTab.Length; i < num; i++)
 		{
-			SetEvent((Enum)uiTypeTab[i], "TYPE_TAB", i);
+			SetEvent(uiTypeTab[i], "TYPE_TAB", i);
 		}
-		SetToggle((Enum)uiTypeTab[selectTypeIndex], true);
+		SetToggle(uiTypeTab[selectTypeIndex], true);
 	}
 
 	protected virtual void OnQuery_SECTION_BACK()
@@ -215,11 +215,10 @@ public abstract class SmithEquipSelectBase : EquipSelectBase
 
 	protected void InitializeCaption(string caption)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		SetLabelText(ctrl, UI.LBL_CAPTION, caption);
-		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
-		if (component != null)
+		UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
+		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 		{
 			component.Reset();
 			int i = 0;

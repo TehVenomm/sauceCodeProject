@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class UIRenderQueueUpdater
+public class UIRenderQueueUpdater : MonoBehaviour
 {
 	private const float OFFSET_GLOBAL_Z = 0.5f;
 
@@ -13,40 +13,26 @@ public class UIRenderQueueUpdater
 
 	private Renderer _renderer;
 
-	public UIRenderQueueUpdater()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		_renderer = this.GetComponent<Renderer>();
-		if (_renderer != null && baseWidget != null)
+		_renderer = GetComponent<Renderer>();
+		if ((UnityEngine.Object)_renderer != (UnityEngine.Object)null && (UnityEngine.Object)baseWidget != (UnityEngine.Object)null)
 		{
-			_renderer.set_enabled(false);
+			_renderer.enabled = false;
 			UIWidget uIWidget = baseWidget;
 			uIWidget.onRender = (UIDrawCall.OnRenderCallback)Delegate.Combine(uIWidget.onRender, new UIDrawCall.OnRenderCallback(OnRender));
-			Vector3 position = baseWidget.get_transform().get_position();
-			float num = position.z + ((!offsetBack) ? (-0.5f) : 0.5f);
-			this.get_transform().set_position(this.get_transform().get_position() + new Vector3(0f, 0f, num));
+			Vector3 position = baseWidget.transform.position;
+			float z = position.z + ((!offsetBack) ? (-0.5f) : 0.5f);
+			base.transform.position = base.transform.position + new Vector3(0f, 0f, z);
 		}
 	}
 
 	private void OnRender(Material mat)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (_renderer != null)
+		if ((UnityEngine.Object)_renderer != (UnityEngine.Object)null)
 		{
-			_renderer.get_material().set_renderQueue(mat.get_renderQueue());
-			_renderer.set_enabled(baseWidget.get_enabled());
+			_renderer.material.renderQueue = mat.renderQueue;
+			_renderer.enabled = baseWidget.enabled;
 		}
 	}
 }

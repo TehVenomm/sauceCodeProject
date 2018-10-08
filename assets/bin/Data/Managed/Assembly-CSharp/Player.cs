@@ -153,24 +153,14 @@ public class Player : Character
 
 		public bool[] isBoostByTypes = new bool[2];
 
-		public unsafe bool IsBoost()
+		public bool IsBoost()
 		{
-			bool[] source = isBoostByTypes;
-			if (_003C_003Ef__am_0024cache3 == null)
-			{
-				_003C_003Ef__am_0024cache3 = new Func<bool, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			return source.Any(_003C_003Ef__am_0024cache3);
+			return isBoostByTypes.Any((bool item) => item);
 		}
 
-		public unsafe bool IsNoBoost()
+		public bool IsNoBoost()
 		{
-			bool[] source = isBoostByTypes;
-			if (_003C_003Ef__am_0024cache4 == null)
-			{
-				_003C_003Ef__am_0024cache4 = new Func<bool, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			return source.All(_003C_003Ef__am_0024cache4);
+			return isBoostByTypes.All((bool item) => !item);
 		}
 
 		public void Copy(BoostPrayInfo info)
@@ -540,9 +530,9 @@ public class Player : Character
 
 	protected bool isSyncingCannonRotation;
 
-	protected Quaternion syncCannonRotation = Quaternion.get_identity();
+	protected Quaternion syncCannonRotation = Quaternion.identity;
 
-	protected Quaternion prevCannonRotation = Quaternion.get_identity();
+	protected Quaternion prevCannonRotation = Quaternion.identity;
 
 	protected float syncCannonVecTimer;
 
@@ -640,9 +630,8 @@ public class Player : Character
 		}
 		set
 		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 			base.id = value;
-			this.get_gameObject().set_name("Player:" + value);
+			base.gameObject.name = "Player:" + value;
 		}
 	}
 
@@ -1068,7 +1057,7 @@ public class Player : Character
 			{
 				return 0f;
 			}
-			return _rescueTime - (Time.get_time() - deadStartTime);
+			return _rescueTime - (Time.time - deadStartTime);
 		}
 	}
 
@@ -1204,7 +1193,7 @@ public class Player : Character
 		protected set;
 	}
 
-	public bool isNpc => base.controller != null && base.controller is NpcController;
+	public bool isNpc => (UnityEngine.Object)base.controller != (UnityEngine.Object)null && base.controller is NpcController;
 
 	public int shotArrowCount
 	{
@@ -1360,23 +1349,10 @@ public class Player : Character
 
 	public bool isActPairSwordsSoulLaser => base.attackID == playerParameter.pairSwordsActionInfo.Soul_SpLaserShotAttackId;
 
-	public TargetPoint RestraintTargetPoint => (!(m_attackRestraint != null)) ? null : m_attackRestraint.BreakTargetPoint;
+	public TargetPoint RestraintTargetPoint => (!((UnityEngine.Object)m_attackRestraint != (UnityEngine.Object)null)) ? null : m_attackRestraint.BreakTargetPoint;
 
 	public Player()
 	{
-		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
 		base.objectType = OBJECT_TYPE.PLAYER;
 		attackMode = ATTACK_MODE.NONE;
 		spAttackType = SP_ATTACK_TYPE.NONE;
@@ -1615,14 +1591,13 @@ public class Player : Character
 		return prayerIds.Count > 0;
 	}
 
-	public unsafe bool IsBoostByType(BOOST_PRAY_TYPE type)
+	public bool IsBoostByType(BOOST_PRAY_TYPE type)
 	{
 		if (boostPrayedInfoList.IsNullOrEmpty())
 		{
 			return false;
 		}
-		_003CIsBoostByType_003Ec__AnonStorey50A _003CIsBoostByType_003Ec__AnonStorey50A;
-		if (boostPrayedInfoList.Count(new Func<BoostPrayInfo, bool>((object)_003CIsBoostByType_003Ec__AnonStorey50A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)) > 0)
+		if (boostPrayedInfoList.Count((BoostPrayInfo item) => item.isBoostByTypes[(int)type]) > 0)
 		{
 			return true;
 		}
@@ -1641,8 +1616,6 @@ public class Player : Character
 
 	public void SetEventMoveVelocity(Vector3 _velocity)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		eventMoveVelocity = _velocity;
 	}
 
@@ -1763,19 +1736,15 @@ public class Player : Character
 
 	public void ClearStoreEffect()
 	{
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Expected O, but got Unknown
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<EffectManager>.IsValid())
 		{
 			if (!pairSwordsBoostModeAuraEffectList.IsNullOrEmpty())
 			{
 				for (int i = 0; i < pairSwordsBoostModeAuraEffectList.Count; i++)
 				{
-					if (!(pairSwordsBoostModeAuraEffectList[i] == null))
+					if (!((UnityEngine.Object)pairSwordsBoostModeAuraEffectList[i] == (UnityEngine.Object)null))
 					{
-						EffectManager.ReleaseEffect(pairSwordsBoostModeAuraEffectList[i].get_gameObject(), true, false);
+						EffectManager.ReleaseEffect(pairSwordsBoostModeAuraEffectList[i].gameObject, true, false);
 						pairSwordsBoostModeAuraEffectList[i] = null;
 					}
 				}
@@ -1785,9 +1754,9 @@ public class Player : Character
 			{
 				for (int j = 0; j < pairSwordsBoostModeTrailEffectList.Count; j++)
 				{
-					if (!(pairSwordsBoostModeTrailEffectList[j] == null))
+					if (!((UnityEngine.Object)pairSwordsBoostModeTrailEffectList[j] == (UnityEngine.Object)null))
 					{
-						EffectManager.ReleaseEffect(pairSwordsBoostModeTrailEffectList[j].get_gameObject(), true, false);
+						EffectManager.ReleaseEffect(pairSwordsBoostModeTrailEffectList[j].gameObject, true, false);
 						pairSwordsBoostModeTrailEffectList[j] = null;
 					}
 				}
@@ -1809,15 +1778,13 @@ public class Player : Character
 
 	private void ActivateStoredEffect()
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 		if (!pairSwordsBoostModeAuraEffectList.IsNullOrEmpty())
 		{
 			for (int i = 0; i < pairSwordsBoostModeAuraEffectList.Count; i++)
 			{
-				if (!(pairSwordsBoostModeAuraEffectList[i] == null))
+				if (!((UnityEngine.Object)pairSwordsBoostModeAuraEffectList[i] == (UnityEngine.Object)null))
 				{
-					pairSwordsBoostModeAuraEffectList[i].get_gameObject().SetActive(true);
+					pairSwordsBoostModeAuraEffectList[i].gameObject.SetActive(true);
 				}
 			}
 		}
@@ -1825,10 +1792,10 @@ public class Player : Character
 		{
 			for (int j = 0; j < pairSwordsBoostModeTrailEffectList.Count; j++)
 			{
-				if (!(pairSwordsBoostModeTrailEffectList[j] == null))
+				if (!((UnityEngine.Object)pairSwordsBoostModeTrailEffectList[j] == (UnityEngine.Object)null))
 				{
-					pairSwordsBoostModeTrailEffectList[j].get_gameObject().SetActive(true);
-					pairSwordsBoostModeTrailEffectList[j].GetComponentsInChildren<Trail>(Temporary.trailList);
+					pairSwordsBoostModeTrailEffectList[j].gameObject.SetActive(true);
+					pairSwordsBoostModeTrailEffectList[j].GetComponentsInChildren(Temporary.trailList);
 					for (int k = 0; k < Temporary.trailList.Count; k++)
 					{
 						Temporary.trailList[k].Reset();
@@ -1841,15 +1808,13 @@ public class Player : Character
 
 	private void DeactivateStoredEffect()
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 		if (!pairSwordsBoostModeAuraEffectList.IsNullOrEmpty())
 		{
 			for (int i = 0; i < pairSwordsBoostModeAuraEffectList.Count; i++)
 			{
-				if (!(pairSwordsBoostModeAuraEffectList[i] == null))
+				if (!((UnityEngine.Object)pairSwordsBoostModeAuraEffectList[i] == (UnityEngine.Object)null))
 				{
-					pairSwordsBoostModeAuraEffectList[i].get_gameObject().SetActive(false);
+					pairSwordsBoostModeAuraEffectList[i].gameObject.SetActive(false);
 				}
 			}
 		}
@@ -1857,9 +1822,9 @@ public class Player : Character
 		{
 			for (int j = 0; j < pairSwordsBoostModeTrailEffectList.Count; j++)
 			{
-				if (!(pairSwordsBoostModeTrailEffectList[j] == null))
+				if (!((UnityEngine.Object)pairSwordsBoostModeTrailEffectList[j] == (UnityEngine.Object)null))
 				{
-					pairSwordsBoostModeTrailEffectList[j].get_gameObject().SetActive(false);
+					pairSwordsBoostModeTrailEffectList[j].gameObject.SetActive(false);
 				}
 			}
 		}
@@ -1867,8 +1832,6 @@ public class Player : Character
 
 	public EnemyHitTypeTable.TypeData GetOverrideHitEffect(AttackedHitStatusDirection status, ref Vector3 scale, ref float delay)
 	{
-		//IL_0337: Unknown result type (might be due to invalid IL or missing references)
-		//IL_033c: Unknown result type (might be due to invalid IL or missing references)
 		if (IsSoulOneHandSwordBoostMode())
 		{
 			EnemyHitTypeTable.TypeData typeData = new EnemyHitTypeTable.TypeData();
@@ -1968,7 +1931,7 @@ public class Player : Character
 		if (num == 3)
 		{
 			delay = 0.15f;
-			EffectManager.OneShot("ef_btl_wsk_spear_01_03", status.hitPos, Quaternion.get_identity(), true);
+			EffectManager.OneShot("ef_btl_wsk_spear_01_03", status.hitPos, Quaternion.identity, true);
 		}
 		return typeData5;
 	}
@@ -1998,7 +1961,7 @@ public class Player : Character
 	protected override void OnDisable()
 	{
 		base.OnDisable();
-		if (uiPlayerStatusGizmo != null)
+		if ((UnityEngine.Object)uiPlayerStatusGizmo != (UnityEngine.Object)null)
 		{
 			uiPlayerStatusGizmo.targetPlayer = null;
 			uiPlayerStatusGizmo = null;
@@ -2007,22 +1970,18 @@ public class Player : Character
 
 	protected override void Awake()
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0227: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		loader = this.get_gameObject().AddComponent<PlayerLoader>();
-		this.get_gameObject().set_layer(8);
-		if (base._rigidbody == null)
+		loader = base.gameObject.AddComponent<PlayerLoader>();
+		base.gameObject.layer = 8;
+		if ((UnityEngine.Object)base._rigidbody == (UnityEngine.Object)null)
 		{
-			base._rigidbody = this.get_gameObject().AddComponent<Rigidbody>();
+			base._rigidbody = base.gameObject.AddComponent<Rigidbody>();
 		}
-		base._rigidbody.set_mass(1f);
-		base._rigidbody.set_angularDrag(100f);
-		base._rigidbody.set_isKinematic(false);
-		base._rigidbody.set_constraints(116);
-		base._rigidbody.set_collisionDetectionMode(1);
+		base._rigidbody.mass = 1f;
+		base._rigidbody.angularDrag = 100f;
+		base._rigidbody.isKinematic = false;
+		base._rigidbody.constraints = (RigidbodyConstraints)116;
+		base._rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
 		if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
 		{
 			playerParameter = MonoBehaviourSingleton<InGameSettingsManager>.I.player;
@@ -2059,7 +2018,7 @@ public class Player : Character
 		buffParam.passive.Reset();
 		evolveCtrl.Init(this);
 		buffParam.ownerEvolveCtrl = evolveCtrl;
-		snatchCtrl.Init(this, this.get_gameObject().AddComponent<SnatchLineRenderer>());
+		snatchCtrl.Init(this, base.gameObject.AddComponent<SnatchLineRenderer>());
 		int j = 0;
 		for (int count = m_weaponCtrlList.Count; j < count; j++)
 		{
@@ -2081,36 +2040,28 @@ public class Player : Character
 
 	public override void OnLoadComplete()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Expected O, but got Unknown
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		if (base._collider == null)
+		if ((UnityEngine.Object)base._collider == (UnityEngine.Object)null)
 		{
-			CapsuleCollider val = this.get_gameObject().AddComponent<CapsuleCollider>();
-			val.set_direction(1);
-			val.set_height(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.height);
-			val.set_radius(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.radius);
-			val.set_center(new Vector3(0f, val.get_height() * 0.5f, 0f));
-			val.get_material().set_dynamicFriction(MonoBehaviourSingleton<InGameSettingsManager>.I.player.friction);
-			val.get_material().set_staticFriction(MonoBehaviourSingleton<InGameSettingsManager>.I.player.friction);
-			val.get_material().set_frictionCombine(2);
-			base._collider = val;
+			CapsuleCollider capsuleCollider = base.gameObject.AddComponent<CapsuleCollider>();
+			capsuleCollider.direction = 1;
+			capsuleCollider.height = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.height;
+			capsuleCollider.radius = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.radius;
+			capsuleCollider.center = new Vector3(0f, capsuleCollider.height * 0.5f, 0f);
+			capsuleCollider.material.dynamicFriction = MonoBehaviourSingleton<InGameSettingsManager>.I.player.friction;
+			capsuleCollider.material.staticFriction = MonoBehaviourSingleton<InGameSettingsManager>.I.player.friction;
+			capsuleCollider.material.frictionCombine = PhysicMaterialCombine.Minimum;
+			base._collider = capsuleCollider;
 		}
 		base.OnLoadComplete();
 		SetAnimUpdatePhysics(this is Self);
-		if (stepCtrl != null)
+		if ((UnityEngine.Object)stepCtrl != (UnityEngine.Object)null)
 		{
 			stepCtrl.stampDistance = playerParameter.stampDistance;
 		}
-		_physics = Utility.Find(this.get_transform(), "SoftPhysics");
-		if (_physics != null && MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		_physics = Utility.Find(base.transform, "SoftPhysics");
+		if ((UnityEngine.Object)_physics != (UnityEngine.Object)null && MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			_physics.get_transform().set_parent(MonoBehaviourSingleton<StageObjectManager>.I.physicsRoot);
+			_physics.transform.parent = MonoBehaviourSingleton<StageObjectManager>.I.physicsRoot;
 		}
 		if (initBuffSyncParam != null)
 		{
@@ -2168,18 +2119,9 @@ public class Player : Character
 
 	protected override void Update()
 	{
-		//IL_0453: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0458: Unknown result type (might be due to invalid IL or missing references)
-		//IL_045e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0463: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0556: Unknown result type (might be due to invalid IL or missing references)
-		//IL_055b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0561: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0566: Unknown result type (might be due to invalid IL or missing references)
-		//IL_061a: Unknown result type (might be due to invalid IL or missing references)
 		if (enableInputCharge)
 		{
-			inputChargeTimeCounter += Time.get_deltaTime();
+			inputChargeTimeCounter += Time.deltaTime;
 			if (inputChargeTimeCounter >= inputChargeTimeMax)
 			{
 				if (inputChargeAutoRelease && (IsCoopNone() || IsOriginal()))
@@ -2198,7 +2140,7 @@ public class Player : Character
 		}
 		if (isChargeExpanding)
 		{
-			timerChargeExpand += Time.get_deltaTime();
+			timerChargeExpand += Time.deltaTime;
 			if (isChargeExpandAutoRelease && timerChargeExpand >= timeChargeExpandMax && (IsCoopNone() || IsOriginal()))
 			{
 				SetChargeExpandRelease(1f);
@@ -2206,7 +2148,7 @@ public class Player : Character
 		}
 		if (isActSpecialAction)
 		{
-			actSpecialActionTimer += Time.get_deltaTime();
+			actSpecialActionTimer += Time.deltaTime;
 		}
 		UpdateCannonCharge();
 		UpdateSpearAction();
@@ -2226,7 +2168,7 @@ public class Player : Character
 		}
 		if (isHitSpAttack)
 		{
-			hitSpAttackContinueTimer += Time.get_deltaTime();
+			hitSpAttackContinueTimer += Time.deltaTime;
 		}
 		if (isSkillCastLoop)
 		{
@@ -2239,7 +2181,7 @@ public class Player : Character
 		CheckBuffShadowSealing();
 		if (healHp > base.hp && !buffParam.IsValidBuff(BuffParam.BUFFTYPE.CANT_HEAL_HP) && (float)buffParam.GetValue(BuffParam.BUFFTYPE.POISON, true) <= 0f && (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEADLY_POISON, true) <= 0f && (float)buffParam.GetValue(BuffParam.BUFFTYPE.BURNING, true) <= 0f && !isProgressStop())
 		{
-			addHp += healHpSpeed * buffParam.GetHealSpeedUp() * _GetGuardingHealSpeedUp() * Time.get_deltaTime();
+			addHp += healHpSpeed * buffParam.GetHealSpeedUp() * _GetGuardingHealSpeedUp() * Time.deltaTime;
 			int num = (int)addHp;
 			addHp -= (float)num;
 			base.hp += num;
@@ -2266,7 +2208,7 @@ public class Player : Character
 				else
 				{
 					Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(prayTargetIds[j]) as Player;
-					if (player == null)
+					if ((UnityEngine.Object)player == (UnityEngine.Object)null)
 					{
 						prayerEndIds.Add(prayTargetIds[j]);
 					}
@@ -2274,7 +2216,7 @@ public class Player : Character
 					{
 						prayerEndIds.Add(prayTargetIds[j]);
 					}
-					else if (Vector3.Distance(player.get_transform().get_position(), this.get_transform().get_position()) > playerParameter.revivalRange)
+					else if (Vector3.Distance(player.transform.position, base.transform.position) > playerParameter.revivalRange)
 					{
 						prayerEndIds.Add(prayTargetIds[j]);
 					}
@@ -2291,7 +2233,7 @@ public class Player : Character
 				for (int count4 = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Count; l < count4; l++)
 				{
 					Player player2 = MonoBehaviourSingleton<StageObjectManager>.I.playerList[l] as Player;
-					if (!(player2 == this) && player2.isDead && player2.actionID == (ACTION_ID)23 && !(player2.rescueTime <= 0f) && !(Vector3.Distance(player2.get_transform().get_position(), this.get_transform().get_position()) > playerParameter.revivalRange))
+					if (!((UnityEngine.Object)player2 == (UnityEngine.Object)this) && player2.isDead && player2.actionID == (ACTION_ID)23 && !(player2.rescueTime <= 0f) && !(Vector3.Distance(player2.transform.position, base.transform.position) > playerParameter.revivalRange))
 					{
 						bool flag2 = false;
 						int m = 0;
@@ -2331,15 +2273,13 @@ public class Player : Character
 
 	protected virtual void OnDestroy()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		if (base._collider != null)
+		if ((UnityEngine.Object)base._collider != (UnityEngine.Object)null)
 		{
-			Object.Destroy(base._collider.get_material());
+			UnityEngine.Object.Destroy(base._collider.material);
 		}
-		if (_physics != null)
+		if ((UnityEngine.Object)_physics != (UnityEngine.Object)null)
 		{
-			Object.Destroy(_physics.get_gameObject());
+			UnityEngine.Object.Destroy(_physics.gameObject);
 		}
 		_physics = null;
 		if (fishingCtrl != null)
@@ -2347,7 +2287,7 @@ public class Player : Character
 			fishingCtrl.Finalize();
 		}
 		fishingCtrl = null;
-		if (activeBulletBarrierObject != null)
+		if ((UnityEngine.Object)activeBulletBarrierObject != (UnityEngine.Object)null)
 		{
 			activeBulletBarrierObject.DestroyObject();
 		}
@@ -2357,59 +2297,6 @@ public class Player : Character
 
 	protected override void FixedUpdate()
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0224: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0229: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0232: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0251: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0296: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02aa: Unknown result type (might be due to invalid IL or missing references)
 		if (base.actionID == (ACTION_ID)28)
 		{
 			ActGrabbedUpdate();
@@ -2424,78 +2311,69 @@ public class Player : Character
 			{
 				for (int i = 0; i < pairSwordsBoostModeAuraEffectList.Count; i++)
 				{
-					if (!(pairSwordsBoostModeAuraEffectList[i] == null))
+					if (!((UnityEngine.Object)pairSwordsBoostModeAuraEffectList[i] == (UnityEngine.Object)null))
 					{
-						pairSwordsBoostModeAuraEffectList[i].set_position(_position);
+						pairSwordsBoostModeAuraEffectList[i].position = _position;
 					}
 				}
 			}
 			if (enableRotateToTargetPoint)
 			{
-				Vector3 val = _forward;
+				Vector3 forward = _forward;
 				if (GetTargetPos(out Vector3 pos))
 				{
 					pos.y = 0f;
-					val = pos - _position;
+					forward = pos - _position;
 				}
-				else if (base.targetPointPos != Vector3.get_zero())
+				else if (base.targetPointPos != Vector3.zero)
 				{
 					pos = base.targetPointPos;
 					pos.y = 0f;
-					val = pos - _position;
+					forward = pos - _position;
 				}
-				else if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
+				else if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.boss != (UnityEngine.Object)null)
 				{
 					pos = GetTargetPosition(MonoBehaviourSingleton<StageObjectManager>.I.boss);
 					pos.y = 0f;
-					val = pos - _position;
+					forward = pos - _position;
 				}
-				if (CheckAttackModeAndSpType(ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.SOUL) && targetPointWithSpWeak != null)
+				if (CheckAttackModeAndSpType(ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.SOUL) && (UnityEngine.Object)targetPointWithSpWeak != (UnityEngine.Object)null)
 				{
 					pos = targetPointWithSpWeak.param.markerPos;
 					pos.y = 0f;
-					val = pos - _position;
+					forward = pos - _position;
 				}
-				Quaternion val2 = Quaternion.LookRotation(val);
-				Vector3 eulerAngles = val2.get_eulerAngles();
+				Vector3 eulerAngles = Quaternion.LookRotation(forward).eulerAngles;
 				rotateEventDirection = eulerAngles.y;
 				if (!periodicSyncActionPositionFlag)
 				{
 					enableRotateToTargetPoint = false;
 				}
-				Vector3 forward = _forward;
-				forward.y = 0f;
-				forward.Normalize();
-				Vector3 val3 = Quaternion.AngleAxis(rotateEventDirection, Vector3.get_up()) * Vector3.get_forward();
-				Vector3 val4 = Vector3.Cross(forward, val3);
-				int num = (val4.y >= 0f) ? 1 : (-1);
-				float num2 = Vector3.Angle(forward, val3);
-				Quaternion rotation = _rotation;
-				Vector3 eulerAngles2 = rotation.get_eulerAngles();
+				Vector3 forward2 = _forward;
+				forward2.y = 0f;
+				forward2.Normalize();
+				Vector3 vector = Quaternion.AngleAxis(rotateEventDirection, Vector3.up) * Vector3.forward;
+				Vector3 vector2 = Vector3.Cross(forward2, vector);
+				int num = (vector2.y >= 0f) ? 1 : (-1);
+				float num2 = Vector3.Angle(forward2, vector);
+				Vector3 eulerAngles2 = _rotation.eulerAngles;
 				_rotation = Quaternion.Euler(eulerAngles2.x, eulerAngles2.y + (float)num * num2, eulerAngles2.z);
 			}
 			base.FixedUpdate();
 			FixedUpdateOneHandSword();
-			CapsuleCollider val5 = base._collider as CapsuleCollider;
-			if (val5 != null)
+			CapsuleCollider capsuleCollider = base._collider as CapsuleCollider;
+			if ((UnityEngine.Object)capsuleCollider != (UnityEngine.Object)null)
 			{
-				CapsuleCollider obj = val5;
-				float num3 = val5.get_height() * 0.5f;
+				CapsuleCollider capsuleCollider2 = capsuleCollider;
+				float num3 = capsuleCollider.height * 0.5f;
 				Vector3 position = _position;
-				obj.set_center(new Vector3(0f, num3 - position.y, 0f));
+				capsuleCollider2.center = new Vector3(0f, num3 - position.y, 0f);
 			}
 		}
 	}
 
 	protected override void FixedUpdatePhysics()
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 		if (base.isInitialized)
 		{
 			Vector3 position = _position;
@@ -2503,13 +2381,13 @@ public class Player : Character
 			switch (base.actionID)
 			{
 			case (ACTION_ID)13:
-				if (Time.get_time() - stumbleEndTime > 0f)
+				if (Time.time - stumbleEndTime > 0f)
 				{
 					SetNextTrigger(0);
 				}
 				break;
 			case (ACTION_ID)14:
-				if (Time.get_time() - shakeEndTime > 0f)
+				if (Time.time - shakeEndTime > 0f)
 				{
 					SetNextTrigger(0);
 				}
@@ -2517,16 +2395,16 @@ public class Player : Character
 			case (ACTION_ID)15:
 			case (ACTION_ID)16:
 			case (ACTION_ID)17:
-				if (!base.waitAddForce && (base._rigidbody.get_constraints() & 4) == 0 && position.y <= height + 0.03f)
+				if (!base.waitAddForce && (base._rigidbody.constraints & RigidbodyConstraints.FreezePositionY) == RigidbodyConstraints.None && position.y <= height + 0.03f)
 				{
-					Vector3 velocity = base._rigidbody.get_velocity();
+					Vector3 velocity = base._rigidbody.velocity;
 					if (velocity.y <= 0f)
 					{
 						ResetIgnoreColliders();
 						SetNextTrigger(0);
 					}
 				}
-				if (base.actionID == (ACTION_ID)17 && isStunnedLoop && stunnedEndTime - Time.get_time() <= 0f)
+				if (base.actionID == (ACTION_ID)17 && isStunnedLoop && stunnedEndTime - Time.time <= 0f)
 				{
 					SetStunnedEnd();
 				}
@@ -2547,31 +2425,31 @@ public class Player : Character
 		}
 		if (isLoopingRush)
 		{
-			float num = animatorSpeed * GetRushDistanceRate();
-			return Mathf.Max(0f, num);
+			float b = animatorSpeed * GetRushDistanceRate();
+			return Mathf.Max(0f, b);
 		}
 		if (IsBurstTwoHandSword() && thsCtrl != null && thsCtrl.IsEnableChangeReloadMotionSpeed)
 		{
 			return GetBurstReloadMotionSpeedRate();
 		}
-		float num2 = 0f;
+		float num = 0f;
 		switch (attackMode)
 		{
 		case ATTACK_MODE.TWO_HAND_SWORD:
-			num2 = buffParam.GetChargeSwordsTimeRate();
+			num = buffParam.GetChargeSwordsTimeRate();
 			break;
 		case ATTACK_MODE.ARROW:
-			num2 = GetChargeArrowTimeRate();
+			num = GetChargeArrowTimeRate();
 			break;
 		case ATTACK_MODE.PAIR_SWORDS:
-			num2 = buffParam.GetChargePairSwordsTimeRate();
+			num = buffParam.GetChargePairSwordsTimeRate();
 			break;
 		}
-		if (num2 >= 1f)
+		if (num >= 1f)
 		{
-			num2 = playerParameter.animatorSpeedMaxTimeRate;
+			num = playerParameter.animatorSpeedMaxTimeRate;
 		}
-		return 1f / (1f - num2);
+		return 1f / (1f - num);
 	}
 
 	public override bool IsChangeableAction(ACTION_ID action_id)
@@ -2775,11 +2653,9 @@ public class Player : Character
 
 	public void ReleaseEffect(ref Transform t, bool isPlayEndAnimation = true)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<EffectManager>.IsValid() && !object.ReferenceEquals(t, null))
 		{
-			EffectManager.ReleaseEffect(t.get_gameObject(), isPlayEndAnimation, false);
+			EffectManager.ReleaseEffect(t.gameObject, isPlayEndAnimation, false);
 			t = null;
 		}
 	}
@@ -2860,7 +2736,7 @@ public class Player : Character
 		else
 		{
 			base.ActIdle(is_sync, transitionTimer);
-			if (loader != null)
+			if ((UnityEngine.Object)loader != (UnityEngine.Object)null)
 			{
 				loader.eyeBlink = true;
 			}
@@ -2869,8 +2745,6 @@ public class Player : Character
 
 	public virtual void ActGuardWalk(Vector3 velocity_, float sync_speed, Vector3 move_vec)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 		if (base.actionID == (ACTION_ID)18)
 		{
 			notEndGuardFlag = true;
@@ -2884,44 +2758,28 @@ public class Player : Character
 
 	public void SetGuardWalkRotation(Vector3 move_vec)
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val;
-		if (base.actionTarget != null && !IsValidBuffBlind())
+		Vector3 vector;
+		if ((UnityEngine.Object)base.actionTarget != (UnityEngine.Object)null && !IsValidBuffBlind())
 		{
-			val = base.actionTarget._position - _position;
-			val.y = 0f;
-			val.Normalize();
-			SetLerpRotation(val);
+			vector = base.actionTarget._position - _position;
+			vector.y = 0f;
+			vector.Normalize();
+			SetLerpRotation(vector);
 		}
 		else
 		{
-			val = move_vec;
+			vector = move_vec;
 			SetLerpRotation(move_vec);
 		}
-		float num = Vector3.Angle(val, move_vec);
+		float num = Vector3.Angle(vector, move_vec);
 		float num2 = 0f;
-		Vector3 val2 = Vector3.Cross(val, move_vec);
-		num2 = ((!(val2.y >= 0f)) ? (num / 360f) : ((360f - num) / 360f));
+		Vector3 vector2 = Vector3.Cross(vector, move_vec);
+		num2 = ((!(vector2.y >= 0f)) ? (num / 360f) : ((360f - num) / 360f));
 		base.animator.SetFloat(guardAngleID, num2);
 	}
 
 	public override void ActMoveSyncVelocity(float time, Vector3 pos, int motion_id)
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		bool flag = false;
 		if (base.actionID != ACTION_ID.MOVE)
 		{
@@ -2943,8 +2801,6 @@ public class Player : Character
 
 	public override void SetMoveSyncVelocityEnd(float time, Vector3 pos, float direction, float sync_speed, int motion_id)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		base.SetMoveSyncVelocityEnd(time, pos, direction, sync_speed, motion_id);
 		if (motion_id == 122)
 		{
@@ -2974,20 +2830,17 @@ public class Player : Character
 
 	public override void SetAttackActionPosition()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		if (targetingPoint != null)
+		if ((UnityEngine.Object)targetingPoint != (UnityEngine.Object)null)
 		{
 			SetActionPosition(targetingPoint.param.targetPos, true);
 		}
-		else if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
+		else if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.boss != (UnityEngine.Object)null)
 		{
 			SetActionPosition(GetTargetPosition(MonoBehaviourSingleton<StageObjectManager>.I.boss), true);
 		}
 		else
 		{
-			SetActionPosition(Vector3.get_zero(), false);
+			SetActionPosition(Vector3.zero, false);
 		}
 	}
 
@@ -3018,7 +2871,7 @@ public class Player : Character
 		{
 			string motionLayerName = _motionLayerName;
 			ActAttack(_attackId, false, false, motionLayerName);
-			if (playerSender != null)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 			{
 				playerSender.OnActAttackCombo(_attackId, _motionLayerName);
 			}
@@ -3086,10 +2939,6 @@ public class Player : Character
 
 	public void CheckSnatchMove()
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 		if ((IsCoopNone() || IsOriginal()) && snatchCtrl.IsMove())
 		{
 			Vector3 snatchPos = snatchCtrl.GetSnatchPos();
@@ -3106,27 +2955,12 @@ public class Player : Character
 
 	public void OnSnatchMoveStart(Vector3 snatchPos)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
 		EventMoveEnd();
 		EndRotate();
 		enableEventMove = true;
 		base.enableAddForce = false;
-		eventMoveVelocity = Vector3.get_forward() * playerParameter.ohsActionInfo.Soul_SnatchMoveVelocity;
-		Vector3 val = snatchPos - _position;
-		Vector3 normalized = val.get_normalized();
+		eventMoveVelocity = Vector3.forward * playerParameter.ohsActionInfo.Soul_SnatchMoveVelocity;
+		Vector3 normalized = (snatchPos - _position).normalized;
 		SetVelocity(Quaternion.LookRotation(normalized) * eventMoveVelocity, VELOCITY_TYPE.EVENT_MOVE);
 		snatchCtrl.StartMoveLoop();
 		if (snatchCtrl.IsShotReleased())
@@ -3138,7 +2972,7 @@ public class Player : Character
 			SetNextTrigger(0);
 		}
 		StartWaitingPacket(WAITING_PACKET.PLAYER_ONE_HAND_SWORD_MOVE_END, true, 0f);
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnSnatchMoveStart(snatchPos);
 		}
@@ -3150,7 +2984,7 @@ public class Player : Character
 		EndRotate();
 		SetNextTrigger(triggerIndex);
 		EndWaitingPacket(WAITING_PACKET.PLAYER_ONE_HAND_SWORD_MOVE_END);
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnSnatchMoveEnd(triggerIndex);
 		}
@@ -3159,7 +2993,7 @@ public class Player : Character
 	public virtual void StartCannonCharge()
 	{
 		FieldGimmickCannonSpecial fieldGimmickCannonSpecial = targetFieldGimmickCannon as FieldGimmickCannonSpecial;
-		if (fieldGimmickCannonSpecial != null)
+		if ((UnityEngine.Object)fieldGimmickCannonSpecial != (UnityEngine.Object)null)
 		{
 			if (!fieldGimmickCannonSpecial.IsAbleToShot())
 			{
@@ -3173,13 +3007,13 @@ public class Player : Character
 	public virtual void UpdateCannonCharge()
 	{
 		FieldGimmickCannonSpecial fieldGimmickCannonSpecial = targetFieldGimmickCannon as FieldGimmickCannonSpecial;
-		if (fieldGimmickCannonSpecial == null)
+		if ((UnityEngine.Object)fieldGimmickCannonSpecial == (UnityEngine.Object)null)
 		{
 			return;
 		}
 		if (cannonState == CANNON_STATE.CHARGE)
 		{
-			inputCannonChargeCounter += Time.get_deltaTime();
+			inputCannonChargeCounter += Time.deltaTime;
 			if (inputCannonChargeMax > 0f && !(inputCannonChargeCounter >= inputCannonChargeMax))
 			{
 				goto IL_0075;
@@ -3187,7 +3021,7 @@ public class Player : Character
 		}
 		else
 		{
-			inputCannonChargeCounter -= Time.get_deltaTime();
+			inputCannonChargeCounter -= Time.deltaTime;
 			fieldGimmickCannonSpecial.ReleaseCharge();
 		}
 		goto IL_0075;
@@ -3197,7 +3031,6 @@ public class Player : Character
 
 	public virtual void SetChargeRelease(float charge_rate)
 	{
-		//IL_0272: Unknown result type (might be due to invalid IL or missing references)
 		if (CheckAttackMode(ATTACK_MODE.TWO_HAND_SWORD) && charge_rate >= 1f)
 		{
 			IncrementCleaveComboCount();
@@ -3299,10 +3132,10 @@ public class Player : Character
 			EndWaitingPacket(WAITING_PACKET.PLAYER_CHARGE_RELEASE);
 			if (isArrowAimLesserMode)
 			{
-				UpdateArrowAimLesserMode(Vector2.get_zero());
+				UpdateArrowAimLesserMode(Vector2.zero);
 			}
 			UpdateArrowAngle();
-			if (playerSender != null)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 			{
 				playerSender.OnSetChargeRelease(charge_rate, isChargeExRush);
 			}
@@ -3335,7 +3168,7 @@ public class Player : Character
 			SetAttackActionPosition();
 		}
 		EndWaitingPacket(WAITING_PACKET.PLAYER_CHARGE_RELEASE);
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnSetChargeExpandRelease(this.chargeExpandRate);
 		}
@@ -3343,21 +3176,6 @@ public class Player : Character
 
 	public void ExecChargeMaxOnce()
 	{
-		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0235: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
 		inputChargeMaxTiming = false;
 		if (!isNpc && (IsCoopNone() || IsOriginal()))
 		{
@@ -3379,7 +3197,7 @@ public class Player : Character
 					if (isChargeExRush)
 					{
 						ReleaseEffect(ref exRushChargeEffect, true);
-						EffectManager.OneShot("ef_btl_wsk_charge_end_01", FindNode("R_Wep").get_transform().get_position(), Quaternion.get_identity(), false);
+						EffectManager.OneShot("ef_btl_wsk_charge_end_01", FindNode("R_Wep").transform.position, Quaternion.identity, false);
 						exRushChargeEffect = EffectManager.GetEffect("ef_btl_wsk_charge_loop_02", FindNode("R_Wep"));
 						SoundManager.PlayOneShotSE(MonoBehaviourSingleton<InGameSettingsManager>.I.player.spearActionInfo.exRushChargeMaxSeId, this, FindNode(string.Empty));
 					}
@@ -3397,8 +3215,8 @@ public class Player : Character
 				}
 				else if (spAttackType == SP_ATTACK_TYPE.SOUL)
 				{
-					Transform val = FindNode("R_Wep");
-					EffectManager.OneShot("ef_btl_wsk_charge_end_01", val.get_position() + val.get_rotation() * MonoBehaviourSingleton<InGameSettingsManager>.I.player.spearActionInfo.Soul_SpAttackMaxChargeEffectOffsetPos, Quaternion.get_identity(), false);
+					Transform transform = FindNode("R_Wep");
+					EffectManager.OneShot("ef_btl_wsk_charge_end_01", transform.position + transform.rotation * MonoBehaviourSingleton<InGameSettingsManager>.I.player.spearActionInfo.Soul_SpAttackMaxChargeEffectOffsetPos, Quaternion.identity, false);
 					SoundManager.PlayOneShotSE(MonoBehaviourSingleton<InGameSettingsManager>.I.player.spearActionInfo.exRushChargeMaxSeId, this, FindNode(string.Empty));
 					spearCtrl.ExecBladeEffect();
 				}
@@ -3406,8 +3224,8 @@ public class Player : Character
 			case ATTACK_MODE.PAIR_SWORDS:
 				if (spAttackType == SP_ATTACK_TYPE.NONE)
 				{
-					EffectManager.OneShot("ef_btl_wsk_charge_end_01", FindNode("R_Wep").get_transform().get_position(), Quaternion.get_identity(), false);
-					EffectManager.OneShot("ef_btl_wsk_charge_end_01", FindNode("L_Wep").get_transform().get_position(), Quaternion.get_identity(), false);
+					EffectManager.OneShot("ef_btl_wsk_charge_end_01", FindNode("R_Wep").transform.position, Quaternion.identity, false);
+					EffectManager.OneShot("ef_btl_wsk_charge_end_01", FindNode("L_Wep").transform.position, Quaternion.identity, false);
 					SoundManager.PlayOneShotSE(MonoBehaviourSingleton<InGameSettingsManager>.I.player.pairSwordsActionInfo.wildDanceChargeMaxSeId, this, FindNode(string.Empty));
 				}
 				break;
@@ -3480,18 +3298,6 @@ public class Player : Character
 
 	public virtual void SetInputAxis(Vector2 input_vec)
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
 		if (enableInputRotate)
 		{
 			if (!startInputRotate)
@@ -3501,14 +3307,14 @@ public class Player : Character
 				rotateEventDirection = 0f;
 				rotateEventKeep = false;
 			}
-			Vector3 right = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_right();
-			Vector3 forward = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_forward();
+			Vector3 right = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.right;
+			Vector3 forward = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.forward;
 			right.y = 0f;
 			right.Normalize();
 			forward.y = 0f;
 			forward.Normalize();
-			Vector3 val = right * input_vec.x + forward * input_vec.y;
-			_rotation = Quaternion.LookRotation(val);
+			Vector3 forward2 = right * input_vec.x + forward * input_vec.y;
+			_rotation = Quaternion.LookRotation(forward2);
 		}
 	}
 
@@ -3533,14 +3339,14 @@ public class Player : Character
 		{
 			m_weaponCtrlList[i].OnActAvoid();
 		}
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnActAvoid();
 		}
 		if (FieldManager.IsValidInTutorial())
 		{
 			InGameTutorialManager component = MonoBehaviourSingleton<AppMain>.I.GetComponent<InGameTutorialManager>();
-			if (component != null)
+			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 			{
 				component.GetState<InGameTutorialManager.TutorialRolling>()?.AddRollingCount();
 			}
@@ -3568,7 +3374,7 @@ public class Player : Character
 		{
 			m_weaponCtrlList[i].OnActAvoid();
 		}
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnWarp();
 		}
@@ -3576,21 +3382,18 @@ public class Player : Character
 
 	public virtual void ActRestraint(RestraintInfo restInfo)
 	{
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Expected O, but got Unknown
 		EndAction();
 		base.actionID = (ACTION_ID)29;
 		PlayMotion(130, -1f);
-		base._rigidbody.set_isKinematic(true);
-		base._rigidbody.set_useGravity(false);
-		base._rigidbody.set_constraints(126);
-		base._rigidbody.set_velocity(Vector3.get_zero());
-		m_restrainTime = Time.get_time() + restInfo.duration;
+		base._rigidbody.isKinematic = true;
+		base._rigidbody.useGravity = false;
+		base._rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+		base._rigidbody.velocity = Vector3.zero;
+		m_restrainTime = Time.time + restInfo.duration;
 		m_restraintDamgeTimer = restInfo.damageInterval;
 		m_restraintInfo = restInfo;
-		GameObject val = new GameObject("AttackRestraintObject");
-		AttackRestraintObject attackRestraintObject = val.AddComponent<AttackRestraintObject>();
+		GameObject gameObject = new GameObject("AttackRestraintObject");
+		AttackRestraintObject attackRestraintObject = gameObject.AddComponent<AttackRestraintObject>();
 		attackRestraintObject.Initialize(this, restInfo);
 		m_attackRestraint = attackRestraintObject;
 		if (restInfo.damageRate > 0)
@@ -3599,7 +3402,7 @@ public class Player : Character
 		}
 		ClearLaser();
 		pairSwordsCtrl.OnReaction();
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnRestraintStart(restInfo);
 		}
@@ -3607,26 +3410,21 @@ public class Player : Character
 
 	public void ActRestraintEnd()
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		if (base.actionID == (ACTION_ID)29)
 		{
 			EndAction();
 			if (base.actionID != (ACTION_ID)16)
 			{
-				ActFallBlow(Vector3.get_down() * 10f);
+				ActFallBlow(Vector3.down * 10f);
 			}
 		}
 	}
 
 	private void PostRestraint()
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		if (!(m_attackRestraint == null))
+		if (!((UnityEngine.Object)m_attackRestraint == (UnityEngine.Object)null))
 		{
-			base._transform.set_position(MonoBehaviourSingleton<StageManager>.I.ClampInside(base._transform.get_position()));
+			base._transform.position = MonoBehaviourSingleton<StageManager>.I.ClampInside(base._transform.position);
 			if (m_restraintInfo.isStopMotion)
 			{
 				setPause(false);
@@ -3635,16 +3433,16 @@ public class Player : Character
 			m_restrainTime = 0f;
 			m_restraintDamgeTimer = 0f;
 			m_restraintInfo = null;
-			base._rigidbody.set_isKinematic(false);
-			base._rigidbody.set_useGravity(true);
-			base._rigidbody.set_constraints(112);
-			base._rigidbody.set_velocity(Vector3.get_zero());
-			if (m_attackRestraint != null)
+			base._rigidbody.isKinematic = false;
+			base._rigidbody.useGravity = true;
+			base._rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+			base._rigidbody.velocity = Vector3.zero;
+			if ((UnityEngine.Object)m_attackRestraint != (UnityEngine.Object)null)
 			{
 				m_attackRestraint.DeleteThis();
 			}
 			m_attackRestraint = null;
-			if (playerSender != null)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 			{
 				playerSender.OnRestraintEnd();
 			}
@@ -3653,23 +3451,17 @@ public class Player : Character
 
 	private void UpdateRestraint()
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		UpdateNextMotion();
-		if (!(m_attackRestraint == null))
+		if (!((UnityEngine.Object)m_attackRestraint == (UnityEngine.Object)null))
 		{
-			if (m_restraintInfo.isStopMotion && !base.isPause)
+			if (m_restraintInfo.isStopMotion && !base.isPause && base.animator.GetCurrentAnimatorStateInfo(0).fullPathHash == Animator.StringToHash("Base Layer.restraint"))
 			{
-				AnimatorStateInfo currentAnimatorStateInfo = base.animator.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_fullPathHash() == Animator.StringToHash("Base Layer.restraint"))
-				{
-					setPause(true);
-				}
+				setPause(true);
 			}
 			int restrainDamageValue = m_restrainDamageValue;
 			if ((IsCoopNone() || IsOriginal()) && restrainDamageValue > 0 && base.hp > 1)
 			{
-				m_restraintDamgeTimer -= Time.get_deltaTime();
+				m_restraintDamgeTimer -= Time.deltaTime;
 				if (m_restraintDamgeTimer <= 0f)
 				{
 					if (IsValidShield())
@@ -3696,13 +3488,13 @@ public class Player : Character
 			if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 			{
 				Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-				if (boss != null && boss.isDead)
+				if ((UnityEngine.Object)boss != (UnityEngine.Object)null && boss.isDead)
 				{
 					ActRestraintEnd();
 					return;
 				}
 			}
-			float num = Time.get_time() - m_restrainTime;
+			float num = Time.time - m_restrainTime;
 			if (num > 0f)
 			{
 				ActRestraintEnd();
@@ -3719,7 +3511,7 @@ public class Player : Character
 			if (!(reduceTimeByFlick <= 0f))
 			{
 				m_restrainTime -= reduceTimeByFlick;
-				if (m_attackRestraint != null)
+				if ((UnityEngine.Object)m_attackRestraint != (UnityEngine.Object)null)
 				{
 					m_attackRestraint.OnFlick();
 				}
@@ -3744,7 +3536,7 @@ public class Player : Character
 		EndAction();
 		base.actionID = (ACTION_ID)13;
 		PlayMotion(116, -1f);
-		stumbleEndTime = Time.get_time() + time;
+		stumbleEndTime = Time.time + time;
 		OnActReaction();
 		ClearLaser();
 	}
@@ -3754,18 +3546,17 @@ public class Player : Character
 		EndAction();
 		base.actionID = (ACTION_ID)14;
 		PlayMotion(117, -1f);
-		shakeEndTime = Time.get_time() + buffParam.GetShakeTime(playerParameter.shakeLoopTime);
+		shakeEndTime = Time.time + buffParam.GetShakeTime(playerParameter.shakeLoopTime);
 		OnActReaction();
 		ClearLaser();
 	}
 
 	public virtual void ActBlow(Vector3 force)
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		EndAction();
 		base.actionID = (ACTION_ID)15;
 		PlayMotion(118, -1f);
-		if (base._rigidbody != null)
+		if ((UnityEngine.Object)base._rigidbody != (UnityEngine.Object)null)
 		{
 			base.addForce = force;
 		}
@@ -3779,7 +3570,7 @@ public class Player : Character
 		if ((!IsCoopNone() && !IsOriginal()) || enableInputCombo)
 		{
 			inputBlowClearFlag = true;
-			if (playerSender != null)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 			{
 				playerSender.OnInputBlowClear();
 			}
@@ -3795,11 +3586,10 @@ public class Player : Character
 
 	public virtual void ActFallBlow(Vector3 force)
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		EndAction();
 		base.actionID = (ACTION_ID)16;
 		PlayMotion(119, -1f);
-		if (base._rigidbody != null)
+		if ((UnityEngine.Object)base._rigidbody != (UnityEngine.Object)null)
 		{
 			base.addForce = force;
 			base.waitAddForce = true;
@@ -3811,11 +3601,10 @@ public class Player : Character
 
 	public virtual void ActStunnedBlow(Vector3 force, float time = 0f)
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		EndAction();
 		base.actionID = (ACTION_ID)17;
 		PlayMotion(120, -1f);
-		if (base._rigidbody != null)
+		if ((UnityEngine.Object)base._rigidbody != (UnityEngine.Object)null)
 		{
 			base.addForce = force;
 		}
@@ -3827,11 +3616,8 @@ public class Player : Character
 
 	public virtual void ActGrabbedStart(int enemyId, GrabInfo grabInfo)
 	{
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
 		Enemy enemy = MonoBehaviourSingleton<StageObjectManager>.I.FindEnemy(enemyId) as Enemy;
-		if (!(enemy == null))
+		if (!((UnityEngine.Object)enemy == (UnityEngine.Object)null))
 		{
 			if ((int)enemy.GrabHpMax > 0)
 			{
@@ -3846,25 +3632,25 @@ public class Player : Character
 			base.actionID = (ACTION_ID)28;
 			PlayMotion(129, -1f);
 			IgnoreEnemyColliders();
-			Transform val = Utility.Find(enemy._transform, grabInfo.parentNode);
-			if (val != null)
+			Transform transform = Utility.Find(enemy._transform, grabInfo.parentNode);
+			if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 			{
-				base._transform.set_parent(val);
-				base._transform.set_localPosition(Vector3.get_zero());
-				base._transform.set_localRotation(Quaternion.get_identity());
-				base._rigidbody.set_isKinematic(true);
-				base._rigidbody.set_useGravity(false);
-				base._rigidbody.set_constraints(126);
+				base._transform.parent = transform;
+				base._transform.localPosition = Vector3.zero;
+				base._transform.localRotation = Quaternion.identity;
+				base._rigidbody.isKinematic = true;
+				base._rigidbody.useGravity = false;
+				base._rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 			}
-			CircleShadow componentInChildren = this.GetComponentInChildren<CircleShadow>();
-			if (componentInChildren != null)
+			CircleShadow componentInChildren = GetComponentInChildren<CircleShadow>();
+			if ((UnityEngine.Object)componentInChildren != (UnityEngine.Object)null)
 			{
-				componentInChildren.get_gameObject().SetActive(false);
+				componentInChildren.gameObject.SetActive(false);
 			}
 			hitOffFlag |= HIT_OFF_FLAG.GRAB;
 			ClearLaser();
 			pairSwordsCtrl.OnReaction();
-			if (playerSender != null)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 			{
 				playerSender.OnGrabbedStart(enemy.id, grabInfo.parentNode, grabInfo.duration, grabInfo.drainAttackId);
 			}
@@ -3873,43 +3659,26 @@ public class Player : Character
 
 	public virtual void ActGrabbedEnd(float angle = 0f, float power = 0f)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
 		EndAction();
 		grabDrainAtkInfo = null;
-		base._transform.set_position(MonoBehaviourSingleton<StageManager>.I.ClampInside(base._transform.get_position()));
-		CircleShadow componentInChildren = this.GetComponentInChildren<CircleShadow>(true);
-		if (componentInChildren != null)
+		base._transform.position = MonoBehaviourSingleton<StageManager>.I.ClampInside(base._transform.position);
+		CircleShadow componentInChildren = GetComponentInChildren<CircleShadow>(true);
+		if ((UnityEngine.Object)componentInChildren != (UnityEngine.Object)null)
 		{
-			componentInChildren.get_gameObject().SetActive(true);
-			componentInChildren.get_transform().set_localPosition(Vector3.get_zero());
+			componentInChildren.gameObject.SetActive(true);
+			componentInChildren.transform.localPosition = Vector3.zero;
 		}
-		base._transform.set_parent(MonoBehaviourSingleton<StageObjectManager>.I._transform);
-		base._transform.set_localRotation(Quaternion.get_identity());
-		base._rigidbody.set_isKinematic(false);
-		base._rigidbody.set_useGravity(true);
-		base._rigidbody.set_constraints(112);
-		base._rigidbody.set_velocity(Vector3.get_zero());
-		Vector3 val = -_forward;
-		val = Quaternion.AngleAxis(angle, _right) * val * power;
-		ActFallBlow(val);
+		base._transform.parent = MonoBehaviourSingleton<StageObjectManager>.I._transform;
+		base._transform.localRotation = Quaternion.identity;
+		base._rigidbody.isKinematic = false;
+		base._rigidbody.useGravity = true;
+		base._rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+		base._rigidbody.velocity = Vector3.zero;
+		Vector3 point = -_forward;
+		point = Quaternion.AngleAxis(angle, _right) * point * power;
+		ActFallBlow(point);
 		hitOffFlag &= ~HIT_OFF_FLAG.GRAB;
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnGrabbedEnd();
 		}
@@ -3923,7 +3692,7 @@ public class Player : Character
 			int num = (int)((float)base.hpMax * (grabDrainAtkInfo.damageRate * 0.01f));
 			if ((IsCoopNone() || IsOriginal()) && num > 0 && base.hp > 1)
 			{
-				grabDrainDamageTimer -= Time.get_deltaTime();
+				grabDrainDamageTimer -= Time.deltaTime;
 				if (grabDrainDamageTimer <= 0f)
 				{
 					if (IsValidShield())
@@ -3972,7 +3741,7 @@ public class Player : Character
 			isStunnedLoop = false;
 			stunnedEndTime = 0f;
 			UpdateStunnedEffect();
-			if (playerSender != null)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 			{
 				playerSender.OnSetStunnedEnd();
 			}
@@ -3981,13 +3750,11 @@ public class Player : Character
 
 	protected void UpdateStunnedEffect()
 	{
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010e: Expected O, but got Unknown
 		bool flag = false;
 		float num = 0f;
 		if (isStunnedLoop && stunnedTime > 0f)
 		{
-			float num2 = stunnedEndTime - Time.get_time();
+			float num2 = stunnedEndTime - Time.time;
 			num = 1f - num2 / stunnedTime;
 			if (num < 0f)
 			{
@@ -4010,7 +3777,7 @@ public class Player : Character
 			if (num3 != stunnedEffectIndex)
 			{
 				stunnedEffectIndex = -1;
-				if (stunnedEffect != null)
+				if ((UnityEngine.Object)stunnedEffect != (UnityEngine.Object)null)
 				{
 					EffectManager.ReleaseEffect(stunnedEffect, true, false);
 					stunnedEffect = null;
@@ -4019,9 +3786,9 @@ public class Player : Character
 				{
 					stunnedEffectIndex = num3;
 					Transform effect = EffectManager.GetEffect(stunnedEffectList[num3], base.rootNode);
-					if (effect != null)
+					if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
 					{
-						stunnedEffect = effect.get_gameObject();
+						stunnedEffect = effect.gameObject;
 					}
 				}
 			}
@@ -4029,7 +3796,7 @@ public class Player : Character
 		else
 		{
 			stunnedEffectIndex = -1;
-			if (stunnedEffect != null)
+			if ((UnityEngine.Object)stunnedEffect != (UnityEngine.Object)null)
 			{
 				EffectManager.ReleaseEffect(stunnedEffect, true, false);
 				stunnedEffect = null;
@@ -4039,8 +3806,6 @@ public class Player : Character
 
 	public virtual void ActGuard()
 	{
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
 		if (base.actionID == (ACTION_ID)19 || base.actionID == (ACTION_ID)33 || base.actionID == (ACTION_ID)20 || isGuardWalk)
 		{
 			notEndGuardFlag = true;
@@ -4056,13 +3821,13 @@ public class Player : Character
 		base.isControllable = true;
 		if (IsCoopNone() || IsOriginal())
 		{
-			if (base.actionTarget != null)
+			if ((UnityEngine.Object)base.actionTarget != (UnityEngine.Object)null)
 			{
 				SetActionPosition(base.actionTarget._position, true);
 			}
 			else
 			{
-				SetActionPosition(Vector3.get_zero(), false);
+				SetActionPosition(Vector3.zero, false);
 			}
 		}
 	}
@@ -4103,13 +3868,11 @@ public class Player : Character
 
 	public virtual bool ActBattleStart(bool effect_only = false)
 	{
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Expected O, but got Unknown
 		if (isActedBattleStart)
 		{
 			return false;
 		}
-		if (base.packetReceiver != null)
+		if ((UnityEngine.Object)base.packetReceiver != (UnityEngine.Object)null)
 		{
 			base.packetReceiver.SetStopPacketUpdate(false);
 		}
@@ -4125,9 +3888,9 @@ public class Player : Character
 			if (!string.IsNullOrEmpty(battleStartEffectName))
 			{
 				Transform effect = EffectManager.GetEffect(battleStartEffectName, base._transform);
-				if (effect != null)
+				if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
 				{
-					AddObjectList(effect.get_gameObject(), OBJECT_LIST_TYPE.STATIC);
+					AddObjectList(effect.gameObject, OBJECT_LIST_TYPE.STATIC);
 				}
 			}
 		}
@@ -4136,7 +3899,7 @@ public class Player : Character
 			EndAction();
 			base.actionID = (ACTION_ID)22;
 			PlayMotion(124, -1f);
-			if (uiPlayerStatusGizmo != null)
+			if ((UnityEngine.Object)uiPlayerStatusGizmo != (UnityEngine.Object)null)
 			{
 				uiPlayerStatusGizmo.SetVisible(false);
 			}
@@ -4149,7 +3912,7 @@ public class Player : Character
 	public virtual void WaitBattleStart()
 	{
 		isWaitBattleStart = true;
-		if (base.packetReceiver != null)
+		if ((UnityEngine.Object)base.packetReceiver != (UnityEngine.Object)null)
 		{
 			base.packetReceiver.SetStopPacketUpdate(true);
 		}
@@ -4239,7 +4002,7 @@ public class Player : Character
 		{
 			flag = MonoBehaviourSingleton<InGameProgress>.I.disableSendProgressStop;
 		}
-		if (!flag && playerSender != null)
+		if (!flag && (UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnStopCounter(stop);
 		}
@@ -4256,16 +4019,16 @@ public class Player : Character
 			_rescueTime = rescue_time;
 			if (!stop)
 			{
-				deadStartTime = Time.get_time();
+				deadStartTime = Time.time;
 				deadStopTime = -1f;
 			}
 			else
 			{
-				deadStartTime = Time.get_time();
-				deadStopTime = Time.get_time();
+				deadStartTime = Time.time;
+				deadStopTime = Time.time;
 			}
 			UpdateRevivalRangeEffect();
-			if (playerSender != null && !syncRequested)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null && !syncRequested)
 			{
 				playerSender.OnDeadCount(_rescueTime, stop);
 			}
@@ -4279,28 +4042,22 @@ public class Player : Character
 
 	public void UpdateRevivalRangeEffect()
 	{
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Expected O, but got Unknown
 		if (base.actionID == (ACTION_ID)23 && (!MonoBehaviourSingleton<InGameManager>.IsValid() || !MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo()) && !QuestManager.IsValidInGameTrial() && !MonoBehaviourSingleton<CoopManager>.I.coopStage.IsPresentQuest())
 		{
 			if (IsRescuable())
 			{
-				if (revivalRangEffect == null)
+				if ((UnityEngine.Object)revivalRangEffect == (UnityEngine.Object)null)
 				{
 					Transform effect = EffectManager.GetEffect("ef_btl_rebirth_area_01", base._transform);
-					if (effect != null)
+					if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
 					{
-						Vector3 localScale = effect.get_localScale();
-						effect.set_localScale(localScale * playerParameter.revivalRange);
-						revivalRangEffect = effect.get_gameObject();
+						Vector3 localScale = effect.localScale;
+						effect.localScale = localScale * playerParameter.revivalRange;
+						revivalRangEffect = effect.gameObject;
 					}
 				}
 			}
-			else if (revivalRangEffect != null)
+			else if ((UnityEngine.Object)revivalRangEffect != (UnityEngine.Object)null)
 			{
 				EffectManager.ReleaseEffect(revivalRangEffect, true, false);
 				revivalRangEffect = null;
@@ -4321,7 +4078,7 @@ public class Player : Character
 		if ((MonoBehaviourSingleton<InGameManager>.I.IsRush() || QuestManager.IsValidInGameWaveMatch(true)) && MonoBehaviourSingleton<StageObjectManager>.I.playerList.TrueForAll(delegate(StageObject so)
 		{
 			Player player = so as Player;
-			if (player != null)
+			if ((UnityEngine.Object)player != (UnityEngine.Object)null)
 			{
 				return player.isDead && !player.IsAutoReviving();
 			}
@@ -4334,11 +4091,6 @@ public class Player : Character
 
 	public virtual void ActDeadStandup(int standup_hp, eContinueType cType)
 	{
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
 		EndAction();
 		base.actionID = (ACTION_ID)24;
 		PlayMotion(126, -1f);
@@ -4376,14 +4128,14 @@ public class Player : Character
 		if (standup_hp >= base.hpMax)
 		{
 			Transform effect = EffectManager.GetEffect("ef_btl_rebirth_01", null);
-			if (effect != null)
+			if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
 			{
-				effect.set_position(_position);
-				effect.set_rotation(_rotation);
-				effect.set_localScale(Vector3.Scale(base._transform.get_lossyScale(), effect.get_localScale()));
+				effect.position = _position;
+				effect.rotation = _rotation;
+				effect.localScale = Vector3.Scale(base._transform.lossyScale, effect.localScale);
 			}
 		}
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnActDeadStandup(standup_hp, cType);
 		}
@@ -4404,7 +4156,7 @@ public class Player : Character
 		base.ActParalyze();
 		ClearLaser();
 		pairSwordsCtrl.OnReaction();
-		paralyzeTime = Time.get_time() + buffParam.GetParalyzeTime();
+		paralyzeTime = Time.time + buffParam.GetParalyzeTime();
 	}
 
 	public void ActPrayer()
@@ -4424,12 +4176,12 @@ public class Player : Character
 				StartWaitingPacket(WAITING_PACKET.PLAYER_PRAYER_END, true, 0f);
 			}
 			prayTargetIds.Add(prayTargetId);
-			if (playerSender != null)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 			{
 				playerSender.OnPrayerStart(prayTargetId);
 			}
 			Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(prayTargetId) as Player;
-			if (!(player == null))
+			if (!((UnityEngine.Object)player == (UnityEngine.Object)null))
 			{
 				BoostPrayInfo boostPrayInfo = boostPrayTargetInfoList.Find((BoostPrayInfo item) => item.prayTargetId == prayTargetId);
 				if (boostPrayInfo == null)
@@ -4457,7 +4209,7 @@ public class Player : Character
 
 	public virtual void OnPrayerEnd(int prayTargetId)
 	{
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnPrayerEnd(prayTargetId);
 		}
@@ -4467,7 +4219,7 @@ public class Player : Character
 			EndWaitingPacket(WAITING_PACKET.PLAYER_PRAYER_END);
 		}
 		Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(prayTargetId) as Player;
-		if (!(player == null))
+		if (!((UnityEngine.Object)player == (UnityEngine.Object)null))
 		{
 			BoostPrayInfo boostPrayInfo = boostPrayTargetInfoList.Find((BoostPrayInfo item) => item.prayTargetId == prayTargetId);
 			if (boostPrayInfo != null)
@@ -4490,12 +4242,12 @@ public class Player : Character
 
 	public void OnChangeBoostPray(int prayedId, BoostPrayInfo boostPrayInfo)
 	{
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnChangePrayBoost(prayedId, boostPrayInfo);
 		}
 		Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(prayedId) as Player;
-		if (!(player == null))
+		if (!((UnityEngine.Object)player == (UnityEngine.Object)null))
 		{
 			BoostPrayInfo boostPrayInfo2 = boostPrayTargetInfoList.Find((BoostPrayInfo item) => item.prayTargetId == boostPrayInfo.prayTargetId);
 			if (boostPrayInfo2 != null)
@@ -4599,7 +4351,7 @@ public class Player : Character
 		PlayMotion(128, -1f);
 		changeWeaponItem = item;
 		changeWeaponIndex = weapon_index;
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnChangeWeapon();
 		}
@@ -4607,15 +4359,13 @@ public class Player : Character
 
 	public virtual void ApplyChangeWeapon(CharaInfo.EquipItem item, int weapon_index)
 	{
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Expected O, but got Unknown
 		if (!base.isDead && base.actionID != (ACTION_ID)26)
 		{
 			ActChangeWeapon(item, weapon_index);
 		}
 		EndWaitingPacket(WAITING_PACKET.PLAYER_APPLY_CHANGE_WEAPON);
 		isChangingWeapon = true;
-		changeWeaponStartTime = Time.get_time();
+		changeWeaponStartTime = Time.time;
 		hitOffFlag |= HIT_OFF_FLAG.INVICIBLE;
 		if (base.isDead)
 		{
@@ -4625,9 +4375,9 @@ public class Player : Character
 		if (!string.IsNullOrEmpty(changeWeaponEffectName))
 		{
 			Transform effect = EffectManager.GetEffect(changeWeaponEffectName, base._transform);
-			if (effect != null)
+			if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
 			{
-				AddObjectList(effect.get_gameObject(), OBJECT_LIST_TYPE.CHANGE_WEAPON);
+				AddObjectList(effect.gameObject, OBJECT_LIST_TYPE.CHANGE_WEAPON);
 			}
 		}
 		OnBuffEnd(BuffParam.BUFFTYPE.LUNATIC_TEAR, true, true);
@@ -4639,16 +4389,15 @@ public class Player : Character
 		DetachRootEffectTemporary();
 		LoadWeapon(item, weapon_index, delegate
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			SetEnableNodeRenderer("BODY", false);
-			if (loader.shadow != null)
+			if ((UnityEngine.Object)loader.shadow != (UnityEngine.Object)null)
 			{
-				loader.shadow.get_gameObject().SetActive(false);
+				loader.shadow.gameObject.SetActive(false);
 			}
 			pairSwordsCtrl.OnLoadComplete();
 			ReAttachRootEffect();
 		});
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnApplyChangeWeapon(item, weapon_index);
 		}
@@ -4656,15 +4405,7 @@ public class Player : Character
 
 	public void ActGather(GatherPointObject gather_point)
 	{
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		if (!(gather_point == null))
+		if (!((UnityEngine.Object)gather_point == (UnityEngine.Object)null))
 		{
 			EndAction();
 			targetGatherPoint = gather_point;
@@ -4680,16 +4421,16 @@ public class Player : Character
 					actionRendererNodeName = targetGatherPoint.viewData.toolNodeName;
 				}
 			}
-			Vector3 position = targetGatherPoint._transform.get_position();
+			Vector3 position = targetGatherPoint._transform.position;
 			position.y = 0f;
 			if (IsCoopNone() || IsOriginal())
 			{
 				SetActionPosition(position, true);
 			}
-			Vector3 lerpRotation = position - base._transform.get_position();
+			Vector3 lerpRotation = position - base._transform.position;
 			lerpRotation.y = 0f;
 			SetLerpRotation(lerpRotation);
-			if (playerSender != null)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 			{
 				playerSender.OnActGather(gather_point);
 			}
@@ -4702,7 +4443,7 @@ public class Player : Character
 		{
 			return false;
 		}
-		if (targetGatherPoint == null)
+		if ((UnityEngine.Object)targetGatherPoint == (UnityEngine.Object)null)
 		{
 			return false;
 		}
@@ -4722,7 +4463,7 @@ public class Player : Character
 			if (fieldGimmickObj != null)
 			{
 				FieldSonarObject fieldSonarObject = fieldGimmickObj as FieldSonarObject;
-				if (!(fieldSonarObject == null))
+				if (!((UnityEngine.Object)fieldSonarObject == (UnityEngine.Object)null))
 				{
 					fieldSonarObject.StartSonar();
 				}
@@ -4738,7 +4479,7 @@ public class Player : Character
 			if (fieldGimmickObj != null)
 			{
 				FieldReadStoryObject fieldReadStoryObject = fieldGimmickObj as FieldReadStoryObject;
-				if (!(fieldReadStoryObject == null))
+				if (!((UnityEngine.Object)fieldReadStoryObject == (UnityEngine.Object)null))
 				{
 					fieldReadStoryObject.StartReadStory();
 				}
@@ -4748,21 +4489,13 @@ public class Player : Character
 
 	public void ActGatherGimmick(int id)
 	{
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
 			IFieldGimmickObject fieldGimmickObj = MonoBehaviourSingleton<InGameProgress>.I.GetFieldGimmickObj(InGameProgress.eFieldGimmick.GatherGimmick, id);
 			if (fieldGimmickObj != null)
 			{
 				FieldGatherGimmickObject fieldGatherGimmickObject = fieldGimmickObj as FieldGatherGimmickObject;
-				if (!(fieldGatherGimmickObject == null))
+				if (!((UnityEngine.Object)fieldGatherGimmickObject == (UnityEngine.Object)null))
 				{
 					GATHER_GIMMICK_TYPE type = fieldGatherGimmickObject.GetType();
 					if (type == GATHER_GIMMICK_TYPE.FISHING && fishingCtrl.CanFishing())
@@ -4783,13 +4516,13 @@ public class Player : Character
 							}
 							add_margin_time = fishingCtrl.GetMaxWaitPacketSec();
 						}
-						Vector3 position = fieldGatherGimmickObject.GetTransform().get_position();
+						Vector3 position = fieldGatherGimmickObject.GetTransform().position;
 						position.y = 0f;
 						if (IsCoopNone() || IsOriginal())
 						{
 							SetActionPosition(position, true);
 						}
-						Vector3 lerpRotation = position - base._transform.get_position();
+						Vector3 lerpRotation = position - base._transform.position;
 						lerpRotation.y = 0f;
 						SetLerpRotation(lerpRotation);
 						fieldGatherGimmickObject.StartAction(this, IsCoopNone() || IsOriginal());
@@ -4807,7 +4540,7 @@ public class Player : Character
 
 	public void OnGatherGimmickState(int state)
 	{
-		if (!(gatherGimmickObject == null))
+		if (!((UnityEngine.Object)gatherGimmickObject == (UnityEngine.Object)null))
 		{
 			GATHER_GIMMICK_TYPE type = gatherGimmickObject.GetType();
 			if (type == GATHER_GIMMICK_TYPE.FISHING)
@@ -4819,7 +4552,7 @@ public class Player : Character
 
 	protected void OnGatherGimmickGet()
 	{
-		if (!(gatherGimmickObject == null))
+		if (!((UnityEngine.Object)gatherGimmickObject == (UnityEngine.Object)null))
 		{
 			GATHER_GIMMICK_TYPE type = gatherGimmickObject.GetType();
 			if (type == GATHER_GIMMICK_TYPE.FISHING)
@@ -4831,7 +4564,7 @@ public class Player : Character
 
 	protected void OnGatherGimmickEnd()
 	{
-		if (!(gatherGimmickObject == null))
+		if (!((UnityEngine.Object)gatherGimmickObject == (UnityEngine.Object)null))
 		{
 			GATHER_GIMMICK_TYPE type = gatherGimmickObject.GetType();
 			if (type == GATHER_GIMMICK_TYPE.FISHING)
@@ -4851,7 +4584,7 @@ public class Player : Character
 			if (fieldGimmickObj != null)
 			{
 				FieldBingoObject fieldBingoObject = fieldGimmickObj as FieldBingoObject;
-				if (!(fieldBingoObject == null))
+				if (!((UnityEngine.Object)fieldBingoObject == (UnityEngine.Object)null))
 				{
 					fieldBingoObject.OpenBingo();
 				}
@@ -4861,7 +4594,6 @@ public class Player : Character
 
 	public void ActCannonStandby(int id)
 	{
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
 			IFieldGimmickCannon fieldGimmickCannon = MonoBehaviourSingleton<InGameProgress>.I.GetFieldGimmickObj(InGameProgress.eFieldGimmick.Cannon, id) as IFieldGimmickCannon;
@@ -4870,11 +4602,11 @@ public class Player : Character
 				base.actionID = (ACTION_ID)30;
 				targetFieldGimmickCannon = fieldGimmickCannon;
 				_position = fieldGimmickCannon.GetPosition();
-				base._rigidbody.set_isKinematic(true);
+				base._rigidbody.isKinematic = true;
 				fieldGimmickCannon.OnBoard(this);
 				PlayMotion(131, -1f);
 				SetCannonState(CANNON_STATE.STANDBY);
-				if (playerSender != null)
+				if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 				{
 					playerSender.OnCannonStandby(id);
 				}
@@ -4891,7 +4623,7 @@ public class Player : Character
 				SetNextTrigger(0);
 			}
 			targetFieldGimmickCannon.Shot();
-			if (playerSender != null)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 			{
 				playerSender.OnCannonShot();
 			}
@@ -4906,15 +4638,11 @@ public class Player : Character
 		}
 		SetCannonState(CANNON_STATE.NONE);
 		targetFieldGimmickCannon = null;
-		base._rigidbody.set_isKinematic(false);
+		base._rigidbody.isKinematic = false;
 	}
 
 	public virtual bool ActSkillAction(int skill_index, bool isGuestUsingSecondGrade = false)
 	{
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0179: Unknown result type (might be due to invalid IL or missing references)
 		SkillInfo.SkillParam skillParam = GetSkillParam(skill_index);
 		if (skillParam == null || !skillParam.isValid)
 		{
@@ -4949,17 +4677,17 @@ public class Player : Character
 		{
 			base.attackStartTarget = base.actionTarget;
 		}
-		if ((float)skillParam.tableData.skillRange > 0f && skillRangeEffect == null)
+		if ((float)skillParam.tableData.skillRange > 0f && (UnityEngine.Object)skillRangeEffect == (UnityEngine.Object)null)
 		{
 			Transform effect = EffectManager.GetEffect(playerParameter.skillRangeEffectName, base._transform);
-			if (effect != null)
+			if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
 			{
-				Vector3 localScale = effect.get_localScale();
-				effect.set_localScale(localScale * (playerParameter.revivalRange / 0.5f));
+				Vector3 localScale = effect.localScale;
+				effect.localScale = localScale * (playerParameter.revivalRange / 0.5f);
 				skillRangeEffect = effect;
 			}
 		}
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnActSkillAction(skill_index, skillParam);
 		}
@@ -4967,7 +4695,7 @@ public class Player : Character
 		{
 			MonoBehaviourSingleton<UIPlayerAnnounce>.I.StartSkill(skillParam.tableData.name, this);
 		}
-		if (bossBrain != null)
+		if ((UnityEngine.Object)bossBrain != (UnityEngine.Object)null)
 		{
 			bossBrain.HandleEvent(BRAIN_EVENT.PLAYER_SKILL, this);
 		}
@@ -4977,7 +4705,7 @@ public class Player : Character
 
 	public virtual void CheckSkillCastLoop()
 	{
-		if (isSkillCastLoop && Time.get_time() - skillCastLoopStartTime >= skillCastLoopTime)
+		if (isSkillCastLoop && Time.time - skillCastLoopStartTime >= skillCastLoopTime)
 		{
 			SetChangeTrigger(skillCastLoopTrigger);
 			isSkillCastLoop = false;
@@ -4989,29 +4717,11 @@ public class Player : Character
 
 	private void ApplySkillParam()
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Expected O, but got Unknown
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Expected O, but got Unknown
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05dd: Unknown result type (might be due to invalid IL or missing references)
 		if (!isAppliedSkillParam)
 		{
-			if (skillRangeEffect != null)
+			if ((UnityEngine.Object)skillRangeEffect != (UnityEngine.Object)null)
 			{
-				EffectManager.ReleaseEffect(skillRangeEffect.get_gameObject(), true, false);
+				EffectManager.ReleaseEffect(skillRangeEffect.gameObject, true, false);
 				skillRangeEffect = null;
 			}
 			isAppliedSkillParam = true;
@@ -5035,24 +4745,19 @@ public class Player : Character
 						{
 							if (MonoBehaviourSingleton<StageObjectManager>.I.ExistsEnemyValiedHealAttack())
 							{
-								GameObject val = new GameObject("HealAttackObject");
-								HealAttackObject healAttackObject = val.AddComponent<HealAttackObject>();
-								healAttackObject.Initialize(this, base._transform, actSkillParam, Vector3.get_zero(), Vector3.get_zero(), 0f, 12);
+								GameObject gameObject = new GameObject("HealAttackObject");
+								HealAttackObject healAttackObject = gameObject.AddComponent<HealAttackObject>();
+								healAttackObject.Initialize(this, base._transform, actSkillParam, Vector3.zero, Vector3.zero, 0f, 12);
 							}
 							List<StageObject> playerList = MonoBehaviourSingleton<StageObjectManager>.I.playerList;
 							List<StageObject>.Enumerator enumerator = playerList.GetEnumerator();
 							while (enumerator.MoveNext())
 							{
 								Player player = enumerator.Current as Player;
-								if (num > 0f)
+								if (!(num > 0f) || !((player._transform.position - base._transform.position).sqrMagnitude > num))
 								{
-									Vector3 val2 = player._transform.get_position() - base._transform.get_position();
-									if (val2.get_sqrMagnitude() > num)
-									{
-										continue;
-									}
+									player.OnHealReceive(healData);
 								}
-								player.OnHealReceive(healData);
 							}
 						}
 					}
@@ -5063,7 +4768,7 @@ public class Player : Character
 						for (int i = 0; i < playerList2.Count; i++)
 						{
 							Player player2 = playerList2[i] as Player;
-							if (!(player2 == null))
+							if (!((UnityEngine.Object)player2 == (UnityEngine.Object)null))
 							{
 								player2.OnResurrectionReceive();
 							}
@@ -5084,27 +4789,22 @@ public class Player : Character
 								while (enumerator2.MoveNext())
 								{
 									Player player3 = enumerator2.Current as Player;
-									if (num > 0f)
+									if (!(num > 0f) || !((player3._transform.position - base._transform.position).sqrMagnitude > num))
 									{
-										Vector3 val3 = player3._transform.get_position() - base._transform.get_position();
-										if (val3.get_sqrMagnitude() > num)
+										BuffParam.BuffData data = new BuffParam.BuffData();
+										data.type = actSkillParam.tableData.supportType[j];
+										data.time = actSkillParam.supportTime[j];
+										data.value = actSkillParam.supportValue[j];
+										SetFromInfo(ref data);
+										data.skillId = actSkillParam.tableData.id;
+										if (data.isSkillChargeType())
 										{
-											continue;
+											player3.OnChargeSkillGaugeReceive(data.type, data.value, (!((UnityEngine.Object)player3 == (UnityEngine.Object)this)) ? (-1) : actSkillParam.skillIndex);
 										}
-									}
-									BuffParam.BuffData data = new BuffParam.BuffData();
-									data.type = actSkillParam.tableData.supportType[j];
-									data.time = actSkillParam.supportTime[j];
-									data.value = actSkillParam.supportValue[j];
-									SetFromInfo(ref data);
-									data.skillId = actSkillParam.tableData.id;
-									if (data.isSkillChargeType())
-									{
-										player3.OnChargeSkillGaugeReceive(data.type, data.value, (!(player3 == this)) ? (-1) : actSkillParam.skillIndex);
-									}
-									else
-									{
-										player3.OnBuffReceive(data);
+										else
+										{
+											player3.OnBuffReceive(data);
+										}
 									}
 								}
 							}
@@ -5148,15 +4848,10 @@ public class Player : Character
 									while (enumerator3.MoveNext())
 									{
 										Player player4 = enumerator3.Current as Player;
-										if (num > 0f)
+										if (!(num > 0f) || !((player4._transform.position - base._transform.position).sqrMagnitude > num))
 										{
-											Vector3 val4 = player4._transform.get_position() - base._transform.get_position();
-											if (val4.get_sqrMagnitude() > num)
-											{
-												continue;
-											}
+											player4.OnBuffReceive(data3);
 										}
-										player4.OnBuffReceive(data3);
 									}
 								}
 							}
@@ -5191,7 +4886,7 @@ public class Player : Character
 		{
 			ExecHealHp(healData, false);
 		}
-		else if (playerSender != null)
+		else if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnHealReceive(healData);
 		}
@@ -5208,24 +4903,23 @@ public class Player : Character
 		{
 			return 0;
 		}
-		int num = ApplyAbilityForHealHp(healData.healHp, healData.applyAbilityTypeList);
-		num = Mathf.Clamp(num, 1, 2147483647);
-		int num3 = base.hp = Mathf.Clamp(base.hp + num, 0, base.hpMax);
-		healHp = Mathf.Max(healHp, num3);
+		int value = ApplyAbilityForHealHp(healData.healHp, healData.applyAbilityTypeList);
+		value = Mathf.Clamp(value, 1, 2147483647);
+		healHp = Mathf.Max(b: base.hp = Mathf.Clamp(base.hp + value, 0, base.hpMax), a: healHp);
 		DoHealType(healData.healType);
 		ExecHealEffect(healData.effectType);
-		if (playerSender != null && !isPacket)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null && !isPacket)
 		{
 			playerSender.OnGetHeal(healData);
 		}
-		if (bossBrain != null)
+		if ((UnityEngine.Object)bossBrain != (UnityEngine.Object)null)
 		{
 			HateInfo hateInfo = new HateInfo();
 			hateInfo.target = this;
 			hateInfo.val = (int)((float)healData.healHp / (float)base.hpMax * 1000f);
 			bossBrain.HandleEvent(BRAIN_EVENT.PLAYER_HEAL, hateInfo);
 		}
-		return num;
+		return value;
 	}
 
 	private int ApplyAbilityForHealHp(int baseHealHp, List<int> applyAbilityTypeList)
@@ -5253,9 +4947,7 @@ public class Player : Character
 
 	private void ExecHealEffect(HEAL_EFFECT_TYPE healEffectType)
 	{
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Expected O, but got Unknown
-		if (!(healEffectTransform != null))
+		if (!((UnityEngine.Object)healEffectTransform != (UnityEngine.Object)null))
 		{
 			switch (healEffectType)
 			{
@@ -5271,9 +4963,9 @@ public class Player : Character
 				healEffectTransform = EffectManager.GetEffect("ef_btl_sk_drain_01_01", FindNode("Root"));
 				break;
 			}
-			if (!(healEffectTransform == null))
+			if (!((UnityEngine.Object)healEffectTransform == (UnityEngine.Object)null))
 			{
-				AddObjectList(healEffectTransform.get_gameObject(), OBJECT_LIST_TYPE.STATIC);
+				AddObjectList(healEffectTransform.gameObject, OBJECT_LIST_TYPE.STATIC);
 			}
 		}
 	}
@@ -5339,7 +5031,7 @@ public class Player : Character
 		{
 			OnGetChargeSkillGauge(buffType, buffValue, useSkillIndex, false, true);
 		}
-		else if (playerSender != null)
+		else if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnChargeSkillGaugeReceive(buffType, buffValue, useSkillIndex);
 		}
@@ -5347,8 +5039,6 @@ public class Player : Character
 
 	public void OnGetChargeSkillGauge(BuffParam.BUFFTYPE buffType, int buffValue, int useSkillIndex, bool packet = false, bool isCorrectWaveMatch = true)
 	{
-		//IL_0230: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0236: Expected O, but got Unknown
 		if (!base.isDead)
 		{
 			for (int i = 0; i < 3; i++)
@@ -5408,7 +5098,7 @@ public class Player : Character
 					}
 				}
 			}
-			if (skillChargeEffectTransform == null)
+			if ((UnityEngine.Object)skillChargeEffectTransform == (UnityEngine.Object)null)
 			{
 				if (buffType == BuffParam.BUFFTYPE.SKILL_CHARGE_WHEN_DAMAGED || !isCorrectWaveMatch)
 				{
@@ -5418,12 +5108,12 @@ public class Player : Character
 				{
 					skillChargeEffectTransform = EffectManager.GetEffect("ef_btl_sk_charge_magi_01_02", base._transform);
 				}
-				if (skillChargeEffectTransform != null)
+				if ((UnityEngine.Object)skillChargeEffectTransform != (UnityEngine.Object)null)
 				{
-					AddObjectList(skillChargeEffectTransform.get_gameObject(), OBJECT_LIST_TYPE.STATIC);
+					AddObjectList(skillChargeEffectTransform.gameObject, OBJECT_LIST_TYPE.STATIC);
 				}
 			}
-			if (playerSender != null && !packet)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null && !packet)
 			{
 				playerSender.OnGetChargeSkillGauge(buffType, buffValue, useSkillIndex, isCorrectWaveMatch);
 			}
@@ -5442,28 +5132,27 @@ public class Player : Character
 		}
 	}
 
-	public unsafe void OnResurrection(bool isPacket = false)
+	public void OnResurrection(bool isPacket = false)
 	{
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Expected O, but got Unknown
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 		if (base.isDead && !MonoBehaviourSingleton<CoopManager>.I.coopStage.IsPresentQuest() && IsAbleToRescueByRemainRescueTime() && (base.actionID != (ACTION_ID)23 || !(rescueTime <= 0f)))
 		{
-			if (isPacket && playerSender != null)
+			if (isPacket && (UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 			{
 				playerSender.OnGetResurrection();
 			}
 			DeactivateRescueTimer();
-			this.StartCoroutine(OnPlayAndDoResurrection(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			StartCoroutine(OnPlayAndDoResurrection(delegate
+			{
+				ActDeadStandup(base.hpMax, eContinueType.RESCUE);
+			}));
 		}
 	}
 
 	public void OnGetResurrection()
 	{
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		if (base.isDead && IsAbleToRescueByRemainRescueTime() && (base.actionID != (ACTION_ID)23 || !(rescueTime <= 0f)))
 		{
-			this.StartCoroutine(OnPlayResurrection());
+			StartCoroutine(OnPlayResurrection());
 		}
 	}
 
@@ -5481,35 +5170,25 @@ public class Player : Character
 		if (MonoBehaviourSingleton<EffectManager>.IsValid())
 		{
 			Transform resurrectionEffectTrans = EffectManager.GetEffect("ef_btl_sk_heal_04_03", base._transform);
-			if (resurrectionEffectTrans != null)
+			if ((UnityEngine.Object)resurrectionEffectTrans != (UnityEngine.Object)null)
 			{
-				Animator effectAnim = resurrectionEffectTrans.get_gameObject().GetComponent<Animator>();
-				if (effectAnim != null)
+				Animator effectAnim = resurrectionEffectTrans.gameObject.GetComponent<Animator>();
+				if ((UnityEngine.Object)effectAnim != (UnityEngine.Object)null)
 				{
-					while (true)
+					while (effectAnim.GetCurrentAnimatorStateInfo(0).fullPathHash != Animator.StringToHash("Base Layer.START"))
 					{
-						AnimatorStateInfo currentAnimatorStateInfo = effectAnim.GetCurrentAnimatorStateInfo(0);
-						if (currentAnimatorStateInfo.get_fullPathHash() == Animator.StringToHash("Base Layer.START"))
-						{
-							break;
-						}
 						yield return (object)null;
 					}
-					while (true)
+					while (effectAnim.GetCurrentAnimatorStateInfo(0).normalizedTime <= 1f)
 					{
-						AnimatorStateInfo currentAnimatorStateInfo2 = effectAnim.GetCurrentAnimatorStateInfo(0);
-						if (!(currentAnimatorStateInfo2.get_normalizedTime() <= 1f))
-						{
-							break;
-						}
 						yield return (object)null;
 					}
 				}
 			}
 		}
-		if (base.isDead && callback != null)
+		if (base.isDead)
 		{
-			callback.Invoke();
+			callback?.Invoke();
 		}
 		ActivateRescueTimer();
 	}
@@ -5523,11 +5202,8 @@ public class Player : Character
 		}
 	}
 
-	public unsafe bool OnAutoRevive()
+	public bool OnAutoRevive()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Expected O, but got Unknown
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 		if (!base.isDead)
 		{
 			return false;
@@ -5537,7 +5213,10 @@ public class Player : Character
 			return false;
 		}
 		DeactivateRescueTimer();
-		this.StartCoroutine(OnPlayAndDoResurrection(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+		StartCoroutine(OnPlayAndDoResurrection(delegate
+		{
+			ActDeadStandup(autoReviveHp, eContinueType.AUTO_REVIVE);
+		}));
 		return true;
 	}
 
@@ -5568,30 +5247,23 @@ public class Player : Character
 
 	public void CreateWeaponLinkEffect(string settingName)
 	{
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Expected O, but got Unknown
 		foreach (WEAPON_EFFECT_DATA weaponEffectData in m_weaponEffectDataList)
 		{
 			EffectPlayProcessor.EffectSetting setting = weaponEffectData.setting;
 			if (!(setting.name != settingName))
 			{
 				Transform effect = EffectManager.GetEffect(setting.effectName, FindNode(setting.nodeName));
-				if (effect != null)
+				if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
 				{
-					effect.set_localPosition(setting.position);
-					effect.set_localRotation(Quaternion.Euler(setting.rotation));
+					effect.localPosition = setting.position;
+					effect.localRotation = Quaternion.Euler(setting.rotation);
 					float num = setting.scale;
 					if (num == 0f)
 					{
 						num = 1f;
 					}
-					effect.set_localScale(Vector3.get_one() * num);
-					weaponEffectData.effectObj = effect.get_gameObject();
+					effect.localScale = Vector3.one * num;
+					weaponEffectData.effectObj = effect.gameObject;
 				}
 			}
 		}
@@ -5599,12 +5271,11 @@ public class Player : Character
 
 	public void DeleteWeaponLinkEffect(string settingName)
 	{
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 		foreach (WEAPON_EFFECT_DATA weaponEffectData in m_weaponEffectDataList)
 		{
-			if (!(weaponEffectData.setting.name != settingName) && weaponEffectData.effectObj != null)
+			if (!(weaponEffectData.setting.name != settingName) && (UnityEngine.Object)weaponEffectData.effectObj != (UnityEngine.Object)null)
 			{
-				weaponEffectData.effectObj.get_transform().SetParent(null);
+				weaponEffectData.effectObj.transform.SetParent(null);
 				EffectManager.ReleaseEffect(weaponEffectData.effectObj, true, false);
 			}
 		}
@@ -5612,32 +5283,37 @@ public class Player : Character
 
 	public void DeleteWeaponLinkEffectAll()
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 		foreach (WEAPON_EFFECT_DATA weaponEffectData in m_weaponEffectDataList)
 		{
-			if (weaponEffectData.effectObj != null)
+			if ((UnityEngine.Object)weaponEffectData.effectObj != (UnityEngine.Object)null)
 			{
-				weaponEffectData.effectObj.get_transform().SetParent(null);
+				weaponEffectData.effectObj.transform.SetParent(null);
 				EffectManager.ReleaseEffect(weaponEffectData.effectObj, true, false);
 			}
 		}
 		m_weaponEffectDataList.Clear();
 	}
 
-	private unsafe void DetachRootEffectTemporary()
+	private void DetachRootEffectTemporary()
 	{
 		Transform attachTrans = (!MonoBehaviourSingleton<EffectManager>.IsValid()) ? MonoBehaviourSingleton<StageObjectManager>.I._transform : MonoBehaviourSingleton<EffectManager>.I._transform;
-		_003CDetachRootEffectTemporary_003Ec__AnonStorey510 _003CDetachRootEffectTemporary_003Ec__AnonStorey;
-		effectTransTable.ForEachKeyAndValue(new Action<string, Transform>((object)_003CDetachRootEffectTemporary_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		effectTransTable.ForEachKeyAndValue(delegate(string key, Transform value)
+		{
+			if ((UnityEngine.Object)value != (UnityEngine.Object)null && (UnityEngine.Object)value.parent == (UnityEngine.Object)base.rootNode)
+			{
+				value.parent = attachTrans;
+				rootEffectDetachTemporaryTable.Add(key, value);
+			}
+		});
 	}
 
 	private void ReAttachRootEffect()
 	{
 		rootEffectDetachTemporaryTable.ForEach(delegate(Transform value)
 		{
-			if (value != null)
+			if ((UnityEngine.Object)value != (UnityEngine.Object)null)
 			{
-				value.set_parent(base.rootNode);
+				value.parent = base.rootNode;
 			}
 		});
 		rootEffectDetachTemporaryTable.Clear();
@@ -5660,11 +5336,6 @@ public class Player : Character
 
 	public virtual bool ActSpecialAction(bool start_effect = true, bool isSuccess = true)
 	{
-		//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0273: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0375: Expected O, but got Unknown
 		bool isActSpecialAction = true;
 		switch (attackMode)
 		{
@@ -5742,25 +5413,25 @@ public class Player : Character
 					if (MonoBehaviourSingleton<EffectManager>.IsValid())
 					{
 						Transform effect = EffectManager.GetEffect("ef_btl_wsk_twinsword_01_02", null);
-						if (effect != null)
+						if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
 						{
-							effect.set_position(_position);
+							effect.position = _position;
 							pairSwordsBoostModeAuraEffectList.Add(effect);
 						}
 						effect = EffectManager.GetEffect("ef_btl_wsk_twinsword_01_03", FindNode("R_Wep"));
-						if (effect != null)
+						if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
 						{
-							effect.set_localPosition(new Vector3(0.2f, 0f, 0f));
+							effect.localPosition = new Vector3(0.2f, 0f, 0f);
 							pairSwordsBoostModeTrailEffectList.Add(effect);
 						}
 						effect = EffectManager.GetEffect("ef_btl_wsk_twinsword_01_03", FindNode("L_Wep"));
-						if (effect != null)
+						if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
 						{
-							effect.set_localPosition(new Vector3(-0.2f, 0f, 0f));
+							effect.localPosition = new Vector3(-0.2f, 0f, 0f);
 							pairSwordsBoostModeTrailEffectList.Add(effect);
 						}
 					}
-					if (playerSender != null)
+					if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 					{
 						playerSender.OnSyncSpActionGauge();
 					}
@@ -5779,12 +5450,12 @@ public class Player : Character
 		if (start_effect && CanPlayEffectEvent())
 		{
 			Transform effect2 = EffectManager.GetEffect(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.spActionStartEffectName, base._transform);
-			if (effect2 != null)
+			if ((UnityEngine.Object)effect2 != (UnityEngine.Object)null)
 			{
-				AddObjectList(effect2.get_gameObject(), OBJECT_LIST_TYPE.STATIC);
+				AddObjectList(effect2.gameObject, OBJECT_LIST_TYPE.STATIC);
 			}
 		}
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnActSpecialAction(start_effect, isSuccess);
 		}
@@ -5809,7 +5480,7 @@ public class Player : Character
 		if (hit_param.processor != null)
 		{
 			BulletObject bulletObject = hit_param.processor.colliderInterface as BulletObject;
-			if (bulletObject != null)
+			if ((UnityEngine.Object)bulletObject != (UnityEngine.Object)null)
 			{
 				flag = bulletObject.isAimBossMode;
 			}
@@ -5987,39 +5658,21 @@ public class Player : Character
 
 	private void FixedUpdateOneHandSword()
 	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
 		if (CheckAttackModeAndSpType(ATTACK_MODE.ONE_HAND_SWORD, SP_ATTACK_TYPE.SOUL) && snatchCtrl.IsSnatching())
 		{
 			Vector3 forward = _forward;
 			forward.y = 0f;
 			forward.Normalize();
-			Vector3 val = snatchCtrl.GetSnatchPos() - _position;
-			val.y = 0f;
-			Vector3 val2 = Vector3.Cross(forward, val);
-			int num = (val2.y >= 0f) ? 1 : (-1);
-			float num2 = Vector3.Angle(forward, val);
-			Quaternion rotation = _rotation;
-			Vector3 eulerAngles = rotation.get_eulerAngles();
+			Vector3 vector = snatchCtrl.GetSnatchPos() - _position;
+			vector.y = 0f;
+			Vector3 vector2 = Vector3.Cross(forward, vector);
+			int num = (vector2.y >= 0f) ? 1 : (-1);
+			float num2 = Vector3.Angle(forward, vector);
+			Vector3 eulerAngles = _rotation.eulerAngles;
 			float num3 = num2;
 			if (rotateEventSpeed > 0f)
 			{
-				num3 = rotateEventSpeed * Time.get_deltaTime();
+				num3 = rotateEventSpeed * Time.deltaTime;
 				if (num2 <= num3)
 				{
 					num3 = num2;
@@ -6031,13 +5684,10 @@ public class Player : Character
 
 	public void DeactiveSnatchMove()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		enableEventMove = false;
 		base.enableAddForce = false;
-		eventMoveVelocity = Vector3.get_zero();
-		SetVelocity(Vector3.get_zero(), VELOCITY_TYPE.NONE);
+		eventMoveVelocity = Vector3.zero;
+		SetVelocity(Vector3.zero, VELOCITY_TYPE.NONE);
 		snatchCtrl.OnArrive();
 	}
 
@@ -6349,7 +5999,7 @@ public class Player : Character
 			case ATTACK_MODE.ONE_HAND_SWORD:
 				if (spAttackType == SP_ATTACK_TYPE.SOUL)
 				{
-					num = ((snatchCtrl.state != SnatchController.STATE.SNATCH) ? (playerParameter.ohsActionInfo.Soul_BoostGaugeDecreasePerSecond * Time.get_deltaTime()) : (playerParameter.ohsActionInfo.Soul_BoostSnatchGaugeDecreasePerSecond * Time.get_deltaTime()));
+					num = ((snatchCtrl.state != SnatchController.STATE.SNATCH) ? (playerParameter.ohsActionInfo.Soul_BoostGaugeDecreasePerSecond * Time.deltaTime) : (playerParameter.ohsActionInfo.Soul_BoostSnatchGaugeDecreasePerSecond * Time.deltaTime));
 				}
 				else
 				{
@@ -6357,7 +6007,7 @@ public class Player : Character
 					{
 						return;
 					}
-					num = 1000f / playerParameter.ohsActionInfo.burstOHSInfo.GaugeTime * Time.get_deltaTime();
+					num = 1000f / playerParameter.ohsActionInfo.burstOHSInfo.GaugeTime * Time.deltaTime;
 				}
 				break;
 			case ATTACK_MODE.TWO_HAND_SWORD:
@@ -6365,14 +6015,14 @@ public class Player : Character
 				{
 					return;
 				}
-				num = ((!enableInputCharge) ? (playerParameter.twoHandSwordActionInfo.soulBoostGaugeDecreasePerSecond * Time.get_deltaTime()) : (playerParameter.twoHandSwordActionInfo.soulBoostChargeGaugeDecreasePerSecond * Time.get_deltaTime()));
+				num = ((!enableInputCharge) ? (playerParameter.twoHandSwordActionInfo.soulBoostGaugeDecreasePerSecond * Time.deltaTime) : (playerParameter.twoHandSwordActionInfo.soulBoostChargeGaugeDecreasePerSecond * Time.deltaTime));
 				break;
 			case ATTACK_MODE.ARROW:
 				if (spAttackType != SP_ATTACK_TYPE.SOUL)
 				{
 					return;
 				}
-				num = playerParameter.arrowActionInfo.soulBoostGaugeDecreasePerSecond * Time.get_deltaTime();
+				num = playerParameter.arrowActionInfo.soulBoostGaugeDecreasePerSecond * Time.deltaTime;
 				break;
 			}
 			float num2 = 1f + buffParam.GetGaugeDecreaseRate();
@@ -6417,11 +6067,6 @@ public class Player : Character
 
 	public void IncreaseSpActonGauge(AttackHitInfo.ATTACK_TYPE attackType, Vector3 hitPosition, float baseValue = 0f, float attackRate = 0f, bool isSpecialAttack = false, bool dontIncreaseGauge = false)
 	{
-		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
 		if (!dontIncreaseGauge && MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
 		{
 			if (IsEvolveWeapon())
@@ -6666,9 +6311,6 @@ public class Player : Character
 
 	public void UpdateBoostHitCount()
 	{
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 		if (isBoostMode)
 		{
 			switch (attackMode)
@@ -6686,12 +6328,12 @@ public class Player : Character
 						{
 							if (boostModeDamageUpLevel < boostDamageUpLevelMax)
 							{
-								EffectManager.OneShot("ef_btl_wsk_twinsword_01_04", _position, Quaternion.get_identity(), false);
+								EffectManager.OneShot("ef_btl_wsk_twinsword_01_04", _position, Quaternion.identity, false);
 							}
 							if (boostModeDamageUpLevel == boostDamageUpLevelMax - 1)
 							{
 								Transform effect = EffectManager.GetEffect("ef_btl_wsk_twinsword_01_05", null);
-								effect.set_position(_position);
+								effect.position = _position;
 								pairSwordsBoostModeAuraEffectList.Add(effect);
 							}
 						}
@@ -6778,11 +6420,6 @@ public class Player : Character
 
 	protected virtual bool StartBoostMode()
 	{
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0384: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0450: Unknown result type (might be due to invalid IL or missing references)
 		if (isBoostMode)
 		{
 			return false;
@@ -6794,16 +6431,16 @@ public class Player : Character
 			{
 				SoundManager.PlayOneShotSE(playerParameter.twoHandSwordActionInfo.soulBoostSeId, this, FindNode(string.Empty));
 				Transform effect2 = EffectManager.GetEffect("ef_btl_wsk2_longsword_02_01", null);
-				if (effect2 != null)
+				if ((UnityEngine.Object)effect2 != (UnityEngine.Object)null)
 				{
-					effect2.set_position(_position);
+					effect2.position = _position;
 				}
 				if (object.ReferenceEquals(twoHandSwordsBoostLoopEffect, null))
 				{
 					twoHandSwordsBoostLoopEffect = EffectManager.GetEffect("ef_btl_wsk2_longsword_03_01", FindNode("Root"));
 				}
 				StartWaitingPacket(WAITING_PACKET.PLAYER_SOUL_BOOST, false, playerParameter.twoHandSwordActionInfo.soulBoostWaitPacketSec);
-				if (playerSender != null)
+				if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 				{
 					playerSender.OnSyncSoulBoost(true);
 				}
@@ -6818,7 +6455,7 @@ public class Player : Character
 				{
 					twoHandSwordsBoostLoopEffect = EffectManager.GetEffect("ef_btl_wsk3_sword_aura_01", FindNode("Root"));
 				}
-				if (playerSender != null)
+				if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 				{
 					playerSender.OnSyncSoulBoost(true);
 				}
@@ -6832,9 +6469,9 @@ public class Player : Character
 			}
 			SoundManager.PlayOneShotSE(playerParameter.twoHandSwordActionInfo.soulBoostSeId, this, FindNode(string.Empty));
 			Transform effect5 = EffectManager.GetEffect("ef_btl_wsk2_longsword_02_01", null);
-			if (effect5 != null)
+			if ((UnityEngine.Object)effect5 != (UnityEngine.Object)null)
 			{
-				effect5.set_position(_position);
+				effect5.position = _position;
 			}
 			if (object.ReferenceEquals(twoHandSwordsBoostLoopEffect, null))
 			{
@@ -6852,7 +6489,7 @@ public class Player : Character
 				}
 			}
 			StartWaitingPacket(WAITING_PACKET.PLAYER_SOUL_BOOST, false, playerParameter.twoHandSwordActionInfo.soulBoostWaitPacketSec);
-			if (playerSender != null)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 			{
 				playerSender.OnSyncSoulBoost(true);
 			}
@@ -6866,16 +6503,16 @@ public class Player : Character
 			}
 			SoundManager.PlayOneShotSE(playerParameter.twoHandSwordActionInfo.soulBoostSeId, this, FindNode(string.Empty));
 			Transform effect3 = EffectManager.GetEffect("ef_btl_wsk2_longsword_02_01", null);
-			if (effect3 != null)
+			if ((UnityEngine.Object)effect3 != (UnityEngine.Object)null)
 			{
-				effect3.set_position(_position);
+				effect3.position = _position;
 			}
-			if (twoHandSwordsBoostLoopEffect == null)
+			if ((UnityEngine.Object)twoHandSwordsBoostLoopEffect == (UnityEngine.Object)null)
 			{
 				twoHandSwordsBoostLoopEffect = EffectManager.GetEffect("ef_btl_wsk2_longsword_03_01", FindNode("Root"));
 			}
 			StartWaitingPacket(WAITING_PACKET.PLAYER_SOUL_BOOST, false, playerParameter.twoHandSwordActionInfo.soulBoostWaitPacketSec);
-			if (playerSender != null)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 			{
 				playerSender.OnSyncSoulBoost(true);
 			}
@@ -6891,16 +6528,16 @@ public class Player : Character
 			{
 				SoundManager.PlayOneShotSE(playerParameter.twoHandSwordActionInfo.soulBoostSeId, this, FindNode(string.Empty));
 				Transform effect4 = EffectManager.GetEffect("ef_btl_wsk2_longsword_02_01", null);
-				if (effect4 != null)
+				if ((UnityEngine.Object)effect4 != (UnityEngine.Object)null)
 				{
-					effect4.set_position(_position);
+					effect4.position = _position;
 				}
 				if (object.ReferenceEquals(twoHandSwordsBoostLoopEffect, null))
 				{
 					twoHandSwordsBoostLoopEffect = EffectManager.GetEffect("ef_btl_wsk2_longsword_03_01", FindNode("Root"));
 				}
 				StartWaitingPacket(WAITING_PACKET.PLAYER_SOUL_BOOST, false, playerParameter.twoHandSwordActionInfo.soulBoostWaitPacketSec);
-				if (playerSender != null)
+				if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 				{
 					playerSender.OnSyncSoulBoost(true);
 				}
@@ -6917,9 +6554,9 @@ public class Player : Character
 			SoundManager.PlayOneShotSE(playerParameter.twoHandSwordActionInfo.soulBoostSeId, this, FindNode(string.Empty));
 			SoundManager.PlayOneShotUISE(40000359);
 			Transform effect = EffectManager.GetEffect("ef_btl_wsk2_longsword_02_01", null);
-			if (effect != null)
+			if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
 			{
-				effect.set_position(_position);
+				effect.position = _position;
 			}
 			if (object.ReferenceEquals(twoHandSwordsBoostLoopEffect, null))
 			{
@@ -6928,7 +6565,7 @@ public class Player : Character
 			float num = 1f + buffParam.GetGaugeDecreaseRate();
 			float add_margin_time = 1000f / (playerParameter.arrowActionInfo.soulBoostGaugeDecreasePerSecond * num);
 			StartWaitingPacket(WAITING_PACKET.PLAYER_SOUL_BOOST, false, add_margin_time);
-			if (playerSender != null)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 			{
 				playerSender.OnSyncSoulBoost(true);
 			}
@@ -6941,10 +6578,6 @@ public class Player : Character
 
 	private void FinishBoostMode()
 	{
-		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Expected O, but got Unknown
-		//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b6: Expected O, but got Unknown
 		if (isBoostMode)
 		{
 			switch (attackMode)
@@ -6956,7 +6589,7 @@ public class Player : Character
 				}
 				ReleaseEffect(ref twoHandSwordsBoostLoopEffect, true);
 				EndWaitingPacket(WAITING_PACKET.PLAYER_SOUL_BOOST);
-				if (playerSender != null)
+				if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 				{
 					playerSender.OnSyncSoulBoost(false);
 				}
@@ -6968,7 +6601,7 @@ public class Player : Character
 				}
 				ReleaseEffect(ref twoHandSwordsBoostLoopEffect, true);
 				EndWaitingPacket(WAITING_PACKET.PLAYER_SOUL_BOOST);
-				if (playerSender != null)
+				if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 				{
 					playerSender.OnSyncSoulBoost(false);
 				}
@@ -6980,7 +6613,7 @@ public class Player : Character
 				}
 				ReleaseEffect(ref twoHandSwordsBoostLoopEffect, true);
 				EndWaitingPacket(WAITING_PACKET.PLAYER_SOUL_BOOST);
-				if (playerSender != null)
+				if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 				{
 					playerSender.OnSyncSoulBoost(false);
 				}
@@ -6995,7 +6628,7 @@ public class Player : Character
 						{
 							for (int i = 0; i < pairSwordsBoostModeTrailEffectList.Count; i++)
 							{
-								EffectManager.ReleaseEffect(pairSwordsBoostModeTrailEffectList[i].get_gameObject(), true, false);
+								EffectManager.ReleaseEffect(pairSwordsBoostModeTrailEffectList[i].gameObject, true, false);
 								pairSwordsBoostModeTrailEffectList[i] = null;
 							}
 							pairSwordsBoostModeTrailEffectList.Clear();
@@ -7004,13 +6637,13 @@ public class Player : Character
 						{
 							for (int j = 0; j < pairSwordsBoostModeAuraEffectList.Count; j++)
 							{
-								EffectManager.ReleaseEffect(pairSwordsBoostModeAuraEffectList[j].get_gameObject(), true, false);
+								EffectManager.ReleaseEffect(pairSwordsBoostModeAuraEffectList[j].gameObject, true, false);
 								pairSwordsBoostModeAuraEffectList[j] = null;
 							}
 							pairSwordsBoostModeAuraEffectList.Clear();
 						}
 					}
-					if (playerSender != null)
+					if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 					{
 						playerSender.OnSyncSpActionGauge();
 					}
@@ -7018,7 +6651,7 @@ public class Player : Character
 				case SP_ATTACK_TYPE.SOUL:
 					ReleaseEffect(ref twoHandSwordsBoostLoopEffect, true);
 					EndWaitingPacket(WAITING_PACKET.PLAYER_SOUL_BOOST);
-					if (playerSender != null)
+					if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 					{
 						playerSender.OnSyncSoulBoost(false);
 					}
@@ -7036,7 +6669,7 @@ public class Player : Character
 					MonoBehaviourSingleton<TargetMarkerManager>.I.EndMultiLockBoost();
 				}
 				EndWaitingPacket(WAITING_PACKET.PLAYER_SOUL_BOOST);
-				if (playerSender != null)
+				if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 				{
 					playerSender.OnSyncSoulBoost(false);
 				}
@@ -7148,7 +6781,7 @@ public class Player : Character
 		default:
 			return false;
 		}
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnActSpAttackContinue();
 		}
@@ -7225,7 +6858,7 @@ public class Player : Character
 						return;
 					}
 					Player player2 = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(prayTargetIds[num2]) as Player;
-					if (player2 != null && player2.isDead)
+					if ((UnityEngine.Object)player2 != (UnityEngine.Object)null && player2.isDead)
 					{
 						break;
 					}
@@ -7245,7 +6878,7 @@ public class Player : Character
 			{
 				if (IsPrayed() && deadStopTime > 0f)
 				{
-					float num = Time.get_deltaTime() * ((!IsBoostByType(BOOST_PRAY_TYPE.GUARD_ONE_HAND_SWORD_NORMAL)) ? 1f : playerParameter.ohsActionInfo.Normal_PrayBoostRate);
+					float num = Time.deltaTime * ((!IsBoostByType(BOOST_PRAY_TYPE.GUARD_ONE_HAND_SWORD_NORMAL)) ? 1f : playerParameter.ohsActionInfo.Normal_PrayBoostRate);
 					switch (prayerIds.Count)
 					{
 					case 2:
@@ -7260,7 +6893,7 @@ public class Player : Character
 				}
 				else if (!IsPrayed())
 				{
-					prayerTime -= Time.get_deltaTime();
+					prayerTime -= Time.deltaTime;
 					if (prayerTime < 0f)
 					{
 						prayerTime = 0f;
@@ -7277,7 +6910,7 @@ public class Player : Character
 				}
 				else if (continueTime > 0f && !isProgressStop())
 				{
-					continueTime -= Time.get_deltaTime();
+					continueTime -= Time.deltaTime;
 					if (continueTime <= 0f)
 					{
 						continueTime = 0f;
@@ -7297,7 +6930,7 @@ public class Player : Character
 			for (int count = prayTargetIds.Count; i < count; i++)
 			{
 				Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(prayTargetIds[i]) as Player;
-				if (player != null && player.isDead)
+				if ((UnityEngine.Object)player != (UnityEngine.Object)null && player.isDead)
 				{
 					flag = false;
 					break;
@@ -7310,7 +6943,7 @@ public class Player : Character
 			break;
 		}
 		case (ACTION_ID)26:
-			if (isChangingWeapon && !base.isLoading && changeWeaponStartTime >= 0f && Time.get_time() - changeWeaponStartTime >= playerParameter.changeWeaponMinTime)
+			if (isChangingWeapon && !base.isLoading && changeWeaponStartTime >= 0f && Time.time - changeWeaponStartTime >= playerParameter.changeWeaponMinTime)
 			{
 				ActIdle(false, -1f);
 			}
@@ -7348,20 +6981,6 @@ public class Player : Character
 
 	protected override void EndAction()
 	{
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e1: Expected O, but got Unknown
-		//IL_030b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0325: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0603: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0609: Unknown result type (might be due to invalid IL or missing references)
-		//IL_060e: Unknown result type (might be due to invalid IL or missing references)
 		if (base.isInitialized)
 		{
 			ACTION_ID actionID = base.actionID;
@@ -7371,7 +6990,7 @@ public class Player : Character
 			switch (actionID)
 			{
 			case ACTION_ID.IDLE:
-				if (loader != null)
+				if ((UnityEngine.Object)loader != (UnityEngine.Object)null)
 				{
 					loader.eyeBlink = false;
 				}
@@ -7398,7 +7017,7 @@ public class Player : Character
 			case (ACTION_ID)15:
 			case (ACTION_ID)16:
 			case (ACTION_ID)17:
-				base._rigidbody.set_constraints(base._rigidbody.get_constraints() | 4);
+				base._rigidbody.constraints = (base._rigidbody.constraints | RigidbodyConstraints.FreezePositionY);
 				ResetIgnoreColliders();
 				if (actionID == (ACTION_ID)17)
 				{
@@ -7416,16 +7035,16 @@ public class Player : Character
 				}
 				break;
 			case (ACTION_ID)21:
-				if (skillRangeEffect != null)
+				if ((UnityEngine.Object)skillRangeEffect != (UnityEngine.Object)null)
 				{
-					EffectManager.ReleaseEffect(skillRangeEffect.get_gameObject(), true, false);
+					EffectManager.ReleaseEffect(skillRangeEffect.gameObject, true, false);
 					skillRangeEffect = null;
 				}
 				isUsingSecondGradeSkill = false;
 				skillInfo.ResetSecondGradeFlags();
 				break;
 			case (ACTION_ID)22:
-				if (uiPlayerStatusGizmo != null)
+				if ((UnityEngine.Object)uiPlayerStatusGizmo != (UnityEngine.Object)null)
 				{
 					uiPlayerStatusGizmo.SetVisible(true);
 				}
@@ -7440,7 +7059,7 @@ public class Player : Character
 				continueTime = 0f;
 				deadStartTime = -1f;
 				deadStopTime = -1f;
-				if (revivalRangEffect != null)
+				if ((UnityEngine.Object)revivalRangEffect != (UnityEngine.Object)null)
 				{
 					EffectManager.ReleaseEffect(revivalRangEffect, true, false);
 					revivalRangEffect = null;
@@ -7455,9 +7074,9 @@ public class Player : Character
 			}
 			EndWaitingPacket(WAITING_PACKET.PLAYER_CHARGE_RELEASE);
 			EndWaitingPacket(WAITING_PACKET.PLAYER_APPLY_CHANGE_WEAPON);
-			if (loader.shadow != null && !loader.shadow.get_gameObject().get_activeSelf())
+			if ((UnityEngine.Object)loader.shadow != (UnityEngine.Object)null && !loader.shadow.gameObject.activeSelf)
 			{
-				loader.shadow.get_gameObject().SetActive(true);
+				loader.shadow.gameObject.SetActive(true);
 			}
 			if (!isArrowAimKeep)
 			{
@@ -7549,11 +7168,11 @@ public class Player : Character
 			useGaugeLevel = 0;
 			if (jumpState != 0)
 			{
-				base.body.get_transform().set_localPosition(Vector3.get_zero());
+				base.body.transform.localPosition = Vector3.zero;
 			}
-			jumpFallBodyPosition = Vector3.get_zero();
-			jumpRandingVector = Vector3.get_zero();
-			jumpRaindngBasePos = Vector3.get_zero();
+			jumpFallBodyPosition = Vector3.zero;
+			jumpRandingVector = Vector3.zero;
+			jumpRaindngBasePos = Vector3.zero;
 			jumpRandingBaseBodyY = 0f;
 			jumpState = eJumpState.None;
 			ReleaseEffect(ref twoHandSwordsChargeMaxEffect, true);
@@ -7574,7 +7193,7 @@ public class Player : Character
 			OnGatherGimmickEnd();
 			if (cancelInvincible != null)
 			{
-				this.StopCoroutine(cancelInvincible);
+				StopCoroutine(cancelInvincible);
 				cancelInvincible = null;
 			}
 		}
@@ -7649,10 +7268,9 @@ public class Player : Character
 
 	public virtual void Load(PlayerLoadInfo load_info, PlayerLoader.OnCompleteLoad callback = null)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (_physics != null)
+		if ((UnityEngine.Object)_physics != (UnityEngine.Object)null)
 		{
-			Object.Destroy(_physics.get_gameObject());
+			UnityEngine.Object.Destroy(_physics.gameObject);
 			_physics = null;
 		}
 		int num = load_info.weaponModelID / 1000;
@@ -7696,7 +7314,7 @@ public class Player : Character
 
 	public void LoadWeapon(CharaInfo.EquipItem item, int weapon_index, PlayerLoader.OnCompleteLoad callback = null)
 	{
-		if (item != null && !(loader == null) && loader.loadInfo != null)
+		if (item != null && !((UnityEngine.Object)loader == (UnityEngine.Object)null) && loader.loadInfo != null)
 		{
 			SetNowWeapon(item, weapon_index);
 			InitParameter();
@@ -8509,7 +8127,7 @@ public class Player : Character
 			base.hp = transfer_info.hp;
 			healHp = transfer_info.healHp;
 		}
-		if (send_packet && playerSender != null)
+		if (send_packet && (UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnSetPlayerStatus(_level, _atk, _def, _hp);
 		}
@@ -9397,7 +9015,7 @@ public class Player : Character
 			buffData.value = 100;
 			buffData.type = BuffParam.BUFFTYPE.INK_SPLASH;
 			buffData.time = info.duration;
-			buffData.interval = Time.get_deltaTime();
+			buffData.interval = Time.deltaTime;
 			buffData.damage = 0;
 			OnBuffStart(buffData);
 		}
@@ -9505,7 +9123,6 @@ public class Player : Character
 
 	public override void OnHitAttack(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
 	{
-		//IL_0205: Unknown result type (might be due to invalid IL or missing references)
 		if (hit_param.toObject is Enemy)
 		{
 			Enemy enemy = hit_param.toObject as Enemy;
@@ -9543,7 +9160,7 @@ public class Player : Character
 		case AttackHitInfo.ATTACK_TYPE.HEAL_ATTACK:
 		{
 			Enemy enemy3 = hit_param.toObject as Enemy;
-			if (!(enemy3 == null))
+			if (!((UnityEngine.Object)enemy3 == (UnityEngine.Object)null))
 			{
 				healAtkRate = info.atkRate * enemy3.healDamageRate;
 				EnemyRegionWork[] regionWorks = enemy3.regionWorks;
@@ -9561,7 +9178,7 @@ public class Player : Character
 		case AttackHitInfo.ATTACK_TYPE.SNATCH:
 		{
 			Enemy enemy2 = hit_param.toObject as Enemy;
-			if (!(enemy2 == null))
+			if (!((UnityEngine.Object)enemy2 == (UnityEngine.Object)null))
 			{
 				moveStopRange = playerParameter.ohsActionInfo.Soul_MoveStopRange;
 				if (IsCoopNone() || IsOriginal())
@@ -9637,11 +9254,6 @@ public class Player : Character
 
 	protected override void OnPlayAttackedHitEffect(AttackedHitStatusDirection status)
 	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
 		if (IsValidAttackedHit(status.fromObject))
 		{
 			bool flag = this is Self;
@@ -9867,7 +9479,7 @@ public class Player : Character
 		}
 		int enemyLevel = 1;
 		Enemy enemy = status.fromObject as Enemy;
-		if (enemy != null)
+		if ((UnityEngine.Object)enemy != (UnityEngine.Object)null)
 		{
 			enemyLevel = enemy.enemyLevel;
 		}
@@ -9881,7 +9493,7 @@ public class Player : Character
 		damage_details.dark = (float)(int)(atkAttribute.dark * InGameUtility.CalcDamageRateToPlayer(levelRate, atkAttribute3.dark, atkAttribute2.dark, defenseThreshold, defenseCoefficient.dark));
 		damage_details.CheckMinus();
 		Character character = status.fromObject as Character;
-		if (character != null)
+		if ((UnityEngine.Object)character != (UnityEngine.Object)null)
 		{
 			damage_details.Mul(character.buffParam.GetAbilityDamageRate(this, status));
 		}
@@ -9904,7 +9516,7 @@ public class Player : Character
 	public override void GetAtk(AttackHitInfo info, ref AtkAttribute atk)
 	{
 		SkillInfo.SkillParam skillParam = skillInfo.actSkillParam;
-		if (base.TrackingTargetBullet != null && base.TrackingTargetBullet.IsReplaceSkill)
+		if ((UnityEngine.Object)base.TrackingTargetBullet != (UnityEngine.Object)null && base.TrackingTargetBullet.IsReplaceSkill)
 		{
 			skillParam = base.TrackingTargetBullet.SkillParamForBullet;
 		}
@@ -10037,9 +9649,6 @@ public class Player : Character
 
 	public override void OnAttackedHitOwner(AttackedHitStatusOwner status)
 	{
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
 		ApplyInvicibleCount(status);
 		bool flag = ApplyInvicibleBadStatus(status);
 		if (_IsGuard() && _CheckJustGuardSec() && spAttackType == SP_ATTACK_TYPE.BURST)
@@ -10107,7 +9716,7 @@ public class Player : Character
 
 	protected override bool IsNarrowEscape(AttackedHitStatusOwner status)
 	{
-		if (timeWhenJustGuardChecked == Time.get_time())
+		if (timeWhenJustGuardChecked == Time.time)
 		{
 			return true;
 		}
@@ -10117,7 +9726,7 @@ public class Player : Character
 		}
 		if (CheckAttackModeAndSpType(ATTACK_MODE.ONE_HAND_SWORD, SP_ATTACK_TYPE.BURST) && _IsGuard() && _CheckJustGuardSec())
 		{
-			timeWhenJustGuardChecked = Time.get_time();
+			timeWhenJustGuardChecked = Time.time;
 			return true;
 		}
 		return buffParam.IsNarrowEscape();
@@ -10138,7 +9747,7 @@ public class Player : Character
 
 	protected override void UseNarrowEscape(AttackedHitStatusOwner status)
 	{
-		if (timeWhenJustGuardChecked != Time.get_time() && buffParam.IsNarrowEscape())
+		if (timeWhenJustGuardChecked != Time.time && buffParam.IsNarrowEscape())
 		{
 			buffParam.UseNarrowEscape();
 		}
@@ -10155,28 +9764,6 @@ public class Player : Character
 
 	protected override REACTION_TYPE OnHitReaction(AttackedHitStatusOwner status)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018b: Unknown result type (might be due to invalid IL or missing references)
 		if (_IsGuard())
 		{
 			Vector3 fromPos = status.fromPos;
@@ -10244,9 +9831,9 @@ public class Player : Character
 		}
 		if (flag2)
 		{
-			Vector3 val = -_forward;
-			val = Quaternion.AngleAxis(status.attackInfo.toPlayer.reactionBlowAngle, _right) * val;
-			val = (status.blowForce = val * status.attackInfo.toPlayer.reactionBlowForce);
+			Vector3 point = -_forward;
+			point = Quaternion.AngleAxis(status.attackInfo.toPlayer.reactionBlowAngle, _right) * point;
+			point = (status.blowForce = point * status.attackInfo.toPlayer.reactionBlowForce);
 		}
 		if (rEACTION_TYPE != 0)
 		{
@@ -10298,9 +9885,6 @@ public class Player : Character
 
 	public override void ActReaction(ReactionInfo info, bool isSync = false)
 	{
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
 		base.ActReaction(info, isSync);
 		switch (info.reactionType)
 		{
@@ -10383,7 +9967,7 @@ public class Player : Character
 		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.enemyList.Count; i < count; i++)
 		{
 			Enemy enemy = MonoBehaviourSingleton<StageObjectManager>.I.enemyList[i] as Enemy;
-			if (enemy != null && enemy.colliders != null)
+			if ((UnityEngine.Object)enemy != (UnityEngine.Object)null && enemy.colliders != null)
 			{
 				list.AddRange(enemy.colliders);
 			}
@@ -10405,37 +9989,6 @@ public class Player : Character
 
 	public override void OnAnimEvent(AnimEventData.EventData data)
 	{
-		//IL_050c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0511: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0514: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0516: Unknown result type (might be due to invalid IL or missing references)
-		//IL_051b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_051d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_051f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0524: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0576: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0587: Unknown result type (might be due to invalid IL or missing references)
-		//IL_058c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0591: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0594: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0596: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b71: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ff9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ffe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_104b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_106b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_109a: Unknown result type (might be due to invalid IL or missing references)
 		switch (data.id)
 		{
 		case AnimEventFormat.ID.TARGET_LOCK_ON:
@@ -10451,24 +10004,24 @@ public class Player : Character
 			}
 			else
 			{
-				int num11 = 0;
+				int num10 = 0;
 				switch (data.intArgs[0])
 				{
 				case 0:
-					num11 = actSkillParam.tableData.startSEID;
+					num10 = actSkillParam.tableData.startSEID;
 					break;
 				case 1:
-					num11 = actSkillParam.tableData.actSEID;
+					num10 = actSkillParam.tableData.actSEID;
 					break;
 				}
 				string name2 = data.stringArgs[0];
-				if (num11 == 0)
+				if (num10 == 0)
 				{
 					base.OnAnimEvent(data);
 				}
 				else if (EnablePlaySound())
 				{
-					SoundManager.PlayOneShotSE(num11, this, FindNode(name2));
+					SoundManager.PlayOneShotSE(num10, this, FindNode(name2));
 				}
 			}
 			break;
@@ -10482,7 +10035,7 @@ public class Player : Character
 		case AnimEventFormat.ID.SHOT_ARROW:
 		{
 			bool flag2 = false;
-			int num13 = 0;
+			int num12 = 0;
 			if (data.intArgs != null)
 			{
 				if (data.intArgs.Length > 0)
@@ -10491,48 +10044,48 @@ public class Player : Character
 				}
 				if (data.intArgs.Length > 1)
 				{
-					num13 = data.intArgs[1];
+					num12 = data.intArgs[1];
 				}
 			}
 			string text = playerParameter.arrowActionInfo.attackInfoNames[(int)spAttackType];
 			if (data.stringArgs != null && data.stringArgs.Length > 0 && flag2)
 			{
-				text = playerParameter.arrowActionInfo.attackInfoForSitShotNames[(int)spAttackType] + num13.ToString();
+				text = playerParameter.arrowActionInfo.attackInfoForSitShotNames[(int)spAttackType] + num12.ToString();
 			}
 			AttackInfo attackInfo = FindAttackInfo(text, true, false);
 			shotArrowCount++;
 			if (attackInfo != null && attackMode == ATTACK_MODE.ARROW)
 			{
-				float num14;
+				float num13;
 				if (defaultBulletSpeedDic.ContainsKey(text))
 				{
-					num14 = defaultBulletSpeedDic[text];
+					num13 = defaultBulletSpeedDic[text];
 				}
 				else
 				{
-					num14 = attackInfo.bulletData.data.speed;
+					num13 = attackInfo.bulletData.data.speed;
 					defaultBulletSpeedDic.Add(text, attackInfo.bulletData.data.speed);
 				}
 				if (flag2)
 				{
-					num14 *= 1f + MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.sitShotBulletSpeedUpRate;
+					num13 *= 1f + MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.sitShotBulletSpeedUpRate;
 				}
-				attackInfo.bulletData.data.speed = num14;
+				attackInfo.bulletData.data.speed = num13;
 				if (IsCoopNone() || IsOriginal())
 				{
 					Vector3 bulletAppearPos = GetBulletAppearPos();
 					Vector3 bulletShotVec = GetBulletShotVec(bulletAppearPos);
-					Quaternion val3 = Quaternion.LookRotation(bulletShotVec);
+					Quaternion quaternion = Quaternion.LookRotation(bulletShotVec);
 					if (CheckAttackModeAndSpType(ATTACK_MODE.ARROW, SP_ATTACK_TYPE.HEAT) && flag2 && MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
 					{
 						float sitShotSideAngle = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.sitShotSideAngle;
-						if (num13 > 1)
+						if (num12 > 1)
 						{
-							float num15 = (float)((num13 % 2 != 1) ? 1 : (-1));
-							val3 *= Quaternion.Euler(0f, num15 * sitShotSideAngle, 0f);
+							float num14 = (float)((num12 % 2 != 1) ? 1 : (-1));
+							quaternion *= Quaternion.Euler(0f, num14 * sitShotSideAngle, 0f);
 						}
 					}
-					ShotArrow(bulletAppearPos, val3, attackInfo, flag2, !flag2 || num13 == 3);
+					ShotArrow(bulletAppearPos, quaternion, attackInfo, flag2, !flag2 || num12 == 3);
 				}
 			}
 			break;
@@ -10580,9 +10133,9 @@ public class Player : Character
 			break;
 		case AnimEventFormat.ID.BLOW_CLEAR_INPUT_ON:
 		{
-			int num10 = data.intArgs[0];
+			int num9 = data.intArgs[0];
 			enableInputCombo = true;
-			inputComboID = num10;
+			inputComboID = num9;
 			break;
 		}
 		case AnimEventFormat.ID.BLOW_CLEAR_INPUT_OFF:
@@ -10677,15 +10230,15 @@ public class Player : Character
 			if (!isSkillCastLoop && skillInfo.actSkillParam != null && skillInfo.actSkillParam.tableData != null)
 			{
 				isSkillCastLoop = true;
-				skillCastLoopStartTime = Time.get_time();
+				skillCastLoopStartTime = Time.time;
 				skillCastLoopTrigger = value;
 				XorFloat castTimeRate = skillInfo.actSkillParam.castTimeRate;
-				float num12 = 1f - (buffParam.GetSkillTimeRate() + (float)castTimeRate);
-				if (num12 <= 0f)
+				float num11 = 1f - (buffParam.GetSkillTimeRate() + (float)castTimeRate);
+				if (num11 <= 0f)
 				{
-					num12 = 0.1f;
+					num11 = 0.1f;
 				}
-				skillCastLoopTime = skillInfo.actSkillParam.tableData.castTime * num12;
+				skillCastLoopTime = skillInfo.actSkillParam.tableData.castTime * num11;
 				CheckSkillCastLoop();
 			}
 			break;
@@ -10759,14 +10312,14 @@ public class Player : Character
 			enableCancelToEvolveSpecialAction = false;
 			break;
 		case AnimEventFormat.ID.FACE:
-			if (loader != null)
+			if ((UnityEngine.Object)loader != (UnityEngine.Object)null)
 			{
 				loader.ChangeFace((PlayerLoader.FACE_ID)data.intArgs[0]);
 			}
 			break;
 		case AnimEventFormat.ID.STUNNED_LOOP_START:
 			isStunnedLoop = true;
-			stunnedEndTime = Time.get_time() + stunnedTime;
+			stunnedEndTime = Time.time + stunnedTime;
 			stunnedReduceEnableTime = stunnedTime * playerParameter.stunnedReduceTimeMaxRate;
 			break;
 		case AnimEventFormat.ID.APPLY_SKILL_PARAM:
@@ -10774,7 +10327,7 @@ public class Player : Character
 			break;
 		case AnimEventFormat.ID.APPLY_BLOW_FORCE:
 			base.waitAddForce = false;
-			SetVelocity(Vector3.get_zero(), VELOCITY_TYPE.NONE);
+			SetVelocity(Vector3.zero, VELOCITY_TYPE.NONE);
 			break;
 		case AnimEventFormat.ID.APPLY_CHANGE_WEAPON:
 			if (IsCoopNone() || IsOriginal())
@@ -10825,20 +10378,20 @@ public class Player : Character
 				isChargeExpanding = true;
 				timerChargeExpandOffset = 0f;
 				isInputChargeExistOffset = false;
-				float num8 = MonoBehaviourSingleton<InGameSettingsManager>.I.player.twoHandSwordActionInfo.timeChargeExpandMax;
-				float num9 = buffParam.GetChargeSwordsTimeRate();
-				if (num9 > 1f)
+				float num7 = MonoBehaviourSingleton<InGameSettingsManager>.I.player.twoHandSwordActionInfo.timeChargeExpandMax;
+				float num8 = buffParam.GetChargeSwordsTimeRate();
+				if (num8 > 1f)
 				{
-					num9 = 1f;
+					num8 = 1f;
 				}
-				num8 *= 1f - num9;
-				if (num8 < MonoBehaviourSingleton<InGameSettingsManager>.I.player.twoHandSwordActionInfo.minTimeChargeExpandMax)
+				num7 *= 1f - num8;
+				if (num7 < MonoBehaviourSingleton<InGameSettingsManager>.I.player.twoHandSwordActionInfo.minTimeChargeExpandMax)
 				{
-					timerChargeExpandOffset = MonoBehaviourSingleton<InGameSettingsManager>.I.player.twoHandSwordActionInfo.minTimeChargeExpandMax - num8;
-					num8 = MonoBehaviourSingleton<InGameSettingsManager>.I.player.twoHandSwordActionInfo.minTimeChargeExpandMax;
+					timerChargeExpandOffset = MonoBehaviourSingleton<InGameSettingsManager>.I.player.twoHandSwordActionInfo.minTimeChargeExpandMax - num7;
+					num7 = MonoBehaviourSingleton<InGameSettingsManager>.I.player.twoHandSwordActionInfo.minTimeChargeExpandMax;
 				}
 				isChargeExpandAutoRelease = MonoBehaviourSingleton<InGameSettingsManager>.I.player.twoHandSwordActionInfo.isChargeExpandAutoRelease;
-				timeChargeExpandMax = num8;
+				timeChargeExpandMax = num7;
 				timerChargeExpand = 0f;
 				chargeExpandRate = 0f;
 				StartWaitingPacket(WAITING_PACKET.PLAYER_CHARGE_RELEASE, true, 0f);
@@ -10850,13 +10403,13 @@ public class Player : Character
 			{
 				enableInputCharge = true;
 				InGameSettingsManager.Player.TwoHandSwordActionInfo twoHandSwordActionInfo = playerParameter.twoHandSwordActionInfo;
-				float num7 = buffParam.GetSoulChargeTimeRate();
+				float num6 = buffParam.GetSoulChargeTimeRate();
 				if (MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.ignoreSpAttackTypeAbility)
 				{
-					num7 += buffParam.GetChargeSwordsTimeRate();
+					num6 += buffParam.GetChargeSwordsTimeRate();
 				}
 				float soulIaiChargeTime = twoHandSwordActionInfo.soulIaiChargeTime;
-				soulIaiChargeTime *= 1f - num7;
+				soulIaiChargeTime *= 1f - num6;
 				if (soulIaiChargeTime < twoHandSwordActionInfo.soulIaiChargeTimeMin)
 				{
 					soulIaiChargeTime = twoHandSwordActionInfo.soulIaiChargeTimeMin;
@@ -10916,7 +10469,7 @@ public class Player : Character
 			}
 			break;
 		case AnimEventFormat.ID.SPEAR_JUMP_FALL_WAIT:
-			if (object.ReferenceEquals((object)base.body, null))
+			if (object.ReferenceEquals(base.body, null))
 			{
 				ActIdle(false, -1f);
 			}
@@ -10924,17 +10477,15 @@ public class Player : Character
 			{
 				InGameSettingsManager.Player.SpearActionInfo spearActionInfo = MonoBehaviourSingleton<InGameSettingsManager>.I.player.spearActionInfo;
 				Vector3 position = _position;
-				float num6 = position.x + jumpFallBodyPosition.x;
+				float x = position.x + jumpFallBodyPosition.x;
 				Vector3 position2 = _position;
 				float y = position2.y;
 				Vector3 position3 = _position;
-				Vector3 val = default(Vector3);
-				val._002Ector(num6, y, position3.z + jumpFallBodyPosition.z);
-				Vector3 val2 = _position - val;
-				jumpRandingVector = val2.get_normalized() * spearActionInfo.jumpRandingLength;
-				_position = val;
+				Vector3 vector = new Vector3(x, y, position3.z + jumpFallBodyPosition.z);
+				jumpRandingVector = (_position - vector).normalized * spearActionInfo.jumpRandingLength;
+				_position = vector;
 				jumpFallBodyPosition.Set(0f, spearActionInfo.jumpStartHeight, 0f);
-				base.body.get_transform().set_localPosition(jumpFallBodyPosition);
+				base.body.transform.localPosition = jumpFallBodyPosition;
 				jumpActionCounter = spearActionInfo.jumpFallWaitSec;
 				jumpState = eJumpState.FallWait;
 			}
@@ -11098,13 +10649,6 @@ public class Player : Character
 
 	protected override void EventMoveStart(AnimEventData.EventData data, Vector3 targetDir)
 	{
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
 		float num = data.floatArgs[0];
 		if (data.intArgs != null && data.intArgs.Length > 0 && data.intArgs[0] == 1 && data.floatArgs.Length > (int)spAttackType)
 		{
@@ -11140,7 +10684,7 @@ public class Player : Character
 	{
 		enableInputRotate = false;
 		startInputRotate = false;
-		if (data.intArgs != null && data.intArgs.Length != 0 && data.intArgs[0] == 1 && playerSender != null)
+		if (data.intArgs != null && data.intArgs.Length != 0 && data.intArgs[0] == 1 && (UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnSyncPosition();
 		}
@@ -11158,16 +10702,10 @@ public class Player : Character
 
 	private void EventPlayerFunnelAttack(AnimEventData.EventData data)
 	{
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Expected O, but got Unknown
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
 		string text = data.stringArgs[0];
 		string text2 = data.stringArgs[1];
-		Transform val = FindNode(text2);
-		if (val == null)
+		Transform transform = FindNode(text2);
+		if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
 		{
 			Log.Error("Not found transform for launch!! name:" + text2);
 		}
@@ -11181,18 +10719,17 @@ public class Player : Character
 			else
 			{
 				BulletData bulletData = attackInfo.bulletData;
-				if (bulletData == null || bulletData.dataFunnel == null)
+				if ((UnityEngine.Object)bulletData == (UnityEngine.Object)null || bulletData.dataFunnel == null)
 				{
 					Log.Error("Not found BulletData!! atkInfoName:" + text);
 				}
 				else
 				{
-					Vector3 offsetPos = default(Vector3);
-					offsetPos._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+					Vector3 offsetPos = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
 					Quaternion offsetRot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
-					GameObject val2 = new GameObject("PlayerAttackFunnelBit");
-					PlayerAttackFunnelBit playerAttackFunnelBit = val2.AddComponent<PlayerAttackFunnelBit>();
-					playerAttackFunnelBit.Initialize(this, attackInfo, (!IsValidBuffBlind()) ? base.actionTarget : null, val, offsetPos, offsetRot);
+					GameObject gameObject = new GameObject("PlayerAttackFunnelBit");
+					PlayerAttackFunnelBit playerAttackFunnelBit = gameObject.AddComponent<PlayerAttackFunnelBit>();
+					playerAttackFunnelBit.Initialize(this, attackInfo, (!IsValidBuffBlind()) ? base.actionTarget : null, transform, offsetPos, offsetRot);
 				}
 			}
 		}
@@ -11219,23 +10756,21 @@ public class Player : Character
 
 	protected override void EventNWayLaserAttack(AnimEventData.EventData data)
 	{
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Expected O, but got Unknown
 		string name = data.stringArgs[0];
 		string name2 = data.stringArgs[1];
 		int numLaser = data.intArgs[0];
-		Transform val = Utility.Find(base._transform, name2);
-		if (!(val == null))
+		Transform transform = Utility.Find(base._transform, name2);
+		if (!((UnityEngine.Object)transform == (UnityEngine.Object)null))
 		{
 			AttackInfo attackInfo = FindAttackInfo(name, true, false);
 			if (attackInfo != null)
 			{
 				BulletData bulletData = attackInfo.bulletData;
-				if (!(bulletData == null) && bulletData.dataLaser != null)
+				if (!((UnityEngine.Object)bulletData == (UnityEngine.Object)null) && bulletData.dataLaser != null)
 				{
-					GameObject val2 = new GameObject("AttackNWayLaser");
-					AttackNWayLaser attackNWayLaser = val2.AddComponent<AttackNWayLaser>();
-					attackNWayLaser.Initialize(this, val, attackInfo, numLaser);
+					GameObject gameObject = new GameObject("AttackNWayLaser");
+					AttackNWayLaser attackNWayLaser = gameObject.AddComponent<AttackNWayLaser>();
+					attackNWayLaser.Initialize(this, transform, attackInfo, numLaser);
 					activeAttackLaserList.Add(attackNWayLaser);
 				}
 			}
@@ -11244,22 +10779,6 @@ public class Player : Character
 
 	protected override void EventShotPresent(AnimEventData.EventData data)
 	{
-		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0211: Unknown result type (might be due to invalid IL or missing references)
 		if (data.stringArgs.Length <= 0)
 		{
 			Log.Error(LOG.INGAME, "Not set bullet name. Please check AnimEvent 'SHOT_PRESENT'.");
@@ -11293,25 +10812,25 @@ public class Player : Character
 					if (!string.IsNullOrEmpty(text))
 					{
 						BulletData bulletData = base.cachedBulletDataTable.Get(text);
-						if (!(bulletData == null))
+						if (!((UnityEngine.Object)bulletData == (UnityEngine.Object)null))
 						{
 							BulletData.BulletPresent dataPresent = bulletData.dataPresent;
 							if (dataPresent != null)
 							{
 								int result = 0;
 								string s = id.ToString() + (MonoBehaviourSingleton<StageObjectManager>.I.presentBulletObjIndex + 1).ToString();
-								float num2 = data.floatArgs[0];
-								float num3 = 360f / (float)(count - 1) * (float)j;
+								float d = data.floatArgs[0];
+								float angle = 360f / (float)(count - 1) * (float)j;
 								if (int.TryParse(s, out result))
 								{
-									Vector3 val = base._transform.get_localRotation() * Quaternion.AngleAxis(num3, Vector3.get_up()) * base._transform.get_forward();
-									Vector3 position = base._transform.get_position() + val * num2;
+									Vector3 a = base._transform.localRotation * Quaternion.AngleAxis(angle, Vector3.up) * base._transform.forward;
+									Vector3 position = base._transform.position + a * d;
 									if (j == 0)
 									{
-										position = base._transform.get_position();
+										position = base._transform.position;
 									}
 									SetPresentBullet(result, dataPresent.type, position, text);
-									if (playerSender != null)
+									if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 									{
 										playerSender.OnSetPresentBullet(result, dataPresent.type, position, text);
 									}
@@ -11326,25 +10845,22 @@ public class Player : Character
 
 	public void SetPresentBullet(int presentBulletId, BulletData.BulletPresent.TYPE type, Vector3 position, string bulletName)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Expected O, but got Unknown
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
 		BulletData bulletData = base.cachedBulletDataTable.Get(bulletName);
-		if (!(bulletData == null))
+		if (!((UnityEngine.Object)bulletData == (UnityEngine.Object)null))
 		{
-			GameObject val = new GameObject();
+			GameObject gameObject = new GameObject();
 			IPresentBulletObject presentBulletObject = null;
 			switch (type)
 			{
 			case BulletData.BulletPresent.TYPE.HEAL:
-				presentBulletObject = val.AddComponent<PresentBulletObject>();
+				presentBulletObject = gameObject.AddComponent<PresentBulletObject>();
 				break;
 			}
 			if (presentBulletObject != null)
 			{
 				if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 				{
-					Object.Destroy(val);
+					UnityEngine.Object.Destroy(gameObject);
 				}
 				else
 				{
@@ -11383,8 +10899,6 @@ public class Player : Character
 
 	protected override void EventShotZone(AnimEventData.EventData data)
 	{
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
 		if (data.stringArgs.Length <= 0)
 		{
 			Log.Error(LOG.INGAME, "Not set bullet name. Please check AnimEvent 'SHOT_ZONE'.");
@@ -11404,10 +10918,10 @@ public class Player : Character
 					BulletData.BulletZone dataZone = bulletData.dataZone;
 					if (!object.ReferenceEquals(dataZone, null))
 					{
-						ShotZoneBullet(this, text, base._transform.get_position(), MonoBehaviourSingleton<StageObjectManager>.I.ExistsEnemyValiedHealAttack(), true);
-						if (playerSender != null)
+						ShotZoneBullet(this, text, base._transform.position, MonoBehaviourSingleton<StageObjectManager>.I.ExistsEnemyValiedHealAttack(), true);
+						if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 						{
-							playerSender.OnShotZoneBullet(text, base._transform.get_position());
+							playerSender.OnShotZoneBullet(text, base._transform.position);
 						}
 					}
 				}
@@ -11417,20 +10931,17 @@ public class Player : Character
 
 	public void ShotZoneBullet(Player onwerPlayer, string bulletName, Vector3 position, bool isHealDamgeEnemy = false, bool isOwner = false)
 	{
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Expected O, but got Unknown
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && !object.ReferenceEquals(skillInfo.actSkillParam, null) && !object.ReferenceEquals(skillInfo.actSkillParam.tableData, null))
 		{
 			BulletData bulletData = base.cachedBulletDataTable.Get(bulletName);
 			if (!object.ReferenceEquals(bulletData, null) && !object.ReferenceEquals(bulletData.dataZone, null))
 			{
-				GameObject val = new GameObject();
+				GameObject gameObject = new GameObject();
 				ZoneBulletObject zoneBulletObject = null;
 				BulletData.BulletZone.TYPE type = bulletData.dataZone.type;
 				if (type == BulletData.BulletZone.TYPE.HEAL)
 				{
-					zoneBulletObject = val.AddComponent<ZoneBulletObject>();
+					zoneBulletObject = gameObject.AddComponent<ZoneBulletObject>();
 				}
 				else
 				{
@@ -11446,10 +10957,6 @@ public class Player : Character
 
 	public override void EventShotDecoy(AnimEventData.EventData data)
 	{
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
 		if (data.stringArgs.Length <= 0)
 		{
 			Log.Error(LOG.INGAME, "Not set bullet name. Please check AnimEvent 'SHOT_DECOY'.");
@@ -11474,7 +10981,7 @@ public class Player : Character
 						{
 							localDecoyId = 0;
 						}
-						Vector3 position = base._transform.get_position();
+						Vector3 position = base._transform.position;
 						if (data.floatArgs != null && data.floatArgs.Length == 3)
 						{
 							position.Set(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
@@ -11489,7 +10996,7 @@ public class Player : Character
 							skIndex = skillInfo.skillIndex;
 						}
 						ShotDecoyBullet(id, skIndex, decoyId, text, position, true);
-						if (playerSender != null)
+						if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 						{
 							playerSender.OnShotDecoyBullet(skIndex, decoyId, text, position);
 						}
@@ -11501,16 +11008,13 @@ public class Player : Character
 
 	public void ShotDecoyBullet(int playerId, int skIndex, int decoyId, string bulletName, Vector3 position, bool isHit)
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Expected O, but got Unknown
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			BulletData bulletData = base.cachedBulletDataTable.Get(bulletName);
 			if (!object.ReferenceEquals(bulletData, null) && !object.ReferenceEquals(bulletData.dataDecoy, null))
 			{
-				GameObject val = new GameObject();
-				DecoyBulletObject decoyBulletObject = val.AddComponent<DecoyBulletObject>();
+				GameObject gameObject = new GameObject();
+				DecoyBulletObject decoyBulletObject = gameObject.AddComponent<DecoyBulletObject>();
 				if (!object.ReferenceEquals(decoyBulletObject, null))
 				{
 					decoyBulletObject.Initialize(playerId, decoyId, bulletData, position, skillInfo.GetSkillParam(skIndex), isHit);
@@ -11526,7 +11030,7 @@ public class Player : Character
 
 	public void ExecExplodeDecoyBullet(int decoyId)
 	{
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnExplodeDecoyBullet(decoyId);
 		}
@@ -11550,25 +11054,6 @@ public class Player : Character
 
 	private void EventPairSwordsShotBullet(AnimEventData.EventData data)
 	{
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
 		if (pairSwordsCtrl == null)
 		{
 			Log.Error("EventPairSwordsShotBullet. pairSwordsCtrl is null!!");
@@ -11577,8 +11062,8 @@ public class Player : Character
 		{
 			string text = data.stringArgs[0];
 			string text2 = data.stringArgs[1];
-			Transform val = FindNode(text2);
-			if (val == null)
+			Transform transform = FindNode(text2);
+			if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
 			{
 				Log.Error("EventPairSwordsShotBullet. Not found transform for launch!! name:" + text2);
 			}
@@ -11592,7 +11077,7 @@ public class Player : Character
 				else
 				{
 					BulletData bulletData = attackInfo.bulletData;
-					if (bulletData == null || bulletData.dataPairSwordsSoul == null)
+					if ((UnityEngine.Object)bulletData == (UnityEngine.Object)null || bulletData.dataPairSwordsSoul == null)
 					{
 						Log.Error("EventPairSwordsShotBullet. Not found BulletData!! atkInfoName:" + text);
 					}
@@ -11607,13 +11092,12 @@ public class Player : Character
 								change_effect = playerParameter.pairSwordsActionInfo.Soul_EffectsForBullet[nowWeaponElement];
 							}
 						}
-						Vector3 val2 = default(Vector3);
-						val2._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-						Quaternion val3 = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
-						Vector3 val4 = val.get_position() + Quaternion.LookRotation(_forward) * val2;
-						Vector3 bulletShotVecPositiveY = GetBulletShotVecPositiveY(val4);
-						Quaternion rot = Quaternion.LookRotation(bulletShotVecPositiveY) * val3;
-						AnimEventShot.Create(this, attackInfo, val4, rot, null, true, change_effect, null, null, ATTACK_MODE.NONE, null, null);
+						Vector3 point = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+						Quaternion rhs = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
+						Vector3 vector = transform.position + Quaternion.LookRotation(_forward) * point;
+						Vector3 bulletShotVecPositiveY = GetBulletShotVecPositiveY(vector);
+						Quaternion rot = Quaternion.LookRotation(bulletShotVecPositiveY) * rhs;
+						AnimEventShot.Create(this, attackInfo, vector, rot, null, true, change_effect, null, null, ATTACK_MODE.NONE, null, null);
 					}
 				}
 			}
@@ -11622,49 +11106,10 @@ public class Player : Character
 
 	private void EventPairSwordsShotLaser(AnimEventData.EventData data)
 	{
-		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0204: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0209: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0215: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0217: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0247: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0249: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027a: Unknown result type (might be due to invalid IL or missing references)
 		string text = data.stringArgs[0];
 		string text2 = data.stringArgs[1];
-		Transform val = FindNode(text2);
-		if (val == null)
+		Transform transform = FindNode(text2);
+		if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
 		{
 			Log.Error("EventPairSwordsShotLaser. Not found transform for launch!! name:" + text2);
 		}
@@ -11686,39 +11131,38 @@ public class Player : Character
 					else
 					{
 						BulletData bulletData = attackInfo.bulletData;
-						if (bulletData == null)
+						if ((UnityEngine.Object)bulletData == (UnityEngine.Object)null)
 						{
 							Log.Error("EventPairSwordsShotLaser. Not found BulletData!! atkInfoName:" + text);
 						}
 						else
 						{
-							Vector3 val2 = default(Vector3);
-							val2._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-							Quaternion val3 = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
+							Vector3 vector = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+							Quaternion rhs = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
 							int num = soul_NumOfLaserByComboLv[comboLv - 1];
-							Vector3 bulletShotVecForSpWeak = GetBulletShotVecForSpWeak(val.get_position());
+							Vector3 bulletShotVecForSpWeak = GetBulletShotVecForSpWeak(transform.position);
 							for (int i = 1; i <= num; i++)
 							{
-								Vector3 zero = Vector3.get_zero();
+								Vector3 zero = Vector3.zero;
 								if (num == 1)
 								{
-									zero = val.get_position() + Quaternion.LookRotation(_forward) * val2;
+									zero = transform.position + Quaternion.LookRotation(_forward) * vector;
 									bulletShotVecForSpWeak = GetBulletShotVecForSpWeak(zero);
 								}
 								else
 								{
-									float num2 = (float)(360 / num * i) * 0.0174532924f;
-									zero = val.get_position() + Quaternion.LookRotation(_forward) * (val2 + new Vector3(Mathf.Cos(num2), Mathf.Sin(num2), 0f) * playerParameter.pairSwordsActionInfo.Soul_RadiusForLaser);
+									float f = (float)(360 / num * i) * 0.0174532924f;
+									zero = transform.position + Quaternion.LookRotation(_forward) * (vector + new Vector3(Mathf.Cos(f), Mathf.Sin(f), 0f) * playerParameter.pairSwordsActionInfo.Soul_RadiusForLaser);
 								}
-								Quaternion rot = Quaternion.LookRotation(bulletShotVecForSpWeak) * val3;
+								Quaternion rot = Quaternion.LookRotation(bulletShotVecForSpWeak) * rhs;
 								AnimEventShot animEventShot = AnimEventShot.Create(this, attackInfo, zero, rot, null, true, null, null, null, ATTACK_MODE.NONE, null, null);
 								pairSwordsCtrl.AddBulletLaser(animEventShot);
-								animEventShot._transform.set_parent(base._transform);
-								Vector3 val4 = bulletShotVecForSpWeak;
-								val4.y = 0f;
-								_rotation = Quaternion.LookRotation(val4);
+								animEventShot._transform.parent = base._transform;
+								Vector3 forward = bulletShotVecForSpWeak;
+								forward.y = 0f;
+								_rotation = Quaternion.LookRotation(forward);
 							}
-							this.StartCoroutine(PlayPairSwordsShotLaserSE());
+							StartCoroutine(PlayPairSwordsShotLaserSE());
 							pairSwordsCtrl.SetGaugePercentForLaser();
 							pairSwordsCtrl.SetEventShotLaserExec();
 							StartWaitingPacket(WAITING_PACKET.PLAYER_PAIR_SWORDS_LASER_END, true, 0f);
@@ -11748,10 +11192,6 @@ public class Player : Character
 
 	private void EventShotHealingHoming(AnimEventData.EventData data)
 	{
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 		if (IsOriginal() || IsCoopNone())
 		{
 			Coop_Model_PlayerShotHealingHoming coop_Model_PlayerShotHealingHoming = new Coop_Model_PlayerShotHealingHoming();
@@ -11768,31 +11208,16 @@ public class Player : Character
 
 	public void OnShotHealingHoming(Coop_Model_PlayerShotHealingHoming model)
 	{
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = FindNode(model.launchNodeName);
-		if (!(val == null))
+		Transform transform = FindNode(model.launchNodeName);
+		if (!((UnityEngine.Object)transform == (UnityEngine.Object)null))
 		{
 			AttackInfo attackInfo = FindAttackInfo(model.atkInfoName, true, false);
 			if (attackInfo != null)
 			{
 				BulletData bulletData = attackInfo.bulletData;
-				if (!(bulletData == null) && bulletData.dataHealingHomingBullet != null && !model.targetPlayerIDs.IsNullOrEmpty() && MonoBehaviourSingleton<StageObjectManager>.IsValid() && model.targetNum > 0)
+				if (!((UnityEngine.Object)bulletData == (UnityEngine.Object)null) && bulletData.dataHealingHomingBullet != null && !model.targetPlayerIDs.IsNullOrEmpty() && MonoBehaviourSingleton<StageObjectManager>.IsValid() && model.targetNum > 0)
 				{
-					Vector3 pos = val.get_position() + Quaternion.LookRotation(_forward) * model.offsetPos;
+					Vector3 pos = transform.position + Quaternion.LookRotation(_forward) * model.offsetPos;
 					Quaternion rot = Quaternion.LookRotation(_forward) * Quaternion.Euler(model.offsetRot);
 					int num = Mathf.Min(model.targetNum, model.targetPlayerIDs.Length);
 					for (int i = 0; i < num; i++)
@@ -11803,7 +11228,7 @@ public class Player : Character
 							animEventShot.SetTarget(MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(model.targetPlayerIDs[i]));
 						}
 					}
-					if (playerSender != null)
+					if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 					{
 						playerSender.OnShotHealingHoming(model);
 					}
@@ -11812,10 +11237,8 @@ public class Player : Character
 		}
 	}
 
-	private unsafe int[] GetSortedArrayByPlayerDistance(int targetNum)
+	private int[] GetSortedArrayByPlayerDistance(int targetNum)
 	{
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			return null;
@@ -11828,34 +11251,14 @@ public class Player : Character
 		List<StageObject> list = new List<StageObject>(playerList);
 		list.Remove(this);
 		Vector3 targetPos = _position;
-		list.Sort(delegate(StageObject a, StageObject b)
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 val = a.get_transform().get_position() - targetPos;
-			float magnitude = val.get_magnitude();
-			Vector3 val2 = b.get_transform().get_position() - targetPos;
-			return Mathf.RoundToInt(magnitude - val2.get_magnitude());
-		});
+		list.Sort((StageObject a, StageObject b) => Mathf.RoundToInt((a.transform.position - targetPos).magnitude - (b.transform.position - targetPos).magnitude));
 		int num = targetNum;
 		if (num <= 0 || list.Count <= num)
 		{
 			num = list.Count;
 		}
-		List<StageObject> range = list.GetRange(0, num);
-		if (_003C_003Ef__am_0024cacheE3 == null)
-		{
-			_003C_003Ef__am_0024cacheE3 = new Func<StageObject, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		return range.Select<StageObject, int>(_003C_003Ef__am_0024cacheE3).ToArray();
+		return (from o in list.GetRange(0, num)
+		select o.id).ToArray();
 	}
 
 	private void EventHealHp()
@@ -11864,13 +11267,9 @@ public class Player : Character
 
 	public virtual void ShotArrow(Vector3 shot_pos, Quaternion shot_rot, AttackInfo attack_info, bool isSitShot, bool isAimEnd)
 	{
-		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019c: Unknown result type (might be due to invalid IL or missing references)
 		if (attack_info != null)
 		{
-			GameObject attach_object = ResourceUtility.Instantiate<GameObject>(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.arrow);
+			GameObject attach_object = ResourceUtility.Instantiate(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.arrow);
 			string change_effect = null;
 			if (isArrowAimBossMode && attack_info.rateInfoRate >= 1f)
 			{
@@ -11912,34 +11311,15 @@ public class Player : Character
 				attack_info.bulletData.dataFall.gravityStartTime = num;
 			}
 			isArrowAimEnd = isAimEnd;
-			if (playerSender != null)
+			if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 			{
 				playerSender.OnShotArrow(shot_pos, shot_rot, attack_info, isSitShot, isAimEnd);
 			}
 		}
 	}
 
-	public unsafe virtual void ShotSoulArrow()
+	public virtual void ShotSoulArrow()
 	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0223: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0237: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023c: Expected O, but got Unknown
-		//IL_0241: Unknown result type (might be due to invalid IL or missing references)
 		List<TargetMarker> targetMarkerList = MonoBehaviourSingleton<TargetMarkerManager>.I.GetTargetMarkerList();
 		if (targetMarkerList != null && targetMarkerList.Count > 0)
 		{
@@ -11986,41 +11366,37 @@ public class Player : Character
 					}
 				}
 			}
-			_003CShotSoulArrow_003Ec__AnonStorey512 _003CShotSoulArrow_003Ec__AnonStorey;
-			this.StartCoroutine(_ShotSoulArrow(shotPos, bowRot, list, arrowActionInfo.soulShotInterval, new Action((object)_003CShotSoulArrow_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			StartCoroutine(_ShotSoulArrow(shotPos, bowRot, list, arrowActionInfo.soulShotInterval, delegate
+			{
+				SetNextTrigger(0);
+				isArrowAimEnd = true;
+				if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
+				{
+					playerSender.OnShotSoulArrow(shotPos, bowRot, targetPosList);
+				}
+			}));
 		}
 	}
 
 	private IEnumerator _ShotSoulArrow(Vector3 shotPos, Quaternion bowRot, List<SoulArrowInfo> saInfo, float interval, Action endCallback)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < saInfo.Count; i++)
 		{
 			SoulArrowInfo info = saInfo[i];
-			AnimEventShot shot = AnimEventShot.CreateArrow(attach_object: ResourceUtility.Instantiate<GameObject>(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.arrow), stage_object: this, atk_info: info.attackInfo, pos: shotPos, rot: bowRot, isScaling: true, change_effect: string.Empty, damageDistanceData: null);
+			AnimEventShot shot = AnimEventShot.CreateArrow(attach_object: ResourceUtility.Instantiate(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.arrow), stage_object: this, atk_info: info.attackInfo, pos: shotPos, rot: bowRot, isScaling: true, change_effect: string.Empty, damageDistanceData: null);
 			shot.SetArrowInfo(isArrowAimBossMode, false);
 			shot.SetTarget(info.point);
 			yield return (object)new WaitForSeconds(interval);
 		}
-		endCallback.Invoke();
+		endCallback();
 	}
 
 	public void ShotSoulArrowPuppet(Vector3 shotPos, Quaternion bowRot, List<Vector3> targetPosList)
 	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		AttackInfo atk_info = FindAttackInfo(playerParameter.arrowActionInfo.attackInfoNames[2], true, false);
 		for (int i = 0; i < targetPosList.Count; i++)
 		{
-			GameObject attach_object = ResourceUtility.Instantiate<GameObject>(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.arrow);
+			GameObject attach_object = ResourceUtility.Instantiate(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.arrow);
 			AnimEventShot animEventShot = AnimEventShot.CreateArrow(this, atk_info, shotPos, bowRot, attach_object, true, string.Empty, null);
 			animEventShot.SetArrowInfo(isArrowAimBossMode, false);
 			animEventShot.SetPuppetTargetPos(targetPosList[i]);
@@ -12030,88 +11406,52 @@ public class Player : Character
 
 	public virtual Vector3 GetBulletAppearPos()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		if (loader.socketWepR == null)
+		if ((UnityEngine.Object)loader.socketWepR == (UnityEngine.Object)null)
 		{
-			Bounds bounds = base._collider.get_bounds();
-			return bounds.get_center() + Vector3.get_up() * 0.3f;
+			return base._collider.bounds.center + Vector3.up * 0.3f;
 		}
-		return loader.socketWepR.get_position();
+		return loader.socketWepR.position;
 	}
 
 	public virtual Vector3 GetBulletShotVec(Vector3 appear_pos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = _forward;
+		Vector3 vector = _forward;
 		if (!IsValidBuffBlind() && GetTargetPos(out Vector3 pos))
 		{
-			val = pos - appear_pos;
+			vector = pos - appear_pos;
 		}
-		return val.get_normalized();
+		return vector.normalized;
 	}
 
 	public Vector3 GetBulletShotVecPositiveY(Vector3 appearPos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = _forward;
+		Vector3 vector = _forward;
 		if (!IsValidBuffBlind() && GetTargetPos(out Vector3 pos))
 		{
 			if (pos.y < 0f)
 			{
 				pos.y = 0f;
 			}
-			val = pos - appearPos;
+			vector = pos - appearPos;
 		}
-		return val.get_normalized();
+		return vector.normalized;
 	}
 
 	public Vector3 GetBulletShotVecForSpWeak(Vector3 appearPos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = GetBulletShotVec(appearPos);
+		Vector3 vector = GetBulletShotVec(appearPos);
 		if (!IsValidBuffBlind())
 		{
-			if (base.targetPointPos != Vector3.get_zero())
+			if (base.targetPointPos != Vector3.zero)
 			{
-				val = base.targetPointPos - appearPos;
+				vector = base.targetPointPos - appearPos;
 			}
-			if (targetPointWithSpWeak != null)
+			if ((UnityEngine.Object)targetPointWithSpWeak != (UnityEngine.Object)null)
 			{
-				val = targetPointWithSpWeak.param.markerPos - appearPos;
+				vector = targetPointWithSpWeak.param.markerPos - appearPos;
 			}
 		}
-		return val.get_normalized();
+		return vector.normalized;
 	}
 
 	public void SetArrowAimKeep()
@@ -12145,26 +11485,13 @@ public class Player : Character
 
 	protected void UpdateArrowAngle()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		if (base.animator != null && attackMode == ATTACK_MODE.ARROW)
+		if ((UnityEngine.Object)base.animator != (UnityEngine.Object)null && attackMode == ATTACK_MODE.ARROW)
 		{
 			Vector3 bulletAppearPos = GetBulletAppearPos();
 			Vector3 bulletShotVec = GetBulletShotVec(bulletAppearPos);
-			if (bulletShotVec != Vector3.get_zero())
+			if (bulletShotVec != Vector3.zero)
 			{
-				Quaternion val = Quaternion.LookRotation(bulletShotVec);
-				Vector3 eulerAngles = val.get_eulerAngles();
+				Vector3 eulerAngles = Quaternion.LookRotation(bulletShotVec).eulerAngles;
 				float num = eulerAngles.x;
 				if (num >= 180f)
 				{
@@ -12232,13 +11559,9 @@ public class Player : Character
 
 	protected override bool GetTargetPos(out Vector3 pos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		pos = Vector3.get_zero();
+		pos = Vector3.zero;
 		bool result = false;
-		if (targetingPoint != null)
+		if ((UnityEngine.Object)targetingPoint != (UnityEngine.Object)null)
 		{
 			pos = targetingPoint.param.targetPos;
 			result = true;
@@ -12248,7 +11571,7 @@ public class Player : Character
 
 	public override void ChatSay(int chatID)
 	{
-		if (uiPlayerStatusGizmo != null)
+		if ((UnityEngine.Object)uiPlayerStatusGizmo != (UnityEngine.Object)null)
 		{
 			uiPlayerStatusGizmo.SayChat(chatID);
 		}
@@ -12257,8 +11580,7 @@ public class Player : Character
 
 	public override void ChatSay(string message)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (uiPlayerStatusGizmo != null && uiPlayerStatusGizmo.get_gameObject().get_activeInHierarchy())
+		if ((UnityEngine.Object)uiPlayerStatusGizmo != (UnityEngine.Object)null && uiPlayerStatusGizmo.gameObject.activeInHierarchy)
 		{
 			uiPlayerStatusGizmo.SayChat(message);
 		}
@@ -12268,8 +11590,7 @@ public class Player : Character
 
 	public override void ChatSayStamp(int stamp_id)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (uiPlayerStatusGizmo != null && uiPlayerStatusGizmo.get_gameObject().get_activeInHierarchy())
+		if ((UnityEngine.Object)uiPlayerStatusGizmo != (UnityEngine.Object)null && uiPlayerStatusGizmo.gameObject.activeInHierarchy)
 		{
 			uiPlayerStatusGizmo.SayChatStamp(stamp_id);
 		}
@@ -12279,7 +11600,7 @@ public class Player : Character
 
 	protected virtual void OnSendChatMessage(string message)
 	{
-		if (MonoBehaviourSingleton<UIInGameMessageBar>.IsValid() && MonoBehaviourSingleton<UIInGameMessageBar>.I.get_isActiveAndEnabled())
+		if (MonoBehaviourSingleton<UIInGameMessageBar>.IsValid() && MonoBehaviourSingleton<UIInGameMessageBar>.I.isActiveAndEnabled)
 		{
 			MonoBehaviourSingleton<UIInGameMessageBar>.I.Announce(base.charaName, message);
 		}
@@ -12287,7 +11608,7 @@ public class Player : Character
 
 	protected virtual void OnSendChatStamp(int stamp_id)
 	{
-		if (MonoBehaviourSingleton<UIInGameMessageBar>.IsValid() && MonoBehaviourSingleton<UIInGameMessageBar>.I.get_isActiveAndEnabled())
+		if (MonoBehaviourSingleton<UIInGameMessageBar>.IsValid() && MonoBehaviourSingleton<UIInGameMessageBar>.I.isActiveAndEnabled)
 		{
 			MonoBehaviourSingleton<UIInGameMessageBar>.I.Announce(base.charaName, stamp_id);
 		}
@@ -12311,7 +11632,7 @@ public class Player : Character
 			for (int count = prayTargetIds.Count; i < count; i++)
 			{
 				Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(prayTargetIds[i]) as Player;
-				if (player == null)
+				if ((UnityEngine.Object)player == (UnityEngine.Object)null)
 				{
 					return;
 				}
@@ -12342,41 +11663,25 @@ public class Player : Character
 
 	public virtual void SetAppearPosField()
 	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		if (FieldManager.IsValidInGame())
 		{
-			Vector3 zero = Vector3.get_zero();
+			Vector3 zero = Vector3.zero;
 			zero.x = MonoBehaviourSingleton<FieldManager>.I.currentStartMapX;
 			zero.z = MonoBehaviourSingleton<FieldManager>.I.currentStartMapZ;
 			_position = zero;
-			_rotation = Quaternion.AngleAxis(MonoBehaviourSingleton<FieldManager>.I.currentStartMapDir, Vector3.get_up());
+			_rotation = Quaternion.AngleAxis(MonoBehaviourSingleton<FieldManager>.I.currentStartMapDir, Vector3.up);
 			SetAppearPos(zero);
 		}
 	}
 
 	public virtual void SetAppearPosOwner(Vector3 enemy_pos)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = enemy_pos + Vector3.get_forward() * playerParameter.appearPosDistance;
-		if (MonoBehaviourSingleton<StageManager>.I.CheckPosInside(val))
+		Vector3 vector = enemy_pos + Vector3.forward * playerParameter.appearPosDistance;
+		if (MonoBehaviourSingleton<StageManager>.I.CheckPosInside(vector))
 		{
-			_position = val;
+			_position = vector;
 			LookAt(enemy_pos, false);
-			SetAppearPos(val);
+			SetAppearPos(vector);
 		}
 		else
 		{
@@ -12386,8 +11691,6 @@ public class Player : Character
 
 	public virtual void SetAppearPosGuest(Vector3 center_pos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		SetAppearRandomPosFixDistance(center_pos, playerParameter.appearPosDistance, playerParameter.appearPosTryCount);
 		LookAt(center_pos, false);
 	}
@@ -12444,15 +11747,13 @@ public class Player : Character
 
 	public void StartEffectDrain(Enemy enemy)
 	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Expected O, but got Unknown
-		if (!(enemy == null) && !(base.effectPlayProcessor == null))
+		if (!((UnityEngine.Object)enemy == (UnityEngine.Object)null) && !((UnityEngine.Object)base.effectPlayProcessor == (UnityEngine.Object)null))
 		{
 			List<EffectPlayProcessor.EffectSetting> settings = base.effectPlayProcessor.GetSettings("EFFECT_DRAIN_DAMAGE");
 			if (settings != null && settings.Count > 0)
 			{
-				GameObject val = new GameObject("EffectDrain");
-				EffectDrain effectDrain = val.AddComponent<EffectDrain>();
+				GameObject gameObject = new GameObject("EffectDrain");
+				EffectDrain effectDrain = gameObject.AddComponent<EffectDrain>();
 				effectDrain.Initialize(this, enemy, settings[0]);
 			}
 		}
@@ -12470,31 +11771,23 @@ public class Player : Character
 
 	public Vector3 GetCannonVector()
 	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 		if (targetFieldGimmickCannon == null)
 		{
-			return Vector3.get_zero();
+			return Vector3.zero;
 		}
 		Transform cannonTransform = targetFieldGimmickCannon.GetCannonTransform();
-		if (cannonTransform != null)
+		if ((UnityEngine.Object)cannonTransform != (UnityEngine.Object)null)
 		{
-			return cannonTransform.get_forward();
+			return cannonTransform.forward;
 		}
-		return Vector3.get_zero();
+		return Vector3.zero;
 	}
 
 	public void ApplyCannonVector(Vector3 cannonVec)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = cannonVec;
-		val.y = 0f;
-		_rotation = Quaternion.LookRotation(val);
+		Vector3 forward = cannonVec;
+		forward.y = 0f;
+		_rotation = Quaternion.LookRotation(forward);
 		if (targetFieldGimmickCannon != null)
 		{
 			targetFieldGimmickCannon.ApplyCannonVector(cannonVec);
@@ -12503,21 +11796,11 @@ public class Player : Character
 
 	public void SetSyncCannonRotation(Vector3 cannonVec)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		if (cannonVec != Vector3.get_zero())
+		if (cannonVec != Vector3.zero)
 		{
 			syncCannonRotation = Quaternion.LookRotation(cannonVec);
 		}
-		if (GetCannonVector() != Vector3.get_zero())
+		if (GetCannonVector() != Vector3.zero)
 		{
 			prevCannonRotation = Quaternion.LookRotation(GetCannonVector());
 		}
@@ -12527,15 +11810,6 @@ public class Player : Character
 
 	protected void UpdateSyncCannonRotation()
 	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		if (isSyncingCannonRotation)
 		{
 			if (base.actionID != (ACTION_ID)30)
@@ -12544,11 +11818,11 @@ public class Player : Character
 			}
 			else
 			{
-				float num = Mathf.Clamp01(syncCannonVecTimer / 1f);
-				Quaternion val = Quaternion.SlerpUnclamped(prevCannonRotation, syncCannonRotation, num);
-				Vector3 cannonVec = val * Vector3.get_forward();
+				float t = Mathf.Clamp01(syncCannonVecTimer / 1f);
+				Quaternion rotation = Quaternion.SlerpUnclamped(prevCannonRotation, syncCannonRotation, t);
+				Vector3 cannonVec = rotation * Vector3.forward;
 				ApplyCannonVector(cannonVec);
-				syncCannonVecTimer += Time.get_deltaTime();
+				syncCannonVecTimer += Time.deltaTime;
 			}
 		}
 	}
@@ -12640,7 +11914,7 @@ public class Player : Character
 	{
 		if (guardingSec > 0f)
 		{
-			guardingSec -= Time.get_deltaTime();
+			guardingSec -= Time.deltaTime;
 		}
 		if (spAttackType == SP_ATTACK_TYPE.HEAT)
 		{
@@ -12670,10 +11944,9 @@ public class Player : Character
 
 	private void _AddRevengeCounter(int damage)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		if (base.hpMax != 0)
 		{
-			IncreaseSpActonGauge(AttackHitInfo.ATTACK_TYPE.NORMAL, Vector3.get_zero(), (float)damage, 0f, false, false);
+			IncreaseSpActonGauge(AttackHitInfo.ATTACK_TYPE.NORMAL, Vector3.zero, (float)damage, 0f, false, false);
 			_StartRevengeCharge();
 		}
 	}
@@ -12707,7 +11980,7 @@ public class Player : Character
 	{
 		if (revengeChargeState == eChargeState.Charge)
 		{
-			revengeChargeSec -= Time.get_deltaTime();
+			revengeChargeSec -= Time.deltaTime;
 			if (revengeChargeSec <= 0f)
 			{
 				revengeChargeState = eChargeState.Full;
@@ -12767,19 +12040,10 @@ public class Player : Character
 
 	protected void UpdateSpearAction()
 	{
-		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0303: Unknown result type (might be due to invalid IL or missing references)
 		InGameSettingsManager.Player.SpearActionInfo spearActionInfo = playerParameter.spearActionInfo;
 		if (hitSpearSpecialAction)
 		{
-			hitSpearSpActionTimer += Time.get_deltaTime();
+			hitSpearSpActionTimer += Time.deltaTime;
 			if (hitSpearSpActionTimer > spearActionInfo.rushCancellableTime)
 			{
 				enableCancelToAttack = false;
@@ -12787,7 +12051,7 @@ public class Player : Character
 		}
 		if (isLoopingRush)
 		{
-			actRushLoopTimer += Time.get_deltaTime();
+			actRushLoopTimer += Time.deltaTime;
 			if (actRushLoopTimer > spearActionInfo.rushLoopTime)
 			{
 				isLoopingRush = false;
@@ -12800,8 +12064,8 @@ public class Player : Character
 		}
 		if (isSpearHundred)
 		{
-			spearHundredSecFromStart += Time.get_deltaTime();
-			spearHundredSecFromLastTap += Time.get_deltaTime();
+			spearHundredSecFromStart += Time.deltaTime;
+			spearHundredSecFromLastTap += Time.deltaTime;
 			if (spearHundredSecFromStart >= spearActionInfo.hundredLoopLimitSec)
 			{
 				isSpearHundred = false;
@@ -12816,7 +12080,7 @@ public class Player : Character
 		switch (jumpState)
 		{
 		case eJumpState.FallWait:
-			jumpActionCounter -= Time.get_deltaTime();
+			jumpActionCounter -= Time.deltaTime;
 			if (jumpActionCounter <= 0f)
 			{
 				SetNextTrigger(1);
@@ -12824,15 +12088,15 @@ public class Player : Character
 			}
 			break;
 		case eJumpState.Fall:
-			jumpFallBodyPosition.y -= spearActionInfo.jumpFallSpeed * Time.get_deltaTime();
+			jumpFallBodyPosition.y -= spearActionInfo.jumpFallSpeed * Time.deltaTime;
 			if (jumpFallBodyPosition.y <= 0f)
 			{
 				OnJumpEnd(_position, false, 0f);
 			}
-			base.body.get_transform().set_localPosition(jumpFallBodyPosition);
+			base.body.transform.localPosition = jumpFallBodyPosition;
 			break;
 		case eJumpState.HitStop:
-			jumpActionCounter += Time.get_deltaTime();
+			jumpActionCounter += Time.deltaTime;
 			if (jumpActionCounter >= spearActionInfo.jumpHitStop)
 			{
 				jumpActionCounter = 0f;
@@ -12841,7 +12105,7 @@ public class Player : Character
 			}
 			break;
 		case eJumpState.Randing:
-			jumpActionCounter += Time.get_deltaTime();
+			jumpActionCounter += Time.deltaTime;
 			if (jumpActionCounter > spearActionInfo.jumpRandingHeightStartTime)
 			{
 				float num = (jumpActionCounter - spearActionInfo.jumpRandingHeightStartTime) / (spearActionInfo.jumpRandingHeightEndTime - spearActionInfo.jumpRandingHeightStartTime);
@@ -12854,7 +12118,7 @@ public class Player : Character
 				{
 					jumpFallBodyPosition.y = 0f;
 				}
-				base.body.get_transform().set_localPosition(jumpFallBodyPosition);
+				base.body.transform.localPosition = jumpFallBodyPosition;
 			}
 			if (jumpActionCounter > spearActionInfo.jumpRandingMoveStartTime)
 			{
@@ -12886,7 +12150,6 @@ public class Player : Character
 
 	public virtual void HitJumpAttack()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		OnJumpEnd(_position, true, jumpFallBodyPosition.y);
 	}
 
@@ -12936,9 +12199,6 @@ public class Player : Character
 
 	public void OnJumpRize(Vector3 dir, int level)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		jumpFallBodyPosition = dir;
 		useGaugeLevel = level;
 		SetNextTrigger(0);
@@ -12953,16 +12213,11 @@ public class Player : Character
 
 	public void OnJumpEnd(Vector3 pos, bool isSuccess, float y)
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 		if (jumpState == eJumpState.Fall)
 		{
 			if (isSuccess)
 			{
-				if (bossBrain == null)
+				if ((UnityEngine.Object)bossBrain == (UnityEngine.Object)null)
 				{
 					return;
 				}
@@ -12974,7 +12229,7 @@ public class Player : Character
 			else
 			{
 				jumpFallBodyPosition.y = 0f;
-				base.body.get_transform().set_localPosition(jumpFallBodyPosition);
+				base.body.transform.localPosition = jumpFallBodyPosition;
 				SetNextTrigger(2);
 				jumpState = eJumpState.Failure;
 			}
@@ -13103,7 +12358,7 @@ public class Player : Character
 		base.actionID = (ACTION_ID)36;
 		PlayMotion("@evolve_" + evolveWeaponId, -1f);
 		evolveCtrl.Start(evolveWeaponId);
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnSyncEvolveAction(true);
 		}
@@ -13113,7 +12368,7 @@ public class Player : Character
 	{
 		evolveCtrl.End();
 		EndWaitingPacket(WAITING_PACKET.EVOLVE);
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnSyncEvolveAction(false);
 		}
@@ -13123,7 +12378,7 @@ public class Player : Character
 	{
 		if (base.actionID == (ACTION_ID)37 && evolveSpecialActionSec > 0f)
 		{
-			evolveSpecialActionSec -= Time.get_deltaTime();
+			evolveSpecialActionSec -= Time.deltaTime;
 			if (evolveSpecialActionSec <= 0f)
 			{
 				SetNextTrigger(0);
@@ -13143,7 +12398,7 @@ public class Player : Character
 		PlayMotionImmidate("EVOLVE_" + evolveWeaponId, "special", 0f);
 		evolveSpecialActionSec = evolveCtrl.GetSpecialActionSec();
 		evolveCtrl.PlaySphinxActionEffect();
-		if (playerSender != null)
+		if ((UnityEngine.Object)playerSender != (UnityEngine.Object)null)
 		{
 			playerSender.OnEvolveSpecialAction();
 		}
@@ -13236,14 +12491,9 @@ public class Player : Character
 		return !bulletBarrierObjList.IsNullOrEmpty();
 	}
 
-	public unsafe bool IsInAliveBarrier()
+	public bool IsInAliveBarrier()
 	{
-		List<BarrierBulletObject> source = bulletBarrierObjList;
-		if (_003C_003Ef__am_0024cacheE4 == null)
-		{
-			_003C_003Ef__am_0024cacheE4 = new Func<BarrierBulletObject, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		return source.Any(_003C_003Ef__am_0024cacheE4);
+		return bulletBarrierObjList.Any((BarrierBulletObject barrier) => !barrier.IsDead());
 	}
 
 	private void ForceClearInBarrier()
@@ -13257,7 +12507,7 @@ public class Player : Character
 				barrierBulletObject.RemovePlayer(this);
 				barrierBulletObject.ForceExitThroughProcessor(base._collider);
 				Transform t = effectTransTable.Get(barrierBulletObject.GetEffectNameInBarrier());
-				if (t != null)
+				if ((UnityEngine.Object)t != (UnityEngine.Object)null)
 				{
 					EffectManager.ReleaseEffect(ref t);
 					effectTransTable.Remove(barrierBulletObject.GetEffectNameInBarrier());
@@ -13273,7 +12523,7 @@ public class Player : Character
 		{
 			bulletBarrierObjList.Remove(barrier);
 			Transform t = effectTransTable.Get(barrier.GetEffectNameInBarrier());
-			if (t != null)
+			if ((UnityEngine.Object)t != (UnityEngine.Object)null)
 			{
 				EffectManager.ReleaseEffect(ref t);
 				effectTransTable.Remove(barrier.GetEffectNameInBarrier());
@@ -13283,10 +12533,9 @@ public class Player : Character
 
 	public void MakeInvincibleByBrokenBarrier()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 		hitOffFlag |= HIT_OFF_FLAG.INVICIBLE;
 		cancelInvincible = CancelInvincibleByBrokenBarrier();
-		this.StartCoroutine(cancelInvincible);
+		StartCoroutine(cancelInvincible);
 	}
 
 	private IEnumerator CancelInvincibleByBrokenBarrier()
@@ -13297,20 +12546,19 @@ public class Player : Character
 
 	protected override void OnAttackedContinuationStart(AttackedContinuationStatus status)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		BarrierBulletObject componentInParent = status.fromCollider.get_gameObject().GetComponentInParent<BarrierBulletObject>();
-		if (componentInParent != null)
+		BarrierBulletObject componentInParent = status.fromCollider.gameObject.GetComponentInParent<BarrierBulletObject>();
+		if ((UnityEngine.Object)componentInParent != (UnityEngine.Object)null)
 		{
 			bulletBarrierObjList.Add(componentInParent);
 			componentInParent.AddPlayer(this);
 			string effectNameInBarrier = componentInParent.GetEffectNameInBarrier();
-			Transform val = effectTransTable.Get(effectNameInBarrier);
-			if (val == null)
+			Transform x = effectTransTable.Get(effectNameInBarrier);
+			if ((UnityEngine.Object)x == (UnityEngine.Object)null)
 			{
-				val = EffectManager.GetEffect(effectNameInBarrier, base.rootNode);
-				if (val != null)
+				x = EffectManager.GetEffect(effectNameInBarrier, base.rootNode);
+				if ((UnityEngine.Object)x != (UnityEngine.Object)null)
 				{
-					effectTransTable.Add(effectNameInBarrier, val);
+					effectTransTable.Add(effectNameInBarrier, x);
 				}
 			}
 		}
@@ -13318,16 +12566,15 @@ public class Player : Character
 
 	protected override void OnAttackedContinuationEnd(AttackedContinuationStatus status)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		BarrierBulletObject componentInParent = status.fromCollider.get_gameObject().GetComponentInParent<BarrierBulletObject>();
-		if (componentInParent != null)
+		BarrierBulletObject componentInParent = status.fromCollider.gameObject.GetComponentInParent<BarrierBulletObject>();
+		if ((UnityEngine.Object)componentInParent != (UnityEngine.Object)null)
 		{
 			bulletBarrierObjList.Remove(componentInParent);
 			componentInParent.RemovePlayer(this);
 			if (!IsInBarrier())
 			{
 				Transform t = effectTransTable.Get(componentInParent.GetEffectNameInBarrier());
-				if (t != null)
+				if ((UnityEngine.Object)t != (UnityEngine.Object)null)
 				{
 					EffectManager.ReleaseEffect(ref t);
 					effectTransTable.Remove(componentInParent.GetEffectNameInBarrier());
@@ -13338,10 +12585,9 @@ public class Player : Character
 
 	protected override void OnCollisionEnter(Collision collision)
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		if ((IsCoopNone() || IsOriginal()) && snatchCtrl.IsMoveLoop())
 		{
-			int layer = collision.get_gameObject().get_layer();
+			int layer = collision.gameObject.layer;
 			if (layer == 11 || layer == 10 || layer == 9 || layer == 17 || layer == 18)
 			{
 				OnSnatchMoveEnd(0);
@@ -13351,17 +12597,13 @@ public class Player : Character
 
 	protected override void OnCollisionStay(Collision collision)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		if (collision.get_gameObject().get_layer() == 9 || collision.get_gameObject().get_layer() == 17 || collision.get_gameObject().get_layer() == 18)
+		if (collision.gameObject.layer == 9 || collision.gameObject.layer == 17 || collision.gameObject.layer == 18)
 		{
 			isWallStay = true;
 		}
 		if ((IsCoopNone() || IsOriginal()) && snatchCtrl.IsMoveLoop())
 		{
-			int layer = collision.get_gameObject().get_layer();
+			int layer = collision.gameObject.layer;
 			if (layer == 11 || layer == 10 || layer == 9 || layer == 17 || layer == 18)
 			{
 				if (!snatchCtrl.IsMoveLoopStart())

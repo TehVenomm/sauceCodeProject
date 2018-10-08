@@ -99,7 +99,7 @@ public class UIStatusIcon
 		{
 			if (!object.ReferenceEquals(tween, null))
 			{
-				tween.set_enabled(enable);
+				tween.enabled = enable;
 			}
 		}
 	}
@@ -112,9 +112,9 @@ public class UIStatusIcon
 		STATUS_TYPE.LIGHT_RING
 	};
 
-	private readonly Color defaultTintColor = Color.get_white();
+	private readonly Color defaultTintColor = Color.white;
 
-	private readonly Color fieldBuffTintColor = Color32.op_Implicit(new Color32((byte)159, (byte)104, (byte)104, byte.MaxValue));
+	private readonly Color fieldBuffTintColor = new Color32(159, 104, 104, byte.MaxValue);
 
 	[SerializeField]
 	protected IconInfo[] statusIcons;
@@ -126,9 +126,7 @@ public class UIStatusIcon
 
 	public void UpDateStatusIcon()
 	{
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		if (!(target == null))
+		if (!((UnityEngine.Object)target == (UnityEngine.Object)null))
 		{
 			int num = statusIcons.Length;
 			int num2 = 0;
@@ -151,15 +149,13 @@ public class UIStatusIcon
 				statusIcons[k].isFieldBuff = false;
 				statusIcons[k].SetTweenEnable(false);
 				statusIcons[k].icon.color = defaultTintColor;
-				statusIcons[k].icon.get_gameObject().SetActive(false);
+				statusIcons[k].icon.gameObject.SetActive(false);
 			}
 		}
 	}
 
 	private bool _SetStatusIcon(STATUS_TYPE type, int index, bool isFieldBuff)
 	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		string iconSpriteNameByStatusType = GetIconSpriteNameByStatusType(type);
 		if (statusIcons[index].icon.atlas.GetSprite(iconSpriteNameByStatusType) == null)
 		{
@@ -168,14 +164,12 @@ public class UIStatusIcon
 		statusIcons[index].icon.spriteName = iconSpriteNameByStatusType;
 		statusIcons[index].icon.color = defaultTintColor;
 		statusIcons[index].SetTweenEnable(isFieldBuff);
-		statusIcons[index].icon.get_gameObject().SetActive(true);
+		statusIcons[index].icon.gameObject.SetActive(true);
 		return true;
 	}
 
 	public int RotatedUpdateStatusIcon(int checkFirstStatus, BuffParam buffParam, List<int> nonBuff)
 	{
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 		int result = checkFirstStatus;
 		int num = statusIcons.Length;
 		int num2 = 0;
@@ -195,14 +189,14 @@ public class UIStatusIcon
 				IconInfo iconInfo = statusIcons[num2];
 				string iconSpriteNameByStatusType = GetIconSpriteNameByStatusType((STATUS_TYPE)num3);
 				iconInfo.icon.spriteName = iconSpriteNameByStatusType;
-				iconInfo.icon.get_gameObject().SetActive(true);
+				iconInfo.icon.gameObject.SetActive(true);
 				num2++;
 				result = num3;
 			}
 		}
 		for (int j = num2; j < num; j++)
 		{
-			statusIcons[j].icon.get_gameObject().SetActive(false);
+			statusIcons[j].icon.gameObject.SetActive(false);
 		}
 		return result;
 	}

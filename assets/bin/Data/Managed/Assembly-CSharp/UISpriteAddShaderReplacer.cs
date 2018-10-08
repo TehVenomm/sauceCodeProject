@@ -1,27 +1,22 @@
 using UnityEngine;
 
-public class UISpriteAddShaderReplacer
+public class UISpriteAddShaderReplacer : MonoBehaviour
 {
 	private UISprite sprite;
 
 	private UIManager.AtlasEntry entry;
 
-	public UISpriteAddShaderReplacer()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		sprite = this.GetComponent<UISprite>();
+		sprite = GetComponent<UISprite>();
 	}
 
 	public void Replace(string shaderName)
 	{
-		if (!Object.op_Implicit(sprite))
+		if (!(bool)sprite)
 		{
 			Awake();
-			if (!Object.op_Implicit(sprite))
+			if (!(bool)sprite)
 			{
 				return;
 			}

@@ -16,20 +16,13 @@ namespace GooglePlayGames.Native.PInvoke
 		{
 			get
 			{
-				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000a: Expected O, but got Unknown
-				AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-				try
+				using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
 				{
-					AndroidJavaObject @static = val.GetStatic<AndroidJavaObject>("currentActivity");
+					AndroidJavaObject @static = androidJavaClass.GetStatic<AndroidJavaObject>("currentActivity");
 					return @static.Call<string>("getPackageName", new object[0]);
 					IL_002e:
 					string result;
 					return result;
-				}
-				finally
-				{
-					((IDisposable)val)?.Dispose();
 				}
 			}
 		}
@@ -56,14 +49,10 @@ namespace GooglePlayGames.Native.PInvoke
 			NearbyConnections.NearbyConnections_SendReliableMessage(SelfPtr(), remoteEndpointId, payload, new UIntPtr((ulong)payload.Length));
 		}
 
-		internal unsafe void StartAdvertising(string name, List<NativeAppIdentifier> appIds, long advertisingDuration, Action<long, NativeStartAdvertisingResult> advertisingCallback, Action<long, NativeConnectionRequest> connectionRequestCallback)
+		internal void StartAdvertising(string name, List<NativeAppIdentifier> appIds, long advertisingDuration, Action<long, NativeStartAdvertisingResult> advertisingCallback, Action<long, NativeConnectionRequest> connectionRequestCallback)
 		{
-			HandleRef self = SelfPtr();
-			if (_003C_003Ef__am_0024cache1 == null)
-			{
-				_003C_003Ef__am_0024cache1 = new Func<NativeAppIdentifier, IntPtr>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			NearbyConnections.NearbyConnections_StartAdvertising(self, name, appIds.Select<NativeAppIdentifier, IntPtr>(_003C_003Ef__am_0024cache1).ToArray(), new UIntPtr((ulong)appIds.Count), advertisingDuration, InternalStartAdvertisingCallback, Callbacks.ToIntPtr<long, NativeStartAdvertisingResult>(advertisingCallback, new Func<IntPtr, NativeStartAdvertisingResult>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)), InternalConnectionRequestCallback, Callbacks.ToIntPtr<long, NativeConnectionRequest>(connectionRequestCallback, new Func<IntPtr, NativeConnectionRequest>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			NearbyConnections.NearbyConnections_StartAdvertising(SelfPtr(), name, (from id in appIds
+			select id.AsPointer()).ToArray(), new UIntPtr((ulong)appIds.Count), advertisingDuration, InternalStartAdvertisingCallback, Callbacks.ToIntPtr(advertisingCallback, NativeStartAdvertisingResult.FromPointer), InternalConnectionRequestCallback, Callbacks.ToIntPtr(connectionRequestCallback, NativeConnectionRequest.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(NearbyConnectionTypes.StartAdvertisingCallback))]
@@ -83,9 +72,9 @@ namespace GooglePlayGames.Native.PInvoke
 			NearbyConnections.NearbyConnections_StopAdvertising(SelfPtr());
 		}
 
-		internal unsafe void SendConnectionRequest(string name, string remoteEndpointId, byte[] payload, Action<long, NativeConnectionResponse> callback, NativeMessageListenerHelper listener)
+		internal void SendConnectionRequest(string name, string remoteEndpointId, byte[] payload, Action<long, NativeConnectionResponse> callback, NativeMessageListenerHelper listener)
 		{
-			NearbyConnections.NearbyConnections_SendConnectionRequest(SelfPtr(), name, remoteEndpointId, payload, new UIntPtr((ulong)payload.Length), InternalConnectResponseCallback, Callbacks.ToIntPtr<long, NativeConnectionResponse>(callback, new Func<IntPtr, NativeConnectionResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)), listener.AsPointer());
+			NearbyConnections.NearbyConnections_SendConnectionRequest(SelfPtr(), name, remoteEndpointId, payload, new UIntPtr((ulong)payload.Length), InternalConnectResponseCallback, Callbacks.ToIntPtr(callback, NativeConnectionResponse.FromPointer), listener.AsPointer());
 		}
 
 		[MonoPInvokeCallback(typeof(NearbyConnectionTypes.ConnectionResponseCallback))]
@@ -141,41 +130,29 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal static string ReadServiceId()
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Expected O, but got Unknown
-			Debug.Log((object)"Initializing ServiceId property!!!!");
-			AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-			try
+			Debug.Log("Initializing ServiceId property!!!!");
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
 			{
-				AndroidJavaObject @static = val.GetStatic<AndroidJavaObject>("currentActivity");
-				try
+				using (AndroidJavaObject androidJavaObject = androidJavaClass.GetStatic<AndroidJavaObject>("currentActivity"))
 				{
-					string text = @static.Call<string>("getPackageName", new object[0]);
-					AndroidJavaObject val2 = @static.Call<AndroidJavaObject>("getPackageManager", new object[0]);
-					AndroidJavaObject val3 = val2.Call<AndroidJavaObject>("getApplicationInfo", new object[2]
+					string text = androidJavaObject.Call<string>("getPackageName", new object[0]);
+					AndroidJavaObject androidJavaObject2 = androidJavaObject.Call<AndroidJavaObject>("getPackageManager", new object[0]);
+					AndroidJavaObject androidJavaObject3 = androidJavaObject2.Call<AndroidJavaObject>("getApplicationInfo", new object[2]
 					{
 						text,
 						128
 					});
-					AndroidJavaObject val4 = val3.Get<AndroidJavaObject>("metaData");
-					string text2 = val4.Call<string>("getString", new object[1]
+					AndroidJavaObject androidJavaObject4 = androidJavaObject3.Get<AndroidJavaObject>("metaData");
+					string text2 = androidJavaObject4.Call<string>("getString", new object[1]
 					{
 						"com.google.android.gms.nearby.connection.SERVICE_ID"
 					});
-					Debug.Log((object)("SystemId from Manifest: " + text2));
+					Debug.Log("SystemId from Manifest: " + text2);
 					return text2;
 					IL_00ad:
 					string result;
 					return result;
 				}
-				finally
-				{
-					((IDisposable)@static)?.Dispose();
-				}
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
 			}
 		}
 	}

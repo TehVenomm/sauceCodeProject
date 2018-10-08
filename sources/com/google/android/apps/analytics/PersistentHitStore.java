@@ -649,10 +649,10 @@ class PersistentHitStore implements HitStore {
     }
 
     Item getItem(long j, SQLiteDatabase sQLiteDatabase) {
+        Cursor query;
         SQLiteException e;
         Cursor cursor;
         Throwable th;
-        Cursor query;
         try {
             SQLiteDatabase sQLiteDatabase2 = sQLiteDatabase;
             query = sQLiteDatabase2.query("item_events", null, "event_id= ?", new String[]{Long.toString(j)}, null, null, null);
@@ -769,10 +769,10 @@ class PersistentHitStore implements HitStore {
     }
 
     Transaction getTransaction(long j, SQLiteDatabase sQLiteDatabase) {
+        Cursor query;
         SQLiteException e;
         Throwable th;
         Cursor cursor = null;
-        Cursor query;
         try {
             SQLiteDatabase sQLiteDatabase2 = sQLiteDatabase;
             query = sQLiteDatabase2.query("transaction_events", null, "event_id= ?", new String[]{Long.toString(j)}, null, null, null);
@@ -979,11 +979,11 @@ class PersistentHitStore implements HitStore {
     }
 
     public Event[] peekEvents(int i, SQLiteDatabase sQLiteDatabase, int i2) {
-        Cursor query;
         SQLiteException e;
         Cursor cursor;
         Throwable th;
         List arrayList = new ArrayList();
+        Cursor query;
         try {
             query = sQLiteDatabase.query("events", null, null, null, null, null, EVENT_ID, Integer.toString(i));
             while (query.moveToNext()) {
@@ -1052,11 +1052,11 @@ class PersistentHitStore implements HitStore {
     }
 
     public Hit[] peekHits(int i) {
+        Cursor query;
         SQLiteException e;
         Throwable th;
         Cursor cursor = null;
         List arrayList = new ArrayList();
-        Cursor query;
         try {
             query = this.databaseHelper.getReadableDatabase().query("hits", null, null, null, null, null, HIT_ID, Integer.toString(i));
             while (query.moveToNext()) {
@@ -1190,10 +1190,10 @@ class PersistentHitStore implements HitStore {
     }
 
     Referrer readCurrentReferrer(SQLiteDatabase sQLiteDatabase) {
-        Cursor query;
         SQLiteException e;
         Cursor cursor;
         Throwable th;
+        Cursor query;
         try {
             SQLiteDatabase sQLiteDatabase2 = sQLiteDatabase;
             query = sQLiteDatabase2.query("referrer", new String[]{"referrer", TIMESTAMP_REFERRER, REFERRER_VISIT, REFERRER_INDEX}, null, null, null, null, null);

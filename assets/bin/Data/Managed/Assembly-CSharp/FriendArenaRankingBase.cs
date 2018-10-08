@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -109,15 +108,9 @@ public class FriendArenaRankingBase : FollowListBase
 
 	protected void DragToOwn()
 	{
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
 		if (isOwn)
 		{
-			if (scrollView == null)
+			if ((Object)scrollView == (Object)null)
 			{
 				scrollView = GetCtrl(UI.SCR_LIST).GetComponent<UIScrollView>();
 				scrollPanel = GetCtrl(UI.SCR_LIST).GetComponent<UIPanel>();
@@ -147,7 +140,7 @@ public class FriendArenaRankingBase : FollowListBase
 				}
 				scrollView.SetDragAmount(num2, num2, true);
 				Vector2 clipOffset = scrollPanel.clipOffset;
-				scrollView.get_transform().set_localPosition(Vector2.op_Implicit(-clipOffset));
+				scrollView.transform.localPosition = -clipOffset;
 			}
 		}
 	}
@@ -237,8 +230,8 @@ public class FriendArenaRankingBase : FollowListBase
 
 	protected virtual void UpdateOwnButton()
 	{
-		SetActive((Enum)UI.BTN_OWN, IsRankingJoined());
-		SetActive((Enum)UI.OBJ_OWN_ON, isOwn);
+		SetActive(UI.BTN_OWN, IsRankingJoined());
+		SetActive(UI.OBJ_OWN_ON, isOwn);
 	}
 
 	protected virtual bool IsRankingJoined()

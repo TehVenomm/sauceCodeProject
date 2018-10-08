@@ -92,11 +92,11 @@ public class TargetMarker
 	public void SetParentTransform(Transform _transform)
 	{
 		transform = _transform;
-		if (effectTransform != null)
+		if ((Object)effectTransform != (Object)null)
 		{
 			Utility.Attach(transform, effectTransform);
 		}
-		if (multiLockTransform != null)
+		if ((Object)multiLockTransform != (Object)null)
 		{
 			Utility.Attach(transform, multiLockTransform);
 		}
@@ -104,18 +104,14 @@ public class TargetMarker
 
 	public void UnableMarker()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Expected O, but got Unknown
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Expected O, but got Unknown
 		effectType = EFFECT_TYPE.NONE;
-		if (effectTransform != null)
+		if ((Object)effectTransform != (Object)null)
 		{
-			EffectManager.ReleaseEffect(effectTransform.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(effectTransform.gameObject, true, false);
 		}
-		if (multiLockTransform != null)
+		if ((Object)multiLockTransform != (Object)null)
 		{
-			EffectManager.ReleaseEffect(multiLockTransform.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(multiLockTransform.gameObject, true, false);
 		}
 		effectTransform = null;
 		multiLockTransform = null;
@@ -124,20 +120,6 @@ public class TargetMarker
 
 	public bool UpdateMarker(UpdateParam param)
 	{
-		//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e7: Expected O, but got Unknown
-		//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0479: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0480: Expected O, but got Unknown
-		//IL_04c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_051f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_052f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_053f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_054a: Unknown result type (might be due to invalid IL or missing references)
 		if (param == null)
 		{
 			return false;
@@ -213,15 +195,15 @@ public class TargetMarker
 			}
 			flag = true;
 		}
-		if (effectType != eFFECT_TYPE || point != param.targetPoint || !param.targetPoint.param.isShowRange)
+		if (effectType != eFFECT_TYPE || (Object)point != (Object)param.targetPoint || !param.targetPoint.param.isShowRange)
 		{
-			if (effectTransform != null)
+			if ((Object)effectTransform != (Object)null)
 			{
-				EffectManager.ReleaseEffect(effectTransform.get_gameObject(), true, false);
+				EffectManager.ReleaseEffect(effectTransform.gameObject, true, false);
 			}
 			effectTransform = null;
 		}
-		if (effectTransform == null && eFFECT_TYPE != EFFECT_TYPE.NONE && param.targetPoint.param.isShowRange)
+		if ((Object)effectTransform == (Object)null && eFFECT_TYPE != EFFECT_TYPE.NONE && param.targetPoint.param.isShowRange)
 		{
 			string text = MonoBehaviourSingleton<InGameSettingsManager>.I.targetMarkerSettings.effectNames[(int)eFFECT_TYPE];
 			switch (eFFECT_TYPE)
@@ -262,7 +244,7 @@ public class TargetMarker
 				if (!string.IsNullOrEmpty(text2))
 				{
 					Transform effect = EffectManager.GetEffect(text2, transform);
-					if (effect != null)
+					if ((Object)effect != (Object)null)
 					{
 						effect.Set(param.targetPoint.param.markerPos, param.targetPoint.param.markerRot);
 					}
@@ -272,14 +254,14 @@ public class TargetMarker
 		}
 		if (flag && param.targetPoint.param.isShowRange)
 		{
-			if (!param.isMultiLockMax && multiLockTransform == null)
+			if (!param.isMultiLockMax && (Object)multiLockTransform == (Object)null)
 			{
 				string text3 = MonoBehaviourSingleton<InGameSettingsManager>.I.targetMarkerSettings.effectNames[24];
 				if (!text3.IsNullOrWhiteSpace())
 				{
 					multiLockTransform = EffectManager.GetEffect(text3, transform);
 					multiLock = multiLockTransform.GetComponentInChildren<MultiLockMarker>();
-					if (multiLock != null)
+					if ((Object)multiLock != (Object)null)
 					{
 						multiLock.Init();
 					}
@@ -289,54 +271,38 @@ public class TargetMarker
 		}
 		else
 		{
-			if (multiLockTransform != null)
+			if ((Object)multiLockTransform != (Object)null)
 			{
-				EffectManager.ReleaseEffect(multiLockTransform.get_gameObject(), true, false);
+				EffectManager.ReleaseEffect(multiLockTransform.gameObject, true, false);
 			}
 			multiLockTransform = null;
 			multiLock = null;
 		}
 		effectType = eFFECT_TYPE;
 		point = param.targetPoint;
-		if (effectTransform != null)
+		if ((Object)effectTransform != (Object)null)
 		{
 			effectTransform.Set(point.param.markerPos, point.param.markerRot);
-			effectTransform.set_localScale(Vector3.get_one() * param.markerScale);
+			effectTransform.localScale = Vector3.one * param.markerScale;
 		}
-		if (multiLockTransform != null)
+		if ((Object)multiLockTransform != (Object)null)
 		{
 			multiLockTransform.Set(point.param.markerPos, point.param.markerRot);
-			multiLockTransform.set_localScale(Vector3.get_one() * param.markerScale);
+			multiLockTransform.localScale = Vector3.one * param.markerScale;
 		}
 		return result;
 	}
 
 	public void UpdateByTargetPoint(TargetPoint targetPoint, string effectName)
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		if (effectTransform == null)
+		if ((Object)effectTransform == (Object)null)
 		{
 			effectTransform = EffectManager.GetEffect(effectName, transform);
 		}
 		Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
 		Vector3 targetPoint2 = targetPoint.GetTargetPoint();
-		Vector3 val = cameraTransform.get_position() - targetPoint2;
-		Vector3 pos = val.get_normalized() * targetPoint.scaledMarkerZShift + targetPoint2;
-		Quaternion rotation = cameraTransform.get_rotation();
+		Vector3 pos = (cameraTransform.position - targetPoint2).normalized * targetPoint.scaledMarkerZShift + targetPoint2;
+		Quaternion rotation = cameraTransform.rotation;
 		effectTransform.Set(pos, rotation);
 	}
 
@@ -347,7 +313,7 @@ public class TargetMarker
 
 	public void HideMultiLock()
 	{
-		if (!(multiLock == null))
+		if (!((Object)multiLock == (Object)null))
 		{
 			multiLock.Hide();
 		}
@@ -355,7 +321,7 @@ public class TargetMarker
 
 	public void ResetMultiLock()
 	{
-		if (!(multiLock == null))
+		if (!((Object)multiLock == (Object)null))
 		{
 			multiLock.Reset();
 		}
@@ -363,7 +329,7 @@ public class TargetMarker
 
 	public void EndMultiLockBoost(bool isHide)
 	{
-		if (!(multiLock == null))
+		if (!((Object)multiLock == (Object)null))
 		{
 			multiLock.EndBoost(isHide);
 		}
@@ -371,7 +337,7 @@ public class TargetMarker
 
 	public List<int> GetMultiLockOrder()
 	{
-		if (multiLock == null)
+		if ((Object)multiLock == (Object)null)
 		{
 			return null;
 		}
@@ -380,7 +346,7 @@ public class TargetMarker
 
 	public int GetMultiLockNum()
 	{
-		if (multiLock == null)
+		if ((Object)multiLock == (Object)null)
 		{
 			return 0;
 		}

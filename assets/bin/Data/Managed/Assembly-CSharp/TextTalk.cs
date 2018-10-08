@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-public class TextTalk
+public class TextTalk : MonoBehaviour
 {
 	private const float CONST_BREAK_TIME = 1f;
 
@@ -41,17 +41,12 @@ public class TextTalk
 
 	private Action<string, string> tagCallback;
 
-	public TextTalk()
-		: this()
-	{
-	}
-
 	public void Initialize(Transform lbl_t, List<string[]> _text_list, Action page_end_call_back = null, Action<string, string> tag_call_back = null, int num_per_sec = 0)
 	{
-		if (!(lbl_t == null) && _text_list != null && _text_list.Count != 0)
+		if (!((UnityEngine.Object)lbl_t == (UnityEngine.Object)null) && _text_list != null && _text_list.Count != 0)
 		{
 			lbl = lbl_t.GetComponent<UILabel>();
-			if (!(lbl == null))
+			if (!((UnityEngine.Object)lbl == (UnityEngine.Object)null))
 			{
 				isStart = false;
 				lbl.text = string.Empty;
@@ -136,9 +131,9 @@ public class TextTalk
 
 	private void Update()
 	{
-		if (isStart && !(lbl == null) && text != null && text.Length != 0 && !isComplete && !isPause)
+		if (isStart && !((UnityEngine.Object)lbl == (UnityEngine.Object)null) && text != null && text.Length != 0 && !isComplete && !isPause)
 		{
-			float num = Time.get_deltaTime();
+			float num = Time.deltaTime;
 			if (breakTime > 0f)
 			{
 				breakTime -= num;
@@ -169,7 +164,7 @@ public class TextTalk
 							}
 							if (pageEndCallback != null)
 							{
-								pageEndCallback.Invoke();
+								pageEndCallback();
 							}
 						}
 						else
@@ -190,7 +185,7 @@ public class TextTalk
 					}
 					else if (tagCallback != null)
 					{
-						tagCallback.Invoke(analyzer.findTag, analyzer.findTagText);
+						tagCallback(analyzer.findTag, analyzer.findTagText);
 					}
 				}
 				lbl.text = sb.ToString();

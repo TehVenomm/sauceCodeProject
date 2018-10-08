@@ -21,18 +21,14 @@ public class FieldGatherGimmickObject : FieldGimmickObject
 
 	protected override void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Expected O, but got Unknown
-		_transform = this.get_transform();
+		_transform = base.transform;
 		SphereCollider componentInChildren = _transform.GetComponentInChildren<SphereCollider>();
 		if (!object.ReferenceEquals(componentInChildren, null))
 		{
-			radius = componentInChildren.get_radius();
+			radius = componentInChildren.radius;
 			sqlRadius = radius * radius;
 		}
-		Utility.SetLayerWithChildren(this.get_transform(), 19);
+		Utility.SetLayerWithChildren(base.transform, 19);
 	}
 
 	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
@@ -68,44 +64,25 @@ public class FieldGatherGimmickObject : FieldGimmickObject
 
 	public override void UpdateTargetMarker(bool isNear)
 	{
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f2: Expected O, but got Unknown
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		if (canUse() && isNear && self != null && self.IsChangeableAction(GetTargetActionId()))
+		if (canUse() && isNear && (Object)self != (Object)null && self.IsChangeableAction(GetTargetActionId()))
 		{
-			if (targetMarkerTrans == null)
+			if ((Object)targetMarkerTrans == (Object)null)
 			{
 				targetMarkerTrans = EffectManager.GetEffect(GetMarkerName(), _transform);
 			}
-			if (targetMarkerTrans != null)
+			if ((Object)targetMarkerTrans != (Object)null)
 			{
 				Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-				Vector3 position = cameraTransform.get_position();
-				Quaternion rotation = cameraTransform.get_rotation();
-				Vector3 val = position - _transform.get_position();
-				Vector3 pos = val.get_normalized() + Vector3.get_up() + _transform.get_position();
+				Vector3 position = cameraTransform.position;
+				Quaternion rotation = cameraTransform.rotation;
+				Vector3 pos = (position - _transform.position).normalized + Vector3.up + _transform.position;
 				targetMarkerTrans.Set(pos, rotation);
 			}
 		}
-		else if (targetMarkerTrans != null)
+		else if ((Object)targetMarkerTrans != (Object)null)
 		{
-			EffectManager.ReleaseEffect(targetMarkerTrans.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(targetMarkerTrans.gameObject, true, false);
 		}
 	}
 
@@ -121,7 +98,7 @@ public class FieldGatherGimmickObject : FieldGimmickObject
 
 	public void OnUseStart(Player player, bool isSend = false)
 	{
-		if (!(player == null) && !userList.Contains(player))
+		if (!((Object)player == (Object)null) && !userList.Contains(player))
 		{
 			userList.Add(player);
 			if (isSend)
@@ -133,7 +110,7 @@ public class FieldGatherGimmickObject : FieldGimmickObject
 
 	public void OnUseEnd(Player player, bool isSend = false)
 	{
-		if (!(player == null) && userList.Contains(player))
+		if (!((Object)player == (Object)null) && userList.Contains(player))
 		{
 			userList.Remove(player);
 			if (isSend)
@@ -162,7 +139,7 @@ public class FieldGatherGimmickObject : FieldGimmickObject
 			return false;
 		}
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		if (self == null)
+		if ((Object)self == (Object)null)
 		{
 			return false;
 		}
@@ -213,14 +190,14 @@ public class FieldGatherGimmickObject : FieldGimmickObject
 		{
 			bool flag = false;
 			Player player = userList[i];
-			if (player == null)
+			if ((Object)player == (Object)null)
 			{
 				flag = true;
 			}
 			else
 			{
-				StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(player.id);
-				if (stageObject == null)
+				StageObject x = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(player.id);
+				if ((Object)x == (Object)null)
 				{
 					flag = true;
 				}

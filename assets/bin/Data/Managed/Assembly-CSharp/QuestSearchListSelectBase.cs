@@ -40,27 +40,32 @@ public abstract class QuestSearchListSelectBase : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
-	private unsafe IEnumerator DoInitialize()
+	private IEnumerator DoInitialize()
 	{
 		ResetSearchRequest();
 		bool is_recv = false;
-		SendGetChallengeInfo(new Action((object)/*Error near IL_003d: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
+		SendGetChallengeInfo(delegate
+		{
+			((_003CDoInitialize_003Ec__IteratorC6)/*Error near IL_003d: stateMachine*/)._003Cis_recv_003E__0 = true;
+		}, null);
 		while (!is_recv)
 		{
 			yield return (object)null;
 		}
-		yield return (object)this.StartCoroutine(Reload(null));
+		yield return (object)StartCoroutine(Reload(null));
 		base.Initialize();
 	}
 
-	private unsafe IEnumerator Reload(Action<bool> cb = null)
+	private IEnumerator Reload(Action<bool> cb = null)
 	{
 		bool is_recv = false;
-		SendSearchRequest(new Action((object)/*Error near IL_002e: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), cb);
+		SendSearchRequest(delegate
+		{
+			((_003CReload_003Ec__IteratorC7)/*Error near IL_002e: stateMachine*/)._003Cis_recv_003E__0 = true;
+		}, cb);
 		while (!is_recv)
 		{
 			yield return (object)null;
@@ -71,11 +76,9 @@ public abstract class QuestSearchListSelectBase : GameSection
 
 	protected void SetNpcMessage()
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		string nPCMessageBySectionData = Singleton<NPCMessageTable>.I.GetNPCMessageBySectionData(base.sectionData);
-		SetRenderNPCModel((Enum)UI.TEX_NPCMODEL, 2, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCRot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCFOV, (Action<NPCLoader>)null);
-		SetLabelText((Enum)UI.LBL_NPC_MESSAGE, nPCMessageBySectionData);
+		SetRenderNPCModel(UI.TEX_NPCMODEL, 2, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCRot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCFOV, null);
+		SetLabelText(UI.LBL_NPC_MESSAGE, nPCMessageBySectionData);
 	}
 
 	protected void SetPartyData(PartyModel.Party party, Transform t)
@@ -105,10 +108,10 @@ public abstract class QuestSearchListSelectBase : GameSection
 
 	protected void SetStatusIconInfo(PartyModel.Party _partyParam, Transform _targetObject)
 	{
-		if (!(_targetObject == null) && _partyParam != null)
+		if (!((UnityEngine.Object)_targetObject == (UnityEngine.Object)null) && _partyParam != null)
 		{
 			QuestUserStatusIconController componentInChildren = _targetObject.GetComponentInChildren<QuestUserStatusIconController>();
-			if (componentInChildren != null)
+			if ((UnityEngine.Object)componentInChildren != (UnityEngine.Object)null)
 			{
 				componentInChildren.Initialize(new QuestUserStatusIconController.InitParam
 				{
@@ -141,9 +144,8 @@ public abstract class QuestSearchListSelectBase : GameSection
 
 	public virtual void OnQuery_RELOAD()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		GameSection.StayEvent();
-		this.StartCoroutine(Reload(delegate(bool b)
+		StartCoroutine(Reload(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b, null);
 		}));
@@ -160,17 +162,25 @@ public abstract class QuestSearchListSelectBase : GameSection
 
 	public void OnCloseDialog_QuestAcceptRoomInvalid()
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(Reload(delegate(bool b)
+		StartCoroutine(Reload(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b, null);
 		}));
 	}
 
-	protected unsafe void SendGetChallengeInfo(Action onFinish, Action<bool> cb)
+	protected void SendGetChallengeInfo(Action onFinish, Action<bool> cb)
 	{
-		_003CSendGetChallengeInfo_003Ec__AnonStorey39C _003CSendGetChallengeInfo_003Ec__AnonStorey39C;
-		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(new Action<bool, Error>((object)_003CSendGetChallengeInfo_003Ec__AnonStorey39C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(delegate(bool is_success, Error err)
+		{
+			if (onFinish != null)
+			{
+				onFinish();
+			}
+			if (cb != null)
+			{
+				cb(is_success);
+			}
+		});
 	}
 
 	protected void SetMemberIcon(Transform t, QuestTable.QuestTableData table)

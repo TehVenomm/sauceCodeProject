@@ -16,47 +16,37 @@ public static class Nexus6CrashWorkaround
 
 	public static void Apply(Camera camera)
 	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
 		if (!disable)
 		{
 			Remove(camera);
-			if (!Object.op_Implicit(mesh))
+			if (!(bool)mesh)
 			{
 				mesh = CreateMesh();
 			}
-			if (!Object.op_Implicit(material))
+			if (!(bool)material)
 			{
 				material = CreateMaterial();
 			}
-			Transform val = CreateObject(mesh, material);
-			val.set_parent(camera.get_transform());
-			val.set_localPosition(Vector3.get_forward() * (camera.get_nearClipPlane() + camera.get_farClipPlane()) * 0.5f);
-			val.set_localScale(Vector3.get_one());
-			val.get_gameObject().set_layer(GetEnabledLayer(camera));
+			Transform transform = CreateObject(mesh, material);
+			transform.parent = camera.transform;
+			transform.localPosition = Vector3.forward * (camera.nearClipPlane + camera.farClipPlane) * 0.5f;
+			transform.localScale = Vector3.one;
+			transform.gameObject.layer = GetEnabledLayer(camera);
 		}
 	}
 
 	public static void Remove(Camera camera)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Expected O, but got Unknown
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = camera.get_transform().FindChild(temporaryObjectName);
-		if (Object.op_Implicit(val))
+		Transform transform = camera.transform.FindChild(temporaryObjectName);
+		if ((bool)transform)
 		{
-			Object.Destroy(val.get_gameObject());
+			Object.Destroy(transform.gameObject);
 		}
 	}
 
 	private static int GetEnabledLayer(Camera camera)
 	{
-		int num = camera.get_cullingMask();
+		int num = camera.cullingMask;
 		int num2 = 0;
 		for (int i = 0; i < 32; i++)
 		{
@@ -72,56 +62,39 @@ public static class Nexus6CrashWorkaround
 
 	private static Transform CreateObject(Mesh mesh, Material material)
 	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Expected O, but got Unknown
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
-		GameObject val = new GameObject(temporaryObjectName);
-		MeshFilter val2 = val.AddComponent<MeshFilter>();
-		val2.set_sharedMesh(mesh);
-		MeshRenderer val3 = val.AddComponent<MeshRenderer>();
-		val3.set_sharedMaterial(material);
-		return val.get_transform();
+		GameObject gameObject = new GameObject(temporaryObjectName);
+		MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
+		meshFilter.sharedMesh = mesh;
+		MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
+		meshRenderer.sharedMaterial = material;
+		return gameObject.transform;
 	}
 
 	private static Mesh CreateMesh()
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Expected O, but got Unknown
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		Mesh val = new Mesh();
-		val.set_name("n6cw_mesh");
-		val.set_vertices((Vector3[])new Vector3[3]
+		Mesh mesh = new Mesh();
+		mesh.name = "n6cw_mesh";
+		mesh.vertices = new Vector3[3]
 		{
 			new Vector3(0f, 0f, 0f),
 			new Vector3(0f, 0f, 0.001f),
 			new Vector3(0f, 0.001f, 0f)
-		});
-		val.set_triangles(new int[3]
+		};
+		mesh.triangles = new int[3]
 		{
 			0,
 			1,
 			2
-		});
-		return val;
+		};
+		return mesh;
 	}
 
 	private static Material CreateMaterial()
 	{
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Expected O, but got Unknown
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Expected O, but got Unknown
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		Material val = new Material(ResourceUtility.FindShader("mobile/Custom/tex_color"));
-		val.set_name("n6cw_mat");
-		val.set_mainTexture(Resources.Load("Texture/White") as Texture);
-		val.set_color(Color.get_clear());
-		return val;
+		Material material = new Material(ResourceUtility.FindShader("mobile/Custom/tex_color"));
+		material.name = "n6cw_mat";
+		material.mainTexture = (Resources.Load("Texture/White") as Texture);
+		material.color = Color.clear;
+		return material;
 	}
 }

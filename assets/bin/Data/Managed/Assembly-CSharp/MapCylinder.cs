@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MapCylinder
+public class MapCylinder : MonoBehaviour
 {
 	[Tooltip("半径")]
 	public float radius = 40f;
@@ -23,43 +23,31 @@ public class MapCylinder
 		protected set;
 	}
 
-	public MapCylinder()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		_transform = this.get_transform();
-		meshRenderer = this.GetComponent<MeshRenderer>();
-		if (meshRenderer != null)
+		_transform = base.transform;
+		meshRenderer = GetComponent<MeshRenderer>();
+		if ((Object)meshRenderer != (Object)null)
 		{
-			meshRenderer.set_enabled(false);
+			meshRenderer.enabled = false;
 		}
 	}
 
 	private void Update()
 	{
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		if (!(meshRenderer == null) && MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		if (!((Object)meshRenderer == (Object)null) && MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if (!(self == null))
+			if (!((Object)self == (Object)null))
 			{
-				Vector3 val = self._transform.get_position() - _transform.get_position();
-				float magnitude = val.get_magnitude();
+				float magnitude = (self._transform.position - _transform.position).magnitude;
 				if (magnitude <= radius - hideLength)
 				{
-					meshRenderer.set_enabled(false);
+					meshRenderer.enabled = false;
 				}
 				else if (magnitude >= radius - showLength)
 				{
-					meshRenderer.set_enabled(true);
+					meshRenderer.enabled = true;
 				}
 			}
 		}

@@ -5,9 +5,8 @@ public class LimitedLoginBonusCheck : GameSection
 {
 	public override void Initialize()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize();
-		this.StartCoroutine("DoCheck");
+		StartCoroutine("DoCheck");
 	}
 
 	private IEnumerator DoCheck()
@@ -49,7 +48,6 @@ public class LimitedLoginBonusCheck : GameSection
 
 	public void OnCloseDialog(string section_name)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine("DoCheck");
+		StartCoroutine("DoCheck");
 	}
 }

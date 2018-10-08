@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 [AddComponentMenu("ProjectUI/UIGameSceneEventSender")]
-public class UIGameSceneEventSender
+public class UIGameSceneEventSender : MonoBehaviour
 {
 	public string eventName = string.Empty;
 
@@ -27,24 +27,16 @@ public class UIGameSceneEventSender
 		set;
 	}
 
-	public UIGameSceneEventSender()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		buttonTweenCtrl = this.get_gameObject().GetComponent<UIButtonTweenEventCtrl>();
-		playSoundCtrl = this.get_gameObject().GetComponent<UIPlaySoundCustom>();
+		buttonTweenCtrl = base.gameObject.GetComponent<UIButtonTweenEventCtrl>();
+		playSoundCtrl = base.gameObject.GetComponent<UIPlaySoundCustom>();
 	}
 
 	private void OnValidate()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		UIButton component = this.get_gameObject().GetComponent<UIButton>();
-		if (component != null && component.onClick.Find((EventDelegate o) => o.target == this) == null)
+		UIButton component = base.gameObject.GetComponent<UIButton>();
+		if ((UnityEngine.Object)component != (UnityEngine.Object)null && component.onClick.Find((EventDelegate o) => (UnityEngine.Object)o.target == (UnityEngine.Object)this) == null)
 		{
 			component.onClick.Add(new EventDelegate(this, "SendEvent"));
 		}
@@ -52,15 +44,14 @@ public class UIGameSceneEventSender
 
 	private void OnPress(bool isDown)
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		if (!(UICamera.currentTouch.current == null) && IsActiveButton())
+		if (!((UnityEngine.Object)UICamera.currentTouch.current == (UnityEngine.Object)null) && IsActiveButton())
 		{
-			bool flag = this.get_gameObject().GetInstanceID() == UICamera.currentTouch.current.GetInstanceID();
+			bool flag = base.gameObject.GetInstanceID() == UICamera.currentTouch.current.GetInstanceID();
 			if (isDown)
 			{
 				enablePress = flag;
 				enableRelease = false;
-				if (buttonTweenCtrl != null && flag)
+				if ((UnityEngine.Object)buttonTweenCtrl != (UnityEngine.Object)null && flag)
 				{
 					buttonTweenCtrl.PlayPush(isDown);
 				}
@@ -68,7 +59,7 @@ public class UIGameSceneEventSender
 			else if (enablePress)
 			{
 				enableRelease = flag;
-				if (Object.op_Implicit(buttonTweenCtrl) && enablePress)
+				if ((bool)buttonTweenCtrl && enablePress)
 				{
 					buttonTweenCtrl.PlayPush(isDown);
 				}
@@ -79,7 +70,7 @@ public class UIGameSceneEventSender
 	private IEnumerator DoButtonTweenCtrlReset()
 	{
 		yield return (object)null;
-		if (buttonTweenCtrl != null)
+		if ((UnityEngine.Object)buttonTweenCtrl != (UnityEngine.Object)null)
 		{
 			buttonTweenCtrl.Reset();
 		}
@@ -91,7 +82,7 @@ public class UIGameSceneEventSender
 		{
 			enablePress = (enableRelease = false);
 			PlaySound();
-			if (buttonTweenCtrl != null && buttonTweenCtrl.tweens.Length > 0 && buttonTweenCtrl.tweens[0] != null)
+			if ((UnityEngine.Object)buttonTweenCtrl != (UnityEngine.Object)null && buttonTweenCtrl.tweens.Length > 0 && (UnityEngine.Object)buttonTweenCtrl.tweens[0] != (UnityEngine.Object)null)
 			{
 				if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 				{
@@ -102,7 +93,6 @@ public class UIGameSceneEventSender
 					buttonTweenCtrl.Reset();
 					buttonTweenCtrl.Play(true, delegate
 					{
-						//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 						if (MonoBehaviourSingleton<UIManager>.IsValid())
 						{
 							MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.UITWEEN_SMALL, false);
@@ -113,7 +103,7 @@ public class UIGameSceneEventSender
 						}
 						else
 						{
-							this.StartCoroutine(DoButtonTweenCtrlReset());
+							StartCoroutine(DoButtonTweenCtrlReset());
 						}
 					});
 				}
@@ -127,14 +117,12 @@ public class UIGameSceneEventSender
 
 	public void _SendEvent()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
-		SendEvent("UIButton", this.get_gameObject(), eventName, eventData, callback);
+		SendEvent("UIButton", base.gameObject, eventName, eventData, callback);
 	}
 
 	private void PlaySound()
 	{
-		if (playSoundCtrl != null)
+		if ((UnityEngine.Object)playSoundCtrl != (UnityEngine.Object)null)
 		{
 			playSoundCtrl.Play();
 		}
@@ -170,9 +158,7 @@ public class UIGameSceneEventSender
 
 	private bool IsActiveButton()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		if (!TutorialMessage.IsActiveButton(this.get_gameObject()))
+		if (!TutorialMessage.IsActiveButton(base.gameObject))
 		{
 			if (eventName == "TUTORIAL_NEXT")
 			{
@@ -198,7 +184,7 @@ public class UIGameSceneEventSender
 			if (MonoBehaviourSingleton<GameSceneManager>.I.isChangeing)
 			{
 				UIPanel componentInParent = sender.GetComponentInParent<UIPanel>();
-				if (componentInParent == null || componentInParent.depth != 9999)
+				if ((UnityEngine.Object)componentInParent == (UnityEngine.Object)null || componentInParent.depth != 9999)
 				{
 					Log.Error(LOG.UI, "GameSceneManager.I.isChangeing == true");
 					return;
@@ -206,7 +192,7 @@ public class UIGameSceneEventSender
 			}
 			string text = null;
 			UIGameSceneEventSenderVersionRestriction component = sender.GetComponent<UIGameSceneEventSenderVersionRestriction>();
-			if (component != null)
+			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 			{
 				text = component.GetCheckApplicationVersionText();
 			}
@@ -216,7 +202,7 @@ public class UIGameSceneEventSender
 			}
 			else
 			{
-				callback.Invoke(event_name, event_data, text);
+				callback(event_name, event_data, text);
 			}
 		}
 	}

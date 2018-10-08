@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -19,14 +18,13 @@ public class CrystalShopSpecialStarter : GameSection
 
 	public override void UpdateUI()
 	{
-		SetModel((Enum)UI.OBJ_MODEL, "RoyalChest_Open");
+		SetModel(UI.OBJ_MODEL, "RoyalChest_Open");
 	}
 
 	public override void StartSection()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		GlobalSettingsManager.PackParam.PackInfo pack = MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.GetPack(purchaseData.productId);
-		this.StartCoroutine(Wait(pack.openAnimEndTime));
+		StartCoroutine(Wait(pack.openAnimEndTime));
 	}
 
 	private IEnumerator Wait(float time)

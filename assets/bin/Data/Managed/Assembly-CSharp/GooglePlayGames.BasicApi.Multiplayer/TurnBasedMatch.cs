@@ -1,5 +1,4 @@
 using GooglePlayGames.OurUtils;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -104,33 +103,10 @@ namespace GooglePlayGames.BasicApi.Multiplayer
 			return null;
 		}
 
-		public unsafe override string ToString()
+		public override string ToString()
 		{
-			object[] obj = new object[10]
-			{
-				mMatchId,
-				mData,
-				mCanRematch,
-				mSelfParticipantId,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null
-			};
-			List<Participant> source = mParticipants;
-			if (_003C_003Ef__am_0024cacheB == null)
-			{
-				_003C_003Ef__am_0024cacheB = new Func<Participant, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			obj[4] = string.Join(",", source.Select<Participant, string>(_003C_003Ef__am_0024cacheB).ToArray());
-			obj[5] = mPendingParticipantId;
-			obj[6] = mTurnStatus;
-			obj[7] = mMatchStatus;
-			obj[8] = mVariant;
-			obj[9] = mVersion;
-			return string.Format("[TurnBasedMatch: mMatchId={0}, mData={1}, mCanRematch={2}, mSelfParticipantId={3}, mParticipants={4}, mPendingParticipantId={5}, mTurnStatus={6}, mMatchStatus={7}, mVariant={8}, mVersion={9}]", obj);
+			return string.Format("[TurnBasedMatch: mMatchId={0}, mData={1}, mCanRematch={2}, mSelfParticipantId={3}, mParticipants={4}, mPendingParticipantId={5}, mTurnStatus={6}, mMatchStatus={7}, mVariant={8}, mVersion={9}]", mMatchId, mData, mCanRematch, mSelfParticipantId, string.Join(",", (from p in mParticipants
+			select p.ToString()).ToArray()), mPendingParticipantId, mTurnStatus, mMatchStatus, mVariant, mVersion);
 		}
 	}
 }

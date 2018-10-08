@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class ItemIconDetailSetuperBase
+public class ItemIconDetailSetuperBase : MonoBehaviour
 {
 	[SerializeField]
 	private UISprite spBG;
@@ -30,21 +30,15 @@ public class ItemIconDetailSetuperBase
 
 	protected virtual UISprite selectSP => null;
 
-	public ItemIconDetailSetuperBase()
-		: this()
-	{
-	}
-
 	public virtual void Set(object[] data = null)
 	{
 		if (inActiveRootAry != null && inActiveRootAry.Length > 0)
 		{
 			Array.ForEach(inActiveRootAry, delegate(GameObject obj)
 			{
-				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-				if (obj != null)
+				if ((UnityEngine.Object)obj != (UnityEngine.Object)null)
 				{
-					obj.get_gameObject().SetActive(false);
+					obj.gameObject.SetActive(false);
 				}
 			});
 		}
@@ -57,12 +51,12 @@ public class ItemIconDetailSetuperBase
 
 	public void SetVisibleBG(bool is_visible)
 	{
-		spBG.set_enabled(is_visible);
+		spBG.enabled = is_visible;
 	}
 
 	public void SetupSelectNumberSprite(int select_number)
 	{
-		if (!(selectSP == null))
+		if (!((UnityEngine.Object)selectSP == (UnityEngine.Object)null))
 		{
 			int num = select_number - 1;
 			bool flag = num >= 0 && num < SPR_SKILL_MATERIAL_NUMBER.Length;
@@ -70,7 +64,7 @@ public class ItemIconDetailSetuperBase
 			if (flag)
 			{
 				selectSP.spriteName = SPR_SKILL_MATERIAL_NUMBER[num];
-				selectSP.set_enabled(true);
+				selectSP.enabled = true;
 			}
 		}
 	}

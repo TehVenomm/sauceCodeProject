@@ -635,14 +635,14 @@ public class StartActivity extends Activity {
                 }
                 boolean z;
                 Iterator it;
+                Purchase purchase;
                 StartActivity.this.mPurchaseList.clear();
                 List<Purchase> allPurchases = inventory.getAllPurchases();
                 if (allPurchases == null || allPurchases.size() <= 0) {
                     z = false;
                 } else {
                     z = false;
-                    for (Purchase purchase : allPurchases) {
-                        Purchase purchase2;
+                    for (Purchase purchase2 : allPurchases) {
                         if (StartActivity.verifyDeveloperPayload(purchase2)) {
                             z = true;
                             StartActivity.this.mPurchaseList.add(purchase2);

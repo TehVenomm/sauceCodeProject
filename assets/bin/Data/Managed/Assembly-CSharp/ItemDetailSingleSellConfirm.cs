@@ -39,8 +39,8 @@ public class ItemDetailSingleSellConfirm : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.LBL_ITEM_NAME, item.GetName());
-		SetLabelText((Enum)UI.LBL_TOTAL, $"{price:N0}");
+		SetLabelText(UI.LBL_ITEM_NAME, item.GetName());
+		SetLabelText(UI.LBL_TOTAL, $"{price:N0}");
 		int enemy_icon_id = 0;
 		int enemy_icon_id2 = 0;
 		if (item is ItemSortData)
@@ -106,7 +106,7 @@ public class ItemDetailSingleSellConfirm : GameSection
 		obj[2] = " : callsection=null? ";
 		ItemDetailEquip.CURRENT_SECTION? nullable6 = callSection;
 		obj[3] = !nullable6.HasValue;
-		Debug.LogWarning((object)string.Concat(obj));
+		Debug.LogWarning(string.Concat(obj));
 		callback(false);
 	}
 
@@ -147,7 +147,7 @@ public class ItemDetailSingleSellConfirm : GameSection
 			{
 				if (!b)
 				{
-					Debug.LogWarning((object)"sellConfirm = false");
+					Debug.LogWarning("sellConfirm = false");
 					GameSection.ResumeEvent(false, null);
 				}
 				else

@@ -295,10 +295,10 @@ public class JSONOutStream
 	public JSONOutStream Content(string tag, Rect value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.get_x()));
-		list.Add(new JSONNumberFieldValue((double)value.get_y()));
-		list.Add(new JSONNumberFieldValue((double)value.get_width()));
-		list.Add(new JSONNumberFieldValue((double)value.get_height()));
+		list.Add(new JSONNumberFieldValue((double)value.x));
+		list.Add(new JSONNumberFieldValue((double)value.y));
+		list.Add(new JSONNumberFieldValue((double)value.width));
+		list.Add(new JSONNumberFieldValue((double)value.height));
 		node.AddField(tag, new JSONListFieldValue(list));
 		return this;
 	}
@@ -306,10 +306,10 @@ public class JSONOutStream
 	public JSONOutStream Content(int idx, Rect value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.get_x()));
-		list.Add(new JSONNumberFieldValue((double)value.get_y()));
-		list.Add(new JSONNumberFieldValue((double)value.get_width()));
-		list.Add(new JSONNumberFieldValue((double)value.get_height()));
+		list.Add(new JSONNumberFieldValue((double)value.x));
+		list.Add(new JSONNumberFieldValue((double)value.y));
+		list.Add(new JSONNumberFieldValue((double)value.width));
+		list.Add(new JSONNumberFieldValue((double)value.height));
 		node.AddField(idx, new JSONListFieldValue(list));
 		return this;
 	}
@@ -317,10 +317,10 @@ public class JSONOutStream
 	public JSONOutStream Content(Rect value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.get_x()));
-		list.Add(new JSONNumberFieldValue((double)value.get_y()));
-		list.Add(new JSONNumberFieldValue((double)value.get_width()));
-		list.Add(new JSONNumberFieldValue((double)value.get_height()));
+		list.Add(new JSONNumberFieldValue((double)value.x));
+		list.Add(new JSONNumberFieldValue((double)value.y));
+		list.Add(new JSONNumberFieldValue((double)value.width));
+		list.Add(new JSONNumberFieldValue((double)value.height));
 		node.AddField(new JSONListFieldValue(list));
 		return this;
 	}

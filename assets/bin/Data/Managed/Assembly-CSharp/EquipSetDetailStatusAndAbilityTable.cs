@@ -221,21 +221,82 @@ public class EquipSetDetailStatusAndAbilityTable : GameSection
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_EQUIP_BTN_ROOT_ACTIVE, isEquipSubWeapon);
-		SetActive((Enum)UI.OBJ_EQUIP_BTN_ROOT_INACTIVE, !isEquipSubWeapon);
+		SetActive(UI.OBJ_EQUIP_BTN_ROOT_ACTIVE, isEquipSubWeapon);
+		SetActive(UI.OBJ_EQUIP_BTN_ROOT_INACTIVE, !isEquipSubWeapon);
 	}
 
-	protected unsafe void UpdateAbilityTable()
+	protected void UpdateAbilityTable()
 	{
 		int item_num = Mathf.Max(abilityCollection.Length + abilityItems.Count, 5);
 		bool is_scroll = true;
 		string allAbilityName = string.Empty;
 		string allAp = string.Empty;
 		string allAbilityDesc = string.Empty;
-		_003CUpdateAbilityTable_003Ec__AnonStorey2E3 _003CUpdateAbilityTable_003Ec__AnonStorey2E;
-		SetGrid(UI.GRD_ABILITY, "EquipSetDetailAbilityTableItem", item_num, true, new Action<int, Transform, bool>((object)_003CUpdateAbilityTable_003Ec__AnonStorey2E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetGrid(UI.GRD_ABILITY, "EquipSetDetailAbilityTableItem", item_num, true, delegate(int i, Transform t, bool is_recycle)
+		{
+			if (i >= abilityCollection.Length + abilityItems.Count)
+			{
+				is_scroll = false;
+				SetActive(t, UI.OBJ_ABILITY_ITEM_ROOT, false);
+			}
+			else
+			{
+				SetActive(t, UI.OBJ_ABILITY_ITEM_ROOT, true);
+				if (i < abilityCollection.Length)
+				{
+					SetActive(t, UI.OBJ_ABILITY_ITEM_ITEM_ROOT, false);
+					EquipItemAbilityCollection equipItemAbilityCollection = abilityCollection[i];
+					if (equipItemAbilityCollection.ability.id == 0 || equipItemAbilityCollection.ability.IsNeedUpdate() || !equipItemAbilityCollection.ability.IsActiveAbility())
+					{
+						SetActive(t, false);
+					}
+					else
+					{
+						SetActive(t, true);
+						int j = 0;
+						for (int num = equipItemAbilityCollection.equip.Length; j < num; j++)
+						{
+							SetAPLabel(t, uiAbility[j], equipItemAbilityCollection.GetAP(j), equipItemAbilityCollection.swapValue[j]);
+						}
+						SetLabelText(t, UI.LBL_AP_TOTAL, equipItemAbilityCollection.ability.GetAP());
+						Color color = Color.white;
+						if (equipItemAbilityCollection.GetSwapBalance() < 0)
+						{
+							color = Color.red;
+						}
+						else if (equipItemAbilityCollection.GetSwapBalance() > 0)
+						{
+							color = Color.green;
+						}
+						GetComponent<UILabel>(t, UI.LBL_AP_TOTAL).color = color;
+						SetLabelText(t, UI.LBL_ABILITY_NAME, equipItemAbilityCollection.ability.GetName());
+						SetAbilityItemEvent(t, i);
+						allAbilityName += equipItemAbilityCollection.ability.GetName();
+						allAp += equipItemAbilityCollection.ability.GetAP();
+						allAbilityDesc += equipItemAbilityCollection.ability.GetDescription();
+						SetToggle(t, UI.TGL_NAME_TAG, equipItemAbilityCollection.IsAbilityOn());
+					}
+				}
+				else
+				{
+					int k = 0;
+					for (int num2 = uiAbility.Length; k < num2; k++)
+					{
+						SetAPLabel(t, uiAbility[k], string.Empty, 0);
+					}
+					SetLabelText(t, UI.LBL_AP_TOTAL, string.Empty);
+					int index = i - abilityCollection.Length;
+					AbilityItemInfo abilityItemInfo = abilityItems[index];
+					SetActive(t, UI.OBJ_ABILITY_ITEM_ITEM_ROOT, true);
+					SetLabelText(t, UI.LBL_ABILITY_NAME, abilityItemInfo.GetName());
+					SetAbilityItemItemEvent(t, i);
+					allAbilityName += abilityItemInfo.GetName();
+					allAbilityDesc += abilityItemInfo.GetDescription();
+				}
+			}
+		});
 		PreCacheAbilityDetail(allAbilityName, allAp, allAbilityDesc);
-		base.GetComponent<UIScrollView>((Enum)UI.SCR_ABILITY).set_enabled(is_scroll);
+		GetComponent<UIScrollView>(UI.SCR_ABILITY).enabled = is_scroll;
 	}
 
 	protected virtual void SetAbilityItemEvent(Transform t, int index)
@@ -289,8 +350,8 @@ public class EquipSetDetailStatusAndAbilityTable : GameSection
 		StatusFactor statusFactor = equipSetCalculator.GetStatusFactor(selectEquipIndex);
 		SimpleStatus finalStatus = equipSetCalculator.GetFinalStatus(selectEquipIndex, num, num2, num3);
 		SetLabelSeparateText(UI.LBL_HP, num + statusFactor.baseStatus.hp, finalStatus.hp);
-		SetLabelText((Enum)UI.LBL_ATK, finalStatus.GetAttacksSum().ToString());
-		SetLabelText((Enum)UI.LBL_DEF, finalStatus.GetDefencesSum().ToString());
+		SetLabelText(UI.LBL_ATK, finalStatus.GetAttacksSum().ToString());
+		SetLabelText(UI.LBL_DEF, finalStatus.GetDefencesSum().ToString());
 		int i = 0;
 		for (int num4 = uiAtkElem.Length; i < num4; i++)
 		{
@@ -305,30 +366,27 @@ public class EquipSetDetailStatusAndAbilityTable : GameSection
 				SetLabelSeparateText(uiDefElem[i], statusFactor.baseStatus.tolerances[i - 1], finalStatus.tolerances[i - 1]);
 			}
 		}
-		SetToggle((Enum)uiToggleStatusIndex[selectEquipIndex], true);
-		SetToggle((Enum)uiToggleWindowIconIndex[selectEquipIndex], true);
-		SetToggle((Enum)uiToggleButtonIndex[selectEquipIndex], true);
+		SetToggle(uiToggleStatusIndex[selectEquipIndex], true);
+		SetToggle(uiToggleWindowIconIndex[selectEquipIndex], true);
+		SetToggle(uiToggleButtonIndex[selectEquipIndex], true);
 	}
 
 	private void SetAPLabel(Transform parent, Enum _enum, string ap, int swap_value)
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(parent, _enum, !string.IsNullOrEmpty(ap));
 		SetLabelText(parent, _enum, ap);
-		UILabel component = base.GetComponent<UILabel>(parent, _enum);
+		UILabel component = GetComponent<UILabel>(parent, _enum);
 		if (swap_value == 0)
 		{
-			component.color = Color.get_white();
+			component.color = Color.white;
 		}
 		else if (swap_value < 0)
 		{
-			component.color = Color.get_red();
+			component.color = Color.red;
 		}
 		else
 		{
-			component.color = Color.get_green();
+			component.color = Color.green;
 		}
 	}
 
@@ -366,16 +424,16 @@ public class EquipSetDetailStatusAndAbilityTable : GameSection
 
 	private void LateUpdate()
 	{
-		if (spring == null)
+		if ((UnityEngine.Object)spring == (UnityEngine.Object)null)
 		{
-			spring = base.GetComponent<SpringPanel>((Enum)UI.SCR_ABILITY);
+			spring = GetComponent<SpringPanel>(UI.SCR_ABILITY);
 		}
-		if (spring != null && spring.get_enabled())
+		if ((UnityEngine.Object)spring != (UnityEngine.Object)null && spring.enabled)
 		{
 			int i = 0;
 			for (int num = spr.Length; i < num; i++)
 			{
-				UISprite component = base.GetComponent<UISprite>((Enum)spr[i]);
+				UISprite component = GetComponent<UISprite>(spr[i]);
 				component.UpdateAnchors();
 			}
 		}
@@ -388,12 +446,11 @@ public class EquipSetDetailStatusAndAbilityTable : GameSection
 
 	private void InitializeCaption()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
-		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
-		if (component != null)
+		UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
+		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 		{
 			component.Reset();
 			int i = 0;

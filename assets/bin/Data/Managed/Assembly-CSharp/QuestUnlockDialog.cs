@@ -1,5 +1,3 @@
-using System;
-
 public class QuestUnlockDialog : GameSection
 {
 	protected enum UI
@@ -10,6 +8,6 @@ public class QuestUnlockDialog : GameSection
 	public override void Initialize()
 	{
 		base.Initialize();
-		PlayTween((Enum)UI.OBJ_UNLOCK_PORTAL_ROOT, true, (EventDelegate.Callback)null, true, 0);
+		PlayTween(UI.OBJ_UNLOCK_PORTAL_ROOT, true, null, true, 0);
 	}
 }

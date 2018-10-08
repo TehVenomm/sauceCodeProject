@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyAegisController
+public class EnemyAegisController : MonoBehaviour
 {
 	public class SetupParam
 	{
@@ -76,30 +76,20 @@ public class EnemyAegisController
 
 	public SyncParam syncParam => _syncParam;
 
-	public EnemyAegisController()
-		: this()
-	{
-	}
-
 	public void Init(Enemy enemy)
 	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Expected O, but got Unknown
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		if (!object.ReferenceEquals(enemy, null))
 		{
 			owner = enemy;
-			cachedTransform = this.get_transform();
+			cachedTransform = base.transform;
 			isNeedUpdate = false;
 			nowAngle = 0f;
-			cachedTransform.set_localRotation(Quaternion.get_identity());
+			cachedTransform.localRotation = Quaternion.identity;
 		}
 	}
 
 	public void Generate(AnimEventData.EventData data)
 	{
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
 		if (!object.ReferenceEquals(owner, null))
 		{
 			_setupParam.maxNum = data.intArgs[0];
@@ -119,20 +109,6 @@ public class EnemyAegisController
 
 	public void Setup(SetupParam param, bool announce)
 	{
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Expected O, but got Unknown
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Expected O, but got Unknown
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020c: Unknown result type (might be due to invalid IL or missing references)
 		_setupParam = param;
 		if (_setupParam.maxNum > 0)
 		{
@@ -142,39 +118,39 @@ public class EnemyAegisController
 				_ReleaseEffect(ref aegisParam.effect, true);
 			}
 			aegisParams.Clear();
-			Transform val = owner.FindNode(_setupParam.nodeName);
-			cachedTransform.SetParent(val);
-			cachedTransform.set_localPosition(Vector3.get_zero());
-			cachedTransform.set_localScale(Vector3.get_one());
+			Transform parent = owner.FindNode(_setupParam.nodeName);
+			cachedTransform.SetParent(parent);
+			cachedTransform.localPosition = Vector3.zero;
+			cachedTransform.localScale = Vector3.one;
 			float num = 360f / (float)_setupParam.maxNum;
 			float num2 = (float)(_setupParam.maxNum - _setupParam.nowNum);
 			bool flag = true;
 			for (int j = 0; j < _setupParam.maxNum; j++)
 			{
-				Transform val3;
+				Transform transform;
 				if (effectParentList.Count <= j)
 				{
-					GameObject val2 = new GameObject("Child");
-					val3 = val2.get_transform();
-					val3.SetParent(cachedTransform);
-					val3.set_localPosition(Vector3.get_zero());
-					val3.set_localScale(Vector3.get_one());
-					val3.set_localRotation(Quaternion.get_identity());
-					effectParentList.Add(val3);
+					GameObject gameObject = new GameObject("Child");
+					transform = gameObject.transform;
+					transform.SetParent(cachedTransform);
+					transform.localPosition = Vector3.zero;
+					transform.localScale = Vector3.one;
+					transform.localRotation = Quaternion.identity;
+					effectParentList.Add(transform);
 				}
 				else
 				{
-					val3 = effectParentList[j];
+					transform = effectParentList[j];
 				}
-				val3.set_localRotation(Quaternion.AngleAxis(num * (float)j, Vector3.get_up()));
+				transform.localRotation = Quaternion.AngleAxis(num * (float)j, Vector3.up);
 				if (!((float)j < num2))
 				{
 					AegisParam aegisParam2 = new AegisParam();
 					aegisParam2.hp = ((!flag) ? _setupParam.maxHp : _setupParam.nowHp);
-					aegisParam2.effect = EffectManager.GetEffect(_setupParam.effectName, val3);
-					aegisParam2.effect.set_localPosition(_setupParam.offset);
-					aegisParam2.effect.set_localScale(new Vector3(_setupParam.scale, _setupParam.scale, _setupParam.scale));
-					aegisParam2.effect.set_localRotation(Quaternion.get_identity());
+					aegisParam2.effect = EffectManager.GetEffect(_setupParam.effectName, transform);
+					aegisParam2.effect.localPosition = _setupParam.offset;
+					aegisParam2.effect.localScale = new Vector3(_setupParam.scale, _setupParam.scale, _setupParam.scale);
+					aegisParam2.effect.localRotation = Quaternion.identity;
 					aegisParams.Add(aegisParam2);
 					flag = false;
 				}
@@ -316,22 +292,19 @@ public class EnemyAegisController
 
 	private void Update()
 	{
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		if (isNeedUpdate)
 		{
-			nowAngle += 50f * Time.get_deltaTime();
+			nowAngle += 50f * Time.deltaTime;
 			if (nowAngle >= 360f)
 			{
 				nowAngle -= 360f;
 			}
-			cachedTransform.set_localRotation(Quaternion.AngleAxis(nowAngle, Vector3.get_up()));
+			cachedTransform.localRotation = Quaternion.AngleAxis(nowAngle, Vector3.up);
 		}
 	}
 
 	private void OnDestroy()
 	{
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 		_setupParam = null;
 		_syncParam = null;
 		isNeedUpdate = false;
@@ -346,7 +319,7 @@ public class EnemyAegisController
 		{
 			for (int j = 0; j < effectParentList.Count; j++)
 			{
-				Object.Destroy(effectParentList[j].get_gameObject());
+				Object.Destroy(effectParentList[j].gameObject);
 			}
 			effectParentList.Clear();
 		}
@@ -363,11 +336,9 @@ public class EnemyAegisController
 
 	private void _ReleaseEffect(ref Transform t, bool isPlayEndAnimation = true)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<EffectManager>.IsValid() && !object.ReferenceEquals(t, null))
 		{
-			EffectManager.ReleaseEffect(t.get_gameObject(), isPlayEndAnimation, false);
+			EffectManager.ReleaseEffect(t.gameObject, isPlayEndAnimation, false);
 			t = null;
 		}
 	}

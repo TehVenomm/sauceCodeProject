@@ -164,7 +164,7 @@ public static class QuestUtility
 		{
 			if (!Singleton<EquipItemTable>.I.IsWeapon(allowTypes[i]))
 			{
-				Debug.LogError((object)"武器のチェックに武器以外のタイプが渡されています(無視されます)");
+				Debug.LogError("武器のチェックに武器以外のタイプが渡されています(無視されます)");
 			}
 		}
 		int j = 0;

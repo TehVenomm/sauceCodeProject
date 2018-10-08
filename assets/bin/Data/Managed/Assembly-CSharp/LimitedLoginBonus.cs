@@ -135,9 +135,6 @@ public class LimitedLoginBonus : GameSection
 
 	public override void Initialize()
 	{
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
 		glowModel_ = Utility.Find(base._transform, "LIB_00000003");
 		texModel_ = Utility.Find(base._transform, "TEX_MODEL");
 		texModelRenderTexture_ = UIModelRenderTexture.Get(texModel_);
@@ -147,24 +144,21 @@ public class LimitedLoginBonus : GameSection
 		texInnerModelTexture_ = texInnerModel_.GetComponent<UITexture>();
 		info = SetPrefab(GetCtrl(UI.SPR_FRAME), "LimitedLoginBonusInfo", true);
 		infoDetail = SetPrefab(GetCtrl(UI.SPR_FRAME), "LimitedLoginBonusInfoDetail", true);
-		info.get_gameObject().SetActive(false);
-		infoDetail.get_gameObject().SetActive(false);
-		this.StartCoroutine(DoInitialize());
+		info.gameObject.SetActive(false);
+		infoDetail.gameObject.SetActive(false);
+		StartCoroutine(DoInitialize());
 	}
 
 	protected void OnQuery_RELEASE_ABILITY()
 	{
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		if (!(infoDetail == null) && !(info == null))
+		if (!((UnityEngine.Object)infoDetail == (UnityEngine.Object)null) && !((UnityEngine.Object)info == (UnityEngine.Object)null))
 		{
 			if (isDetail)
 			{
 				SetLabelText(infoDetail, UI.LBL_INFODETAIL_NAME, string.Empty);
 				SetLabelText(infoDetail, UI.LBL_INFODETAIL_DESC, string.Empty);
 				SetLabelText(infoDetail, UI.LBL_INFODETAIL_NUM, string.Empty);
-				infoDetail.get_gameObject().SetActive(false);
+				infoDetail.gameObject.SetActive(false);
 			}
 			else
 			{
@@ -172,18 +166,14 @@ public class LimitedLoginBonus : GameSection
 				SetLabelText(infoDetail, UI.LBL_INFODETAIL_DESC, string.Empty);
 				SetLabelText(infoDetail, UI.LBL_INFODETAIL_NUM, string.Empty);
 			}
-			infoDetail.get_gameObject().SetActive(false);
-			info.get_gameObject().SetActive(false);
+			infoDetail.gameObject.SetActive(false);
+			info.gameObject.SetActive(false);
 			GameSection.StopEvent();
 		}
 	}
 
 	protected void OnQuery_ABILITY_DATA_POPUP()
 	{
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0169: Unknown result type (might be due to invalid IL or missing references)
 		object[] array = GameSection.GetEventData() as object[];
 		int index = (int)array[0];
 		string text = string.Empty;
@@ -204,23 +194,22 @@ public class LimitedLoginBonus : GameSection
 			text = loginBonusReward.name;
 		}
 		empty = "x" + loginBonusReward.itemNum.ToString();
-		Vector3 localPosition = default(Vector3);
-		localPosition._002Ector(0f, 60f, 0f);
+		Vector3 localPosition = new Vector3(0f, 60f, 0f);
 		if (text2 != null)
 		{
 			SetLabelText(infoDetail, UI.LBL_INFODETAIL_NAME, text);
 			SetLabelText(infoDetail, UI.LBL_INFODETAIL_DESC, text2);
 			SetLabelText(infoDetail, UI.LBL_INFODETAIL_NUM, empty);
-			infoDetail.set_localPosition(localPosition);
-			infoDetail.get_gameObject().SetActive(true);
+			infoDetail.localPosition = localPosition;
+			infoDetail.gameObject.SetActive(true);
 			isDetail = true;
 		}
 		else
 		{
 			SetLabelText(info, UI.LBL_INFO_NAME, text);
 			SetLabelText(info, UI.LBL_INFO_NUM, empty);
-			info.set_localPosition(localPosition);
-			info.get_gameObject().SetActive(true);
+			info.localPosition = localPosition;
+			info.gameObject.SetActive(true);
 			isDetail = false;
 		}
 		GameSection.StopEvent();
@@ -251,9 +240,9 @@ public class LimitedLoginBonus : GameSection
 				{
 					if (ret != null && ret.result != null && ret.result.Count > 0)
 					{
-						((_003CDoInitialize_003Ec__Iterator9E)/*Error near IL_0071: stateMachine*/)._003C_003Ef__this.lb = ret.result[0];
+						((_003CDoInitialize_003Ec__IteratorA0)/*Error near IL_0071: stateMachine*/)._003C_003Ef__this.lb = ret.result[0];
 					}
-					((_003CDoInitialize_003Ec__Iterator9E)/*Error near IL_0071: stateMachine*/)._003Cconnect_003E__0 = true;
+					((_003CDoInitialize_003Ec__IteratorA0)/*Error near IL_0071: stateMachine*/)._003Cconnect_003E__0 = true;
 				}
 			}, get_param: string.Empty);
 			while (!connect)
@@ -311,7 +300,7 @@ public class LimitedLoginBonus : GameSection
 			float rotateSpeed = 35f;
 			if (pickUpReward.type == 14)
 			{
-				SetRenderAccessoryModel((Enum)UI.TEX_MODEL, (uint)pickUpReward.itemId, pickUpReward.GetScale(), true, false);
+				SetRenderAccessoryModel(UI.TEX_MODEL, (uint)pickUpReward.itemId, pickUpReward.GetScale(), true, false);
 				isModel = true;
 			}
 			else if (pickUpReward.type == 5)
@@ -323,7 +312,7 @@ public class LimitedLoginBonus : GameSection
 			}
 			else if (pickUpReward.type == 4)
 			{
-				SetRenderEquipModel((Enum)UI.TEX_MODEL, (uint)pickUpReward.itemId, -1, -1, pickUpReward.GetScale());
+				SetRenderEquipModel(UI.TEX_MODEL, (uint)pickUpReward.itemId, -1, -1, pickUpReward.GetScale());
 				isModel = true;
 			}
 			else if (pickUpReward.type == 1 || pickUpReward.type == 2)
@@ -351,51 +340,121 @@ public class LimitedLoginBonus : GameSection
 		}
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0215: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
 		if (lb == null)
 		{
-			SetLabelText((Enum)UI.LBL_PICKUP, string.Empty);
-			SetLabelText((Enum)UI.LBL_PERIOD, string.Empty);
+			SetLabelText(UI.LBL_PICKUP, string.Empty);
+			SetLabelText(UI.LBL_PERIOD, string.Empty);
 		}
 		else
 		{
 			if (topImageLoadObj != null)
 			{
-				Texture2D val = null;
-				val = (topImageLoadObj.loadedObject as Texture2D);
-				if (val != null)
+				Texture2D texture2D = null;
+				texture2D = (topImageLoadObj.loadedObject as Texture2D);
+				if ((UnityEngine.Object)texture2D != (UnityEngine.Object)null)
 				{
-					Transform t = FindCtrl(base._transform, UI.TEX_LOGIN_BANNER);
-					SetActive(t, true);
-					SetTexture(t, val);
+					Transform t2 = FindCtrl(base._transform, UI.TEX_LOGIN_BANNER);
+					SetActive(t2, true);
+					SetTexture(t2, texture2D);
 				}
 			}
 			if (!isModel)
 			{
-				FindCtrl(base._transform, UI.OBJ_DETAIL_ROOT).set_localPosition(new Vector3(pickUpPosX, pickUpItemPosY, 0f));
+				FindCtrl(base._transform, UI.OBJ_DETAIL_ROOT).localPosition = new Vector3(pickUpPosX, pickUpItemPosY, 0f);
 				LoginBonus.LoginBonusReward loginBonusReward = pickUpReward;
 				ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)loginBonusReward.type, (uint)loginBonusReward.itemId, Utility.Find(base._transform, "OBJ_DETAIL_ROOT"), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-				itemIcon.transform.set_localScale(new Vector3(1.5f, 1.5f, 1.5f));
+				itemIcon.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
 			}
-			SetLabelText((Enum)UI.LBL_PERIOD, lb.period_announce);
-			SetLabelText((Enum)UI.LBL_LOGIN_DAYS, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 7u), lb.nowCount.ToString()));
+			SetLabelText(UI.LBL_PERIOD, lb.period_announce);
+			SetLabelText(UI.LBL_LOGIN_DAYS, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 7u), lb.nowCount.ToString()));
 			FindCtrl(base._transform, UI.LBL_PICKUP).GetComponent<UILabel>().supportEncoding = true;
-			SetLabelText((Enum)UI.LBL_PICKUP, pickUpReward.pickUpText);
+			SetLabelText(UI.LBL_PICKUP, pickUpReward.pickUpText);
 			int count = lb.next.Count;
 			SetFrame(1 + (lb.next.Count - 1) / 5, lb.boardType);
 			touchAndReleaseList.Clear();
-			SetGrid(UI.GRD_BONUSLIST, "LimitedLoginBonusItem", count, false, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetGrid(UI.GRD_BONUSLIST, "LimitedLoginBonusItem", count, false, delegate(int i, Transform t, bool b)
+			{
+				bool flag = false;
+				LoginBonus.LoginBonusReward loginBonusReward2 = null;
+				loginBonusReward2 = lb.next[i].reward[0];
+				flag = loginBonusReward2.isGet;
+				if (arrayNow == i && lb.reward.Count > 0)
+				{
+					GameObject gameObject = FindCtrl(t, UI.SPR_STAMP_ANIM).gameObject;
+					gameObject.SetActive(true);
+					EventDelegate.Set(gameObject.GetComponentInChildren<TweenScale>().onFinished, SetGetDialog);
+					FindCtrl(t, UI.SPR_STAMP).gameObject.SetActive(false);
+				}
+				else if (flag)
+				{
+					FindCtrl(t, UI.SPR_STAMP_ANIM).gameObject.SetActive(false);
+					FindCtrl(t, UI.SPR_STAMP).gameObject.SetActive(true);
+				}
+				else
+				{
+					FindCtrl(t, UI.SPR_STAMP).gameObject.SetActive(false);
+					FindCtrl(t, UI.SPR_STAMP_ANIM).gameObject.SetActive(false);
+				}
+				if (loginBonusReward2.isPickUp)
+				{
+					FindCtrl(t, UI.SPR_DAY_BASE).gameObject.SetActive(false);
+					FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).gameObject.SetActive(true);
+					FindCtrl(t, UI.SPR_DAY_BASE_FINE).gameObject.SetActive(false);
+					FindCtrl(t, UI.LBL_DAY_PICKUP).gameObject.SetActive(true);
+					FindCtrl(t, UI.LBL_DAY_FINE).gameObject.SetActive(false);
+					FindCtrl(t, UI.LBL_DAY).gameObject.SetActive(false);
+					SetLabelText(t, UI.LBL_DAY_PICKUP, loginBonusReward2.day);
+				}
+				else if (loginBonusReward2.frameType != 0)
+				{
+					FindCtrl(t, UI.SPR_DAY_BASE).gameObject.SetActive(false);
+					FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).gameObject.SetActive(false);
+					FindCtrl(t, UI.SPR_DAY_BASE_FINE).gameObject.SetActive(true);
+					FindCtrl(t, UI.LBL_DAY_PICKUP).gameObject.SetActive(false);
+					FindCtrl(t, UI.LBL_DAY_FINE).gameObject.SetActive(true);
+					FindCtrl(t, UI.LBL_DAY).gameObject.SetActive(false);
+					SetLabelText(t, UI.LBL_DAY_FINE, loginBonusReward2.day);
+				}
+				else
+				{
+					FindCtrl(t, UI.SPR_DAY_BASE).gameObject.SetActive(true);
+					FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).gameObject.SetActive(false);
+					FindCtrl(t, UI.SPR_DAY_BASE_FINE).gameObject.SetActive(false);
+					FindCtrl(t, UI.LBL_DAY_PICKUP).gameObject.SetActive(false);
+					FindCtrl(t, UI.LBL_DAY_FINE).gameObject.SetActive(false);
+					FindCtrl(t, UI.LBL_DAY).gameObject.SetActive(true);
+					SetLabelText(t, UI.LBL_DAY, loginBonusReward2.day);
+				}
+				SetLabelText(t, UI.LBL_ITEMNUM, "x" + loginBonusReward2.itemNum.ToString());
+				ItemIcon itemIcon2 = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)loginBonusReward2.type, (uint)loginBonusReward2.itemId, FindCtrl(t, UI.OBJ_ICON_ROOT), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
+				if ((UnityEngine.Object)itemIcon2 != (UnityEngine.Object)null)
+				{
+					itemIcon2.SetEnableCollider(false);
+				}
+				if (flag)
+				{
+					UITexture[] componentsInChildren = itemIcon2.GetComponentsInChildren<UITexture>();
+					int j = 0;
+					for (int num = componentsInChildren.Length; j < num; j++)
+					{
+						componentsInChildren[j].color = Color.gray;
+					}
+					UISprite[] componentsInChildren2 = itemIcon2.GetComponentsInChildren<UISprite>();
+					int k = 0;
+					for (int num2 = componentsInChildren2.Length; k < num2; k++)
+					{
+						componentsInChildren2[k].color = Color.gray;
+					}
+				}
+				SetAbilityItemEvent(t, i, touchAndReleaseList);
+			});
 			if (isFirst)
 			{
 				Transform ctrl = GetCtrl(UI.SCR_BONUSLIST);
 				UIPanel component = ctrl.GetComponent<UIPanel>();
-				ctrl.get_transform().set_localPosition(new Vector3(0f, startScrPos, 0f));
+				ctrl.transform.localPosition = new Vector3(0f, startScrPos, 0f);
 				component.clipOffset = new Vector2(0f, 0f - startScrPos);
 			}
 		}
@@ -403,26 +462,6 @@ public class LimitedLoginBonus : GameSection
 
 	private void SetFrame(int column_num, int board_type)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0297: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0315: Unknown result type (might be due to invalid IL or missing references)
 		Color color;
 		switch (board_type)
 		{
@@ -453,12 +492,12 @@ public class LimitedLoginBonus : GameSection
 			FindCtrl(base._transform, UI.SPR_FRAME_ICONS).GetComponent<UIWidget>().height = (int)num;
 			FindCtrl(base._transform, UI.SPR_FRAME_BG_3_L).GetComponent<UIWidget>().height = (int)(bg3SizeBase.y - num2);
 			FindCtrl(base._transform, UI.SPR_FRAME_BG_3_R).GetComponent<UIWidget>().height = (int)(bg3SizeBase.y - num2);
-			FindCtrl(base._transform, UI.SPR_FRAME_BG_4_L).set_localPosition(new Vector3(0f, bg4Height + num2, 0f));
-			FindCtrl(base._transform, UI.SPR_FRAME_BG_4_R).set_localPosition(new Vector3(0f, bg4Height + num2, 0f));
-			FindCtrl(base._transform, UI.SPR_FRAME_FOOTER_L).set_localPosition(new Vector3(0f, footerHeight + num2, 0f));
-			FindCtrl(base._transform, UI.SPR_FRAME_FOOTER_R).set_localPosition(new Vector3(0f, footerHeight + num2, 0f));
-			FindCtrl(base._transform, UI.BTN_CLOSE).set_localPosition(new Vector3(0f, btnHeight + num2, 0f));
-			base._transform.set_localPosition(new Vector3(0f, (0f - num2) / 2f, 0f));
+			FindCtrl(base._transform, UI.SPR_FRAME_BG_4_L).localPosition = new Vector3(0f, bg4Height + num2, 0f);
+			FindCtrl(base._transform, UI.SPR_FRAME_BG_4_R).localPosition = new Vector3(0f, bg4Height + num2, 0f);
+			FindCtrl(base._transform, UI.SPR_FRAME_FOOTER_L).localPosition = new Vector3(0f, footerHeight + num2, 0f);
+			FindCtrl(base._transform, UI.SPR_FRAME_FOOTER_R).localPosition = new Vector3(0f, footerHeight + num2, 0f);
+			FindCtrl(base._transform, UI.BTN_CLOSE).localPosition = new Vector3(0f, btnHeight + num2, 0f);
+			base._transform.localPosition = new Vector3(0f, (0f - num2) / 2f, 0f);
 		}
 	}
 
@@ -496,9 +535,8 @@ public class LimitedLoginBonus : GameSection
 
 	private void SetGetDialog()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		PlayAudio(AUDIO.REQUEST_COMPLETE, 1f, false);
-		this.StartCoroutine("WaitGetDialog");
+		StartCoroutine("WaitGetDialog");
 	}
 
 	private IEnumerator WaitGetDialog()
@@ -513,10 +551,9 @@ public class LimitedLoginBonus : GameSection
 
 	public void OnQuery_CLOSE()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (null != glowModel_)
+		if ((UnityEngine.Object)null != (UnityEngine.Object)glowModel_)
 		{
-			glowModel_.get_gameObject().SetActive(false);
+			glowModel_.gameObject.SetActive(false);
 		}
 		if (lb.type == 6 && lb.isBeginner2Pop && !showedBLBP)
 		{

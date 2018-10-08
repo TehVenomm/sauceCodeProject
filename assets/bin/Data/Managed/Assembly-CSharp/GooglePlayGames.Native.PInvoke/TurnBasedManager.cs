@@ -103,9 +103,9 @@ namespace GooglePlayGames.Native.PInvoke
 				return TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetStatus(SelfPtr());
 			}
 
-			internal unsafe IEnumerable<MultiplayerInvitation> Invitations()
+			internal IEnumerable<MultiplayerInvitation> Invitations()
 			{
-				return PInvokeUtilities.ToEnumerable<MultiplayerInvitation>(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetInvitations_Length(SelfPtr()), new Func<UIntPtr, MultiplayerInvitation>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				return PInvokeUtilities.ToEnumerable(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetInvitations_Length(SelfPtr()), (UIntPtr index) => new MultiplayerInvitation(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetInvitations_GetElement(SelfPtr(), index)));
 			}
 
 			internal int InvitationCount()
@@ -113,9 +113,9 @@ namespace GooglePlayGames.Native.PInvoke
 				return (int)TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetInvitations_Length(SelfPtr()).ToUInt32();
 			}
 
-			internal unsafe IEnumerable<NativeTurnBasedMatch> MyTurnMatches()
+			internal IEnumerable<NativeTurnBasedMatch> MyTurnMatches()
 			{
-				return PInvokeUtilities.ToEnumerable<NativeTurnBasedMatch>(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetMyTurnMatches_Length(SelfPtr()), new Func<UIntPtr, NativeTurnBasedMatch>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				return PInvokeUtilities.ToEnumerable(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetMyTurnMatches_Length(SelfPtr()), (UIntPtr index) => new NativeTurnBasedMatch(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetMyTurnMatches_GetElement(SelfPtr(), index)));
 			}
 
 			internal int MyTurnMatchesCount()
@@ -123,9 +123,9 @@ namespace GooglePlayGames.Native.PInvoke
 				return (int)TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetMyTurnMatches_Length(SelfPtr()).ToUInt32();
 			}
 
-			internal unsafe IEnumerable<NativeTurnBasedMatch> TheirTurnMatches()
+			internal IEnumerable<NativeTurnBasedMatch> TheirTurnMatches()
 			{
-				return PInvokeUtilities.ToEnumerable<NativeTurnBasedMatch>(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetTheirTurnMatches_Length(SelfPtr()), new Func<UIntPtr, NativeTurnBasedMatch>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				return PInvokeUtilities.ToEnumerable(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetTheirTurnMatches_Length(SelfPtr()), (UIntPtr index) => new NativeTurnBasedMatch(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetTheirTurnMatches_GetElement(SelfPtr(), index)));
 			}
 
 			internal int TheirTurnMatchesCount()
@@ -133,9 +133,9 @@ namespace GooglePlayGames.Native.PInvoke
 				return (int)TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetTheirTurnMatches_Length(SelfPtr()).ToUInt32();
 			}
 
-			internal unsafe IEnumerable<NativeTurnBasedMatch> CompletedMatches()
+			internal IEnumerable<NativeTurnBasedMatch> CompletedMatches()
 			{
-				return PInvokeUtilities.ToEnumerable<NativeTurnBasedMatch>(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetCompletedMatches_Length(SelfPtr()), new Func<UIntPtr, NativeTurnBasedMatch>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				return PInvokeUtilities.ToEnumerable(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetCompletedMatches_Length(SelfPtr()), (UIntPtr index) => new NativeTurnBasedMatch(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetCompletedMatches_GetElement(SelfPtr(), index)));
 			}
 
 			internal int CompletedMatchesCount()
@@ -178,9 +178,9 @@ namespace GooglePlayGames.Native.PInvoke
 			TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_CreateTurnBasedMatch(mGameServices.AsHandle(), config.AsPointer(), InternalTurnBasedMatchCallback, ToCallbackPointer(callback));
 		}
 
-		internal unsafe void ShowPlayerSelectUI(uint minimumPlayers, uint maxiumPlayers, bool allowAutomatching, Action<PlayerSelectUIResponse> callback)
+		internal void ShowPlayerSelectUI(uint minimumPlayers, uint maxiumPlayers, bool allowAutomatching, Action<PlayerSelectUIResponse> callback)
 		{
-			TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_ShowPlayerSelectUI(mGameServices.AsHandle(), minimumPlayers, maxiumPlayers, allowAutomatching, InternalPlayerSelectUIcallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, PlayerSelectUIResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_ShowPlayerSelectUI(mGameServices.AsHandle(), minimumPlayers, maxiumPlayers, allowAutomatching, InternalPlayerSelectUIcallback, Callbacks.ToIntPtr(callback, PlayerSelectUIResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(TurnBasedMultiplayerManager.PlayerSelectUICallback))]
@@ -189,9 +189,9 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("TurnBasedManager#PlayerSelectUICallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal unsafe void GetAllTurnbasedMatches(Action<TurnBasedMatchesResponse> callback)
+		internal void GetAllTurnbasedMatches(Action<TurnBasedMatchesResponse> callback)
 		{
-			TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_FetchMatches(mGameServices.AsHandle(), InternalTurnBasedMatchesCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, TurnBasedMatchesResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_FetchMatches(mGameServices.AsHandle(), InternalTurnBasedMatchesCallback, Callbacks.ToIntPtr(callback, TurnBasedMatchesResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(TurnBasedMultiplayerManager.TurnBasedMatchesCallback))]
@@ -222,9 +222,9 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("TurnBasedManager#MatchInboxUICallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal unsafe void ShowInboxUI(Action<MatchInboxUIResponse> callback)
+		internal void ShowInboxUI(Action<MatchInboxUIResponse> callback)
 		{
-			TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_ShowMatchInboxUI(mGameServices.AsHandle(), InternalMatchInboxUICallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, MatchInboxUIResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_ShowMatchInboxUI(mGameServices.AsHandle(), InternalMatchInboxUICallback, Callbacks.ToIntPtr(callback, MatchInboxUIResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(TurnBasedMultiplayerManager.MultiplayerStatusCallback))]
@@ -272,9 +272,9 @@ namespace GooglePlayGames.Native.PInvoke
 			TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_Rematch(mGameServices.AsHandle(), match.AsPointer(), InternalTurnBasedMatchCallback, ToCallbackPointer(callback));
 		}
 
-		private unsafe static IntPtr ToCallbackPointer(Action<TurnBasedMatchResponse> callback)
+		private static IntPtr ToCallbackPointer(Action<TurnBasedMatchResponse> callback)
 		{
-			return Callbacks.ToIntPtr(callback, new Func<IntPtr, TurnBasedMatchResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			return Callbacks.ToIntPtr(callback, TurnBasedMatchResponse.FromPointer);
 		}
 	}
 }

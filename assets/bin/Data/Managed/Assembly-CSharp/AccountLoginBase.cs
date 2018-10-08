@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -35,33 +34,33 @@ public class AccountLoginBase : AccountPopupAdjuster
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.IPT_ADDRESS, !isValidGoogleAccountPopup);
-		SetActive((Enum)UI.POP_ADDRESS, isValidGoogleAccountPopup);
-		SetInput((Enum)UI.IPT_ADDRESS, string.Empty, 255, (EventDelegate.Callback)InputCallback);
-		SetInput((Enum)UI.IPT_PASSWORD, string.Empty, 255, (EventDelegate.Callback)InputCallback);
+		SetActive(UI.IPT_ADDRESS, !isValidGoogleAccountPopup);
+		SetActive(UI.POP_ADDRESS, isValidGoogleAccountPopup);
+		SetInput(UI.IPT_ADDRESS, string.Empty, 255, InputCallback);
+		SetInput(UI.IPT_PASSWORD, string.Empty, 255, InputCallback);
 		if (isValidGoogleAccountPopup)
 		{
 			List<string> account_list = null;
 			googleAccountList = NetworkNative.getGoogleAccounts();
 			if (googleAccountList.googleAccounts.Count > 0)
 			{
-				UILabel lbl = base.GetComponent<UILabel>((Enum)UI.LBL_ADDRESS);
+				UILabel lbl = GetComponent<UILabel>(UI.LBL_ADDRESS);
 				account_list = new List<string>();
 				googleAccountList.googleAccounts.ForEach(delegate(NetworkNative.GoogleAccount account)
 				{
 					account_list.Add(PopupTextAdjust(lbl, account.name));
 				});
 			}
-			SetPopupListText((Enum)UI.POP_ADDRESS, account_list, -1);
-			SetPopupListOnChange((Enum)UI.POP_ADDRESS, (Enum)UI.LBL_ADDRESS, (EventDelegate.Callback)InputCallback_Address);
+			SetPopupListText(UI.POP_ADDRESS, account_list, -1);
+			SetPopupListOnChange(UI.POP_ADDRESS, UI.LBL_ADDRESS, InputCallback_Address);
 		}
-		SetLabelText((Enum)UI.LBL_ADDRESS_TEXT, base.sectionData.GetText((!isGoogleAccount) ? "MAIL" : "GOOGLE"));
+		SetLabelText(UI.LBL_ADDRESS_TEXT, base.sectionData.GetText((!isGoogleAccount) ? "MAIL" : "GOOGLE"));
 		base.UpdateUI();
 	}
 
 	private void InputCallback_Address()
 	{
-		UIPopupList component = base.GetComponent<UIPopupList>((Enum)UI.POP_ADDRESS);
+		UIPopupList component = GetComponent<UIPopupList>(UI.POP_ADDRESS);
 		selectGoogleAccountIndex = component.items.IndexOf(component.value);
 		InputCallback();
 	}
@@ -69,13 +68,13 @@ public class AccountLoginBase : AccountPopupAdjuster
 	private void InputCallback()
 	{
 		bool flag = CheckInputLoginData(false);
-		SetActive((Enum)UI.BTN_OK, flag);
-		SetActive((Enum)UI.BTN_INVALID, !flag);
+		SetActive(UI.BTN_OK, flag);
+		SetActive(UI.BTN_INVALID, !flag);
 	}
 
 	private bool CheckInputLoginData(bool is_send_event = false)
 	{
-		string text = (!isValidGoogleAccountPopup) ? base.GetComponent<UILabel>((Enum)UI.LBL_ADDRESS).text : GetAdjustBeforeText(selectGoogleAccountIndex);
+		string text = (!isValidGoogleAccountPopup) ? GetComponent<UILabel>(UI.LBL_ADDRESS).text : GetAdjustBeforeText(selectGoogleAccountIndex);
 		string inputText = GetInputText(UI.IPT_PASSWORD);
 		if (string.IsNullOrEmpty(text))
 		{
@@ -146,7 +145,7 @@ public class AccountLoginBase : AccountPopupAdjuster
 	{
 		if (CheckInputLoginData(true))
 		{
-			string address = base.GetComponent<UILabel>((Enum)UI.LBL_ADDRESS).text;
+			string address = GetComponent<UILabel>(UI.LBL_ADDRESS).text;
 			string inputText = GetInputText(UI.IPT_PASSWORD);
 			GameSection.StayEvent();
 			if (isGoogleAccount)

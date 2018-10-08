@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ResourceObject
 {
-	private class Pool_ResourceObject
+	private class Pool_ResourceObject : rymTPool<ResourceObject>
 	{
 	}
 
@@ -50,13 +50,6 @@ public class ResourceObject
 
 	public static ResourceObject Get(RESOURCE_CATEGORY category, string name, Object obj)
 	{
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Expected O, but got Unknown
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Expected O, but got Unknown
-		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Expected O, but got Unknown
 		ResourceObject resourceObject = rymTPool<ResourceObject>.Get();
 		resourceObject._refCount = 0;
 		resourceObject.category = category;
@@ -76,23 +69,23 @@ public class ResourceObject
 		case RESOURCE_CATEGORY.PLAYER_LEG:
 		case RESOURCE_CATEGORY.PLAYER_WEAPON:
 		{
-			GameObject val = resourceObject.obj as GameObject;
-			if (val != null)
+			GameObject gameObject = resourceObject.obj as GameObject;
+			if ((Object)gameObject != (Object)null)
 			{
-				Renderer componentInChildren = val.GetComponentInChildren<Renderer>();
-				willReleaseList.Add(componentInChildren.get_sharedMaterial().get_mainTexture());
+				Renderer componentInChildren = gameObject.GetComponentInChildren<Renderer>();
+				willReleaseList.Add(componentInChildren.sharedMaterial.mainTexture);
 				if (componentInChildren is MeshRenderer)
 				{
 					MeshFilter component = componentInChildren.GetComponent<MeshFilter>();
-					if (component != null)
+					if ((Object)component != (Object)null)
 					{
-						willReleaseList.Add(component.get_sharedMesh());
+						willReleaseList.Add(component.sharedMesh);
 					}
 				}
 				else if (componentInChildren is SkinnedMeshRenderer)
 				{
-					SkinnedMeshRenderer val2 = componentInChildren as SkinnedMeshRenderer;
-					willReleaseList.Add(val2.get_sharedMesh());
+					SkinnedMeshRenderer skinnedMeshRenderer = componentInChildren as SkinnedMeshRenderer;
+					willReleaseList.Add(skinnedMeshRenderer.sharedMesh);
 				}
 			}
 			break;

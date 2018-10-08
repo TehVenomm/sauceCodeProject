@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -117,36 +116,35 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 
 	public override void Initialize()
 	{
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize();
 		UITexture component = GetCtrl(UI.TEX_RUSH_IMAGE).GetComponent<UITexture>();
 		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.RUSH_QUEST_ICON, ResourceName.GetRushQuestIconName((int)info.GetQuestData().rushIconId));
 		if ((base.isComplete || isNotice) && !isCompletedEventDelivery)
 		{
-			SetActive((Enum)UI.BTN_JOIN, false);
-			SetActive((Enum)UI.BTN_CREATE, false);
-			SetActive((Enum)UI.BTN_AUTO_MATCHING, false);
-			SetActive((Enum)UI.BTN_JOIN_OFF, false);
-			SetActive((Enum)UI.BTN_CREATE_OFF, false);
-			SetActive((Enum)UI.BTN_AUTO_MATCHING_OFF, false);
+			SetActive(UI.BTN_JOIN, false);
+			SetActive(UI.BTN_CREATE, false);
+			SetActive(UI.BTN_AUTO_MATCHING, false);
+			SetActive(UI.BTN_JOIN_OFF, false);
+			SetActive(UI.BTN_CREATE_OFF, false);
+			SetActive(UI.BTN_AUTO_MATCHING_OFF, false);
 		}
 		else
 		{
-			this.StartCoroutine(StartPredownload());
+			StartCoroutine(StartPredownload());
 		}
 	}
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_DROP_REWARD, true);
-		SetActive((Enum)UI.OBJ_CLEAR_REWARD, true);
+		SetActive(UI.OBJ_DROP_REWARD, true);
+		SetActive(UI.OBJ_CLEAR_REWARD, true);
 		base.UpdateUI();
 		questTableData = info.GetQuestData();
 		if (questTableData != null)
 		{
 			int num = (int)questTableData.limitTime;
-			SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num / 60:D2}:{num % 60:D2}");
-			SetLabelText((Enum)UI.LBL_RUSH_LEVEL, string.Empty);
+			SetLabelText(UI.LBL_LIMIT_TIME, $"{num / 60:D2}:{num % 60:D2}");
+			SetLabelText(UI.LBL_RUSH_LEVEL, string.Empty);
 			SetSprite(baseRoot, UI.SPR_WINDOW, "RequestWindowBase_Rush");
 			SetSprite(baseRoot, UI.SPR_MESSAGE_BG, "Checkhukidashi_Rush");
 			SetDifficultySprite();
@@ -185,23 +183,20 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 
 	private void UpdateRewardInfo()
 	{
-		SetActive((Enum)UI.OBJ_CLEAR_ICON_ROOT, !isShowDropInfo);
-		SetActive((Enum)UI.OBJ_DROP_ICON_ROOT, isShowDropInfo);
-		SetActive((Enum)UI.OBJ_CLEAR_REWARD, !isShowDropInfo);
-		SetActive((Enum)UI.OBJ_DROP_REWARD, isShowDropInfo);
-		SetActive((Enum)UI.OBJ_COMPLETE_ROOT, !isShowDropInfo);
+		SetActive(UI.OBJ_CLEAR_ICON_ROOT, !isShowDropInfo);
+		SetActive(UI.OBJ_DROP_ICON_ROOT, isShowDropInfo);
+		SetActive(UI.OBJ_CLEAR_REWARD, !isShowDropInfo);
+		SetActive(UI.OBJ_DROP_REWARD, isShowDropInfo);
+		SetActive(UI.OBJ_COMPLETE_ROOT, !isShowDropInfo);
 	}
 
 	private void OnQuery_SWITCH_SUBMISSION()
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		if (Object.op_Implicit(targetFrame) && Object.op_Implicit(submissionFrame))
+		if ((bool)targetFrame && (bool)submissionFrame)
 		{
-			bool activeSelf = targetFrame.get_gameObject().get_activeSelf();
-			targetFrame.get_gameObject().SetActive(!activeSelf);
-			submissionFrame.get_gameObject().SetActive(activeSelf);
+			bool activeSelf = targetFrame.gameObject.activeSelf;
+			targetFrame.gameObject.SetActive(!activeSelf);
+			submissionFrame.gameObject.SetActive(activeSelf);
 			isCompletedEventDelivery = true;
 			RefreshUI();
 		}
@@ -232,12 +227,12 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 
 	protected IEnumerator StartPredownload()
 	{
-		SetActive((Enum)UI.BTN_JOIN, false);
-		SetActive((Enum)UI.BTN_CREATE, false);
-		SetActive((Enum)UI.BTN_AUTO_MATCHING, false);
-		SetActive((Enum)UI.BTN_JOIN_OFF, false);
-		SetActive((Enum)UI.BTN_CREATE_OFF, false);
-		SetActive((Enum)UI.BTN_AUTO_MATCHING_OFF, false);
+		SetActive(UI.BTN_JOIN, false);
+		SetActive(UI.BTN_CREATE, false);
+		SetActive(UI.BTN_AUTO_MATCHING, false);
+		SetActive(UI.BTN_JOIN_OFF, false);
+		SetActive(UI.BTN_CREATE_OFF, false);
+		SetActive(UI.BTN_AUTO_MATCHING_OFF, false);
 		List<ResourceInfo> list = new List<ResourceInfo>();
 		List<QuestTable.QuestTableData> targetQuest = QuestTable.GetSameRushQuestData(info.GetQuestData().rushId);
 		targetQuest.Remove(info.GetQuestData());
@@ -299,9 +294,9 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 		if (list.Find((ResourceInfo x) => !MonoBehaviourSingleton<ResourceManager>.I.IsCached(x.category, x.packageName)) != null)
 		{
 			RequestEvent("ASSET_DOWNLOAD", StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 3000u));
-			SetActive((Enum)UI.BTN_JOIN_OFF, true);
-			SetActive((Enum)UI.BTN_CREATE_OFF, true);
-			SetActive((Enum)UI.BTN_AUTO_MATCHING_OFF, true);
+			SetActive(UI.BTN_JOIN_OFF, true);
+			SetActive(UI.BTN_CREATE_OFF, true);
+			SetActive(UI.BTN_AUTO_MATCHING_OFF, true);
 			LoadingQueue load_queue = new LoadingQueue(this);
 			foreach (ResourceInfo item3 in list)
 			{
@@ -315,15 +310,15 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 			}
 		}
 		bool pushEnable = true;
-		SetActive((Enum)UI.BTN_JOIN, pushEnable);
-		SetActive((Enum)UI.BTN_CREATE, pushEnable);
-		SetActive((Enum)UI.BTN_AUTO_MATCHING, pushEnable);
-		SetActive((Enum)UI.BTN_JOIN_OFF, !pushEnable);
-		SetActive((Enum)UI.BTN_CREATE_OFF, !pushEnable);
-		SetActive((Enum)UI.BTN_AUTO_MATCHING_OFF, !pushEnable);
+		SetActive(UI.BTN_JOIN, pushEnable);
+		SetActive(UI.BTN_CREATE, pushEnable);
+		SetActive(UI.BTN_AUTO_MATCHING, pushEnable);
+		SetActive(UI.BTN_JOIN_OFF, !pushEnable);
+		SetActive(UI.BTN_CREATE_OFF, !pushEnable);
+		SetActive(UI.BTN_AUTO_MATCHING_OFF, !pushEnable);
 	}
 
-	private unsafe void OnQuery_AUTO_MATCHING()
+	private void OnQuery_AUTO_MATCHING()
 	{
 		GameSection.SetEventData(new object[1]
 		{
@@ -332,14 +327,60 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 		GameSection.StayEvent();
 		int retryCount = 0;
 		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 0);
-		_003COnQuery_AUTO_MATCHING_003Ec__AnonStorey403 _003COnQuery_AUTO_MATCHING_003Ec__AnonStorey;
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.GetQuestData().questID, retryCount, false, new Action<bool, int, bool, float>((object)_003COnQuery_AUTO_MATCHING_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.GetQuestData().questID, retryCount, false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
+		{
+			if (!is_success)
+			{
+				GameSection.ResumeEvent(false, null);
+			}
+			else if (maxRetryCount > 0)
+			{
+				retryCount++;
+				StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
+			}
+			else if (!isJoined)
+			{
+				OnQuery_AUTO_CREATE_ROOM();
+			}
+			else
+			{
+				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
+				GameSection.ResumeEvent(true, null);
+			}
+		});
 	}
 
-	private unsafe IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
+	private IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
 	{
 		yield return (object)new WaitForSeconds(time);
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, false, new Action<bool, int, bool, float>((object)/*Error near IL_0061: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
+		{
+			if (!is_success)
+			{
+				GameSection.ResumeEvent(false, null);
+			}
+			else if (maxRetryCount > 0)
+			{
+				if (((_003CMatchAtRandom_003Ec__Iterator127)/*Error near IL_0061: stateMachine*/).retryCount >= maxRetryCount)
+				{
+					((_003CMatchAtRandom_003Ec__Iterator127)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.OnQuery_AUTO_CREATE_ROOM();
+				}
+				else
+				{
+					((_003CMatchAtRandom_003Ec__Iterator127)/*Error near IL_0061: stateMachine*/).retryCount++;
+					((_003CMatchAtRandom_003Ec__Iterator127)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.StartCoroutine(((_003CMatchAtRandom_003Ec__Iterator127)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.MatchAtRandom(((_003CMatchAtRandom_003Ec__Iterator127)/*Error near IL_0061: stateMachine*/).setting, ((_003CMatchAtRandom_003Ec__Iterator127)/*Error near IL_0061: stateMachine*/).retryCount, waitTime));
+				}
+			}
+			else if (!isJoined)
+			{
+				((_003CMatchAtRandom_003Ec__Iterator127)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.OnQuery_AUTO_CREATE_ROOM();
+			}
+			else
+			{
+				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(((_003CMatchAtRandom_003Ec__Iterator127)/*Error near IL_0061: stateMachine*/).setting);
+				GameSection.ResumeEvent(true, null);
+			}
+		});
 	}
 
 	private void OnQuery_AUTO_CREATE_ROOM()
@@ -366,6 +407,6 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 	private void SetDifficultySprite()
 	{
 		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryID);
-		SetActive((Enum)UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
+		SetActive(UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
 	}
 }

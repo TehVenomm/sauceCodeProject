@@ -126,11 +126,10 @@ public class Opening : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoInitialzie());
+		StartCoroutine(DoInitialzie());
 	}
 
-	private unsafe IEnumerator DoInitialzie()
+	private IEnumerator DoInitialzie()
 	{
 		LoadingQueue loadQueue = new LoadingQueue(this);
 		LoadObject loadedCutSceneObj = loadQueue.Load(RESOURCE_CATEGORY.CUTSCENE, "Opening", false);
@@ -151,26 +150,26 @@ public class Opening : GameSection
 		{
 			yield return (object)loadQueue.Wait();
 		}
-		if (MonoBehaviourSingleton<AppMain>.I.mainCamera != null)
+		if ((UnityEngine.Object)MonoBehaviourSingleton<AppMain>.I.mainCamera != (UnityEngine.Object)null)
 		{
-			MonoBehaviourSingleton<AppMain>.I.mainCamera.set_enabled(false);
+			MonoBehaviourSingleton<AppMain>.I.mainCamera.enabled = false;
 		}
-		cutSceneObjectRoot = (ResourceUtility.Instantiate<Object>(loadedCutSceneObj.loadedObject) as GameObject);
-		cutSceneObjectRoot.get_transform().set_parent(MonoBehaviourSingleton<AppMain>.I.get_transform());
-		titleObjectRoot = (ResourceUtility.Instantiate<Object>(loadedTitleObj.loadedObject) as GameObject);
-		titleObjectRoot.get_transform().set_parent(MonoBehaviourSingleton<AppMain>.I.get_transform());
-		Transform eventObj = cutSceneObjectRoot.get_transform().FindChild("CUT_op");
-		if (eventObj != null)
+		cutSceneObjectRoot = (ResourceUtility.Instantiate(loadedCutSceneObj.loadedObject) as GameObject);
+		cutSceneObjectRoot.transform.parent = MonoBehaviourSingleton<AppMain>.I.transform;
+		titleObjectRoot = (ResourceUtility.Instantiate(loadedTitleObj.loadedObject) as GameObject);
+		titleObjectRoot.transform.parent = MonoBehaviourSingleton<AppMain>.I.transform;
+		Transform eventObj = cutSceneObjectRoot.transform.FindChild("CUT_op");
+		if ((UnityEngine.Object)eventObj != (UnityEngine.Object)null)
 		{
-			cutOP = eventObj.get_gameObject();
+			cutOP = eventObj.gameObject;
 			cutSceneAnimation = cutOP.GetComponent<Animation>();
 			cutOP.SetActive(false);
 		}
-		Transform fade = cutSceneObjectRoot.get_transform().FindChild("Main Camera/Plane");
-		if (fade != null)
+		Transform fade = cutSceneObjectRoot.transform.FindChild("Main Camera/Plane");
+		if ((UnityEngine.Object)fade != (UnityEngine.Object)null)
 		{
 			MeshRenderer renderer = fade.GetComponent<MeshRenderer>();
-			whiteFadeMaterial = renderer.get_material();
+			whiteFadeMaterial = renderer.material;
 		}
 		titleAnimation = titleObjectRoot.GetComponent<Animation>();
 		cutSceneAnimation.Stop();
@@ -179,18 +178,29 @@ public class Opening : GameSection
 		MonoBehaviourSingleton<UIManager>.I.loading.HideAllPermissionMsg();
 		base.Initialize();
 		PredownloadManager.openingMode = true;
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<PredownloadManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<PredownloadManager>();
 		MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible = false;
 		PredownloadManager.Stop(PredownloadManager.STOP_FLAG.INGAME_TUTORIAL, true);
 		DataTableManager dataTableManager = MonoBehaviourSingleton<DataTableManager>.I;
 		Protocol.Send<CheckRegisterModel>(CheckRegisterModel.URL, delegate
 		{
-			((_003CDoInitialzie_003Ec__Iterator101)/*Error near IL_0399: stateMachine*/)._003CupdatedTableIndex_003E__15 = true;
+			((_003CDoInitialzie_003Ec__Iterator103)/*Error near IL_0399: stateMachine*/)._003CupdatedTableIndex_003E__15 = true;
 		}, string.Empty);
-		yield return (object)new WaitUntil(new Func<bool>((object)/*Error near IL_03b0: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		yield return (object)new WaitUntil(() => ((_003CDoInitialzie_003Ec__Iterator103)/*Error near IL_03b0: stateMachine*/)._003CupdatedTableIndex_003E__15);
 		isDownloading = true;
 		dataTableManager.InitializeForDownload();
-		dataTableManager.UpdateManifest(new Action((object)/*Error near IL_03ef: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		dataTableManager.UpdateManifest(delegate
+		{
+			((_003CDoInitialzie_003Ec__Iterator103)/*Error near IL_03ef: stateMachine*/)._003CdataTableManager_003E__14.LoadInitialTable(delegate
+			{
+				List<DataLoadRequest> loadings = ((_003CDoInitialzie_003Ec__Iterator103)/*Error near IL_03ef: stateMachine*/)._003CdataTableManager_003E__14.LoadAllTable(delegate
+				{
+					PredownloadManager.Stop(PredownloadManager.STOP_FLAG.INGAME_TUTORIAL, false);
+					((_003CDoInitialzie_003Ec__Iterator103)/*Error near IL_03ef: stateMachine*/)._003C_003Ef__this.isDownloading = false;
+				}, true);
+				MonoBehaviourSingleton<UIManager>.I.loading.SetProgress(new FirstOpeningProgress(loadings));
+			}, true);
+		});
 		TitleTop.isFirstBoot = false;
 	}
 
@@ -207,23 +217,23 @@ public class Opening : GameSection
 	{
 		SoundManager.StopVoice(0u, 2);
 		SoundManager.StopSEAll(0);
-		if (cutSceneObjectRoot != null)
+		if ((UnityEngine.Object)cutSceneObjectRoot != (UnityEngine.Object)null)
 		{
-			Object.Destroy(cutSceneObjectRoot);
+			UnityEngine.Object.Destroy(cutSceneObjectRoot);
 			cutSceneObjectRoot = null;
 		}
-		if (titleObjectRoot != null)
+		if ((UnityEngine.Object)titleObjectRoot != (UnityEngine.Object)null)
 		{
-			Object.Destroy(titleObjectRoot);
+			UnityEngine.Object.Destroy(titleObjectRoot);
 			titleObjectRoot = null;
 		}
-		if (MonoBehaviourSingleton<AppMain>.I.mainCamera != null)
+		if ((UnityEngine.Object)MonoBehaviourSingleton<AppMain>.I.mainCamera != (UnityEngine.Object)null)
 		{
-			MonoBehaviourSingleton<AppMain>.I.mainCamera.set_enabled(true);
+			MonoBehaviourSingleton<AppMain>.I.mainCamera.enabled = true;
 		}
 		if (MonoBehaviourSingleton<PredownloadManager>.IsValid() && (MonoBehaviourSingleton<PredownloadManager>.I.tutorialCount == 0 || MonoBehaviourSingleton<PredownloadManager>.I.loadedCount < MonoBehaviourSingleton<PredownloadManager>.I.tutorialCount))
 		{
-			Object.Destroy(MonoBehaviourSingleton<PredownloadManager>.I);
+			UnityEngine.Object.Destroy(MonoBehaviourSingleton<PredownloadManager>.I);
 		}
 		MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible = true;
 		base.OnClose();
@@ -235,7 +245,7 @@ public class Opening : GameSection
 		{
 			if (MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible)
 			{
-				downloadGaugeDisplayTimer -= Time.get_deltaTime();
+				downloadGaugeDisplayTimer -= Time.deltaTime;
 				if (downloadGaugeDisplayTimer <= 0f)
 				{
 					downloadGaugeDisplayTimer = 0f;
@@ -248,21 +258,21 @@ public class Opening : GameSection
 				if (!i.isChangeing && isRegisted)
 				{
 					bool flag = i.GetCurrentSectionName() == "Opening";
-					if (cutSceneAnimation == null)
+					if ((UnityEngine.Object)cutSceneAnimation == (UnityEngine.Object)null)
 					{
 						if (i.IsEventExecutionPossible() && flag)
 						{
 							GoEventTutorial();
 						}
 					}
-					else if (!cutSceneAnimation.get_isPlaying())
+					else if (!cutSceneAnimation.isPlaying)
 					{
 						if (i.IsEventExecutionPossible() && flag)
 						{
 							GoEventTutorial();
 						}
 					}
-					else if (MonoBehaviourSingleton<InputManager>.I.IsTouch() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection() == this)
+					else if (MonoBehaviourSingleton<InputManager>.I.IsTouch() && (UnityEngine.Object)MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection() == (UnityEngine.Object)this)
 					{
 						if (MonoBehaviourSingleton<PredownloadManager>.IsValid() && !MonoBehaviourSingleton<PredownloadManager>.I.isLoadingInOpening)
 						{
@@ -279,14 +289,23 @@ public class Opening : GameSection
 		}
 	}
 
-	private unsafe void GoEventTutorial()
+	private void GoEventTutorial()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Expected O, but got Unknown
 		MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_loading_start, "Tutorial");
 		endCutScene = true;
-		Fade(Color.get_black(), 0f, 1f, 1f, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		Fade(Color.black, 0f, 1f, 1f, delegate
+		{
+			if (MonoBehaviourSingleton<PredownloadManager>.I.isLoadingInOpening || isDownloading)
+			{
+				StartCoroutine("WaitForDownload");
+			}
+			else
+			{
+				DispatchEvent("ENTER_TUTORIAL", null);
+				ResourceManager.internalMode = false;
+				MonoBehaviourSingleton<UIManager>.I.ShowGGTutorialMessage();
+			}
+		});
 	}
 
 	private IEnumerator WaitForDownload()
@@ -332,7 +351,7 @@ public class Opening : GameSection
 		MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_start_game, "Tutorial");
 	}
 
-	private unsafe void OnQuery_FB_LOGIN()
+	private void OnQuery_FB_LOGIN()
 	{
 		GameSection.StayEvent();
 		if (MonoBehaviourSingleton<FBManager>.I.isLoggedIn)
@@ -341,7 +360,17 @@ public class Opening : GameSection
 		}
 		else
 		{
-			MonoBehaviourSingleton<FBManager>.I.LoginWithReadPermission(new Action<bool, string>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			MonoBehaviourSingleton<FBManager>.I.LoginWithReadPermission(delegate(bool success, string b)
+			{
+				if (success)
+				{
+					_SendRegistAuthFacebook();
+				}
+				else
+				{
+					GameSection.ResumeEvent(success, null);
+				}
+			});
 		}
 	}
 
@@ -374,19 +403,27 @@ public class Opening : GameSection
 		});
 	}
 
-	private unsafe void StartOpening()
+	private void StartOpening()
 	{
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Expected O, but got Unknown
-		SetActive((Enum)UI.LBL_APP_VERSION, false);
-		SetActive((Enum)UI.BTN_START, false);
-		SetActive((Enum)UI.BTN_ADVANCED_LOGIN, false);
-		SetActive((Enum)UI.BTN_CLEARCACHE, false);
-		SetActive((Enum)UI.BTN_FB_LOGIN, false);
+		SetActive(UI.LBL_APP_VERSION, false);
+		SetActive(UI.BTN_START, false);
+		SetActive(UI.BTN_ADVANCED_LOGIN, false);
+		SetActive(UI.BTN_CLEARCACHE, false);
+		SetActive(UI.BTN_FB_LOGIN, false);
 		MonoBehaviourSingleton<SoundManager>.I.TransitionTo("Opening", 1f);
 		titleAnimation.Play("Tap");
-		Fade(Color.get_white(), 0f, 1f, 1f, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		Fade(Color.white, 0f, 1f, 1f, delegate
+		{
+			titleObjectRoot.SetActive(false);
+			cutOP.SetActive(true);
+			cutSceneAnimation.Play();
+			StartCoroutine(DoSEPlay());
+			StartCoroutine(DoVOICEPlay());
+			isAnimationStarted = true;
+			Fade(Color.white, 1f, 0f, 1f, delegate
+			{
+			});
+		});
 		MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_story, "Tutorial");
 	}
 
@@ -418,37 +455,28 @@ public class Opening : GameSection
 
 	private void Fade(Color baseColor, float _from, float _to, float duration, Action onComplete)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoFade(baseColor, _from, _to, duration, onComplete));
+		StartCoroutine(DoFade(baseColor, _from, _to, duration, onComplete));
 	}
 
 	private IEnumerator DoFade(Color baseColor, float _from, float _to, float duration, Action onComplete)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 		float timer = 0f;
-		if (baseColor != Color.get_white())
+		if (baseColor != Color.white)
 		{
-			whiteFadeMaterial.set_shader(Shader.Find("mobile/Custom/Effect/effect_alpha"));
+			whiteFadeMaterial.shader = Shader.Find("mobile/Custom/Effect/effect_alpha");
 		}
 		else
 		{
-			whiteFadeMaterial.set_shader(Shader.Find("mobile/Custom/Effect/effect_add"));
+			whiteFadeMaterial.shader = Shader.Find("mobile/Custom/Effect/effect_add");
 		}
 		while (timer < duration)
 		{
-			timer += Time.get_deltaTime();
+			timer += Time.deltaTime;
 			float alpha = Mathf.Lerp(_from, _to, timer / duration);
 			whiteFadeMaterial.SetColor("_Color", new Color(baseColor.r, baseColor.g, baseColor.b, alpha));
 			yield return (object)null;
 		}
-		if (onComplete != null)
-		{
-			onComplete.Invoke();
-		}
+		onComplete?.Invoke();
 	}
 
 	public override void UpdateUI()
@@ -456,28 +484,26 @@ public class Opening : GameSection
 		SetApplicationVersionText(UI.LBL_APP_VERSION);
 		if (MonoBehaviourSingleton<GlobalSettingsManager>.IsValid() && MonoBehaviourSingleton<GlobalSettingsManager>.I.submissionVersion)
 		{
-			SetActive((Enum)UI.BTN_ADVANCED_LOGIN, false);
+			SetActive(UI.BTN_ADVANCED_LOGIN, false);
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_ADVANCED_LOGIN, !MonoBehaviourSingleton<AccountManager>.I.account.IsRegist());
+			SetActive(UI.BTN_ADVANCED_LOGIN, !MonoBehaviourSingleton<AccountManager>.I.account.IsRegist());
 		}
-		SetActive((Enum)UI.BTN_FB_LOGIN, !MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUserFacebook);
-		SetActive((Enum)UI.BTN_START, !MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUserFacebook);
+		SetActive(UI.BTN_FB_LOGIN, !MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUserFacebook);
+		SetActive(UI.BTN_START, !MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUserFacebook);
 	}
 
 	public override void Exit()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		base.Exit();
 		if (!isCacheClear)
 		{
 			if (!MonoBehaviourSingleton<LoadingProcess>.IsValid())
 			{
-				MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<LoadingProcess>();
+				MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<LoadingProcess>();
 			}
-			MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<InGameTutorialManager>();
+			MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<InGameTutorialManager>();
 		}
 	}
 

@@ -140,9 +140,9 @@ namespace GooglePlayGames.Native.PInvoke
 				return RealTimeMultiplayerManager.RealTimeMultiplayerManager_FetchInvitationsResponse_GetStatus(SelfPtr());
 			}
 
-			internal unsafe IEnumerable<MultiplayerInvitation> Invitations()
+			internal IEnumerable<MultiplayerInvitation> Invitations()
 			{
-				return PInvokeUtilities.ToEnumerable<MultiplayerInvitation>(RealTimeMultiplayerManager.RealTimeMultiplayerManager_FetchInvitationsResponse_GetInvitations_Length(SelfPtr()), new Func<UIntPtr, MultiplayerInvitation>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				return PInvokeUtilities.ToEnumerable(RealTimeMultiplayerManager.RealTimeMultiplayerManager_FetchInvitationsResponse_GetInvitations_Length(SelfPtr()), (UIntPtr index) => new MultiplayerInvitation(RealTimeMultiplayerManager.RealTimeMultiplayerManager_FetchInvitationsResponse_GetInvitations_GetElement(SelfPtr(), index)));
 			}
 
 			protected override void CallDispose(HandleRef selfPointer)
@@ -172,9 +172,9 @@ namespace GooglePlayGames.Native.PInvoke
 			RealTimeMultiplayerManager.RealTimeMultiplayerManager_CreateRealTimeRoom(mGameServices.AsHandle(), config.AsPointer(), helper.AsPointer(), InternalRealTimeRoomCallback, ToCallbackPointer(callback));
 		}
 
-		internal unsafe void ShowPlayerSelectUI(uint minimumPlayers, uint maxiumPlayers, bool allowAutomatching, Action<PlayerSelectUIResponse> callback)
+		internal void ShowPlayerSelectUI(uint minimumPlayers, uint maxiumPlayers, bool allowAutomatching, Action<PlayerSelectUIResponse> callback)
 		{
-			RealTimeMultiplayerManager.RealTimeMultiplayerManager_ShowPlayerSelectUI(mGameServices.AsHandle(), minimumPlayers, maxiumPlayers, allowAutomatching, InternalPlayerSelectUIcallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, PlayerSelectUIResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			RealTimeMultiplayerManager.RealTimeMultiplayerManager_ShowPlayerSelectUI(mGameServices.AsHandle(), minimumPlayers, maxiumPlayers, allowAutomatching, InternalPlayerSelectUIcallback, Callbacks.ToIntPtr(callback, PlayerSelectUIResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(RealTimeMultiplayerManager.PlayerSelectUICallback))]
@@ -195,15 +195,15 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("RealtimeManager#InternalRoomInboxUICallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal unsafe void ShowRoomInboxUI(Action<RoomInboxUIResponse> callback)
+		internal void ShowRoomInboxUI(Action<RoomInboxUIResponse> callback)
 		{
-			RealTimeMultiplayerManager.RealTimeMultiplayerManager_ShowRoomInboxUI(mGameServices.AsHandle(), InternalRoomInboxUICallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, RoomInboxUIResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			RealTimeMultiplayerManager.RealTimeMultiplayerManager_ShowRoomInboxUI(mGameServices.AsHandle(), InternalRoomInboxUICallback, Callbacks.ToIntPtr(callback, RoomInboxUIResponse.FromPointer));
 		}
 
-		internal unsafe void ShowWaitingRoomUI(NativeRealTimeRoom room, uint minimumParticipantsBeforeStarting, Action<WaitingRoomUIResponse> callback)
+		internal void ShowWaitingRoomUI(NativeRealTimeRoom room, uint minimumParticipantsBeforeStarting, Action<WaitingRoomUIResponse> callback)
 		{
 			Misc.CheckNotNull(room);
-			RealTimeMultiplayerManager.RealTimeMultiplayerManager_ShowWaitingRoomUI(mGameServices.AsHandle(), room.AsPointer(), minimumParticipantsBeforeStarting, InternalWaitingRoomUICallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, WaitingRoomUIResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			RealTimeMultiplayerManager.RealTimeMultiplayerManager_ShowWaitingRoomUI(mGameServices.AsHandle(), room.AsPointer(), minimumParticipantsBeforeStarting, InternalWaitingRoomUICallback, Callbacks.ToIntPtr(callback, WaitingRoomUIResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(RealTimeMultiplayerManager.WaitingRoomUICallback))]
@@ -218,9 +218,9 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("RealtimeManager#InternalFetchInvitationsCallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal unsafe void FetchInvitations(Action<FetchInvitationsResponse> callback)
+		internal void FetchInvitations(Action<FetchInvitationsResponse> callback)
 		{
-			RealTimeMultiplayerManager.RealTimeMultiplayerManager_FetchInvitations(mGameServices.AsHandle(), InternalFetchInvitationsCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, FetchInvitationsResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			RealTimeMultiplayerManager.RealTimeMultiplayerManager_FetchInvitations(mGameServices.AsHandle(), InternalFetchInvitationsCallback, Callbacks.ToIntPtr(callback, FetchInvitationsResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(RealTimeMultiplayerManager.LeaveRoomCallback))]
@@ -284,20 +284,15 @@ namespace GooglePlayGames.Native.PInvoke
 			RealTimeMultiplayerManager.RealTimeMultiplayerManager_SendUnreliableMessageToOthers(mGameServices.AsHandle(), room.AsPointer(), data, PInvokeUtilities.ArrayToSizeT(data));
 		}
 
-		internal unsafe void SendUnreliableMessageToSpecificParticipants(NativeRealTimeRoom room, List<MultiplayerParticipant> recipients, byte[] data)
+		internal void SendUnreliableMessageToSpecificParticipants(NativeRealTimeRoom room, List<MultiplayerParticipant> recipients, byte[] data)
 		{
-			HandleRef self = mGameServices.AsHandle();
-			IntPtr room2 = room.AsPointer();
-			if (_003C_003Ef__am_0024cache1 == null)
-			{
-				_003C_003Ef__am_0024cache1 = new Func<MultiplayerParticipant, IntPtr>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			RealTimeMultiplayerManager.RealTimeMultiplayerManager_SendUnreliableMessage(self, room2, recipients.Select<MultiplayerParticipant, IntPtr>(_003C_003Ef__am_0024cache1).ToArray(), new UIntPtr((ulong)recipients.LongCount()), data, PInvokeUtilities.ArrayToSizeT(data));
+			RealTimeMultiplayerManager.RealTimeMultiplayerManager_SendUnreliableMessage(mGameServices.AsHandle(), room.AsPointer(), (from r in recipients
+			select r.AsPointer()).ToArray(), new UIntPtr((ulong)recipients.LongCount()), data, PInvokeUtilities.ArrayToSizeT(data));
 		}
 
-		private unsafe static IntPtr ToCallbackPointer(Action<RealTimeRoomResponse> callback)
+		private static IntPtr ToCallbackPointer(Action<RealTimeRoomResponse> callback)
 		{
-			return Callbacks.ToIntPtr(callback, new Func<IntPtr, RealTimeRoomResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			return Callbacks.ToIntPtr(callback, RealTimeRoomResponse.FromPointer);
 		}
 	}
 }

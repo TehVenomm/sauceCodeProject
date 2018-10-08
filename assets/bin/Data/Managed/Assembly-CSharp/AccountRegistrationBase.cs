@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -42,15 +41,15 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.IPT_ADDRESS, !isGoogleAccount);
-		SetActive((Enum)UI.POP_ADDRESS, isGoogleAccount);
-		SetActive((Enum)UI.OBJ_SECRET_QUESTION, !isGoogleAccount);
-		SetInput((Enum)UI.IPT_ADDRESS, string.Empty, 255, (EventDelegate.Callback)InputCallBack);
-		SetInput((Enum)UI.IPT_PASSWORD, string.Empty, 255, (EventDelegate.Callback)InputCallBack);
-		SetInput((Enum)UI.IPT_CONFIRM_PASSWORD, string.Empty, 255, (EventDelegate.Callback)InputCallBack);
+		SetActive(UI.IPT_ADDRESS, !isGoogleAccount);
+		SetActive(UI.POP_ADDRESS, isGoogleAccount);
+		SetActive(UI.OBJ_SECRET_QUESTION, !isGoogleAccount);
+		SetInput(UI.IPT_ADDRESS, string.Empty, 255, InputCallBack);
+		SetInput(UI.IPT_PASSWORD, string.Empty, 255, InputCallBack);
+		SetInput(UI.IPT_CONFIRM_PASSWORD, string.Empty, 255, InputCallBack);
 		if (!isGoogleAccount)
 		{
-			SetInput((Enum)UI.IPT_SECRET_ANSER, string.Empty, 45, (EventDelegate.Callback)InputCallBack);
+			SetInput(UI.IPT_SECRET_ANSER, string.Empty, 45, InputCallBack);
 		}
 		if (isGoogleAccount)
 		{
@@ -58,15 +57,15 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 			googleAccountList = NetworkNative.getGoogleAccounts();
 			if (googleAccountList.googleAccounts.Count > 0)
 			{
-				UILabel lbl = base.GetComponent<UILabel>((Enum)UI.LBL_ADDRESS);
+				UILabel lbl = GetComponent<UILabel>(UI.LBL_ADDRESS);
 				account_list = new List<string>();
 				googleAccountList.googleAccounts.ForEach(delegate(NetworkNative.GoogleAccount account)
 				{
 					account_list.Add(PopupTextAdjust(lbl, account.name));
 				});
 			}
-			SetPopupListText((Enum)UI.POP_ADDRESS, account_list, -1);
-			SetPopupListOnChange((Enum)UI.POP_ADDRESS, (Enum)UI.LBL_ADDRESS, (EventDelegate.Callback)InputCallBack_Address);
+			SetPopupListText(UI.POP_ADDRESS, account_list, -1);
+			SetPopupListOnChange(UI.POP_ADDRESS, UI.LBL_ADDRESS, InputCallBack_Address);
 		}
 		else
 		{
@@ -78,14 +77,14 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 			list.Add(StringTable.Get(STRING_CATEGORY.ACCOUNT, 4u));
 			list.Add(StringTable.Get(STRING_CATEGORY.ACCOUNT, 5u));
 			list.Add(StringTable.Get(STRING_CATEGORY.ACCOUNT, 6u));
-			SetPopupListText((Enum)UI.POP_SECRET_QUESTION, list, -1);
-			SetPopupListOnChange((Enum)UI.POP_SECRET_QUESTION, (Enum)UI.LBL_SECRET_QUESTION, (EventDelegate.Callback)InputCallBack_SecretQuestion);
+			SetPopupListText(UI.POP_SECRET_QUESTION, list, -1);
+			SetPopupListOnChange(UI.POP_SECRET_QUESTION, UI.LBL_SECRET_QUESTION, InputCallBack_SecretQuestion);
 		}
 	}
 
 	private void InputCallBack_SecretQuestion()
 	{
-		UIPopupList component = base.GetComponent<UIPopupList>((Enum)UI.POP_SECRET_QUESTION);
+		UIPopupList component = GetComponent<UIPopupList>(UI.POP_SECRET_QUESTION);
 		secretQuestionIndex = component.items.IndexOf(component.value);
 		isSelectedSecretQuest = true;
 		InputCallBack();
@@ -93,7 +92,7 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 
 	private void InputCallBack_Address()
 	{
-		UIPopupList component = base.GetComponent<UIPopupList>((Enum)UI.POP_ADDRESS);
+		UIPopupList component = GetComponent<UIPopupList>(UI.POP_ADDRESS);
 		secretGoogleAccountIndex = component.items.IndexOf(component.value);
 		InputCallBack();
 	}
@@ -101,14 +100,14 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 	private void InputCallBack()
 	{
 		bool flag = CheckRegistData(false);
-		SetActive((Enum)UI.BTN_OK, flag);
-		SetActive((Enum)UI.BTN_INVALID, !flag);
+		SetActive(UI.BTN_OK, flag);
+		SetActive(UI.BTN_INVALID, !flag);
 	}
 
 	private bool CheckRegistData(bool is_send_event = false)
 	{
 		string empty = string.Empty;
-		empty = ((!isGoogleAccount) ? base.GetComponent<UILabel>((Enum)UI.LBL_ADDRESS).text : GetAdjustBeforeText(secretGoogleAccountIndex));
+		empty = ((!isGoogleAccount) ? GetComponent<UILabel>(UI.LBL_ADDRESS).text : GetAdjustBeforeText(secretGoogleAccountIndex));
 		string inputText = GetInputText(UI.IPT_PASSWORD);
 		string inputText2 = GetInputText(UI.IPT_CONFIRM_PASSWORD);
 		string empty2 = string.Empty;
@@ -168,7 +167,7 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 				CheckChangeEvent(is_send_event, "NON_SELECT_SECRET_QUESTION", null);
 				return false;
 			}
-			empty2 = base.GetComponent<UILabel>((Enum)UI.LBL_SECRET_ANSER).text;
+			empty2 = GetComponent<UILabel>(UI.LBL_SECRET_ANSER).text;
 			if (string.IsNullOrEmpty(empty2))
 			{
 				CheckChangeEvent(is_send_event, "EMPTY", new object[1]
@@ -198,10 +197,10 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 	{
 		if (CheckRegistData(true))
 		{
-			string mail_address = base.GetComponent<UILabel>((Enum)UI.LBL_ADDRESS).text;
+			string mail_address = GetComponent<UILabel>(UI.LBL_ADDRESS).text;
 			string inputText = GetInputText(UI.IPT_PASSWORD);
 			string inputText2 = GetInputText(UI.IPT_CONFIRM_PASSWORD);
-			string secretQuestionAnswer = (!isGoogleAccount) ? base.GetComponent<UILabel>((Enum)UI.LBL_SECRET_ANSER).text : string.Empty;
+			string secretQuestionAnswer = (!isGoogleAccount) ? GetComponent<UILabel>(UI.LBL_SECRET_ANSER).text : string.Empty;
 			GameSection.StayEvent();
 			if (isGoogleAccount)
 			{

@@ -63,28 +63,20 @@ public class StatusEnemyList : GameSection
 
 	private List<string> fields;
 
-	public unsafe override void Initialize()
+	public override void Initialize()
 	{
 		currentPageIndex = 0;
 		popupIndex = 0;
 		achievementCounter = MonoBehaviourSingleton<AchievementManager>.I.monsterCollectionList;
-		SetText((Enum)UI.STR_MONSTER, "NORMAL");
-		SetText((Enum)UI.STR_BIGMONSTER, "HAPPEN");
-		SetText((Enum)UI.STR_RAREMONSTER, "HAPPEN_RARE");
-		SetText((Enum)UI.STR_FIELDMONSTER, "FIELD_CHANGE");
+		SetText(UI.STR_MONSTER, "NORMAL");
+		SetText(UI.STR_BIGMONSTER, "HAPPEN");
+		SetText(UI.STR_RAREMONSTER, "HAPPEN_RARE");
+		SetText(UI.STR_FIELDMONSTER, "FIELD_CHANGE");
 		uint[] openRegionIdList = MonoBehaviourSingleton<WorldMapManager>.I.GetOpenRegionIdList();
-		uint[] source = openRegionIdList;
-		if (_003C_003Ef__am_0024cacheA == null)
-		{
-			_003C_003Ef__am_0024cacheA = new Func<uint, RegionTable.Data>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		unlockRegion = source.Select<uint, RegionTable.Data>(_003C_003Ef__am_0024cacheA).ToList();
-		List<RegionTable.Data> source2 = unlockRegion;
-		if (_003C_003Ef__am_0024cacheB == null)
-		{
-			_003C_003Ef__am_0024cacheB = new Func<RegionTable.Data, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		fields = source2.Select<RegionTable.Data, string>(_003C_003Ef__am_0024cacheB).ToList();
+		unlockRegion = (from x in openRegionIdList
+		select Singleton<RegionTable>.I.GetData(x)).ToList();
+		fields = (from x in unlockRegion
+		select x.regionName).ToList();
 		InitializeCaption();
 		base.Initialize();
 	}
@@ -108,8 +100,8 @@ public class StatusEnemyList : GameSection
 			return false;
 		}
 		currentPageIndex = pageIndex;
-		SetPageNumText((Enum)UI.LBL_PAGE_MAX, maxPageNum);
-		SetLabelText((Enum)UI.LBL_TARGET_FIELD, fields[popupIndex]);
+		SetPageNumText(UI.LBL_PAGE_MAX, maxPageNum);
+		SetLabelText(UI.LBL_TARGET_FIELD, fields[popupIndex]);
 		UpdateRegion();
 		UpdateInventory();
 		UpdateAnchors();
@@ -133,15 +125,12 @@ public class StatusEnemyList : GameSection
 		ShowLevelPopup();
 	}
 
-	private unsafe void UpdateRegion()
+	private void UpdateRegion()
 	{
-		uint regionId = unlockRegion.First(new Func<RegionTable.Data, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).regionId;
-		List<EnemyCollectionTable.EnemyCollectionData> enemyCollectionDataByRegion = Singleton<EnemyCollectionTable>.I.GetEnemyCollectionDataByRegion(regionId);
-		if (_003C_003Ef__am_0024cacheC == null)
-		{
-			_003C_003Ef__am_0024cacheC = new Func<EnemyCollectionTable.EnemyCollectionData, uint>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		currentRegionCollectionItems = enemyCollectionDataByRegion.OrderBy<EnemyCollectionTable.EnemyCollectionData, uint>(_003C_003Ef__am_0024cacheC).ToList();
+		uint regionId = unlockRegion.First((RegionTable.Data x) => x.regionName == fields[popupIndex]).regionId;
+		currentRegionCollectionItems = (from data in Singleton<EnemyCollectionTable>.I.GetEnemyCollectionDataByRegion(regionId)
+		orderby data.id
+		select data).ToList();
 		int num = 0;
 		using (List<EnemyCollectionTable.EnemyCollectionData>.Enumerator enumerator = currentRegionCollectionItems.GetEnumerator())
 		{
@@ -155,54 +144,42 @@ public class StatusEnemyList : GameSection
 				}
 			}
 		}
-		SetLabelText((Enum)UI.LBL_CURRENT_NUM, $"{num}/{currentRegionCollectionItems.Count}");
+		SetLabelText(UI.LBL_CURRENT_NUM, $"{num}/{currentRegionCollectionItems.Count}");
 	}
 
-	private unsafe void UpdateInventory()
+	private void UpdateInventory()
 	{
-		List<EnemyCollectionTable.EnemyCollectionData> source = currentRegionCollectionItems;
-		if (_003C_003Ef__am_0024cacheD == null)
-		{
-			_003C_003Ef__am_0024cacheD = new Func<EnemyCollectionTable.EnemyCollectionData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable = source.Where(_003C_003Ef__am_0024cacheD);
-		List<EnemyCollectionTable.EnemyCollectionData> source2 = currentRegionCollectionItems;
-		if (_003C_003Ef__am_0024cacheE == null)
-		{
-			_003C_003Ef__am_0024cacheE = new Func<EnemyCollectionTable.EnemyCollectionData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable2 = source2.Where(_003C_003Ef__am_0024cacheE);
-		List<EnemyCollectionTable.EnemyCollectionData> source3 = currentRegionCollectionItems;
-		if (_003C_003Ef__am_0024cacheF == null)
-		{
-			_003C_003Ef__am_0024cacheF = new Func<EnemyCollectionTable.EnemyCollectionData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable3 = source3.Where(_003C_003Ef__am_0024cacheF);
-		List<EnemyCollectionTable.EnemyCollectionData> source4 = currentRegionCollectionItems;
-		if (_003C_003Ef__am_0024cache10 == null)
-		{
-			_003C_003Ef__am_0024cache10 = new Func<EnemyCollectionTable.EnemyCollectionData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable4 = source4.Where(_003C_003Ef__am_0024cache10);
+		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable = from x in currentRegionCollectionItems
+		where x.collectionType == COLLECTION_TYPE.NORMAL
+		select x;
+		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable2 = from x in currentRegionCollectionItems
+		where x.collectionType == COLLECTION_TYPE.HAPPEN
+		select x;
+		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable3 = from x in currentRegionCollectionItems
+		where x.collectionType == COLLECTION_TYPE.HAPPEN_RARE
+		select x;
+		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable4 = from x in currentRegionCollectionItems
+		where x.collectionType == COLLECTION_TYPE.FIELD_CHANGE
+		select x;
 		regionCollectionSortItems = enumerable.Concat(enumerable2).Concat(enumerable3).Concat(enumerable4)
 			.ToList();
-		int num = Mathf.Max(enumerable.Count(), enumerable2.Count());
-		num = Mathf.Max(num, enumerable3.Count());
-		num = Mathf.Max(num, enumerable4.Count());
-		int num2 = Mathf.CeilToInt((float)num / (float)ONE_PAGE_EQUIP_NUM);
-		SetPageNumText((Enum)UI.LBL_PAGE_MAX, num2);
+		int a = Mathf.Max(enumerable.Count(), enumerable2.Count());
+		a = Mathf.Max(a, enumerable3.Count());
+		a = Mathf.Max(a, enumerable4.Count());
+		int num = Mathf.CeilToInt((float)a / (float)ONE_PAGE_EQUIP_NUM);
+		SetPageNumText(UI.LBL_PAGE_MAX, num);
 		if (currentPageIndex < 0)
 		{
-			currentPageIndex = num2 - 1;
+			currentPageIndex = num - 1;
 		}
-		if (currentPageIndex >= num2)
+		if (currentPageIndex >= num)
 		{
 			currentPageIndex = 0;
 		}
 		int start = currentPageIndex * ONE_PAGE_EQUIP_NUM;
 		if (currentRegionCollectionItems != null && currentRegionCollectionItems.Count != 0)
 		{
-			SetPageNumText((Enum)UI.LBL_PAGE_NOW, currentPageIndex + 1);
+			SetPageNumText(UI.LBL_PAGE_NOW, currentPageIndex + 1);
 			CreateIcon(enumerable, UI.GRD_NORMAL_INVENTORY, start);
 			CreateIcon(enumerable2, UI.GRD_BIG_INVENTORY, start);
 			CreateIcon(enumerable3, UI.GRD_RARE_INVENTORY, start);
@@ -210,7 +187,7 @@ public class StatusEnemyList : GameSection
 		}
 	}
 
-	private unsafe void CreateIcon(IEnumerable<EnemyCollectionTable.EnemyCollectionData> items, UI targetType, int start)
+	private void CreateIcon(IEnumerable<EnemyCollectionTable.EnemyCollectionData> items, UI targetType, int start)
 	{
 		if (items.Count() > start)
 		{
@@ -218,18 +195,35 @@ public class StatusEnemyList : GameSection
 			int num = Mathf.Min(indexItems.Count, ONE_PAGE_EQUIP_NUM);
 			if (num > 0)
 			{
-				SetActive((Enum)targetType, true);
-				_003CCreateIcon_003Ec__AnonStorey46E _003CCreateIcon_003Ec__AnonStorey46E;
-				SetDynamicList((Enum)targetType, "EnemyCollectionIcon", num, false, null, null, new Action<int, Transform, bool>((object)_003CCreateIcon_003Ec__AnonStorey46E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				SetActive(targetType, true);
+				SetDynamicList(targetType, "EnemyCollectionIcon", num, false, null, null, delegate(int i, Transform t, bool isRecycle)
+				{
+					SetActive(t, true);
+					bool flag = achievementCounter.Find((AchievementCounter x) => x.subType == indexItems[i].id) == null;
+					SetActive(t, UI.OBJ_UNKNOWN, flag);
+					SetActive(t, UI.TEX_ICON, !flag);
+					SetFrame(t, (int)(targetType - 10));
+					if (!flag)
+					{
+						EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyDataByEnemyCollectionId(indexItems[i].id).FirstOrDefault();
+						SetEnemyIcon(t, UI.TEX_ICON, enemyData.iconId);
+					}
+					object[] event_data = new object[2]
+					{
+						indexItems[i].id,
+						regionCollectionSortItems
+					};
+					SetEvent(t, "DETAIL", event_data);
+				});
 			}
 			else
 			{
-				SetActive((Enum)targetType, false);
+				SetActive(targetType, false);
 			}
 		}
 		else
 		{
-			SetActive((Enum)targetType, false);
+			SetActive(targetType, false);
 		}
 	}
 
@@ -244,16 +238,13 @@ public class StatusEnemyList : GameSection
 
 	private void ShowLevelPopup()
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Expected O, but got Unknown
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		if (popup == null)
+		if ((UnityEngine.Object)popup == (UnityEngine.Object)null)
 		{
-			popup = GetCtrl(UI.POP_TARGET_FIELD).GetComponentInChildren<UIScrollablePopupList>(true).get_transform();
+			popup = GetCtrl(UI.POP_TARGET_FIELD).GetComponentInChildren<UIScrollablePopupList>(true).transform;
 		}
-		if (!(popup == null))
+		if (!((UnityEngine.Object)popup == (UnityEngine.Object)null))
 		{
-			popup.get_gameObject().SetActive(true);
+			popup.gameObject.SetActive(true);
 			bool[] array = new bool[fields.Count];
 			for (int i = 0; i < array.Length; i++)
 			{
@@ -270,12 +261,11 @@ public class StatusEnemyList : GameSection
 
 	private void InitializeCaption()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_2);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
-		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
-		if (component != null)
+		UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
+		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 		{
 			component.Reset();
 			int i = 0;

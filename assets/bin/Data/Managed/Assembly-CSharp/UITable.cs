@@ -36,7 +36,7 @@ public class UITable : UIWidgetContainer
 
 	public bool keepWithinPanel;
 
-	public Vector2 padding = Vector2.get_zero();
+	public Vector2 padding = Vector2.zero;
 
 	public OnReposition onReposition;
 
@@ -55,27 +55,21 @@ public class UITable : UIWidgetContainer
 			if (value)
 			{
 				mReposition = true;
-				this.set_enabled(true);
+				base.enabled = true;
 			}
 		}
 	}
 
 	public List<Transform> GetChildList()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Expected O, but got Unknown
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Expected O, but got Unknown
-		Transform val = this.get_transform();
+		Transform transform = base.transform;
 		List<Transform> list = new List<Transform>();
-		for (int i = 0; i < val.get_childCount(); i++)
+		for (int i = 0; i < transform.childCount; i++)
 		{
-			Transform val2 = val.GetChild(i);
-			if (!hideInactive || (Object.op_Implicit(val2) && NGUITools.GetActive(val2.get_gameObject())))
+			Transform child = transform.GetChild(i);
+			if (!hideInactive || ((bool)child && NGUITools.GetActive(child.gameObject)))
 			{
-				list.Add(val2);
+				list.Add(child);
 			}
 		}
 		if (sorting != 0)
@@ -113,15 +107,13 @@ public class UITable : UIWidgetContainer
 	{
 		Init();
 		Reposition();
-		this.set_enabled(false);
+		base.enabled = false;
 	}
 
 	protected virtual void Init()
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Expected O, but got Unknown
 		mInitDone = true;
-		mPanel = NGUITools.FindInParents<UIPanel>(this.get_gameObject());
+		mPanel = NGUITools.FindInParents<UIPanel>(base.gameObject);
 	}
 
 	protected virtual void LateUpdate()
@@ -130,12 +122,12 @@ public class UITable : UIWidgetContainer
 		{
 			Reposition();
 		}
-		this.set_enabled(false);
+		base.enabled = false;
 	}
 
 	private void OnValidate()
 	{
-		if (!Application.get_isPlaying() && NGUITools.GetActive(this))
+		if (!Application.isPlaying && NGUITools.GetActive(this))
 		{
 			Reposition();
 		}
@@ -143,108 +135,26 @@ public class UITable : UIWidgetContainer
 
 	protected void RepositionVariableSize(List<Transform> children)
 	{
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0239: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0268: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0278: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0289: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0330: Unknown result type (might be due to invalid IL or missing references)
-		//IL_033c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0341: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0371: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0390: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0409: Unknown result type (might be due to invalid IL or missing references)
-		//IL_040e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0411: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0416: Expected O, but got Unknown
-		//IL_0416: Unknown result type (might be due to invalid IL or missing references)
-		//IL_041b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0424: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0429: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0442: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0447: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0465: Unknown result type (might be due to invalid IL or missing references)
-		//IL_046a: Expected O, but got Unknown
-		//IL_0478: Unknown result type (might be due to invalid IL or missing references)
-		//IL_047d: Expected O, but got Unknown
-		//IL_04c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ef: Unknown result type (might be due to invalid IL or missing references)
 		float num = 0f;
 		float num2 = 0f;
 		int num3 = (columns <= 0) ? 1 : (children.Count / columns + 1);
 		int num4 = (columns <= 0) ? children.Count : columns;
 		Bounds[,] array = new Bounds[num3, num4];
-		Bounds[] array2 = (Bounds[])new Bounds[num4];
-		Bounds[] array3 = (Bounds[])new Bounds[num3];
+		Bounds[] array2 = new Bounds[num4];
+		Bounds[] array3 = new Bounds[num3];
 		int num5 = 0;
 		int num6 = 0;
 		int i = 0;
 		for (int count = children.Count; i < count; i++)
 		{
-			Transform val = children[i];
-			Bounds val2 = NGUIMath.CalculateRelativeWidgetBounds(val, !hideInactive);
-			Vector3 localScale = val.get_localScale();
-			val2.set_min(Vector3.Scale(val2.get_min(), localScale));
-			val2.set_max(Vector3.Scale(val2.get_max(), localScale));
-			array[num6, num5] = val2;
-			array2[num5].Encapsulate(val2);
-			array3[num6].Encapsulate(val2);
+			Transform transform = children[i];
+			Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(transform, !hideInactive);
+			Vector3 localScale = transform.localScale;
+			bounds.min = Vector3.Scale(bounds.min, localScale);
+			bounds.max = Vector3.Scale(bounds.max, localScale);
+			array[num6, num5] = bounds;
+			array2[num5].Encapsulate(bounds);
+			array3[num6].Encapsulate(bounds);
 			if (++num5 >= columns && columns > 0)
 			{
 				num5 = 0;
@@ -257,97 +167,97 @@ public class UITable : UIWidgetContainer
 		int j = 0;
 		for (int count2 = children.Count; j < count2; j++)
 		{
-			Transform val3 = children[j];
-			Bounds val4 = array[num6, num5];
-			Bounds val5 = array2[num5];
-			Bounds val6 = array3[num6];
-			Vector3 localPosition = val3.get_localPosition();
+			Transform transform2 = children[j];
+			Bounds bounds2 = array[num6, num5];
+			Bounds bounds3 = array2[num5];
+			Bounds bounds4 = array3[num6];
+			Vector3 localPosition = transform2.localPosition;
 			float num7 = num;
-			Vector3 extents = val4.get_extents();
+			Vector3 extents = bounds2.extents;
 			float num8 = num7 + extents.x;
-			Vector3 center = val4.get_center();
+			Vector3 center = bounds2.center;
 			localPosition.x = num8 - center.x;
 			float x = localPosition.x;
-			Vector3 max = val4.get_max();
+			Vector3 max = bounds2.max;
 			float x2 = max.x;
-			Vector3 min = val4.get_min();
+			Vector3 min = bounds2.min;
 			float num9 = x2 - min.x;
-			Vector3 max2 = val5.get_max();
+			Vector3 max2 = bounds3.max;
 			float num10 = num9 - max2.x;
-			Vector3 min2 = val5.get_min();
+			Vector3 min2 = bounds3.min;
 			localPosition.x = x - (Mathf.Lerp(0f, num10 + min2.x, pivotOffset.x) - padding.x);
 			if (direction == Direction.Down)
 			{
 				float num11 = 0f - num2;
-				Vector3 extents2 = val4.get_extents();
+				Vector3 extents2 = bounds2.extents;
 				float num12 = num11 - extents2.y;
-				Vector3 center2 = val4.get_center();
+				Vector3 center2 = bounds2.center;
 				localPosition.y = num12 - center2.y;
 				float y = localPosition.y;
-				Vector3 max3 = val4.get_max();
+				Vector3 max3 = bounds2.max;
 				float y2 = max3.y;
-				Vector3 min3 = val4.get_min();
+				Vector3 min3 = bounds2.min;
 				float num13 = y2 - min3.y;
-				Vector3 max4 = val6.get_max();
+				Vector3 max4 = bounds4.max;
 				float num14 = num13 - max4.y;
-				Vector3 min4 = val6.get_min();
+				Vector3 min4 = bounds4.min;
 				localPosition.y = y + (Mathf.Lerp(num14 + min4.y, 0f, pivotOffset.y) - padding.y);
 			}
 			else
 			{
 				float num15 = num2;
-				Vector3 extents3 = val4.get_extents();
+				Vector3 extents3 = bounds2.extents;
 				float num16 = num15 + extents3.y;
-				Vector3 center3 = val4.get_center();
+				Vector3 center3 = bounds2.center;
 				localPosition.y = num16 - center3.y;
 				float y3 = localPosition.y;
-				Vector3 max5 = val4.get_max();
+				Vector3 max5 = bounds2.max;
 				float y4 = max5.y;
-				Vector3 min5 = val4.get_min();
+				Vector3 min5 = bounds2.min;
 				float num17 = y4 - min5.y;
-				Vector3 max6 = val6.get_max();
+				Vector3 max6 = bounds4.max;
 				float num18 = num17 - max6.y;
-				Vector3 min6 = val6.get_min();
+				Vector3 min6 = bounds4.min;
 				localPosition.y = y3 - (Mathf.Lerp(0f, num18 + min6.y, pivotOffset.y) - padding.y);
 			}
 			float num19 = num;
-			Vector3 size = val5.get_size();
+			Vector3 size = bounds3.size;
 			num = num19 + (size.x + padding.x * 2f);
-			val3.set_localPosition(localPosition);
+			transform2.localPosition = localPosition;
 			if (++num5 >= columns && columns > 0)
 			{
 				num5 = 0;
 				num6++;
 				num = 0f;
 				float num20 = num2;
-				Vector3 size2 = val6.get_size();
+				Vector3 size2 = bounds4.size;
 				num2 = num20 + (size2.y + padding.y * 2f);
 			}
 		}
 		if (pivot != 0)
 		{
 			pivotOffset = NGUIMath.GetPivotOffset(pivot);
-			Bounds val7 = NGUIMath.CalculateRelativeWidgetBounds(this.get_transform());
-			Vector3 size3 = val7.get_size();
+			Bounds bounds5 = NGUIMath.CalculateRelativeWidgetBounds(base.transform);
+			Vector3 size3 = bounds5.size;
 			float num21 = Mathf.Lerp(0f, size3.x, pivotOffset.x);
-			Vector3 size4 = val7.get_size();
+			Vector3 size4 = bounds5.size;
 			float num22 = Mathf.Lerp(0f - size4.y, 0f, pivotOffset.y);
-			Transform val8 = this.get_transform();
-			for (int k = 0; k < val8.get_childCount(); k++)
+			Transform transform3 = base.transform;
+			for (int k = 0; k < transform3.childCount; k++)
 			{
-				Transform val9 = val8.GetChild(k);
-				SpringPosition component = val9.GetComponent<SpringPosition>();
-				if (component != null)
+				Transform child = transform3.GetChild(k);
+				SpringPosition component = child.GetComponent<SpringPosition>();
+				if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 				{
 					component.target.x -= num21;
 					component.target.y -= num22;
 				}
 				else
 				{
-					Vector3 localPosition2 = val9.get_localPosition();
+					Vector3 localPosition2 = child.localPosition;
 					localPosition2.x -= num21;
 					localPosition2.y -= num22;
-					val9.set_localPosition(localPosition2);
+					child.localPosition = localPosition2;
 				}
 			}
 		}
@@ -356,24 +266,22 @@ public class UITable : UIWidgetContainer
 	[ContextMenu("Execute")]
 	public virtual void Reposition()
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Expected O, but got Unknown
-		if (Application.get_isPlaying() && !mInitDone && NGUITools.GetActive(this))
+		if (Application.isPlaying && !mInitDone && NGUITools.GetActive(this))
 		{
 			Init();
 		}
 		mReposition = false;
-		Transform target = this.get_transform();
+		Transform transform = base.transform;
 		List<Transform> childList = GetChildList();
 		if (childList.Count > 0)
 		{
 			RepositionVariableSize(childList);
 		}
-		if (keepWithinPanel && mPanel != null)
+		if (keepWithinPanel && (UnityEngine.Object)mPanel != (UnityEngine.Object)null)
 		{
-			mPanel.ConstrainTargetToBounds(target, true);
+			mPanel.ConstrainTargetToBounds(transform, true);
 			UIScrollView component = mPanel.GetComponent<UIScrollView>();
-			if (component != null)
+			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 			{
 				component.UpdateScrollbars(true);
 			}

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class UITweenCtrl
+public class UITweenCtrl : MonoBehaviour
 {
 	[SerializeField]
 	private int _id;
@@ -14,23 +14,17 @@ public class UITweenCtrl
 
 	public int id => _id;
 
-	public UITweenCtrl()
-		: this()
-	{
-	}
-
 	public static void Set(Transform root)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		UITweenCtrl component = root.GetComponent<UITweenCtrl>();
-		if (!(component != null))
+		if (!((UnityEngine.Object)component != (UnityEngine.Object)null))
 		{
-			component = root.get_gameObject().AddComponent<UITweenCtrl>();
+			component = root.gameObject.AddComponent<UITweenCtrl>();
 			UITweener[] componentsInChildren = root.GetComponentsInChildren<UITweener>();
 			int i = 0;
 			for (int num = componentsInChildren.Length; i < num; i++)
 			{
-				componentsInChildren[i].set_enabled(false);
+				componentsInChildren[i].enabled = false;
 			}
 			component.tweens = componentsInChildren;
 		}
@@ -52,7 +46,7 @@ public class UITweenCtrl
 		{
 			Array.ForEach(components, delegate(UITweenCtrl tw)
 			{
-				if (!(c != null) && tw.id == tween_ctrl_id)
+				if (!((UnityEngine.Object)c != (UnityEngine.Object)null) && tw.id == tween_ctrl_id)
 				{
 					c = tw;
 				}
@@ -64,7 +58,7 @@ public class UITweenCtrl
 	public static void Play(Transform root, bool forward = true, EventDelegate.Callback callback = null, bool is_input_block = true, int tween_ctrl_id = 0)
 	{
 		UITweenCtrl uITweenCtrl = SearchTweenCtrl(root, tween_ctrl_id);
-		if (!(uITweenCtrl == null))
+		if (!((UnityEngine.Object)uITweenCtrl == (UnityEngine.Object)null))
 		{
 			if (is_input_block)
 			{
@@ -87,7 +81,7 @@ public class UITweenCtrl
 	public static void Skip(Transform root, bool forward = true, int tween_ctrl_id = 0)
 	{
 		UITweenCtrl uITweenCtrl = SearchTweenCtrl(root, tween_ctrl_id);
-		if (!(uITweenCtrl == null))
+		if (!((UnityEngine.Object)uITweenCtrl == (UnityEngine.Object)null))
 		{
 			uITweenCtrl.Skip(forward);
 		}
@@ -96,7 +90,7 @@ public class UITweenCtrl
 	public static void Reset(Transform root, int tween_ctrl_id = 0)
 	{
 		UITweenCtrl uITweenCtrl = SearchTweenCtrl(root, tween_ctrl_id);
-		if (!(uITweenCtrl == null))
+		if (!((UnityEngine.Object)uITweenCtrl == (UnityEngine.Object)null))
 		{
 			uITweenCtrl.Reset();
 		}
@@ -126,23 +120,18 @@ public class UITweenCtrl
 		_Play(tweens, forward, onFinished);
 	}
 
-	protected unsafe void _Play(UITweener[] target_tweens, bool forward = true, EventDelegate.Callback onFinished = null)
+	protected void _Play(UITweener[] target_tweens, bool forward = true, EventDelegate.Callback onFinished = null)
 	{
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Expected O, but got Unknown
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Expected O, but got Unknown
 		if (target_tweens != null && target_tweens.Length != 0 && !isPlaying)
 		{
-			if (target_tweens[0] == null)
+			if ((UnityEngine.Object)target_tweens[0] == (UnityEngine.Object)null)
 			{
 				Log.Error("tween[0] = null!");
 			}
 			else
 			{
 				isPlaying = true;
-				uiTable = this.get_gameObject().GetComponentInParent<UITable>();
+				uiTable = base.gameObject.GetComponentInParent<UITable>();
 				if (onFinished != null)
 				{
 					EventDelegate.Add(target_tweens[0].onFinished, onFinished, true);
@@ -151,7 +140,7 @@ public class UITweenCtrl
 				int i = 0;
 				for (int num = target_tweens.Length; i < num; i++)
 				{
-					if (!(target_tweens[i] == null))
+					if (!((UnityEngine.Object)target_tweens[i] == (UnityEngine.Object)null))
 					{
 						_TweenPlay(target_tweens[i], forward);
 					}
@@ -159,8 +148,20 @@ public class UITweenCtrl
 				if (GameSceneManager.isAutoEventSkip)
 				{
 					AppMain i2 = MonoBehaviourSingleton<AppMain>.I;
-					_003C_Play_003Ec__AnonStorey7A6 _003C_Play_003Ec__AnonStorey7A;
-					i2.onDelayCall = Delegate.Combine((Delegate)i2.onDelayCall, (Delegate)new Action((object)_003C_Play_003Ec__AnonStorey7A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					i2.onDelayCall = (Action)Delegate.Combine(i2.onDelayCall, (Action)delegate
+					{
+						if (isPlaying)
+						{
+							int j = 0;
+							for (int num2 = target_tweens.Length; j < num2; j++)
+							{
+								if ((UnityEngine.Object)target_tweens[j] != (UnityEngine.Object)null)
+								{
+									target_tweens[j].tweenFactor = 1f;
+								}
+							}
+						}
+					});
 				}
 			}
 		}
@@ -178,22 +179,21 @@ public class UITweenCtrl
 
 	protected void _Reset(UITweener[] target_tweens)
 	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		if (target_tweens != null && target_tweens.Length != 0)
 		{
-			if (target_tweens[0] == null)
+			if ((UnityEngine.Object)target_tweens[0] == (UnityEngine.Object)null)
 			{
 				Log.Error("tween[0] = null!");
 			}
 			else
 			{
 				isPlaying = false;
-				uiTable = this.get_gameObject().GetComponentInParent<UITable>();
+				uiTable = base.gameObject.GetComponentInParent<UITable>();
 				EventDelegate.Set(target_tweens[0].onFinished, OnFinished);
 				int i = 0;
 				for (int num = target_tweens.Length; i < num; i++)
 				{
-					if (!(target_tweens[i] == null))
+					if (!((UnityEngine.Object)target_tweens[i] == (UnityEngine.Object)null))
 					{
 						_TweenReset(target_tweens[i]);
 					}
@@ -228,7 +228,7 @@ public class UITweenCtrl
 			int i = 0;
 			for (int num = target_tweens.Length; i < num; i++)
 			{
-				if (!(target_tweens[i] == null))
+				if (!((UnityEngine.Object)target_tweens[i] == (UnityEngine.Object)null))
 				{
 					float tweenFactor = (float)(forward ? 1 : 0);
 					target_tweens[i].tweenFactor = tweenFactor;
@@ -241,7 +241,7 @@ public class UITweenCtrl
 	private void OnFinished()
 	{
 		isPlaying = false;
-		if (uiTable != null)
+		if ((UnityEngine.Object)uiTable != (UnityEngine.Object)null)
 		{
 			uiTable.Reposition();
 			uiTable = null;
@@ -250,7 +250,7 @@ public class UITweenCtrl
 
 	public void LateUpdate()
 	{
-		if (uiTable != null)
+		if ((UnityEngine.Object)uiTable != (UnityEngine.Object)null)
 		{
 			uiTable.Reposition();
 		}
@@ -261,7 +261,7 @@ public class UITweenCtrl
 		int num = tweens.Length;
 		for (int i = 0; i < num; i++)
 		{
-			if (tweens[i] == null)
+			if ((UnityEngine.Object)tweens[i] == (UnityEngine.Object)null)
 			{
 				num--;
 				int j = i;

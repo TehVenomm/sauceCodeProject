@@ -17,9 +17,9 @@ namespace GooglePlayGames.Native.PInvoke
 			return PInvokeUtilities.OutParamsToString((byte[] out_string, UIntPtr size) => RealTimeRoom.RealTimeRoom_Id(SelfPtr(), out_string, size));
 		}
 
-		internal unsafe IEnumerable<MultiplayerParticipant> Participants()
+		internal IEnumerable<MultiplayerParticipant> Participants()
 		{
-			return PInvokeUtilities.ToEnumerable<MultiplayerParticipant>(RealTimeRoom.RealTimeRoom_Participants_Length(SelfPtr()), new Func<UIntPtr, MultiplayerParticipant>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			return PInvokeUtilities.ToEnumerable(RealTimeRoom.RealTimeRoom_Participants_Length(SelfPtr()), (UIntPtr index) => new MultiplayerParticipant(RealTimeRoom.RealTimeRoom_Participants_GetElement(SelfPtr(), index)));
 		}
 
 		internal uint ParticipantCount()

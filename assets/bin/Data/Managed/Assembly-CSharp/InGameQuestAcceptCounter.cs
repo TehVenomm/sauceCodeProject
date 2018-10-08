@@ -1,4 +1,4 @@
-using System;
+using UnityEngine;
 
 public class InGameQuestAcceptCounter : QuestAcceptCounter
 {
@@ -139,7 +139,6 @@ public class InGameQuestAcceptCounter : QuestAcceptCounter
 
 	private void Reposition(bool isPortrait)
 	{
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 		UIScreenRotationHandler[] components = GetCtrl(UI.OBJ_FRAME).GetComponents<UIScreenRotationHandler>();
 		for (int i = 0; i < components.Length; i++)
 		{
@@ -148,23 +147,21 @@ public class InGameQuestAcceptCounter : QuestAcceptCounter
 		GetCtrl(UI.BTN_EVENT).GetComponent<UIScreenRotationHandler>().InvokeRotate();
 		GetCtrl(UI.SPR_BG_FRAME).GetComponent<UIScreenRotationHandler>().InvokeRotate();
 		UpdateAnchors();
-		if (GetCtrl(UI.SCR_DELIVERY_QUEST).get_gameObject().get_activeInHierarchy())
+		if (GetCtrl(UI.SCR_DELIVERY_QUEST).gameObject.activeInHierarchy)
 		{
-			ScrollViewResetPosition((Enum)UI.SCR_DELIVERY_QUEST);
+			ScrollViewResetPosition(UI.SCR_DELIVERY_QUEST);
 		}
 	}
 
 	private void OnScreenRotate(bool isPortrait)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		if (base.transferUI != null)
+		if ((Object)base.transferUI != (Object)null)
 		{
-			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
 		}
 		else
 		{
-			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
 		}
 		if (!isInActiveRotate)
 		{

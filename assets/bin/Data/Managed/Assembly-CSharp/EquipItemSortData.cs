@@ -293,7 +293,7 @@ public class EquipItemSortData : SortCompareData
 			EvolveEquipItemTable.EvolveEquipItemData[] evolveEquipItemData = Singleton<EvolveEquipItemTable>.I.GetEvolveEquipItemData(equipData.tableID);
 			if (evolveEquipItemData == null)
 			{
-				Debug.LogWarning((object)("Evolve Data is Not Found. : BaseItemID = " + equipData.tableID));
+				Debug.LogWarning("Evolve Data is Not Found. : BaseItemID = " + equipData.tableID);
 				return false;
 			}
 			int i = 0;

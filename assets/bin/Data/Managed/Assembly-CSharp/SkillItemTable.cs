@@ -218,8 +218,8 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 			{
 				return result;
 			}
-			float num = (float)(exceed_cnt + 1 - under.exceedCnt) / (float)(over.exceedCnt - under.exceedCnt);
-			return Mathf.FloorToInt(Mathf.Lerp((float)under.lv, (float)over.lv, num)) - 1;
+			float t = (float)(exceed_cnt + 1 - under.exceedCnt) / (float)(over.exceedCnt - under.exceedCnt);
+			return Mathf.FloorToInt(Mathf.Lerp((float)under.lv, (float)over.lv, t)) - 1;
 		}
 
 		public bool IsPassive()

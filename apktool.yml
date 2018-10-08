@@ -1,5 +1,5 @@
 !!brut.androlib.meta.MetaInfo
-apkFileName: DragonProject_v1.3.0_apkpure.com.apk
+apkFileName: net.gogame.dragon.apk
 compressionType: false
 doNotCompress:
 - arsc
@@ -96,5 +96,5 @@ usesFramework:
   tag: null
 version: 2.3.3
 versionInfo:
-  versionCode: '2018060402'
-  versionName: 1.3.0
+  versionCode: '2018061102'
+  versionName: 1.3.1

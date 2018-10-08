@@ -82,18 +82,18 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 		return true;
 	}
 
-	public unsafe void OnPromotionItem(bool success)
+	public void OnPromotionItem(bool success)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Expected O, but got Unknown
 		IsCheckingPromotionItem = false;
 		if (success)
 		{
-			if (_003C_003Ef__am_0024cache9 == null)
+			Protocol.Force(delegate
 			{
-				_003C_003Ef__am_0024cache9 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			Protocol.Force(_003C_003Ef__am_0024cache9);
+				MonoBehaviourSingleton<PresentManager>.I.SendGetPresent(0, delegate
+				{
+					MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_PRESENT_LIST);
+				});
+			});
 		}
 	}
 
@@ -186,7 +186,7 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 		}, string.Empty);
 	}
 
-	public unsafe void SendGetGoldPurchaseItemList(Action<bool> call_back)
+	public void SendGetGoldPurchaseItemList(Action<bool> call_back)
 	{
 		purchaseItemList = null;
 		GoldPurchaseItemListModel.SendForm sendForm = new GoldPurchaseItemListModel.SendForm();
@@ -199,19 +199,11 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 				if (purchaseItemList == null || !purchaseItemList.checkSum.Equals(ret.result.checkSum))
 				{
 					purchaseItemList = ret.result;
-					List<ProductData> shopList = purchaseItemList.shopList;
-					if (_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey68E._003C_003Ef__am_0024cache2 == null)
-					{
-						_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey68E._003C_003Ef__am_0024cache2 = new Func<ProductData, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-					}
-					string productNameData = string.Join("----", shopList.Select<ProductData, string>(_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey68E._003C_003Ef__am_0024cache2).ToArray());
+					string productNameData = string.Join("----", (from x in purchaseItemList.shopList
+					select x.name).ToArray());
 					Native.SetProductNameData(productNameData);
-					List<ProductData> shopList2 = purchaseItemList.shopList;
-					if (_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey68E._003C_003Ef__am_0024cache3 == null)
-					{
-						_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey68E._003C_003Ef__am_0024cache3 = new Func<ProductData, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-					}
-					productNameData = string.Join("----", shopList2.Select<ProductData, string>(_003CSendGetGoldPurchaseItemList_003Ec__AnonStorey68E._003C_003Ef__am_0024cache3).ToArray());
+					productNameData = string.Join("----", (from x in purchaseItemList.shopList
+					select x.productId).ToArray());
 					Native.SetProductIdData(productNameData);
 					obj = true;
 					MonoBehaviourSingleton<AppMain>.I.UpdatePurchaseItemListRequestTime();

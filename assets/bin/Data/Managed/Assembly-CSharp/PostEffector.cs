@@ -1,14 +1,9 @@
 using UnityEngine;
 
-public class PostEffector
+public class PostEffector : MonoBehaviour
 {
 	[SerializeField]
 	private FilterBase filter;
-
-	public PostEffector()
-		: this()
-	{
-	}
 
 	public void SetFilter(FilterBase filter)
 	{
@@ -17,7 +12,7 @@ public class PostEffector
 
 	private void OnRenderImage(RenderTexture src, RenderTexture dest)
 	{
-		if (filter == null)
+		if ((Object)filter == (Object)null)
 		{
 			Graphics.Blit(src, dest);
 		}

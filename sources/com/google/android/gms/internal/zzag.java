@@ -139,22 +139,22 @@ public final class zzag implements zzb {
     }
 
     public final void initialize() {
+        BufferedInputStream bufferedInputStream;
         Throwable th;
-        BufferedInputStream bufferedInputStream = null;
+        BufferedInputStream bufferedInputStream2 = null;
         synchronized (this) {
             if (this.zzbx.exists()) {
                 File[] listFiles = this.zzbx.listFiles();
                 if (listFiles != null) {
                     for (File file : listFiles) {
-                        BufferedInputStream bufferedInputStream2;
                         try {
-                            bufferedInputStream2 = new BufferedInputStream(new FileInputStream(file));
+                            bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
                             try {
-                                zzai zzf = zzai.zzf(bufferedInputStream2);
+                                zzai zzf = zzai.zzf(bufferedInputStream);
                                 zzf.size = file.length();
                                 zza(zzf.key, zzf);
                                 try {
-                                    bufferedInputStream2.close();
+                                    bufferedInputStream.close();
                                 } catch (IOException e) {
                                 }
                             } catch (IOException e2) {
@@ -163,23 +163,23 @@ public final class zzag implements zzb {
                                         file.delete();
                                     } catch (Throwable th2) {
                                         th = th2;
-                                        bufferedInputStream = bufferedInputStream2;
+                                        bufferedInputStream2 = bufferedInputStream;
                                     }
                                 }
-                                if (bufferedInputStream2 != null) {
+                                if (bufferedInputStream != null) {
                                     try {
-                                        bufferedInputStream2.close();
+                                        bufferedInputStream.close();
                                     } catch (IOException e3) {
                                     }
                                 }
                             }
                         } catch (IOException e4) {
-                            bufferedInputStream2 = null;
+                            bufferedInputStream = null;
                             if (file != null) {
                                 file.delete();
                             }
-                            if (bufferedInputStream2 != null) {
-                                bufferedInputStream2.close();
+                            if (bufferedInputStream != null) {
+                                bufferedInputStream.close();
                             }
                         } catch (Throwable th3) {
                             th = th3;
@@ -191,9 +191,9 @@ public final class zzag implements zzb {
             }
         }
         return;
-        if (bufferedInputStream != null) {
+        if (bufferedInputStream2 != null) {
             try {
-                bufferedInputStream.close();
+                bufferedInputStream2.close();
             } catch (IOException e5) {
             }
         }

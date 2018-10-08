@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class ItemDetailQuest : QuestSelect
@@ -100,7 +99,7 @@ public class ItemDetailQuest : QuestSelect
 
 	private QuestSortData data;
 
-	private Color backupAmbientLight = RenderSettings.get_ambientLight();
+	private Color backupAmbientLight = RenderSettings.ambientLight;
 
 	private bool isGachaResult;
 
@@ -108,9 +107,6 @@ public class ItemDetailQuest : QuestSelect
 
 	public override void Initialize()
 	{
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
 		data = (GameSection.GetEventData() as QuestSortData);
 		QuestItemInfo questItemInfo = data.GetItemData() as QuestItemInfo;
 		GameSaveData.instance.RemoveNewIconAndSave(ITEM_ICON_TYPE.QUEST_ITEM, data.GetUniqID());
@@ -119,18 +115,17 @@ public class ItemDetailQuest : QuestSelect
 		if (isGachaResult)
 		{
 			isInProgressMultiResultGacha = (MonoBehaviourSingleton<GachaManager>.IsValid() && MonoBehaviourSingleton<GachaManager>.I.IsMultiResult() && MonoBehaviourSingleton<GachaManager>.I.IsExistNextGachaResult());
-			backupAmbientLight = RenderSettings.get_ambientLight();
-			RenderSettings.set_ambientLight(Utility.MakeColorByInt(201, 210, 226, 255));
+			backupAmbientLight = RenderSettings.ambientLight;
+			RenderSettings.ambientLight = Utility.MakeColorByInt(201, 210, 226, 255);
 		}
 		base.Initialize();
 	}
 
 	protected override void OnClose()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		if (isGachaResult)
 		{
-			RenderSettings.set_ambientLight(backupAmbientLight);
+			RenderSettings.ambientLight = backupAmbientLight;
 		}
 		base.OnClose();
 	}
@@ -138,15 +133,15 @@ public class ItemDetailQuest : QuestSelect
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetActive((Enum)UI.BTN_NEXT, false);
-		SetActive((Enum)UI.OBJ_NEXT_OPT, false);
-		SetActive((Enum)UI.BTN_PARTY, false);
-		SetActive((Enum)UI.OBJ_PARTY_OPT, false);
-		SetActive((Enum)UI.BTN_BACK, false);
+		SetActive(UI.BTN_NEXT, false);
+		SetActive(UI.OBJ_NEXT_OPT, false);
+		SetActive(UI.BTN_PARTY, false);
+		SetActive(UI.OBJ_PARTY_OPT, false);
+		SetActive(UI.BTN_BACK, false);
 		questPrefab = SetPrefab(base.collectUI, "ItemDetailQuest", true);
 		SetActive(questPrefab, UI.BTN_SELL, !isGachaResult);
 		SetActive(questPrefab, UI.BTN_BATTLE, isGachaResult && !isInProgressMultiResultGacha);
-		SetActive((Enum)UI.OBJ_PARTY_BTN_ROOT, false);
+		SetActive(UI.OBJ_PARTY_BTN_ROOT, false);
 		SetLabelText(questPrefab, UI.STR_BTN_SELL, base.sectionData.GetText("TEXT_EXCHANGE"));
 		SetLabelText(questPrefab, UI.STR_BTN_SELL_D, base.sectionData.GetText("TEXT_EXCHANGE"));
 		SetActive(questPrefab, UI.OBJ_ICON, !isGachaResult);

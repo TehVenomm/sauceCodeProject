@@ -111,7 +111,7 @@ public class UIntKeyTable<T> : UIntKeyTableBase
 			{
 				lists[i]?.ForEach(delegate(Item o)
 				{
-					action.Invoke(o.key, (T)o.value);
+					action(o.key, (T)o.value);
 				});
 			}
 		}
@@ -182,7 +182,7 @@ public class UIntKeyTable<T> : UIntKeyTableBase
 		return false;
 	}
 
-	public unsafe override bool Equals(object obj)
+	public override bool Equals(object obj)
 	{
 		if (obj == null)
 		{
@@ -198,8 +198,11 @@ public class UIntKeyTable<T> : UIntKeyTableBase
 			return false;
 		}
 		bool isEqual = true;
-		_003CEquals_003Ec__AnonStorey52A _003CEquals_003Ec__AnonStorey52A;
-		ForEachKeyValue(new Action<uint, uint>((object)_003CEquals_003Ec__AnonStorey52A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		ForEachKeyValue(delegate(uint key, T value1)
+		{
+			T val = rhs.Get(key);
+			isEqual = (isEqual && value1.Equals(val));
+		});
 		return isEqual;
 	}
 

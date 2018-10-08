@@ -13,14 +13,12 @@ public class TestStone : BreakObject
 
 	protected override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize();
-		Renderer componentInChildren = this.get_gameObject().GetComponentInChildren<MeshRenderer>();
-		if (componentInChildren != null)
+		Renderer componentInChildren = base.gameObject.GetComponentInChildren<MeshRenderer>();
+		if ((Object)componentInChildren != (Object)null)
 		{
-			SphereCollider val = componentInChildren.get_gameObject().AddComponent<SphereCollider>();
-			val.set_radius(2.2f);
+			SphereCollider sphereCollider = componentInChildren.gameObject.AddComponent<SphereCollider>();
+			sphereCollider.radius = 2.2f;
 		}
 	}
 }

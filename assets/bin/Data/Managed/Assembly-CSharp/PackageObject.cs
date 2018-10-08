@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PackageObject
 {
-	private class Pool_PackageObject
+	private class Pool_PackageObject : rymTPool<PackageObject>
 	{
 	}
 
@@ -47,10 +47,10 @@ public class PackageObject
 
 	public static void Release(ref PackageObject obj)
 	{
-		AssetBundle val = obj.obj as AssetBundle;
-		if (val != null)
+		AssetBundle assetBundle = obj.obj as AssetBundle;
+		if ((Object)assetBundle != (Object)null)
 		{
-			val.Unload(false);
+			assetBundle.Unload(false);
 		}
 		obj.Reset();
 		rymTPool<PackageObject>.Release(ref obj);

@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class QuestResultHostLeft : GameSection
 {
@@ -11,7 +12,7 @@ public class QuestResultHostLeft : GameSection
 			GameSection.ResumeEvent(true, null);
 		};
 		MonoBehaviourSingleton<CoopApp>.I.LeaveWithParty(call_back, true, false);
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.mainChat.HideOpenButton();
 			MonoBehaviourSingleton<UIManager>.I.mainChat.HideAll();

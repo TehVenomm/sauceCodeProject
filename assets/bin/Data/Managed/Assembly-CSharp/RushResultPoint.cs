@@ -59,8 +59,7 @@ public class RushResultPoint : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -85,15 +84,14 @@ public class RushResultPoint : GameSection
 		base.Initialize();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
-		//IL_0254: Unknown result type (might be due to invalid IL or missing references)
 		allPointEvents = new PointEventCurrentData();
 		allPointEvents.pointRankingData = new PointEventCurrentData.PointResultData();
-		for (int i = 0; i < MonoBehaviourSingleton<InGameManager>.I.rushPointEvents.Count; i++)
+		for (int j = 0; j < MonoBehaviourSingleton<InGameManager>.I.rushPointEvents.Count; j++)
 		{
-			PointEventCurrentData pointEventCurrentData = MonoBehaviourSingleton<InGameManager>.I.rushPointEvents[i];
-			if (i == 0)
+			PointEventCurrentData pointEventCurrentData = MonoBehaviourSingleton<InGameManager>.I.rushPointEvents[j];
+			if (j == 0)
 			{
 				allPointEvents.pointRankingData.userPoint = pointEventCurrentData.pointRankingData.userPoint;
 			}
@@ -101,13 +99,22 @@ public class RushResultPoint : GameSection
 		}
 		PointEventCurrentData.PointResultData d = allPointEvents.pointRankingData;
 		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
-		SetLabelText((Enum)UI.LBL_QUEST_NAME, questData.questText);
-		SetFontStyle((Enum)UI.LBL_GET_POINT, 2);
-		SetLabelText((Enum)UI.LBL_GET_POINT, "0pt");
-		SetFontStyle((Enum)UI.LBL_TOTAL_POINT, 2);
-		SetLabelText((Enum)UI.LBL_TOTAL_POINT, d.userPoint.ToString("N0") + "pt");
-		_003CUpdateUI_003Ec__AnonStorey42B _003CUpdateUI_003Ec__AnonStorey42B;
-		SetGrid(UI.GRD_POINT_DETAIL, "RushResultPointDetailItem", d.bonusPoint.Count, true, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey42B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetLabelText(UI.LBL_QUEST_NAME, questData.questText);
+		SetFontStyle(UI.LBL_GET_POINT, FontStyle.Italic);
+		SetLabelText(UI.LBL_GET_POINT, "0pt");
+		SetFontStyle(UI.LBL_TOTAL_POINT, FontStyle.Italic);
+		SetLabelText(UI.LBL_TOTAL_POINT, d.userPoint.ToString("N0") + "pt");
+		SetGrid(UI.GRD_POINT_DETAIL, "RushResultPointDetailItem", d.bonusPoint.Count, true, delegate(int i, Transform t, bool is_recycle)
+		{
+			UILabel component = FindCtrl(t, UI.LBL_POINT).GetComponent<UILabel>();
+			component.alpha = 1f;
+			component.text = d.bonusPoint[i].point.ToString("N0");
+			component.fontStyle = FontStyle.Italic;
+			UILabel component2 = FindCtrl(t, UI.LBL_POINT_NAME).GetComponent<UILabel>();
+			component2.alpha = 1f;
+			component2.text = d.bonusPoint[i].name;
+			component2.fontStyle = FontStyle.Italic;
+		});
 		if (d.nextReward != null)
 		{
 			List<PointEventCurrentData.Reward> reward = d.nextReward.reward;
@@ -116,8 +123,8 @@ public class RushResultPoint : GameSection
 		}
 		else
 		{
-			SetActive((Enum)UI.STR_POINT_NEXT, false);
-			SetFontStyle(GetCtrl(UI.OBJ_NEXT_REWARD), UI.LBL_POINT, 2);
+			SetActive(UI.STR_POINT_NEXT, false);
+			SetFontStyle(GetCtrl(UI.OBJ_NEXT_REWARD), UI.LBL_POINT, FontStyle.Italic);
 			SetLabelText(GetCtrl(UI.OBJ_NEXT_REWARD), UI.LBL_POINT, "なし");
 		}
 		List<PointEventCurrentData.Reward> list = new List<PointEventCurrentData.Reward>();
@@ -126,18 +133,34 @@ public class RushResultPoint : GameSection
 			list.AddRange(item.reward);
 		}
 		SetAllRewardItem(UI.GRD_ITEM_ROOT, list);
-		this.StartCoroutine(PlayAnimation());
+		StartCoroutine(PlayAnimation());
 	}
 
-	private unsafe void SetAllRewardItem(UI targetGrid, List<PointEventCurrentData.Reward> rewardList)
+	private void SetAllRewardItem(UI targetGrid, List<PointEventCurrentData.Reward> rewardList)
 	{
-		_003CSetAllRewardItem_003Ec__AnonStorey42C _003CSetAllRewardItem_003Ec__AnonStorey42C;
-		SetGrid(targetGrid, "ItemIconReward", rewardList.Count, true, new Action<int, Transform, bool>((object)_003CSetAllRewardItem_003Ec__AnonStorey42C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetGrid(targetGrid, "ItemIconReward", rewardList.Count, true, delegate(int i, Transform t, bool is_recycle)
+		{
+			PointEventCurrentData.Reward reward = rewardList[i];
+			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)reward.type, (uint)reward.itemId, t, reward.num, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
+			if ((UnityEngine.Object)itemIcon != (UnityEngine.Object)null)
+			{
+				itemIcon.SetEnableCollider(false);
+			}
+			t.FindChild("itemNum").GetComponent<UILabel>().text = "×" + rewardList[i].num;
+			if (targetGrid == UI.GRD_NEXT_ITEM_ROOT)
+			{
+				t.localScale = new Vector3(0.7f, 0.7f, 1f);
+				if (i > 2)
+				{
+					itemIcon.VisibleIcon(false, true);
+				}
+			}
+		});
 	}
 
 	private void SetPoint(UI parent, int point)
 	{
-		SetFontStyle(GetCtrl(parent), UI.LBL_POINT, 2);
+		SetFontStyle(GetCtrl(parent), UI.LBL_POINT, FontStyle.Italic);
 		SetLabelText(GetCtrl(parent), UI.LBL_POINT, point.ToString("N0") + "pt");
 	}
 
@@ -168,39 +191,42 @@ public class RushResultPoint : GameSection
 		}
 	}
 
-	private unsafe IEnumerator PlayAnimation()
+	private IEnumerator PlayAnimation()
 	{
 		is_skip = false;
-		PlayTween((Enum)UI.OBJ_TITLE, true, (EventDelegate.Callback)null, true, 0);
-		SkipTween((Enum)UI.OBJ_TITLE, true, 0);
+		PlayTween(UI.OBJ_TITLE, true, null, true, 0);
+		SkipTween(UI.OBJ_TITLE, true, 0);
 		animState = RESULT_ANIM_STATE.POINT;
-		PlayTween((Enum)UI.OBJ_RUSH_POINT, true, (EventDelegate.Callback)delegate
+		PlayTween(UI.OBJ_RUSH_POINT, true, delegate
 		{
 			SoundManager.PlayOneShotUISE(40000228);
-			((_003CPlayAnimation_003Ec__Iterator140)/*Error near IL_0072: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			((_003CPlayAnimation_003Ec__Iterator142)/*Error near IL_0072: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 		}, false, 0);
 		while (animState != 0 && !is_skip)
 		{
 			yield return (object)null;
 		}
 		animState = RESULT_ANIM_STATE.COUNT_UP;
-		this.StartCoroutine(GetPointAnimation(new Action((object)/*Error near IL_00d5: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+		StartCoroutine(GetPointAnimation(delegate
+		{
+			((_003CPlayAnimation_003Ec__Iterator142)/*Error near IL_00d5: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+		}));
 		while (animState != 0 && !is_skip)
 		{
 			yield return (object)null;
 		}
 		animState = RESULT_ANIM_STATE.NEXT_REWARD;
-		PlayTween((Enum)UI.OBJ_NEXT_REWARD, true, (EventDelegate.Callback)delegate
+		PlayTween(UI.OBJ_NEXT_REWARD, true, delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator140)/*Error near IL_013e: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			((_003CPlayAnimation_003Ec__Iterator142)/*Error near IL_013e: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 		}, false, 0);
 		SoundManager.PlayOneShotUISE(40000228);
 		if (allPointEvents.pointRankingData.getReward.Count > 0)
 		{
 			animState = RESULT_ANIM_STATE.REWARD;
-			PlayTween((Enum)UI.OBJ_GET_REWARD_ROOT, true, (EventDelegate.Callback)delegate
+			PlayTween(UI.OBJ_GET_REWARD_ROOT, true, delegate
 			{
-				((_003CPlayAnimation_003Ec__Iterator140)/*Error near IL_0195: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+				((_003CPlayAnimation_003Ec__Iterator142)/*Error near IL_0195: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 			}, false, 0);
 		}
 		animState = RESULT_ANIM_STATE.END;
@@ -212,11 +238,11 @@ public class RushResultPoint : GameSection
 		int getPoint = allPointEvents.pointRankingData.getPoint;
 		int userPoint = allPointEvents.pointRankingData.userPoint;
 		int totalPoint = userPoint + getPoint;
-		SetFontStyle((Enum)UI.LBL_GET_POINT, 2);
-		yield return (object)this.StartCoroutine(CountUpAnimation(0f, getPoint, UI.LBL_GET_POINT));
-		SetFontStyle((Enum)UI.LBL_TOTAL_POINT, 2);
-		yield return (object)this.StartCoroutine(CountUpAnimation((float)userPoint, totalPoint, UI.LBL_TOTAL_POINT));
-		callback.Invoke();
+		SetFontStyle(UI.LBL_GET_POINT, FontStyle.Italic);
+		yield return (object)StartCoroutine(CountUpAnimation(0f, getPoint, UI.LBL_GET_POINT));
+		SetFontStyle(UI.LBL_TOTAL_POINT, FontStyle.Italic);
+		yield return (object)StartCoroutine(CountUpAnimation((float)userPoint, totalPoint, UI.LBL_TOTAL_POINT));
+		callback();
 	}
 
 	private IEnumerator CountUpAnimation(float currentPoint, int targetPoint, UI targetUI)
@@ -229,14 +255,14 @@ public class RushResultPoint : GameSection
 				currentPoint = (float)targetPoint;
 			}
 			int before = Mathf.FloorToInt(currentPoint);
-			float addingPoint = Mathf.Max(((float)targetPoint - currentPoint) * CountDownCube(Time.get_deltaTime() * 4f), 1f);
+			float addingPoint = Mathf.Max(((float)targetPoint - currentPoint) * CountDownCube(Time.deltaTime * 4f), 1f);
 			currentPoint += addingPoint;
 			currentPoint = Mathf.Min(currentPoint, (float)targetPoint);
 			if (before < Mathf.FloorToInt(currentPoint))
 			{
 				SoundManager.PlayOneShotUISE(40000012);
 			}
-			SetLabelText((Enum)targetUI, Mathf.FloorToInt(currentPoint).ToString("N0") + "pt");
+			SetLabelText(targetUI, Mathf.FloorToInt(currentPoint).ToString("N0") + "pt");
 		}
 	}
 
@@ -247,9 +273,9 @@ public class RushResultPoint : GameSection
 
 	private void VisibleEndButton()
 	{
-		SetActive((Enum)UI.BTN_NEXT, animState == RESULT_ANIM_STATE.END);
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, animState != RESULT_ANIM_STATE.END);
-		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL, animState != RESULT_ANIM_STATE.END);
+		SetActive(UI.BTN_NEXT, animState == RESULT_ANIM_STATE.END);
+		SetActive(UI.BTN_SKIP_FULL_SCREEN, animState != RESULT_ANIM_STATE.END);
+		SetActive(UI.BTN_SKIP_IN_SCROLL, animState != RESULT_ANIM_STATE.END);
 	}
 
 	private void OnQuery_SKIP()
@@ -260,11 +286,11 @@ public class RushResultPoint : GameSection
 		case RESULT_ANIM_STATE.POINT:
 		case RESULT_ANIM_STATE.COUNT_UP:
 		case RESULT_ANIM_STATE.NEXT_REWARD:
-			SkipTween((Enum)UI.OBJ_RUSH_POINT, true, 0);
-			SkipTween((Enum)UI.OBJ_NEXT_REWARD, true, 0);
+			SkipTween(UI.OBJ_RUSH_POINT, true, 0);
+			SkipTween(UI.OBJ_NEXT_REWARD, true, 0);
 			break;
 		case RESULT_ANIM_STATE.REWARD:
-			SkipTween((Enum)UI.OBJ_GET_REWARD_ROOT, true, 0);
+			SkipTween(UI.OBJ_GET_REWARD_ROOT, true, 0);
 			break;
 		}
 	}

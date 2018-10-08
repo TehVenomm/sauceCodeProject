@@ -67,7 +67,7 @@ public class AttackColliderProcessor : StageObjectManager.IDetachedNotify
 		colliderInterface = _collider_interface;
 		targetPointList = null;
 		Player player = fromObject as Player;
-		if (player != null && player.targetingPointList != null)
+		if ((Object)player != (Object)null && player.targetingPointList != null)
 		{
 			targetPointList = player.targetingPointList.GetRange(0, player.targetingPointList.Count);
 		}
@@ -91,7 +91,7 @@ public class AttackColliderProcessor : StageObjectManager.IDetachedNotify
 
 	public virtual void OnDetachedObject(StageObject stage_object)
 	{
-		if (fromObject == stage_object)
+		if ((Object)fromObject == (Object)stage_object)
 		{
 			fromObject = null;
 		}

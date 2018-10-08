@@ -1,5 +1,3 @@
-using System;
-
 public class WorldMapSelectDifficultyDialog : GameSection
 {
 	protected enum UI
@@ -28,22 +26,22 @@ public class WorldMapSelectDifficultyDialog : GameSection
 		{
 			flag = isOpenedHard;
 		}
-		SetActive((Enum)UI.BTN_HARD, flag);
-		SetActive((Enum)UI.BTN_HARD_GRAY, !flag);
+		SetActive(UI.BTN_HARD, flag);
+		SetActive(UI.BTN_HARD_GRAY, !flag);
 		SetText();
 		base.Initialize();
 	}
 
 	private void SetText()
 	{
-		SetLabelText((Enum)UI.STR_NORMAL, base.sectionData.GetText("NORMAL"));
-		SetLabelText((Enum)UI.STR_HARD, base.sectionData.GetText("HARD"));
+		SetLabelText(UI.STR_NORMAL, base.sectionData.GetText("NORMAL"));
+		SetLabelText(UI.STR_HARD, base.sectionData.GetText("HARD"));
 		string text = base.sectionData.GetText("HARD_LV");
 		text = string.Format(text, 150);
 		UILabel component = GetCtrl(UI.STR_HARD_LV).GetComponent<UILabel>();
 		component.text = text;
 		GetCtrl(UI.STR_HARD_LV).GetComponent<UILabel>().supportEncoding = true;
-		SetLabelText((Enum)UI.STR_HARD_LV, text);
+		SetLabelText(UI.STR_HARD_LV, text);
 	}
 
 	private void OnQuery_HARD()

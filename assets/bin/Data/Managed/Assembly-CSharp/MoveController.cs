@@ -25,7 +25,7 @@ public class MoveController
 
 	private RaycastHit _seekHit = default(RaycastHit);
 
-	public bool isStopTimeOver => stopTime < Time.get_time();
+	public bool isStopTimeOver => stopTime < Time.time;
 
 	public RaycastHit seekHit => _seekHit;
 
@@ -55,9 +55,6 @@ public class MoveController
 
 	public MoveController(Brain brain)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 		this.brain = brain;
 	}
 
@@ -153,45 +150,36 @@ public class MoveController
 
 	public void SetStopTime(float time)
 	{
-		stopTime = time + Time.get_time();
+		stopTime = time + Time.time;
 	}
 
 	public void SetSeek(Vector2 stick, Vector3 pos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		stickVec = stick;
 		targetPos = pos;
 	}
 
 	public void SetTargetPos(Vector3 pos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		targetPos = pos;
 	}
 
 	public bool CanSeekToOpponent(Vector3 target_pos, float move_len)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		int obstacleMask = AIUtility.GetObstacleMask();
 		return CanSeekToPosition(target_pos, move_len, obstacleMask);
 	}
 
 	public bool CanSeekToAlly(Vector3 target_pos, float move_len)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		int mask = AIUtility.GetObstacleMask() | AIUtility.GetOpponentMask(brain.owner);
 		return CanSeekToPosition(target_pos, move_len, mask);
 	}
 
 	public bool CanSeekToPosition(Vector3 target_pos, float move_len, int mask)
 	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 position = brain.owner._transform.get_position();
-		if (AIUtility.RaycastForTargetPos(position, target_pos, mask, out _seekHit) && _seekHit.get_distance() <= move_len)
+		Vector3 position = brain.owner._transform.position;
+		if (AIUtility.RaycastForTargetPos(position, target_pos, mask, out _seekHit) && _seekHit.distance <= move_len)
 		{
 			return false;
 		}
@@ -230,7 +218,6 @@ public class MoveController
 
 	public void SetRootPosition(Vector3 pos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		rootPosition = pos;
 	}
 }

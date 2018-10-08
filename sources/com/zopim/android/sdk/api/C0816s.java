@@ -46,13 +46,13 @@ final class C0816s implements HttpRequest {
     private void m623b(@NonNull File file, @NonNull URL url) {
         OutputStream outputStream;
         PrintWriter printWriter;
-        InputStream bufferedInputStream;
         OutputStream outputStream2;
         Throwable th;
         Throwable th2;
         ErrorResponse a;
         HttpsURLConnection httpsURLConnection;
         HttpsURLConnection httpsURLConnection2 = null;
+        InputStream bufferedInputStream;
         try {
             long length;
             HttpsURLConnection httpsURLConnection3 = (HttpsURLConnection) url.openConnection();

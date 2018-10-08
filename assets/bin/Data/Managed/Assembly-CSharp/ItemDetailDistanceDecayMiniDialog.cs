@@ -33,8 +33,7 @@ public class ItemDetailDistanceDecayMiniDialog : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -84,68 +83,37 @@ public class ItemDetailDistanceDecayMiniDialog : GameSection
 
 	private void CreatePoint(DamageDistanceTable.DamagePoint point)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = ResourceUtility.Realizes(circlePrefab, startPoint, 5);
+		Transform transform = ResourceUtility.Realizes(circlePrefab, startPoint, 5);
 		Vector3 pos = GetPos(point);
-		val.get_transform().set_localPosition(pos);
+		transform.transform.localPosition = pos;
 	}
 
 	private void CreateBar(DamageDistanceTable.DamagePoint point, DamageDistanceTable.DamagePoint nextPoint)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 		Vector3 pos = GetPos(point);
 		Vector3 pos2 = GetPos(nextPoint);
 		float angle = GetAngle(pos, pos2);
 		float num = Vector3.Distance(pos, pos2);
-		Transform val = ResourceUtility.Realizes(barPrefab, startPoint, 5);
-		val.get_transform().set_localPosition(pos);
-		val.get_transform().set_localRotation(Quaternion.AngleAxis(angle, Vector3.get_forward()));
-		UISprite component = val.GetComponent<UISprite>();
+		Transform transform = ResourceUtility.Realizes(barPrefab, startPoint, 5);
+		transform.transform.localPosition = pos;
+		transform.transform.localRotation = Quaternion.AngleAxis(angle, Vector3.forward);
+		UISprite component = transform.GetComponent<UISprite>();
 		component.width = (int)num;
 	}
 
 	private Vector3 GetPos(DamageDistanceTable.DamagePoint point)
 	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		float num = (float)point.distance / 30f * 300f;
-		float num2 = (float)point.rate / 1f * 150f;
-		return new Vector3(num, num2, 0f);
+		float x = (float)point.distance / 30f * 300f;
+		float y = (float)point.rate / 1f * 150f;
+		return new Vector3(x, y, 0f);
 	}
 
 	private float GetAngle(Vector3 pos, Vector3 next)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = next - pos;
-		Vector3 normalized = val.get_normalized();
-		float num = Vector3.Angle(Vector3.get_right(), normalized);
-		Vector3 val2 = Vector3.Cross(Vector3.get_right(), normalized);
-		if (val2.z < 0f)
+		Vector3 normalized = (next - pos).normalized;
+		float num = Vector3.Angle(Vector3.right, normalized);
+		Vector3 vector = Vector3.Cross(Vector3.right, normalized);
+		if (vector.z < 0f)
 		{
 			return 0f - num;
 		}

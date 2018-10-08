@@ -873,6 +873,7 @@ final class zzcaq extends zzcdm {
 
     @WorkerThread
     public final zzcay zzah(String str, String str2) {
+        Cursor query;
         Object e;
         Cursor cursor;
         Throwable th;
@@ -880,7 +881,6 @@ final class zzcaq extends zzcdm {
         zzbp.zzgf(str2);
         zzug();
         zzwh();
-        Cursor query;
         try {
             query = getWritableDatabase().query("events", new String[]{"lifetime_count", "current_bundle_count", "last_fire_timestamp"}, "app_id=? and name=?", new String[]{str, str2}, null, null, null);
             try {
@@ -956,7 +956,6 @@ final class zzcaq extends zzcdm {
 
     @WorkerThread
     public final zzcfn zzaj(String str, String str2) {
-        Cursor query;
         Object e;
         Cursor cursor;
         Throwable th;
@@ -964,6 +963,7 @@ final class zzcaq extends zzcdm {
         zzbp.zzgf(str2);
         zzug();
         zzwh();
+        Cursor query;
         try {
             query = getWritableDatabase().query("user_attributes", new String[]{"set_timestamp", Param.VALUE, Param.ORIGIN}, "app_id=? and name=?", new String[]{str, str2}, null, null, null);
             try {
@@ -1027,7 +1027,6 @@ final class zzcaq extends zzcdm {
 
     @WorkerThread
     public final zzcan zzak(String str, String str2) {
-        Cursor query;
         Object e;
         Cursor cursor;
         Throwable th;
@@ -1035,6 +1034,7 @@ final class zzcaq extends zzcdm {
         zzbp.zzgf(str2);
         zzug();
         zzwh();
+        Cursor query;
         try {
             query = getWritableDatabase().query("conditional_properties", new String[]{Param.ORIGIN, Param.VALUE, "active", "trigger_event_name", "trigger_timeout", "timed_out_event", "creation_timestamp", "triggered_event", "triggered_timestamp", "time_to_live", "expired_event"}, "app_id=? and name=?", new String[]{str, str2}, null, null, null);
             try {
@@ -1120,7 +1120,6 @@ final class zzcaq extends zzcdm {
     }
 
     final Map<Integer, List<zzcfq>> zzam(String str, String str2) {
-        Cursor query;
         Object e;
         Throwable th;
         Cursor cursor = null;
@@ -1129,6 +1128,7 @@ final class zzcaq extends zzcdm {
         zzbp.zzgf(str);
         zzbp.zzgf(str2);
         Map<Integer, List<zzcfq>> arrayMap = new ArrayMap();
+        Cursor query;
         try {
             query = getWritableDatabase().query("event_filters", new String[]{"audience_id", ShareConstants.WEB_DIALOG_PARAM_DATA}, "app_id=? AND event_name=?", new String[]{str, str2}, null, null, null);
             if (query.moveToFirst()) {
@@ -1496,13 +1496,13 @@ final class zzcaq extends zzcdm {
     }
 
     public final List<zzcan> zzc(String str, String[] strArr) {
-        Cursor query;
         Object e;
         Cursor cursor;
         Throwable th;
         zzug();
         zzwh();
         List<zzcan> arrayList = new ArrayList();
+        Cursor query;
         try {
             SQLiteDatabase writableDatabase = getWritableDatabase();
             zzcap.zzawa();
@@ -1935,13 +1935,13 @@ final class zzcaq extends zzcdm {
 
     @WorkerThread
     public final byte[] zziy(String str) {
+        Cursor query;
         Object e;
         Throwable th;
         Cursor cursor = null;
         zzbp.zzgf(str);
         zzug();
         zzwh();
-        Cursor query;
         try {
             query = getWritableDatabase().query("apps", new String[]{"remote_config"}, "app_id=?", new String[]{str}, null, null, null);
             try {

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class NPCLoader : ModelLoaderBase
 {
-	public static readonly Bounds BOUNDS = new Bounds(Vector3.get_zero(), new Vector3(2f, 2f, 2f));
+	public static readonly Bounds BOUNDS = new Bounds(Vector3.zero, new Vector3(2f, 2f, 2f));
 
 	private IEnumerator coroutine;
 
@@ -67,23 +67,21 @@ public class NPCLoader : ModelLoaderBase
 
 	public override void SetEnabled(bool is_enable)
 	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		if (animator != null)
+		if ((UnityEngine.Object)animator != (UnityEngine.Object)null)
 		{
-			animator.set_enabled(is_enable);
+			animator.enabled = is_enable;
 		}
-		if (shadow != null)
+		if ((UnityEngine.Object)shadow != (UnityEngine.Object)null)
 		{
-			shadow.get_gameObject().SetActive(is_enable);
+			shadow.gameObject.SetActive(is_enable);
 		}
 		ModelLoaderBase.SetEnabled(renderers, is_enable);
 	}
 
 	public void Load(int npc_model_id, int layer, bool need_shadow, bool enable_light_probes, SHADER_TYPE shader_type, Action callback)
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		Clear();
-		this.StartCoroutine(coroutine = DoLoad(npc_model_id, layer, need_shadow, enable_light_probes, shader_type, callback));
+		StartCoroutine(coroutine = DoLoad(npc_model_id, layer, need_shadow, enable_light_probes, shader_type, callback));
 	}
 
 	private IEnumerator DoLoad(int npc_model_id, int layer, bool need_shadow, bool enable_light_probes, SHADER_TYPE shader_type, Action callback)
@@ -100,19 +98,19 @@ public class NPCLoader : ModelLoaderBase
 		{
 			yield return (object)loadingQueue.Wait();
 		}
-		model = lo_model.Realizes(this.get_transform(), layer);
-		if (model != null)
+		model = lo_model.Realizes(base.transform, layer);
+		if ((UnityEngine.Object)model != (UnityEngine.Object)null)
 		{
 			head = Utility.Find(model, "Head");
 			facial = model.GetComponentInChildren<NPCFacial>();
-			if (facial != null)
+			if ((UnityEngine.Object)facial != (UnityEngine.Object)null)
 			{
 				facial.animNode = Utility.Find(model, "Face");
 			}
 			animator = model.GetComponentInChildren<Animator>();
-			if (lo_anim != null && animator != null)
+			if (lo_anim != null && (UnityEngine.Object)animator != (UnityEngine.Object)null)
 			{
-				animator.set_runtimeAnimatorController(lo_anim.loadedObjects[0].obj as RuntimeAnimatorController);
+				animator.runtimeAnimatorController = (lo_anim.loadedObjects[0].obj as RuntimeAnimatorController);
 			}
 		}
 		PlayerLoader.SetLightProbes(model, enable_light_probes);
@@ -122,7 +120,7 @@ public class NPCLoader : ModelLoaderBase
 		{
 			if (renderers[j] is SkinnedMeshRenderer)
 			{
-				(renderers[j] as SkinnedMeshRenderer).set_localBounds(BOUNDS);
+				(renderers[j] as SkinnedMeshRenderer).localBounds = BOUNDS;
 			}
 		}
 		switch (shader_type)
@@ -136,26 +134,22 @@ public class NPCLoader : ModelLoaderBase
 		}
 		if (need_shadow)
 		{
-			shadow = PlayerLoader.CreateShadow(this.get_transform(), true, -1, shader_type == SHADER_TYPE.LIGHTWEIGHT);
+			shadow = PlayerLoader.CreateShadow(base.transform, true, -1, shader_type == SHADER_TYPE.LIGHTWEIGHT);
 		}
 		coroutine = null;
-		if (callback != null)
-		{
-			callback.Invoke();
-		}
+		callback?.Invoke();
 	}
 
 	public void Clear()
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 		if (coroutine != null)
 		{
-			this.StopCoroutine(coroutine);
+			StopCoroutine(coroutine);
 			coroutine = null;
 		}
-		if (model != null)
+		if ((UnityEngine.Object)model != (UnityEngine.Object)null)
 		{
-			Object.DestroyImmediate(model.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(model.gameObject);
 			model = null;
 			head = null;
 		}

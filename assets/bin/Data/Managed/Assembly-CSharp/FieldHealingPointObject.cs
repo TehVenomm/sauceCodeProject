@@ -49,34 +49,26 @@ public class FieldHealingPointObject : FieldGimmickObject
 		{
 			SetReadyForHeal();
 		}
-		healData = new Character.HealData((!(MonoBehaviourSingleton<StageObjectManager>.I.self == null)) ? MonoBehaviourSingleton<StageObjectManager>.I.self.hpMax : 0, HEAL_TYPE.ALL_BADSTATUS, HEAL_EFFECT_TYPE.BASIS, null);
+		healData = new Character.HealData((!((Object)MonoBehaviourSingleton<StageObjectManager>.I.self == (Object)null)) ? MonoBehaviourSingleton<StageObjectManager>.I.self.hpMax : 0, HEAL_TYPE.ALL_BADSTATUS, HEAL_EFFECT_TYPE.BASIS, null);
 	}
 
 	private void SetReadyForHeal()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Expected O, but got Unknown
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Expected O, but got Unknown
 		isReady = true;
 		healTimer = 0f;
-		if (effectTransForBase != null)
+		if ((Object)effectTransForBase != (Object)null)
 		{
-			if (effectTransForBase.get_gameObject() != null)
+			if ((Object)effectTransForBase.gameObject != (Object)null)
 			{
-				Object.Destroy(effectTransForBase.get_gameObject());
+				Object.Destroy(effectTransForBase.gameObject);
 			}
 			effectTransForBase = null;
 		}
-		if (effectTransForCrystal != null)
+		if ((Object)effectTransForCrystal != (Object)null)
 		{
-			if (effectTransForCrystal.get_gameObject() != null)
+			if ((Object)effectTransForCrystal.gameObject != (Object)null)
 			{
-				Object.Destroy(effectTransForCrystal.get_gameObject());
+				Object.Destroy(effectTransForCrystal.gameObject);
 			}
 			effectTransForCrystal = null;
 		}
@@ -84,16 +76,16 @@ public class FieldHealingPointObject : FieldGimmickObject
 		{
 			effectTransForBase = EffectManager.GetEffect("ef_btl_heal_spot_01_01", modelTrans.Find("base01"));
 			effectTransForCrystal = EffectManager.GetEffect("ef_btl_heal_spot_01_02", modelTrans.Find("crystal01"));
-			if (effectTransForBase != null)
+			if ((Object)effectTransForBase != (Object)null)
 			{
 				animForEffectOnBase = effectTransForBase.GetComponent<Animator>();
 			}
-			if (effectTransForCrystal != null)
+			if ((Object)effectTransForCrystal != (Object)null)
 			{
 				animForEffectOnCrystal = effectTransForCrystal.GetComponent<Animator>();
 			}
 		}
-		if (animForModel != null)
+		if ((Object)animForModel != (Object)null)
 		{
 			animForModel.Play(STATE_HEAL_POINT_ACTIVE, 0);
 		}
@@ -101,7 +93,6 @@ public class FieldHealingPointObject : FieldGimmickObject
 		{
 			Utility.MaterialForEach(rendererArray, delegate(Material material)
 			{
-				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 				if (material.HasProperty("_SpeLightColor"))
 				{
 					material.SetColor("_SpeLightColor", COLOR_CRYSTAL_IS_READY);
@@ -112,20 +103,17 @@ public class FieldHealingPointObject : FieldGimmickObject
 
 	private void SetNotReadyForHeal()
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 		isReady = false;
-		if (animForModel != null)
+		if ((Object)animForModel != (Object)null)
 		{
 			animForModel.Play(STATE_END, 0);
 		}
-		this.StartCoroutine(EndEffectOnBase());
-		this.StartCoroutine(EndEffectOnCrystal());
+		StartCoroutine(EndEffectOnBase());
+		StartCoroutine(EndEffectOnCrystal());
 		if (rendererArray != null)
 		{
 			Utility.MaterialForEach(rendererArray, delegate(Material material)
 			{
-				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 				if (material.HasProperty("_SpeLightColor"))
 				{
 					material.SetColor("_SpeLightColor", COLOR_CRYSTAL_IS_NOT_READY);
@@ -136,31 +124,21 @@ public class FieldHealingPointObject : FieldGimmickObject
 
 	private IEnumerator EndEffectOnBase()
 	{
-		if (!(animForEffectOnBase == null))
+		if (!((Object)animForEffectOnBase == (Object)null))
 		{
 			animForEffectOnBase.Play(STATE_END, 0, 0f);
 			yield return (object)null;
-			while (true)
+			while (animForEffectOnBase.GetCurrentAnimatorStateInfo(0).fullPathHash != STATE_END_INCLUDE_LAYER)
 			{
-				AnimatorStateInfo currentAnimatorStateInfo = animForEffectOnBase.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_fullPathHash() == STATE_END_INCLUDE_LAYER)
-				{
-					break;
-				}
 				yield return (object)null;
 			}
-			while (true)
+			while (animForEffectOnBase.GetCurrentAnimatorStateInfo(0).normalizedTime <= 1f)
 			{
-				AnimatorStateInfo currentAnimatorStateInfo2 = animForEffectOnBase.GetCurrentAnimatorStateInfo(0);
-				if (!(currentAnimatorStateInfo2.get_normalizedTime() <= 1f))
-				{
-					break;
-				}
 				yield return (object)null;
 			}
-			if (effectTransForBase != null)
+			if ((Object)effectTransForBase != (Object)null)
 			{
-				Object.Destroy(effectTransForBase.get_gameObject());
+				Object.Destroy(effectTransForBase.gameObject);
 				effectTransForBase = null;
 			}
 		}
@@ -168,31 +146,21 @@ public class FieldHealingPointObject : FieldGimmickObject
 
 	private IEnumerator EndEffectOnCrystal()
 	{
-		if (!(animForEffectOnCrystal == null))
+		if (!((Object)animForEffectOnCrystal == (Object)null))
 		{
 			animForEffectOnCrystal.Play(STATE_END, 0, 0f);
 			yield return (object)null;
-			while (true)
+			while (animForEffectOnBase.GetCurrentAnimatorStateInfo(0).fullPathHash != STATE_END_INCLUDE_LAYER)
 			{
-				AnimatorStateInfo currentAnimatorStateInfo = animForEffectOnBase.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_fullPathHash() == STATE_END_INCLUDE_LAYER)
-				{
-					break;
-				}
 				yield return (object)null;
 			}
-			while (true)
+			while (animForEffectOnCrystal.GetCurrentAnimatorStateInfo(0).normalizedTime <= 1f)
 			{
-				AnimatorStateInfo currentAnimatorStateInfo2 = animForEffectOnCrystal.GetCurrentAnimatorStateInfo(0);
-				if (!(currentAnimatorStateInfo2.get_normalizedTime() <= 1f))
-				{
-					break;
-				}
 				yield return (object)null;
 			}
-			if (effectTransForCrystal != null)
+			if ((Object)effectTransForCrystal != (Object)null)
 			{
-				Object.Destroy(effectTransForCrystal.get_gameObject());
+				Object.Destroy(effectTransForCrystal.gameObject);
 				effectTransForCrystal = null;
 			}
 		}
@@ -202,7 +170,7 @@ public class FieldHealingPointObject : FieldGimmickObject
 	{
 		if (!isReady)
 		{
-			healTimer += Time.get_deltaTime();
+			healTimer += Time.deltaTime;
 		}
 		if (m_healInterval <= healTimer)
 		{
@@ -212,12 +180,10 @@ public class FieldHealingPointObject : FieldGimmickObject
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		if (!(collider.get_gameObject().GetComponent<Self>() == null) && MonoBehaviourSingleton<InGameProgress>.I.isBattleStart && MonoBehaviourSingleton<InGameProgress>.I.progressEndType == InGameProgress.PROGRESS_END_TYPE.NONE && !MonoBehaviourSingleton<InGameProgress>.I.isHappenQuestDirection && MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		if (!((Object)collider.gameObject.GetComponent<Self>() == (Object)null) && MonoBehaviourSingleton<InGameProgress>.I.isBattleStart && MonoBehaviourSingleton<InGameProgress>.I.progressEndType == InGameProgress.PROGRESS_END_TYPE.NONE && !MonoBehaviourSingleton<InGameProgress>.I.isHappenQuestDirection && MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if (!(self == null) && !self.isDead && isReady)
+			if (!((Object)self == (Object)null) && !self.isDead && isReady)
 			{
 				self.OnHealReceive(healData);
 				SoundManager.PlayOneShotSE(30000038, self._position);
@@ -228,23 +194,19 @@ public class FieldHealingPointObject : FieldGimmickObject
 
 	public override void RequestDestroy()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		if (effectTransForBase != null)
+		if ((Object)effectTransForBase != (Object)null)
 		{
-			if (effectTransForBase.get_gameObject() != null)
+			if ((Object)effectTransForBase.gameObject != (Object)null)
 			{
-				Object.Destroy(effectTransForBase.get_gameObject());
+				Object.Destroy(effectTransForBase.gameObject);
 			}
 			effectTransForBase = null;
 		}
-		if (effectTransForCrystal != null)
+		if ((Object)effectTransForCrystal != (Object)null)
 		{
-			if (effectTransForCrystal.get_gameObject() != null)
+			if ((Object)effectTransForCrystal.gameObject != (Object)null)
 			{
-				Object.Destroy(effectTransForCrystal.get_gameObject());
+				Object.Destroy(effectTransForCrystal.gameObject);
 			}
 			effectTransForCrystal = null;
 		}

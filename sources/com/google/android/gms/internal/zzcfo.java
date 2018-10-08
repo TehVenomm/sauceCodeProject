@@ -277,37 +277,37 @@ public final class zzcfo extends zzcdm {
     }
 
     public static Object zzad(Object obj) {
+        ObjectInputStream objectInputStream;
         Throwable th;
         ObjectOutputStream objectOutputStream;
-        ObjectInputStream objectInputStream;
+        ObjectInputStream objectInputStream2;
         if (obj == null) {
             return null;
         }
         try {
-            ObjectInputStream objectInputStream2;
             OutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ObjectOutputStream objectOutputStream2 = new ObjectOutputStream(byteArrayOutputStream);
             try {
                 objectOutputStream2.writeObject(obj);
                 objectOutputStream2.flush();
-                objectInputStream2 = new ObjectInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+                objectInputStream = new ObjectInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
             } catch (Throwable th2) {
                 th = th2;
                 objectOutputStream = objectOutputStream2;
-                objectInputStream = null;
+                objectInputStream2 = null;
                 if (objectOutputStream != null) {
                     objectOutputStream.close();
                 }
-                if (objectInputStream != null) {
-                    objectInputStream.close();
+                if (objectInputStream2 != null) {
+                    objectInputStream2.close();
                 }
                 throw th;
             }
             try {
-                Object readObject = objectInputStream2.readObject();
+                Object readObject = objectInputStream.readObject();
                 try {
                     objectOutputStream2.close();
-                    objectInputStream2.close();
+                    objectInputStream.close();
                     return readObject;
                 } catch (IOException e) {
                     return null;
@@ -316,26 +316,26 @@ public final class zzcfo extends zzcdm {
                 }
             } catch (Throwable th22) {
                 ObjectOutputStream objectOutputStream3 = objectOutputStream2;
-                objectInputStream = objectInputStream2;
+                objectInputStream2 = objectInputStream;
                 th = th22;
                 objectOutputStream = objectOutputStream3;
                 if (objectOutputStream != null) {
                     objectOutputStream.close();
                 }
-                if (objectInputStream != null) {
-                    objectInputStream.close();
+                if (objectInputStream2 != null) {
+                    objectInputStream2.close();
                 }
                 throw th;
             }
         } catch (Throwable th222) {
-            objectInputStream = null;
+            objectInputStream2 = null;
             th = th222;
             objectOutputStream = null;
             if (objectOutputStream != null) {
                 objectOutputStream.close();
             }
-            if (objectInputStream != null) {
-                objectInputStream.close();
+            if (objectInputStream2 != null) {
+                objectInputStream2.close();
             }
             throw th;
         }

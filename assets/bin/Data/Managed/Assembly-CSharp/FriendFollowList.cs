@@ -17,13 +17,13 @@ public class FriendFollowList : FollowListBase
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_FOLLOW_NUMBER_ROOT, true);
-		SetLabelText((Enum)UI.LBL_FOLLOW_NUMBER_NOW, MonoBehaviourSingleton<FriendManager>.I.followNum.ToString());
-		SetLabelText((Enum)UI.LBL_FOLLOW_NUMBER_MAX, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxFollow.ToString());
+		SetActive(UI.OBJ_FOLLOW_NUMBER_ROOT, true);
+		SetLabelText(UI.LBL_FOLLOW_NUMBER_NOW, MonoBehaviourSingleton<FriendManager>.I.followNum.ToString());
+		SetLabelText(UI.LBL_FOLLOW_NUMBER_MAX, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxFollow.ToString());
 		ListUI();
 	}
 
-	protected unsafe override void UpdateDynamicList()
+	protected override void UpdateDynamicList()
 	{
 		FriendCharaInfo[] currentUserArray = GetCurrentUserArray();
 		int pageItemLength = GetPageItemLength(nowPage);
@@ -31,17 +31,19 @@ public class FriendFollowList : FollowListBase
 		if (pageItemLength >= 1 && currentUserArray.Length >= 1 && currentUserArray.Length >= num + pageItemLength)
 		{
 			FriendCharaInfo[] info = new FriendCharaInfo[pageItemLength];
-			for (int i = 0; i < pageItemLength; i++)
+			for (int j = 0; j < pageItemLength; j++)
 			{
-				info[i] = currentUserArray[num + i];
+				info[j] = currentUserArray[num + j];
 			}
 			if (GameDefine.ACTIVE_DEGREE)
 			{
 				base.ScrollGrid.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 			}
 			CleanItemList();
-			_003CUpdateDynamicList_003Ec__AnonStorey2F5 _003CUpdateDynamicList_003Ec__AnonStorey2F;
-			SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, pageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetDynamicList(UI.GRD_LIST, GetListItemName, pageItemLength, false, null, null, delegate(int i, Transform t, bool is_recycle)
+			{
+				SetListItem(i, t, is_recycle, info[i]);
+			});
 		}
 	}
 
@@ -50,10 +52,22 @@ public class FriendFollowList : FollowListBase
 		return (currentPage + 1 < pageNumMax || recvList.Count % 10 <= 0) ? 10 : (recvList.Count % 10);
 	}
 
-	protected unsafe override void SendGetList(int page, Action<bool> callback)
+	protected override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey2F6 _003CSendGetList_003Ec__AnonStorey2F;
-		MonoBehaviourSingleton<FriendManager>.I.SendGetFollowList(page, new Action<bool, FriendFollowListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<FriendManager>.I.SendGetFollowList(page, delegate(bool is_success, FriendFollowListModel.Param recv_data)
+		{
+			if (is_success)
+			{
+				recvList = recv_data.follow;
+				nowPage = page;
+				pageNumMax = Mathf.CeilToInt((float)recvList.Count / 10f);
+				Sort(recvList);
+			}
+			if (callback != null)
+			{
+				callback(is_success);
+			}
+		});
 	}
 
 	protected override void PostSendGetListByReopen(int page)

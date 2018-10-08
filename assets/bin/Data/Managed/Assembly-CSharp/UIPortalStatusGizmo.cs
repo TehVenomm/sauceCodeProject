@@ -39,102 +39,52 @@ public class UIPortalStatusGizmo : UIStatusGizmoBase
 		}
 		set
 		{
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Expected O, but got Unknown
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			if (_portal != null)
+			if ((Object)_portal != (Object)null)
 			{
 				_portal.uiGizmo = null;
 			}
 			_portal = value;
-			if (_portal != null)
+			if ((Object)_portal != (Object)null)
 			{
 				_portal.uiGizmo = this;
-				this.get_gameObject().SetActive(true);
-				portalTransform = value.get_transform();
+				base.gameObject.SetActive(true);
+				portalTransform = value.transform;
 				UpdateParam();
 			}
 			else
 			{
-				this.get_gameObject().SetActive(false);
+				base.gameObject.SetActive(false);
 			}
 		}
 	}
 
 	protected override void OnEnable()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		base.OnEnable();
-		if (arrow != null)
+		if ((Object)arrow != (Object)null)
 		{
-			arrowTransform = arrow.get_transform();
+			arrowTransform = arrow.transform;
 		}
 	}
 
 	protected override void UpdateParam()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Expected O, but got Unknown
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Expected O, but got Unknown
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Expected O, but got Unknown
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Expected O, but got Unknown
-		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0186: Expected O, but got Unknown
-		//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a5: Expected O, but got Unknown
-		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b7: Expected O, but got Unknown
-		//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0212: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0214: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0236: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0276: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d3: Expected O, but got Unknown
-		//IL_03f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f7: Expected O, but got Unknown
-		if (portal == null || !portal.get_gameObject().get_activeSelf())
+		if ((Object)portal == (Object)null || !portal.gameObject.activeSelf)
 		{
-			SetActiveSafe(statusSprite.get_gameObject(), false);
+			SetActiveSafe(statusSprite.gameObject, false);
 			SetActiveSafe(arrow, false);
-			SetActiveSafe(addTween.get_gameObject(), false);
-			SetActiveSafe(fullTween.get_gameObject(), false);
+			SetActiveSafe(addTween.gameObject, false);
+			SetActiveSafe(fullTween.gameObject, false);
 		}
 		else
 		{
-			Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, portalTransform.get_position() + offset);
+			Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, portalTransform.position + offset);
 			screenZ = screenUIPosition.z;
 			screenUIPosition.z = 0f;
 			float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
-			Vector3 val = screenUIPosition;
+			Vector3 a = screenUIPosition;
 			bool flag = false;
-			float num2 = (float)Screen.get_width();
+			float num2 = (float)Screen.width;
 			if (screenUIPosition.x < screenSideOffset * num)
 			{
 				screenUIPosition.x = screenSideOffset * num;
@@ -152,29 +102,28 @@ public class UIPortalStatusGizmo : UIStatusGizmoBase
 			}
 			if (flag)
 			{
-				SetActiveSafe(statusSprite.get_gameObject(), true);
+				SetActiveSafe(statusSprite.gameObject, true);
 				SetActiveSafe(arrow, true);
-				Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
-				Vector3 val3 = transform.get_position() - val2;
-				if (val3.get_sqrMagnitude() >= 2E-05f)
+				Vector3 vector = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
+				if ((transform.position - vector).sqrMagnitude >= 2E-05f)
 				{
-					transform.set_position(val2);
+					transform.position = vector;
 				}
-				if (arrowTransform != null)
+				if ((Object)arrowTransform != (Object)null)
 				{
-					Vector3 val4 = val - screenUIPosition;
-					if (val4 != Vector3.get_zero())
+					Vector3 vector2 = a - screenUIPosition;
+					if (vector2 != Vector3.zero)
 					{
-						float num3 = 90f - Vector3.Angle(Vector3.get_right(), val4);
-						arrowTransform.set_eulerAngles(new Vector3(0f, 0f, num3));
+						float z = 90f - Vector3.Angle(Vector3.right, vector2);
+						arrowTransform.eulerAngles = new Vector3(0f, 0f, z);
 					}
 					else
 					{
-						arrowTransform.set_eulerAngles(new Vector3(0f, 0f, 0f));
+						arrowTransform.eulerAngles = new Vector3(0f, 0f, 0f);
 					}
 				}
 				bool flag2 = false;
-				if (statusSprite != null)
+				if ((Object)statusSprite != (Object)null)
 				{
 					switch (portal.viewType)
 					{
@@ -189,13 +138,13 @@ public class UIPortalStatusGizmo : UIStatusGizmoBase
 						}
 						else
 						{
-							float num4 = (float)portal.nowPoint / (float)portal.maxPoint;
-							int num5 = (int)(num4 * (float)MonoBehaviourSingleton<InGameSettingsManager>.I.portal.pointRankNum);
-							if (num5 >= MonoBehaviourSingleton<InGameSettingsManager>.I.portal.pointRankNum - 1)
+							float num3 = (float)portal.nowPoint / (float)portal.maxPoint;
+							int num4 = (int)(num3 * (float)MonoBehaviourSingleton<InGameSettingsManager>.I.portal.pointRankNum);
+							if (num4 >= MonoBehaviourSingleton<InGameSettingsManager>.I.portal.pointRankNum - 1)
 							{
-								num5 = MonoBehaviourSingleton<InGameSettingsManager>.I.portal.pointRankNum - 2;
+								num4 = MonoBehaviourSingleton<InGameSettingsManager>.I.portal.pointRankNum - 2;
 							}
-							statusSprite.spriteName = string.Format("Ingame_portal_vitalsign_red_{0}", num5.ToString("D2"));
+							statusSprite.spriteName = string.Format("Ingame_portal_vitalsign_red_{0}", num4.ToString("D2"));
 						}
 						break;
 					case PortalObject.VIEW_TYPE.TO_HOME:
@@ -211,35 +160,31 @@ public class UIPortalStatusGizmo : UIStatusGizmoBase
 				}
 				if (flag2)
 				{
-					SetActiveSafe(fullTween.get_gameObject(), true);
+					SetActiveSafe(fullTween.gameObject, true);
 					fullTween.Play(true, null);
 				}
 				else
 				{
-					SetActiveSafe(fullTween.get_gameObject(), false);
+					SetActiveSafe(fullTween.gameObject, false);
 				}
 			}
 			else
 			{
-				SetActiveSafe(statusSprite.get_gameObject(), false);
+				SetActiveSafe(statusSprite.gameObject, false);
 				SetActiveSafe(arrow, false);
-				SetActiveSafe(addTween.get_gameObject(), false);
-				SetActiveSafe(fullTween.get_gameObject(), false);
+				SetActiveSafe(addTween.gameObject, false);
+				SetActiveSafe(fullTween.gameObject, false);
 			}
 		}
 	}
 
 	public void OnGetPortalPoint()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Expected O, but got Unknown
-		SetActiveSafe(addTween.get_gameObject(), true);
+		SetActiveSafe(addTween.gameObject, true);
 		addTween.Reset();
 		addTween.Play(true, delegate
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Expected O, but got Unknown
-			SetActiveSafe(fullTween.get_gameObject(), false);
+			SetActiveSafe(fullTween.gameObject, false);
 		});
 	}
 }

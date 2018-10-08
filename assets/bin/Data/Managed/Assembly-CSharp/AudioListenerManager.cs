@@ -44,7 +44,7 @@ public class AudioListenerManager : MonoBehaviourSingleton<AudioListenerManager>
 
 	public void SetTargetObject(StageObject obj)
 	{
-		if (!(obj == null))
+		if (!((UnityEngine.Object)obj == (UnityEngine.Object)null))
 		{
 			m_target = obj;
 			SetFlag(STATUS_FLAGS.TARGET_OBJECT_ACTIVE, true);
@@ -59,8 +59,7 @@ public class AudioListenerManager : MonoBehaviourSingleton<AudioListenerManager>
 
 	protected override void Awake()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().AddComponent<AudioListener>();
+		base.gameObject.AddComponent<AudioListener>();
 		base.Awake();
 	}
 
@@ -90,27 +89,22 @@ public class AudioListenerManager : MonoBehaviourSingleton<AudioListenerManager>
 
 	private void Trace(Transform t, TRACE_FLAGS flag)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		if (t != null)
+		if ((UnityEngine.Object)t != (UnityEngine.Object)null)
 		{
 			if ((flag & TRACE_FLAGS.POSITION) != 0)
 			{
-				base._transform.set_position(t.get_position());
+				base._transform.position = t.position;
 			}
 			if ((flag & TRACE_FLAGS.ROTATION) != 0)
 			{
-				base._transform.set_rotation(Quaternion.LookRotation(Vector3.Cross(Vector3.get_up(), t.get_right())));
+				base._transform.rotation = Quaternion.LookRotation(Vector3.Cross(Vector3.up, t.right));
 			}
 		}
 	}
 
 	private void TraceMainCamera(TRACE_FLAGS flags = TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION)
 	{
-		if (MonoBehaviourSingleton<AppMain>.IsValid() && MonoBehaviourSingleton<AppMain>.I.mainCameraTransform != null)
+		if (MonoBehaviourSingleton<AppMain>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<AppMain>.I.mainCameraTransform != (UnityEngine.Object)null)
 		{
 			Trace(MonoBehaviourSingleton<AppMain>.I.mainCameraTransform, TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION);
 		}
@@ -119,7 +113,7 @@ public class AudioListenerManager : MonoBehaviourSingleton<AudioListenerManager>
 	private void TraceObject()
 	{
 		TraceMainCamera(TRACE_FLAGS.ROTATION);
-		if (m_target == null || m_target._transform == null)
+		if ((UnityEngine.Object)m_target == (UnityEngine.Object)null || (UnityEngine.Object)m_target._transform == (UnityEngine.Object)null)
 		{
 			SetFlag(STATUS_FLAGS.TARGET_OBJECT_ACTIVE, false);
 		}
@@ -131,7 +125,7 @@ public class AudioListenerManager : MonoBehaviourSingleton<AudioListenerManager>
 
 	private void TraceIngameCamera(TRACE_FLAGS flags = TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION)
 	{
-		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform != null)
+		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform != (UnityEngine.Object)null)
 		{
 			Trace(MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION);
 		}

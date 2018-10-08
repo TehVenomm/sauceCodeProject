@@ -44,9 +44,9 @@ public abstract class UIBasicSprite : UIWidget
 	[HideInInspector]
 	protected FillDirection mFillDirection = FillDirection.Radial360;
 
-	[SerializeField]
 	[HideInInspector]
 	[Range(0f, 1f)]
+	[SerializeField]
 	protected float mFillAmount = 1f;
 
 	[HideInInspector]
@@ -73,9 +73,9 @@ public abstract class UIBasicSprite : UIWidget
 
 	public AdvancedType topType = AdvancedType.Sliced;
 
-	protected static Vector2[] mTempPos = (Vector2[])new Vector2[4];
+	protected static Vector2[] mTempPos = new Vector2[4];
 
-	protected static Vector2[] mTempUVs = (Vector2[])new Vector2[4];
+	protected static Vector2[] mTempUVs = new Vector2[4];
 
 	public virtual Type type
 	{
@@ -146,13 +146,10 @@ public abstract class UIBasicSprite : UIWidget
 	{
 		get
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			if (type == Type.Sliced || type == Type.Advanced)
 			{
-				Vector4 val = border * pixelSize;
-				int num = Mathf.RoundToInt(val.x + val.z);
+				Vector4 vector = border * pixelSize;
+				int num = Mathf.RoundToInt(vector.x + vector.z);
 				return Mathf.Max(base.minWidth, ((num & 1) != 1) ? num : (num + 1));
 			}
 			return base.minWidth;
@@ -163,13 +160,10 @@ public abstract class UIBasicSprite : UIWidget
 	{
 		get
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			if (type == Type.Sliced || type == Type.Advanced)
 			{
-				Vector4 val = border * pixelSize;
-				int num = Mathf.RoundToInt(val.y + val.w);
+				Vector4 vector = border * pixelSize;
+				int num = Mathf.RoundToInt(vector.y + vector.w);
 				return Mathf.Max(base.minHeight, ((num & 1) != 1) ? num : (num + 1));
 			}
 			return base.minHeight;
@@ -196,8 +190,6 @@ public abstract class UIBasicSprite : UIWidget
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			Vector4 border = this.border;
 			return border.x != 0f || border.y != 0f || border.z != 0f || border.w != 0f;
 		}
@@ -211,20 +203,16 @@ public abstract class UIBasicSprite : UIWidget
 	{
 		get
 		{
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 			switch (mFlip)
 			{
 			case Flip.Horizontally:
-				return new Vector4(mOuterUV.get_xMax(), mOuterUV.get_yMin(), mOuterUV.get_xMin(), mOuterUV.get_yMax());
+				return new Vector4(mOuterUV.xMax, mOuterUV.yMin, mOuterUV.xMin, mOuterUV.yMax);
 			case Flip.Vertically:
-				return new Vector4(mOuterUV.get_xMin(), mOuterUV.get_yMax(), mOuterUV.get_xMax(), mOuterUV.get_yMin());
+				return new Vector4(mOuterUV.xMin, mOuterUV.yMax, mOuterUV.xMax, mOuterUV.yMin);
 			case Flip.Both:
-				return new Vector4(mOuterUV.get_xMax(), mOuterUV.get_yMax(), mOuterUV.get_xMin(), mOuterUV.get_yMin());
+				return new Vector4(mOuterUV.xMax, mOuterUV.yMax, mOuterUV.xMin, mOuterUV.yMin);
 			default:
-				return new Vector4(mOuterUV.get_xMin(), mOuterUV.get_yMin(), mOuterUV.get_xMax(), mOuterUV.get_yMax());
+				return new Vector4(mOuterUV.xMin, mOuterUV.yMin, mOuterUV.xMax, mOuterUV.yMax);
 			}
 		}
 	}
@@ -233,37 +221,24 @@ public abstract class UIBasicSprite : UIWidget
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Invalid comparison between Unknown and I4
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			Color val = base.color;
-			val.a = finalAlpha;
+			Color c = base.color;
+			c.a = finalAlpha;
 			if (premultipliedAlpha)
 			{
-				val = NGUITools.ApplyPMA(val);
+				c = NGUITools.ApplyPMA(c);
 			}
-			if ((int)QualitySettings.get_activeColorSpace() == 1)
+			if (QualitySettings.activeColorSpace == ColorSpace.Linear)
 			{
-				val.r = Mathf.GammaToLinearSpace(val.r);
-				val.g = Mathf.GammaToLinearSpace(val.g);
-				val.b = Mathf.GammaToLinearSpace(val.b);
+				c.r = Mathf.GammaToLinearSpace(c.r);
+				c.g = Mathf.GammaToLinearSpace(c.g);
+				c.b = Mathf.GammaToLinearSpace(c.b);
 			}
-			return Color32.op_Implicit(val);
+			return c;
 		}
 	}
 
 	protected void Fill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols, Rect outer, Rect inner)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 		mOuterUV = outer;
 		mInnerUV = inner;
 		switch (type)
@@ -288,24 +263,6 @@ public abstract class UIBasicSprite : UIWidget
 
 	private void SimpleFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
 		Vector4 drawingDimensions = this.drawingDimensions;
 		Vector4 drawingUVs = this.drawingUVs;
 		Color32 drawingColor = this.drawingColor;
@@ -325,27 +282,8 @@ public abstract class UIBasicSprite : UIWidget
 
 	private void SlicedFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_044f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_047b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0501: Unknown result type (might be due to invalid IL or missing references)
-		//IL_052d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_055a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0587: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0592: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0599: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05a7: Unknown result type (might be due to invalid IL or missing references)
-		Vector4 val = border * pixelSize;
-		if (val.x == 0f && val.y == 0f && val.z == 0f && val.w == 0f)
+		Vector4 vector = border * pixelSize;
+		if (vector.x == 0f && vector.y == 0f && vector.z == 0f && vector.w == 0f)
 		{
 			SimpleFill(verts, uvs, cols);
 		}
@@ -359,39 +297,39 @@ public abstract class UIBasicSprite : UIWidget
 			mTempPos[3].y = drawingDimensions.w;
 			if (mFlip == Flip.Horizontally || mFlip == Flip.Both)
 			{
-				mTempPos[1].x = mTempPos[0].x + val.z;
-				mTempPos[2].x = mTempPos[3].x - val.x;
-				mTempUVs[3].x = mOuterUV.get_xMin();
-				mTempUVs[2].x = mInnerUV.get_xMin();
-				mTempUVs[1].x = mInnerUV.get_xMax();
-				mTempUVs[0].x = mOuterUV.get_xMax();
+				mTempPos[1].x = mTempPos[0].x + vector.z;
+				mTempPos[2].x = mTempPos[3].x - vector.x;
+				mTempUVs[3].x = mOuterUV.xMin;
+				mTempUVs[2].x = mInnerUV.xMin;
+				mTempUVs[1].x = mInnerUV.xMax;
+				mTempUVs[0].x = mOuterUV.xMax;
 			}
 			else
 			{
-				mTempPos[1].x = mTempPos[0].x + val.x;
-				mTempPos[2].x = mTempPos[3].x - val.z;
-				mTempUVs[0].x = mOuterUV.get_xMin();
-				mTempUVs[1].x = mInnerUV.get_xMin();
-				mTempUVs[2].x = mInnerUV.get_xMax();
-				mTempUVs[3].x = mOuterUV.get_xMax();
+				mTempPos[1].x = mTempPos[0].x + vector.x;
+				mTempPos[2].x = mTempPos[3].x - vector.z;
+				mTempUVs[0].x = mOuterUV.xMin;
+				mTempUVs[1].x = mInnerUV.xMin;
+				mTempUVs[2].x = mInnerUV.xMax;
+				mTempUVs[3].x = mOuterUV.xMax;
 			}
 			if (mFlip == Flip.Vertically || mFlip == Flip.Both)
 			{
-				mTempPos[1].y = mTempPos[0].y + val.w;
-				mTempPos[2].y = mTempPos[3].y - val.y;
-				mTempUVs[3].y = mOuterUV.get_yMin();
-				mTempUVs[2].y = mInnerUV.get_yMin();
-				mTempUVs[1].y = mInnerUV.get_yMax();
-				mTempUVs[0].y = mOuterUV.get_yMax();
+				mTempPos[1].y = mTempPos[0].y + vector.w;
+				mTempPos[2].y = mTempPos[3].y - vector.y;
+				mTempUVs[3].y = mOuterUV.yMin;
+				mTempUVs[2].y = mInnerUV.yMin;
+				mTempUVs[1].y = mInnerUV.yMax;
+				mTempUVs[0].y = mOuterUV.yMax;
 			}
 			else
 			{
-				mTempPos[1].y = mTempPos[0].y + val.y;
-				mTempPos[2].y = mTempPos[3].y - val.w;
-				mTempUVs[0].y = mOuterUV.get_yMin();
-				mTempUVs[1].y = mInnerUV.get_yMin();
-				mTempUVs[2].y = mInnerUV.get_yMax();
-				mTempUVs[3].y = mOuterUV.get_yMax();
+				mTempPos[1].y = mTempPos[0].y + vector.y;
+				mTempPos[2].y = mTempPos[3].y - vector.w;
+				mTempUVs[0].y = mOuterUV.yMin;
+				mTempUVs[1].y = mInnerUV.yMin;
+				mTempUVs[2].y = mInnerUV.yMax;
+				mTempUVs[3].y = mOuterUV.yMax;
 			}
 			for (int i = 0; i < 3; i++)
 			{
@@ -421,87 +359,67 @@ public abstract class UIBasicSprite : UIWidget
 
 	private void TiledFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0237: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0246: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0255: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0273: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0282: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0291: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c0: Unknown result type (might be due to invalid IL or missing references)
 		Texture mainTexture = this.mainTexture;
-		if (!(mainTexture == null))
+		if (!((UnityEngine.Object)mainTexture == (UnityEngine.Object)null))
 		{
-			Vector2 val = default(Vector2);
-			val._002Ector(mInnerUV.get_width() * (float)mainTexture.get_width(), mInnerUV.get_height() * (float)mainTexture.get_height());
-			val *= pixelSize;
-			if (!(mainTexture == null) && !(val.x < 2f) && !(val.y < 2f))
+			Vector2 a = new Vector2(mInnerUV.width * (float)mainTexture.width, mInnerUV.height * (float)mainTexture.height);
+			a *= pixelSize;
+			if (!((UnityEngine.Object)mainTexture == (UnityEngine.Object)null) && !(a.x < 2f) && !(a.y < 2f))
 			{
 				Color32 drawingColor = this.drawingColor;
 				Vector4 drawingDimensions = this.drawingDimensions;
-				Vector4 val2 = default(Vector4);
+				Vector4 vector = default(Vector4);
 				if (mFlip == Flip.Horizontally || mFlip == Flip.Both)
 				{
-					val2.x = mInnerUV.get_xMax();
-					val2.z = mInnerUV.get_xMin();
+					vector.x = mInnerUV.xMax;
+					vector.z = mInnerUV.xMin;
 				}
 				else
 				{
-					val2.x = mInnerUV.get_xMin();
-					val2.z = mInnerUV.get_xMax();
+					vector.x = mInnerUV.xMin;
+					vector.z = mInnerUV.xMax;
 				}
 				if (mFlip == Flip.Vertically || mFlip == Flip.Both)
 				{
-					val2.y = mInnerUV.get_yMax();
-					val2.w = mInnerUV.get_yMin();
+					vector.y = mInnerUV.yMax;
+					vector.w = mInnerUV.yMin;
 				}
 				else
 				{
-					val2.y = mInnerUV.get_yMin();
-					val2.w = mInnerUV.get_yMax();
+					vector.y = mInnerUV.yMin;
+					vector.w = mInnerUV.yMax;
 				}
 				float x = drawingDimensions.x;
 				float num = drawingDimensions.y;
-				float x2 = val2.x;
-				float y = val2.y;
-				for (; num < drawingDimensions.w; num += val.y)
+				float x2 = vector.x;
+				float y = vector.y;
+				for (; num < drawingDimensions.w; num += a.y)
 				{
 					x = drawingDimensions.x;
-					float num2 = num + val.y;
-					float num3 = val2.w;
+					float num2 = num + a.y;
+					float y2 = vector.w;
 					if (num2 > drawingDimensions.w)
 					{
-						num3 = Mathf.Lerp(val2.y, val2.w, (drawingDimensions.w - num) / val.y);
+						y2 = Mathf.Lerp(vector.y, vector.w, (drawingDimensions.w - num) / a.y);
 						num2 = drawingDimensions.w;
 					}
-					for (; x < drawingDimensions.z; x += val.x)
+					for (; x < drawingDimensions.z; x += a.x)
 					{
-						float num4 = x + val.x;
-						float num5 = val2.z;
-						if (num4 > drawingDimensions.z)
+						float num3 = x + a.x;
+						float x3 = vector.z;
+						if (num3 > drawingDimensions.z)
 						{
-							num5 = Mathf.Lerp(val2.x, val2.z, (drawingDimensions.z - x) / val.x);
-							num4 = drawingDimensions.z;
+							x3 = Mathf.Lerp(vector.x, vector.z, (drawingDimensions.z - x) / a.x);
+							num3 = drawingDimensions.z;
 						}
 						verts.Add(new Vector3(x, num));
 						verts.Add(new Vector3(x, num2));
-						verts.Add(new Vector3(num4, num2));
-						verts.Add(new Vector3(num4, num));
+						verts.Add(new Vector3(num3, num2));
+						verts.Add(new Vector3(num3, num));
 						uvs.Add(new Vector2(x2, y));
-						uvs.Add(new Vector2(x2, num3));
-						uvs.Add(new Vector2(num5, num3));
-						uvs.Add(new Vector2(num5, y));
+						uvs.Add(new Vector2(x2, y2));
+						uvs.Add(new Vector2(x3, y2));
+						uvs.Add(new Vector2(x3, y));
 						cols.Add(drawingColor);
 						cols.Add(drawingColor);
 						cols.Add(drawingColor);
@@ -514,44 +432,6 @@ public abstract class UIBasicSprite : UIWidget
 
 	private void FilledFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0205: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0223: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0246: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0291: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0304: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_060d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0612: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0629: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0634: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0970: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0975: Unknown result type (might be due to invalid IL or missing references)
-		//IL_098c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0997: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09f6: Unknown result type (might be due to invalid IL or missing references)
 		if (!(mFillAmount < 0.001f))
 		{
 			Vector4 drawingDimensions = this.drawingDimensions;
@@ -604,7 +484,7 @@ public abstract class UIBasicSprite : UIWidget
 					{
 						for (int i = 0; i < 4; i++)
 						{
-							verts.Add(Vector2.op_Implicit(mTempPos[i]));
+							verts.Add(mTempPos[i]);
 							uvs.Add(mTempUVs[i]);
 							cols.Add(drawingColor);
 						}
@@ -615,42 +495,42 @@ public abstract class UIBasicSprite : UIWidget
 				{
 					for (int j = 0; j < 2; j++)
 					{
-						float num3 = 0f;
-						float num4 = 1f;
-						float num5;
-						float num6;
+						float t = 0f;
+						float t2 = 1f;
+						float t3;
+						float t4;
 						if (j == 0)
 						{
-							num5 = 0f;
-							num6 = 0.5f;
+							t3 = 0f;
+							t4 = 0.5f;
 						}
 						else
 						{
-							num5 = 0.5f;
-							num6 = 1f;
+							t3 = 0.5f;
+							t4 = 1f;
 						}
-						mTempPos[0].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, num5);
+						mTempPos[0].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, t3);
 						mTempPos[1].x = mTempPos[0].x;
-						mTempPos[2].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, num6);
+						mTempPos[2].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, t4);
 						mTempPos[3].x = mTempPos[2].x;
-						mTempPos[0].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, num3);
-						mTempPos[1].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, num4);
+						mTempPos[0].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, t);
+						mTempPos[1].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, t2);
 						mTempPos[2].y = mTempPos[1].y;
 						mTempPos[3].y = mTempPos[0].y;
-						mTempUVs[0].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, num5);
+						mTempUVs[0].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, t3);
 						mTempUVs[1].x = mTempUVs[0].x;
-						mTempUVs[2].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, num6);
+						mTempUVs[2].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, t4);
 						mTempUVs[3].x = mTempUVs[2].x;
-						mTempUVs[0].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, num3);
-						mTempUVs[1].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, num4);
+						mTempUVs[0].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, t);
+						mTempUVs[1].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, t2);
 						mTempUVs[2].y = mTempUVs[1].y;
 						mTempUVs[3].y = mTempUVs[0].y;
-						float num7 = mInvert ? (mFillAmount * 2f - (float)(1 - j)) : (fillAmount * 2f - (float)j);
-						if (RadialCut(mTempPos, mTempUVs, Mathf.Clamp01(num7), !mInvert, NGUIMath.RepeatIndex(j + 3, 4)))
+						float value = mInvert ? (mFillAmount * 2f - (float)(1 - j)) : (fillAmount * 2f - (float)j);
+						if (RadialCut(mTempPos, mTempUVs, Mathf.Clamp01(value), !mInvert, NGUIMath.RepeatIndex(j + 3, 4)))
 						{
 							for (int k = 0; k < 4; k++)
 							{
-								verts.Add(Vector2.op_Implicit(mTempPos[k]));
+								verts.Add(mTempPos[k]);
 								uvs.Add(mTempUVs[k]);
 								cols.Add(drawingColor);
 							}
@@ -662,52 +542,52 @@ public abstract class UIBasicSprite : UIWidget
 				{
 					for (int l = 0; l < 4; l++)
 					{
-						float num8;
-						float num9;
+						float t5;
+						float t6;
 						if (l < 2)
 						{
-							num8 = 0f;
-							num9 = 0.5f;
+							t5 = 0f;
+							t6 = 0.5f;
 						}
 						else
 						{
-							num8 = 0.5f;
-							num9 = 1f;
+							t5 = 0.5f;
+							t6 = 1f;
 						}
-						float num10;
-						float num11;
+						float t7;
+						float t8;
 						if (l == 0 || l == 3)
 						{
-							num10 = 0f;
-							num11 = 0.5f;
+							t7 = 0f;
+							t8 = 0.5f;
 						}
 						else
 						{
-							num10 = 0.5f;
-							num11 = 1f;
+							t7 = 0.5f;
+							t8 = 1f;
 						}
-						mTempPos[0].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, num8);
+						mTempPos[0].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, t5);
 						mTempPos[1].x = mTempPos[0].x;
-						mTempPos[2].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, num9);
+						mTempPos[2].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, t6);
 						mTempPos[3].x = mTempPos[2].x;
-						mTempPos[0].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, num10);
-						mTempPos[1].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, num11);
+						mTempPos[0].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, t7);
+						mTempPos[1].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, t8);
 						mTempPos[2].y = mTempPos[1].y;
 						mTempPos[3].y = mTempPos[0].y;
-						mTempUVs[0].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, num8);
+						mTempUVs[0].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, t5);
 						mTempUVs[1].x = mTempUVs[0].x;
-						mTempUVs[2].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, num9);
+						mTempUVs[2].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, t6);
 						mTempUVs[3].x = mTempUVs[2].x;
-						mTempUVs[0].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, num10);
-						mTempUVs[1].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, num11);
+						mTempUVs[0].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, t7);
+						mTempUVs[1].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, t8);
 						mTempUVs[2].y = mTempUVs[1].y;
 						mTempUVs[3].y = mTempUVs[0].y;
-						float num12 = (!mInvert) ? (mFillAmount * 4f - (float)(3 - NGUIMath.RepeatIndex(l + 2, 4))) : (mFillAmount * 4f - (float)NGUIMath.RepeatIndex(l + 2, 4));
-						if (RadialCut(mTempPos, mTempUVs, Mathf.Clamp01(num12), mInvert, NGUIMath.RepeatIndex(l + 2, 4)))
+						float value2 = (!mInvert) ? (mFillAmount * 4f - (float)(3 - NGUIMath.RepeatIndex(l + 2, 4))) : (mFillAmount * 4f - (float)NGUIMath.RepeatIndex(l + 2, 4));
+						if (RadialCut(mTempPos, mTempUVs, Mathf.Clamp01(value2), mInvert, NGUIMath.RepeatIndex(l + 2, 4)))
 						{
 							for (int m = 0; m < 4; m++)
 							{
-								verts.Add(Vector2.op_Implicit(mTempPos[m]));
+								verts.Add(mTempPos[m]);
 								uvs.Add(mTempUVs[m]);
 								cols.Add(drawingColor);
 							}
@@ -718,7 +598,7 @@ public abstract class UIBasicSprite : UIWidget
 			}
 			for (int n = 0; n < 4; n++)
 			{
-				verts.Add(Vector2.op_Implicit(mTempPos[n]));
+				verts.Add(mTempPos[n]);
 				uvs.Add(mTempUVs[n]);
 				cols.Add(drawingColor);
 			}
@@ -727,35 +607,11 @@ public abstract class UIBasicSprite : UIWidget
 
 	private void AdvancedFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ab8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ab9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b9d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b9e: Unknown result type (might be due to invalid IL or missing references)
 		Texture mainTexture = this.mainTexture;
-		if (!(mainTexture == null))
+		if (!((UnityEngine.Object)mainTexture == (UnityEngine.Object)null))
 		{
-			Vector4 val = border * pixelSize;
-			if (val.x == 0f && val.y == 0f && val.z == 0f && val.w == 0f)
+			Vector4 vector = border * pixelSize;
+			if (vector.x == 0f && vector.y == 0f && vector.z == 0f && vector.w == 0f)
 			{
 				SimpleFill(verts, uvs, cols);
 			}
@@ -763,16 +619,15 @@ public abstract class UIBasicSprite : UIWidget
 			{
 				Color32 drawingColor = this.drawingColor;
 				Vector4 drawingDimensions = this.drawingDimensions;
-				Vector2 val2 = default(Vector2);
-				val2._002Ector(mInnerUV.get_width() * (float)mainTexture.get_width(), mInnerUV.get_height() * (float)mainTexture.get_height());
-				val2 *= pixelSize;
-				if (val2.x < 1f)
+				Vector2 a = new Vector2(mInnerUV.width * (float)mainTexture.width, mInnerUV.height * (float)mainTexture.height);
+				a *= pixelSize;
+				if (a.x < 1f)
 				{
-					val2.x = 1f;
+					a.x = 1f;
 				}
-				if (val2.y < 1f)
+				if (a.y < 1f)
 				{
-					val2.y = 1f;
+					a.y = 1f;
 				}
 				mTempPos[0].x = drawingDimensions.x;
 				mTempPos[0].y = drawingDimensions.y;
@@ -780,39 +635,39 @@ public abstract class UIBasicSprite : UIWidget
 				mTempPos[3].y = drawingDimensions.w;
 				if (mFlip == Flip.Horizontally || mFlip == Flip.Both)
 				{
-					mTempPos[1].x = mTempPos[0].x + val.z;
-					mTempPos[2].x = mTempPos[3].x - val.x;
-					mTempUVs[3].x = mOuterUV.get_xMin();
-					mTempUVs[2].x = mInnerUV.get_xMin();
-					mTempUVs[1].x = mInnerUV.get_xMax();
-					mTempUVs[0].x = mOuterUV.get_xMax();
+					mTempPos[1].x = mTempPos[0].x + vector.z;
+					mTempPos[2].x = mTempPos[3].x - vector.x;
+					mTempUVs[3].x = mOuterUV.xMin;
+					mTempUVs[2].x = mInnerUV.xMin;
+					mTempUVs[1].x = mInnerUV.xMax;
+					mTempUVs[0].x = mOuterUV.xMax;
 				}
 				else
 				{
-					mTempPos[1].x = mTempPos[0].x + val.x;
-					mTempPos[2].x = mTempPos[3].x - val.z;
-					mTempUVs[0].x = mOuterUV.get_xMin();
-					mTempUVs[1].x = mInnerUV.get_xMin();
-					mTempUVs[2].x = mInnerUV.get_xMax();
-					mTempUVs[3].x = mOuterUV.get_xMax();
+					mTempPos[1].x = mTempPos[0].x + vector.x;
+					mTempPos[2].x = mTempPos[3].x - vector.z;
+					mTempUVs[0].x = mOuterUV.xMin;
+					mTempUVs[1].x = mInnerUV.xMin;
+					mTempUVs[2].x = mInnerUV.xMax;
+					mTempUVs[3].x = mOuterUV.xMax;
 				}
 				if (mFlip == Flip.Vertically || mFlip == Flip.Both)
 				{
-					mTempPos[1].y = mTempPos[0].y + val.w;
-					mTempPos[2].y = mTempPos[3].y - val.y;
-					mTempUVs[3].y = mOuterUV.get_yMin();
-					mTempUVs[2].y = mInnerUV.get_yMin();
-					mTempUVs[1].y = mInnerUV.get_yMax();
-					mTempUVs[0].y = mOuterUV.get_yMax();
+					mTempPos[1].y = mTempPos[0].y + vector.w;
+					mTempPos[2].y = mTempPos[3].y - vector.y;
+					mTempUVs[3].y = mOuterUV.yMin;
+					mTempUVs[2].y = mInnerUV.yMin;
+					mTempUVs[1].y = mInnerUV.yMax;
+					mTempUVs[0].y = mOuterUV.yMax;
 				}
 				else
 				{
-					mTempPos[1].y = mTempPos[0].y + val.y;
-					mTempPos[2].y = mTempPos[3].y - val.w;
-					mTempUVs[0].y = mOuterUV.get_yMin();
-					mTempUVs[1].y = mInnerUV.get_yMin();
-					mTempUVs[2].y = mInnerUV.get_yMax();
-					mTempUVs[3].y = mOuterUV.get_yMax();
+					mTempPos[1].y = mTempPos[0].y + vector.y;
+					mTempPos[2].y = mTempPos[3].y - vector.w;
+					mTempUVs[0].y = mOuterUV.yMin;
+					mTempUVs[1].y = mInnerUV.yMin;
+					mTempUVs[2].y = mInnerUV.yMax;
+					mTempUVs[3].y = mOuterUV.yMax;
 				}
 				for (int i = 0; i < 3; i++)
 				{
@@ -832,32 +687,32 @@ public abstract class UIBasicSprite : UIWidget
 									float y2 = mTempPos[num2].y;
 									float x3 = mTempUVs[i].x;
 									float y3 = mTempUVs[j].y;
-									for (float num3 = y; num3 < y2; num3 += val2.y)
+									for (float num3 = y; num3 < y2; num3 += a.y)
 									{
 										float num4 = x;
 										float num5 = mTempUVs[num2].y;
-										float num6 = num3 + val2.y;
+										float num6 = num3 + a.y;
 										if (num6 > y2)
 										{
-											num5 = Mathf.Lerp(y3, num5, (y2 - num3) / val2.y);
+											num5 = Mathf.Lerp(y3, num5, (y2 - num3) / a.y);
 											num6 = y2;
 										}
-										for (; num4 < x2; num4 += val2.x)
+										for (; num4 < x2; num4 += a.x)
 										{
-											float num7 = num4 + val2.x;
+											float num7 = num4 + a.x;
 											float num8 = mTempUVs[num].x;
 											if (num7 > x2)
 											{
-												num8 = Mathf.Lerp(x3, num8, (x2 - num4) / val2.x);
+												num8 = Mathf.Lerp(x3, num8, (x2 - num4) / a.x);
 												num7 = x2;
 											}
-											Fill(verts, uvs, cols, num4, num7, num3, num6, x3, num8, y3, num5, Color32.op_Implicit(drawingColor));
+											Fill(verts, uvs, cols, num4, num7, num3, num6, x3, num8, y3, num5, drawingColor);
 										}
 									}
 								}
 								else if (centerType == AdvancedType.Sliced)
 								{
-									Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, Color32.op_Implicit(drawingColor));
+									Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, drawingColor);
 								}
 							}
 							else if (i == 1)
@@ -871,21 +726,21 @@ public abstract class UIBasicSprite : UIWidget
 									float x6 = mTempUVs[i].x;
 									float y6 = mTempUVs[j].y;
 									float y7 = mTempUVs[num2].y;
-									for (float num9 = x4; num9 < x5; num9 += val2.x)
+									for (float num9 = x4; num9 < x5; num9 += a.x)
 									{
-										float num10 = num9 + val2.x;
+										float num10 = num9 + a.x;
 										float num11 = mTempUVs[num].x;
 										if (num10 > x5)
 										{
-											num11 = Mathf.Lerp(x6, num11, (x5 - num9) / val2.x);
+											num11 = Mathf.Lerp(x6, num11, (x5 - num9) / a.x);
 											num10 = x5;
 										}
-										Fill(verts, uvs, cols, num9, num10, y4, y5, x6, num11, y6, y7, Color32.op_Implicit(drawingColor));
+										Fill(verts, uvs, cols, num9, num10, y4, y5, x6, num11, y6, y7, drawingColor);
 									}
 								}
 								else if ((j == 0 && bottomType != 0) || (j == 2 && topType != 0))
 								{
-									Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, Color32.op_Implicit(drawingColor));
+									Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, drawingColor);
 								}
 							}
 							else
@@ -902,21 +757,21 @@ public abstract class UIBasicSprite : UIWidget
 										float x9 = mTempUVs[i].x;
 										float x10 = mTempUVs[num].x;
 										float y10 = mTempUVs[j].y;
-										for (float num12 = y8; num12 < y9; num12 += val2.y)
+										for (float num12 = y8; num12 < y9; num12 += a.y)
 										{
 											float num13 = mTempUVs[num2].y;
-											float num14 = num12 + val2.y;
+											float num14 = num12 + a.y;
 											if (num14 > y9)
 											{
-												num13 = Mathf.Lerp(y10, num13, (y9 - num12) / val2.y);
+												num13 = Mathf.Lerp(y10, num13, (y9 - num12) / a.y);
 												num14 = y9;
 											}
-											Fill(verts, uvs, cols, x7, x8, num12, num14, x9, x10, y10, num13, Color32.op_Implicit(drawingColor));
+											Fill(verts, uvs, cols, x7, x8, num12, num14, x9, x10, y10, num13, drawingColor);
 										}
 									}
 									else if ((i == 0 && leftType != 0) || (i == 2 && rightType != 0))
 									{
-										Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, Color32.op_Implicit(drawingColor));
+										Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, drawingColor);
 									}
 									break;
 								case 0:
@@ -934,7 +789,7 @@ public abstract class UIBasicSprite : UIWidget
 										goto IL_0b12;
 									}
 									IL_0b12:
-									Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, Color32.op_Implicit(drawingColor));
+									Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, drawingColor);
 									break;
 								}
 							}
@@ -1053,22 +908,6 @@ public abstract class UIBasicSprite : UIWidget
 
 	private static void Fill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols, float v0x, float v1x, float v0y, float v1y, float u0x, float u1x, float u0y, float u1y, Color col)
 	{
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 		verts.Add(new Vector3(v0x, v0y));
 		verts.Add(new Vector3(v0x, v1y));
 		verts.Add(new Vector3(v1x, v1y));
@@ -1077,9 +916,9 @@ public abstract class UIBasicSprite : UIWidget
 		uvs.Add(new Vector2(u0x, u1y));
 		uvs.Add(new Vector2(u1x, u1y));
 		uvs.Add(new Vector2(u1x, u0y));
-		cols.Add(Color32.op_Implicit(col));
-		cols.Add(Color32.op_Implicit(col));
-		cols.Add(Color32.op_Implicit(col));
-		cols.Add(Color32.op_Implicit(col));
+		cols.Add(col);
+		cols.Add(col);
+		cols.Add(col);
+		cols.Add(col);
 	}
 }

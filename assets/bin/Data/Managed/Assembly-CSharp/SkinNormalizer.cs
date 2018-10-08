@@ -1,10 +1,7 @@
-public class SkinNormalizer
-{
-	public SkinNormalizer()
-		: this()
-	{
-	}
+using UnityEngine;
 
+public class SkinNormalizer : MonoBehaviour
+{
 	private void Start()
 	{
 	}

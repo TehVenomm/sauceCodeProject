@@ -47,21 +47,13 @@ public class UIAdditionalDamageNum : UIDamageNum
 
 	public bool Initialize(Vector3 pos, int damage, DAMAGE_COLOR color, int groupOffset, UIDamageNum originalDamage, int effective)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
 		worldPos = pos;
 		worldPos.y += offsetY;
-		float num = (float)Screen.get_height() / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
-		float num2 = (float)Screen.get_width() / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth;
+		float num = (float)Screen.height / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
+		float num2 = (float)Screen.width / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth;
 		higthOffset_f = (float)(damadeNum.height * groupOffset) * heightOffsetRatio * num;
 		widthOffset = (float)damadeNum.width * 0.2f * (float)groupOffset * num2;
-		if (null != damageNormal && null != damageGood && null != damageBad)
+		if ((Object)null != (Object)damageNormal && (Object)null != (Object)damageGood && (Object)null != (Object)damageBad)
 		{
 			float num3 = 1f;
 			if (effective == 0)
@@ -109,38 +101,38 @@ public class UIAdditionalDamageNum : UIDamageNum
 		damadeNum.text = damage.ToString();
 		damageLength = damadeNum.text.Length;
 		ChangeColor(color, damadeNum);
-		if (animPos != null)
+		if ((Object)animPos != (Object)null)
 		{
 			animPos.ResetToBeginning();
 		}
-		if (animScale != null)
+		if ((Object)animScale != (Object)null)
 		{
 			animScale.ResetToBeginning();
 		}
-		this.StartCoroutine(DirectionNumber());
+		StartCoroutine(DirectionNumber());
 		return true;
 	}
 
 	private IEnumerator DirectionNumber()
 	{
-		if (animPos != null)
+		if ((Object)animPos != (Object)null)
 		{
 			animPos.PlayForward();
 		}
-		if (animScale != null)
+		if ((Object)animScale != (Object)null)
 		{
 			animScale.PlayForward();
 		}
-		if (animPos != null)
+		if ((Object)animPos != (Object)null)
 		{
-			while (animPos.get_enabled())
+			while (animPos.enabled)
 			{
 				yield return (object)null;
 			}
 		}
-		if (animScale != null)
+		if ((Object)animScale != (Object)null)
 		{
-			while (animScale.get_enabled())
+			while (animScale.enabled)
 			{
 				yield return (object)null;
 			}

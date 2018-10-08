@@ -1,5 +1,4 @@
 using Network;
-using System;
 using UnityEngine;
 
 public class SmithGuildRequestDialog : GameSection
@@ -39,26 +38,26 @@ public class SmithGuildRequestDialog : GameSection
 
 	public override void StartSection()
 	{
-		m_Input.SendMessage("OnSelect", (object)true);
+		m_Input.SendMessage("OnSelect", true);
 	}
 
 	public override void UpdateUI()
 	{
-		SetInputSubmitEvent((Enum)UI.IPT_POST, new EventDelegate(delegate
+		SetInputSubmitEvent(UI.IPT_POST, new EventDelegate(delegate
 		{
 			OnTouchPost();
 		}));
-		SetActive((Enum)UI.OBJ_TARGET, true);
-		SetActive((Enum)UI.OBJ_OWNER, false);
-		SetInputValue((Enum)UI.IPT_POST, base.sectionData.GetText("TEXT_HELP"));
-		SetInputLabel((Enum)UI.IPT_POST, base.sectionData.GetText("TEXT_HELP"));
-		SetLabelText((Enum)UI.LBL_USER_NAME, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name);
-		SetLabelText((Enum)UI.LBL_MATERIAL_NAME, data.GetName());
+		SetActive(UI.OBJ_TARGET, true);
+		SetActive(UI.OBJ_OWNER, false);
+		SetInputValue(UI.IPT_POST, base.sectionData.GetText("TEXT_HELP"));
+		SetInputLabel(UI.IPT_POST, base.sectionData.GetText("TEXT_HELP"));
+		SetLabelText(UI.LBL_USER_NAME, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name);
+		SetLabelText(UI.LBL_MATERIAL_NAME, data.GetName());
 		SetLabelText(UI.LBL_QUATITY, data.GetNum());
 		SetLabelText(UI.LBL_DONATE_NUM, data.GetNum());
 		SetLabelText(UI.LBL_DONATE_MAX, needNum);
-		SetButtonEnabled((Enum)UI.BTN_GIFT, false);
-		SetSliderValue((Enum)UI.SLD_PROGRESS, (float)data.GetNum() / (float)needNum);
+		SetButtonEnabled(UI.BTN_GIFT, false);
+		SetSliderValue(UI.SLD_PROGRESS, (float)data.GetNum() / (float)needNum);
 		Transform ctrl = GetCtrl(UI.OBJ_MATERIAL_ICON);
 		Item item = new Item();
 		item.uniqId = "0";
@@ -72,13 +71,13 @@ public class SmithGuildRequestDialog : GameSection
 
 	private void OnTouchPost()
 	{
-		SetLabelText((Enum)UI.LBL_CHAT_MESSAGE, m_Input.value);
+		SetLabelText(UI.LBL_CHAT_MESSAGE, m_Input.value);
 	}
 
 	private void OnQuery_SUBMIT()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest((int)data.GetTableID(), data.GetName(), GetLabelText((Enum)UI.LBL_CHAT_MESSAGE), needNum - data.GetNum(), delegate(bool success)
+		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest((int)data.GetTableID(), data.GetName(), GetLabelText(UI.LBL_CHAT_MESSAGE), needNum - data.GetNum(), delegate(bool success)
 		{
 			if (success)
 			{

@@ -18,10 +18,9 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 
 	private void Start()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		if (currentTarget == null)
+		if ((Object)currentTarget == (Object)null)
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(false);
 		}
 	}
 
@@ -32,10 +31,9 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 
 	public void BeginSpect()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		Player value = GetPlayers().First.Value;
 		SetTarget(value);
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(true);
 	}
 
 	public void OnPrev()
@@ -77,17 +75,16 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 
 	public void EndSpect()
 	{
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient != null && Object.op_Implicit(MonoBehaviourSingleton<CoopManager>.I.coopMyClient.GetPlayer()))
+		if ((Object)MonoBehaviourSingleton<CoopManager>.I.coopMyClient != (Object)null && (bool)MonoBehaviourSingleton<CoopManager>.I.coopMyClient.GetPlayer())
 		{
 			MonoBehaviourSingleton<InGameCameraManager>.I.target = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.GetPlayer()._transform;
 		}
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(false);
 	}
 
 	public void LateUpdate()
 	{
-		if (!MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop && currentTarget == null)
+		if (!MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop && (Object)currentTarget == (Object)null)
 		{
 			BeginSpect();
 		}
@@ -99,7 +96,7 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 		foreach (StageObject player2 in MonoBehaviourSingleton<StageObjectManager>.I.playerList)
 		{
 			Player player = player2 as Player;
-			if (player != null)
+			if ((Object)player != (Object)null)
 			{
 				if (player2 is Self)
 				{
@@ -116,7 +113,7 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 
 	private void OnEnable()
 	{
-		if (panelChange != null)
+		if ((Object)panelChange != (Object)null)
 		{
 			panelChange.UnLock();
 		}
@@ -125,7 +122,7 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 	protected override void OnDisable()
 	{
 		base.OnDisable();
-		if (panelChange != null)
+		if ((Object)panelChange != (Object)null)
 		{
 			panelChange.Lock();
 		}
@@ -133,7 +130,6 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 
 	public bool IsEnable()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		return this.get_gameObject().get_activeSelf();
+		return base.gameObject.activeSelf;
 	}
 }

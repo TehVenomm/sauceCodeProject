@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -110,7 +109,6 @@ public class QuestFriendDetailBase : FriendInfo
 
 	public override void Initialize()
 	{
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
 		detailUserID = 0;
 		isSelfData = false;
 		isQuestResult = false;
@@ -133,8 +131,8 @@ public class QuestFriendDetailBase : FriendInfo
 			}
 		}
 		selfCharaEquipSetNo = ((!isSelfData) ? (-1) : MonoBehaviourSingleton<UserInfoManager>.I.userStatus.eSetNo);
-		transRoot = SetPrefab((Enum)UI.OBJ_EQUIP_SET_ROOT, "FriendInfoBase");
-		this.StartCoroutine(DoInitialize());
+		transRoot = SetPrefab(UI.OBJ_EQUIP_SET_ROOT, "FriendInfoBase");
+		StartCoroutine(DoInitialize());
 	}
 
 	protected IEnumerator DoInitialize()
@@ -224,15 +222,13 @@ public class QuestFriendDetailBase : FriendInfo
 
 	protected void SetRenderPlayerModel(PlayerLoadInfo load_player_info)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		SetRenderPlayerModel(transRoot, UI.TEX_MODEL, load_player_info, record.animID, new Vector3(0f, -0.75f, 14f), new Vector3(0f, 180f, 0f), isVisualMode, delegate(PlayerLoader player_loader)
 		{
-			if (player_loader != null)
+			if ((Object)player_loader != (Object)null)
 			{
 				loader = player_loader;
 			}
-			if (loader != null && loader.animator != null)
+			if ((Object)loader != (Object)null && (Object)loader.animator != (Object)null)
 			{
 				if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
 				{
@@ -417,7 +413,6 @@ public class QuestFriendDetailBase : FriendInfo
 
 	protected override void UpdateEquipIcon(List<CharaInfo.EquipItem> equip_set_info)
 	{
-		//IL_0310: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(transRoot, UI.LBL_CHANGE_MODE, isVisualMode);
 		int i = 0;
 		for (int num = 7; i < num; i++)
@@ -478,10 +473,10 @@ public class QuestFriendDetailBase : FriendInfo
 			SetLongTouch(itemIcon.transform, "DETAIL", j);
 			SetEvent(FindCtrl(transRoot, icons_btn[j]), "DETAIL", j);
 			SetEvent(itemIcon.transform, "DETAIL", j);
-			itemIcon.get_gameObject().SetActive(num3 != -1);
+			itemIcon.gameObject.SetActive(num3 != -1);
 			if (num3 != -1)
 			{
-				itemIcon.SetEquipExtInvertedColor(equipItemInfo, base.GetComponent<UILabel>(transRoot, (Enum)icons_level[j]));
+				itemIcon.SetEquipExtInvertedColor(equipItemInfo, GetComponent<UILabel>(transRoot, icons_level[j]));
 			}
 		}
 		if (flag && record.charaInfo.hId != 0)

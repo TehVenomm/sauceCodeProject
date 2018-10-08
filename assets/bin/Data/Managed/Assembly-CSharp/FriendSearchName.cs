@@ -1,5 +1,4 @@
 using Network;
-using System;
 
 public class FriendSearchName : ConfigName
 {
@@ -28,12 +27,21 @@ public class FriendSearchName : ConfigName
 		inputMaxLength = 12;
 	}
 
-	private unsafe void OnQuery_OK()
+	private void OnQuery_OK()
 	{
 		GameSection.SetEventData(null);
-		string input_text = GetInputValue((Enum)UI.IPT_TEXT);
+		string input_text = GetInputValue(UI.IPT_TEXT);
 		GameSection.StayEvent();
-		_003COnQuery_OK_003Ec__AnonStorey303 _003COnQuery_OK_003Ec__AnonStorey;
-		MonoBehaviourSingleton<FriendManager>.I.SendSearchName(input_text, page, new Action<bool, FriendSearchResult>((object)_003COnQuery_OK_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<FriendManager>.I.SendSearchName(input_text, page, delegate(bool is_success, FriendSearchResult recv_data)
+		{
+			GameSection.ChangeStayEvent("OK", new object[4]
+			{
+				is_success,
+				page,
+				recv_data,
+				input_text
+			});
+			GameSection.ResumeEvent(is_success, null);
+		});
 	}
 }

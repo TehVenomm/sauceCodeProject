@@ -137,39 +137,38 @@ public class EnemyLoader : ModelLoaderBase
 
 	public void StartLoad(int body_id, int anim_id, float scale, string base_effect, string base_effect_node, bool need_shadow, bool enable_light_probes, bool need_anim_event_res_cache, SHADER_TYPE shader_type, int layer = -1, string foundation_name = null, bool need_stamp_effect = false, bool will_stock = false, OnCompleteLoad callback = null)
 	{
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 		if (isLoading)
 		{
-			Log.Error(LOG.RESOURCE, this.get_name() + " now loading.");
+			Log.Error(LOG.RESOURCE, base.name + " now loading.");
 		}
-		else if (body != null)
+		else if ((UnityEngine.Object)body != (UnityEngine.Object)null)
 		{
-			Log.Error(LOG.RESOURCE, this.get_name() + " loaded.");
+			Log.Error(LOG.RESOURCE, base.name + " loaded.");
 		}
 		else
 		{
-			this.StartCoroutine(DoLoad(body_id, anim_id, scale, base_effect, base_effect_node, need_shadow, enable_light_probes, need_anim_event_res_cache, shader_type, layer, foundation_name, need_stamp_effect, will_stock, callback));
+			StartCoroutine(DoLoad(body_id, anim_id, scale, base_effect, base_effect_node, need_shadow, enable_light_probes, need_anim_event_res_cache, shader_type, layer, foundation_name, need_stamp_effect, will_stock, callback));
 		}
 	}
 
 	private IEnumerator DoLoad(int body_id, int anim_id, float scale, string base_effect, string base_effect_node, bool need_shadow, bool enable_light_probes, bool need_anim_event_res_cache, SHADER_TYPE shader_type, int layer, string foundation_name, bool need_stamp_effect, bool will_stock, OnCompleteLoad callback)
 	{
-		Enemy enemy = this.get_gameObject().GetComponent<Enemy>();
-		if (enemy != null)
+		Enemy enemy = base.gameObject.GetComponent<Enemy>();
+		if ((UnityEngine.Object)enemy != (UnityEngine.Object)null)
 		{
 			int id = enemy.id;
 		}
 		bodyID = body_id;
 		bodyScale = scale;
 		bool is_boss = false;
-		if (enemy != null)
+		if ((UnityEngine.Object)enemy != (UnityEngine.Object)null)
 		{
 			is_boss = enemy.isBoss;
-			if (enemy.controller != null)
+			if ((UnityEngine.Object)enemy.controller != (UnityEngine.Object)null)
 			{
-				enemy.controller.set_enabled(false);
+				enemy.controller.enabled = false;
 			}
-			if (enemy.packetReceiver != null)
+			if ((UnityEngine.Object)enemy.packetReceiver != (UnityEngine.Object)null)
 			{
 				enemy.packetReceiver.SetStopPacketUpdate(true);
 			}
@@ -178,7 +177,7 @@ public class EnemyLoader : ModelLoaderBase
 		string body_name = ResourceName.GetEnemyBody(body_id);
 		string mate_name = ResourceName.GetEnemyMaterial(body_id);
 		string anim_name = ResourceName.GetEnemyAnim(anim_id);
-		Transform _this = this.get_transform();
+		Transform _this = base.transform;
 		isLoading = true;
 		LoadingQueue load_queue = new LoadingQueue(this);
 		LoadObject lo_body = load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.ENEMY_MODEL, body_name);
@@ -208,35 +207,35 @@ public class EnemyLoader : ModelLoaderBase
 		body = lo_body.Realizes(_this, (layer != -1) ? layer : 11);
 		if (layer == -1)
 		{
-			this.get_gameObject().set_layer(10);
+			base.gameObject.layer = 10;
 		}
-		body.set_localPosition(Vector3.get_zero());
-		body.set_localRotation(Quaternion.get_identity());
-		renderersBody = body.get_gameObject().GetComponentsInChildren<Renderer>();
-		if (lo_mate != null && lo_mate.loadedObject != null && renderersBody.Length == 1)
+		body.localPosition = Vector3.zero;
+		body.localRotation = Quaternion.identity;
+		renderersBody = body.gameObject.GetComponentsInChildren<Renderer>();
+		if (lo_mate != null && lo_mate.loadedObject != (UnityEngine.Object)null && renderersBody.Length == 1)
 		{
 			Material mate = lo_mate.loadedObject as Material;
-			if (mate != null)
+			if ((UnityEngine.Object)mate != (UnityEngine.Object)null)
 			{
-				renderersBody[0].set_sharedMaterial(mate);
+				renderersBody[0].sharedMaterial = mate;
 			}
 		}
-		if (enemy != null)
+		if ((UnityEngine.Object)enemy != (UnityEngine.Object)null)
 		{
 			enemy.body = body;
 		}
-		body.set_localScale(Vector3.Scale(body.get_localScale(), new Vector3(scale, scale, scale)));
-		animator = body.get_gameObject().GetComponent<Animator>();
-		if (animator != null && lo_anim.loadedObjects != null)
+		body.localScale = Vector3.Scale(body.localScale, new Vector3(scale, scale, scale));
+		animator = body.gameObject.GetComponent<Animator>();
+		if ((UnityEngine.Object)animator != (UnityEngine.Object)null && lo_anim.loadedObjects != null)
 		{
-			animator.set_runtimeAnimatorController(lo_anim.loadedObjects[0].obj);
+			animator.runtimeAnimatorController = (RuntimeAnimatorController)lo_anim.loadedObjects[0].obj;
 			if (lo_anim.loadedObjects.Length >= 2 && lo_anim.loadedObjects[1] != null)
 			{
 				this.animEventData = (lo_anim.loadedObjects[1].obj as AnimEventData);
 			}
-			if (enemy != null)
+			if ((UnityEngine.Object)enemy != (UnityEngine.Object)null)
 			{
-				body.get_gameObject().AddComponent<StageObjectProxy>().stageObject = enemy;
+				body.gameObject.AddComponent<StageObjectProxy>().stageObject = enemy;
 				enemy.animEventData = this.animEventData;
 			}
 		}
@@ -249,7 +248,7 @@ public class EnemyLoader : ModelLoaderBase
 			}
 			Transform node = Utility.Find(body, node_name);
 			Transform effect_transform = EffectManager.GetEffect(base_effect, node);
-			if (effect_transform != null)
+			if ((UnityEngine.Object)effect_transform != (UnityEngine.Object)null)
 			{
 				baseEffect = effect_transform;
 				if (layer != -1)
@@ -271,39 +270,39 @@ public class EnemyLoader : ModelLoaderBase
 			Shader.PropertyToID("_Vanish_rate");
 			Utility.MaterialForEach(renderersBody, delegate(Material material)
 			{
-				if (material != null)
+				if ((UnityEngine.Object)material != (UnityEngine.Object)null)
 				{
 					MaterialParams materialParams = new MaterialParams
 					{
 						material = material
 					};
-					if (materialParams.hasRimPower = material.HasProperty(((_003CDoLoad_003Ec__Iterator260)/*Error near IL_062e: stateMachine*/)._003CID_RIM_POWER_003E__16))
+					if (materialParams.hasRimPower = material.HasProperty(((_003CDoLoad_003Ec__Iterator262)/*Error near IL_062e: stateMachine*/)._003CID_RIM_POWER_003E__16))
 					{
-						materialParams.defaultRimPower = material.GetFloat(((_003CDoLoad_003Ec__Iterator260)/*Error near IL_062e: stateMachine*/)._003CID_RIM_POWER_003E__16);
+						materialParams.defaultRimPower = material.GetFloat(((_003CDoLoad_003Ec__Iterator262)/*Error near IL_062e: stateMachine*/)._003CID_RIM_POWER_003E__16);
 					}
-					if (materialParams.hasRimWidth = material.HasProperty(((_003CDoLoad_003Ec__Iterator260)/*Error near IL_062e: stateMachine*/)._003CID_RIM_WIDTH_003E__17))
+					if (materialParams.hasRimWidth = material.HasProperty(((_003CDoLoad_003Ec__Iterator262)/*Error near IL_062e: stateMachine*/)._003CID_RIM_WIDTH_003E__17))
 					{
-						materialParams.defaultRimWidth = material.GetFloat(((_003CDoLoad_003Ec__Iterator260)/*Error near IL_062e: stateMachine*/)._003CID_RIM_WIDTH_003E__17);
+						materialParams.defaultRimWidth = material.GetFloat(((_003CDoLoad_003Ec__Iterator262)/*Error near IL_062e: stateMachine*/)._003CID_RIM_WIDTH_003E__17);
 					}
-					materialParams.hasVanishFlag = material.HasProperty(((_003CDoLoad_003Ec__Iterator260)/*Error near IL_062e: stateMachine*/)._003CID_VANISH_FLAG_003E__18);
-					materialParams.hasVanishRate = material.HasProperty(((_003CDoLoad_003Ec__Iterator260)/*Error near IL_062e: stateMachine*/)._003CID_VANISH_RATE_003E__19);
-					((_003CDoLoad_003Ec__Iterator260)/*Error near IL_062e: stateMachine*/)._003C_003Ef__this.materialParamsList.Add(materialParams);
+					materialParams.hasVanishFlag = material.HasProperty(((_003CDoLoad_003Ec__Iterator262)/*Error near IL_062e: stateMachine*/)._003CID_VANISH_FLAG_003E__18);
+					materialParams.hasVanishRate = material.HasProperty(((_003CDoLoad_003Ec__Iterator262)/*Error near IL_062e: stateMachine*/)._003CID_VANISH_RATE_003E__19);
+					((_003CDoLoad_003Ec__Iterator262)/*Error near IL_062e: stateMachine*/)._003C_003Ef__this.materialParamsList.Add(materialParams);
 				}
 			});
 		}
 		int l = 0;
 		for (int k = renderersBody.Length; l < k; l++)
 		{
-			renderersBody[l].set_useLightProbes(enable_light_probes);
+			renderersBody[l].useLightProbes = enable_light_probes;
 		}
-		EnemyParam param = body.get_gameObject().GetComponent<EnemyParam>();
-		body.get_gameObject().SetActive(false);
-		if (need_anim_event_res_cache && animator != null && lo_anim.loadedObjects != null && lo_anim.loadedObjects[1] != null)
+		EnemyParam param = body.gameObject.GetComponent<EnemyParam>();
+		body.gameObject.SetActive(false);
+		if (need_anim_event_res_cache && (UnityEngine.Object)animator != (UnityEngine.Object)null && lo_anim.loadedObjects != null && lo_anim.loadedObjects[1] != null)
 		{
 			AnimEventData tmpAnimEventData = lo_anim.loadedObjects[1].obj as AnimEventData;
-			if (tmpAnimEventData != null)
+			if ((UnityEngine.Object)tmpAnimEventData != (UnityEngine.Object)null)
 			{
-				if (enemy == null)
+				if ((UnityEngine.Object)enemy == (UnityEngine.Object)null)
 				{
 					load_queue.CacheAnimDataUseResource(tmpAnimEventData, null, null);
 				}
@@ -318,7 +317,7 @@ public class EnemyLoader : ModelLoaderBase
 			}
 		}
 		AnimEventData.ResidentEffectData[] residentEffectList = null;
-		if (this.animEventData != null)
+		if ((UnityEngine.Object)this.animEventData != (UnityEngine.Object)null)
 		{
 			residentEffectList = this.animEventData.residentEffectDataList;
 			if (residentEffectList != null)
@@ -333,9 +332,9 @@ public class EnemyLoader : ModelLoaderBase
 				}
 			}
 		}
-		if (param != null)
+		if ((UnityEngine.Object)param != (UnityEngine.Object)null)
 		{
-			if (enemy != null || need_stamp_effect)
+			if ((UnityEngine.Object)enemy != (UnityEngine.Object)null || need_stamp_effect)
 			{
 				StageObject.StampInfo[] stampInfos = param.stampInfos;
 				foreach (StageObject.StampInfo info4 in stampInfos)
@@ -359,7 +358,7 @@ public class EnemyLoader : ModelLoaderBase
 				}
 			}
 			SystemEffectSetting sysEffectSetting2 = param.residentEffectSetting;
-			if (sysEffectSetting2 != null)
+			if ((UnityEngine.Object)sysEffectSetting2 != (UnityEngine.Object)null)
 			{
 				SystemEffectSetting.Data[] effectDataList = sysEffectSetting2.effectDataList;
 				if (effectDataList != null)
@@ -379,9 +378,9 @@ public class EnemyLoader : ModelLoaderBase
 		{
 			yield return (object)load_queue.Wait();
 		}
-		if (enemy != null)
+		if ((UnityEngine.Object)enemy != (UnityEngine.Object)null)
 		{
-			if (param != null)
+			if ((UnityEngine.Object)param != (UnityEngine.Object)null)
 			{
 				EnemyTable.EnemyData data = enemy.enemyTableData;
 				AttackHitInfo[] attackHitInfos = param.attackHitInfos;
@@ -520,8 +519,8 @@ public class EnemyLoader : ModelLoaderBase
 					load_queue.CacheSE(lihgtRing.endSeId, null);
 				}
 			}
-			EffectPlayProcessor processor = body.get_gameObject().GetComponent<EffectPlayProcessor>();
-			if (processor != null && processor.effectSettings != null)
+			EffectPlayProcessor processor = body.gameObject.GetComponent<EffectPlayProcessor>();
+			if ((UnityEngine.Object)processor != (UnityEngine.Object)null && processor.effectSettings != null)
 			{
 				enemy.effectPlayProcessor = processor;
 				int i = 0;
@@ -538,7 +537,7 @@ public class EnemyLoader : ModelLoaderBase
 				yield return (object)load_queue.Wait();
 			}
 		}
-		body.get_gameObject().SetActive(true);
+		body.gameObject.SetActive(true);
 		if (residentEffectList != null)
 		{
 			int numEffect = residentEffectList.Length;
@@ -547,25 +546,25 @@ public class EnemyLoader : ModelLoaderBase
 				AnimEventData.ResidentEffectData effectData = residentEffectList[ef];
 				if (!string.IsNullOrEmpty(effectData.effectName) && !string.IsNullOrEmpty(effectData.linkNodeName))
 				{
-					Transform parentTrans = Utility.Find(body.get_transform(), effectData.linkNodeName);
-					if (parentTrans == null)
+					Transform parentTrans = Utility.Find(body.transform, effectData.linkNodeName);
+					if ((UnityEngine.Object)parentTrans == (UnityEngine.Object)null)
 					{
-						parentTrans = body.get_transform();
+						parentTrans = body.transform;
 					}
 					Transform effectTrans = EffectManager.GetEffect(effectData.effectName, parentTrans);
-					if (effectTrans != null)
+					if ((UnityEngine.Object)effectTrans != (UnityEngine.Object)null)
 					{
 						if (layer != -1)
 						{
 							Utility.SetLayerWithChildren(effectTrans, layer);
 						}
-						Vector3 basisScale = effectTrans.get_localScale();
-						effectTrans.set_localScale(basisScale * effectData.scale);
-						effectTrans.set_localPosition(effectData.offsetPos);
-						effectTrans.set_localRotation(Quaternion.Euler(effectData.offsetRot));
-						ResidentEffectObject residentEffect = effectTrans.get_gameObject().AddComponent<ResidentEffectObject>();
+						Vector3 basisScale = effectTrans.localScale;
+						effectTrans.localScale = basisScale * effectData.scale;
+						effectTrans.localPosition = effectData.offsetPos;
+						effectTrans.localRotation = Quaternion.Euler(effectData.offsetRot);
+						ResidentEffectObject residentEffect = effectTrans.gameObject.AddComponent<ResidentEffectObject>();
 						residentEffect.Initialize(effectData);
-						if (enemy != null)
+						if ((UnityEngine.Object)enemy != (UnityEngine.Object)null)
 						{
 							enemy.RegisterResidentEffect(residentEffect);
 						}
@@ -573,29 +572,29 @@ public class EnemyLoader : ModelLoaderBase
 				}
 			}
 		}
-		if (param != null)
+		if ((UnityEngine.Object)param != (UnityEngine.Object)null)
 		{
 			SystemEffectSetting sysEffectSetting = param.residentEffectSetting;
 			SysEffectCreate(enemy, layer, sysEffectSetting);
 		}
-		if (need_shadow && param != null && param.shadowSize > 0f)
+		if (need_shadow && (UnityEngine.Object)param != (UnityEngine.Object)null && param.shadowSize > 0f)
 		{
 			shadow = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.CreateShadow(param.shadowSize, param.bodyRadius, bodyScale, true, _this, shader_type == SHADER_TYPE.LIGHTWEIGHT);
 		}
-		if (enemy != null)
+		if ((UnityEngine.Object)enemy != (UnityEngine.Object)null)
 		{
-			if (param != null)
+			if ((UnityEngine.Object)param != (UnityEngine.Object)null)
 			{
 				param.SetParam(enemy);
-				Object.DestroyImmediate(param);
+				UnityEngine.Object.DestroyImmediate(param);
 			}
-			if (enemy.controller != null)
+			if ((UnityEngine.Object)enemy.controller != (UnityEngine.Object)null)
 			{
-				enemy.controller.set_enabled(true);
+				enemy.controller.enabled = true;
 			}
 			enemy.willStock = will_stock;
 			enemy.OnLoadComplete();
-			if (enemy.packetReceiver != null)
+			if ((UnityEngine.Object)enemy.packetReceiver != (UnityEngine.Object)null)
 			{
 				enemy.packetReceiver.SetStopPacketUpdate(false);
 			}
@@ -604,26 +603,14 @@ public class EnemyLoader : ModelLoaderBase
 		if (lo_foundation != null)
 		{
 			foundation = lo_foundation.Realizes(_this, layer);
-			foundation.SetParent(_this.get_parent(), true);
+			foundation.SetParent(_this.parent, true);
 		}
 		isLoading = false;
 	}
 
 	public void SysEffectCreate(Enemy enemy, int layer, SystemEffectSetting sysEffectSetting)
 	{
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Expected O, but got Unknown
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Expected O, but got Unknown
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-		if (sysEffectSetting != null)
+		if ((UnityEngine.Object)sysEffectSetting != (UnityEngine.Object)null)
 		{
 			int[] array = sysEffectSetting.startGroupIds;
 			bool flag = false;
@@ -662,25 +649,25 @@ public class EnemyLoader : ModelLoaderBase
 					}
 					if (!string.IsNullOrEmpty(data.effectName) && !string.IsNullOrEmpty(data.linkNodeName))
 					{
-						Transform val = Utility.Find(body.get_transform(), data.linkNodeName);
-						if (val == null)
+						Transform transform = Utility.Find(body.transform, data.linkNodeName);
+						if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
 						{
-							val = body.get_transform();
+							transform = body.transform;
 						}
-						Transform effect = EffectManager.GetEffect(data.effectName, val);
-						if (effect != null)
+						Transform effect = EffectManager.GetEffect(data.effectName, transform);
+						if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
 						{
 							if (layer != -1)
 							{
 								Utility.SetLayerWithChildren(effect, layer);
 							}
-							Vector3 localScale = effect.get_localScale();
-							effect.set_localScale(localScale * data.scale);
-							effect.set_localPosition(data.offsetPos);
-							effect.set_localRotation(Quaternion.Euler(data.offsetRot));
-							ResidentEffectObject residentEffectObject = effect.get_gameObject().AddComponent<ResidentEffectObject>();
+							Vector3 localScale = effect.localScale;
+							effect.localScale = localScale * data.scale;
+							effect.localPosition = data.offsetPos;
+							effect.localRotation = Quaternion.Euler(data.offsetRot);
+							ResidentEffectObject residentEffectObject = effect.gameObject.AddComponent<ResidentEffectObject>();
 							residentEffectObject.Initialize(data);
-							if (enemy != null)
+							if ((UnityEngine.Object)enemy != (UnityEngine.Object)null)
 							{
 								enemy.RegisterResidentEffect(residentEffectObject);
 							}
@@ -713,9 +700,7 @@ public class EnemyLoader : ModelLoaderBase
 
 	private void PreSetAnimationEventDataParamToEnemy(AnimEventData animEventData, Enemy enemy)
 	{
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		if (!(animEventData == null) && !(enemy == null))
+		if (!((UnityEngine.Object)animEventData == (UnityEngine.Object)null) && !((UnityEngine.Object)enemy == (UnityEngine.Object)null))
 		{
 			AnimEventData.AnimData[] animations = animEventData.animations;
 			if (animations != null)
@@ -778,16 +763,14 @@ public class EnemyLoader : ModelLoaderBase
 
 	public void DeleteLoadedObjects()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		if (body != null)
+		if ((UnityEngine.Object)body != (UnityEngine.Object)null)
 		{
-			Object.DestroyImmediate(body.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(body.gameObject);
 			body = null;
 		}
-		if (foundation != null)
+		if ((UnityEngine.Object)foundation != (UnityEngine.Object)null)
 		{
-			Object.DestroyImmediate(foundation.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(foundation.gameObject);
 			foundation = null;
 		}
 		animator = null;
@@ -798,12 +781,9 @@ public class EnemyLoader : ModelLoaderBase
 
 	public void ApplyGachaDisplayScaleToParentNode()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		if (body != null && body.get_parent() != null)
+		if ((UnityEngine.Object)body != (UnityEngine.Object)null && (UnityEngine.Object)body.parent != (UnityEngine.Object)null)
 		{
-			body.get_parent().set_localScale(new Vector3(displayGachaScale, displayGachaScale, displayGachaScale));
+			body.parent.localScale = new Vector3(displayGachaScale, displayGachaScale, displayGachaScale);
 		}
 	}
 

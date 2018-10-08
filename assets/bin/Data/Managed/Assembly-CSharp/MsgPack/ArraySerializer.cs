@@ -1,9 +1,8 @@
 using MsgPack.Serialization;
-using System;
 
 namespace MsgPack
 {
-	public class ArraySerializer<T>
+	public class ArraySerializer<T> : MessagePackSerializer<T[]>
 	{
 		public ArraySerializer(SerializationContext ownerContext)
 			: base(ownerContext)
@@ -12,29 +11,24 @@ namespace MsgPack
 
 		protected override void PackToCore(Packer packer, T[] objectTree)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			MessagePackSerializer<T> serializer = base.get_OwnerContext().GetSerializer<T>();
+			MessagePackSerializer<T> serializer = base.OwnerContext.GetSerializer<T>();
 			packer.PackArrayHeader(objectTree.Length);
-			foreach (T val in objectTree)
+			foreach (T objectTree2 in objectTree)
 			{
-				serializer.PackTo(packer, val);
+				serializer.PackTo(packer, objectTree2);
 			}
 		}
 
 		protected override T[] UnpackFromCore(Unpacker unpacker)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Expected O, but got Unknown
-			MessagePackSerializer<T> serializer = base.get_OwnerContext().GetSerializer<T>();
-			if (!unpacker.get_IsArrayHeader())
+			MessagePackSerializer<T> serializer = base.OwnerContext.GetSerializer<T>();
+			if (!unpacker.IsArrayHeader)
 			{
 				throw SerializationExceptions.NewIsNotArrayHeader();
 			}
 			int itemsCount = UnpackHelpers.GetItemsCount(unpacker);
 			T[] array = new T[itemsCount];
-			if (!unpacker.get_IsArrayHeader())
+			if (!unpacker.IsArrayHeader)
 			{
 				throw SerializationExceptions.NewIsNotArrayHeader();
 			}
@@ -45,20 +39,15 @@ namespace MsgPack
 					throw SerializationExceptions.NewMissingItem(i);
 				}
 				T val = default(T);
-				if (!unpacker.get_IsArrayHeader() && !unpacker.get_IsMapHeader())
+				if (!unpacker.IsArrayHeader && !unpacker.IsMapHeader)
 				{
 					val = serializer.UnpackFrom(unpacker);
 				}
 				else
 				{
-					Unpacker val2 = unpacker.ReadSubtree();
-					try
+					using (Unpacker unpacker2 = unpacker.ReadSubtree())
 					{
-						val = serializer.UnpackFrom(val2);
-					}
-					finally
-					{
-						((IDisposable)val2)?.Dispose();
+						val = serializer.UnpackFrom(unpacker2);
 					}
 				}
 				array[i] = val;

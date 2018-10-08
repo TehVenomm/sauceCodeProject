@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(UIWidget))]
 [AddComponentMenu("NGUI/Tween/Tween Height")]
+[RequireComponent(typeof(UIWidget))]
 public class TweenHeight : UITweener
 {
 	public int from = 100;
@@ -19,9 +19,9 @@ public class TweenHeight : UITweener
 	{
 		get
 		{
-			if (mWidget == null)
+			if ((UnityEngine.Object)mWidget == (UnityEngine.Object)null)
 			{
-				mWidget = this.GetComponent<UIWidget>();
+				mWidget = GetComponent<UIWidget>();
 			}
 			return mWidget;
 		}
@@ -54,15 +54,13 @@ public class TweenHeight : UITweener
 
 	protected override void OnUpdate(float factor, bool isFinished)
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Expected O, but got Unknown
 		value = Mathf.RoundToInt((float)from * (1f - factor) + (float)to * factor);
 		if (updateTable)
 		{
-			if (mTable == null)
+			if ((UnityEngine.Object)mTable == (UnityEngine.Object)null)
 			{
-				mTable = NGUITools.FindInParents<UITable>(this.get_gameObject());
-				if (mTable == null)
+				mTable = NGUITools.FindInParents<UITable>(base.gameObject);
+				if ((UnityEngine.Object)mTable == (UnityEngine.Object)null)
 				{
 					updateTable = false;
 					return;
@@ -74,15 +72,13 @@ public class TweenHeight : UITweener
 
 	public static TweenHeight Begin(UIWidget widget, float duration, int height)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Expected O, but got Unknown
-		TweenHeight tweenHeight = UITweener.Begin<TweenHeight>(widget.get_gameObject(), duration, true);
+		TweenHeight tweenHeight = UITweener.Begin<TweenHeight>(widget.gameObject, duration, true);
 		tweenHeight.from = widget.height;
 		tweenHeight.to = height;
 		if (duration <= 0f)
 		{
 			tweenHeight.Sample(1f, true);
-			tweenHeight.set_enabled(false);
+			tweenHeight.enabled = false;
 		}
 		return tweenHeight;
 	}

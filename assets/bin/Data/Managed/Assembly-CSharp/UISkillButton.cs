@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class UISkillButton
+public class UISkillButton : MonoBehaviour
 {
 	[Serializable]
 	public class GaugeEffect
@@ -27,7 +27,7 @@ public class UISkillButton
 			if (isActive)
 			{
 				isActive = false;
-				if (obj != null)
+				if ((UnityEngine.Object)obj != (UnityEngine.Object)null)
 				{
 					obj.SetActive(false);
 				}
@@ -36,18 +36,17 @@ public class UISkillButton
 
 		public void Play(UISkillButton parent)
 		{
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
 			isActive = true;
-			if (obj != null)
+			if ((UnityEngine.Object)obj != (UnityEngine.Object)null)
 			{
 				obj.SetActive(true);
 			}
-			if (alpha != null)
+			if ((UnityEngine.Object)alpha != (UnityEngine.Object)null)
 			{
 				alpha.ResetToBeginning();
 				alpha.PlayForward();
 			}
-			if (scale != null)
+			if ((UnityEngine.Object)scale != (UnityEngine.Object)null)
 			{
 				scale.ResetToBeginning();
 				scale.PlayForward();
@@ -62,22 +61,22 @@ public class UISkillButton
 
 		private IEnumerator EndCheck()
 		{
-			if (alpha != null)
+			if ((UnityEngine.Object)alpha != (UnityEngine.Object)null)
 			{
-				while (alpha.get_enabled())
+				while (alpha.enabled)
 				{
 					yield return (object)null;
 				}
 			}
-			if (scale != null)
+			if ((UnityEngine.Object)scale != (UnityEngine.Object)null)
 			{
-				while (scale.get_enabled())
+				while (scale.enabled)
 				{
 					yield return (object)null;
 				}
 			}
 			work = null;
-			if (obj != null)
+			if ((UnityEngine.Object)obj != (UnityEngine.Object)null)
 			{
 				obj.SetActive(false);
 			}
@@ -129,21 +128,15 @@ public class UISkillButton
 
 		public void Init(float btnSize)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Expected O, but got Unknown
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			this.btnSize = btnSize;
-			effectTransform = iconTexture.get_transform();
-			skillIconOnPos = effectTransform.get_localPosition();
+			effectTransform = iconTexture.transform;
+			skillIconOnPos = effectTransform.localPosition;
 		}
 
 		public void SetActive(bool isActive)
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			typeSprite.get_gameObject().SetActive(isActive);
-			iconTexture.get_gameObject().SetActive(isActive);
+			typeSprite.gameObject.SetActive(isActive);
+			iconTexture.gameObject.SetActive(isActive);
 		}
 
 		private void SetDepth(int depth)
@@ -168,30 +161,24 @@ public class UISkillButton
 
 		public bool PlayEffect1(float dispPercent)
 		{
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			bool result = false;
-			if (gaugeEffect_1 == null)
+			if ((UnityEngine.Object)gaugeEffect_1 == (UnityEngine.Object)null)
 			{
 				gaugeEffect_1 = EffectManager.GetUIEffect(useEffectNames[0], effectTransform, -1f, 0, null);
-				if (gaugeEffect_1 != null)
+				if ((UnityEngine.Object)gaugeEffect_1 != (UnityEngine.Object)null)
 				{
-					Vector3 localPosition = gaugeEffect_1.get_localPosition();
+					Vector3 localPosition = gaugeEffect_1.localPosition;
 					localPosition.x = btnSize * 2f;
-					gaugeEffect_1.set_localPosition(localPosition);
+					gaugeEffect_1.localPosition = localPosition;
 					result = true;
 				}
 			}
 			else
 			{
-				Vector3 localPosition2 = gaugeEffect_1.get_localPosition();
+				Vector3 localPosition2 = gaugeEffect_1.localPosition;
 				localPosition2.x = 0f;
 				localPosition2.y = (0f - btnSize) * dispPercent + btnSize * 0.5f;
-				gaugeEffect_1.set_localPosition(localPosition2);
+				gaugeEffect_1.localPosition = localPosition2;
 			}
 			return result;
 		}
@@ -199,10 +186,10 @@ public class UISkillButton
 		public bool PlayEffect2()
 		{
 			bool result = false;
-			if (gaugeEffect_2 == null)
+			if ((UnityEngine.Object)gaugeEffect_2 == (UnityEngine.Object)null)
 			{
 				gaugeEffect_2 = EffectManager.GetUIEffect(useEffectNames[1], effectTransform, -0.001f, 0, null);
-				if (gaugeEffect_2 != null)
+				if ((UnityEngine.Object)gaugeEffect_2 != (UnityEngine.Object)null)
 				{
 					result = true;
 				}
@@ -212,17 +199,16 @@ public class UISkillButton
 
 		public bool PlayEffect3()
 		{
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			bool result = false;
-			if (gaugeEffect_3 == null)
+			if ((UnityEngine.Object)gaugeEffect_3 == (UnityEngine.Object)null)
 			{
 				gaugeEffect_3 = EffectManager.GetUIEffect(useEffectNames[3], effectTransform, -0.001f, 0, null);
-				if (gaugeEffect_3 != null)
+				if ((UnityEngine.Object)gaugeEffect_3 != (UnityEngine.Object)null)
 				{
 					result = true;
 				}
 			}
-			gaugeEffect_3.get_gameObject().SetActive(true);
+			gaugeEffect_3.gameObject.SetActive(true);
 			return result;
 		}
 
@@ -238,109 +224,82 @@ public class UISkillButton
 
 		public void ReleaseEffect1()
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Expected O, but got Unknown
-			if (!(gaugeEffect_1 == null))
+			if (!((UnityEngine.Object)gaugeEffect_1 == (UnityEngine.Object)null))
 			{
-				Vector3 localPosition = gaugeEffect_1.get_localPosition();
+				Vector3 localPosition = gaugeEffect_1.localPosition;
 				localPosition.y = btnSize * 0.5f;
-				gaugeEffect_1.set_localPosition(localPosition);
-				EffectManager.ReleaseEffect(gaugeEffect_1.get_gameObject(), true, false);
+				gaugeEffect_1.localPosition = localPosition;
+				EffectManager.ReleaseEffect(gaugeEffect_1.gameObject, true, false);
 				gaugeEffect_1 = null;
 			}
 		}
 
 		public void ReleaseEffect2()
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Expected O, but got Unknown
-			if (!(gaugeEffect_2 == null))
+			if (!((UnityEngine.Object)gaugeEffect_2 == (UnityEngine.Object)null))
 			{
-				EffectManager.ReleaseEffect(gaugeEffect_2.get_gameObject(), true, false);
+				EffectManager.ReleaseEffect(gaugeEffect_2.gameObject, true, false);
 				gaugeEffect_2 = null;
 			}
 		}
 
 		public void HideEffect3()
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			if (!(gaugeEffect_3 == null))
+			if (!((UnityEngine.Object)gaugeEffect_3 == (UnityEngine.Object)null))
 			{
-				gaugeEffect_3.get_gameObject().SetActive(false);
+				gaugeEffect_3.gameObject.SetActive(false);
 			}
 		}
 
 		public void ReleaseEffects()
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			if (gaugeEffect_1 != null)
+			if ((UnityEngine.Object)gaugeEffect_1 != (UnityEngine.Object)null)
 			{
-				Object.Destroy(gaugeEffect_1.get_gameObject());
+				UnityEngine.Object.Destroy(gaugeEffect_1.gameObject);
 				gaugeEffect_1 = null;
 			}
-			if (gaugeEffect_2 != null)
+			if ((UnityEngine.Object)gaugeEffect_2 != (UnityEngine.Object)null)
 			{
-				Object.Destroy(gaugeEffect_2.get_gameObject());
+				UnityEngine.Object.Destroy(gaugeEffect_2.gameObject);
 				gaugeEffect_2 = null;
 			}
-			if (gaugeEffect_3 != null)
+			if ((UnityEngine.Object)gaugeEffect_3 != (UnityEngine.Object)null)
 			{
-				Object.Destroy(gaugeEffect_3.get_gameObject());
+				UnityEngine.Object.Destroy(gaugeEffect_3.gameObject);
 				gaugeEffect_3 = null;
 			}
-			if (gaugeEffect_Max != null)
+			if ((UnityEngine.Object)gaugeEffect_Max != (UnityEngine.Object)null)
 			{
-				Object.Destroy(gaugeEffect_Max.get_gameObject());
+				UnityEngine.Object.Destroy(gaugeEffect_Max.gameObject);
 				gaugeEffect_Max = null;
 			}
 		}
 
 		public void OnDisable()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			iconTexture.get_transform().set_localPosition(skillIconOnPos);
-			iconTexture.get_transform().set_localScale(Vector3.get_one());
+			iconTexture.transform.localPosition = skillIconOnPos;
+			iconTexture.transform.localScale = Vector3.one;
 			iconTexture.alpha = 1f;
-			if (alphaTween != null)
+			if ((UnityEngine.Object)alphaTween != (UnityEngine.Object)null)
 			{
-				alphaTween.set_enabled(false);
+				alphaTween.enabled = false;
 				alphaTween = null;
 			}
-			if (scaleTween != null)
+			if ((UnityEngine.Object)scaleTween != (UnityEngine.Object)null)
 			{
-				scaleTween.set_enabled(false);
+				scaleTween.enabled = false;
 				scaleTween = null;
 			}
 		}
 
 		public void PlayTween()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Expected O, but got Unknown
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Expected O, but got Unknown
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Expected O, but got Unknown
-			Transform val = iconTexture.get_transform();
-			Vector3 localPosition = iconTexture.get_transform().get_localPosition();
+			Transform transform = iconTexture.transform;
+			Vector3 localPosition = iconTexture.transform.localPosition;
 			localPosition.z = 0f;
-			val.set_localPosition(localPosition);
-			alphaTween = TweenAlpha.Begin(val.get_gameObject(), 0.5f, 0.01f);
-			scaleTween = TweenScale.Begin(val.get_gameObject(), 0.5f, new Vector3(2f, 2f, 2f));
+			transform.localPosition = localPosition;
+			alphaTween = TweenAlpha.Begin(transform.gameObject, 0.5f, 0.01f);
+			scaleTween = TweenScale.Begin(transform.gameObject, 0.5f, new Vector3(2f, 2f, 2f));
 		}
 	}
 
@@ -469,7 +428,6 @@ public class UISkillButton
 	}
 
 	public UISkillButton()
-		: this()
 	{
 		buttonIndex = -1;
 	}
@@ -481,22 +439,20 @@ public class UISkillButton
 
 	private void Awake()
 	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
 		skillGauge1.maxEffect.Init(this);
 		skillGauge2.maxEffect.Init(this);
 		silenceBase.SetActive(false);
-		if (skillGaugeMask != null)
+		if ((UnityEngine.Object)skillGaugeMask != (UnityEngine.Object)null)
 		{
-			UIWidget component = skillGaugeMask.get_gameObject().GetComponent<UIWidget>();
+			UIWidget component = skillGaugeMask.gameObject.GetComponent<UIWidget>();
 			skillGauge1.Init((float)component.height);
 			skillGauge2.Init((float)component.height);
 		}
-		if (skillButton != null)
+		if ((UnityEngine.Object)skillButton != (UnityEngine.Object)null)
 		{
 			btnEnable = skillButton.isEnabled;
 		}
-		UIButtonEffect uIButtonEffect = this.get_gameObject().AddComponent<UIButtonEffect>();
+		UIButtonEffect uIButtonEffect = base.gameObject.AddComponent<UIButtonEffect>();
 		uIButtonEffect.isSimple = true;
 	}
 
@@ -507,7 +463,7 @@ public class UISkillButton
 		silenceBase.SetActive(false);
 		if (playSkill)
 		{
-			this.StopCoroutine(routineWork);
+			StopCoroutine(routineWork);
 			int depth = skillGaugeMask.GetComponent<UIWidget>().depth;
 			skillGauge1.MoveToFront(depth);
 			skillGauge2.MoveToFront(depth);
@@ -527,7 +483,7 @@ public class UISkillButton
 	public void SetButtonIndex(int button_index)
 	{
 		this.buttonIndex = button_index + target.skillInfo.weaponOffset;
-		if (!(target == null))
+		if (!((UnityEngine.Object)target == (UnityEngine.Object)null))
 		{
 			int buttonIndex = this.buttonIndex;
 			SkillInfo.SkillParam skillParam = target.skillInfo.GetSkillParam(buttonIndex);
@@ -600,7 +556,7 @@ public class UISkillButton
 					skillGauge2.SetActive(false);
 				}
 				UpdateSilence();
-				if (skillButton != null)
+				if ((UnityEngine.Object)skillButton != (UnityEngine.Object)null)
 				{
 					bool flag = IsEnable();
 					if (btnEnable != flag)
@@ -623,16 +579,14 @@ public class UISkillButton
 
 	private void UpdateSkillButton(SkillGauge activeGauge, SkillGauge inactiveGauge)
 	{
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		if (!(skillGaugeMask == null))
+		if (!((UnityEngine.Object)skillGaugeMask == (UnityEngine.Object)null))
 		{
 			SetDepthOfGauges(activeGauge, inactiveGauge);
 			bool isGraphicOptOverLow = MonoBehaviourSingleton<InGameManager>.I.graphicOptionType > 0;
 			if (UpdateSkillGauge(activeGauge, inactiveGauge, isGraphicOptOverLow))
 			{
-				activeGauge.effectTransform.get_gameObject().SetActive(false);
-				activeGauge.effectTransform.get_gameObject().SetActive(true);
+				activeGauge.effectTransform.gameObject.SetActive(false);
+				activeGauge.effectTransform.gameObject.SetActive(true);
 			}
 		}
 	}
@@ -721,7 +675,7 @@ public class UISkillButton
 			SoundManager.PlayOneShotUISE(gaugeMaxSEId);
 			if (isGraphicOptOverLow)
 			{
-				if (frame != null)
+				if ((UnityEngine.Object)frame != (UnityEngine.Object)null)
 				{
 					skillGauge.PlayEffectMax(frame);
 				}
@@ -733,13 +687,13 @@ public class UISkillButton
 	private void UpdateSilence()
 	{
 		bool flag = false;
-		if (silenceBase != null)
+		if ((UnityEngine.Object)silenceBase != (UnityEngine.Object)null)
 		{
-			if (target != null && target.IsValidBuffSilence())
+			if ((UnityEngine.Object)target != (UnityEngine.Object)null && target.IsValidBuffSilence())
 			{
 				flag = true;
 			}
-			if (silenceBase.get_activeInHierarchy() != flag)
+			if (silenceBase.activeInHierarchy != flag)
 			{
 				silenceBase.SetActive(flag);
 			}
@@ -754,9 +708,8 @@ public class UISkillButton
 
 	protected void ChengeSkillType(int index, SkillItemTable.SkillItemData data, float percent)
 	{
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 		ReleaseEffects();
-		if (skillGaugeMask != null)
+		if ((UnityEngine.Object)skillGaugeMask != (UnityEngine.Object)null)
 		{
 			if (percent > 0f)
 			{
@@ -771,16 +724,16 @@ public class UISkillButton
 				skillGaugeMask.SetPercent(percent, false);
 			}
 		}
-		if (skillIconOff != null)
+		if ((UnityEngine.Object)skillIconOff != (UnityEngine.Object)null)
 		{
-			skillIconOff.get_gameObject().SetActive(true);
+			skillIconOff.gameObject.SetActive(true);
 			ResourceLoad.LoadItemIconTexture(skillIconOff, data.iconID);
 		}
-		if (skillGauge1 != null && skillGauge1.iconTexture != null)
+		if (skillGauge1 != null && (UnityEngine.Object)skillGauge1.iconTexture != (UnityEngine.Object)null)
 		{
 			ResourceLoad.LoadItemIconTexture(skillGauge1.iconTexture, data.iconID);
 		}
-		if (skillGauge2 != null && skillGauge2.iconTexture != null)
+		if (skillGauge2 != null && (UnityEngine.Object)skillGauge2.iconTexture != (UnityEngine.Object)null)
 		{
 			ResourceLoad.LoadItemIconTexture(skillGauge2.iconTexture, data.iconID);
 		}
@@ -794,26 +747,23 @@ public class UISkillButton
 
 	public void SetInActiveSlot(SKILL_SLOT_TYPE type)
 	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 		buttonIndex = -1;
 		ReleaseEffects();
-		if (skillGaugeMask != null)
+		if ((UnityEngine.Object)skillGaugeMask != (UnityEngine.Object)null)
 		{
 			skillGaugeMask.SetPercent(1f, false);
 		}
-		if (skillIconOff != null)
+		if ((UnityEngine.Object)skillIconOff != (UnityEngine.Object)null)
 		{
-			skillIconOff.get_gameObject().SetActive(false);
+			skillIconOff.gameObject.SetActive(false);
 		}
 		if (skillGauge1 != null)
 		{
-			skillGauge1.iconTexture.get_gameObject().SetActive(false);
+			skillGauge1.iconTexture.gameObject.SetActive(false);
 		}
 		if (skillGauge2 != null)
 		{
-			skillGauge2.iconTexture.get_gameObject().SetActive(false);
+			skillGauge2.iconTexture.gameObject.SetActive(false);
 		}
 		SetSlotType(type);
 		skillTypeOFF.alpha = 0.5f;
@@ -872,7 +822,7 @@ public class UISkillButton
 		{
 			return false;
 		}
-		if (target == null)
+		if ((UnityEngine.Object)target == (UnityEngine.Object)null)
 		{
 			return false;
 		}
@@ -883,7 +833,7 @@ public class UISkillButton
 			return false;
 		}
 		SelfController selfController = target.controller as SelfController;
-		if (selfController == null)
+		if ((UnityEngine.Object)selfController == (UnityEngine.Object)null)
 		{
 			return false;
 		}
@@ -898,7 +848,7 @@ public class UISkillButton
 	{
 		int buttonIndex = this.buttonIndex;
 		SelfController selfController = target.controller as SelfController;
-		if (selfController == null)
+		if ((UnityEngine.Object)selfController == (UnityEngine.Object)null)
 		{
 			return false;
 		}
@@ -911,10 +861,10 @@ public class UISkillButton
 
 	public void OnClick()
 	{
-		if (this.buttonIndex >= 0 && !(target == null))
+		if (this.buttonIndex >= 0 && !((UnityEngine.Object)target == (UnityEngine.Object)null))
 		{
 			SelfController selfController = target.controller as SelfController;
-			if (!(selfController == null) && !selfController.IsCancelNextNotCancel())
+			if (!((UnityEngine.Object)selfController == (UnityEngine.Object)null) && !selfController.IsCancelNextNotCancel())
 			{
 				int buttonIndex = this.buttonIndex;
 				if (selfController.OnSkillButtonPress(buttonIndex))
@@ -929,7 +879,6 @@ public class UISkillButton
 
 	private void RequestCheck(SkillGauge activeGauge, SkillGauge inactiveGauge)
 	{
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
 		if (requestCheck && !IsSelfCommandCheck())
 		{
 			activeGauge.HideEffect3();
@@ -937,12 +886,12 @@ public class UISkillButton
 			requestCheck = false;
 			if (target.actionID == (Character.ACTION_ID)21)
 			{
-				if (frame != null)
+				if ((UnityEngine.Object)frame != (UnityEngine.Object)null)
 				{
 					activeGauge.PlayEffectPlaySkill(frame);
 				}
 				ReleaseEffects();
-				if (skillGaugeMask != null && activeGauge == skillGauge2)
+				if ((UnityEngine.Object)skillGaugeMask != (UnityEngine.Object)null && activeGauge == skillGauge2)
 				{
 					if (skillGauge2.percent > 0f)
 					{
@@ -958,10 +907,10 @@ public class UISkillButton
 				{
 					if (routineWork != null)
 					{
-						this.StopCoroutine(routineWork);
+						StopCoroutine(routineWork);
 					}
 					routineWork = SkillStart(activeGauge, inactiveGauge);
-					this.StartCoroutine(routineWork);
+					StartCoroutine(routineWork);
 				}
 			}
 		}

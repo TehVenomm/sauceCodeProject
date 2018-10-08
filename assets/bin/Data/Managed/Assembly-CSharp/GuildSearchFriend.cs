@@ -65,31 +65,46 @@ public class GuildSearchFriend : FollowListBase
 		UpdateListUI();
 	}
 
-	protected unsafe override void SendGetList(int page, Action<bool> callback)
+	protected override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey330 _003CSendGetList_003Ec__AnonStorey;
-		MonoBehaviourSingleton<GuildManager>.I.SendSearchFollowerRoom(new Action<bool, List<GuildSearchFollowerRoomModel.GuildFollowerModel>>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<GuildManager>.I.SendSearchFollowerRoom(delegate(bool isSuccess, List<GuildSearchFollowerRoomModel.GuildFollowerModel> clans)
+		{
+			if (isSuccess)
+			{
+				nowPage = 1;
+				pageNumMax = 1;
+				clanFollowers = clans;
+			}
+			if (callback != null)
+			{
+				callback(isSuccess);
+			}
+		});
 	}
 
-	private unsafe void UpdateListUI()
+	private void UpdateListUI()
 	{
 		if (clanFollowers == null || clanFollowers.Count == 0)
 		{
-			SetActive((Enum)UI.LBL_NON_LIST, true);
-			SetActive((Enum)UI.GRD_LIST, false);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_PREV, false);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_NEXT, false);
-			SetLabelText((Enum)UI.LBL_NOW, "0");
-			SetLabelText((Enum)UI.LBL_MAX, "0");
+			SetActive(UI.LBL_NON_LIST, true);
+			SetActive(UI.GRD_LIST, false);
+			SetButtonEnabled(UI.BTN_PAGE_PREV, false);
+			SetButtonEnabled(UI.BTN_PAGE_NEXT, false);
+			SetLabelText(UI.LBL_NOW, "0");
+			SetLabelText(UI.LBL_MAX, "0");
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_NOW, (nowPage + 1).ToString());
-			SetActive((Enum)UI.LBL_NON_LIST, false);
-			SetActive((Enum)UI.GRD_LIST, true);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_PREV, nowPage > 0);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_NEXT, nowPage + 1 < pageNumMax);
-			SetDynamicList((Enum)UI.GRD_LIST, "GuildSearchFriendItem", clanFollowers.Count, false, null, null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetLabelText(UI.LBL_NOW, (nowPage + 1).ToString());
+			SetActive(UI.LBL_NON_LIST, false);
+			SetActive(UI.GRD_LIST, true);
+			SetButtonEnabled(UI.BTN_PAGE_PREV, nowPage > 0);
+			SetButtonEnabled(UI.BTN_PAGE_NEXT, nowPage + 1 < pageNumMax);
+			SetDynamicList(UI.GRD_LIST, "GuildSearchFriendItem", clanFollowers.Count, false, null, null, delegate(int i, Transform t, bool is_recycle)
+			{
+				GuildSearchFollowerRoomModel.GuildFollowerModel data = clanFollowers[i];
+				SetupListItem(data, i, t);
+			});
 		}
 	}
 
@@ -102,8 +117,6 @@ public class GuildSearchFriend : FollowListBase
 
 	private void SetFollowerInfo(GuildSearchFollowerRoomModel.GuildFollowerModel data, Transform t)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		SetRenderPlayerModel(t, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data.charInfo, false, true, false, true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), true, null);
 		SetLabelText(t, UI.LBL_NAME, data.charInfo.name);
 		SetLabelText(t, UI.LBL_LEVEL, data.charInfo.level.ToString());

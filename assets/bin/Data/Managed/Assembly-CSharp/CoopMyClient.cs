@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class CoopMyClient : CoopClient
 {
 	public CoopClientPacketSender packetSender
@@ -8,8 +10,7 @@ public class CoopMyClient : CoopClient
 
 	protected override void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		packetSender = this.get_gameObject().AddComponent<CoopClientPacketSender>();
+		packetSender = base.gameObject.AddComponent<CoopClientPacketSender>();
 		base.Awake();
 	}
 
@@ -85,7 +86,7 @@ public class CoopMyClient : CoopClient
 		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Count; i < count; i++)
 		{
 			Player player = MonoBehaviourSingleton<StageObjectManager>.I.playerList[i] as Player;
-			if (!(player == null) && !(player == MonoBehaviourSingleton<StageObjectManager>.I.self) && !player.isNpc)
+			if (!((Object)player == (Object)null) && !((Object)player == (Object)MonoBehaviourSingleton<StageObjectManager>.I.self) && !player.isNpc)
 			{
 				return false;
 			}

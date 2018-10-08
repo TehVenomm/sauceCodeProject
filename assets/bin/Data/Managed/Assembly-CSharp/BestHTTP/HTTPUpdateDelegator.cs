@@ -3,30 +3,21 @@ using UnityEngine;
 
 namespace BestHTTP
 {
-	internal sealed class HTTPUpdateDelegator
+	internal sealed class HTTPUpdateDelegator : MonoBehaviour
 	{
 		private static HTTPUpdateDelegator instance;
 
-		public HTTPUpdateDelegator()
-			: this()
-		{
-		}
-
 		public static void CheckInstance()
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Expected O, but got Unknown
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Expected O, but got Unknown
-			if (!Object.op_Implicit(instance))
+			if (!(bool)instance)
 			{
 				instance = (Object.FindObjectOfType(typeof(HTTPUpdateDelegator)) as HTTPUpdateDelegator);
-				if (!Object.op_Implicit(instance))
+				if (!(bool)instance)
 				{
-					GameObject val = new GameObject("HTTP Update Delegator");
-					val.set_hideFlags(3);
-					Object.DontDestroyOnLoad(val);
-					instance = val.AddComponent<HTTPUpdateDelegator>();
+					GameObject gameObject = new GameObject("HTTP Update Delegator");
+					gameObject.hideFlags = (HideFlags.HideInHierarchy | HideFlags.HideInInspector);
+					Object.DontDestroyOnLoad(gameObject);
+					instance = gameObject.AddComponent<HTTPUpdateDelegator>();
 				}
 			}
 		}

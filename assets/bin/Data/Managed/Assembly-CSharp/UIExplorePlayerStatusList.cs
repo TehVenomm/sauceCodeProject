@@ -1,39 +1,29 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIExplorePlayerStatusList
+public class UIExplorePlayerStatusList : MonoBehaviour
 {
 	[SerializeField]
 	private UIExplorePlayerStatus[] statuses = new UIExplorePlayerStatus[3];
 
 	private ExploreStatus exploreStatus;
 
-	public UIExplorePlayerStatusList()
-		: this()
+	public void Initialize(ExploreStatus exploreStatus)
 	{
-	}
-
-	public unsafe void Initialize(ExploreStatus exploreStatus)
-	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Expected O, but got Unknown
 		if (this.exploreStatus != exploreStatus)
 		{
 			Clear();
 			this.exploreStatus = exploreStatus;
-			exploreStatus.onChangeExploreMemberList += new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			exploreStatus.onChangeExploreMemberList += OnChangeExploreMemberList;
 		}
 		OnChangeExploreMemberList();
 	}
 
-	private unsafe void Clear()
+	private void Clear()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
 		if (exploreStatus != null)
 		{
-			exploreStatus.onChangeExploreMemberList -= new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			exploreStatus.onChangeExploreMemberList -= OnChangeExploreMemberList;
 			exploreStatus = null;
 		}
 	}
@@ -45,10 +35,9 @@ public class UIExplorePlayerStatusList
 
 	private void OnChangeExploreMemberList()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < statuses.Length; i++)
 		{
-			statuses[i].get_gameObject().SetActive(false);
+			statuses[i].gameObject.SetActive(false);
 		}
 		List<ExplorePlayerStatus> enabledPlayerStatusList = exploreStatus.GetEnabledPlayerStatusList();
 		bool flag = false;

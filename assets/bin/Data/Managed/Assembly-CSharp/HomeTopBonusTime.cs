@@ -55,9 +55,7 @@ public class HomeTopBonusTime : UIBehaviour
 
 	public void SetUp()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		myTrans = this.get_transform();
+		myTrans = base.transform;
 		tweenCtrl = myTrans.GetComponent<UITweenCtrl>();
 		isFirst = true;
 		timeSlotEvents = MonoBehaviourSingleton<StatusManager>.I.timeSlotEvents;
@@ -101,7 +99,7 @@ public class HomeTopBonusTime : UIBehaviour
 
 	private void UpdateVisualIndex()
 	{
-		time += Time.get_deltaTime();
+		time += Time.deltaTime;
 		if (time >= ChangeIndexTime)
 		{
 			currentIndex++;
@@ -124,31 +122,20 @@ public class HomeTopBonusTime : UIBehaviour
 
 	private void TweenFirst()
 	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 		TweenPosition tween = FindCtrl(myTrans, UI.OBJ_TWEEN_BONUS_TIME).GetComponent<TweenPosition>();
 		Vector3 defaultFrom = default(Vector3);
-		if (tween != null)
+		if ((UnityEngine.Object)tween != (UnityEngine.Object)null)
 		{
 			defaultFrom = tween.from;
 			Vector3 from = defaultFrom;
 			from.x = 350f;
 			tween.from = from;
 		}
-		if (!(tweenCtrl == null))
+		if (!((UnityEngine.Object)tweenCtrl == (UnityEngine.Object)null))
 		{
 			isActiveTap = false;
 			tweenCtrl.Play(true, delegate
 			{
-				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 				tween.from = defaultFrom;
 				isActiveTap = true;
 			});
@@ -157,7 +144,7 @@ public class HomeTopBonusTime : UIBehaviour
 
 	private void TweenBonusTime(bool isCloseBonusTime)
 	{
-		if (!(tweenCtrl == null))
+		if (!((UnityEngine.Object)tweenCtrl == (UnityEngine.Object)null))
 		{
 			isActiveTap = false;
 			tweenCtrl.Play(isCloseBonusTime, delegate

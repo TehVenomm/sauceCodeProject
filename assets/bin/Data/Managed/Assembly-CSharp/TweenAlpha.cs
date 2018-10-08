@@ -35,27 +35,23 @@ public class TweenAlpha : UITweener
 	{
 		get
 		{
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 			if (!mCached)
 			{
 				Cache();
 			}
-			if (mRect != null)
+			if ((UnityEngine.Object)mRect != (UnityEngine.Object)null)
 			{
 				return mRect.alpha;
 			}
-			if (mSr != null)
+			if ((UnityEngine.Object)mSr != (UnityEngine.Object)null)
 			{
-				Color color = mSr.get_color();
+				Color color = mSr.color;
 				return color.a;
 			}
 			float result;
-			if (mMat != null)
+			if ((UnityEngine.Object)mMat != (UnityEngine.Object)null)
 			{
-				Color color2 = mMat.get_color();
+				Color color2 = mMat.color;
 				result = color2.a;
 			}
 			else
@@ -66,52 +62,44 @@ public class TweenAlpha : UITweener
 		}
 		set
 		{
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
 			if (!mCached)
 			{
 				Cache();
 			}
-			if (mRect != null)
+			if ((UnityEngine.Object)mRect != (UnityEngine.Object)null)
 			{
 				mRect.alpha = value;
 			}
-			else if (mSr != null)
+			else if ((UnityEngine.Object)mSr != (UnityEngine.Object)null)
 			{
-				Color color = mSr.get_color();
+				Color color = mSr.color;
 				color.a = value;
-				mSr.set_color(color);
+				mSr.color = color;
 			}
-			else if (mMat != null)
+			else if ((UnityEngine.Object)mMat != (UnityEngine.Object)null)
 			{
-				Color color2 = mMat.get_color();
+				Color color2 = mMat.color;
 				color2.a = value;
-				mMat.set_color(color2);
+				mMat.color = color2;
 			}
 		}
 	}
 
 	private void Cache()
 	{
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Expected O, but got Unknown
 		mCached = true;
-		mRect = this.GetComponent<UIRect>();
-		mSr = this.GetComponent<SpriteRenderer>();
-		if (mRect == null && mSr == null)
+		mRect = GetComponent<UIRect>();
+		mSr = GetComponent<SpriteRenderer>();
+		if ((UnityEngine.Object)mRect == (UnityEngine.Object)null && (UnityEngine.Object)mSr == (UnityEngine.Object)null)
 		{
-			Renderer component = this.GetComponent<Renderer>();
-			if (component != null)
+			Renderer component = GetComponent<Renderer>();
+			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 			{
-				mMat = component.get_material();
+				mMat = component.material;
 			}
-			if (mMat == null)
+			if ((UnityEngine.Object)mMat == (UnityEngine.Object)null)
 			{
-				mRect = this.GetComponentInChildren<UIRect>();
+				mRect = GetComponentInChildren<UIRect>();
 			}
 		}
 	}
@@ -129,7 +117,7 @@ public class TweenAlpha : UITweener
 		if (duration <= 0f)
 		{
 			tweenAlpha.Sample(1f, true);
-			tweenAlpha.set_enabled(false);
+			tweenAlpha.enabled = false;
 		}
 		return tweenAlpha;
 	}

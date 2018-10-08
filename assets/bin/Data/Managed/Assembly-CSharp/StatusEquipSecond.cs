@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class StatusEquipSecond : StatusEquip
@@ -105,16 +104,16 @@ public class StatusEquipSecond : StatusEquip
 		if (MonoBehaviourSingleton<InventoryManager>.I.IsWeaponInventoryType(MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType))
 		{
 			switchInventoryAry = weaponInventoryAry;
-			SetActive((Enum)UI.OBJ_WEAPON_WINDOW, true);
-			SetActive((Enum)UI.OBJ_DEFENSE_WINDOW, false);
-			SetToggle((Enum)tgl[(int)(MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType - 1)], true);
+			SetActive(UI.OBJ_WEAPON_WINDOW, true);
+			SetActive(UI.OBJ_DEFENSE_WINDOW, false);
+			SetToggle(tgl[(int)(MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType - 1)], true);
 			text = base.sectionData.GetText("CAPTION_WEAPON");
 		}
 		else
 		{
 			switchInventoryAry = defenseInventoryAry;
-			SetActive((Enum)UI.OBJ_WEAPON_WINDOW, false);
-			SetActive((Enum)UI.OBJ_DEFENSE_WINDOW, true);
+			SetActive(UI.OBJ_WEAPON_WINDOW, false);
+			SetActive(UI.OBJ_DEFENSE_WINDOW, true);
 			text = base.sectionData.GetText("CAPTION_DEFENCE");
 		}
 		InitializeCaption(text);
@@ -123,35 +122,35 @@ public class StatusEquipSecond : StatusEquip
 	private void OnQuery_TAB_1()
 	{
 		int num = 0;
-		SetToggle((Enum)tgl[num], true);
+		SetToggle(tgl[num], true);
 		LimitedInventory(num);
 	}
 
 	private void OnQuery_TAB_2()
 	{
 		int num = 1;
-		SetToggle((Enum)tgl[num], true);
+		SetToggle(tgl[num], true);
 		LimitedInventory(num);
 	}
 
 	private void OnQuery_TAB_3()
 	{
 		int num = 2;
-		SetToggle((Enum)tgl[num], true);
+		SetToggle(tgl[num], true);
 		LimitedInventory(num);
 	}
 
 	private void OnQuery_TAB_4()
 	{
 		int num = 3;
-		SetToggle((Enum)tgl[num], true);
+		SetToggle(tgl[num], true);
 		LimitedInventory(num);
 	}
 
 	private void OnQuery_TAB_5()
 	{
 		int num = 4;
-		SetToggle((Enum)tgl[num], true);
+		SetToggle(tgl[num], true);
 		LimitedInventory(num);
 	}
 
@@ -208,11 +207,10 @@ public class StatusEquipSecond : StatusEquip
 
 	private void InitializeCaption(string caption)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		SetLabelText(ctrl, UI.LBL_CAPTION, caption);
-		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
-		if (component != null)
+		UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
+		if ((Object)component != (Object)null)
 		{
 			component.Reset();
 			int i = 0;

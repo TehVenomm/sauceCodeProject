@@ -2,14 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using UnityEngine;
 
-public class SpeedTest_ForEach
+public class SpeedTest_ForEach : MonoBehaviour
 {
-	public SpeedTest_ForEach()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		Execute();

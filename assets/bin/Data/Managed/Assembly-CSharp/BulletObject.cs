@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManager.IDetachedNotify
+public class BulletObject : MonoBehaviour, IAttackCollider, IBulletObservable, StageObjectManager.IDetachedNotify
 {
 	private const float IS_LAND_HIT_MARGIN = 1f;
 
@@ -35,9 +35,9 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	protected bool isLandHitDelete;
 
-	protected Vector3 landHitPosition = Vector3.get_zero();
+	protected Vector3 landHitPosition = Vector3.zero;
 
-	protected Quaternion landHitRotation = Quaternion.get_identity();
+	protected Quaternion landHitRotation = Quaternion.identity;
 
 	public Transform bulletEffect;
 
@@ -208,37 +208,23 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 	}
 
 	public BulletObject()
-		: this()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		prevPosition = Vector3.get_zero();
-		dispOffset = Vector3.get_zero();
-		dispRotation = Vector3.get_zero();
-		offset = Vector3.get_zero();
-		baseScale = Vector3.get_one();
+		prevPosition = Vector3.zero;
+		dispOffset = Vector3.zero;
+		dispRotation = Vector3.zero;
+		offset = Vector3.zero;
+		baseScale = Vector3.one;
 		appearTime = 0f;
 		radius = 0f;
-		timeStartScale = Vector3.get_one();
-		timeEndScale = Vector3.get_one();
+		timeStartScale = Vector3.one;
+		timeEndScale = Vector3.one;
 		isCharacterHitDelete = true;
 		isObjectHitDelete = true;
 		isLandHit = false;
 		isBulletTakeoverTarget = false;
-		endVec = Vector3.get_zero();
+		endVec = Vector3.zero;
 		capsuleHeight = 0f;
-		boxSize = Vector3.get_zero();
+		boxSize = Vector3.zero;
 	}
 
 	public void SetEndBulletSkillIndex(int skillIndex)
@@ -253,29 +239,24 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		_transform = this.get_transform();
-		_rigidbody = this.GetComponent<Rigidbody>();
-		_collider = this.GetComponent<Collider>();
-		if (_rigidbody == null)
+		_transform = base.transform;
+		_rigidbody = GetComponent<Rigidbody>();
+		_collider = GetComponent<Collider>();
+		if ((Object)_rigidbody == (Object)null)
 		{
-			_rigidbody = this.get_gameObject().AddComponent<Rigidbody>();
+			_rigidbody = base.gameObject.AddComponent<Rigidbody>();
 		}
-		if (_collider == null)
+		if ((Object)_collider == (Object)null)
 		{
-			_collider = this.get_gameObject().GetComponentInChildren<Collider>();
+			_collider = base.gameObject.GetComponentInChildren<Collider>();
 		}
-		if (_collider != null)
+		if ((Object)_collider != (Object)null)
 		{
-			_collider.set_isTrigger(true);
+			_collider.isTrigger = true;
 			capsuleCollider = (_collider as CapsuleCollider);
 		}
-		this.get_gameObject().SetActive(false);
-		_rigidbody.set_useGravity(false);
+		base.gameObject.SetActive(false);
+		_rigidbody.useGravity = false;
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			MonoBehaviourSingleton<StageObjectManager>.I.AddNotifyInterface(this);
@@ -288,34 +269,10 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	protected virtual void Update()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_gameObject().get_activeSelf())
+		if (base.gameObject.activeSelf)
 		{
-			timeCount += Time.get_deltaTime();
-			float num = timeCount / appearTime;
+			timeCount += Time.deltaTime;
+			float t = timeCount / appearTime;
 			if (appearTime < timeCount)
 			{
 				OnDestroy();
@@ -324,34 +281,34 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 			{
 				if (timeStartScale != timeEndScale)
 				{
-					Vector3 scale = Vector3.Lerp(timeStartScale, timeEndScale, num);
+					Vector3 scale = Vector3.Lerp(timeStartScale, timeEndScale, t);
 					SetScale(scale);
 				}
 				if (isLandHit)
 				{
-					Vector3 position = _transform.get_position();
-					float num2 = StageManager.GetHeight(position);
+					Vector3 position = _transform.position;
+					float num = StageManager.GetHeight(position);
 					if (!isShotArrow)
 					{
-						num2 += radius;
+						num += radius;
 					}
-					if (num2 - 1f >= position.y)
+					if (num - 1f >= position.y)
 					{
-						Vector3 val = position - this.prevPosition;
-						float num3 = 0f;
-						if (val.y != 0f)
+						Vector3 a = position - this.prevPosition;
+						float d = 0f;
+						if (a.y != 0f)
 						{
-							float num4 = num2;
+							float num2 = num;
 							Vector3 prevPosition = this.prevPosition;
-							num3 = (num4 - prevPosition.y) / val.y;
+							d = (num2 - prevPosition.y) / a.y;
 						}
-						if (controller != null)
+						if ((Object)controller != (Object)null)
 						{
 							controller.OnLandHit();
 						}
 						isLandHitDelete = true;
-						landHitPosition = val * num3 + this.prevPosition;
-						landHitRotation = Quaternion.get_identity();
+						landHitPosition = a * d + this.prevPosition;
+						landHitRotation = Quaternion.identity;
 						position.y = 0f;
 						OnDestroy();
 						return;
@@ -367,36 +324,23 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	protected virtual void FixedUpdate()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		endVec = Vector3.get_zero();
+		endVec = Vector3.zero;
 		if (capsuleHeight <= 0f)
 		{
-			float num = Vector3.Distance(prevPosition, _transform.get_position());
+			float num = Vector3.Distance(prevPosition, _transform.position);
 			float num2 = num;
-			Vector3 localScale = _transform.get_localScale();
+			Vector3 localScale = _transform.localScale;
 			num = num2 / localScale.x;
-			if (num > 0f && capsuleCollider != null)
+			if (num > 0f && (Object)capsuleCollider != (Object)null)
 			{
 				Vector3 offset = this.offset;
 				offset.z -= num * 0.5f;
-				capsuleCollider.set_center(offset);
-				capsuleCollider.set_height(num + capsuleCollider.get_radius() * 2f);
-				endVec = _transform.get_rotation() * (Vector3.get_back() * (num * 0.5f + capsuleCollider.get_radius()));
+				capsuleCollider.center = offset;
+				capsuleCollider.height = num + capsuleCollider.radius * 2f;
+				endVec = _transform.rotation * (Vector3.back * (num * 0.5f + capsuleCollider.radius));
 			}
 		}
-		prevPosition = _transform.get_position();
+		prevPosition = _transform.position;
 	}
 
 	protected virtual bool IsLoopEnd()
@@ -406,26 +350,16 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		if (isObjectHitDelete && (collider.get_gameObject().get_layer() == 9 || collider.get_gameObject().get_layer() == 21))
+		if (isObjectHitDelete && (collider.gameObject.layer == 9 || collider.gameObject.layer == 21))
 		{
 			isLandHitDelete = true;
 			landHitPosition = Utility.ClosestPointOnCollider(collider, prevPosition);
-			landHitRotation = _transform.get_rotation() * Quaternion.Euler(new Vector3(-90f, 0f, 0f));
+			landHitRotation = _transform.rotation * Quaternion.Euler(new Vector3(-90f, 0f, 0f));
 			_rigidbody.Sleep();
 		}
 		else
 		{
-			if (controller != null)
+			if ((Object)controller != (Object)null)
 			{
 				if (!controller.IsHit(collider))
 				{
@@ -449,7 +383,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	private void OnTriggerStay(Collider collider)
 	{
-		if (controller != null)
+		if ((Object)controller != (Object)null)
 		{
 			if (!controller.IsHit(collider))
 			{
@@ -473,7 +407,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	public virtual void OnDetachedObject(StageObject stage_object)
 	{
-		if (stageObject == stage_object)
+		if ((Object)stageObject == (Object)stage_object)
 		{
 			stageObject = null;
 		}
@@ -493,43 +427,19 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 	{
 		stack_list.Sort(delegate(AttackHitColliderProcessor.HitResult a, AttackHitColliderProcessor.HitResult b)
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 val = a.target._position - prevPosition;
-			float sqrMagnitude = val.get_sqrMagnitude();
-			Vector3 val2 = b.target._position - prevPosition;
-			float num = sqrMagnitude - val2.get_sqrMagnitude();
+			float num = (a.target._position - prevPosition).sqrMagnitude - (b.target._position - prevPosition).sqrMagnitude;
 			return (num >= 0f) ? 1 : (-1);
 		});
 	}
 
 	public virtual Vector3 GetCrossCheckPoint(Collider from_collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		Bounds bounds = from_collider.get_bounds();
-		Vector3 val = bounds.get_center();
-		if (endVec != Vector3.get_zero())
+		Vector3 vector = from_collider.bounds.center;
+		if (endVec != Vector3.zero)
 		{
-			val += endVec * 2f;
+			vector += endVec * 2f;
 		}
-		return val;
+		return vector;
 	}
 
 	public bool CheckHitAttack(AttackHitInfo info, Collider to_collider, StageObject to_object)
@@ -543,14 +453,6 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	public void OnHitAttack(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
 	{
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
 		if (attackHitChecker != null)
 		{
 			attackHitChecker.OnHitAttack(info, hit_param);
@@ -564,7 +466,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 		{
 			isLandHitDelete = true;
 			landHitPosition = Utility.ClosestPointOnCollider(hit_param.toCollider, prevPosition);
-			landHitRotation = _transform.get_rotation() * Quaternion.Euler(new Vector3(-90f, 0f, 0f));
+			landHitRotation = _transform.rotation * Quaternion.Euler(new Vector3(-90f, 0f, 0f));
 			_rigidbody.Sleep();
 		}
 	}
@@ -581,30 +483,25 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	public virtual void OnDestroy()
 	{
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Expected O, but got Unknown
-		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
 		if (!AppMain.isApplicationQuit && !isDestroyed)
 		{
 			isDestroyed = true;
-			if (_rigidbody != null)
+			if ((Object)_rigidbody != (Object)null)
 			{
 				_rigidbody.Sleep();
 			}
-			if (_collider != null)
+			if ((Object)_collider != (Object)null)
 			{
-				_collider.set_enabled(false);
+				_collider.enabled = false;
 			}
 			capsuleCollider = null;
-			if (controller != null)
+			if ((Object)controller != (Object)null)
 			{
-				controller.set_enabled(false);
+				controller.enabled = false;
 			}
 			if (colliderProcessor != null)
 			{
-				if (endBullet != null)
+				if ((Object)endBullet != (Object)null)
 				{
 					CreateEndBullet();
 				}
@@ -614,44 +511,43 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 			if (isLandHitDelete && !string.IsNullOrEmpty(landHitEfect))
 			{
 				Transform effect = EffectManager.GetEffect(landHitEfect, null);
-				if (effect != null)
+				if ((Object)effect != (Object)null)
 				{
-					effect.set_localPosition(landHitPosition);
-					effect.set_localRotation(landHitRotation);
+					effect.localPosition = landHitPosition;
+					effect.localRotation = landHitRotation;
 				}
 			}
-			Transform val = (!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform;
-			if (bulletEffect != null)
+			Transform parent = (!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform;
+			if ((Object)bulletEffect != (Object)null)
 			{
-				bulletEffect.set_parent(val);
-				EffectManager.ReleaseEffect(bulletEffect.get_gameObject(), !m_isDisablePlayEndAnim, false);
+				bulletEffect.parent = parent;
+				EffectManager.ReleaseEffect(bulletEffect.gameObject, !m_isDisablePlayEndAnim, false);
 			}
 			if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 			{
 				MonoBehaviourSingleton<StageObjectManager>.I.RemoveNotifyInterface(this);
 			}
 			NotifyDestroy();
-			Object.Destroy(this.get_gameObject());
+			Object.Destroy(base.gameObject);
 		}
 	}
 
 	private void CreateEndBullet()
 	{
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			if (string.IsNullOrEmpty(endBullet.get_name()))
+			if (string.IsNullOrEmpty(endBullet.name))
 			{
 				Log.Error("endBullet.name is empty, so can't create EndBullet!!");
 			}
 			else if (endBullet.type == BulletData.BULLET_TYPE.ICE_FLOOR)
 			{
 				Enemy enemy = stageObject as Enemy;
-				if (!(enemy == null))
+				if (!((Object)enemy == (Object)null))
 				{
 					List<Vector3> list = new List<Vector3>(1);
 					List<Quaternion> rotList = new List<Quaternion>();
-					list.Add(_transform.get_position());
+					list.Add(_transform.position);
 					enemy.ActCreateIceFloor(endBullet, list, rotList);
 				}
 			}
@@ -666,10 +562,10 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 				{
 					Log.Error("AttackInfo is null!!");
 				}
-				else if (!(stageObject == null))
+				else if (!((Object)stageObject == (Object)null))
 				{
 					Transform transform = MonoBehaviourSingleton<StageObjectManager>.I._transform;
-					if (transform == null)
+					if ((Object)transform == (Object)null)
 					{
 						Log.Error("parentTrans is null, so can't create EndBullet!!");
 					}
@@ -681,13 +577,13 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 					{
 						BulletObject bulletObject = ShotEndBullet(endBulletAttackInfo, transform);
 						BulletData.BulletHoming dataHoming = endBullet.dataHoming;
-						if (dataHoming != null && dataHoming.isTakeOverTarget && m_targetObject != null)
+						if (dataHoming != null && dataHoming.isTakeOverTarget && (Object)m_targetObject != (Object)null)
 						{
 							bulletObject.SetTarget(m_targetObject);
 						}
 						if (type == BulletData.BULLET_TYPE.BREAKABLE && bulletData.dataBreakable != null)
 						{
-							if (bulletData.dataBreakable.isTakeOverTarget && m_targetObject != null)
+							if (bulletData.dataBreakable.isTakeOverTarget && (Object)m_targetObject != (Object)null)
 							{
 								bulletObject.SetTarget(m_targetObject);
 							}
@@ -695,7 +591,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 							{
 								BulletControllerBreakable bulletControllerBreakable = controller as BulletControllerBreakable;
 								BulletControllerBreakable bulletControllerBreakable2 = bulletObject.controller as BulletControllerBreakable;
-								if (bulletControllerBreakable != null && bulletControllerBreakable2 != null)
+								if ((Object)bulletControllerBreakable != (Object)null && (Object)bulletControllerBreakable2 != (Object)null)
 								{
 									bulletControllerBreakable2.SetHitCount(bulletControllerBreakable.GetHitCount());
 								}
@@ -709,23 +605,19 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	private void CreateEndBulletDecoy()
 	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 		Self self = stageObject as Self;
-		if (!(self == null))
+		if (!((Object)self == (Object)null))
 		{
 			AnimEventData.EventData eventData = new AnimEventData.EventData();
 			eventData.stringArgs = new string[1]
 			{
-				endBullet.get_name()
+				endBullet.name
 			};
 			AnimEventData.EventData eventData2 = eventData;
 			float[] obj = new float[3];
-			Vector3 position = _transform.get_position();
+			Vector3 position = _transform.position;
 			obj[0] = position.x;
-			Vector3 position2 = _transform.get_position();
+			Vector3 position2 = _transform.position;
 			obj[2] = position2.z;
 			eventData2.floatArgs = obj;
 			eventData.intArgs = new int[1]
@@ -738,7 +630,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	protected void HighExplosiveSettings(AttackInfo _atkInfo, Transform _parentTrans)
 	{
-		if (!(bulletData == null))
+		if (!((Object)bulletData == (Object)null))
 		{
 			BulletData.BulletHighExplosive dataHighExplosive = bulletData.dataHighExplosive;
 			if (dataHighExplosive != null && MonoBehaviourSingleton<StageObjectManager>.IsValid())
@@ -763,7 +655,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 						int i = 0;
 						for (int count = playerList.Count; i < count; i++)
 						{
-							if (!(playerList[i] == stageObject))
+							if (!((Object)playerList[i] == (Object)stageObject))
 							{
 								BulletObject bulletObject = ShotEndBullet(_atkInfo, _parentTrans);
 								if (endBullet.dataHoming != null || endBullet.dataHealingHomingBullet != null)
@@ -782,55 +674,29 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	private List<StageObject> GetSortedListByPlayerDistance(List<StageObject> allPlayerList, StageObject me)
 	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		if (allPlayerList == null || allPlayerList.Count < 1 || me == null)
+		if (allPlayerList == null || allPlayerList.Count < 1 || (Object)me == (Object)null)
 		{
 			return null;
 		}
 		List<StageObject> list = new List<StageObject>(allPlayerList);
 		list.Remove(me);
-		Vector3 targetPos = me.get_transform().get_position();
-		list.Sort(delegate(StageObject a, StageObject b)
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 val = a.get_transform().get_position() - targetPos;
-			float magnitude = val.get_magnitude();
-			Vector3 val2 = b.get_transform().get_position() - targetPos;
-			return Mathf.RoundToInt(magnitude - val2.get_magnitude());
-		});
+		Vector3 targetPos = me.transform.position;
+		list.Sort((StageObject a, StageObject b) => Mathf.RoundToInt((a.transform.position - targetPos).magnitude - (b.transform.position - targetPos).magnitude));
 		return list;
 	}
 
 	private BulletObject ShotEndBullet(AttackInfo atkInfo, Transform parentTrans)
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Expected O, but got Unknown
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = Utility.CreateGameObject(endBullet.get_name(), parentTrans, -1);
-		if (val == null)
+		Transform transform = Utility.CreateGameObject(endBullet.name, parentTrans, -1);
+		if ((Object)transform == (Object)null)
 		{
-			Log.Error("Failed to create Bullet!! name:" + endBullet.get_name());
+			Log.Error("Failed to create Bullet!! name:" + endBullet.name);
 			return null;
 		}
-		BulletObject bulletObject = val.get_gameObject().AddComponent(GetType()) as BulletObject;
-		if (bulletObject == null)
+		BulletObject bulletObject = transform.gameObject.AddComponent(GetType()) as BulletObject;
+		if ((Object)bulletObject == (Object)null)
 		{
-			Object.Destroy(val.get_gameObject());
+			Object.Destroy(transform.gameObject);
 			return null;
 		}
 		bulletObject.SetBaseScale(baseScale);
@@ -838,7 +704,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 		{
 			bulletObject.SetEndBulletSkillIndex(masterSkill.skillIndex);
 		}
-		bulletObject.Shot(stageObject, atkInfo, endBullet, _transform.get_position(), _transform.get_rotation(), null, false, m_exAtk, m_attackMode, null, null);
+		bulletObject.Shot(stageObject, atkInfo, endBullet, _transform.position, _transform.rotation, null, false, m_exAtk, m_attackMode, null, null);
 		bulletObject.attackHitChecker = attackHitChecker;
 		if (isBulletTakeoverTarget)
 		{
@@ -854,7 +720,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 		{
 			return null;
 		}
-		if (stageObject == null)
+		if ((Object)stageObject == (Object)null)
 		{
 			return attackInfo;
 		}
@@ -873,14 +739,13 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	public void SetBaseScale(Vector3 _scale)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		baseScale = _scale;
 	}
 
 	public void SetRadius(float _radius)
 	{
 		radius = _radius;
-		if (isColliderCreate && capsuleCollider != null)
+		if (isColliderCreate && (Object)capsuleCollider != (Object)null)
 		{
 			if (radius <= 0f)
 			{
@@ -889,78 +754,52 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 			}
 			else
 			{
-				capsuleCollider.set_radius(radius);
-				capsuleCollider.set_height(radius * 2f);
+				capsuleCollider.radius = radius;
+				capsuleCollider.height = radius * 2f;
 			}
 		}
 	}
 
 	public void SetScale(Vector3 scale)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		_transform.set_localScale(Vector3.Scale(baseScale, scale));
+		_transform.localScale = Vector3.Scale(baseScale, scale);
 	}
 
 	public void SetHitOffset(Vector3 _offset)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		offset = _offset;
-		if (capsuleCollider != null)
+		if ((Object)capsuleCollider != (Object)null)
 		{
-			capsuleCollider.set_center(_offset);
+			capsuleCollider.center = _offset;
 		}
 	}
 
 	public void SetCapsuleAxis(BulletData.AXIS axis)
 	{
-		if (isColliderCreate && capsuleCollider != null)
+		if (isColliderCreate && (Object)capsuleCollider != (Object)null)
 		{
 			int direction = 2;
 			if (axis != BulletData.AXIS.NONE)
 			{
 				direction = (int)axis;
 			}
-			capsuleCollider.set_direction(direction);
+			capsuleCollider.direction = direction;
 		}
 	}
 
 	public void SetCapsuleHeight(float height)
 	{
-		if (isColliderCreate && !(height <= 0f) && capsuleCollider != null)
+		if (isColliderCreate && !(height <= 0f) && (Object)capsuleCollider != (Object)null)
 		{
-			capsuleCollider.set_height(height);
+			capsuleCollider.height = height;
 			capsuleHeight = height;
 		}
 	}
 
 	public virtual void Shot(StageObject master, AttackInfo atkInfo, BulletData bulletData, Vector3 pos, Quaternion rot, string exEffectName = null, bool reference_attack = true, AtkAttribute exAtk = null, Player.ATTACK_MODE attackMode = Player.ATTACK_MODE.NONE, DamageDistanceTable.DamageDistanceData damageDistanceData = null, SkillInfo.SkillParam exSkillParam = null)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0239: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0330: Unknown result type (might be due to invalid IL or missing references)
-		//IL_034d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0352: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0374: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0379: Unknown result type (might be due to invalid IL or missing references)
-		//IL_039b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
 		Player player = master as Player;
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(true);
 		stageObject = master;
 		m_exAtk = exAtk;
 		m_attackMode = attackMode;
@@ -972,11 +811,11 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 		if (!string.IsNullOrEmpty(text))
 		{
 			bulletEffect = EffectManager.GetEffect(text, _transform);
-			if (bulletEffect != null)
+			if ((Object)bulletEffect != (Object)null)
 			{
-				bulletEffect.set_localPosition(bulletData.data.dispOffset);
-				bulletEffect.set_localRotation(Quaternion.Euler(bulletData.data.dispRotation));
-				bulletEffect.set_localScale(Vector3.get_one());
+				bulletEffect.localPosition = bulletData.data.dispOffset;
+				bulletEffect.localRotation = Quaternion.Euler(bulletData.data.dispRotation);
+				bulletEffect.localScale = Vector3.one;
 			}
 		}
 		AttackHitInfo attackHitInfo = atkInfo as AttackHitInfo;
@@ -986,7 +825,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 		}
 		else if (attackHitInfo != null)
 		{
-			if (player != null && HasEndBulletSkillIndex)
+			if ((Object)player != (Object)null && HasEndBulletSkillIndex)
 			{
 				int skillIndex = player.skillInfo.skillIndex;
 				player.skillInfo.skillIndex = m_endBulletSkillIndex;
@@ -999,7 +838,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 			}
 		}
 		masterSkill = null;
-		if (player != null)
+		if ((Object)player != (Object)null)
 		{
 			if (exSkillParam != null)
 			{
@@ -1008,7 +847,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 			else
 			{
 				masterSkill = player.skillInfo.actSkillParam;
-				if (player.TrackingTargetBullet != null && player.TrackingTargetBullet.IsReplaceSkill && atkInfo.isSkillReference)
+				if ((Object)player.TrackingTargetBullet != (Object)null && player.TrackingTargetBullet.IsReplaceSkill && atkInfo.isSkillReference)
 				{
 					masterSkill = player.TrackingTargetBullet.SkillParamForBullet;
 				}
@@ -1025,12 +864,12 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 		SetBulletData(bulletData, masterSkill, pos, rot);
 		if (bulletData.type == BulletData.BULLET_TYPE.OBSTACLE)
 		{
-			AttackObstacle attackObstacle = this.get_gameObject().AddComponent<AttackObstacle>();
+			AttackObstacle attackObstacle = base.gameObject.AddComponent<AttackObstacle>();
 			attackObstacle.Initialize(this as AnimEventShot, bulletData.dataObstacle.colliderStartTime);
 		}
 		else if (bulletData.type == BulletData.BULLET_TYPE.BARRIER)
 		{
-			BarrierBulletObject barrierBulletObject = this.get_gameObject().AddComponent<BarrierBulletObject>();
+			BarrierBulletObject barrierBulletObject = base.gameObject.AddComponent<BarrierBulletObject>();
 			barrierBulletObject.Initialize(this);
 		}
 		else if (bulletData.type != BulletData.BULLET_TYPE.HEALING_HOMING && bulletData.type != BulletData.BULLET_TYPE.ENEMY_PRESENT)
@@ -1056,23 +895,23 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 				colliderProcessor.ValidMultiHitInterval();
 			}
 		}
-		Vector3 val = Vector3.get_zero();
+		Vector3 b = Vector3.zero;
 		if (_collider is BoxCollider)
 		{
-			val = (_collider as BoxCollider).get_center();
+			b = (_collider as BoxCollider).center;
 		}
 		else if (_collider is SphereCollider)
 		{
-			val = (_collider as SphereCollider).get_center();
+			b = (_collider as SphereCollider).center;
 		}
 		else if (_collider is CapsuleCollider)
 		{
-			val = (_collider as CapsuleCollider).get_center();
+			b = (_collider as CapsuleCollider).center;
 		}
-		startColliderPos = _transform.get_position() + val;
+		startColliderPos = _transform.position + b;
 		isDestroyed = false;
 		prevPosition = pos;
-		if (controller != null)
+		if ((Object)controller != (Object)null)
 		{
 			controller.OnShot();
 		}
@@ -1080,29 +919,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	protected virtual void SetBulletData(BulletData bullet, SkillInfo.SkillParam _skillParam, Vector3 pos, Quaternion rot)
 	{
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0211: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0253: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0295: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d9: Unknown result type (might be due to invalid IL or missing references)
-		if (!(bullet == null))
+		if (!((Object)bullet == (Object)null))
 		{
 			bulletData = bullet;
 			type = bullet.type;
@@ -1125,49 +942,49 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 			switch (bullet.type)
 			{
 			case BulletData.BULLET_TYPE.FALL:
-				controller = this.get_gameObject().AddComponent<BulletControllerFall>();
+				controller = base.gameObject.AddComponent<BulletControllerFall>();
 				break;
 			case BulletData.BULLET_TYPE.HOMING:
-				controller = this.get_gameObject().AddComponent<BulletControllerHoming>();
+				controller = base.gameObject.AddComponent<BulletControllerHoming>();
 				break;
 			case BulletData.BULLET_TYPE.CURVE:
-				controller = this.get_gameObject().AddComponent<BulletControllerCurve>();
+				controller = base.gameObject.AddComponent<BulletControllerCurve>();
 				break;
 			case BulletData.BULLET_TYPE.BREAKABLE:
-				controller = this.get_gameObject().AddComponent<BulletControllerBreakable>();
+				controller = base.gameObject.AddComponent<BulletControllerBreakable>();
 				break;
 			case BulletData.BULLET_TYPE.OBSTACLE_CYLINDER:
-				controller = this.get_gameObject().AddComponent<BulletControllerObstacleCylinder>();
+				controller = base.gameObject.AddComponent<BulletControllerObstacleCylinder>();
 				break;
 			case BulletData.BULLET_TYPE.SNATCH:
-				controller = this.get_gameObject().AddComponent<BulletControllerSnatch>();
+				controller = base.gameObject.AddComponent<BulletControllerSnatch>();
 				break;
 			case BulletData.BULLET_TYPE.PAIR_SWORDS_SOUL:
-				controller = this.get_gameObject().AddComponent<BulletControllerPairSwordsSoul>();
+				controller = base.gameObject.AddComponent<BulletControllerPairSwordsSoul>();
 				break;
 			case BulletData.BULLET_TYPE.PAIR_SWORDS_LASER:
-				controller = this.get_gameObject().AddComponent<BulletControllerPairSwordsLaser>();
+				controller = base.gameObject.AddComponent<BulletControllerPairSwordsLaser>();
 				break;
 			case BulletData.BULLET_TYPE.HEALING_HOMING:
-				controller = this.get_gameObject().AddComponent<BulletControllerHealingHoming>();
+				controller = base.gameObject.AddComponent<BulletControllerHealingHoming>();
 				break;
 			case BulletData.BULLET_TYPE.ARROW_SOUL:
-				controller = this.get_gameObject().AddComponent<BulletControllerArrowSoul>();
+				controller = base.gameObject.AddComponent<BulletControllerArrowSoul>();
 				break;
 			case BulletData.BULLET_TYPE.ENEMY_PRESENT:
-				controller = this.get_gameObject().AddComponent<BulletControllerEnemyPresent>();
+				controller = base.gameObject.AddComponent<BulletControllerEnemyPresent>();
 				break;
 			case BulletData.BULLET_TYPE.CRASH_BIT:
-				controller = this.get_gameObject().AddComponent<BulletControllerCrashBit>();
+				controller = base.gameObject.AddComponent<BulletControllerCrashBit>();
 				break;
 			case BulletData.BULLET_TYPE.BARRIER:
-				controller = this.get_gameObject().AddComponent<BulletControllerBarrier>();
+				controller = base.gameObject.AddComponent<BulletControllerBarrier>();
 				break;
 			default:
-				controller = this.get_gameObject().AddComponent<BulletControllerBase>();
+				controller = base.gameObject.AddComponent<BulletControllerBase>();
 				break;
 			}
-			if (controller != null)
+			if ((Object)controller != (Object)null)
 			{
 				controller.Initialize(bullet, _skillParam, pos, rot);
 				controller.RegisterBulletObject(this);
@@ -1180,7 +997,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 					if (observable != null)
 					{
 						Player player = stageObject as Player;
-						if (player != null)
+						if ((Object)player != (Object)null)
 						{
 							observable.RegisterObserver(player.pairSwordsCtrl);
 						}
@@ -1195,7 +1012,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 				}
 			}
 			Character character = stageObject as Character;
-			if (character != null)
+			if ((Object)character != (Object)null)
 			{
 				SetTarget(character.actionTarget);
 			}
@@ -1205,10 +1022,10 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 	public void SetTarget(StageObject obj)
 	{
 		m_targetObject = obj;
-		if (stageObject != null)
+		if ((Object)stageObject != (Object)null)
 		{
 			Character character = stageObject as Character;
-			if (character != null && character.IsValidBuffBlind())
+			if ((Object)character != (Object)null && character.IsValidBuffBlind())
 			{
 				m_targetObject = null;
 			}
@@ -1219,7 +1036,7 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 	public void SetTarget(TargetPoint targetPoint)
 	{
 		BulletControllerArrowSoul bulletControllerArrowSoul = controller as BulletControllerArrowSoul;
-		if (!(bulletControllerArrowSoul == null))
+		if (!((Object)bulletControllerArrowSoul == (Object)null))
 		{
 			bulletControllerArrowSoul.SetTarget(targetPoint);
 		}
@@ -1227,9 +1044,8 @@ public class BulletObject : IAttackCollider, IBulletObservable, StageObjectManag
 
 	public void SetPuppetTargetPos(Vector3 pos)
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		BulletControllerArrowSoul bulletControllerArrowSoul = controller as BulletControllerArrowSoul;
-		if (!(bulletControllerArrowSoul == null))
+		if (!((Object)bulletControllerArrowSoul == (Object)null))
 		{
 			bulletControllerArrowSoul.SetPuppetTargetPos(pos);
 		}

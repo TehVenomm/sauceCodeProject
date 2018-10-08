@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UICenterOnChildCtrl
+public class UICenterOnChildCtrl : MonoBehaviour
 {
 	public UICenterOnChild.OnCenterCallback onCenter;
 
@@ -18,21 +18,16 @@ public class UICenterOnChildCtrl
 		private set;
 	}
 
-	public UICenterOnChildCtrl()
-		: this()
-	{
-	}
-
 	public static UICenterOnChildCtrl Get(GameObject go)
 	{
 		UICenterOnChild component = go.GetComponent<UICenterOnChild>();
-		if (component == null)
+		if ((Object)component == (Object)null)
 		{
 			Log.Error("UICenterOnChild is not found.");
 			return null;
 		}
 		UICenterOnChildCtrl uICenterOnChildCtrl = go.GetComponent<UICenterOnChildCtrl>();
-		if (uICenterOnChildCtrl == null)
+		if ((Object)uICenterOnChildCtrl == (Object)null)
 		{
 			uICenterOnChildCtrl = go.AddComponent<UICenterOnChildCtrl>();
 		}
@@ -41,10 +36,10 @@ public class UICenterOnChildCtrl
 
 	private void Start()
 	{
-		if (centerOnChild == null)
+		if ((Object)centerOnChild == (Object)null)
 		{
-			centerOnChild = this.GetComponent<UICenterOnChild>();
-			if (centerOnChild == null)
+			centerOnChild = GetComponent<UICenterOnChild>();
+			if ((Object)centerOnChild == (Object)null)
 			{
 				Object.Destroy(this);
 				return;
@@ -53,7 +48,7 @@ public class UICenterOnChildCtrl
 			centerOnChild.onFinished = OnFinised;
 			centerOnChild.onCenter = OnCenter;
 		}
-		if (reserveTarget != null)
+		if ((Object)reserveTarget != (Object)null)
 		{
 			Centering(reserveTarget, true);
 			reserveTarget = null;
@@ -62,12 +57,9 @@ public class UICenterOnChildCtrl
 
 	private void OnCenter(GameObject go)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
-		if (go.get_transform() != lastTarget)
+		if ((Object)go.transform != (Object)lastTarget)
 		{
-			lastTarget = go.get_transform();
+			lastTarget = go.transform;
 			if (onCenter != null)
 			{
 				onCenter(go);
@@ -86,7 +78,7 @@ public class UICenterOnChildCtrl
 
 	public void Centering(Transform target, bool is_instant = false)
 	{
-		if (centerOnChild == null)
+		if ((Object)centerOnChild == (Object)null)
 		{
 			reserveTarget = target;
 		}

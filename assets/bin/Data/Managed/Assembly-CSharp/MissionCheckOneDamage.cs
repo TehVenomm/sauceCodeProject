@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class MissionCheckOneDamage : MissionCheckBase
 {
 	private bool isOver;
@@ -9,7 +11,7 @@ public class MissionCheckOneDamage : MissionCheckBase
 
 	public override void OnDamage(AttackedHitStatusFix status, Character to_obj)
 	{
-		if (!(status.fromObject as Self == null) && status.damage >= missionParam)
+		if (!((Object)(status.fromObject as Self) == (Object)null) && status.damage >= missionParam)
 		{
 			isOver = true;
 		}

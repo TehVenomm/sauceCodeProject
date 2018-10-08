@@ -84,20 +84,26 @@ public class SmithGrowSkillConfirm : GameSection
 		base.Initialize();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.STR_TITLE_R, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText((Enum)UI.LBL_NAME, baseSkill.tableData.name);
-		SetLabelText((Enum)UI.LBL_MATERIAL_2, (!isExceed) ? base.sectionData.GetText("TEXT_GROW") : base.sectionData.GetText("TEXT_EXCEED"));
-		SetActive((Enum)UI.OBJ_MONEY, !isExceed);
+		SetLabelText(UI.STR_TITLE_R, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.LBL_NAME, baseSkill.tableData.name);
+		SetLabelText(UI.LBL_MATERIAL_2, (!isExceed) ? base.sectionData.GetText("TEXT_GROW") : base.sectionData.GetText("TEXT_EXCEED"));
+		SetActive(UI.OBJ_MONEY, !isExceed);
 		if (!isExceed)
 		{
-			SetLabelText((Enum)UI.LBL_MONEY, total.ToString());
+			SetLabelText(UI.LBL_MONEY, total.ToString());
 		}
-		SetGrid(UI.GRD_MATERIAL, null, material.Length, false, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetGrid(UI.GRD_MATERIAL, null, material.Length, false, delegate(int i, Transform t, bool is_recycle)
+		{
+			SkillItemInfo skillItemInfo = material[i];
+			ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(skillItemInfo.tableData.type), skillItemInfo.tableData.iconID, skillItemInfo.tableData.rarity, t, ELEMENT_TYPE.MAX, skillItemInfo.tableData.GetEnableEquipType(), -1, "DETAIL", i, false, -1, false, null, skillItemInfo.isAttached, 0, 0, false, GET_TYPE.PAY, ELEMENT_TYPE.MAX);
+			Transform ctrl = GetCtrl(UI.PNL_MATERIAL_INFO);
+			SetMaterialInfo(itemIcon.transform, REWARD_TYPE.SKILL_ITEM, skillItemInfo.tableID, ctrl);
+		});
 	}
 
-	private unsafe void OnQuery_DECISION()
+	private void OnQuery_DECISION()
 	{
 		StringBuilder stringBuilder = new StringBuilder();
 		if (isRareConfirm || isEquipConfirm || isExceedConfirm)
@@ -125,11 +131,75 @@ public class SmithGrowSkillConfirm : GameSection
 			GameSection.StayEvent();
 			if (isExceed)
 			{
-				MonoBehaviourSingleton<SmithManager>.I.SendExceedSkill(baseSkill, material, new Action<SkillItemInfo, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				MonoBehaviourSingleton<SmithManager>.I.SendExceedSkill(baseSkill, material, delegate(SkillItemInfo ret_skill_item, bool isGreat)
+				{
+					if (ret_skill_item != null)
+					{
+						SmithManager.ResultData resultData2 = new SmithManager.ResultData
+						{
+							itemData = ret_skill_item,
+							beforeRarity = baseSkill.tableData.rarity,
+							beforeMaxLevel = baseSkill.tableData.GetMaxLv(ret_skill_item.exceedCnt),
+							beforeExceedCnt = baseSkill.exceedCnt,
+							beforeLevel = baseSkill.level,
+							beforeExp = baseSkill.exp,
+							beforeAtk = baseSkill.atk,
+							beforeDef = baseSkill.def,
+							beforeHp = baseSkill.hp,
+							beforeElemAtk = baseSkill.elemAtk,
+							beforeElemDef = baseSkill.elemDef
+						};
+						GameSection.ChangeStayEvent("DECISION", new object[4]
+						{
+							resultData2,
+							isGreat,
+							material,
+							isExceed
+						});
+						MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
+						GameSection.ResumeEvent(true, null);
+					}
+					else
+					{
+						GameSection.ResumeEvent(false, null);
+					}
+				});
 			}
 			else
 			{
-				MonoBehaviourSingleton<SmithManager>.I.SendGrowSkill(baseSkill, material, new Action<SkillItemInfo, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				MonoBehaviourSingleton<SmithManager>.I.SendGrowSkill(baseSkill, material, delegate(SkillItemInfo ret_skill_item, bool is_great)
+				{
+					if (ret_skill_item != null)
+					{
+						SmithManager.ResultData resultData = new SmithManager.ResultData
+						{
+							itemData = ret_skill_item,
+							beforeRarity = baseSkill.tableData.rarity,
+							beforeMaxLevel = baseSkill.tableData.GetMaxLv(ret_skill_item.exceedCnt),
+							beforeExceedCnt = baseSkill.exceedCnt,
+							beforeLevel = baseSkill.level,
+							beforeExp = baseSkill.exp,
+							beforeAtk = baseSkill.atk,
+							beforeDef = baseSkill.def,
+							beforeHp = baseSkill.hp,
+							beforeElemAtk = baseSkill.elemAtk,
+							beforeElemDef = baseSkill.elemDef
+						};
+						GameSection.ChangeStayEvent("DECISION", new object[4]
+						{
+							resultData,
+							is_great,
+							material,
+							isExceed
+						});
+						MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
+						GameSection.ResumeEvent(true, null);
+					}
+					else
+					{
+						GameSection.ResumeEvent(false, null);
+					}
+				});
 			}
 		}
 	}

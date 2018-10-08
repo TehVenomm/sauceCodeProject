@@ -4,9 +4,8 @@ public class HomeSceneBase : GameSection
 {
 	public override void Initialize()
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 		UILabel.OutlineLimit = false;
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -14,7 +13,7 @@ public class HomeSceneBase : GameSection
 		bool wait = true;
 		MonoBehaviourSingleton<OnceManager>.I.SendGetOnce(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator61)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CDoInitialize_003Ec__Iterator63)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
 		});
 		while (wait)
 		{

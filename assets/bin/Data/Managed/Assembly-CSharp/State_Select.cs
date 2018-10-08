@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class State_Select : State
 {
 	public override void Enter(StateMachine fsm, Brain brain)
@@ -7,7 +9,7 @@ public class State_Select : State
 	public override void Process(StateMachine fsm, Brain brain)
 	{
 		EnemyBrain enemyBrain = brain as EnemyBrain;
-		if (!(enemyBrain == null) && enemyBrain.opponentMem != null)
+		if (!((Object)enemyBrain == (Object)null) && enemyBrain.opponentMem != null)
 		{
 			enemyBrain.opponentMem.Update();
 			enemyBrain.actionCtrl.SelectAction();

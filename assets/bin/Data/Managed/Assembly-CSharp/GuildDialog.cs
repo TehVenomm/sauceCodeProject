@@ -1,22 +1,18 @@
 using Network;
-using System;
 
 public class GuildDialog : GameSection
 {
-	public unsafe void OnQuery_INVITED_LOUNGE()
+	public void OnQuery_INVITED_LOUNGE()
 	{
 		string inviteValue = MonoBehaviourSingleton<LoungeMatchingManager>.I.InviteValue;
 		if (!string.IsNullOrEmpty(inviteValue))
 		{
 			string[] array = inviteValue.Split('_');
 			GameSection.StayEvent();
-			LoungeMatchingManager i = MonoBehaviourSingleton<LoungeMatchingManager>.I;
-			string loungeNumber = array[0];
-			if (_003C_003Ef__am_0024cache0 == null)
+			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendApply(array[0], delegate(bool is_success, Error ret_code)
 			{
-				_003C_003Ef__am_0024cache0 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			i.SendApply(loungeNumber, _003C_003Ef__am_0024cache0);
+				GameSection.ResumeEvent(is_success, null);
+			});
 		}
 	}
 

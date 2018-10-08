@@ -48,7 +48,7 @@ public class PairSwordsController : IObserver, IWeaponController
 	{
 		get
 		{
-			if (owner == null)
+			if ((Object)owner == (Object)null)
 			{
 				return 0f;
 			}
@@ -56,7 +56,7 @@ public class PairSwordsController : IObserver, IWeaponController
 		}
 		set
 		{
-			if (!(owner == null))
+			if (!((Object)owner == (Object)null))
 			{
 				owner.spActionGauge[owner.weaponIndex] = value;
 			}
@@ -67,7 +67,7 @@ public class PairSwordsController : IObserver, IWeaponController
 	{
 		get
 		{
-			if (owner == null)
+			if ((Object)owner == (Object)null)
 			{
 				return 0f;
 			}
@@ -75,7 +75,7 @@ public class PairSwordsController : IObserver, IWeaponController
 		}
 		set
 		{
-			if (!(owner == null))
+			if (!((Object)owner == (Object)null))
 			{
 				owner.spActionGaugeMax[owner.weaponIndex] = value;
 			}
@@ -113,11 +113,10 @@ public class PairSwordsController : IObserver, IWeaponController
 
 	public void GetEffectTransStartShotLaser()
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<EffectManager>.IsValid() && effectTransStartShotLaser == null)
+		if (MonoBehaviourSingleton<EffectManager>.IsValid() && (Object)effectTransStartShotLaser == (Object)null)
 		{
 			effectTransStartShotLaser = EffectManager.GetEffect(pairSwordsInfo.Soul_EffectForWaitingLaser, owner._transform);
-			effectTransStartShotLaser.set_localPosition(OFFSET_LASER_WAIT_EFFECT);
+			effectTransStartShotLaser.localPosition = OFFSET_LASER_WAIT_EFFECT;
 		}
 	}
 
@@ -138,12 +137,12 @@ public class PairSwordsController : IObserver, IWeaponController
 			effectAnimatorOnWeaponList.Clear();
 			int currentWeaponElement = owner.GetCurrentWeaponElement();
 			string name = pairSwordsInfo.Soul_EffectsForWeapon[currentWeaponElement];
-			Transform val = Utility.Find(owner.FindNode("R_Wep"), name);
-			Transform val2 = Utility.Find(owner.FindNode("L_Wep"), name);
-			effectTransOnWeaponList.Add(val);
-			effectTransOnWeaponList.Add(val2);
-			effectAnimatorOnWeaponList.Add(val.GetComponent<Animator>());
-			effectAnimatorOnWeaponList.Add(val2.GetComponent<Animator>());
+			Transform transform = Utility.Find(owner.FindNode("R_Wep"), name);
+			Transform transform2 = Utility.Find(owner.FindNode("L_Wep"), name);
+			effectTransOnWeaponList.Add(transform);
+			effectTransOnWeaponList.Add(transform2);
+			effectAnimatorOnWeaponList.Add(transform.GetComponent<Animator>());
+			effectAnimatorOnWeaponList.Add(transform2.GetComponent<Animator>());
 		}
 	}
 
@@ -176,14 +175,14 @@ public class PairSwordsController : IObserver, IWeaponController
 			SetChargeState(CHARGE_STATE.NONE);
 			break;
 		}
-		timerForSpActionGaugeDecreaseAfterHit += Time.get_deltaTime();
+		timerForSpActionGaugeDecreaseAfterHit += Time.deltaTime;
 		UpdateSpActionGauge();
 		UpdateEffectOnWeapon();
 	}
 
 	private void UpdateSpActionGauge()
 	{
-		if (!(owner == null) && owner.CheckAttackMode(Player.ATTACK_MODE.PAIR_SWORDS))
+		if (!((Object)owner == (Object)null) && owner.CheckAttackMode(Player.ATTACK_MODE.PAIR_SWORDS))
 		{
 			switch (owner.spAttackType)
 			{
@@ -194,23 +193,23 @@ public class PairSwordsController : IObserver, IWeaponController
 					return;
 				}
 				float num = 1f + owner.buffParam.GetGaugeDecreaseRate();
-				owner.spActionGauge[owner.weaponIndex] -= pairSwordsInfo.boostGaugeDecreasePerSecond * num * Time.get_deltaTime();
+				owner.spActionGauge[owner.weaponIndex] -= pairSwordsInfo.boostGaugeDecreasePerSecond * num * Time.deltaTime;
 				break;
 			}
 			case SP_ATTACK_TYPE.SOUL:
 				if ((chargeState == CHARGE_STATE.LASER_SHOT || chargeState == CHARGE_STATE.LASER_LOOP) && isEventShotLaserExec)
 				{
-					spActionGauge -= pairSwordsInfo.Soul_GaugeDecreaseShootingLaserPerSecond * Time.get_deltaTime();
+					spActionGauge -= pairSwordsInfo.Soul_GaugeDecreaseShootingLaserPerSecond * Time.deltaTime;
 				}
 				else if (timerForSpActionGaugeDecreaseAfterHit >= pairSwordsInfo.Soul_TimeForGaugeDecreaseAfterHit && (!IsComboLvMax() || !(timerForSpActionGaugeDecreaseAfterHit < pairSwordsInfo.Soul_TimeForGaugeDecreaseAfterHitOnComboLvMax)))
 				{
 					if (chargeState == CHARGE_STATE.LOOP || (chargeState == CHARGE_STATE.LASER_SHOT && !isEventShotLaserExec))
 					{
-						spActionGauge -= pairSwordsInfo.Soul_GaugeDecreaseWaitingLaserPerSecond * Time.get_deltaTime();
+						spActionGauge -= pairSwordsInfo.Soul_GaugeDecreaseWaitingLaserPerSecond * Time.deltaTime;
 					}
 					else
 					{
-						spActionGauge -= pairSwordsInfo.Soul_GaugeDecreasePerSecond * Time.get_deltaTime();
+						spActionGauge -= pairSwordsInfo.Soul_GaugeDecreasePerSecond * Time.deltaTime;
 					}
 				}
 				break;
@@ -224,19 +223,13 @@ public class PairSwordsController : IObserver, IWeaponController
 
 	private void UpdateEffectOnWeapon()
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
 		if (!effectAnimatorOnWeaponList.IsNullOrEmpty())
 		{
 			for (int i = 0; i < effectAnimatorOnWeaponList.Count; i++)
 			{
-				if (!(effectAnimatorOnWeaponList[i] == null))
+				if (!((Object)effectAnimatorOnWeaponList[i] == (Object)null))
 				{
-					AnimatorStateInfo currentAnimatorStateInfo = effectAnimatorOnWeaponList[i].GetCurrentAnimatorStateInfo(0);
-					int fullPathHash = currentAnimatorStateInfo.get_fullPathHash();
+					int fullPathHash = effectAnimatorOnWeaponList[i].GetCurrentAnimatorStateInfo(0).fullPathHash;
 					if (IsComboLvMax())
 					{
 						if (fullPathHash != HASH_EFFECT_ON_WEAPON_FULL)
@@ -250,9 +243,9 @@ public class PairSwordsController : IObserver, IWeaponController
 						{
 							effectAnimatorOnWeaponList[i].Play(HASH_EFFECT_ON_WEAPON_DEFAULT);
 						}
-						Vector3 localScale = effectTransOnWeaponList[i].get_localScale();
+						Vector3 localScale = effectTransOnWeaponList[i].localScale;
 						localScale.z = GetGaugeRate();
-						effectTransOnWeaponList[i].set_localScale(localScale);
+						effectTransOnWeaponList[i].localScale = localScale;
 					}
 				}
 			}
@@ -266,12 +259,9 @@ public class PairSwordsController : IObserver, IWeaponController
 
 	public void OnLaserEnd(bool isPacket = false)
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Expected O, but got Unknown
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<EffectManager>.IsValid() && effectTransStartShotLaser != null)
+		if (MonoBehaviourSingleton<EffectManager>.IsValid() && (Object)effectTransStartShotLaser != (Object)null)
 		{
-			EffectManager.ReleaseEffect(effectTransStartShotLaser.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(effectTransStartShotLaser.gameObject, true, false);
 			effectTransStartShotLaser = null;
 		}
 		ClearLaserBullet();
@@ -287,7 +277,7 @@ public class PairSwordsController : IObserver, IWeaponController
 		isSetGaugePercentForLaser = false;
 		gaugePercentForLaser = 0f;
 		owner.EndWaitingPacket(StageObject.WAITING_PACKET.PLAYER_PAIR_SWORDS_LASER_END);
-		if (owner.playerSender != null)
+		if ((Object)owner.playerSender != (Object)null)
 		{
 			owner.playerSender.OnPairSwordsLaserEnd();
 		}
@@ -529,7 +519,7 @@ public class PairSwordsController : IObserver, IWeaponController
 		{
 			owner.ActAttack(pairSwordsInfo.Soul_SpLaserShotAttackId, true, true, string.Empty);
 			SetChargeState(CHARGE_STATE.LASER_SHOT);
-			if (owner.playerSender != null)
+			if ((Object)owner.playerSender != (Object)null)
 			{
 				owner.playerSender.OnSyncSpActionGauge();
 			}

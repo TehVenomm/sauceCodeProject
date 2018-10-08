@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class QuestRoomUserInfo
+public class QuestRoomUserInfo : MonoBehaviour
 {
 	private delegate bool TypeCondition(EQUIPMENT_TYPE type);
 
@@ -21,16 +21,8 @@ public class QuestRoomUserInfo
 
 	private Action animEndCallback;
 
-	public QuestRoomUserInfo()
-		: this()
-	{
-	}
-
 	public void LoadModel(int index, CharaInfo user_info)
 	{
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
 		if (user_info == null)
 		{
 			if (index <= 3 && index >= 0)
@@ -47,7 +39,7 @@ public class QuestRoomUserInfo
 			userInfo = user_info;
 			if (index <= 3)
 			{
-				UITexture componentInChildren = this.GetComponentInChildren<UITexture>();
+				UITexture componentInChildren = GetComponentInChildren<UITexture>();
 				if (MonoBehaviourSingleton<OutGameSettingsManager>.I.questSelect.isRightDepthForward)
 				{
 					componentInChildren.depth = index;
@@ -59,14 +51,14 @@ public class QuestRoomUserInfo
 				renderTexture = UIRenderTexture.Get(componentInChildren, -1f, false, -1);
 				renderTexture.nearClipPlane = 4f;
 				model = Utility.CreateGameObject("PlayerModel", renderTexture.modelTransform, -1);
-				model.set_localPosition(new Vector3(0f, -1.1f, 8f));
-				model.set_eulerAngles(new Vector3(0f, 180f, 0f));
-				this.StartCoroutine(Loading());
+				model.localPosition = new Vector3(0f, -1.1f, 8f);
+				model.eulerAngles = new Vector3(0f, 180f, 0f);
+				StartCoroutine(Loading());
 			}
 		}
 	}
 
-	private unsafe IEnumerator Loading()
+	private IEnumerator Loading()
 	{
 		renderTexture.enableTexture = false;
 		if (userInfo != null && userIndex >= 0)
@@ -74,23 +66,17 @@ public class QuestRoomUserInfo
 			bool is_owner = userInfo.userId == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId();
 			foreach (Transform item in model)
 			{
-				Transform t = item;
-				Object.Destroy(t.get_gameObject());
+				UnityEngine.Object.Destroy(item.gameObject);
 			}
 			PlayerLoadInfo load_info = new PlayerLoadInfo();
 			load_info.Apply(userInfo, true, true, true, true);
 			bool wait = true;
-			loader = model.get_gameObject().AddComponent<PlayerLoader>();
+			loader = model.gameObject.AddComponent<PlayerLoader>();
 			loader.StartLoad(load_info, renderTexture.renderLayer, 90, false, false, false, false, false, false, true, true, SHADER_TYPE.UI, delegate
 			{
-				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-				//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-				((_003CLoading_003Ec__Iterator11E)/*Error near IL_0168: stateMachine*/)._003Cwait_003E__4 = false;
-				float num = (((_003CLoading_003Ec__Iterator11E)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.userInfo.sex != 0) ? MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleFemale : MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleMale;
-				((_003CLoading_003Ec__Iterator11E)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.loader.get_transform().set_localScale(((_003CLoading_003Ec__Iterator11E)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.loader.get_transform().get_localScale().Mul(new Vector3(num, num, num)));
+				((_003CLoading_003Ec__Iterator120)/*Error near IL_0168: stateMachine*/)._003Cwait_003E__4 = false;
+				float num = (((_003CLoading_003Ec__Iterator120)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.userInfo.sex != 0) ? MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleFemale : MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleMale;
+				((_003CLoading_003Ec__Iterator120)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.loader.transform.localScale = ((_003CLoading_003Ec__Iterator120)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.loader.transform.localScale.Mul(new Vector3(num, num, num));
 			}, true, -1);
 			int voice_id = -1;
 			if (!is_owner)
@@ -107,7 +93,7 @@ public class QuestRoomUserInfo
 			{
 				yield return (object)null;
 			}
-			animCtrl = PlayerAnimCtrl.Get(loader.animator, PlayerAnimCtrl.battleAnims[load_info.weaponModelID / 1000], null, new Action<PlayerAnimCtrl, PLCA>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<PlayerAnimCtrl, PLCA>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			animCtrl = PlayerAnimCtrl.Get(loader.animator, PlayerAnimCtrl.battleAnims[load_info.weaponModelID / 1000], null, OnAnimChange, OnAnimEnd);
 			renderTexture.enableTexture = true;
 			if (voice_id > 0)
 			{
@@ -118,7 +104,7 @@ public class QuestRoomUserInfo
 
 	public void PlayAnim(PLCA anim)
 	{
-		if (!(animCtrl == null))
+		if (!((UnityEngine.Object)animCtrl == (UnityEngine.Object)null))
 		{
 			animCtrl.Play(anim, false);
 		}
@@ -126,18 +112,16 @@ public class QuestRoomUserInfo
 
 	private void OnAnimChange(PlayerAnimCtrl anim_ctrl, PLCA anim)
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		if (!(loader == null))
+		if (!((UnityEngine.Object)loader == (UnityEngine.Object)null))
 		{
 			bool active = anim_ctrl.IsPlaying(PlayerAnimCtrl.battleAnims);
-			if (loader.wepL != null)
+			if ((UnityEngine.Object)loader.wepL != (UnityEngine.Object)null)
 			{
-				loader.wepL.get_gameObject().SetActive(active);
+				loader.wepL.gameObject.SetActive(active);
 			}
-			if (loader.wepR != null)
+			if ((UnityEngine.Object)loader.wepR != (UnityEngine.Object)null)
 			{
-				loader.wepR.get_gameObject().SetActive(active);
+				loader.wepR.gameObject.SetActive(active);
 			}
 		}
 	}
@@ -146,7 +130,7 @@ public class QuestRoomUserInfo
 	{
 		if (animEndCallback != null)
 		{
-			animEndCallback.Invoke();
+			animEndCallback();
 		}
 	}
 
@@ -204,17 +188,16 @@ public class QuestRoomUserInfo
 
 	public void DeleteModel()
 	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		if (!AppMain.isApplicationQuit)
 		{
-			if (renderTexture != null)
+			if ((UnityEngine.Object)renderTexture != (UnityEngine.Object)null)
 			{
-				Object.DestroyImmediate(renderTexture);
+				UnityEngine.Object.DestroyImmediate(renderTexture);
 				renderTexture = null;
 			}
-			if (model != null)
+			if ((UnityEngine.Object)model != (UnityEngine.Object)null)
 			{
-				Object.Destroy(model.get_gameObject());
+				UnityEngine.Object.Destroy(model.gameObject);
 				model = null;
 				loader = null;
 				animCtrl = null;
@@ -224,11 +207,10 @@ public class QuestRoomUserInfo
 
 	public void SetOnEmotion(RoomEmotion.OnEmotion on_emotion, Action anim_end_callback, UIChatItem[] target)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		RoomEmotion roomEmotion = this.GetComponent<RoomEmotion>();
-		if (roomEmotion == null)
+		RoomEmotion roomEmotion = GetComponent<RoomEmotion>();
+		if ((UnityEngine.Object)roomEmotion == (UnityEngine.Object)null)
 		{
-			roomEmotion = this.get_gameObject().AddComponent<RoomEmotion>();
+			roomEmotion = base.gameObject.AddComponent<RoomEmotion>();
 		}
 		roomEmotion.SetChatItem(target);
 		roomEmotion.SetOnEmotion(on_emotion);

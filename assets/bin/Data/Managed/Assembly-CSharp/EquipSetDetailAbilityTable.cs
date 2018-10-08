@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -101,7 +100,7 @@ public class EquipSetDetailAbilityTable : EquipSetDetailStatusAndAbilityTable
 		base.OnNotify(flags);
 		if ((flags & NOTIFY_FLAG.PRETREAT_SCENE) != (NOTIFY_FLAG)0L)
 		{
-			UIGrid component = base.GetComponent<UIGrid>((Enum)UI.GRD_ABILITY);
+			UIGrid component = GetComponent<UIGrid>(UI.GRD_ABILITY);
 			List<Transform> childList = component.GetChildList();
 			NoEventReleaseTouchAndReleases(childList);
 			OnQuery_RELEASE_ABILITY();
@@ -110,26 +109,22 @@ public class EquipSetDetailAbilityTable : EquipSetDetailStatusAndAbilityTable
 
 	protected override void SetAbilityItemEvent(Transform t, int index)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Expected O, but got Unknown
-		SetTouchAndRelease(t.GetComponentInChildren<UIButton>().get_transform(), "ABILITY_DATA", "RELEASE_ABILITY", index);
+		SetTouchAndRelease(t.GetComponentInChildren<UIButton>().transform, "ABILITY_DATA", "RELEASE_ABILITY", index);
 	}
 
 	protected override void SetAbilityItemItemEvent(Transform t, int index)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Expected O, but got Unknown
-		SetTouchAndRelease(t.GetComponentInChildren<UIButton>().get_transform(), "ABILITY_ITEM_DATA", "RELEASE_ABILITY", index);
+		SetTouchAndRelease(t.GetComponentInChildren<UIButton>().transform, "ABILITY_ITEM_DATA", "RELEASE_ABILITY", index);
 	}
 
 	protected override void OnQuery_ABILITY_DATA()
 	{
 		int num = (int)GameSection.GetEventData();
 		EquipItemAbility ability = abilityCollection[num].ability;
-		Transform child = base.GetComponent<UIGrid>((Enum)UI.GRD_ABILITY).GetChild(num);
-		if (abilityDetailPopUp == null)
+		Transform child = GetComponent<UIGrid>(UI.GRD_ABILITY).GetChild(num);
+		if ((Object)abilityDetailPopUp == (Object)null)
 		{
-			abilityDetailPopUp = CreateAndGetAbilityDetail((Enum)UI.OBJ_DETAIL_ROOT);
+			abilityDetailPopUp = CreateAndGetAbilityDetail(UI.OBJ_DETAIL_ROOT);
 		}
 		abilityDetailPopUp.ShowAbilityDetail(child);
 		abilityDetailPopUp.SetAbilityDetailText(ability);
@@ -141,10 +136,10 @@ public class EquipSetDetailAbilityTable : EquipSetDetailStatusAndAbilityTable
 		int num = (int)GameSection.GetEventData();
 		int index = num - abilityCollection.Length;
 		AbilityItemInfo abilityItemInfo = abilityItems[index];
-		Transform child = base.GetComponent<UIGrid>((Enum)UI.GRD_ABILITY).GetChild(num);
-		if (abilityDetailPopUp == null)
+		Transform child = GetComponent<UIGrid>(UI.GRD_ABILITY).GetChild(num);
+		if ((Object)abilityDetailPopUp == (Object)null)
 		{
-			abilityDetailPopUp = CreateAndGetAbilityDetail((Enum)UI.OBJ_DETAIL_ROOT);
+			abilityDetailPopUp = CreateAndGetAbilityDetail(UI.OBJ_DETAIL_ROOT);
 		}
 		abilityDetailPopUp.ShowAbilityDetail(child);
 		abilityDetailPopUp.SetAbilityDetailText(abilityItemInfo.GetName(), string.Empty, abilityItemInfo.GetDescription());
@@ -153,7 +148,7 @@ public class EquipSetDetailAbilityTable : EquipSetDetailStatusAndAbilityTable
 
 	protected void OnQuery_RELEASE_ABILITY()
 	{
-		if (!(abilityDetailPopUp == null))
+		if (!((Object)abilityDetailPopUp == (Object)null))
 		{
 			abilityDetailPopUp.Hide();
 			GameSection.StopEvent();
@@ -162,9 +157,9 @@ public class EquipSetDetailAbilityTable : EquipSetDetailStatusAndAbilityTable
 
 	protected override void PreCacheAbilityDetail(string name, string ap, string desc)
 	{
-		if (abilityDetailPopUp == null)
+		if ((Object)abilityDetailPopUp == (Object)null)
 		{
-			abilityDetailPopUp = CreateAndGetAbilityDetail((Enum)UI.OBJ_DETAIL_ROOT);
+			abilityDetailPopUp = CreateAndGetAbilityDetail(UI.OBJ_DETAIL_ROOT);
 		}
 		abilityDetailPopUp.PreCacheAbilityDetail(name, ap, desc);
 	}

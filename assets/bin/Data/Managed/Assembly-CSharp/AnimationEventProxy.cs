@@ -1,4 +1,6 @@
-public class AnimationEventProxy
+using UnityEngine;
+
+public class AnimationEventProxy : MonoBehaviour
 {
 	public interface IEvent
 	{
@@ -10,11 +12,6 @@ public class AnimationEventProxy
 	}
 
 	public IEvent listener;
-
-	public AnimationEventProxy()
-		: this()
-	{
-	}
 
 	private void OnEvent()
 	{

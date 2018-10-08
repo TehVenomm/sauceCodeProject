@@ -33,30 +33,62 @@ public class QuestExploreSearchListSelect : QuestSearchListSelectBase
 		base.Initialize();
 	}
 
-	protected unsafe override void SendSearchRequest(Action onFinish, Action<bool> cb)
+	protected override void SendSearchRequest(Action onFinish, Action<bool> cb)
 	{
-		_003CSendSearchRequest_003Ec__AnonStorey3ED _003CSendSearchRequest_003Ec__AnonStorey3ED;
-		MonoBehaviourSingleton<PartyManager>.I.SendEventSearch(eventId, new Action<bool, Error>((object)_003CSendSearchRequest_003Ec__AnonStorey3ED, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<PartyManager>.I.SendEventSearch(eventId, delegate(bool is_success, Error err)
+		{
+			onFinish();
+			if (!is_success && base.isInitialized)
+			{
+				if (err == Error.WRN_PARTY_SEARCH_NOT_FOUND_QUEST)
+				{
+					GameSection.ChangeStayEvent("NOT_FOUND_QUEST", null);
+					if (cb != null)
+					{
+						cb(true);
+					}
+				}
+			}
+			else if (cb != null)
+			{
+				cb(is_success);
+			}
+		});
 	}
 
 	protected override void ResetSearchRequest()
 	{
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
 		if (!PartyManager.IsValidNotEmptyList())
 		{
-			SetActive((Enum)UI.GRD_QUEST, false);
-			SetActive((Enum)UI.STR_NON_LIST, true);
+			SetActive(UI.GRD_QUEST, false);
+			SetActive(UI.STR_NON_LIST, true);
 		}
 		else
 		{
 			PartyModel.Party[] partys = MonoBehaviourSingleton<PartyManager>.I.partys.ToArray();
-			SetActive((Enum)UI.GRD_QUEST, true);
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			_003CUpdateUI_003Ec__AnonStorey3EE _003CUpdateUI_003Ec__AnonStorey3EE;
-			SetGrid(UI.GRD_QUEST, "QuestExploreSearchListSelectItem", partys.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3EE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetActive(UI.GRD_QUEST, true);
+			SetActive(UI.STR_NON_LIST, false);
+			SetGrid(UI.GRD_QUEST, "QuestExploreSearchListSelectItem", partys.Length, false, delegate(int i, Transform t, bool is_recycle)
+			{
+				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)partys[i].quest.explore.mainQuestId);
+				if (questData == null)
+				{
+					SetActive(t, false);
+				}
+				else
+				{
+					SetEvent(t, "SELECT_ROOM", i);
+					SetQuestData(questData, t);
+					SetPartyData(partys[i], t);
+					SetDeliveryData(questData.questID, t);
+					SetStatusIconInfo(partys[i], t);
+					SetMemberIcon(t, questData);
+				}
+			});
 			base.UpdateUI();
 		}
 	}

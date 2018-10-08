@@ -1,5 +1,5 @@
-using System;
 using System.Linq;
+using UnityEngine;
 
 public class QuestRoomSettings : GameSection
 {
@@ -34,13 +34,13 @@ public class QuestRoomSettings : GameSection
 		MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(null);
 		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
 		{
-			SetActive((Enum)UI.OBJ_LOCK_LOUNGE, true);
-			SetActive((Enum)UI.OBJ_LOCK, false);
+			SetActive(UI.OBJ_LOCK_LOUNGE, true);
+			SetActive(UI.OBJ_LOCK, false);
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_LOCK_LOUNGE, false);
-			SetActive((Enum)UI.OBJ_LOCK, true);
+			SetActive(UI.OBJ_LOCK_LOUNGE, false);
+			SetActive(UI.OBJ_LOCK, true);
 		}
 		base.Initialize();
 	}
@@ -55,21 +55,21 @@ public class QuestRoomSettings : GameSection
 	{
 		if (setting.level > 0)
 		{
-			SetActive((Enum)UI.STR_NON_CONDITION_TOTAL, false);
-			SetActive((Enum)UI.LBL_LEVEL, true);
-			SetLabelText((Enum)UI.LBL_LEVEL, setting.level.ToString());
+			SetActive(UI.STR_NON_CONDITION_TOTAL, false);
+			SetActive(UI.LBL_LEVEL, true);
+			SetLabelText(UI.LBL_LEVEL, setting.level.ToString());
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_LEVEL, false);
-			SetActive((Enum)UI.STR_NON_CONDITION_TOTAL, true);
+			SetActive(UI.LBL_LEVEL, false);
+			SetActive(UI.STR_NON_CONDITION_TOTAL, true);
 		}
 	}
 
 	private void UpdateSelectFrame()
 	{
-		QuestRoomSettingsOption component = base.GetComponent<QuestRoomSettingsOption>((Enum)UI.OBJ_OPTION);
-		if (component != null)
+		QuestRoomSettingsOption component = GetComponent<QuestRoomSettingsOption>(UI.OBJ_OPTION);
+		if ((Object)component != (Object)null)
 		{
 			component.SetShowOption(true);
 		}
@@ -117,14 +117,13 @@ public class QuestRoomSettings : GameSection
 		}
 	}
 
-	private unsafe void OnQuery_CoopServerInvalidConfirm_YES()
+	private void OnQuery_CoopServerInvalidConfirm_YES()
 	{
 		GameSection.StayEvent();
-		if (_003C_003Ef__am_0024cache3 == null)
+		CoopApp.EnterQuestOffline(delegate(bool is_m, bool is_c, bool is_r, bool is_s)
 		{
-			_003C_003Ef__am_0024cache3 = new Action<bool, bool, bool, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		CoopApp.EnterQuestOffline(_003C_003Ef__am_0024cache3);
+			GameSection.ResumeEvent(is_s, null);
+		});
 	}
 
 	private void OnQuery_CLOSE()

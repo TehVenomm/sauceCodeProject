@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace BestHTTP.Extensions
@@ -10,17 +9,13 @@ namespace BestHTTP.Extensions
 			base.Values = ParseQuotedHeader(headerValue).AsReadOnly();
 		}
 
-		private unsafe List<KeyValuePair> ParseQuotedHeader(string str)
+		private List<KeyValuePair> ParseQuotedHeader(string str)
 		{
 			List<KeyValuePair> list = new List<KeyValuePair>();
 			if (str != null)
 			{
 				int pos = 0;
-				if (_003C_003Ef__am_0024cache0 == null)
-				{
-					_003C_003Ef__am_0024cache0 = new Func<char, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-				}
-				string key = str.Read(ref pos, _003C_003Ef__am_0024cache0, true).TrimAndLower();
+				string key = str.Read(ref pos, (char ch) => !char.IsWhiteSpace(ch) && !char.IsControl(ch), true).TrimAndLower();
 				list.Add(new KeyValuePair(key));
 				while (pos < str.Length)
 				{

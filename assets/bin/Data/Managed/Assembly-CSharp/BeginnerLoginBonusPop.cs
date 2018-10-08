@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -37,10 +36,9 @@ public class BeginnerLoginBonusPop : GameSection
 
 	public override void Initialize()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		SetFullScreenButton((Enum)UI.BTN_SKIP_FULL_SCREEN);
-		InitTween((Enum)UI.OBJ_IMG_ROOT);
-		this.StartCoroutine(DoInitialize());
+		SetFullScreenButton(UI.BTN_SKIP_FULL_SCREEN);
+		InitTween(UI.OBJ_IMG_ROOT);
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -54,7 +52,7 @@ public class BeginnerLoginBonusPop : GameSection
 		{
 			yield return (object)loadQueue.Wait();
 		}
-		if (lo_image.loadedObject == null)
+		if (lo_image.loadedObject == (Object)null)
 		{
 			yield return (object)null;
 		}
@@ -66,24 +64,21 @@ public class BeginnerLoginBonusPop : GameSection
 
 	private void Update()
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 		if (!stateInitialized)
 		{
 			switch (currentState)
 			{
 			case State.START:
-				this.StartCoroutine(StartAnimation());
+				StartCoroutine(StartAnimation());
 				stateInitialized = true;
 				break;
 			case State.SHOW:
 				showTimer = 0f;
-				this.StartCoroutine(ShowCountdown());
+				StartCoroutine(ShowCountdown());
 				stateInitialized = true;
 				break;
 			case State.END:
-				this.StartCoroutine(EndAnimation());
+				StartCoroutine(EndAnimation());
 				stateInitialized = true;
 				break;
 			}
@@ -98,12 +93,12 @@ public class BeginnerLoginBonusPop : GameSection
 
 	private IEnumerator StartAnimation()
 	{
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, false);
+		SetActive(UI.BTN_SKIP_FULL_SCREEN, false);
 		bool wait = true;
 		PlayAudio(AUDIO.START, 1.3f, false);
-		PlayTween((Enum)UI.OBJ_IMG_ROOT, true, (EventDelegate.Callback)delegate
+		PlayTween(UI.OBJ_IMG_ROOT, true, delegate
 		{
-			((_003CStartAnimation_003Ec__Iterator80)/*Error near IL_0062: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CStartAnimation_003Ec__Iterator82)/*Error near IL_0062: stateMachine*/)._003Cwait_003E__0 = false;
 		}, true, 0);
 		while (wait)
 		{
@@ -118,10 +113,10 @@ public class BeginnerLoginBonusPop : GameSection
 		Transform skip = GetCtrl(UI.BTN_SKIP_FULL_SCREEN);
 		while (wait)
 		{
-			showTimer += Time.get_deltaTime();
-			if (1.2f < showTimer && !skip.get_gameObject().get_activeSelf())
+			showTimer += Time.deltaTime;
+			if (1.2f < showTimer && !skip.gameObject.activeSelf)
 			{
-				SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, true);
+				SetActive(UI.BTN_SKIP_FULL_SCREEN, true);
 			}
 			if (skipRequest && 1.2f < showTimer)
 			{
@@ -135,9 +130,9 @@ public class BeginnerLoginBonusPop : GameSection
 	private IEnumerator EndAnimation()
 	{
 		bool wait = true;
-		PlayTween((Enum)UI.OBJ_IMG_ROOT, false, (EventDelegate.Callback)delegate
+		PlayTween(UI.OBJ_IMG_ROOT, false, delegate
 		{
-			((_003CEndAnimation_003Ec__Iterator82)/*Error near IL_0035: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CEndAnimation_003Ec__Iterator84)/*Error near IL_0035: stateMachine*/)._003Cwait_003E__0 = false;
 		}, true, 0);
 		while (wait)
 		{

@@ -4,7 +4,7 @@ using UnityEngine;
 
 [AddComponentMenu("NGUI/UI/NGUI Font")]
 [ExecuteInEditMode]
-public class UIFont
+public class UIFont : MonoBehaviour
 {
 	[SerializeField]
 	[HideInInspector]
@@ -14,8 +14,8 @@ public class UIFont
 	[SerializeField]
 	private Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private BMFont mFont = new BMFont();
 
 	[SerializeField]
@@ -30,12 +30,12 @@ public class UIFont
 	[SerializeField]
 	private List<BMSymbol> mSymbols = new List<BMSymbol>();
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Font mDynamicFont;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private int mDynamicFontSize = 16;
 
 	[SerializeField]
@@ -53,11 +53,11 @@ public class UIFont
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? mFont : mReplacement.bmFont;
+			return (!((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)) ? mFont : mReplacement.bmFont;
 		}
 		set
 		{
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				mReplacement.bmFont = value;
 			}
@@ -72,11 +72,11 @@ public class UIFont
 	{
 		get
 		{
-			return (mReplacement != null) ? mReplacement.texWidth : ((mFont == null) ? 1 : mFont.texWidth);
+			return ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null) ? mReplacement.texWidth : ((mFont == null) ? 1 : mFont.texWidth);
 		}
 		set
 		{
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				mReplacement.texWidth = value;
 			}
@@ -91,11 +91,11 @@ public class UIFont
 	{
 		get
 		{
-			return (mReplacement != null) ? mReplacement.texHeight : ((mFont == null) ? 1 : mFont.texHeight);
+			return ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null) ? mReplacement.texHeight : ((mFont == null) ? 1 : mFont.texHeight);
 		}
 		set
 		{
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				mReplacement.texHeight = value;
 			}
@@ -106,29 +106,27 @@ public class UIFont
 		}
 	}
 
-	public bool hasSymbols => (mReplacement != null) ? mReplacement.hasSymbols : (mSymbols != null && mSymbols.Count != 0);
+	public bool hasSymbols => ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null) ? mReplacement.hasSymbols : (mSymbols != null && mSymbols.Count != 0);
 
-	public List<BMSymbol> symbols => (!(mReplacement != null)) ? mSymbols : mReplacement.symbols;
+	public List<BMSymbol> symbols => (!((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)) ? mSymbols : mReplacement.symbols;
 
 	public UIAtlas atlas
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? mAtlas : mReplacement.atlas;
+			return (!((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)) ? mAtlas : mReplacement.atlas;
 		}
 		set
 		{
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				mReplacement.atlas = value;
 			}
-			else if (mAtlas != value)
+			else if ((UnityEngine.Object)mAtlas != (UnityEngine.Object)value)
 			{
 				mPMA = -1;
 				mAtlas = value;
-				if (mAtlas != null)
+				if ((UnityEngine.Object)mAtlas != (UnityEngine.Object)null)
 				{
 					mMat = mAtlas.spriteMaterial;
 					if (sprite != null)
@@ -145,40 +143,35 @@ public class UIFont
 	{
 		get
 		{
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Expected O, but got Unknown
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				return mReplacement.material;
 			}
-			if (mAtlas != null)
+			if ((UnityEngine.Object)mAtlas != (UnityEngine.Object)null)
 			{
 				return mAtlas.spriteMaterial;
 			}
-			if (mMat != null)
+			if ((UnityEngine.Object)mMat != (UnityEngine.Object)null)
 			{
-				if (mDynamicFont != null && mMat != mDynamicFont.get_material())
+				if ((UnityEngine.Object)mDynamicFont != (UnityEngine.Object)null && (UnityEngine.Object)mMat != (UnityEngine.Object)mDynamicFont.material)
 				{
-					mMat.set_mainTexture(mDynamicFont.get_material().get_mainTexture());
+					mMat.mainTexture = mDynamicFont.material.mainTexture;
 				}
 				return mMat;
 			}
-			if (mDynamicFont != null)
+			if ((UnityEngine.Object)mDynamicFont != (UnityEngine.Object)null)
 			{
-				return mDynamicFont.get_material();
+				return mDynamicFont.material;
 			}
 			return null;
 		}
 		set
 		{
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				mReplacement.material = value;
 			}
-			else if (mMat != value)
+			else if ((UnityEngine.Object)mMat != (UnityEngine.Object)value)
 			{
 				mPMA = -1;
 				mMat = value;
@@ -200,20 +193,18 @@ public class UIFont
 	{
 		get
 		{
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				return mReplacement.premultipliedAlphaShader;
 			}
-			if (mAtlas != null)
+			if ((UnityEngine.Object)mAtlas != (UnityEngine.Object)null)
 			{
 				return mAtlas.premultipliedAlpha;
 			}
 			if (mPMA == -1)
 			{
 				Material material = this.material;
-				mPMA = ((material != null && material.get_shader() != null && material.get_shader().get_name().Contains("Premultiplied")) ? 1 : 0);
+				mPMA = (((UnityEngine.Object)material != (UnityEngine.Object)null && (UnityEngine.Object)material.shader != (UnityEngine.Object)null && material.shader.name.Contains("Premultiplied")) ? 1 : 0);
 			}
 			return mPMA == 1;
 		}
@@ -223,20 +214,18 @@ public class UIFont
 	{
 		get
 		{
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				return mReplacement.packedFontShader;
 			}
-			if (mAtlas != null)
+			if ((UnityEngine.Object)mAtlas != (UnityEngine.Object)null)
 			{
 				return false;
 			}
 			if (mPacked == -1)
 			{
 				Material material = this.material;
-				mPacked = ((material != null && material.get_shader() != null && material.get_shader().get_name().Contains("Packed")) ? 1 : 0);
+				mPacked = (((UnityEngine.Object)material != (UnityEngine.Object)null && (UnityEngine.Object)material.shader != (UnityEngine.Object)null && material.shader.name.Contains("Packed")) ? 1 : 0);
 			}
 			return mPacked == 1;
 		}
@@ -246,14 +235,12 @@ public class UIFont
 	{
 		get
 		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Expected O, but got Unknown
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				return mReplacement.texture;
 			}
 			Material material = this.material;
-			return (!(material != null)) ? null : (material.get_mainTexture() as Texture2D);
+			return (!((UnityEngine.Object)material != (UnityEngine.Object)null)) ? null : (material.mainTexture as Texture2D);
 		}
 	}
 
@@ -261,23 +248,15 @@ public class UIFont
 	{
 		get
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				return mReplacement.uvRect;
 			}
-			return (!(mAtlas != null) || sprite == null) ? new Rect(0f, 0f, 1f, 1f) : mUVRect;
+			return (!((UnityEngine.Object)mAtlas != (UnityEngine.Object)null) || sprite == null) ? new Rect(0f, 0f, 1f, 1f) : mUVRect;
 		}
 		set
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				mReplacement.uvRect = value;
 			}
@@ -293,11 +272,11 @@ public class UIFont
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? mFont.spriteName : mReplacement.spriteName;
+			return (!((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)) ? mFont.spriteName : mReplacement.spriteName;
 		}
 		set
 		{
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				mReplacement.spriteName = value;
 			}
@@ -309,7 +288,7 @@ public class UIFont
 		}
 	}
 
-	public bool isValid => mDynamicFont != null || mFont.isValid;
+	public bool isValid => (UnityEngine.Object)mDynamicFont != (UnityEngine.Object)null || mFont.isValid;
 
 	[Obsolete("Use UIFont.defaultSize instead")]
 	public int size
@@ -328,7 +307,7 @@ public class UIFont
 	{
 		get
 		{
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				return mReplacement.defaultSize;
 			}
@@ -340,7 +319,7 @@ public class UIFont
 		}
 		set
 		{
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				mReplacement.defaultSize = value;
 			}
@@ -355,16 +334,16 @@ public class UIFont
 	{
 		get
 		{
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				return mReplacement.sprite;
 			}
-			if (mSprite == null && mAtlas != null && !string.IsNullOrEmpty(mFont.spriteName))
+			if (mSprite == null && (UnityEngine.Object)mAtlas != (UnityEngine.Object)null && !string.IsNullOrEmpty(mFont.spriteName))
 			{
 				mSprite = mAtlas.GetSprite(mFont.spriteName);
 				if (mSprite == null)
 				{
-					mSprite = mAtlas.GetSprite(this.get_name());
+					mSprite = mAtlas.GetSprite(base.name);
 				}
 				if (mSprite == null)
 				{
@@ -393,22 +372,22 @@ public class UIFont
 		set
 		{
 			UIFont uIFont = value;
-			if (uIFont == this)
+			if ((UnityEngine.Object)uIFont == (UnityEngine.Object)this)
 			{
 				uIFont = null;
 			}
-			if (mReplacement != uIFont)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)uIFont)
 			{
-				if (uIFont != null && uIFont.replacement == this)
+				if ((UnityEngine.Object)uIFont != (UnityEngine.Object)null && (UnityEngine.Object)uIFont.replacement == (UnityEngine.Object)this)
 				{
 					uIFont.replacement = null;
 				}
-				if (mReplacement != null)
+				if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 				{
 					MarkAsChanged();
 				}
 				mReplacement = uIFont;
-				if (uIFont != null)
+				if ((UnityEngine.Object)uIFont != (UnityEngine.Object)null)
 				{
 					mPMA = -1;
 					mMat = null;
@@ -420,23 +399,23 @@ public class UIFont
 		}
 	}
 
-	public bool isDynamic => (!(mReplacement != null)) ? (mDynamicFont != null) : mReplacement.isDynamic;
+	public bool isDynamic => (!((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)) ? ((UnityEngine.Object)mDynamicFont != (UnityEngine.Object)null) : mReplacement.isDynamic;
 
 	public Font dynamicFont
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? ((object)mDynamicFont) : ((object)mReplacement.dynamicFont);
+			return (!((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)) ? mDynamicFont : mReplacement.dynamicFont;
 		}
 		set
 		{
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				mReplacement.dynamicFont = value;
 			}
-			else if (mDynamicFont != value)
+			else if ((UnityEngine.Object)mDynamicFont != (UnityEngine.Object)value)
 			{
-				if (mDynamicFont != null)
+				if ((UnityEngine.Object)mDynamicFont != (UnityEngine.Object)null)
 				{
 					material = null;
 				}
@@ -450,18 +429,11 @@ public class UIFont
 	{
 		get
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			return (!(mReplacement != null)) ? mDynamicFontStyle : mReplacement.dynamicFontStyle;
+			return (!((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)) ? mDynamicFontStyle : mReplacement.dynamicFontStyle;
 		}
 		set
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			if (mReplacement != null)
+			if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 			{
 				mReplacement.dynamicFontStyle = value;
 			}
@@ -477,78 +449,62 @@ public class UIFont
 	{
 		get
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Expected O, but got Unknown
-			if (Object.op_Implicit(mReplacement))
+			if ((bool)mReplacement)
 			{
 				return mReplacement.dynamicTexture;
 			}
 			if (isDynamic)
 			{
-				return mDynamicFont.get_material().get_mainTexture();
+				return mDynamicFont.material.mainTexture;
 			}
 			return null;
 		}
 	}
 
-	public UIFont()
-		: this()
-	{
-	}//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-	//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-
-
 	private void Trim()
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		Texture texture = mAtlas.texture;
-		if (texture != null && mSprite != null)
+		if ((UnityEngine.Object)texture != (UnityEngine.Object)null && mSprite != null)
 		{
-			Rect val = NGUIMath.ConvertToPixels(mUVRect, this.texture.get_width(), this.texture.get_height(), true);
-			Rect val2 = default(Rect);
-			val2._002Ector((float)mSprite.x, (float)mSprite.y, (float)mSprite.width, (float)mSprite.height);
-			int xMin = Mathf.RoundToInt(val2.get_xMin() - val.get_xMin());
-			int yMin = Mathf.RoundToInt(val2.get_yMin() - val.get_yMin());
-			int xMax = Mathf.RoundToInt(val2.get_xMax() - val.get_xMin());
-			int yMax = Mathf.RoundToInt(val2.get_yMax() - val.get_yMin());
+			Rect rect = NGUIMath.ConvertToPixels(mUVRect, this.texture.width, this.texture.height, true);
+			Rect rect2 = new Rect((float)mSprite.x, (float)mSprite.y, (float)mSprite.width, (float)mSprite.height);
+			int xMin = Mathf.RoundToInt(rect2.xMin - rect.xMin);
+			int yMin = Mathf.RoundToInt(rect2.yMin - rect.yMin);
+			int xMax = Mathf.RoundToInt(rect2.xMax - rect.xMin);
+			int yMax = Mathf.RoundToInt(rect2.yMax - rect.yMin);
 			mFont.Trim(xMin, yMin, xMax, yMax);
 		}
 	}
 
 	private bool References(UIFont font)
 	{
-		if (font == null)
+		if ((UnityEngine.Object)font == (UnityEngine.Object)null)
 		{
 			return false;
 		}
-		if (font == this)
+		if ((UnityEngine.Object)font == (UnityEngine.Object)this)
 		{
 			return true;
 		}
-		return mReplacement != null && mReplacement.References(font);
+		return (UnityEngine.Object)mReplacement != (UnityEngine.Object)null && mReplacement.References(font);
 	}
 
 	public static bool CheckIfRelated(UIFont a, UIFont b)
 	{
-		if (a == null || b == null)
+		if ((UnityEngine.Object)a == (UnityEngine.Object)null || (UnityEngine.Object)b == (UnityEngine.Object)null)
 		{
 			return false;
 		}
-		if (a.isDynamic && b.isDynamic && a.dynamicFont.get_fontNames()[0] == b.dynamicFont.get_fontNames()[0])
+		if (a.isDynamic && b.isDynamic && a.dynamicFont.fontNames[0] == b.dynamicFont.fontNames[0])
 		{
 			return true;
 		}
-		return a == b || a.References(b) || b.References(a);
+		return (UnityEngine.Object)a == (UnityEngine.Object)b || a.References(b) || b.References(a);
 	}
 
 	public void MarkAsChanged()
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Expected O, but got Unknown
-		if (mReplacement != null)
+		if ((UnityEngine.Object)mReplacement != (UnityEngine.Object)null)
 		{
 			mReplacement.MarkAsChanged();
 		}
@@ -558,7 +514,7 @@ public class UIFont
 		for (int num = array.Length; i < num; i++)
 		{
 			UILabel uILabel = array[i];
-			if (uILabel.get_enabled() && NGUITools.GetActive(uILabel.get_gameObject()) && CheckIfRelated(this, uILabel.bitmapFont))
+			if (uILabel.enabled && NGUITools.GetActive(uILabel.gameObject) && CheckIfRelated(this, uILabel.bitmapFont))
 			{
 				UIFont bitmapFont = uILabel.bitmapFont;
 				uILabel.bitmapFont = null;
@@ -574,18 +530,13 @@ public class UIFont
 
 	public void UpdateUVRect()
 	{
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		if (!(mAtlas == null))
+		if (!((UnityEngine.Object)mAtlas == (UnityEngine.Object)null))
 		{
 			Texture texture = mAtlas.texture;
-			if (texture != null)
+			if ((UnityEngine.Object)texture != (UnityEngine.Object)null)
 			{
 				mUVRect = new Rect((float)(mSprite.x - mSprite.paddingLeft), (float)(mSprite.y - mSprite.paddingTop), (float)(mSprite.width + mSprite.paddingLeft + mSprite.paddingRight), (float)(mSprite.height + mSprite.paddingTop + mSprite.paddingBottom));
-				mUVRect = NGUIMath.ConvertToTexCoords(mUVRect, texture.get_width(), texture.get_height());
+				mUVRect = NGUIMath.ConvertToTexCoords(mUVRect, texture.width, texture.height);
 				if (mSprite.hasPadding)
 				{
 					Trim();

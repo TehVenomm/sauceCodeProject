@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StageObjectRader
+public class StageObjectRader : MonoBehaviour
 {
 	public class CatchStageObject
 	{
@@ -42,76 +42,65 @@ public class StageObjectRader
 		protected set;
 	}
 
-	public StageObjectRader()
-		: this()
-	{
-	}
-
 	protected virtual void Awake()
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 		objects = new List<CatchStageObject>();
-		_transform = this.get_transform();
-		_rigidbody = this.GetComponent<Rigidbody>();
-		_collider = this.GetComponent<Collider>();
-		if (_collider == null)
+		_transform = base.transform;
+		_rigidbody = GetComponent<Rigidbody>();
+		_collider = GetComponent<Collider>();
+		if ((Object)_collider == (Object)null)
 		{
-			SphereCollider val = this.get_gameObject().AddComponent<SphereCollider>();
-			val.set_center(new Vector3(0f, 0f, 0f));
-			_collider = val;
+			SphereCollider sphereCollider = base.gameObject.AddComponent<SphereCollider>();
+			sphereCollider.center = new Vector3(0f, 0f, 0f);
+			_collider = sphereCollider;
 		}
-		if (_collider != null)
+		if ((Object)_collider != (Object)null)
 		{
-			_collider.set_isTrigger(true);
-			if (_rigidbody == null)
+			_collider.isTrigger = true;
+			if ((Object)_rigidbody == (Object)null)
 			{
-				_rigidbody = this.get_gameObject().AddComponent<Rigidbody>();
+				_rigidbody = base.gameObject.AddComponent<Rigidbody>();
 			}
-			_rigidbody.set_isKinematic(true);
+			_rigidbody.isKinematic = true;
 		}
 	}
 
 	protected virtual void Start()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		stageObject = this.get_gameObject().GetComponentInParent<StageObject>();
+		stageObject = base.gameObject.GetComponentInParent<StageObject>();
 	}
 
 	public void SetRadius(float radius)
 	{
-		SphereCollider val = _collider as SphereCollider;
-		if (val != null)
+		SphereCollider sphereCollider = _collider as SphereCollider;
+		if ((Object)sphereCollider != (Object)null)
 		{
-			val.set_radius(radius);
+			sphereCollider.radius = radius;
 		}
 	}
 
 	public CatchStageObject Find(Collider collider)
 	{
 		RemoveFromDestroyedCollider();
-		return objects.Find((CatchStageObject o) => o.collider == collider);
+		return objects.Find((CatchStageObject o) => (Object)o.collider == (Object)collider);
 	}
 
 	public Enemy FindEnemy()
 	{
 		RemoveFromDestroyedCollider();
-		CatchStageObject catchStageObject = objects.Find((CatchStageObject o) => o.obj is Enemy && o.collider != null && o.bullet == null);
+		CatchStageObject catchStageObject = objects.Find((CatchStageObject o) => o.obj is Enemy && (Object)o.collider != (Object)null && (Object)o.bullet == (Object)null);
 		return (catchStageObject == null) ? null : (catchStageObject.obj as Enemy);
 	}
 
 	public BulletObject FindEnemyBullet()
 	{
 		RemoveFromDestroyedCollider();
-		return objects.Find((CatchStageObject o) => o.obj is Enemy && o.collider != null && o.bullet != null)?.bullet;
+		return objects.Find((CatchStageObject o) => o.obj is Enemy && (Object)o.collider != (Object)null && (Object)o.bullet != (Object)null)?.bullet;
 	}
 
 	protected virtual void RemoveFromDestroyedCollider()
 	{
-		objects.RemoveAll((CatchStageObject o) => o.collider == null);
+		objects.RemoveAll((CatchStageObject o) => (Object)o.collider == (Object)null);
 	}
 
 	protected virtual void Add(StageObject obj, Collider collider, BulletObject bullet)
@@ -139,27 +128,23 @@ public class StageObjectRader
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		if (!(_collider == null) && _collider.get_enabled() && !(this.stageObject == null) && !(collider.get_gameObject() == this.get_gameObject()))
+		if (!((Object)_collider == (Object)null) && _collider.enabled && !((Object)this.stageObject == (Object)null) && !((Object)collider.gameObject == (Object)base.gameObject))
 		{
 			StageObject stageObject = null;
-			BulletObject component = collider.get_gameObject().GetComponent<BulletObject>();
-			if (component != null)
+			BulletObject component = collider.gameObject.GetComponent<BulletObject>();
+			if ((Object)component != (Object)null)
 			{
 				stageObject = component.stageObject;
 			}
 			else
 			{
-				if (collider.get_isTrigger())
+				if (collider.isTrigger)
 				{
 					return;
 				}
-				stageObject = collider.get_gameObject().GetComponentInParent<StageObject>();
+				stageObject = collider.gameObject.GetComponentInParent<StageObject>();
 			}
-			if (!(stageObject == null) && !(stageObject == this.stageObject))
+			if (!((Object)stageObject == (Object)null) && !((Object)stageObject == (Object)this.stageObject))
 			{
 				Add(stageObject, collider, component);
 			}
@@ -168,13 +153,10 @@ public class StageObjectRader
 
 	private void OnTriggerExit(Collider collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		if (!(collider.get_gameObject() == this.get_gameObject()))
+		if (!((Object)collider.gameObject == (Object)base.gameObject))
 		{
-			StageObject componentInParent = collider.get_gameObject().GetComponentInParent<StageObject>();
-			if (!(componentInParent == null))
+			StageObject componentInParent = collider.gameObject.GetComponentInParent<StageObject>();
+			if (!((Object)componentInParent == (Object)null))
 			{
 				Remove(collider);
 			}

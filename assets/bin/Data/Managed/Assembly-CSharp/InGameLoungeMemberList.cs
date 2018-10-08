@@ -53,18 +53,21 @@ public class InGameLoungeMemberList : GameSection
 		base.Initialize();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
 		int count = memberInfo.Count;
 		if (count <= 0)
 		{
-			SetActive((Enum)UI.GRD_LIST, false);
-			SetActive((Enum)UI.STR_NON_LIST, true);
+			SetActive(UI.GRD_LIST, false);
+			SetActive(UI.STR_NON_LIST, true);
 		}
 		else
 		{
-			SetGrid(UI.GRD_LIST, "InGameLoungeMemberListItem", count, false, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-			SetActive((Enum)UI.STR_NON_LIST, false);
+			SetGrid(UI.GRD_LIST, "InGameLoungeMemberListItem", count, false, delegate(int i, Transform t, bool isRecycle)
+			{
+				SetupListItem(memberInfo[i], i, t);
+			});
+			SetActive(UI.STR_NON_LIST, false);
 		}
 	}
 
@@ -103,51 +106,39 @@ public class InGameLoungeMemberList : GameSection
 		}
 	}
 
-	private unsafe void OnScreenRotate(bool is_portrait)
+	private void OnScreenRotate(bool is_portrait)
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0185: Expected O, but got Unknown
-		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018f: Expected O, but got Unknown
 		UIPanel panel = GetCtrl(UI.SCR_LIST).GetComponent<UIPanel>();
 		Vector4 baseClipRegion = panel.baseClipRegion;
 		if (is_portrait)
 		{
-			Vector3 localPosition = GetCtrl(UI.PORTRAIT_FRAME).get_localPosition();
+			Vector3 localPosition = GetCtrl(UI.PORTRAIT_FRAME).localPosition;
 			int height = GetHeight(UI.PORTRAIT_FRAME);
-			GetCtrl(UI.FRAME).set_localPosition(localPosition);
-			SetHeight((Enum)UI.FRAME, height);
-			GetCtrl(UI.SCR_LIST).set_parent(GetCtrl(UI.PORTRAIT_LIST));
+			GetCtrl(UI.FRAME).localPosition = localPosition;
+			SetHeight(UI.FRAME, height);
+			GetCtrl(UI.SCR_LIST).parent = GetCtrl(UI.PORTRAIT_LIST);
 			baseClipRegion.w = (float)GetHeight(UI.PORTRAIT_LIST);
 		}
 		else
 		{
-			Vector3 localPosition2 = GetCtrl(UI.LANDSCAPE_FRAME).get_localPosition();
+			Vector3 localPosition2 = GetCtrl(UI.LANDSCAPE_FRAME).localPosition;
 			int height2 = GetHeight(UI.LANDSCAPE_FRAME);
-			GetCtrl(UI.FRAME).set_localPosition(localPosition2);
-			SetHeight((Enum)UI.FRAME, height2);
-			GetCtrl(UI.SCR_LIST).set_parent(GetCtrl(UI.LANDSCAPE_LIST));
+			GetCtrl(UI.FRAME).localPosition = localPosition2;
+			SetHeight(UI.FRAME, height2);
+			GetCtrl(UI.SCR_LIST).parent = GetCtrl(UI.LANDSCAPE_LIST);
 			baseClipRegion.w = (float)GetHeight(UI.LANDSCAPE_LIST);
 		}
 		panel.baseClipRegion = baseClipRegion;
-		panel.clipOffset = Vector2.get_zero();
-		GetCtrl(UI.SCR_LIST).set_localPosition(Vector3.get_zero());
-		ScrollViewResetPosition((Enum)UI.SCR_LIST);
+		panel.clipOffset = Vector2.zero;
+		GetCtrl(UI.SCR_LIST).localPosition = Vector3.zero;
+		ScrollViewResetPosition(UI.SCR_LIST);
 		UpdateAnchors();
 		AppMain i = MonoBehaviourSingleton<AppMain>.I;
-		_003COnScreenRotate_003Ec__AnonStorey387 _003COnScreenRotate_003Ec__AnonStorey;
-		i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003COnScreenRotate_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+		{
+			RefreshUI();
+			panel.Refresh();
+		});
 	}
 
 	private void UpdateMemberList()

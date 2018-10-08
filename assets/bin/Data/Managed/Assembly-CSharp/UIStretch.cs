@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/Stretch")]
 [ExecuteInEditMode]
-public class UIStretch
+[AddComponentMenu("NGUI/UI/Stretch")]
+public class UIStretch : MonoBehaviour
 {
 	public enum Style
 	{
@@ -24,11 +24,11 @@ public class UIStretch
 
 	public bool runOnlyOnce = true;
 
-	public Vector2 relativeSize = Vector2.get_one();
+	public Vector2 relativeSize = Vector2.one;
 
-	public Vector2 initialSize = Vector2.get_one();
+	public Vector2 initialSize = Vector2.one;
 
-	public Vector2 borderPadding = Vector2.get_zero();
+	public Vector2 borderPadding = Vector2.zero;
 
 	[HideInInspector]
 	[SerializeField]
@@ -50,30 +50,14 @@ public class UIStretch
 
 	private bool mStarted;
 
-	public UIStretch()
-		: this()
-	{
-	}//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-	//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-	//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-
-
 	private void Awake()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
-		mAnim = this.GetComponent<Animation>();
+		mAnim = GetComponent<Animation>();
 		mRect = default(Rect);
-		mTrans = this.get_transform();
-		mWidget = this.GetComponent<UIWidget>();
-		mSprite = this.GetComponent<UISprite>();
-		mPanel = this.GetComponent<UIPanel>();
+		mTrans = base.transform;
+		mWidget = GetComponent<UIWidget>();
+		mSprite = GetComponent<UISprite>();
+		mPanel = GetComponent<UIPanel>();
 		UICamera.onScreenResize = (UICamera.OnScreenResize)Delegate.Combine(UICamera.onScreenResize, new UICamera.OnScreenResize(ScreenSizeChanged));
 	}
 
@@ -92,159 +76,104 @@ public class UIStretch
 
 	private void Start()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Expected O, but got Unknown
-		if (container == null && widgetContainer != null)
+		if ((UnityEngine.Object)container == (UnityEngine.Object)null && (UnityEngine.Object)widgetContainer != (UnityEngine.Object)null)
 		{
-			container = widgetContainer.get_gameObject();
+			container = widgetContainer.gameObject;
 			widgetContainer = null;
 		}
-		if (uiCamera == null)
+		if ((UnityEngine.Object)uiCamera == (UnityEngine.Object)null)
 		{
-			uiCamera = NGUITools.FindCameraForLayer(this.get_gameObject().get_layer());
+			uiCamera = NGUITools.FindCameraForLayer(base.gameObject.layer);
 		}
-		mRoot = NGUITools.FindInParents<UIRoot>(this.get_gameObject());
+		mRoot = NGUITools.FindInParents<UIRoot>(base.gameObject);
 		Update();
 		mStarted = true;
 	}
 
 	private void Update()
 	{
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Expected O, but got Unknown
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0241: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0246: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024b: Expected O, but got Unknown
-		//IL_0262: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0267: Expected O, but got Unknown
-		//IL_0267: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0277: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027c: Expected O, but got Unknown
-		//IL_027c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0281: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0290: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0311: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_063d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0642: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0734: Unknown result type (might be due to invalid IL or missing references)
-		//IL_073b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0740: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0797: Unknown result type (might be due to invalid IL or missing references)
-		//IL_079c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07ae: Unknown result type (might be due to invalid IL or missing references)
-		if ((!(mAnim != null) || !mAnim.get_isPlaying()) && style != 0)
+		if ((!((UnityEngine.Object)mAnim != (UnityEngine.Object)null) || !mAnim.isPlaying) && style != 0)
 		{
-			UIWidget uIWidget = (!(container == null)) ? container.GetComponent<UIWidget>() : null;
-			UIPanel uIPanel = (!(container == null) || !(uIWidget == null)) ? container.GetComponent<UIPanel>() : null;
+			UIWidget uIWidget = (!((UnityEngine.Object)container == (UnityEngine.Object)null)) ? container.GetComponent<UIWidget>() : null;
+			UIPanel uIPanel = (!((UnityEngine.Object)container == (UnityEngine.Object)null) || !((UnityEngine.Object)uIWidget == (UnityEngine.Object)null)) ? container.GetComponent<UIPanel>() : null;
 			float num = 1f;
-			if (uIWidget != null)
+			if ((UnityEngine.Object)uIWidget != (UnityEngine.Object)null)
 			{
-				Bounds val = uIWidget.CalculateBounds(this.get_transform().get_parent());
+				Bounds bounds = uIWidget.CalculateBounds(base.transform.parent);
 				ref Rect reference = ref mRect;
-				Vector3 min = val.get_min();
-				reference.set_x(min.x);
+				Vector3 min = bounds.min;
+				reference.x = min.x;
 				ref Rect reference2 = ref mRect;
-				Vector3 min2 = val.get_min();
-				reference2.set_y(min2.y);
+				Vector3 min2 = bounds.min;
+				reference2.y = min2.y;
 				ref Rect reference3 = ref mRect;
-				Vector3 size = val.get_size();
-				reference3.set_width(size.x);
+				Vector3 size = bounds.size;
+				reference3.width = size.x;
 				ref Rect reference4 = ref mRect;
-				Vector3 size2 = val.get_size();
-				reference4.set_height(size2.y);
+				Vector3 size2 = bounds.size;
+				reference4.height = size2.y;
 			}
-			else if (uIPanel != null)
+			else if ((UnityEngine.Object)uIPanel != (UnityEngine.Object)null)
 			{
 				if (uIPanel.clipping == UIDrawCall.Clipping.None)
 				{
-					float num2 = (!(mRoot != null)) ? 0.5f : ((float)mRoot.activeHeight / (float)Screen.get_height() * 0.5f);
-					mRect.set_xMin((float)(-Screen.get_width()) * num2);
-					mRect.set_yMin((float)(-Screen.get_height()) * num2);
-					mRect.set_xMax(0f - mRect.get_xMin());
-					mRect.set_yMax(0f - mRect.get_yMin());
+					float num2 = (!((UnityEngine.Object)mRoot != (UnityEngine.Object)null)) ? 0.5f : ((float)mRoot.activeHeight / (float)Screen.height * 0.5f);
+					mRect.xMin = (float)(-Screen.width) * num2;
+					mRect.yMin = (float)(-Screen.height) * num2;
+					mRect.xMax = 0f - mRect.xMin;
+					mRect.yMax = 0f - mRect.yMin;
 				}
 				else
 				{
 					Vector4 finalClipRegion = uIPanel.finalClipRegion;
-					mRect.set_x(finalClipRegion.x - finalClipRegion.z * 0.5f);
-					mRect.set_y(finalClipRegion.y - finalClipRegion.w * 0.5f);
-					mRect.set_width(finalClipRegion.z);
-					mRect.set_height(finalClipRegion.w);
+					mRect.x = finalClipRegion.x - finalClipRegion.z * 0.5f;
+					mRect.y = finalClipRegion.y - finalClipRegion.w * 0.5f;
+					mRect.width = finalClipRegion.z;
+					mRect.height = finalClipRegion.w;
 				}
 			}
-			else if (container != null)
+			else if ((UnityEngine.Object)container != (UnityEngine.Object)null)
 			{
-				Transform val2 = this.get_transform().get_parent();
-				Bounds val3 = (!(val2 != null)) ? NGUIMath.CalculateRelativeWidgetBounds(container.get_transform()) : NGUIMath.CalculateRelativeWidgetBounds(val2, container.get_transform());
+				Transform parent = base.transform.parent;
+				Bounds bounds2 = (!((UnityEngine.Object)parent != (UnityEngine.Object)null)) ? NGUIMath.CalculateRelativeWidgetBounds(container.transform) : NGUIMath.CalculateRelativeWidgetBounds(parent, container.transform);
 				ref Rect reference5 = ref mRect;
-				Vector3 min3 = val3.get_min();
-				reference5.set_x(min3.x);
+				Vector3 min3 = bounds2.min;
+				reference5.x = min3.x;
 				ref Rect reference6 = ref mRect;
-				Vector3 min4 = val3.get_min();
-				reference6.set_y(min4.y);
+				Vector3 min4 = bounds2.min;
+				reference6.y = min4.y;
 				ref Rect reference7 = ref mRect;
-				Vector3 size3 = val3.get_size();
-				reference7.set_width(size3.x);
+				Vector3 size3 = bounds2.size;
+				reference7.width = size3.x;
 				ref Rect reference8 = ref mRect;
-				Vector3 size4 = val3.get_size();
-				reference8.set_height(size4.y);
+				Vector3 size4 = bounds2.size;
+				reference8.height = size4.y;
 			}
 			else
 			{
-				if (!(uiCamera != null))
+				if (!((UnityEngine.Object)uiCamera != (UnityEngine.Object)null))
 				{
 					return;
 				}
-				mRect = uiCamera.get_pixelRect();
-				if (mRoot != null)
+				mRect = uiCamera.pixelRect;
+				if ((UnityEngine.Object)mRoot != (UnityEngine.Object)null)
 				{
 					num = mRoot.pixelSizeAdjustment;
 				}
 			}
-			float num3 = mRect.get_width();
-			float num4 = mRect.get_height();
+			float num3 = mRect.width;
+			float num4 = mRect.height;
 			if (num != 1f && num4 > 1f)
 			{
 				float num5 = (float)mRoot.activeHeight / num4;
 				num3 *= num5;
 				num4 *= num5;
 			}
-			Vector3 val4 = (!(mWidget != null)) ? mTrans.get_localScale() : new Vector3((float)mWidget.width, (float)mWidget.height);
+			Vector3 vector = (!((UnityEngine.Object)mWidget != (UnityEngine.Object)null)) ? mTrans.localScale : new Vector3((float)mWidget.width, (float)mWidget.height);
 			if (style == Style.BasedOnHeight)
 			{
-				val4.x = relativeSize.x * num4;
-				val4.y = relativeSize.y * num4;
+				vector.x = relativeSize.x * num4;
+				vector.y = relativeSize.y * num4;
 			}
 			else if (style == Style.FillKeepingRatio)
 			{
@@ -253,14 +182,14 @@ public class UIStretch
 				if (num7 < num6)
 				{
 					float num8 = num3 / initialSize.x;
-					val4.x = num3;
-					val4.y = initialSize.y * num8;
+					vector.x = num3;
+					vector.y = initialSize.y * num8;
 				}
 				else
 				{
 					float num9 = num4 / initialSize.y;
-					val4.x = initialSize.x * num9;
-					val4.y = num4;
+					vector.x = initialSize.x * num9;
+					vector.y = num4;
 				}
 			}
 			else if (style == Style.FitInternalKeepingRatio)
@@ -270,86 +199,86 @@ public class UIStretch
 				if (num11 > num10)
 				{
 					float num12 = num3 / initialSize.x;
-					val4.x = num3;
-					val4.y = initialSize.y * num12;
+					vector.x = num3;
+					vector.y = initialSize.y * num12;
 				}
 				else
 				{
 					float num13 = num4 / initialSize.y;
-					val4.x = initialSize.x * num13;
-					val4.y = num4;
+					vector.x = initialSize.x * num13;
+					vector.y = num4;
 				}
 			}
 			else
 			{
 				if (style != Style.Vertical)
 				{
-					val4.x = relativeSize.x * num3;
+					vector.x = relativeSize.x * num3;
 				}
 				if (style != Style.Horizontal)
 				{
-					val4.y = relativeSize.y * num4;
+					vector.y = relativeSize.y * num4;
 				}
 			}
-			if (mSprite != null)
+			if ((UnityEngine.Object)mSprite != (UnityEngine.Object)null)
 			{
-				float num14 = (!(mSprite.atlas != null)) ? 1f : mSprite.atlas.pixelSize;
-				val4.x -= borderPadding.x * num14;
-				val4.y -= borderPadding.y * num14;
+				float num14 = (!((UnityEngine.Object)mSprite.atlas != (UnityEngine.Object)null)) ? 1f : mSprite.atlas.pixelSize;
+				vector.x -= borderPadding.x * num14;
+				vector.y -= borderPadding.y * num14;
 				if (style != Style.Vertical)
 				{
-					mSprite.width = Mathf.RoundToInt(val4.x);
+					mSprite.width = Mathf.RoundToInt(vector.x);
 				}
 				if (style != Style.Horizontal)
 				{
-					mSprite.height = Mathf.RoundToInt(val4.y);
+					mSprite.height = Mathf.RoundToInt(vector.y);
 				}
-				val4 = Vector3.get_one();
+				vector = Vector3.one;
 			}
-			else if (mWidget != null)
+			else if ((UnityEngine.Object)mWidget != (UnityEngine.Object)null)
 			{
 				if (style != Style.Vertical)
 				{
-					mWidget.width = Mathf.RoundToInt(val4.x - borderPadding.x);
+					mWidget.width = Mathf.RoundToInt(vector.x - borderPadding.x);
 				}
 				if (style != Style.Horizontal)
 				{
-					mWidget.height = Mathf.RoundToInt(val4.y - borderPadding.y);
+					mWidget.height = Mathf.RoundToInt(vector.y - borderPadding.y);
 				}
-				val4 = Vector3.get_one();
+				vector = Vector3.one;
 			}
-			else if (mPanel != null)
+			else if ((UnityEngine.Object)mPanel != (UnityEngine.Object)null)
 			{
 				Vector4 baseClipRegion = mPanel.baseClipRegion;
 				if (style != Style.Vertical)
 				{
-					baseClipRegion.z = val4.x - borderPadding.x;
+					baseClipRegion.z = vector.x - borderPadding.x;
 				}
 				if (style != Style.Horizontal)
 				{
-					baseClipRegion.w = val4.y - borderPadding.y;
+					baseClipRegion.w = vector.y - borderPadding.y;
 				}
 				mPanel.baseClipRegion = baseClipRegion;
-				val4 = Vector3.get_one();
+				vector = Vector3.one;
 			}
 			else
 			{
 				if (style != Style.Vertical)
 				{
-					val4.x -= borderPadding.x;
+					vector.x -= borderPadding.x;
 				}
 				if (style != Style.Horizontal)
 				{
-					val4.y -= borderPadding.y;
+					vector.y -= borderPadding.y;
 				}
 			}
-			if (mTrans.get_localScale() != val4)
+			if (mTrans.localScale != vector)
 			{
-				mTrans.set_localScale(val4);
+				mTrans.localScale = vector;
 			}
-			if (runOnlyOnce && Application.get_isPlaying())
+			if (runOnlyOnce && Application.isPlaying)
 			{
-				this.set_enabled(false);
+				base.enabled = false;
 			}
 		}
 	}

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class Picker : GameSection
@@ -33,21 +32,24 @@ public class Picker : GameSection
 		base.Initialize();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
-		SetGrid(UI.GRD_PICKER, "PickerItem", desc.text.Length, false, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-		UIWrapContent component = base.GetComponent<UIWrapContent>((Enum)UI.GRD_PICKER);
-		if (component != null)
+		SetGrid(UI.GRD_PICKER, "PickerItem", desc.text.Length, false, delegate(int i, Transform t, bool is_recycle)
 		{
-			component.set_enabled(desc.enableLoop);
+			SetLabelText(t, UI.LBL_PICKER, desc.text[i]);
+		});
+		UIWrapContent component = GetComponent<UIWrapContent>(UI.GRD_PICKER);
+		if ((Object)component != (Object)null)
+		{
+			component.enabled = desc.enableLoop;
 		}
-		SetCenterOnChildFunc((Enum)UI.GRD_PICKER, (UICenterOnChild.OnCenterCallback)OnCenter);
-		SetCenter((Enum)UI.GRD_PICKER, selectIndex, false);
+		SetCenterOnChildFunc(UI.GRD_PICKER, OnCenter);
+		SetCenter(UI.GRD_PICKER, selectIndex, false);
 	}
 
 	public void OnCenter(GameObject go)
 	{
-		if (int.TryParse(go.get_name(), out int result))
+		if (int.TryParse(go.name, out int result))
 		{
 			selectIndex = result;
 		}

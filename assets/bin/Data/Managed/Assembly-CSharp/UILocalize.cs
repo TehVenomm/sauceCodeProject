@@ -1,9 +1,9 @@
 using UnityEngine;
 
 [RequireComponent(typeof(UIWidget))]
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/Localize")]
-public class UILocalize
+[ExecuteInEditMode]
+public class UILocalize : MonoBehaviour
 {
 	public string key;
 
@@ -13,20 +13,15 @@ public class UILocalize
 	{
 		set
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Expected O, but got Unknown
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Expected O, but got Unknown
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 			if (!string.IsNullOrEmpty(value))
 			{
-				UIWidget component = this.GetComponent<UIWidget>();
+				UIWidget component = GetComponent<UIWidget>();
 				UILabel uILabel = component as UILabel;
 				UISprite uISprite = component as UISprite;
-				if (uILabel != null)
+				if ((Object)uILabel != (Object)null)
 				{
-					UIInput uIInput = NGUITools.FindInParents<UIInput>(uILabel.get_gameObject());
-					if (uIInput != null && uIInput.label == uILabel)
+					UIInput uIInput = NGUITools.FindInParents<UIInput>(uILabel.gameObject);
+					if ((Object)uIInput != (Object)null && (Object)uIInput.label == (Object)uILabel)
 					{
 						uIInput.defaultText = value;
 					}
@@ -35,10 +30,10 @@ public class UILocalize
 						uILabel.SetTextOnly(value);
 					}
 				}
-				else if (uISprite != null)
+				else if ((Object)uISprite != (Object)null)
 				{
-					UIButton uIButton = NGUITools.FindInParents<UIButton>(uISprite.get_gameObject());
-					if (uIButton != null && uIButton.tweenTarget == uISprite.get_gameObject())
+					UIButton uIButton = NGUITools.FindInParents<UIButton>(uISprite.gameObject);
+					if ((Object)uIButton != (Object)null && (Object)uIButton.tweenTarget == (Object)uISprite.gameObject)
 					{
 						uIButton.normalSprite = value;
 					}
@@ -47,11 +42,6 @@ public class UILocalize
 				}
 			}
 		}
-	}
-
-	public UILocalize()
-		: this()
-	{
 	}
 
 	private void OnEnable()
@@ -74,8 +64,8 @@ public class UILocalize
 		{
 			if (string.IsNullOrEmpty(key))
 			{
-				UILabel component = this.GetComponent<UILabel>();
-				if (component != null)
+				UILabel component = GetComponent<UILabel>();
+				if ((Object)component != (Object)null)
 				{
 					key = component.text;
 				}

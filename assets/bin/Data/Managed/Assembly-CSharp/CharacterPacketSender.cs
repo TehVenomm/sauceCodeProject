@@ -23,8 +23,6 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 
 	public override void OnUpdate()
 	{
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
 		base.OnUpdate();
 		if (actUpdateSendFlag)
 		{
@@ -39,7 +37,7 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 					break;
 				}
 			}
-			actUpdateTimer += Time.get_deltaTime();
+			actUpdateTimer += Time.deltaTime;
 			if (character.actionID == Character.ACTION_ID.MOVE && actUpdateTimer >= num)
 			{
 				Coop_Model_CharacterMoveVelocity coop_Model_CharacterMoveVelocity = new Coop_Model_CharacterMoveVelocity();
@@ -47,7 +45,7 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 				coop_Model_CharacterMoveVelocity.time = actUpdateTimer;
 				coop_Model_CharacterMoveVelocity.pos = base.owner._position;
 				coop_Model_CharacterMoveVelocity.motion_id = moveMotion;
-				coop_Model_CharacterMoveVelocity.target_id = ((!(character.actionTarget != null)) ? (-1) : character.actionTarget.id);
+				coop_Model_CharacterMoveVelocity.target_id = ((!((Object)character.actionTarget != (Object)null)) ? (-1) : character.actionTarget.id);
 				if (base.enableSend && base.owner.IsOriginal())
 				{
 					SendBroadcast(coop_Model_CharacterMoveVelocity, false, null, null);
@@ -58,7 +56,7 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		}
 		if (character.isControllable || character.enableMotionCancel)
 		{
-			PassNeedWaitSyncTime(Time.get_deltaTime());
+			PassNeedWaitSyncTime(Time.deltaTime);
 		}
 	}
 
@@ -68,15 +66,13 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		{
 			Coop_Model_CharacterActionTarget coop_Model_CharacterActionTarget = new Coop_Model_CharacterActionTarget();
 			coop_Model_CharacterActionTarget.id = base.owner.id;
-			coop_Model_CharacterActionTarget.target_id = ((!(target != null)) ? (-1) : target.id);
+			coop_Model_CharacterActionTarget.target_id = ((!((Object)target != (Object)null)) ? (-1) : target.id);
 			SendBroadcast(coop_Model_CharacterActionTarget, false, null, null);
 		}
 	}
 
 	public virtual void OnUpdateActionPosition(string trigger)
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_CharacterUpdateActionPosition coop_Model_CharacterUpdateActionPosition = new Coop_Model_CharacterUpdateActionPosition();
 		coop_Model_CharacterUpdateActionPosition.id = base.owner.id;
 		coop_Model_CharacterUpdateActionPosition.trigger = trigger;
@@ -91,33 +87,20 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 
 	public virtual void OnUpdateDirection(string trigger)
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_CharacterUpdateDirection coop_Model_CharacterUpdateDirection = new Coop_Model_CharacterUpdateDirection();
 		coop_Model_CharacterUpdateDirection.id = base.owner.id;
 		coop_Model_CharacterUpdateDirection.trigger = trigger;
 		Coop_Model_CharacterUpdateDirection coop_Model_CharacterUpdateDirection2 = coop_Model_CharacterUpdateDirection;
-		Quaternion rotation = base.owner._rotation;
-		Vector3 eulerAngles = rotation.get_eulerAngles();
+		Vector3 eulerAngles = base.owner._rotation.eulerAngles;
 		coop_Model_CharacterUpdateDirection2.dir = eulerAngles.y;
-		if (character.lerpRotateVec == Vector3.get_zero())
+		if (character.lerpRotateVec == Vector3.zero)
 		{
 			coop_Model_CharacterUpdateDirection.lerp_dir = coop_Model_CharacterUpdateDirection.dir;
 		}
 		else
 		{
 			Coop_Model_CharacterUpdateDirection coop_Model_CharacterUpdateDirection3 = coop_Model_CharacterUpdateDirection;
-			Quaternion val = Quaternion.LookRotation(character.lerpRotateVec);
-			Vector3 eulerAngles2 = val.get_eulerAngles();
+			Vector3 eulerAngles2 = Quaternion.LookRotation(character.lerpRotateVec).eulerAngles;
 			coop_Model_CharacterUpdateDirection3.lerp_dir = eulerAngles2.y;
 		}
 		if (base.enableSend && base.owner.IsOriginal())
@@ -153,8 +136,6 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 
 	public virtual void OnActAttack(int id, bool sync_immediately, int syncRandomSeed = 0, string _motionLayerName = "")
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_CharacterAttack coop_Model_CharacterAttack = new Coop_Model_CharacterAttack();
 		coop_Model_CharacterAttack.id = base.owner.id;
 		coop_Model_CharacterAttack.SetSyncPosition(base.owner);
@@ -180,8 +161,6 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 
 	public virtual void OnActMoveToPosition(Vector3 target_pos)
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_CharacterMoveToPosition coop_Model_CharacterMoveToPosition = new Coop_Model_CharacterMoveToPosition();
 		coop_Model_CharacterMoveToPosition.id = base.owner.id;
 		coop_Model_CharacterMoveToPosition.SetSyncPosition(base.owner);
@@ -195,8 +174,6 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 
 	public virtual void OnActMoveHoming(float max_length)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_CharacterMoveHoming coop_Model_CharacterMoveHoming = new Coop_Model_CharacterMoveHoming();
 		coop_Model_CharacterMoveHoming.id = base.owner.id;
 		coop_Model_CharacterMoveHoming.SetSyncPosition(base.owner);
@@ -212,8 +189,6 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 
 	public virtual void OnActMoveSideways(int moveAngleSign)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_CharacterMoveSideways coop_Model_CharacterMoveSideways = new Coop_Model_CharacterMoveSideways();
 		coop_Model_CharacterMoveSideways.id = base.owner.id;
 		coop_Model_CharacterMoveSideways.SetSyncPosition(base.owner);
@@ -229,13 +204,11 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 
 	public virtual void OnActMovePoint(Vector3 targetPos)
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_CharacterMovePoint coop_Model_CharacterMovePoint = new Coop_Model_CharacterMovePoint();
 		coop_Model_CharacterMovePoint.id = base.owner.id;
 		coop_Model_CharacterMovePoint.SetSyncPosition(base.owner);
 		coop_Model_CharacterMovePoint.targetPos = targetPos;
-		if (this.get_enabled() && base.owner.IsOriginal())
+		if (base.enabled && base.owner.IsOriginal())
 		{
 			SendBroadcast(coop_Model_CharacterMovePoint, false, null, null);
 		}
@@ -244,13 +217,11 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 
 	public void OnActMoveLookAt(Vector3 moveLookAtPos)
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_CharacterMoveLookAt coop_Model_CharacterMoveLookAt = new Coop_Model_CharacterMoveLookAt();
 		coop_Model_CharacterMoveLookAt.id = base.owner.id;
 		coop_Model_CharacterMoveLookAt.SetSyncPosition(base.owner);
 		coop_Model_CharacterMoveLookAt.moveLookAtPos = moveLookAtPos;
-		if (this.get_enabled() && base.owner.IsOriginal())
+		if (base.enabled && base.owner.IsOriginal())
 		{
 			SendBroadcast(coop_Model_CharacterMoveLookAt, false, null, null);
 		}
@@ -348,12 +319,6 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 
 	public virtual void OnEndAction()
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 		Character.ACTION_ID actionID = character.actionID;
 		if (actionID == Character.ACTION_ID.MOVE && actUpdateSendFlag)
 		{
@@ -364,8 +329,7 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 				coop_Model_CharacterMoveVelocityEnd.time = actUpdateTimer;
 				coop_Model_CharacterMoveVelocityEnd.pos = base.owner._position;
 				Coop_Model_CharacterMoveVelocityEnd coop_Model_CharacterMoveVelocityEnd2 = coop_Model_CharacterMoveVelocityEnd;
-				Quaternion rotation = base.owner._rotation;
-				Vector3 eulerAngles = rotation.get_eulerAngles();
+				Vector3 eulerAngles = base.owner._rotation.eulerAngles;
 				coop_Model_CharacterMoveVelocityEnd2.direction = eulerAngles.y;
 				coop_Model_CharacterMoveVelocityEnd.sync_speed = character.moveSyncSpeed;
 				coop_Model_CharacterMoveVelocityEnd.motion_id = moveMotion;
@@ -378,8 +342,6 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 
 	public void OnActReaction(Character.ReactionInfo info, bool isSync)
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_CharacterReaction coop_Model_CharacterReaction = new Coop_Model_CharacterReaction();
 		coop_Model_CharacterReaction.id = base.owner.id;
 		coop_Model_CharacterReaction.SetSyncPosition(base.owner);

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BuffSlideEffectController
+public class BuffSlideEffectController : MonoBehaviour
 {
 	public const float END_STATE_PLAY_HEIGHT = 0.8f;
 
@@ -14,32 +14,21 @@ public class BuffSlideEffectController
 
 	private int m_animHashEnd;
 
-	public BuffSlideEffectController()
-		: this()
-	{
-	}
-
 	public void Initialize(Player targetPlayer)
 	{
 		m_targetPlayer = targetPlayer;
 		m_footNode = m_targetPlayer.FindNode("L_Foot");
-		m_animator = this.GetComponent<Animator>();
+		m_animator = GetComponent<Animator>();
 		m_animHashLoop = Animator.StringToHash("LOOP");
 		m_animHashEnd = Animator.StringToHash("END");
 	}
 
 	private void Update()
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		if (!(m_animator == null) && !(m_targetPlayer == null))
+		if (!((Object)m_animator == (Object)null) && !((Object)m_targetPlayer == (Object)null))
 		{
-			AnimatorStateInfo currentAnimatorStateInfo = m_animator.GetCurrentAnimatorStateInfo(0);
-			int shortNameHash = currentAnimatorStateInfo.get_shortNameHash();
-			Vector3 position = m_footNode.get_position();
+			int shortNameHash = m_animator.GetCurrentAnimatorStateInfo(0).shortNameHash;
+			Vector3 position = m_footNode.position;
 			float y = position.y;
 			float height = StageManager.GetHeight(m_targetPlayer._position);
 			int num = m_animHashLoop;

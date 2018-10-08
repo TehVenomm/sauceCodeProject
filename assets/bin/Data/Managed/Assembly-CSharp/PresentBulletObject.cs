@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PresentBulletObject : IPresentBulletObject
+public class PresentBulletObject : MonoBehaviour, IPresentBulletObject
 {
 	private enum STATE
 	{
@@ -53,36 +53,15 @@ public class PresentBulletObject : IPresentBulletObject
 
 	private Character.HealData m_healData;
 
-	public PresentBulletObject()
-		: this()
-	{
-	}
-
 	public void Initialize(int id, BulletData bulletData, Transform transform)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Expected O, but got Unknown
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			Log.Error(LOG.INGAME, "StageObjectManager is invalid. Can't initialize PresentBulletObject.");
 		}
 		else
 		{
-			this.get_gameObject().set_name("PresentBulletObject:" + id.ToString());
+			base.gameObject.name = "PresentBulletObject:" + id.ToString();
 			m_presentBulletId = id;
 			m_bulletData = bulletData;
 			m_stageObjMgr = MonoBehaviourSingleton<StageObjectManager>.I;
@@ -92,44 +71,40 @@ public class PresentBulletObject : IPresentBulletObject
 				m_lifeSpanType = m_bulletData.dataPresent.lifeSpanType;
 				m_buffIds = m_bulletData.dataPresent.buffIds;
 			}
-			m_cachedTransform = this.get_transform();
-			m_cachedTransform.set_parent(m_stageObjMgr._transform);
-			m_cachedTransform.set_position(transform.get_position());
-			m_cachedTransform.set_localScale(Vector3.get_one());
+			m_cachedTransform = base.transform;
+			m_cachedTransform.parent = m_stageObjMgr._transform;
+			m_cachedTransform.position = transform.position;
+			m_cachedTransform.localScale = Vector3.one;
 			if (MonoBehaviourSingleton<EffectManager>.IsValid())
 			{
 				m_cachedEffectTransform = EffectManager.GetEffect(m_bulletData.data.effectName, MonoBehaviourSingleton<EffectManager>.I._transform);
 			}
-			if (m_cachedEffectTransform != null)
+			if ((Object)m_cachedEffectTransform != (Object)null)
 			{
-				m_cachedEffectTransform.set_position(transform.get_position() + bulletData.data.dispOffset);
-				m_cachedEffectTransform.set_localRotation(Quaternion.Euler(bulletData.data.dispRotation));
-				m_effectAnimator = m_cachedEffectTransform.get_gameObject().GetComponent<Animator>();
-				m_effectCtrl = m_cachedEffectTransform.get_gameObject().GetComponent<EffectCtrl>();
+				m_cachedEffectTransform.position = transform.position + bulletData.data.dispOffset;
+				m_cachedEffectTransform.localRotation = Quaternion.Euler(bulletData.data.dispRotation);
+				m_effectAnimator = m_cachedEffectTransform.gameObject.GetComponent<Animator>();
+				m_effectCtrl = m_cachedEffectTransform.gameObject.GetComponent<EffectCtrl>();
 			}
-			this.get_gameObject().set_layer(31);
+			base.gameObject.layer = 31;
 			m_ignoreLayerMask |= 41984;
 			m_ignoreLayerMask |= 20480;
 			m_ignoreLayerMask |= 2490880;
-			m_cachedCollider = this.get_gameObject().AddComponent<BoxCollider>();
-			m_cachedCollider.set_size(COLLIDER_SIZE);
-			m_cachedCollider.set_center(COLLIDER_CENTER);
-			m_cachedCollider.set_isTrigger(true);
-			m_cachedCollider.set_enabled(false);
+			m_cachedCollider = base.gameObject.AddComponent<BoxCollider>();
+			m_cachedCollider.size = COLLIDER_SIZE;
+			m_cachedCollider.center = COLLIDER_CENTER;
+			m_cachedCollider.isTrigger = true;
+			m_cachedCollider.enabled = false;
 			m_state = STATE.ACTIVE;
 		}
 	}
 
 	public void SetPosition(Vector3 position)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		m_cachedTransform.set_position(position);
-		if (m_cachedEffectTransform != null)
+		m_cachedTransform.position = position;
+		if ((Object)m_cachedEffectTransform != (Object)null)
 		{
-			m_cachedEffectTransform.set_position(position + m_bulletData.data.dispOffset);
+			m_cachedEffectTransform.position = position + m_bulletData.data.dispOffset;
 		}
 	}
 
@@ -149,15 +124,9 @@ public class PresentBulletObject : IPresentBulletObject
 
 	private void Update()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		if (m_effectAnimator != null)
+		if ((Object)m_effectAnimator != (Object)null && m_effectAnimator.GetCurrentAnimatorStateInfo(0).fullPathHash == ANIM_STATE_LOOP_INCLUDE_LAYER)
 		{
-			AnimatorStateInfo currentAnimatorStateInfo = m_effectAnimator.GetCurrentAnimatorStateInfo(0);
-			if (currentAnimatorStateInfo.get_fullPathHash() == ANIM_STATE_LOOP_INCLUDE_LAYER)
-			{
-				m_cachedCollider.set_enabled(true);
-			}
+			m_cachedCollider.enabled = true;
 		}
 		if (m_state == STATE.ACTIVE && m_lifeSpanType == BulletData.BulletPresent.LIFE_SPAN_TYPE.TIME)
 		{
@@ -165,65 +134,49 @@ public class PresentBulletObject : IPresentBulletObject
 			{
 				OnDisappear();
 			}
-			m_lifeSpan -= Time.get_deltaTime();
+			m_lifeSpan -= Time.deltaTime;
 		}
 	}
 
 	public void OnDisappear()
 	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Expected O, but got Unknown
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		if (m_cachedCollider != null)
+		if ((Object)m_cachedCollider != (Object)null)
 		{
-			m_cachedCollider.set_enabled(false);
+			m_cachedCollider.enabled = false;
 		}
 		m_stageObjMgr.RemovePresentBulletObject(m_presentBulletId);
-		if (m_cachedEffectTransform != null && m_cachedEffectTransform.get_gameObject() != null)
+		if ((Object)m_cachedEffectTransform != (Object)null && (Object)m_cachedEffectTransform.gameObject != (Object)null)
 		{
-			EffectManager.ReleaseEffect(m_cachedEffectTransform.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(m_cachedEffectTransform.gameObject, true, false);
 		}
-		if (this.get_gameObject() != null)
+		if ((Object)base.gameObject != (Object)null)
 		{
-			Object.Destroy(this.get_gameObject());
+			Object.Destroy(base.gameObject);
 		}
 	}
 
 	public void OnPicked()
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 		m_state = STATE.PICKED;
-		if (m_cachedCollider != null)
+		if ((Object)m_cachedCollider != (Object)null)
 		{
-			m_cachedCollider.set_enabled(false);
+			m_cachedCollider.enabled = false;
 		}
-		this.StartCoroutine(OnPickedEffect());
+		StartCoroutine(OnPickedEffect());
 	}
 
 	private IEnumerator OnPickedEffect()
 	{
-		if (!(m_effectAnimator == null) && !(m_effectCtrl == null))
+		if (!((Object)m_effectAnimator == (Object)null) && !((Object)m_effectCtrl == (Object)null))
 		{
 			m_effectAnimator.Play(ANIM_STATE_PICKED, 0, 0f);
 			yield return (object)null;
-			while (true)
+			while (m_effectAnimator.GetCurrentAnimatorStateInfo(0).fullPathHash != ANIM_STATE_PICKED_INCLUDE_LAYER)
 			{
-				AnimatorStateInfo currentAnimatorStateInfo = m_effectAnimator.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_fullPathHash() == ANIM_STATE_PICKED_INCLUDE_LAYER)
-				{
-					break;
-				}
 				yield return (object)null;
 			}
-			while (true)
+			while (m_effectAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
 			{
-				AnimatorStateInfo currentAnimatorStateInfo2 = m_effectAnimator.GetCurrentAnimatorStateInfo(0);
-				if (!(currentAnimatorStateInfo2.get_normalizedTime() < 1f))
-				{
-					break;
-				}
 				yield return (object)null;
 			}
 			if (m_effectCtrl.waitParticlePlaying)
@@ -231,47 +184,44 @@ public class PresentBulletObject : IPresentBulletObject
 				for (int i = 0; i < m_effectCtrl.particles.Length; i++)
 				{
 					ParticleSystem ps = m_effectCtrl.particles[i];
-					if (ps != null && ps.get_isPlaying())
+					if ((Object)ps != (Object)null && ps.isPlaying)
 					{
 						ps.Stop(true);
 						yield return (object)null;
 					}
 				}
 			}
-			if (m_cachedEffectTransform != null && m_cachedEffectTransform.get_gameObject() != null)
+			if ((Object)m_cachedEffectTransform != (Object)null && (Object)m_cachedEffectTransform.gameObject != (Object)null)
 			{
 				bool isStock = false;
 				if (MonoBehaviourSingleton<EffectManager>.IsValid())
 				{
-					isStock = MonoBehaviourSingleton<EffectManager>.I.StockOrDestroy(m_cachedEffectTransform.get_gameObject(), false);
+					isStock = MonoBehaviourSingleton<EffectManager>.I.StockOrDestroy(m_cachedEffectTransform.gameObject, false);
 				}
 				if (!isStock)
 				{
-					Object.Destroy(m_cachedEffectTransform.get_gameObject());
+					Object.Destroy(m_cachedEffectTransform.gameObject);
 				}
 			}
-			if (this.get_gameObject() != null)
+			if ((Object)base.gameObject != (Object)null)
 			{
-				Object.Destroy(this.get_gameObject());
+				Object.Destroy(base.gameObject);
 			}
 		}
 	}
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		int layer = collider.get_gameObject().get_layer();
-		if (((1 << layer) & m_ignoreLayerMask) <= 0 && (layer != 8 || !(collider.get_gameObject().GetComponent<DangerRader>() != null)) && m_state != STATE.PICKED)
+		int layer = collider.gameObject.layer;
+		if (((1 << layer) & m_ignoreLayerMask) <= 0 && (layer != 8 || !((Object)collider.gameObject.GetComponent<DangerRader>() != (Object)null)) && m_state != STATE.PICKED)
 		{
 			int num = 0;
 			if (m_skillParam != null)
 			{
 				num = m_skillParam.healHp;
 			}
-			Self component = collider.get_gameObject().GetComponent<Self>();
-			if (component != null)
+			Self component = collider.gameObject.GetComponent<Self>();
+			if ((Object)component != (Object)null)
 			{
 				OnPicked();
 				component.OnHealReceive(m_healData);
@@ -282,7 +232,7 @@ public class PresentBulletObject : IPresentBulletObject
 						component.StartBuffByBuffTableId(m_buffIds[i], m_skillParam);
 					}
 				}
-				if (component.playerSender != null)
+				if ((Object)component.playerSender != (Object)null)
 				{
 					component.playerSender.OnPickPresentBullet(m_presentBulletId);
 				}

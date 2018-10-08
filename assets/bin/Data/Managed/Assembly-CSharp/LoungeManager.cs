@@ -80,17 +80,15 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 
 	public void OnRecvRoomJoined(int userId)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		if (userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
-			this.StartCoroutine(CreateCharacterRoomJoined(userId));
+			StartCoroutine(CreateCharacterRoomJoined(userId));
 		}
 	}
 
 	public void OnRecvRoomLeaved(int id)
 	{
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		if (!(HomePeople == null))
+		if (!((UnityEngine.Object)HomePeople == (UnityEngine.Object)null))
 		{
 			if (HomePeople.DestroyLoungePlayer(id))
 			{
@@ -99,15 +97,14 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 			}
 			if (id != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 			{
-				this.StartCoroutine(SendLoungeInfoForce());
+				StartCoroutine(SendLoungeInfoForce());
 			}
 		}
 	}
 
 	public void OnRecvRoomMove(int id, Vector3 targetPos)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		if (!(HomePeople == null))
+		if (!((UnityEngine.Object)HomePeople == (UnityEngine.Object)null))
 		{
 			HomePeople.MoveLoungePlayer(id, targetPos);
 		}
@@ -115,8 +112,7 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 
 	public void OnRecvRoomPosition(int id, Vector3 targetPos, LOUNGE_ACTION_TYPE type)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		if (!(HomePeople == null))
+		if (!((UnityEngine.Object)HomePeople == (UnityEngine.Object)null))
 		{
 			HomePeople.SetInitialPositionLoungePlayer(id, targetPos, type);
 		}
@@ -124,10 +120,10 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 
 	public void OnRecvRoomAction(int cid, int aid)
 	{
-		if (!(HomePeople == null))
+		if (!((UnityEngine.Object)HomePeople == (UnityEngine.Object)null))
 		{
 			LoungePlayer loungePlayer = HomePeople.GetLoungePlayer(cid);
-			if (!(loungePlayer == null))
+			if (!((UnityEngine.Object)loungePlayer == (UnityEngine.Object)null))
 			{
 				loungePlayer.ResetAFKTimer();
 				switch (aid)
@@ -157,10 +153,10 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 
 	public void OnRecvChatMessage(int userId)
 	{
-		if (!(HomePeople == null))
+		if (!((UnityEngine.Object)HomePeople == (UnityEngine.Object)null))
 		{
 			LoungePlayer loungePlayer = HomePeople.GetLoungePlayer(userId);
-			if (!(loungePlayer == null))
+			if (!((UnityEngine.Object)loungePlayer == (UnityEngine.Object)null))
 			{
 				loungePlayer.ResetAFKTimer();
 			}
@@ -169,7 +165,7 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 
 	public void OnRecvRoomKick(int id)
 	{
-		if (!(HomePeople == null))
+		if (!((UnityEngine.Object)HomePeople == (UnityEngine.Object)null))
 		{
 			if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id == id)
 			{
@@ -204,10 +200,10 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 		{
 			yield return (object)null;
 		}
-		HomeCamera = this.get_gameObject().AddComponent<HomeCamera>();
-		HomePeople = this.get_gameObject().AddComponent<HomePeople>();
-		HomeFeatureBanner = this.get_gameObject().AddComponent<HomeFeatureBanner>();
-		TableSet = this.get_gameObject().AddComponent<LoungeTableSet>();
+		HomeCamera = base.gameObject.AddComponent<HomeCamera>();
+		HomePeople = base.gameObject.AddComponent<HomePeople>();
+		HomeFeatureBanner = base.gameObject.AddComponent<HomeFeatureBanner>();
+		TableSet = base.gameObject.AddComponent<LoungeTableSet>();
 		while (!HomeCamera.isInitialized || !HomePeople.isInitialized || !TableSet.isInitialized)
 		{
 			yield return (object)null;
@@ -219,9 +215,9 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInLounge();
 		}
 		IsInitialized = true;
-		yield return (object)this.StartCoroutine(SendLoungeInfoForce());
-		yield return (object)this.StartCoroutine(CreateLoungePlayerFromSlotInfo());
-		yield return (object)this.StartCoroutine(LoadSE());
+		yield return (object)StartCoroutine(SendLoungeInfoForce());
+		yield return (object)StartCoroutine(CreateLoungePlayerFromSlotInfo());
+		yield return (object)StartCoroutine(LoadSE());
 		PlayWaveSound();
 	}
 
@@ -242,10 +238,9 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 
 	private void PlayWaveSound()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = Utility.CreateGameObject("WaveAudioObjectPos", base._transform, -1);
-		val.set_position(MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.waveSoundPoint);
-		SoundManager.PlayLoopSE(40000363, null, val);
+		Transform transform = Utility.CreateGameObject("WaveAudioObjectPos", base._transform, -1);
+		transform.position = MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.waveSoundPoint;
+		SoundManager.PlayLoopSE(40000363, null, transform);
 	}
 
 	private IEnumerator CreateLoungePlayerFromSlotInfo()
@@ -275,9 +270,9 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 
 	private IEnumerator CreateCharacterRoomJoined(int userId)
 	{
-		yield return (object)this.StartCoroutine(SendLoungeInfoForce());
+		yield return (object)StartCoroutine(SendLoungeInfoForce());
 		LoungeModel.SlotInfo slot = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId);
-		if (slot != null && HomePeople != null && HomePeople.CreateLoungePlayer(slot, true, false))
+		if (slot != null && (UnityEngine.Object)HomePeople != (UnityEngine.Object)null && HomePeople.CreateLoungePlayer(slot, true, false))
 		{
 			SetAnnounce(new LoungeAnnounce.AnnounceData(LoungeAnnounce.ANNOUNCE_TYPE.JOIN_LOUNGE, slot.userInfo.name));
 			if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
@@ -289,7 +284,6 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 
 	private void OnChangeMemberStatus(LoungeMemberStatus status)
 	{
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 		int userId = status.userId;
 		switch (status.GetStatus())
 		{
@@ -307,7 +301,7 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 		case LoungeMemberStatus.MEMBER_STATUS.LOUNGE:
 			SendRoomPosition(userId);
 			NeedLoungeQuestBalloonUpdate = true;
-			this.StartCoroutine(CreatePlayerOnChangedStatus(userId));
+			StartCoroutine(CreatePlayerOnChangedStatus(userId));
 			break;
 		}
 	}
@@ -329,22 +323,20 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 
 	private void SetAnnounce(LoungeAnnounce.AnnounceData data)
 	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Expected O, but got Unknown
 		if (!object.ReferenceEquals(data, null))
 		{
 			loungeAnnounceQueue.Enqueue(data);
 			if (object.ReferenceEquals(loungeAnnounceCoroutine, null))
 			{
-				loungeAnnounceCoroutine = this.StartCoroutine(ShowAnnounce());
+				loungeAnnounceCoroutine = StartCoroutine(ShowAnnounce());
 			}
 		}
 	}
 
-	private unsafe IEnumerator ShowAnnounce()
+	private IEnumerator ShowAnnounce()
 	{
 		LoungeAnnounce announce = MonoBehaviourSingleton<UIManager>.I.loungeAnnounce;
-		if (announce == null)
+		if ((UnityEngine.Object)announce == (UnityEngine.Object)null)
 		{
 			loungeAnnounceCoroutine = null;
 		}
@@ -354,7 +346,10 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 			{
 				LoungeAnnounce.AnnounceData annouceData = loungeAnnounceQueue.Dequeue();
 				bool wait = true;
-				announce.Play(annouceData, new Action((object)/*Error near IL_0085: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				announce.Play(annouceData, delegate
+				{
+					((_003CShowAnnounce_003Ec__IteratorF1)/*Error near IL_0085: stateMachine*/)._003Cwait_003E__2 = false;
+				});
 				while (wait)
 				{
 					yield return (object)null;
@@ -367,10 +362,9 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 
 	private void Update()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (sendInfoSpan.IsReady())
 		{
-			this.StartCoroutine(SendLoungeInfoForce());
+			StartCoroutine(SendLoungeInfoForce());
 		}
 	}
 
@@ -383,10 +377,9 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 
 	private void OnApplicationPause(bool pause)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		if (!pause)
 		{
-			this.StartCoroutine(ResumeApp());
+			StartCoroutine(ResumeApp());
 		}
 	}
 
@@ -404,7 +397,7 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 		{
 			DestoryMembersOnResume();
 			yield return (object)null;
-			this.StartCoroutine(CreateMembersOnResume());
+			StartCoroutine(CreateMembersOnResume());
 			yield return (object)null;
 			ResetAllMemberAction();
 		}
@@ -428,7 +421,7 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 
 	private void DestoryMembersOnResume()
 	{
-		if (!(HomePeople == null) && HomePeople.loungePlayers != null)
+		if (!((UnityEngine.Object)HomePeople == (UnityEngine.Object)null) && HomePeople.loungePlayers != null)
 		{
 			for (int i = 0; i < HomePeople.loungePlayers.Count; i++)
 			{
@@ -484,7 +477,7 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 
 	private void ResetAllMemberAction()
 	{
-		if (!(HomePeople == null))
+		if (!((UnityEngine.Object)HomePeople == (UnityEngine.Object)null))
 		{
 			for (int i = 0; i < HomePeople.loungePlayers.Count; i++)
 			{
@@ -498,7 +491,7 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 		bool wait = true;
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
 		{
-			((_003CSendLoungeInfoForce_003Ec__IteratorF2)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CSendLoungeInfoForce_003Ec__IteratorF4)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
 		}, true);
 		while (wait)
 		{
@@ -508,12 +501,9 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
 
 	private void SendRoomPosition(int cid)
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		if (!(HomePeople == null) && !(HomePeople.selfChara == null))
+		if (!((UnityEngine.Object)HomePeople == (UnityEngine.Object)null) && !((UnityEngine.Object)HomePeople.selfChara == (UnityEngine.Object)null))
 		{
-			Vector3 position = HomePeople.selfChara._transform.get_position();
+			Vector3 position = HomePeople.selfChara._transform.position;
 			LOUNGE_ACTION_TYPE actionType = HomePeople.selfChara.GetActionType();
 			MonoBehaviourSingleton<LoungeNetworkManager>.I.RoomPosition(cid, position, actionType);
 		}

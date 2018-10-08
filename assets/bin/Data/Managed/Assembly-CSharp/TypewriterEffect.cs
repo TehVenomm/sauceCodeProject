@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Typewriter Effect")]
 [RequireComponent(typeof(UILabel))]
-public class TypewriterEffect
+[AddComponentMenu("NGUI/Interaction/Typewriter Effect")]
+public class TypewriterEffect : MonoBehaviour
 {
 	private struct FadeEntry
 	{
@@ -47,11 +47,6 @@ public class TypewriterEffect
 
 	public bool isActive => mActive;
 
-	public TypewriterEffect()
-		: this()
-	{
-	}
-
 	public void ResetToBeginning()
 	{
 		Finish();
@@ -73,7 +68,7 @@ public class TypewriterEffect
 				mFade.Clear();
 				mLabel.text = mFullText;
 			}
-			if (keepFullDimensions && scrollView != null)
+			if (keepFullDimensions && (Object)scrollView != (Object)null)
 			{
 				scrollView.UpdatePosition();
 			}
@@ -102,10 +97,10 @@ public class TypewriterEffect
 			{
 				mCurrentOffset = 0;
 				mReset = false;
-				mLabel = this.GetComponent<UILabel>();
+				mLabel = GetComponent<UILabel>();
 				mFullText = mLabel.processedText;
 				mFade.Clear();
-				if (keepFullDimensions && scrollView != null)
+				if (keepFullDimensions && (Object)scrollView != (Object)null)
 				{
 					scrollView.UpdatePosition();
 				}
@@ -177,7 +172,7 @@ public class TypewriterEffect
 					else
 					{
 						mLabel.text = ((!keepFullDimensions) ? mFullText.Substring(0, mCurrentOffset) : (mFullText.Substring(0, mCurrentOffset) + "[00]" + mFullText.Substring(mCurrentOffset)));
-						if (!keepFullDimensions && scrollView != null)
+						if (!keepFullDimensions && (Object)scrollView != (Object)null)
 						{
 							scrollView.UpdatePosition();
 						}

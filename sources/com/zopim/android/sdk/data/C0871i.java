@@ -15,26 +15,26 @@ class C0871i extends AsyncTask<String, Void, C0870h> {
     private C0870h m699a(String str) {
         String c = m701c(str);
         C0870h b = m700b(str);
-        switch (C0872j.f869a[b.ordinal()]) {
-            case 1:
+        switch (b) {
+            case LIVECHAT_CHANNEL_LOG:
                 LivechatChatLogPath.getInstance().update(c);
                 break;
-            case 2:
+            case LIVECHAT_PROFILE:
                 LivechatProfilePath.getInstance().update(c);
                 break;
-            case 3:
+            case LIVECHAT_AGENTS:
                 LivechatAgentsPath.getInstance().update(c);
                 break;
-            case 4:
+            case LIVECHAT_DEPARTMENTS:
                 LivechatDepartmentsPath.getInstance().update(c);
                 break;
-            case 5:
+            case LIVECHAT_ACCOUNT:
                 LivechatAccountPath.getInstance().update(c);
                 break;
-            case 6:
+            case LIVECHAT_SETTINGS_FORMS:
                 LivechatFormsPath.getInstance().update(c);
                 break;
-            case 7:
+            case CONNECTION:
                 ConnectionPath.getInstance().update(c);
                 break;
         }

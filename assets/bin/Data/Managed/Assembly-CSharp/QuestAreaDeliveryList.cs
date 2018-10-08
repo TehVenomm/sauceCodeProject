@@ -44,7 +44,7 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 		int regionId = (int)GameSection.GetEventData();
 		regionData = Singleton<RegionTable>.I.GetData((uint)regionId);
 		bool needSummary = regionId != 0;
-		SetActive((Enum)UI.BTN_SUMMARY, needSummary);
+		SetActive(UI.BTN_SUMMARY, needSummary);
 		LoadingQueue loadQueue = new LoadingQueue(this);
 		string bannerName = ResourceName.GetAreaBG(regionId);
 		LoadObject bannerObj = loadQueue.Load(RESOURCE_CATEGORY.AREA_BACKGROUND, bannerName, false);
@@ -53,9 +53,9 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 			yield return (object)loadQueue.Wait();
 		}
 		Texture2D bannerTex = bannerObj.loadedObject as Texture2D;
-		if (bannerTex != null)
+		if ((UnityEngine.Object)bannerTex != (UnityEngine.Object)null)
 		{
-			SetTexture((Enum)UI.TEX_AREA_BG, bannerTex);
+			SetTexture(UI.TEX_AREA_BG, bannerTex);
 		}
 		if (ShouldShowEventMapButton())
 		{
@@ -65,10 +65,10 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 				yield return (object)loadQueue.Wait();
 			}
 			SetTexture(texture: item.loadedObject as Texture2D, texture_enum: UI.TEX_EVENT_BG);
-			if (item != null && null != item.loadedObject)
+			if (item != null && (UnityEngine.Object)null != item.loadedObject)
 			{
 				GameObject mapItemObj = item.loadedObject as GameObject;
-				mapItem = mapItemObj.get_transform();
+				mapItem = mapItemObj.transform;
 			}
 		}
 		SetAreaName();
@@ -90,15 +90,12 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 
 	private void SetAreaName()
 	{
-		SetLabelText((Enum)UI.LBL_LOCATION_NAME, regionData.regionName);
-		SetLabelText((Enum)UI.LBL_LOCATION_NAME_EFFECT, regionData.regionName);
+		SetLabelText(UI.LBL_LOCATION_NAME, regionData.regionName);
+		SetLabelText(UI.LBL_LOCATION_NAME_EFFECT, regionData.regionName);
 	}
 
-	protected unsafe override void UpdateTable()
+	protected override void UpdateTable()
 	{
-		//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0218: Expected O, but got Unknown
-		//IL_0224: Unknown result type (might be due to invalid IL or missing references)
 		int num = 0;
 		int count = stories.Count;
 		if (count > 0)
@@ -108,33 +105,33 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 		List<ShowDeliveryData> list = new List<ShowDeliveryData>();
 		if (deliveryInfo != null)
 		{
-			for (int i = 0; i < deliveryInfo.Length; i++)
+			for (int j = 0; j < deliveryInfo.Length; j++)
 			{
-				ShowDeliveryData item = new ShowDeliveryData(i, false, deliveryInfo[i]);
+				ShowDeliveryData item = new ShowDeliveryData(j, false, deliveryInfo[j]);
 				list.Add(item);
 			}
 		}
 		if (clearedDeliveries != null)
 		{
-			for (int j = 0; j < clearedDeliveries.Count; j++)
+			for (int k = 0; k < clearedDeliveries.Count; k++)
 			{
-				ShowDeliveryData item2 = new ShowDeliveryData(j, true, clearedDeliveries[j]);
+				ShowDeliveryData item2 = new ShowDeliveryData(k, true, clearedDeliveries[k]);
 				list.Add(item2);
 			}
 		}
 		pageMax = 1 + (list.Count - 1) / 10;
 		bool flag = pageMax > 1;
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
-		SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
+		SetActive(UI.OBJ_ACTIVE_ROOT, flag);
+		SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
+		SetLabelText(UI.LBL_MAX, pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, nowPage.ToString());
 		ShowDeliveryData[] showList = GetPagingList(list.ToArray(), 10, nowPage);
 		int num2 = showList.Length;
 		if (showStory)
 		{
 			num2 += num + stories.Count;
 		}
-		SetActive((Enum)UI.TBL_DELIVERY_QUEST, true);
+		SetActive(UI.TBL_DELIVERY_QUEST, true);
 		bool flag2 = false;
 		if (ShouldShowEventMapButton())
 		{
@@ -153,18 +150,64 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 			storyStartIndex++;
 		}
 		Transform ctrl = GetCtrl(UI.TBL_DELIVERY_QUEST);
-		int k = 0;
-		for (int childCount = ctrl.get_childCount(); k < childCount; k++)
+		int l = 0;
+		for (int childCount = ctrl.childCount; l < childCount; l++)
 		{
-			Transform val = ctrl.GetChild(0);
-			val.set_parent(null);
-			Object.Destroy(val.get_gameObject());
+			Transform child = ctrl.GetChild(0);
+			child.parent = null;
+			UnityEngine.Object.Destroy(child.gameObject);
 		}
 		bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-		_003CUpdateTable_003Ec__AnonStorey3A9 _003CUpdateTable_003Ec__AnonStorey3A;
-		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, isResetUI, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-		component.set_enabled(true);
+		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, isResetUI, delegate(int i, Transform parent)
+		{
+			Transform transform = null;
+			if (i >= storyStartIndex)
+			{
+				if (!HasChapterStory() || i == storyStartIndex || !isRenewalFlag)
+				{
+					return Realizes("QuestEventStoryItem", parent, true);
+				}
+				return null;
+			}
+			if (i < borderIndex)
+			{
+				if (i < questStartIndex)
+				{
+					if (!((UnityEngine.Object)null != (UnityEngine.Object)mapItem))
+					{
+						return Realizes("QuestEventBorderItem", parent, true);
+					}
+					return ResourceUtility.Realizes(mapItem.gameObject, parent, -1);
+				}
+				return Realizes("QuestRequestItem", parent, true);
+			}
+			return Realizes("QuestEventBorderItem", parent, true);
+		}, delegate(int i, Transform t, bool is_recycle)
+		{
+			if (!((UnityEngine.Object)t == (UnityEngine.Object)null))
+			{
+				SetActive(t, true);
+				if (i >= storyStartIndex)
+				{
+					int storyIndex = i - storyStartIndex;
+					InitStory(storyIndex, t);
+				}
+				else if (i < borderIndex)
+				{
+					if (i >= questStartIndex)
+					{
+						int num3 = i - questStartIndex;
+						InitDelivery(showList[num3], t);
+					}
+					else
+					{
+						InitMap(t);
+					}
+				}
+			}
+		});
+		UIScrollView component = GetComponent<UIScrollView>(UI.SCR_DELIVERY_QUEST);
+		component.enabled = true;
 		RepositionTable();
 	}
 

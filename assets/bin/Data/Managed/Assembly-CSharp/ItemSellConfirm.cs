@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -71,9 +70,9 @@ public class ItemSellConfirm : GameSection
 	{
 		if (sellData != null)
 		{
-			SetLabelText((Enum)UI.STR_TITLE_R, base.sectionData.GetText("STR_TITLE"));
-			SetActive((Enum)UI.STR_INCLUDE_RARE, isRareConfirm);
-			SetActive((Enum)UI.STR_MAIN_TEXT, !isHideMainText);
+			SetLabelText(UI.STR_TITLE_R, base.sectionData.GetText("STR_TITLE"));
+			SetActive(UI.STR_INCLUDE_RARE, isRareConfirm);
+			SetActive(UI.STR_MAIN_TEXT, !isHideMainText);
 			DrawIcon();
 			SortCompareData[] array = sellData.ToArray();
 			int num = GetSellGold();
@@ -85,19 +84,19 @@ public class ItemSellConfirm : GameSection
 					num += array[i].GetSalePrice();
 				}
 			}
-			SetActive((Enum)UI.OBJ_GOLD, num != 0);
-			SetLabelText((Enum)UI.LBL_TOTAL, num.ToString());
+			SetActive(UI.OBJ_GOLD, num != 0);
+			SetLabelText(UI.LBL_TOTAL, num.ToString());
 			if (isButtonSingle)
 			{
-				SetActive((Enum)UI.BTN_CENTER, true);
-				SetActive((Enum)UI.BTN_0, false);
-				SetActive((Enum)UI.BTN_1, false);
+				SetActive(UI.BTN_CENTER, true);
+				SetActive(UI.BTN_0, false);
+				SetActive(UI.BTN_1, false);
 			}
 			else
 			{
-				SetActive((Enum)UI.BTN_CENTER, false);
-				SetActive((Enum)UI.BTN_0, true);
-				SetActive((Enum)UI.BTN_1, true);
+				SetActive(UI.BTN_CENTER, false);
+				SetActive(UI.BTN_0, true);
+				SetActive(UI.BTN_1, true);
 			}
 		}
 	}
@@ -107,12 +106,45 @@ public class ItemSellConfirm : GameSection
 		return 0;
 	}
 
-	protected unsafe virtual void DrawIcon()
+	protected virtual void DrawIcon()
 	{
 		SortCompareData[] sell_data_ary = sellData.ToArray();
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		_003CDrawIcon_003Ec__AnonStorey3C3 _003CDrawIcon_003Ec__AnonStorey3C;
-		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey3C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, delegate(int i, Transform t, bool is_recycle)
+		{
+			if (i < sell_data_ary.Length)
+			{
+				int enemy_icon_id = 0;
+				int enemy_icon_id2 = 0;
+				bool is_equipping = false;
+				SortCompareData sortCompareData = sell_data_ary[i];
+				if (sortCompareData is ItemSortData)
+				{
+					ItemSortData itemSortData = sortCompareData as ItemSortData;
+					enemy_icon_id = itemSortData.itemData.tableData.enemyIconID;
+					enemy_icon_id2 = itemSortData.itemData.tableData.enemyIconID2;
+				}
+				else if (sortCompareData is SkillItemSortData)
+				{
+					SkillItemSortData skillItemSortData = sortCompareData as SkillItemSortData;
+					is_equipping = skillItemSortData.IsEquipping();
+				}
+				else if (sortCompareData is AbilityItemSortData)
+				{
+					enemy_icon_id = (sortCompareData as AbilityItemSortData).itemData.GetItemTableData().enemyIconID;
+					enemy_icon_id2 = (sortCompareData as AbilityItemSortData).itemData.GetItemTableData().enemyIconID2;
+				}
+				GET_TYPE getType = sell_data_ary[i].GetGetType();
+				ItemIcon itemIcon = ItemIcon.Create(sell_data_ary[i].GetIconType(), sell_data_ary[i].GetIconID(), sell_data_ary[i].GetRarity(), t, sell_data_ary[i].GetIconElement(), sell_data_ary[i].GetIconMagiEnableType(), GetTargetIconNum(sell_data_ary, i), null, 0, false, -1, false, null, is_equipping, enemy_icon_id, enemy_icon_id2, false, getType, sell_data_ary[i].GetIconElementSub());
+				itemIcon.SetRewardBG(isShowIconBG());
+				Transform ctrl = GetCtrl(UI.SCR_ICON);
+				SetMaterialInfo(itemIcon.transform, sell_data_ary[i].GetMaterialType(), sell_data_ary[i].GetTableID(), ctrl);
+			}
+			else
+			{
+				SetActive(t, false);
+			}
+		});
 	}
 
 	protected virtual int GetTargetIconNum(SortCompareData[] sell_data_ary, int i)

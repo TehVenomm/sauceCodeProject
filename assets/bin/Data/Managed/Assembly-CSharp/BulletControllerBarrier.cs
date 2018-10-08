@@ -6,8 +6,6 @@ public class BulletControllerBarrier : BulletControllerBase
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam _skillInfoParam, Vector3 pos, Quaternion rot)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(bullet, _skillInfoParam, pos, rot);
 		ignoreLayerMask |= 3072;
 		ignoreLayerMask |= 20480;
@@ -16,20 +14,17 @@ public class BulletControllerBarrier : BulletControllerBase
 
 	public override bool IsHit(Collider collider)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		if (((1 << collider.get_gameObject().get_layer()) & ignoreLayerMask) > 0)
+		if (((1 << collider.gameObject.layer) & ignoreLayerMask) > 0)
 		{
 			return false;
 		}
-		AnimEventCollider.AtkColliderHiter component = collider.get_gameObject().GetComponent<AnimEventCollider.AtkColliderHiter>();
-		if (component != null)
+		AnimEventCollider.AtkColliderHiter component = collider.gameObject.GetComponent<AnimEventCollider.AtkColliderHiter>();
+		if ((Object)component != (Object)null)
 		{
 			return false;
 		}
-		DangerRader component2 = collider.get_gameObject().GetComponent<DangerRader>();
-		if (component2 != null)
+		DangerRader component2 = collider.gameObject.GetComponent<DangerRader>();
+		if ((Object)component2 != (Object)null)
 		{
 			return false;
 		}

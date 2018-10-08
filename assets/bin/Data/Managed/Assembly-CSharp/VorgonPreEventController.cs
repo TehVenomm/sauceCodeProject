@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VorgonPreEventController
+public class VorgonPreEventController : MonoBehaviour
 {
 	private const int ENERGY_BALL_INDEX = 14;
 
@@ -32,14 +32,9 @@ public class VorgonPreEventController
 
 	private bool npcAnnouncedHint;
 
-	public VorgonPreEventController()
-		: this()
-	{
-	}
-
 	private IEnumerator Start()
 	{
-		while (enemy == null)
+		while ((Object)enemy == (Object)null)
 		{
 			if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 			{
@@ -73,23 +68,21 @@ public class VorgonPreEventController
 
 	private void UpdateVorgonBattle()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		if (!npcStartedTalking)
 		{
 			npcStartedTalking = true;
-			this.StartCoroutine("UpdateNPCTalking");
+			StartCoroutine("UpdateNPCTalking");
 		}
 		if (vorgonBarrierBrokenProc && !npcAnnouncedHint && !enemy.IsValidBarrier)
 		{
-			this.StopCoroutine("UpdateNPCTalking");
-			this.StartCoroutine("UpdateNPCTalkingAfterBreakedBariier");
+			StopCoroutine("UpdateNPCTalking");
+			StartCoroutine("UpdateNPCTalkingAfterBreakedBariier");
 			npcAnnouncedHint = true;
 		}
 		if ((float)enemy.hp / (float)enemy.hpMax <= 0.5f || MonoBehaviourSingleton<InGameProgress>.I.remaindTime < 84f)
 		{
-			this.StopCoroutine("UpdateNPCTalking");
-			this.StopCoroutine("UpdateNPCTalkingAfterBreakedBariier");
+			StopCoroutine("UpdateNPCTalking");
+			StopCoroutine("UpdateNPCTalkingAfterBreakedBariier");
 			EnemyBrain componentInChildren = enemy.GetComponentInChildren<EnemyBrain>();
 			for (int i = 0; i < componentInChildren.actionCtrl.actions.Count; i++)
 			{
@@ -166,7 +159,7 @@ public class VorgonPreEventController
 			for (int i = 0; i < nonplayerList.Count; i++)
 			{
 				Player player = nonplayerList[i] as Player;
-				if (!(player == null))
+				if (!((Object)player == (Object)null))
 				{
 					int num = (int)((float)player.hpMax * 0.8f);
 					if (player.hp < num)

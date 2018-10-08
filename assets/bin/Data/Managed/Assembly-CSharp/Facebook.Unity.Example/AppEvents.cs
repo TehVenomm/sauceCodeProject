@@ -9,14 +9,14 @@ namespace Facebook.Unity.Example
 			if (Button("Log FB App Event"))
 			{
 				base.Status = "Logged FB.AppEvent";
-				FB.LogAppEvent("fb_mobile_achievement_unlocked", (float?)null, new Dictionary<string, object>
+				FB.LogAppEvent("fb_mobile_achievement_unlocked", null, new Dictionary<string, object>
 				{
 					{
 						"fb_description",
 						"Clicked 'Log AppEvent' button"
 					}
 				});
-				LogView.AddLog("You may see results showing up at https://www.facebook.com/analytics/" + FB.get_AppId());
+				LogView.AddLog("You may see results showing up at https://www.facebook.com/analytics/" + FB.AppId);
 			}
 		}
 	}

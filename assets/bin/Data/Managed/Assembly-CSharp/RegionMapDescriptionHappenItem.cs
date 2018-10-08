@@ -120,13 +120,11 @@ public class RegionMapDescriptionHappenItem : UIBehaviour
 
 	private Transform GetTransform()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
-		Transform val = base._transform;
-		if (val == null)
+		Transform transform = base._transform;
+		if ((Object)transform == (Object)null)
 		{
-			val = this.get_transform();
+			transform = base.transform;
 		}
-		return val;
+		return transform;
 	}
 }

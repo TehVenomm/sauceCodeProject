@@ -94,10 +94,10 @@ public static class Localization
 		{
 			if (loadFunction == null)
 			{
-				TextAsset val = Resources.Load<TextAsset>("Localization");
-				if (val != null)
+				TextAsset textAsset = Resources.Load<TextAsset>("Localization");
+				if ((UnityEngine.Object)textAsset != (UnityEngine.Object)null)
 				{
-					array = val.get_bytes();
+					array = textAsset.bytes;
 				}
 			}
 			else
@@ -120,10 +120,10 @@ public static class Localization
 		}
 		if (loadFunction == null)
 		{
-			TextAsset val2 = Resources.Load<TextAsset>(value);
-			if (val2 != null)
+			TextAsset textAsset2 = Resources.Load<TextAsset>(value);
+			if ((UnityEngine.Object)textAsset2 != (UnityEngine.Object)null)
 			{
-				array = val2.get_bytes();
+				array = textAsset2.bytes;
 			}
 		}
 		else
@@ -167,7 +167,7 @@ public static class Localization
 	public static void Load(TextAsset asset)
 	{
 		ByteReader byteReader = new ByteReader(asset);
-		Set(asset.get_name(), byteReader.ReadDictionary());
+		Set(asset.name, byteReader.ReadDictionary());
 	}
 
 	public static void Set(string languageName, byte[] bytes)
@@ -195,7 +195,7 @@ public static class Localization
 
 	public static bool LoadCSV(TextAsset asset, bool merge = false)
 	{
-		return LoadCSV(asset.get_bytes(), asset, merge);
+		return LoadCSV(asset.bytes, asset, merge);
 	}
 
 	public static bool LoadCSV(byte[] bytes, bool merge = false)
@@ -320,7 +320,7 @@ public static class Localization
 					mDictionary[text] = value;
 					if (newLanguages == null)
 					{
-						Debug.LogWarning((object)("Localization key '" + text + "' is already present"));
+						Debug.LogWarning("Localization key '" + text + "' is already present");
 					}
 				}
 				else
@@ -331,7 +331,7 @@ public static class Localization
 					}
 					catch (Exception ex)
 					{
-						Debug.LogError((object)("Unable to add '" + text + "' to the Localization dictionary.\n" + ex.Message));
+						Debug.LogError("Unable to add '" + text + "' to the Localization dictionary.\n" + ex.Message);
 					}
 				}
 			}
@@ -430,7 +430,7 @@ public static class Localization
 		}
 		if (mLanguages == null)
 		{
-			Debug.LogError((object)"No localization data present");
+			Debug.LogError("No localization data present");
 			return null;
 		}
 		string language = Localization.language;
@@ -449,7 +449,7 @@ public static class Localization
 		{
 			mLanguageIndex = 0;
 			mLanguage = mLanguages[0];
-			Debug.LogWarning((object)("Language not found: " + language));
+			Debug.LogWarning("Language not found: " + language);
 		}
 		string value;
 		string[] value2;

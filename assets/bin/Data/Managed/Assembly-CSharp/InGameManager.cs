@@ -616,7 +616,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 	{
 		rushBossBackup = null;
 		Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-		if (boss != null)
+		if ((UnityEngine.Object)boss != (UnityEngine.Object)null)
 		{
 			rushBossBackup = boss.CreateBackup();
 		}
@@ -626,7 +626,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 	public void RestoreRushInReentry()
 	{
 		Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-		if (boss != null && rushBossBackup != null)
+		if ((UnityEngine.Object)boss != (UnityEngine.Object)null && rushBossBackup != null)
 		{
 			CoopPacket coopPacket = new CoopPacket();
 			coopPacket.model = rushBossBackup;
@@ -807,7 +807,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 	{
 		seriesBossBackup = null;
 		Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-		if (boss != null && !boss.isDead)
+		if ((UnityEngine.Object)boss != (UnityEngine.Object)null && !boss.isDead)
 		{
 			seriesBossBackup = boss.CreateBackup();
 		}
@@ -817,7 +817,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 	public void RestoreSeriesInReentry()
 	{
 		Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-		if (boss != null && seriesBossBackup != null)
+		if ((UnityEngine.Object)boss != (UnityEngine.Object)null && seriesBossBackup != null)
 		{
 			CoopPacket coopPacket = new CoopPacket();
 			coopPacket.model = seriesBossBackup;
@@ -1005,9 +1005,6 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 
 	public void CheckStageInitialState()
 	{
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
 		isValidGimmickObject = (MonoBehaviourSingleton<StageObjectManager>.I.gimmickList.Count > 0);
 		if (FieldManager.IsValidInGameNoBoss())
 		{
@@ -1020,7 +1017,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 			int i = 0;
 			for (int num = componentsInChildren.Length; i < num; i++)
 			{
-				if (componentsInChildren[i].get_gameObject().get_layer() == 18 || componentsInChildren[i].get_gameObject().get_layer() == 9 || componentsInChildren[i].get_gameObject().get_layer() == 21)
+				if (componentsInChildren[i].gameObject.layer == 18 || componentsInChildren[i].gameObject.layer == 9 || componentsInChildren[i].gameObject.layer == 21)
 				{
 					flag = true;
 					break;
@@ -1043,7 +1040,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 		{
 			if (MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeries())
 			{
-				this.StartCoroutine(InitializeEnemyPopForSeries());
+				StartCoroutine(InitializeEnemyPopForSeries());
 			}
 			else
 			{
@@ -1088,12 +1085,11 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 							if (!enemy_list.Contains(enemy_id))
 							{
 								enemy_list.Add(enemy_pop.enemyID);
-								MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(0, Vector3.get_zero(), 0f, (int)enemy_id, enemy_level, enemy_pop.bossFlag, enemy_pop.bigMonsterFlag, true, true, delegate(Enemy o)
+								MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(0, Vector3.zero, 0f, (int)enemy_id, enemy_level, enemy_pop.bossFlag, enemy_pop.bigMonsterFlag, true, true, delegate(Enemy o)
 								{
-									//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-									o.get_gameObject().SetActive(false);
+									o.gameObject.SetActive(false);
 									MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(o);
-									((_003CInitializeEnemyPop_003Ec__Iterator226)/*Error near IL_0232: stateMachine*/)._003Cload_count_003E__4++;
+									((_003CInitializeEnemyPop_003Ec__Iterator228)/*Error near IL_0232: stateMachine*/)._003Cload_count_003E__4++;
 								});
 							}
 						}
@@ -1118,12 +1114,11 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 			int enemyLv = questMgr.GetCurrentQuestEnemyLv(i);
 			if (enemyId != 0 && enemyLv > 0)
 			{
-				MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(0, Vector3.get_zero(), 0f, (int)enemyId, enemyLv, true, true, true, true, delegate(Enemy o)
+				MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(0, Vector3.zero, 0f, (int)enemyId, enemyLv, true, true, true, true, delegate(Enemy o)
 				{
-					//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-					o.get_gameObject().SetActive(false);
+					o.gameObject.SetActive(false);
 					MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(o);
-					((_003CInitializeEnemyPopForSeries_003Ec__Iterator227)/*Error near IL_00c4: stateMachine*/)._003CloadCount_003E__2++;
+					((_003CInitializeEnemyPopForSeries_003Ec__Iterator229)/*Error near IL_00c4: stateMachine*/)._003CloadCount_003E__2++;
 				});
 			}
 		}
@@ -1141,13 +1136,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 
 	public GameObject CreateBossDropObject(int rarity)
 	{
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Expected O, but got Unknown
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0143: Expected O, but got Unknown
-		//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e6: Expected O, but got Unknown
-		GameObject val = null;
+		GameObject gameObject = null;
 		switch (rarity)
 		{
 		case 2:
@@ -1155,20 +1144,20 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 			int k = 0;
 			for (int count3 = bossDropRegionBreakCaches.Count; k < count3; k++)
 			{
-				if (!bossDropRegionBreakCaches[k].get_activeSelf())
+				if (!bossDropRegionBreakCaches[k].activeSelf)
 				{
-					val = bossDropRegionBreakCaches[k];
-					val.SetActive(true);
+					gameObject = bossDropRegionBreakCaches[k];
+					gameObject.SetActive(true);
 					break;
 				}
 			}
-			if (val == null)
+			if ((UnityEngine.Object)gameObject == (UnityEngine.Object)null)
 			{
-				Transform val4 = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropRegionBreak, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-				if (val4 != null)
+				Transform transform3 = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropRegionBreak, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
+				if ((UnityEngine.Object)transform3 != (UnityEngine.Object)null)
 				{
-					val = val4.get_gameObject();
-					bossDropRegionBreakCaches.Add(val);
+					gameObject = transform3.gameObject;
+					bossDropRegionBreakCaches.Add(gameObject);
 				}
 			}
 			break;
@@ -1178,20 +1167,20 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 			int j = 0;
 			for (int count2 = bossDropRCaches.Count; j < count2; j++)
 			{
-				if (!bossDropRCaches[j].get_activeSelf())
+				if (!bossDropRCaches[j].activeSelf)
 				{
-					val = bossDropRCaches[j];
-					val.SetActive(true);
+					gameObject = bossDropRCaches[j];
+					gameObject.SetActive(true);
 					break;
 				}
 			}
-			if (val == null)
+			if ((UnityEngine.Object)gameObject == (UnityEngine.Object)null)
 			{
-				Transform val3 = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropR, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-				if (val3 != null)
+				Transform transform2 = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropR, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
+				if ((UnityEngine.Object)transform2 != (UnityEngine.Object)null)
 				{
-					val = val3.get_gameObject();
-					bossDropRCaches.Add(val);
+					gameObject = transform2.gameObject;
+					bossDropRCaches.Add(gameObject);
 				}
 			}
 			break;
@@ -1201,32 +1190,32 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 			int i = 0;
 			for (int count = bossDropNCaches.Count; i < count; i++)
 			{
-				if (!bossDropNCaches[i].get_activeSelf())
+				if (!bossDropNCaches[i].activeSelf)
 				{
-					val = bossDropNCaches[i];
-					val.SetActive(true);
+					gameObject = bossDropNCaches[i];
+					gameObject.SetActive(true);
 					break;
 				}
 			}
-			if (val == null)
+			if ((UnityEngine.Object)gameObject == (UnityEngine.Object)null)
 			{
-				Transform val2 = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropN, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-				if (val2 != null)
+				Transform transform = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropN, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
+				if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 				{
-					val = val2.get_gameObject();
-					bossDropNCaches.Add(val);
+					gameObject = transform.gameObject;
+					bossDropNCaches.Add(gameObject);
 				}
 			}
 			break;
 		}
 		}
-		return val;
+		return gameObject;
 	}
 
 	public void CreateDropObject(Coop_Model_EnemyDefeat model, List<DropDeliveryInfo> deliveryList, List<DropItemInfo> itemList)
 	{
 		FieldDropObject fieldDropObject = FieldDropObject.Create(model, deliveryList, itemList);
-		if (fieldDropObject != null)
+		if ((UnityEngine.Object)fieldDropObject != (UnityEngine.Object)null)
 		{
 			dropList.Add(fieldDropObject);
 			if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<InGameProgress>.I.isHappenQuestDirection)
@@ -1300,7 +1289,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 	public void DeleteDropObject(int reward_id, bool is_get)
 	{
 		FieldDropObject fieldDropObject = dropList.Find((FieldDropObject o) => o.rewardId == reward_id);
-		if (fieldDropObject != null)
+		if ((UnityEngine.Object)fieldDropObject != (UnityEngine.Object)null)
 		{
 			fieldDropObject.Delete(is_get);
 		}
@@ -1332,7 +1321,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 		int i = 0;
 		for (int count = dropCaches.Count; i < count; i++)
 		{
-			Object.Destroy(dropCaches[i]);
+			UnityEngine.Object.Destroy(dropCaches[i]);
 		}
 		dropCaches.Clear();
 	}
@@ -1372,24 +1361,22 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 
 	private GameObject RealizeTreasureBox(List<GameObject> caches, GameObject prefab)
 	{
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Expected O, but got Unknown
 		int i = 0;
 		for (int count = caches.Count; i < count; i++)
 		{
-			if (caches[i] != null && !caches[i].get_activeSelf())
+			if ((UnityEngine.Object)caches[i] != (UnityEngine.Object)null && !caches[i].activeSelf)
 			{
-				GameObject val = caches[i];
-				val.SetActive(true);
-				return val;
+				GameObject gameObject = caches[i];
+				gameObject.SetActive(true);
+				return gameObject;
 			}
 		}
-		Transform val2 = ResourceUtility.Realizes(prefab, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-		if (val2 != null)
+		Transform transform = ResourceUtility.Realizes(prefab, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			GameObject val3 = val2.get_gameObject();
-			caches.Add(val3);
-			return val3;
+			GameObject gameObject2 = transform.gameObject;
+			caches.Add(gameObject2);
+			return gameObject2;
 		}
 		return null;
 	}
@@ -1412,10 +1399,10 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 			if (have >= need)
 			{
 				GameSection currentSection = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection();
-				if (currentSection != null)
+				if ((UnityEngine.Object)currentSection != (UnityEngine.Object)null)
 				{
 					InGameMain component = currentSection.GetComponent<InGameMain>();
-					if (component != null)
+					if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 					{
 						component.OnNoticeCompletedDelivery();
 					}
@@ -1467,7 +1454,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Count; i < count; i++)
 		{
 			Player player = MonoBehaviourSingleton<StageObjectManager>.I.playerList[i] as Player;
-			if (!(player == null) && (transfer_other || player is Self))
+			if (!((UnityEngine.Object)player == (UnityEngine.Object)null) && (transfer_other || player is Self))
 			{
 				if (!keep_dead && player.hp <= 0)
 				{
@@ -1480,8 +1467,8 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 				if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && !keep_dead)
 				{
 					int currentRushStandupHpPer = MonoBehaviourSingleton<InGameManager>.I.GetCurrentRushStandupHpPer();
-					int num = (int)((float)player.hpMax * ((float)currentRushStandupHpPer / 100f));
-					player.hp = Mathf.Max(player.hp, num);
+					int b = (int)((float)player.hpMax * ((float)currentRushStandupHpPer / 100f));
+					player.hp = Mathf.Max(player.hp, b);
 				}
 				IntervalTransferInfo.PlayerInfo playerInfo = new IntervalTransferInfo.PlayerInfo();
 				playerInfo.id = player.id;
@@ -1503,7 +1490,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 				if (player is Self)
 				{
 					Self self = player as Self;
-					if (self != null)
+					if ((UnityEngine.Object)self != (UnityEngine.Object)null)
 					{
 						playerInfo.taskChecker = self.taskChecker;
 					}
@@ -1511,7 +1498,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 				if (player.coopClientId != 0 && MonoBehaviourSingleton<CoopManager>.IsValid())
 				{
 					CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByPlayerId(player.id);
-					if (coopClient != null)
+					if ((UnityEngine.Object)coopClient != (UnityEngine.Object)null)
 					{
 						playerInfo.coopClientId = coopClient.clientId;
 						playerInfo.isCoopPlayer = true;
@@ -1524,45 +1511,35 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 
 	public void SetIntervalTransferSelf()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Expected O, but got Unknown
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		if (!(selfCacheObject != null))
+		if (!((UnityEngine.Object)selfCacheObject != (UnityEngine.Object)null))
 		{
 			selfCacheObject = new GameObject();
-			selfCacheObject.set_name("SelfCacheObject");
-			selfCacheObject.get_transform().set_parent(MonoBehaviourSingleton<AppMain>.I._transform);
+			selfCacheObject.name = "SelfCacheObject";
+			selfCacheObject.transform.parent = MonoBehaviourSingleton<AppMain>.I._transform;
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 			self.OnCached();
-			GameObject val = self.get_gameObject();
-			val.get_transform().set_parent(selfCacheObject.get_transform());
-			val.get_gameObject().set_name("SelfCache");
-			val.get_gameObject().SetActive(false);
+			GameObject gameObject = self.gameObject;
+			gameObject.transform.parent = selfCacheObject.transform;
+			gameObject.gameObject.name = "SelfCache";
+			gameObject.gameObject.SetActive(false);
 		}
 	}
 
 	public void DestroySelfCache()
 	{
-		if (!(selfCacheObject == null))
+		if (!((UnityEngine.Object)selfCacheObject == (UnityEngine.Object)null))
 		{
-			Object.Destroy(selfCacheObject);
+			UnityEngine.Object.Destroy(selfCacheObject);
 			selfCacheObject = null;
 		}
 	}
 
 	public void SetEnableIntervalTransferInfoRemaindTimeUpdate()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		if (updateIntervalTransferInfoRemaindTime == null)
 		{
 			updateIntervalTransferInfoRemaindTime = UpdateIntervalTransferInfoRemaindTime();
-			this.StartCoroutine(updateIntervalTransferInfoRemaindTime);
+			StartCoroutine(updateIntervalTransferInfoRemaindTime);
 		}
 	}
 
@@ -1570,18 +1547,18 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 	{
 		if (updateIntervalTransferInfoRemaindTime != null)
 		{
-			this.StopCoroutine(updateIntervalTransferInfoRemaindTime);
+			StopCoroutine(updateIntervalTransferInfoRemaindTime);
 			updateIntervalTransferInfoRemaindTime = null;
 		}
 	}
 
 	private IEnumerator UpdateIntervalTransferInfoRemaindTime()
 	{
-		float startTime = Time.get_realtimeSinceStartup();
+		float startTime = Time.realtimeSinceStartup;
 		float startRemaindTime = intervalTransferInfo.remaindTime;
 		while (intervalTransferInfo != null)
 		{
-			intervalTransferInfo.remaindTime = startRemaindTime - (Time.get_realtimeSinceStartup() - startTime);
+			intervalTransferInfo.remaindTime = startRemaindTime - (Time.realtimeSinceStartup - startTime);
 			yield return (object)null;
 		}
 	}

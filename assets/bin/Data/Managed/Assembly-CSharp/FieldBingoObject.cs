@@ -20,21 +20,13 @@ public class FieldBingoObject : FieldGimmickObject
 
 	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Expected O, but got Unknown
 		base.Initialize(pointData);
 		ParseParam(pointData.value2);
 		if (Singleton<NPCTable>.IsValid())
 		{
-			Singleton<NPCTable>.I.GetNPCData(npcId)?.LoadModel(this.get_gameObject(), true, true, delegate(Animator animator)
+			Singleton<NPCTable>.I.GetNPCData(npcId)?.LoadModel(base.gameObject, true, true, delegate(Animator animator)
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-				Transform transform = animator.get_gameObject().get_transform();
-				transform.set_localScale(transform.get_localScale() * npcScale);
+				animator.gameObject.transform.localScale *= npcScale;
 			}, false);
 		}
 	}
@@ -77,53 +69,32 @@ public class FieldBingoObject : FieldGimmickObject
 
 	public override void UpdateTargetMarker(bool isNear)
 	{
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0105: Expected O, but got Unknown
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		if (isNear && self != null && self.IsChangeableAction((Character.ACTION_ID)38))
+		if (isNear && (Object)self != (Object)null && self.IsChangeableAction((Character.ACTION_ID)38))
 		{
 			string readStoryTargetEffectName = ResourceName.GetReadStoryTargetEffectName();
-			if (targetMarker == null && !string.IsNullOrEmpty(readStoryTargetEffectName))
+			if ((Object)targetMarker == (Object)null && !string.IsNullOrEmpty(readStoryTargetEffectName))
 			{
 				targetMarker = EffectManager.GetEffect(readStoryTargetEffectName, _transform);
 			}
-			if (targetMarker != null)
+			if ((Object)targetMarker != (Object)null)
 			{
 				Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-				Vector3 position = cameraTransform.get_position();
-				Quaternion rotation = cameraTransform.get_rotation();
-				Vector3 val = position - _transform.get_position();
-				Vector3 pos = val.get_normalized() + Vector3.get_up() + _transform.get_position();
+				Vector3 position = cameraTransform.position;
+				Quaternion rotation = cameraTransform.rotation;
+				Vector3 pos = (position - _transform.position).normalized + Vector3.up + _transform.position;
 				pos.y += markerOffsetY;
 				targetMarker.Set(pos, rotation);
 			}
 		}
-		else if (targetMarker != null)
+		else if ((Object)targetMarker != (Object)null)
 		{
-			EffectManager.ReleaseEffect(targetMarker.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(targetMarker.gameObject, true, false);
 		}
 	}
 
 	public void OpenBingo()
 	{
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Expected O, but got Unknown
 		if (IsValidBingo())
 		{
 			if (deliveryId != 0 && MonoBehaviourSingleton<DeliveryManager>.I.IsAppearDelivery(deliveryId) && !MonoBehaviourSingleton<DeliveryManager>.I.IsClearDelivery(deliveryId) && !MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)deliveryId))
@@ -140,7 +111,7 @@ public class FieldBingoObject : FieldGimmickObject
 				SoundManager.PlaySystemSE(SoundID.UISE.POP_QUEST, 1f);
 				if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("FieldBingoObject", this.get_gameObject(), "BINGO", new object[2]
+					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("FieldBingoObject", base.gameObject, "BINGO", new object[2]
 					{
 						bingoId,
 						false
@@ -157,12 +128,8 @@ public class FieldBingoObject : FieldGimmickObject
 
 	protected override void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
-		_transform = this.get_transform();
-		Utility.SetLayerWithChildren(this.get_transform(), 19);
+		_transform = base.transform;
+		Utility.SetLayerWithChildren(base.transform, 19);
 	}
 
 	private bool IsValidBingo()
@@ -188,7 +155,7 @@ public class FieldBingoObject : FieldGimmickObject
 			return false;
 		}
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		if (self == null)
+		if ((Object)self == (Object)null)
 		{
 			return false;
 		}

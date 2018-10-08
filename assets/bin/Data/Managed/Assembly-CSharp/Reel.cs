@@ -56,7 +56,7 @@ public class Reel : GameSection
 		base.Initialize();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
 		int width = GetWidth(UI.OBJ_REEL_SIZE_BASE);
 		int digits = 0;
@@ -65,23 +65,53 @@ public class Reel : GameSection
 			digits += ((data <= 0) ? 1 : data);
 		});
 		int reel_list_width_base = width / digits;
-		_003CUpdateUI_003Ec__AnonStorey79C _003CUpdateUI_003Ec__AnonStorey79C;
-		SetTable(UI.TBL_REEL, "ReelList", initData.digit.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey79C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetTable(UI.TBL_REEL, "ReelList", initData.digit.Length, false, delegate(int i, Transform t, bool is_recycle)
+		{
+			if (initData.digit[i] <= 0)
+			{
+				SetActive(t, false);
+			}
+			else
+			{
+				SetActive(t, true);
+				float width2 = (float)(reel_list_width_base * initData.digit[i]);
+				SetWidth(t, (int)width2);
+				UIScrollView component = GetComponent<UIScrollView>(t, UI.SCR_LIST);
+				Vector4 baseClipRegion = component.panel.baseClipRegion;
+				baseClipRegion.z = width2;
+				component.panel.baseClipRegion = baseClipRegion;
+				GetComponent<UIGrid>(t, UI.GRD_REEL_LIST).cellWidth = (float)reel_list_width_base;
+				SetGrid(t, UI.GRD_REEL_LIST, "ReelListItem", 10, false, delegate(int i2, Transform t2, bool is_recycle2)
+				{
+					GetComponent<UIGrid>(t2, UI.GRD_REEL_LIST_ITEM).cellWidth = (float)reel_list_width_base;
+					SetWidth(t2, (int)width2);
+					SetGrid(t2, UI.GRD_REEL_LIST_ITEM, "ReelListText", initData.digit[i], false, delegate(int i3, Transform t3, bool is_recycle3)
+					{
+						int num3 = (i3 == 0) ? i2 : 0;
+						SetLabelText(t3, num3.ToString());
+						SetWidth(t3, (int)width2);
+					});
+				});
+				int num = digits;
+				int j = 0;
+				for (int num2 = i; j < num2; j++)
+				{
+					num -= initData.digit[j];
+				}
+				int index = initData.initValue / (int)Mathf.Pow(10f, (float)(num - 1)) % 10;
+				SetCenter(t, UI.GRD_REEL_LIST, index, true);
+				SetCenterOnChildFunc(t, UI.GRD_REEL_LIST, OnCenter);
+			}
+		});
 	}
 
 	public void OnCenter(GameObject go)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 		int result = 0;
-		if (int.TryParse(go.get_name(), out result))
+		if (int.TryParse(go.name, out result))
 		{
 			int result2 = 0;
-			if (int.TryParse(go.get_transform().get_parent().get_parent()
-				.get_parent()
-				.get_name(), out result2) && result2 < recvData.Length)
+			if (int.TryParse(go.transform.parent.parent.parent.name, out result2) && result2 < recvData.Length)
 			{
 				int digits = 0;
 				Array.ForEach(initData.digit, delegate(int data)

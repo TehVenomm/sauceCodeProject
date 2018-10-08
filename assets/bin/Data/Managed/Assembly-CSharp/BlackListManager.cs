@@ -46,13 +46,13 @@ public class BlackListManager : MonoBehaviourSingleton<BlackListManager>
 		requestSendForm.page = page;
 		Protocol.Send(BlackListListModel.URL, requestSendForm, delegate(BlackListListModel ret)
 		{
-			bool flag = false;
+			bool arg = false;
 			if (ret.Error == Error.None)
 			{
-				flag = true;
+				arg = true;
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
-			call_back.Invoke(flag, ret.result);
+			call_back(arg, ret.result);
 		}, string.Empty);
 	}
 

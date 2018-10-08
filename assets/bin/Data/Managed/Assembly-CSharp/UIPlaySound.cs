@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Play Sound")]
-public class UIPlaySound
+public class UIPlaySound : MonoBehaviour
 {
 	public enum Trigger
 	{
@@ -31,18 +31,13 @@ public class UIPlaySound
 	{
 		get
 		{
-			if (!this.get_enabled())
+			if (!base.enabled)
 			{
 				return false;
 			}
-			UIButton component = this.GetComponent<UIButton>();
-			return component == null || component.isEnabled;
+			UIButton component = GetComponent<UIButton>();
+			return (Object)component == (Object)null || component.isEnabled;
 		}
-	}
-
-	public UIPlaySound()
-		: this()
-	{
 	}
 
 	private void OnEnable()

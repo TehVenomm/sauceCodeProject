@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class UIShowControlScheme
+public class UIShowControlScheme : MonoBehaviour
 {
 	public GameObject target;
 
@@ -10,11 +10,6 @@ public class UIShowControlScheme
 	public bool touch;
 
 	public bool controller = true;
-
-	public UIShowControlScheme()
-		: this()
-	{
-	}
 
 	private void OnEnable()
 	{
@@ -29,7 +24,7 @@ public class UIShowControlScheme
 
 	private void OnScheme()
 	{
-		if (target != null)
+		if ((UnityEngine.Object)target != (UnityEngine.Object)null)
 		{
 			switch (UICamera.currentScheme)
 			{

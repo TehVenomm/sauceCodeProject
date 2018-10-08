@@ -39,42 +39,28 @@ public class SpotManager
 
 		public void Update(Camera camera)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			if (null != camera)
+			if ((UnityEngine.Object)null != (UnityEngine.Object)camera)
 			{
-				Vector3 val = camera.WorldToScreenPoint(originalPos);
-				val = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
-				val.z = 0f;
-				_transform.set_position(val);
+				Vector3 position = camera.WorldToScreenPoint(originalPos);
+				position = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(position);
+				position.z = 0f;
+				_transform.position = position;
 			}
 		}
 
 		public Vector2 GetScreenPos()
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 val = MonoBehaviourSingleton<UIManager>.I.uiCamera.WorldToViewportPoint(_transform.get_position());
-			return new Vector2(val.x, val.y);
+			Vector3 vector = MonoBehaviourSingleton<UIManager>.I.uiCamera.WorldToViewportPoint(_transform.position);
+			return new Vector2(vector.x, vector.y);
 		}
 
 		public void SetIconSprite(string iconObjectName, Texture2D icon, int iconWidth, int iconHeight)
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Expected O, but got Unknown
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			Transform val = _transform.FindChild(iconObjectName);
-			if (!(val == null))
+			Transform transform = _transform.FindChild(iconObjectName);
+			if (!((UnityEngine.Object)transform == (UnityEngine.Object)null))
 			{
-				UITexture component = val.get_gameObject().GetComponent<UITexture>();
-				if (!(component == null))
+				UITexture component = transform.gameObject.GetComponent<UITexture>();
+				if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
 				{
 					component.mainTexture = icon;
 					component.width = iconWidth;
@@ -85,30 +71,23 @@ public class SpotManager
 
 		public void ReleaseRegion(string name, Texture2D icon, string eventName)
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Expected O, but got Unknown
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Expected O, but got Unknown
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			Transform val = _transform.FindChild("LBL_NAME");
-			if (val != null)
+			Transform transform = _transform.FindChild("LBL_NAME");
+			if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 			{
-				UILabel component = val.GetComponent<UILabel>();
+				UILabel component = transform.GetComponent<UILabel>();
 				component.text = name;
 			}
-			Transform val2 = _transform.FindChild("SPR_ICON");
-			if (!(val2 == null))
+			Transform transform2 = _transform.FindChild("SPR_ICON");
+			if (!((UnityEngine.Object)transform2 == (UnityEngine.Object)null))
 			{
-				UITexture component2 = val2.get_gameObject().GetComponent<UITexture>();
-				if (!(component2 == null))
+				UITexture component2 = transform2.gameObject.GetComponent<UITexture>();
+				if (!((UnityEngine.Object)component2 == (UnityEngine.Object)null))
 				{
 					component2.mainTexture = icon;
 					UIGameSceneEventSender component3 = _transform.FindChild("SPR_BUTTON").GetComponent<UIGameSceneEventSender>();
 					if (string.IsNullOrEmpty(eventName))
 					{
-						Object.Destroy(component3.get_gameObject());
+						UnityEngine.Object.Destroy(component3.gameObject);
 					}
 					else
 					{
@@ -120,13 +99,10 @@ public class SpotManager
 
 		public void UpdateDeliveryTargetMarker(bool isExistDelivery)
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Expected O, but got Unknown
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			Transform val = _transform.FindChild("SPR_DELIVERY_TARGET");
-			if (val != null)
+			Transform transform = _transform.FindChild("SPR_DELIVERY_TARGET");
+			if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 			{
-				val.get_gameObject().SetActive(isExistDelivery);
+				transform.gameObject.SetActive(isExistDelivery);
 			}
 		}
 	}
@@ -157,13 +133,13 @@ public class SpotManager
 
 	public Transform SetRoot(Transform t)
 	{
-		if (spotRootTransform == null)
+		if ((UnityEngine.Object)spotRootTransform == (UnityEngine.Object)null)
 		{
 			spotRootTransform = ResourceUtility.Realizes(spotRootPrehab, t, -1);
 		}
-		else if (t != null)
+		else if ((UnityEngine.Object)t != (UnityEngine.Object)null)
 		{
-			spotRootTransform.set_parent(t);
+			spotRootTransform.parent = t;
 		}
 		return spotRootTransform;
 	}
@@ -175,12 +151,11 @@ public class SpotManager
 
 	public void ClearAllSpot()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < spots.Count; i++)
 		{
 			if (spots[i] != null)
 			{
-				Object.Destroy(spots[i]._transform.get_gameObject());
+				UnityEngine.Object.Destroy(spots[i]._transform.gameObject);
 				spots[i] = null;
 			}
 		}
@@ -189,7 +164,7 @@ public class SpotManager
 
 	public void CreateSpotRoot()
 	{
-		if (spotRootTransform == null)
+		if ((UnityEngine.Object)spotRootTransform == (UnityEngine.Object)null)
 		{
 			spotRootTransform = ResourceUtility.Realizes(spotRootPrehab, MonoBehaviourSingleton<UIManager>.I.uiRootTransform, -1);
 		}
@@ -197,55 +172,6 @@ public class SpotManager
 
 	public Spot AddSpot(int id, string name, Vector3 pos, ICON_TYPE icon, string event_name, bool isNew = false, bool canUnlockNewPortal = false, bool viewEnemyPopBallon = false, object _event = null, Texture2D dungeon_icon = null, bool isExistDelivery = false, HAPPEN_CONDITION happenQuestCondition = HAPPEN_CONDITION.NONE, int mapNo = 0)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Expected O, but got Unknown
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Expected O, but got Unknown
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Expected O, but got Unknown
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Expected O, but got Unknown
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Expected O, but got Unknown
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Expected O, but got Unknown
-		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0199: Expected O, but got Unknown
-		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c6: Expected O, but got Unknown
-		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0201: Expected O, but got Unknown
-		//IL_0212: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Expected O, but got Unknown
-		//IL_023b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0257: Expected O, but got Unknown
-		//IL_0265: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0281: Expected O, but got Unknown
-		//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d1: Expected O, but got Unknown
-		//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fb: Expected O, but got Unknown
-		//IL_0309: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0323: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0328: Expected O, but got Unknown
-		//IL_0336: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0350: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036a: Unknown result type (might be due to invalid IL or missing references)
 		CreateSpotRoot();
 		Spot spot = new Spot();
 		spot.id = id;
@@ -253,99 +179,99 @@ public class SpotManager
 		spot.type = icon;
 		spot.mapNo = mapNo;
 		spot._transform = ResourceUtility.Realizes(spotPrefab, spotRootTransform, 5);
-		Transform val = spot._transform.FindChild("LBL_NAME");
-		if (val != null)
+		Transform transform = spot._transform.FindChild("LBL_NAME");
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			UILabel component = val.GetComponent<UILabel>();
+			UILabel component = transform.GetComponent<UILabel>();
 			component.text = name;
-			component.get_gameObject().SetActive(icon != ICON_TYPE.NOT_OPENED);
+			component.gameObject.SetActive(icon != ICON_TYPE.NOT_OPENED);
 		}
 		if (mapNo > 0)
 		{
-			val = spot._transform.FindChild("LBL_LOCATION_NUMBER");
-			if (val != null)
+			transform = spot._transform.FindChild("LBL_LOCATION_NUMBER");
+			if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 			{
-				val.get_gameObject().SetActive(true);
-				UILabel component2 = val.get_gameObject().GetComponent<UILabel>();
+				transform.gameObject.SetActive(true);
+				UILabel component2 = transform.gameObject.GetComponent<UILabel>();
 				component2.text = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 25u) + mapNo.ToString();
 			}
 		}
-		val = spot._transform.FindChild("SPR_TWN_NEW");
-		if (val != null)
+		transform = spot._transform.FindChild("SPR_TWN_NEW");
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			val.get_gameObject().SetActive(isNew);
+			transform.gameObject.SetActive(isNew);
 		}
-		val = spot._transform.FindChild("SPR_ICON_NEW");
-		if (val != null)
+		transform = spot._transform.FindChild("SPR_ICON_NEW");
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			val.get_gameObject().SetActive(icon == ICON_TYPE.NEW);
+			transform.gameObject.SetActive(icon == ICON_TYPE.NEW);
 		}
-		val = spot._transform.FindChild("SPR_ICON_CLEARED");
-		if (val != null)
+		transform = spot._transform.FindChild("SPR_ICON_CLEARED");
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			val.get_gameObject().SetActive(icon == ICON_TYPE.CLEARED);
+			transform.gameObject.SetActive(icon == ICON_TYPE.CLEARED);
 		}
-		val = spot._transform.FindChild("SPR_ICON_HOME");
-		if (val != null)
+		transform = spot._transform.FindChild("SPR_ICON_HOME");
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			val.get_gameObject().SetActive(icon == ICON_TYPE.HOME);
+			transform.gameObject.SetActive(icon == ICON_TYPE.HOME);
 		}
-		val = spot._transform.FindChild("SPR_ICON_NOT_OPENED");
-		if (val != null)
+		transform = spot._transform.FindChild("SPR_ICON_NOT_OPENED");
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			val.get_gameObject().SetActive(icon == ICON_TYPE.NOT_OPENED);
+			transform.gameObject.SetActive(icon == ICON_TYPE.NOT_OPENED);
 		}
-		val = spot._transform.FindChild("SPR_ICON_HARD");
-		if (val != null)
+		transform = spot._transform.FindChild("SPR_ICON_HARD");
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			val.get_gameObject().SetActive(icon == ICON_TYPE.HARD || icon == ICON_TYPE.HARD_NEW);
+			transform.gameObject.SetActive(icon == ICON_TYPE.HARD || icon == ICON_TYPE.HARD_NEW);
 			if (icon == ICON_TYPE.HARD)
 			{
-				Transform val2 = val.FindChild("DODAIADD");
-				if (null != val2)
+				Transform transform2 = transform.FindChild("DODAIADD");
+				if ((UnityEngine.Object)null != (UnityEngine.Object)transform2)
 				{
-					val2.get_gameObject().SetActive(false);
+					transform2.gameObject.SetActive(false);
 				}
 			}
 		}
-		val = spot._transform.FindChild("OBJ_NEW_PORTAL");
-		if (val != null)
+		transform = spot._transform.FindChild("OBJ_NEW_PORTAL");
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			val.get_gameObject().SetActive(canUnlockNewPortal);
+			transform.gameObject.SetActive(canUnlockNewPortal);
 		}
-		val = spot._transform.FindChild("OBJ_POP_PORTAL");
-		if (val != null)
+		transform = spot._transform.FindChild("OBJ_POP_PORTAL");
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			val.get_gameObject().SetActive(viewEnemyPopBallon);
+			transform.gameObject.SetActive(viewEnemyPopBallon);
 		}
-		val = spot._transform.FindChild("SPR_ICON_DUNGEON");
-		if (val != null)
+		transform = spot._transform.FindChild("SPR_ICON_DUNGEON");
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			UITexture component3 = val.GetComponent<UITexture>();
-			if (component3 != null && dungeon_icon != null && icon == ICON_TYPE.CHILD_REGION)
+			UITexture component3 = transform.GetComponent<UITexture>();
+			if ((UnityEngine.Object)component3 != (UnityEngine.Object)null && (UnityEngine.Object)dungeon_icon != (UnityEngine.Object)null && icon == ICON_TYPE.CHILD_REGION)
 			{
 				component3.mainTexture = dungeon_icon;
 			}
 		}
-		val = spot._transform.FindChild("SPR_DELIVERY_TARGET");
-		if (val != null)
+		transform = spot._transform.FindChild("SPR_DELIVERY_TARGET");
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			val.get_gameObject().SetActive(isExistDelivery);
+			transform.gameObject.SetActive(isExistDelivery);
 		}
-		val = spot._transform.FindChild("SPR_SUBMISSION_CLEARED");
-		if (val != null)
+		transform = spot._transform.FindChild("SPR_SUBMISSION_CLEARED");
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			val.get_gameObject().SetActive(happenQuestCondition == HAPPEN_CONDITION.ALL_CLEAR);
+			transform.gameObject.SetActive(happenQuestCondition == HAPPEN_CONDITION.ALL_CLEAR);
 		}
-		val = spot._transform.FindChild("SPR_SUBMISSION_NOT_CLEARED");
-		if (val != null)
+		transform = spot._transform.FindChild("SPR_SUBMISSION_NOT_CLEARED");
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			val.get_gameObject().SetActive(happenQuestCondition == HAPPEN_CONDITION.NOT_CLEAR);
+			transform.gameObject.SetActive(happenQuestCondition == HAPPEN_CONDITION.NOT_CLEAR);
 		}
 		UIGameSceneEventSender component4 = spot._transform.FindChild("SPR_BUTTON").GetComponent<UIGameSceneEventSender>();
 		if (string.IsNullOrEmpty(event_name))
 		{
-			Object.Destroy(component4.get_gameObject());
+			UnityEngine.Object.Destroy(component4.gameObject);
 		}
 		else
 		{

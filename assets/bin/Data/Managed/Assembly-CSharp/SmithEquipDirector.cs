@@ -84,32 +84,22 @@ public class SmithEquipDirector : AnimationDirector
 
 	public void SetNPC003(GameObject npcObject)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Expected O, but got Unknown
-		if (!(npcObject == null))
+		if (!((UnityEngine.Object)npcObject == (UnityEngine.Object)null))
 		{
-			Utility.Attach(npc003Parent, npcObject.get_transform());
-			Utility.SetLayerWithChildren(npcObject.get_transform(), npc003Parent.get_gameObject().get_layer());
+			Utility.Attach(npc003Parent, npcObject.transform);
+			Utility.SetLayerWithChildren(npcObject.transform, npc003Parent.gameObject.layer);
 			npc003Animator = npcObject.GetComponentInChildren<Animator>();
-			npc003Animator.set_cullingMode(0);
+			npc003Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 			npc003TransformList = npcObject.GetComponentsInChildren<Transform>();
 		}
 	}
 
 	public void SetNPC004(GameObject npcObject)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Expected O, but got Unknown
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Expected O, but got Unknown
-		Utility.Attach(npcParent, npcObject.get_transform());
-		Utility.SetLayerWithChildren(npcObject.get_transform(), npcParent.get_gameObject().get_layer());
+		Utility.Attach(npcParent, npcObject.transform);
+		Utility.SetLayerWithChildren(npcObject.transform, npcParent.gameObject.layer);
 		npc004Animator = npcObject.GetComponentInChildren<Animator>();
-		npc004Animator.set_cullingMode(0);
+		npc004Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 		npc004TransformList = npcObject.GetComponentsInChildren<Transform>();
 	}
 
@@ -120,11 +110,11 @@ public class SmithEquipDirector : AnimationDirector
 			return null;
 		}
 		Transform[] array = npc004TransformList;
-		foreach (Transform val in array)
+		foreach (Transform transform in array)
 		{
-			if (val.get_name() == targetName)
+			if (transform.name == targetName)
 			{
-				return val;
+				return transform;
 			}
 		}
 		return null;
@@ -137,11 +127,11 @@ public class SmithEquipDirector : AnimationDirector
 			return null;
 		}
 		Transform[] array = npc003TransformList;
-		foreach (Transform val in array)
+		foreach (Transform transform in array)
 		{
-			if (val.get_name() == targetName)
+			if (transform.name == targetName)
 			{
-				return val;
+				return transform;
 			}
 		}
 		return null;
@@ -169,7 +159,6 @@ public class SmithEquipDirector : AnimationDirector
 
 	public void StartEvolve(Action onEnd)
 	{
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		updateFOV = false;
 		effectBindTarget = Utility.FindChild(npcParent, "NPC004_001/NPC004_Origin/Move/Root/Hip/Spine00/Spine01/L_Shoulder/L_Upperarm/L_Forearm/L_Hand/L_Wep");
 		SetEffects(evolveEffectPrefabs);
@@ -177,19 +166,18 @@ public class SmithEquipDirector : AnimationDirector
 		PlayNPCAnimation("EVOLVE");
 		PlayCameraAnimation("EVOLVE");
 		time = 0f;
-		this.StartCoroutine(DoEvolveEffect());
+		StartCoroutine(DoEvolveEffect());
 	}
 
 	public void StartExceed(Action onEnd)
 	{
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
 		updateFOV = false;
 		effectBindTarget = Utility.FindChild(npcParent, "NPC004_001/NPC004_Origin/Move/Root/Tools/Hammer_L");
 		SetEffects(exceedEffectPrefabs);
 		PlayDirection("EXCEED", onEnd);
 		PlayNPCAnimation("EXCEED");
 		PlayCameraAnimation("EXCEED");
-		if (effectBindTarget != null)
+		if ((UnityEngine.Object)effectBindTarget != (UnityEngine.Object)null)
 		{
 			PlayBindEffect(0, effectBindTarget, new Vector3(0f, 0f, 0.522f));
 		}
@@ -204,10 +192,8 @@ public class SmithEquipDirector : AnimationDirector
 		PlayCameraAnimation("ABILITY_CHANGE");
 	}
 
-	private unsafe void PlayDirection(string name, Action onEnd)
+	private void PlayDirection(string name, Action onEnd)
 	{
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
 		{
 			MonoBehaviourSingleton<StatusStageManager>.I.SetSmithCharacterActivateFlag(false);
@@ -216,8 +202,13 @@ public class SmithEquipDirector : AnimationDirector
 		{
 			SetLinkCamera(true);
 		}
-		_003CPlayDirection_003Ec__AnonStorey44F _003CPlayDirection_003Ec__AnonStorey44F;
-		Play(name, new Action((object)_003CPlayDirection_003Ec__AnonStorey44F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), 0f);
+		Play(name, delegate
+		{
+			ResetPlayRate();
+			SoundManager.StopSEAll(0);
+			PlayAudioOnEnd(name);
+			onEnd();
+		}, 0f);
 	}
 
 	private void PlayAudioOnEnd(string name)
@@ -242,29 +233,26 @@ public class SmithEquipDirector : AnimationDirector
 
 	private void SetEffects(GameObject[] prefabs)
 	{
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Expected O, but got Unknown
 		if (prefabs != null && prefabs.Length > 0)
 		{
-			Camera val = (!MonoBehaviourSingleton<AppMain>.IsValid()) ? ((object)useCamera) : ((object)MonoBehaviourSingleton<AppMain>.I.mainCamera);
+			Camera camera = (!MonoBehaviourSingleton<AppMain>.IsValid()) ? useCamera : MonoBehaviourSingleton<AppMain>.I.mainCamera;
 			List<Animator> list = new List<Animator>();
-			effects = (GameObject[])new GameObject[prefabs.Length];
+			effects = new GameObject[prefabs.Length];
 			for (int i = 0; i < prefabs.Length; i++)
 			{
-				GameObject val2 = ResourceUtility.Realizes(prefabs[i], effectParent, effectParent.get_gameObject().get_layer()).get_gameObject();
-				rymFX component = val2.GetComponent<rymFX>();
-				if (component != null)
+				GameObject gameObject = ResourceUtility.Realizes(prefabs[i], effectParent, effectParent.gameObject.layer).gameObject;
+				rymFX component = gameObject.GetComponent<rymFX>();
+				if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 				{
-					component.Cameras = (Camera[])new Camera[1]
+					component.Cameras = new Camera[1]
 					{
-						val
+						camera
 					};
-					val2.GetComponentsInChildren<Animator>(list);
+					gameObject.GetComponentsInChildren(list);
 					animators.AddRange(list);
 				}
-				val2.SetActive(false);
-				effects[i] = val2;
+				gameObject.SetActive(false);
+				effects[i] = gameObject;
 			}
 		}
 	}
@@ -278,10 +266,10 @@ public class SmithEquipDirector : AnimationDirector
 			{
 				for (int i = 0; i < effects.Length; i++)
 				{
-					GameObject val = effects[i];
-					if (Object.op_Implicit(val))
+					GameObject gameObject = effects[i];
+					if ((bool)gameObject)
 					{
-						Object.Destroy(val);
+						UnityEngine.Object.Destroy(gameObject);
 					}
 				}
 			}
@@ -292,38 +280,35 @@ public class SmithEquipDirector : AnimationDirector
 
 	protected override void Update()
 	{
-		time += Time.get_deltaTime();
+		time += Time.deltaTime;
 		if (skip)
 		{
 			time = 10000f;
 		}
-		if (npc004Animator != null)
+		if ((UnityEngine.Object)npc004Animator != (UnityEngine.Object)null)
 		{
-			npc004Animator.set_speed((!skip) ? 1f : 10000f);
+			npc004Animator.speed = ((!skip) ? 1f : 10000f);
 		}
-		if (npc003Animator != null)
+		if ((UnityEngine.Object)npc003Animator != (UnityEngine.Object)null)
 		{
-			npc003Animator.set_speed((!skip) ? 1f : 10000f);
+			npc003Animator.speed = ((!skip) ? 1f : 10000f);
 		}
-		if (Object.op_Implicit(cameraAnimator))
+		if ((bool)cameraAnimator)
 		{
-			cameraAnimator.set_speed((!skip) ? 1f : 10000f);
+			cameraAnimator.speed = ((!skip) ? 1f : 10000f);
 		}
 		base.Update();
 	}
 
 	protected override void LateUpdate()
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		if (updateFOV && useCamera != null)
+		if (updateFOV && (UnityEngine.Object)useCamera != (UnityEngine.Object)null)
 		{
-			Vector3 localScale = cameraAnimator.get_transform().get_localScale();
+			Vector3 localScale = cameraAnimator.transform.localScale;
 			float x = localScale.x;
 			if (x > 0f)
 			{
-				useCamera.set_fieldOfView(Utility.HorizontalToVerticalFOV(x));
+				useCamera.fieldOfView = Utility.HorizontalToVerticalFOV(x);
 			}
 		}
 		base.LateUpdate();
@@ -335,17 +320,17 @@ public class SmithEquipDirector : AnimationDirector
 		{
 			for (int i = 0; i < effects.Length; i++)
 			{
-				GameObject val = effects[i];
-				if (val != null)
+				GameObject gameObject = effects[i];
+				if ((UnityEngine.Object)gameObject != (UnityEngine.Object)null)
 				{
-					rymFX component = val.GetComponent<rymFX>();
-					if (component != null)
+					rymFX component = gameObject.GetComponent<rymFX>();
+					if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 					{
 						float num = component.GetEndFrame() - component.GetCurFrame();
 						if (num > 0f)
 						{
-							float num2 = num / 30f;
-							component.UpdateFx(num2, null, component.IsLoop());
+							float delta_time = num / 30f;
+							component.UpdateFx(delta_time, null, component.IsLoop());
 						}
 					}
 				}
@@ -354,7 +339,7 @@ public class SmithEquipDirector : AnimationDirector
 			{
 				for (int j = 0; j < animators.Count; j++)
 				{
-					animators[j].set_speed(10000f);
+					animators[j].speed = 10000f;
 				}
 			}
 			SoundManager.StopSEAll(0);
@@ -368,7 +353,7 @@ public class SmithEquipDirector : AnimationDirector
 		{
 			for (int i = 0; i < animators.Count; i++)
 			{
-				animators[i].set_speed(1f);
+				animators[i].speed = 1f;
 			}
 		}
 	}
@@ -377,7 +362,7 @@ public class SmithEquipDirector : AnimationDirector
 	{
 		npc004Animator.Play(stateName, 0, 0f);
 		npc004Animator.Update(0f);
-		if (npc003Animator != null)
+		if ((UnityEngine.Object)npc003Animator != (UnityEngine.Object)null)
 		{
 			npc003Animator.Play(stateName, 0, 0f);
 			npc003Animator.Update(0f);
@@ -408,36 +393,31 @@ public class SmithEquipDirector : AnimationDirector
 
 	private void PlayEffect(string name)
 	{
-		GameObject val = FindEffect(name);
-		if (Object.op_Implicit(val))
+		GameObject gameObject = FindEffect(name);
+		if ((bool)gameObject)
 		{
-			val.SetActive(true);
+			gameObject.SetActive(true);
 		}
 	}
 
 	private void PlayEffectWithParent(string name)
 	{
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Expected O, but got Unknown
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 		string[] array = name.Split('@');
 		if (array.Length > 1)
 		{
-			GameObject val = FindEffect(array[0]);
-			if (!(val == null))
+			GameObject gameObject = FindEffect(array[0]);
+			if (!((UnityEngine.Object)gameObject == (UnityEngine.Object)null))
 			{
-				GameObject val2 = Object.Instantiate<GameObject>(val);
-				Transform val3 = SearchNpc004Transform(array[1]);
-				if (val2 != null && val3 != null)
+				GameObject gameObject2 = UnityEngine.Object.Instantiate(gameObject);
+				Transform transform = SearchNpc004Transform(array[1]);
+				if ((UnityEngine.Object)gameObject2 != (UnityEngine.Object)null && (UnityEngine.Object)transform != (UnityEngine.Object)null)
 				{
-					Transform val4 = val2.get_transform();
-					val4.set_parent(val3);
-					val4.set_localPosition(Vector3.get_zero());
-					val4.set_localScale(Vector3.get_one());
-					val4.set_localRotation(Quaternion.get_identity());
-					val2.SetActive(true);
+					Transform transform2 = gameObject2.transform;
+					transform2.parent = transform;
+					transform2.localPosition = Vector3.zero;
+					transform2.localScale = Vector3.one;
+					transform2.localRotation = Quaternion.identity;
+					gameObject2.SetActive(true);
 				}
 			}
 		}
@@ -449,27 +429,22 @@ public class SmithEquipDirector : AnimationDirector
 
 	private void PlayEffectSilvy(string name)
 	{
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Expected O, but got Unknown
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 		string[] array = name.Split('@');
 		if (array.Length > 1)
 		{
-			GameObject val = FindEffect(array[0]);
-			if (!(val == null))
+			GameObject gameObject = FindEffect(array[0]);
+			if (!((UnityEngine.Object)gameObject == (UnityEngine.Object)null))
 			{
-				GameObject val2 = Object.Instantiate<GameObject>(val);
-				Transform val3 = SearchNpc003Transform(array[1]);
-				if (val2 != null && val3 != null)
+				GameObject gameObject2 = UnityEngine.Object.Instantiate(gameObject);
+				Transform transform = SearchNpc003Transform(array[1]);
+				if ((UnityEngine.Object)gameObject2 != (UnityEngine.Object)null && (UnityEngine.Object)transform != (UnityEngine.Object)null)
 				{
-					Transform val4 = val2.get_transform();
-					val4.set_parent(val3);
-					val4.set_localPosition(Vector3.get_zero());
-					val4.set_localScale(Vector3.get_one());
-					val4.set_localRotation(Quaternion.get_identity());
-					val2.SetActive(true);
+					Transform transform2 = gameObject2.transform;
+					transform2.parent = transform;
+					transform2.localPosition = Vector3.zero;
+					transform2.localScale = Vector3.one;
+					transform2.localRotation = Quaternion.identity;
+					gameObject2.SetActive(true);
 				}
 			}
 		}
@@ -481,23 +456,20 @@ public class SmithEquipDirector : AnimationDirector
 
 	private void PlayBindEffect(int effectIndex, Transform bindTarget, Vector3 offset)
 	{
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		GameObject val = effects[effectIndex];
-		val.get_transform().set_parent(bindTarget);
-		val.get_transform().set_localPosition(offset);
-		val.SetActive(true);
+		GameObject gameObject = effects[effectIndex];
+		gameObject.transform.parent = bindTarget;
+		gameObject.transform.localPosition = offset;
+		gameObject.SetActive(true);
 	}
 
 	private GameObject FindEffect(string name)
 	{
 		for (int i = 0; i < effects.Length; i++)
 		{
-			GameObject val = effects[i];
-			if (val.get_name() == name)
+			GameObject gameObject = effects[i];
+			if (gameObject.name == name)
 			{
-				return val;
+				return gameObject;
 			}
 		}
 		return null;
@@ -505,19 +477,19 @@ public class SmithEquipDirector : AnimationDirector
 
 	private IEnumerator DoEvolveEffect()
 	{
-		if (Object.op_Implicit(effectBindTarget))
+		if ((bool)effectBindTarget)
 		{
 			PlayBindEffect(1, effectBindTarget, new Vector3(-0.022f, -0.041f, 0.04f));
 		}
 		GameObject e = FindEffect("ef_studio_evolve_01");
-		for (float time = 0.3f; time > 0f; time -= Time.get_deltaTime())
+		for (float time = 0.3f; time > 0f; time -= Time.deltaTime)
 		{
 			yield return (object)null;
 		}
-		if (Object.op_Implicit(e))
+		if ((bool)e)
 		{
 			e.SetActive(true);
-			e.get_transform().set_localPosition(new Vector3(2.846f, 0.968f, 2.001f));
+			e.transform.localPosition = new Vector3(2.846f, 0.968f, 2.001f);
 		}
 	}
 

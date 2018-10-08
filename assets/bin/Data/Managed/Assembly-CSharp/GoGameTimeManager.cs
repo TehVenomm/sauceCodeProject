@@ -23,7 +23,7 @@ public class GoGameTimeManager : MonoBehaviourSingleton<GoGameTimeManager>
 	protected override void Awake()
 	{
 		base.Awake();
-		Time.set_timeScale(1f);
+		Time.timeScale = 1f;
 	}
 
 	public void SetStop(STOP_FLAG flag, bool is_stop)
@@ -36,7 +36,7 @@ public class GoGameTimeManager : MonoBehaviourSingleton<GoGameTimeManager>
 		{
 			stopFlags &= ~flag;
 		}
-		Time.set_timeScale((!IsStop()) ? 1f : 0f);
+		Time.timeScale = ((!IsStop()) ? 1f : 0f);
 	}
 
 	public bool IsStop()
@@ -113,7 +113,7 @@ public class GoGameTimeManager : MonoBehaviourSingleton<GoGameTimeManager>
 
 	private void Update()
 	{
-		elapsedTime += Time.get_unscaledDeltaTime();
+		elapsedTime += Time.unscaledDeltaTime;
 	}
 
 	public static DateTime CombineDateAndTime(DateTime date, DateTime time)

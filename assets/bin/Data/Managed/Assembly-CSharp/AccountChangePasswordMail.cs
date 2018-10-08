@@ -1,5 +1,3 @@
-using System;
-
 public class AccountChangePasswordMail : AccountPopupAdjuster
 {
 	private enum UI
@@ -13,16 +11,16 @@ public class AccountChangePasswordMail : AccountPopupAdjuster
 
 	public override void UpdateUI()
 	{
-		SetInput((Enum)UI.IPT_PASSWORD, string.Empty, 255, (EventDelegate.Callback)InputCallBack);
-		SetInput((Enum)UI.IPT_NEW_PASSWORD, string.Empty, 255, (EventDelegate.Callback)InputCallBack);
-		SetInput((Enum)UI.IPT_CONFIRM_NEW_PASSWORD, string.Empty, 255, (EventDelegate.Callback)InputCallBack);
+		SetInput(UI.IPT_PASSWORD, string.Empty, 255, InputCallBack);
+		SetInput(UI.IPT_NEW_PASSWORD, string.Empty, 255, InputCallBack);
+		SetInput(UI.IPT_CONFIRM_NEW_PASSWORD, string.Empty, 255, InputCallBack);
 	}
 
 	private void InputCallBack()
 	{
 		bool flag = CheckRegistData(false);
-		SetActive((Enum)UI.BTN_OK, flag);
-		SetActive((Enum)UI.BTN_INVALID, !flag);
+		SetActive(UI.BTN_OK, flag);
+		SetActive(UI.BTN_INVALID, !flag);
 	}
 
 	private bool CheckRegistData(bool is_send_event = false)

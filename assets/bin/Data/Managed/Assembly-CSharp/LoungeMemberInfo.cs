@@ -70,7 +70,6 @@ public class LoungeMemberInfo : FriendInfo
 
 	public override void Initialize()
 	{
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 		data = (GameSection.GetEventData() as CharaInfo);
 		if (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
 		{
@@ -88,7 +87,7 @@ public class LoungeMemberInfo : FriendInfo
 				dataFollower = followLoungeMember.follower;
 				dataFollowing = followLoungeMember.following;
 				nowSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-				isFollowerList = Object.op_Implicit(Object.FindObjectOfType(typeof(FriendFollowerList)));
+				isFollowerList = UnityEngine.Object.FindObjectOfType(typeof(FriendFollowerList));
 				InitializeBase();
 			}
 		}
@@ -110,22 +109,22 @@ public class LoungeMemberInfo : FriendInfo
 		{
 			int ownerUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetOwnerUserId();
 			bool is_visible = ownerUserId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-			SetActive((Enum)UI.BTN_KICK, is_visible);
+			SetActive(UI.BTN_KICK, is_visible);
 			if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus != null)
 			{
-				SetActive((Enum)UI.BTN_JOIN, false);
+				SetActive(UI.BTN_JOIN, false);
 				status = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[data.userId];
 				switch (status.GetStatus())
 				{
 				case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
 				case LoungeMemberStatus.MEMBER_STATUS.FIELD:
-					SetActive((Enum)UI.BTN_JOIN, true);
+					SetActive(UI.BTN_JOIN, true);
 					break;
 				case LoungeMemberStatus.MEMBER_STATUS.QUEST:
-					SetActive((Enum)UI.BTN_JOIN, !CheckRush(status.questId));
+					SetActive(UI.BTN_JOIN, !CheckRush(status.questId));
 					break;
 				case LoungeMemberStatus.MEMBER_STATUS.ARENA:
-					SetActive((Enum)UI.BTN_JOIN, false);
+					SetActive(UI.BTN_JOIN, false);
 					break;
 				}
 			}
@@ -146,7 +145,7 @@ public class LoungeMemberInfo : FriendInfo
 		return true;
 	}
 
-	private unsafe void JoinField(int fieldMapId)
+	private void JoinField(int fieldMapId)
 	{
 		if (fieldMapId == MonoBehaviourSingleton<FieldManager>.I.currentMapID)
 		{
@@ -170,7 +169,27 @@ public class LoungeMemberInfo : FriendInfo
 			else
 			{
 				GameSection.StayEvent();
-				CoopApp.EnterField(fieldMapData.jumpPortalID, 0u, new Action<bool, bool, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				CoopApp.EnterField(fieldMapData.jumpPortalID, 0u, delegate(bool is_matching, bool is_connect, bool is_regist)
+				{
+					if (!is_connect)
+					{
+						GameSection.ChangeStayEvent("COOP_SERVER_INVALID", null);
+						GameSection.ResumeEvent(true, null);
+						AppMain i = MonoBehaviourSingleton<AppMain>.I;
+						i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+						{
+							DispatchEvent("CLOSE", null);
+						});
+					}
+					else
+					{
+						GameSection.ResumeEvent(is_regist, null);
+						if (is_regist)
+						{
+							MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("InGame", null, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
+						}
+					}
+				});
 			}
 		}
 	}

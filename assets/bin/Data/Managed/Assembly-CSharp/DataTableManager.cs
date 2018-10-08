@@ -2,7 +2,6 @@ using Ionic.Zlib;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 
@@ -134,26 +133,13 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		set;
 	}
 
-	public event Action<DataTableLoadError, Action> onError
-	{
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		add
-		{
-			this.onError = Delegate.Combine((Delegate)this.onError, (Delegate)value);
-		}
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		remove
-		{
-			this.onError = Delegate.Remove((Delegate)this.onError, (Delegate)value);
-		}
-	}
+	public event Action<DataTableLoadError, Action> onError;
 
 	protected override void Awake()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		cache = new DataTableCache(null);
-		dataLoader = this.get_gameObject().AddComponent<DataLoader>();
+		dataLoader = base.gameObject.AddComponent<DataLoader>();
 		dataLoader.SetCache(new DataTableCache(null));
 		forceLoadCSV = false;
 		loadStatus = LoadStatus.NotInitialize;
@@ -197,10 +183,8 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		dataLoader.RequestManifest(dataLoadRequest);
 	}
 
-	public unsafe List<DataLoadRequest> LoadInitialTable(Action onComplete, bool downloadOnly = false)
+	public List<DataLoadRequest> LoadInitialTable(Action onComplete, bool downloadOnly = false)
 	{
-		//IL_0204: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0209: Expected O, but got Unknown
 		if (!downloadOnly)
 		{
 			loadStatus = LoadStatus.LoadingInitialTable;
@@ -243,17 +227,25 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		int reqCount = list.Count;
 		foreach (DataLoadRequest item2 in list)
 		{
-			_003CLoadInitialTable_003Ec__AnonStorey6EF _003CLoadInitialTable_003Ec__AnonStorey6EF;
-			item2.onComplete += new Action((object)_003CLoadInitialTable_003Ec__AnonStorey6EF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			item2.onComplete += delegate
+			{
+				reqCount--;
+				if (reqCount <= 0)
+				{
+					onComplete();
+					if (!downloadOnly)
+					{
+						loadStatus = LoadStatus.LoadingAllTable;
+					}
+				}
+			};
 		}
 		Request(list);
 		return list;
 	}
 
-	public unsafe List<DataLoadRequest> LoadAllTable(Action onComplete, bool downloadOnly = false)
+	public List<DataLoadRequest> LoadAllTable(Action onComplete, bool downloadOnly = false)
 	{
-		//IL_0368: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036d: Expected O, but got Unknown
 		RequestParam[] array = new RequestParam[48]
 		{
 			new RequestParam("AbilityDataTable", null),
@@ -317,8 +309,18 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		int reqCount = list.Count;
 		foreach (DataLoadRequest item2 in list)
 		{
-			_003CLoadAllTable_003Ec__AnonStorey6F0 _003CLoadAllTable_003Ec__AnonStorey6F;
-			item2.onComplete += new Action((object)_003CLoadAllTable_003Ec__AnonStorey6F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			item2.onComplete += delegate
+			{
+				reqCount--;
+				if (reqCount <= 0)
+				{
+					onComplete();
+					if (!downloadOnly)
+					{
+						loadStatus = LoadStatus.LoadComplete;
+					}
+				}
+			};
 		}
 		Request(list);
 		return list;
@@ -415,26 +417,39 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		return dataLoadRequest;
 	}
 
-	private unsafe DataLoadRequest CreateRequest(string name, IDataTableRequestHash hash, string directory, bool downloadOnly = false)
+	private DataLoadRequest CreateRequest(string name, IDataTableRequestHash hash, string directory, bool downloadOnly = false)
 	{
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Expected O, but got Unknown
 		DataLoadRequest req = new DataLoadRequest(name, hash, directory, downloadOnly);
-		_003CCreateRequest_003Ec__AnonStorey6F3 _003CCreateRequest_003Ec__AnonStorey6F;
-		req.onVerifyError += new Func<string, bool>((object)_003CCreateRequest_003Ec__AnonStorey6F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		req.onVerifyError += delegate(string filehash)
+		{
+			ReportVerifyError(name, filehash);
+			if (reportOnly)
+			{
+				Log.Error(LOG.DATA_TABLE, "VerifyError(report-only): {0}", req.name);
+				return true;
+			}
+			if (!verifyErroredRequest.Contains(req))
+			{
+				Log.Error(LOG.DATA_TABLE, "VerifyError(auto-retry): {0}", req.name);
+				cache.Remove(req);
+				verifyErroredRequest.Add(req);
+			}
+			return false;
+		};
 		req.onError += delegate(DataTableLoadError error)
 		{
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Expected O, but got Unknown
 			Log.Error(LOG.DATA_TABLE, "load error ({1}): {0}", req.name, error.ToString());
 			erroredRequests.Add(req);
 			cache.Remove(req);
 			if (this.onError != null)
 			{
-				this.onError.Invoke(error, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				this.onError(error, Retry);
 			}
 		};
-		req.onComplete += new Action((object)_003CCreateRequest_003Ec__AnonStorey6F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		req.onComplete += delegate
+		{
+			verifyErroredRequest.Remove(req);
+		};
 		return req;
 	}
 
@@ -474,18 +489,18 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 	{
 		foreach (Action afterProcess in afterProcesses)
 		{
-			afterProcess.Invoke();
+			afterProcess();
 		}
 	}
 
 	public void Clear()
 	{
-		this.StopAllCoroutines();
+		StopAllCoroutines();
 		tables.Clear();
 		erroredRequests.Clear();
 	}
 
-	public unsafe void Initialize()
+	public void Initialize()
 	{
 		Clear();
 		Singleton<AbilityDataTable>.Create();
@@ -598,15 +613,11 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		RegisterTable("GrowEquipItemNeedUniqueItemTable", new DataTableInterfaceProxy(Singleton<GrowEquipItemTable>.I.CreateNeedUniqueTable), "ItemTable");
 		RegisterTable("QuestTable", new DataTableInterfaceProxy(delegate(string csv)
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Expected O, but got Unknown
 			Singleton<QuestTable>.I.CreateQuestTable(csv);
-			List<Action> list3 = afterProcesses;
-			if (_003C_003Ef__am_0024cache11 == null)
+			afterProcesses.Add(delegate
 			{
-				_003C_003Ef__am_0024cache11 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			list3.Add(_003C_003Ef__am_0024cache11);
+				Singleton<QuestTable>.I.InitQuestDependencyData();
+			});
 		}), null);
 		RegisterTable("MissionTable", new DataTableInterfaceProxy(Singleton<QuestTable>.I.CreateMissionTable), null);
 		RegisterTable("RegionTable", Singleton<RegionTable>.I, null);
@@ -619,27 +630,19 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		RegisterTable("FieldMapGimmickActionTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateGimmickActionTable), null);
 		RegisterTable("QuestToFieldTable", new DataTableInterfaceProxy(delegate(string csv)
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Expected O, but got Unknown
 			Singleton<QuestToFieldTable>.I.CreateTable(csv);
-			List<Action> list2 = afterProcesses;
-			if (_003C_003Ef__am_0024cache12 == null)
+			afterProcesses.Add(delegate
 			{
-				_003C_003Ef__am_0024cache12 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			list2.Add(_003C_003Ef__am_0024cache12);
+				Singleton<QuestToFieldTable>.I.InitDependencyData();
+			});
 		}), null);
 		RegisterTable("ItemToFieldTable", new DataTableInterfaceProxy(delegate(string csv)
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Expected O, but got Unknown
 			Singleton<ItemToFieldTable>.I.CreateTable(csv);
-			List<Action> list = afterProcesses;
-			if (_003C_003Ef__am_0024cache13 == null)
+			afterProcesses.Add(delegate
 			{
-				_003C_003Ef__am_0024cache13 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			list.Add(_003C_003Ef__am_0024cache13);
+				Singleton<ItemToFieldTable>.I.InitDependencyData();
+			});
 		}), null);
 		RegisterTable("EnemyHitTypeTable", Singleton<EnemyHitTypeTable>.I, null);
 		RegisterTable("EnemyHitMaterialTable", Singleton<EnemyHitMaterialTable>.I, "EnemyHitTypeTable");
@@ -782,16 +785,13 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 
 	public static string DecompressToString(byte[] bytes)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
 		string text = null;
 		using (MemoryStream memoryStream = new MemoryStream(bytes))
 		{
 			memoryStream.Seek(256L, SeekOrigin.Begin);
-			ZlibStream val = new ZlibStream((Stream)memoryStream, 1);
-			try
+			using (ZlibStream stream = new ZlibStream(memoryStream, CompressionMode.Decompress))
 			{
-				using (StreamReader streamReader = new StreamReader((Stream)val))
+				using (StreamReader streamReader = new StreamReader(stream))
 				{
 					try
 					{
@@ -805,10 +805,6 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 					}
 				}
 			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
-			}
 		}
 	}
 
@@ -816,31 +812,24 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 	{
 		return delegate(byte[] bytes)
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Expected O, but got Unknown
 			MemoryStream memoryStream = new MemoryStream();
-			using (MemoryStream memoryStream2 = new MemoryStream(bytes))
+			using (MemoryStream stream = new MemoryStream(bytes))
 			{
 				byte[] array = new byte[1024];
-				ZlibStream val = new ZlibStream((Stream)memoryStream2, 1);
-				try
+				using (ZlibStream zlibStream = new ZlibStream(stream, CompressionMode.Decompress))
 				{
 					try
 					{
 						int count;
-						while ((count = val.Read(array, 0, array.Length)) != 0)
+						while ((count = zlibStream.Read(array, 0, array.Length)) != 0)
 						{
 							memoryStream.Write(array, 0, count);
 						}
 					}
 					finally
 					{
-						((IDisposable)val)?.Dispose();
+						((IDisposable)zlibStream)?.Dispose();
 					}
-				}
-				finally
-				{
-					((IDisposable)val)?.Dispose();
 				}
 			}
 			memoryStream.Seek(0L, SeekOrigin.Begin);
@@ -856,12 +845,12 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 			MD5Hash tableHash = manifest.GetTableHash(allFileName);
 			stringBuilder.AppendLine($"{allFileName} : {tableHash.ToString()}");
 		}
-		Debug.Log((object)stringBuilder.ToString());
+		Debug.Log(stringBuilder.ToString());
 	}
 
 	public void ChangePriorityTop(string tableName)
 	{
-		if (null != dataLoader)
+		if ((UnityEngine.Object)null != (UnityEngine.Object)dataLoader)
 		{
 			dataLoader.ChangePriorityTop(tableName);
 		}
@@ -882,7 +871,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		{
 			return true;
 		}
-		if (null != dataLoader)
+		if ((UnityEngine.Object)null != (UnityEngine.Object)dataLoader)
 		{
 			return dataLoader.IsLoading(tableName);
 		}

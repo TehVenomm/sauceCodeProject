@@ -15,8 +15,8 @@ public class UISonarGizmo : UIStatusGizmoBase
 	[Tooltip("スクリ\u30fcン横オフセット")]
 	protected float screenSideOffset = 22f;
 
-	[Tooltip("スクリ\u30fcン下オフセット")]
 	[SerializeField]
+	[Tooltip("スクリ\u30fcン下オフセット")]
 	protected float screenBottomOffset = 112f;
 
 	private FieldSonarObject _sonar;
@@ -33,83 +33,45 @@ public class UISonarGizmo : UIStatusGizmoBase
 		}
 		set
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Expected O, but got Unknown
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			_sonar = value;
-			if (_sonar != null)
+			if ((Object)_sonar != (Object)null)
 			{
-				this.get_gameObject().SetActive(true);
-				portalTransform = value.get_transform();
+				base.gameObject.SetActive(true);
+				portalTransform = value.transform;
 				UpdateParam();
 			}
 			else
 			{
-				this.get_gameObject().SetActive(false);
+				base.gameObject.SetActive(false);
 			}
 		}
 	}
 
 	protected override void OnEnable()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		base.OnEnable();
-		if (arrow != null)
+		if ((Object)arrow != (Object)null)
 		{
-			arrowTransform = arrow.get_transform();
+			arrowTransform = arrow.transform;
 		}
 	}
 
 	protected override void UpdateParam()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Expected O, but got Unknown
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013e: Expected O, but got Unknown
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Expected O, but got Unknown
-		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-		if (sonar == null || !sonar.get_gameObject().get_activeSelf())
+		if ((Object)sonar == (Object)null || !sonar.gameObject.activeSelf)
 		{
-			SetActiveSafe(statusSprite.get_gameObject(), false);
+			SetActiveSafe(statusSprite.gameObject, false);
 			SetActiveSafe(arrow, false);
 		}
 		else
 		{
-			Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, portalTransform.get_position() + offset);
+			Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, portalTransform.position + offset);
 			screenZ = screenUIPosition.z;
 			screenUIPosition.z = 0f;
 			float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
-			Vector3 val = screenUIPosition;
+			Vector3 a = screenUIPosition;
 			bool flag = false;
-			float num2 = (float)Screen.get_width();
+			float num2 = (float)Screen.width;
 			if (screenUIPosition.x < screenSideOffset * num)
 			{
 				screenUIPosition.x = screenSideOffset * num;
@@ -127,31 +89,30 @@ public class UISonarGizmo : UIStatusGizmoBase
 			}
 			if (flag)
 			{
-				SetActiveSafe(statusSprite.get_gameObject(), true);
+				SetActiveSafe(statusSprite.gameObject, true);
 				SetActiveSafe(arrow, true);
-				Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
-				Vector3 val3 = transform.get_position() - val2;
-				if (val3.get_sqrMagnitude() >= 2E-05f)
+				Vector3 vector = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
+				if ((transform.position - vector).sqrMagnitude >= 2E-05f)
 				{
-					transform.set_position(val2);
+					transform.position = vector;
 				}
-				if (arrowTransform != null)
+				if ((Object)arrowTransform != (Object)null)
 				{
-					Vector3 val4 = val - screenUIPosition;
-					if (val4 != Vector3.get_zero())
+					Vector3 vector2 = a - screenUIPosition;
+					if (vector2 != Vector3.zero)
 					{
-						float num3 = 90f - Vector3.Angle(Vector3.get_right(), val4);
-						arrowTransform.set_eulerAngles(new Vector3(0f, 0f, num3));
+						float z = 90f - Vector3.Angle(Vector3.right, vector2);
+						arrowTransform.eulerAngles = new Vector3(0f, 0f, z);
 					}
 					else
 					{
-						arrowTransform.set_eulerAngles(new Vector3(0f, 0f, 0f));
+						arrowTransform.eulerAngles = new Vector3(0f, 0f, 0f);
 					}
 				}
 			}
 			else
 			{
-				SetActiveSafe(statusSprite.get_gameObject(), false);
+				SetActiveSafe(statusSprite.gameObject, false);
 				SetActiveSafe(arrow, false);
 			}
 		}

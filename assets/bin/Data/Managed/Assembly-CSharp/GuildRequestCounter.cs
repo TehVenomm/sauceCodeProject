@@ -93,7 +93,6 @@ public class GuildRequestCounter : GameSection
 
 	public override void Initialize()
 	{
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		selectedQuestInfoData = (GameSection.GetEventData() as QuestInfoData);
 		if (selectedQuestInfoData != null)
 		{
@@ -106,22 +105,25 @@ public class GuildRequestCounter : GameSection
 				selectedQuestNum = selectedQuestInfoData.questData.num;
 			}
 		}
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
-	private unsafe IEnumerator DoInitialize()
+	private IEnumerator DoInitialize()
 	{
 		bool wait2 = true;
 		MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestList(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator7C)/*Error near IL_0031: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CDoInitialize_003Ec__Iterator7E)/*Error near IL_0031: stateMachine*/)._003Cwait_003E__0 = false;
 		});
 		while (wait2)
 		{
 			yield return (object)null;
 		}
 		wait2 = true;
-		SendGetChallengeInfo(new Action((object)/*Error near IL_0072: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
+		SendGetChallengeInfo(delegate
+		{
+			((_003CDoInitialize_003Ec__Iterator7E)/*Error near IL_0072: stateMachine*/)._003Cwait_003E__0 = false;
+		}, null);
 		while (wait2)
 		{
 			yield return (object)null;
@@ -141,7 +143,7 @@ public class GuildRequestCounter : GameSection
 	{
 		if (timer < 0.2f)
 		{
-			timer += Time.get_deltaTime();
+			timer += Time.deltaTime;
 		}
 		if (!(timer < 0.2f))
 		{
@@ -161,7 +163,7 @@ public class GuildRequestCounter : GameSection
 		}
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
 		int count = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Count;
 		MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Sort(delegate(GuildRequestItem a, GuildRequestItem b)
@@ -191,8 +193,47 @@ public class GuildRequestCounter : GameSection
 		ShowNonRequestList(count > 0);
 		prefabCache.Clear();
 		bool isExistEmployButton = false;
-		_003CUpdateUI_003Ec__AnonStorey34A _003CUpdateUI_003Ec__AnonStorey34A;
-		SetGrid(UI.GRD_REQUEST_HOUND, "GuildRequestItem", count, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey34A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetGrid(UI.GRD_REQUEST_HOUND, "GuildRequestItem", count, false, delegate(int i, Transform t, bool b)
+		{
+			GuildRequestItem guildRequestItem = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList[i];
+			prefabCache.Add(new GuildRequestPrefab(guildRequestItem, t));
+			InitButtonColor(guildRequestItem, i, t, b);
+			UpdateHoundRemainTime(guildRequestItem, t);
+			if (guildRequestItem.IsSortieing())
+			{
+				if (!guildRequestItem.IsComplete() && guildRequestItem.IsExpired())
+				{
+					InitTimeupButton(guildRequestItem, i, t, b);
+					return;
+				}
+				if (!guildRequestItem.IsComplete())
+				{
+					InitSortieingButton(guildRequestItem, i, t, b);
+					return;
+				}
+				if (guildRequestItem.IsComplete())
+				{
+					InitCompleteButton(guildRequestItem, i, t, b);
+					return;
+				}
+			}
+			if (guildRequestItem.IsExpired())
+			{
+				if (isExistEmployButton)
+				{
+					InitInactiveButton(guildRequestItem, i, t, b);
+				}
+				else
+				{
+					InitEmployButton(guildRequestItem, i, t, b);
+					isExistEmployButton = true;
+				}
+			}
+			else
+			{
+				InitHoundStartButton(guildRequestItem, i, t, b);
+			}
+		});
 		InitCompleteAllButton(MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList);
 		base.UpdateUI();
 	}
@@ -202,15 +243,10 @@ public class GuildRequestCounter : GameSection
 		return selectedQuestInfoData != null;
 	}
 
-	private unsafe bool IsFromShadow()
+	private bool IsFromShadow()
 	{
 		List<GameSectionHistory.HistoryData> historyList = MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList();
-		List<GameSectionHistory.HistoryData> source = historyList;
-		if (_003C_003Ef__am_0024cache5 == null)
-		{
-			_003C_003Ef__am_0024cache5 = new Func<GameSectionHistory.HistoryData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		return source.Any(_003C_003Ef__am_0024cache5);
+		return historyList.Any((GameSectionHistory.HistoryData h) => h.sectionName == "QuestAcceptChallengeCounter" || h.sectionName == "GuildRequestChallengeCounter");
 	}
 
 	private void InitButtonColor(GuildRequestItem item, int index, Transform parent, bool recycle)
@@ -303,26 +339,20 @@ public class GuildRequestCounter : GameSection
 		UpdateQuestTimer(item, parent);
 	}
 
-	private unsafe void InitCompleteAllButton(List<GuildRequestItem> guildRequestItemList)
+	private void InitCompleteAllButton(List<GuildRequestItem> guildRequestItemList)
 	{
-		if (_003C_003Ef__am_0024cache6 == null)
-		{
-			_003C_003Ef__am_0024cache6 = new Func<GuildRequestItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		bool flag = guildRequestItemList.Any(_003C_003Ef__am_0024cache6);
-		SetActive((Enum)UI.BTN_COMPLETE_ALL, flag);
-		SetActive((Enum)UI.BTN_COMPLETE_ALL_DISABLE, !flag);
+		bool flag = guildRequestItemList.Any((GuildRequestItem g) => g.IsSortieing() && g.IsComplete());
+		SetActive(UI.BTN_COMPLETE_ALL, flag);
+		SetActive(UI.BTN_COMPLETE_ALL_DISABLE, !flag);
 	}
 
 	private void InitHoundStartButton(GuildRequestItem item, int index, Transform parent, bool recycle)
 	{
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(parent, UI.BTN_EMPLOY, false);
 		SetActive(parent, UI.BTN_HOUND_START, true);
 		SetActive(parent, UI.OBJ_QUEST_ROOT, false);
-		Transform val = FindCtrl(parent, UI.BTN_HOUND_START);
-		UIButton component = val.GetComponent<UIButton>();
+		Transform transform = FindCtrl(parent, UI.BTN_HOUND_START);
+		UIButton component = transform.GetComponent<UIButton>();
 		if (IsOpenFromGachaQuest() && selectedQuestNum == 0)
 		{
 			component.isEnabled = false;
@@ -335,11 +365,11 @@ public class GuildRequestCounter : GameSection
 		}
 		if (IsOpenFromGachaQuest())
 		{
-			SetEvent(val, "SORTIE", item);
+			SetEvent(transform, "SORTIE", item);
 		}
 		else
 		{
-			SetEvent(val, "SELECT", item);
+			SetEvent(transform, "SELECT", item);
 		}
 	}
 
@@ -354,12 +384,6 @@ public class GuildRequestCounter : GameSection
 
 	private void SetDefaultColor(GuildRequestItem item, Transform parent)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 		SetColor(parent, UI.SPR_QUEST_INFO_BASE, new Color(1f, 1f, 1f));
 		SetColor(parent, UI.LBL_QUEST_NAME, new Color(1f, 1f, 1f));
 		SetColor(parent, UI.LBL_QUEST_CURRENT_POINT, new Color(1f, 1f, 1f));
@@ -370,12 +394,6 @@ public class GuildRequestCounter : GameSection
 
 	private void SetTimeupColor(GuildRequestItem item, Transform parent)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 		SetColor(parent, UI.SPR_QUEST_INFO_BASE, new Color(0.5f, 0.5f, 0.5f));
 		SetColor(parent, UI.LBL_QUEST_NAME, new Color(0.5f, 0.5f, 0.5f));
 		SetColor(parent, UI.LBL_QUEST_CURRENT_POINT, new Color(0.5f, 0.5f, 0.5f));
@@ -427,14 +445,10 @@ public class GuildRequestCounter : GameSection
 
 	private void UpdateHoundRemainTime(GuildRequestItem item, Transform parent)
 	{
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
 		double totalSeconds = item.GetHoundRemainTime().TotalSeconds;
 		string empty = string.Empty;
-		Transform val = FindCtrl(parent, UI.LBL_HOUND_REMAIN_TIME);
-		UILabel component = val.GetComponent<UILabel>();
+		Transform transform = FindCtrl(parent, UI.LBL_HOUND_REMAIN_TIME);
+		UILabel component = transform.GetComponent<UILabel>();
 		if (item.crystalNum > 0)
 		{
 			string format = StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 15u);
@@ -442,25 +456,25 @@ public class GuildRequestCounter : GameSection
 			if (totalSeconds < 0.0)
 			{
 				empty = string.Format(format, arg, UIUtility.TimeFormat(0, true));
-				SetLabelText(val, empty);
-				SetColor(val, Color.get_yellow());
+				SetLabelText(transform, empty);
+				SetColor(transform, Color.yellow);
 				component.effectStyle = UILabel.Effect.None;
 			}
 			else
 			{
 				empty = string.Format(format, arg, UIUtility.TimeFormat((int)totalSeconds, true));
-				SetLabelText(val, empty);
-				SetColor(val, Color.get_yellow());
+				SetLabelText(transform, empty);
+				SetColor(transform, Color.yellow);
 				component.effectStyle = UILabel.Effect.None;
 			}
 		}
 		else
 		{
 			empty = StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 12u);
-			SetLabelText(val, empty);
-			SetColor(val, Color.get_white());
+			SetLabelText(transform, empty);
+			SetColor(transform, Color.white);
 			component.effectStyle = UILabel.Effect.Outline8;
-			component.effectColor = Color.get_black();
+			component.effectColor = Color.black;
 		}
 	}
 
@@ -476,19 +490,28 @@ public class GuildRequestCounter : GameSection
 	{
 		if (isShow && MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData != null && MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Count == 0)
 		{
-			SetActive((Enum)UI.LBL_REQUEST_NON_LIST, true);
-			SetLabelText((Enum)UI.LBL_REQUEST_NON_LIST, StringTable.Get(STRING_CATEGORY.QUEST_DELIVERY, 100u));
+			SetActive(UI.LBL_REQUEST_NON_LIST, true);
+			SetLabelText(UI.LBL_REQUEST_NON_LIST, StringTable.Get(STRING_CATEGORY.QUEST_DELIVERY, 100u));
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_REQUEST_NON_LIST, false);
+			SetActive(UI.LBL_REQUEST_NON_LIST, false);
 		}
 	}
 
-	protected unsafe void SendGetChallengeInfo(Action onFinish, Action<bool> cb)
+	protected void SendGetChallengeInfo(Action onFinish, Action<bool> cb)
 	{
-		_003CSendGetChallengeInfo_003Ec__AnonStorey34B _003CSendGetChallengeInfo_003Ec__AnonStorey34B;
-		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(new Action<bool, Error>((object)_003CSendGetChallengeInfo_003Ec__AnonStorey34B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(delegate(bool is_success, Error err)
+		{
+			if (onFinish != null)
+			{
+				onFinish();
+			}
+			if (cb != null)
+			{
+				cb(is_success);
+			}
+		});
 	}
 
 	private void OnQuery_SELECT()
@@ -531,17 +554,18 @@ public class GuildRequestCounter : GameSection
 		GameSection.SetEventData(eventData);
 	}
 
-	private unsafe void OnQuery_GuildRequestCancel_YES()
+	private void OnQuery_GuildRequestCancel_YES()
 	{
 		GuildRequestItem selectedItem = MonoBehaviourSingleton<GuildRequestManager>.I.GetSelectedItem();
 		uint selectedQuestId = (uint)selectedItem.questId;
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestRetire(delegate
+		MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestRetire(delegate(bool isSuccess)
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Expected O, but got Unknown
-			_003COnQuery_GuildRequestCancel_YES_003Ec__AnonStorey34C._003COnQuery_GuildRequestCancel_YES_003Ec__AnonStorey34D _003COnQuery_GuildRequestCancel_YES_003Ec__AnonStorey34D;
-			SendGetChallengeInfo(new Action((object)_003COnQuery_GuildRequestCancel_YES_003Ec__AnonStorey34D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
+			SendGetChallengeInfo(delegate
+			{
+				UpdateSelectedQuestNum(1, selectedQuestId);
+				GameSection.ResumeEvent(isSuccess, null);
+			}, null);
 		});
 	}
 
@@ -635,18 +659,19 @@ public class GuildRequestCounter : GameSection
 		GameSection.SetEventData(eventData);
 	}
 
-	protected unsafe virtual void OnQuery_GuildRequestCounterSortieMessage_YES()
+	protected virtual void OnQuery_GuildRequestCounterSortieMessage_YES()
 	{
 		QuestInfoData questInfoData = selectedQuestInfoData;
 		bool flag = IsFromShadow();
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestStart(questInfoData, !flag, delegate
+		MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestStart(questInfoData, !flag, delegate(bool isSuccess)
 		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Expected O, but got Unknown
 			GuildRequestCounter guildRequestCounter = this;
-			_003COnQuery_GuildRequestCounterSortieMessage_YES_003Ec__AnonStorey350 _003COnQuery_GuildRequestCounterSortieMessage_YES_003Ec__AnonStorey;
-			SendGetChallengeInfo(new Action((object)_003COnQuery_GuildRequestCounterSortieMessage_YES_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
+			SendGetChallengeInfo(delegate
+			{
+				guildRequestCounter.UpdateSelectedQuestNum(-1, guildRequestCounter.selectedQuestInfoData.questData.tableData.questID);
+				GameSection.ResumeEvent(isSuccess, null);
+			}, null);
 		});
 	}
 

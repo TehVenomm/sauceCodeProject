@@ -10,7 +10,7 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 
 	public int fromType;
 
-	public Vector3 hitPos = Vector3.get_zero();
+	public Vector3 hitPos = Vector3.zero;
 
 	public int fromClientID;
 
@@ -34,7 +34,7 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 
 	public int arrowBurstDamage;
 
-	public Vector3 hostPos = Vector3.get_zero();
+	public Vector3 hostPos = Vector3.zero;
 
 	public float hostDir;
 
@@ -48,7 +48,7 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 
 	public int reactionType;
 
-	public Vector3 blowForce = Vector3.get_zero();
+	public Vector3 blowForce = Vector3.zero;
 
 	public float downTotal;
 
@@ -74,12 +74,6 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 
 	public Coop_Model_ObjectAttackedHitFix()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		base.packetType = PACKET_TYPE.OBJECT_ATTACKED_HIT_FIX;
 	}
 
@@ -90,7 +84,6 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 
 	public override Vector3 GetObjectPosition()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		return hostPos;
 	}
 
@@ -114,12 +107,6 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 
 	public void SetAttackedHitStatus(AttackedHitStatusFix status)
 	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
 		attackInfoName = status.attackInfo.name;
 		attackInfoRate = status.attackInfo.rateInfoRate;
 		fromObjectID = status.fromObjectID;
@@ -161,16 +148,10 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 
 	public void CopyAttackedHitStatus(out AttackedHitStatusFix status)
 	{
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
 		AttackedHitStatus attackedHitStatus = new AttackedHitStatus();
 		attackedHitStatus.fromObjectID = fromObjectID;
 		attackedHitStatus.fromObject = MonoBehaviourSingleton<StageObjectManager>.I.FindCharacter(fromObjectID);
-		if (attackedHitStatus.fromObject != null && !attackedHitStatus.fromObject.isLoading)
+		if ((Object)attackedHitStatus.fromObject != (Object)null && !attackedHitStatus.fromObject.isLoading)
 		{
 			attackedHitStatus.attackInfo = (attackedHitStatus.fromObject.FindAttackInfoExternal(attackInfoName, true, attackInfoRate) as AttackHitInfo);
 		}
@@ -181,7 +162,7 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 		attackedHitStatus.fromType = (StageObject.OBJECT_TYPE)fromType;
 		attackedHitStatus.hitPos = hitPos;
 		attackedHitStatus.fromClientID = fromClientID;
-		if (attackedHitStatus.fromObject != null)
+		if ((Object)attackedHitStatus.fromObject != (Object)null)
 		{
 			attackedHitStatus.skillParam = attackedHitStatus.fromObject.GetSkillParam(skillIndex);
 		}

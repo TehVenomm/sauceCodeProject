@@ -1,10 +1,11 @@
 using GooglePlayGames.BasicApi;
 using System;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 namespace GooglePlayGames
 {
-	internal class PlayGamesAchievement
+	internal class PlayGamesAchievement : IAchievementDescription, IAchievement
 	{
 		private readonly ReportProgress mProgressCallback;
 
@@ -141,10 +142,6 @@ namespace GooglePlayGames
 
 		private Texture2D LoadImage()
 		{
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Expected O, but got Unknown
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Expected O, but got Unknown
 			if (hidden)
 			{
 				return null;
@@ -152,18 +149,18 @@ namespace GooglePlayGames
 			string text = (!completed) ? mRevealedImageUrl : mUnlockedImageUrl;
 			if (!string.IsNullOrEmpty(text))
 			{
-				if (mImageFetcher == null || mImageFetcher.get_url() != text)
+				if (mImageFetcher == null || mImageFetcher.url != text)
 				{
 					mImageFetcher = new WWW(text);
 					mImage = null;
 				}
-				if (mImage != null)
+				if ((UnityEngine.Object)mImage != (UnityEngine.Object)null)
 				{
 					return mImage;
 				}
-				if (mImageFetcher.get_isDone())
+				if (mImageFetcher.isDone)
 				{
-					mImage = mImageFetcher.get_texture();
+					mImage = mImageFetcher.texture;
 					return mImage;
 				}
 			}

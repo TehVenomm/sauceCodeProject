@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class ChatInputFrame
+public class ChatInputFrame : MonoBehaviour
 {
 	private const float INPUT_COLLIDER_MARGIN = 10f;
 
@@ -44,11 +44,6 @@ public class ChatInputFrame
 
 	private bool IsBusy => m_BusyCount != 0;
 
-	public ChatInputFrame()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		InitTweens(m_OpenTweens);
@@ -63,7 +58,7 @@ public class ChatInputFrame
 			int i = 0;
 			for (int num = tweens.Length; i < num; i++)
 			{
-				tweens[i].set_enabled(false);
+				tweens[i].enabled = false;
 				tweens[i].AddOnFinished(new EventDelegate(OnFinished));
 			}
 		}
@@ -74,7 +69,7 @@ public class ChatInputFrame
 		m_BusyCount--;
 		if (!IsBusy)
 		{
-			m_InputCollider.set_enabled(m_IsOpen);
+			m_InputCollider.enabled = m_IsOpen;
 		}
 	}
 
@@ -115,11 +110,11 @@ public class ChatInputFrame
 			return false;
 		}
 		m_BusyCount = tweens.Length;
-		m_InputCollider.set_enabled(false);
+		m_InputCollider.enabled = false;
 		int i = 0;
 		for (int num = tweens.Length; i < num; i++)
 		{
-			tweens[i].set_enabled(true);
+			tweens[i].enabled = true;
 			tweens[i].ResetToBeginning();
 		}
 		return true;
@@ -141,24 +136,19 @@ public class ChatInputFrame
 
 	public void FrameResize()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 		BoxCollider inputCollider = m_InputCollider;
-		Vector3 size = m_InputCollider.get_size();
+		Vector3 size = m_InputCollider.size;
 		float x = size.x;
-		float num = (float)m_BackgroundSprite.height + 10f;
-		Vector3 size2 = m_InputCollider.get_size();
-		inputCollider.set_size(new Vector3(x, num, size2.z));
+		float y = (float)m_BackgroundSprite.height + 10f;
+		Vector3 size2 = m_InputCollider.size;
+		inputCollider.size = new Vector3(x, y, size2.z);
 	}
 
 	public void ChangeText()
 	{
 		if (onChange != null)
 		{
-			onChange.Invoke();
+			onChange();
 		}
 	}
 
@@ -166,7 +156,7 @@ public class ChatInputFrame
 	{
 		if (onSubmit != null)
 		{
-			onSubmit.Invoke();
+			onSubmit();
 		}
 	}
 
@@ -188,17 +178,15 @@ public class ChatInputFrame
 
 	public void UpdateAgeConfirm()
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		bool active = !UserInfoManager.IsRegisterdAge();
 		bool active2 = UserInfoManager.IsRegisterdAge() && !UserInfoManager.IsEnableCommunication();
-		if (m_AgeConfirmSprite != null)
+		if ((UnityEngine.Object)m_AgeConfirmSprite != (UnityEngine.Object)null)
 		{
-			m_AgeConfirmSprite.get_gameObject().SetActive(active);
+			m_AgeConfirmSprite.gameObject.SetActive(active);
 		}
-		if (m_DenyChatSprite != null)
+		if ((UnityEngine.Object)m_DenyChatSprite != (UnityEngine.Object)null)
 		{
-			m_DenyChatSprite.get_gameObject().SetActive(active2);
+			m_DenyChatSprite.gameObject.SetActive(active2);
 		}
 	}
 }

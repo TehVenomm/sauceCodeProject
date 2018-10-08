@@ -127,19 +127,17 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 	public static void Startup()
 	{
 		string text = "Startup()";
-		Application.set_targetFrameRate(30);
+		Application.targetFrameRate = 30;
 		ShaderGlobal.Initialize();
 		EffectManager.Startup();
 	}
 
 	public void SetMainCamera(Camera _camera)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
 		mainCamera = _camera;
-		if (_camera != null)
+		if ((UnityEngine.Object)_camera != (UnityEngine.Object)null)
 		{
-			mainCameraTransform = _camera.get_transform();
+			mainCameraTransform = _camera.transform;
 		}
 		else
 		{
@@ -169,10 +167,10 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 	protected override void Awake()
 	{
 		base.Awake();
-		Object.DontDestroyOnLoad(this);
+		UnityEngine.Object.DontDestroyOnLoad(this);
 		CrashlyticsReporter.EnableReport();
-		this.defaultScreenWidth = Screen.get_width();
-		defaultScreenHeight = Screen.get_height();
+		this.defaultScreenWidth = Screen.width;
+		defaultScreenHeight = Screen.height;
 		if (this.defaultScreenWidth > defaultScreenHeight)
 		{
 			int defaultScreenWidth = this.defaultScreenWidth;
@@ -180,7 +178,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 			defaultScreenHeight = defaultScreenWidth;
 		}
 		SetupScreen();
-		UpdateResolution(Screen.get_width() < Screen.get_height());
+		UpdateResolution(Screen.width < Screen.height);
 		TitleTop.isFirstBoot = true;
 		GC.Collect();
 		long totalMemory = GC.GetTotalMemory(false);
@@ -221,82 +219,68 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		{
 			if (!isApplicationQuit)
 			{
-				onDelayCall.Invoke();
+				onDelayCall();
 			}
 			onDelayCall = null;
 		}
 	}
 
-	private unsafe void Start()
+	private void Start()
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Invalid comparison between Unknown and I4
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Invalid comparison between Unknown and I4
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Invalid comparison between Unknown and I4
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Invalid comparison between Unknown and I4
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Expected O, but got Unknown
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		Screen.set_sleepTimeout(-1);
+		Screen.sleepTimeout = -1;
 		isInitialized = false;
 		isApplicationQuit = false;
 		isReset = false;
 		showingTableLoadError = false;
 		Startup();
 		InitCollideLayers();
-		if ((int)Screen.get_orientation() == 0 || (int)Screen.get_orientation() == 1 || (int)Screen.get_orientation() == 3 || (int)Screen.get_orientation() == 3 || (int)Screen.get_orientation() == 4)
+		if (Screen.orientation == ScreenOrientation.Unknown || Screen.orientation == ScreenOrientation.Portrait || Screen.orientation == ScreenOrientation.LandscapeLeft || Screen.orientation == ScreenOrientation.LandscapeLeft || Screen.orientation == ScreenOrientation.LandscapeRight)
 		{
-			Screen.set_orientation(1);
+			Screen.orientation = ScreenOrientation.Portrait;
 		}
 		else
 		{
-			Screen.set_orientation(2);
+			Screen.orientation = ScreenOrientation.PortraitUpsideDown;
 		}
 		Utility.Initialize();
 		Temporary.Initialize();
 		Protocol.Initialize();
 		HomeSelfCharacter.CTRL = true;
 		appVer = NetworkNative.getNativeVersionFromName();
-		GameObject val = this.get_gameObject();
-		val.AddComponent<GoWrapManager>();
-		val.AddComponent<FCMManager>();
-		val.AddComponent<DefaultTimeUpdater>();
-		val.AddComponent<ResourceManager>();
-		MonoBehaviourSingleton<ResourceManager>.I.onAsyncLoadQuery = new Func<bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		val.AddComponent<InstantiateManager>();
+		GameObject gameObject = base.gameObject;
+		gameObject.AddComponent<GoWrapManager>();
+		gameObject.AddComponent<FCMManager>();
+		gameObject.AddComponent<DefaultTimeUpdater>();
+		gameObject.AddComponent<ResourceManager>();
+		MonoBehaviourSingleton<ResourceManager>.I.onAsyncLoadQuery = onAsyncLoadQuery;
+		gameObject.AddComponent<InstantiateManager>();
 		DataTableManager dataTableManager = new GameObject("DataTableManager").AddComponent<DataTableManager>();
-		dataTableManager.get_transform().set_parent(base._transform);
-		dataTableManager.onError += new Action<DataTableLoadError, Action>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		dataTableManager.transform.parent = base._transform;
+		dataTableManager.onError += OnTableDownloadError;
 		ResourceManager.enableLoadDirect = false;
 		CreateDefaultCamera();
-		val.AddComponent<ScreenOrientationManager>();
+		gameObject.AddComponent<ScreenOrientationManager>();
 		MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
 		UpdateResolution(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
 		Utility.CreateGameObjectAndComponent("AudioListenerManager", MonoBehaviourSingleton<AppMain>.I._transform, -1);
 		Utility.CreateGameObjectAndComponent("SoundManager", base._transform, -1);
 		Utility.CreateGameObjectAndComponent("AudioObjectPool", base._transform, -1);
 		Utility.CreateGameObjectAndComponent("EffectManager", base._transform, -1);
-		val.AddComponent<NetworkManager>();
-		val.AddComponent<ProtocolManager>();
-		val.AddComponent<AccountManager>();
-		val.AddComponent<TimeManager>();
-		val.AddComponent<GoGameTimeManager>();
+		gameObject.AddComponent<NetworkManager>();
+		gameObject.AddComponent<ProtocolManager>();
+		gameObject.AddComponent<AccountManager>();
+		gameObject.AddComponent<TimeManager>();
+		gameObject.AddComponent<GoGameTimeManager>();
 		Utility.CreateGameObjectAndComponent("NativeReceiver", base._transform, -1);
 		Utility.CreateGameObjectAndComponent("ShopReceiver", base._transform, -1);
 		Utility.CreateGameObjectAndComponent("ChatManager", base._transform, -1);
 		Utility.CreateGameObjectAndComponent("NativeShare", base._transform, -1);
-		val.AddComponent<CoopApp>();
-		val.AddComponent<BootProcess>();
+		gameObject.AddComponent<CoopApp>();
+		gameObject.AddComponent<BootProcess>();
 	}
 
 	public void UpdateResolution(bool is_portrait)
 	{
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 		bool flag = false;
 		if (GameSaveData.instance != null)
 		{
@@ -327,19 +311,19 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		}
 		if (changedResolutionWork != null)
 		{
-			this.StopCoroutine(changedResolutionWork);
+			StopCoroutine(changedResolutionWork);
 		}
 		changedResolutionWork = _UpdateResolution(num, num2);
-		this.StartCoroutine(changedResolutionWork);
+		StartCoroutine(changedResolutionWork);
 	}
 
 	private IEnumerator _UpdateResolution(int w, int h)
 	{
-		UIRenderTexture[] renderTextures = this.get_gameObject().GetComponentsInChildren<UIRenderTexture>(true);
+		UIRenderTexture[] renderTextures = base.gameObject.GetComponentsInChildren<UIRenderTexture>(true);
 		int l = 0;
 		for (int k = renderTextures.Length; l < k; l++)
 		{
-			renderTextures[l].set_enabled(false);
+			renderTextures[l].enabled = false;
 		}
 		Screen.SetResolution(w, h, true);
 		yield return (object)new WaitForEndOfFrame();
@@ -347,7 +331,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		int j = 0;
 		for (int i = renderTextures.Length; j < i; j++)
 		{
-			renderTextures[j].set_enabled(true);
+			renderTextures[j].enabled = true;
 		}
 		changedResolutionWork = null;
 	}
@@ -364,38 +348,34 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	private void CreateDefaultCamera()
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Expected O, but got Unknown
-		if (Camera.get_main() == null)
+		if ((UnityEngine.Object)Camera.main == (UnityEngine.Object)null)
 		{
 			ResourceUtility.Realizes(Resources.Load("System/DefaultMainCamera"), base._transform, -1);
 		}
 	}
 
-	private unsafe void OnApplicationPause(bool pause_status)
+	private void OnApplicationPause(bool pause_status)
 	{
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Expected O, but got Unknown
 		if (pause_status)
 		{
 			GameSaveData.Save();
-			Screen.set_sleepTimeout(-2);
+			Screen.sleepTimeout = -2;
 			Native.CancelAllLocalNotification();
 			RegisterLocalNotify();
 		}
 		else
 		{
-			Screen.set_sleepTimeout(-1);
+			Screen.sleepTimeout = -1;
 			if (isInitialized && !CheckInvitedClanBySNS() && !CheckInvitedPartyBySNS() && !CheckInvitedLoungeBySNS() && !CheckMutualFollowBySNS())
 			{
 				if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "HomeTop" || MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "LoungeTop")
 				{
-					if (_003C_003Ef__am_0024cache17 == null)
+					Protocol.Force(delegate
 					{
-						_003C_003Ef__am_0024cache17 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-					}
-					Protocol.Force(_003C_003Ef__am_0024cache17);
+						MonoBehaviourSingleton<PartyManager>.I.SendInvitedParty(delegate
+						{
+						}, true);
+					});
 				}
 				Native.CancelAllLocalNotification();
 			}
@@ -466,7 +446,6 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	private bool CheckInvitedLoungeBySNS()
 	{
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
 		string @string = PlayerPrefs.GetString("il");
 		if (!string.IsNullOrEmpty(@string))
 		{
@@ -487,7 +466,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 			EventData[] array = null;
 			if (MonoBehaviourSingleton<LoungeManager>.IsValid())
 			{
-				this.StartCoroutine(SetAutoEventLoungeToLounge(@string));
+				StartCoroutine(SetAutoEventLoungeToLounge(@string));
 			}
 			else
 			{
@@ -573,10 +552,10 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		if (MonoBehaviourSingleton<GameSceneManager>.IsValid())
 		{
 			GameSection currentScene = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentScene();
-			if (currentScene != null && currentScene is InGameScene)
+			if ((UnityEngine.Object)currentScene != (UnityEngine.Object)null && currentScene is InGameScene)
 			{
 				GameSection currentSection = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection();
-				if (MonoBehaviourSingleton<InGameProgress>.IsValid() && currentSection != null && currentSection is InGameMain)
+				if (MonoBehaviourSingleton<InGameProgress>.IsValid() && (UnityEngine.Object)currentSection != (UnityEngine.Object)null && currentSection is InGameMain)
 				{
 					return MonoBehaviourSingleton<InGameProgress>.I.isBattleStart;
 				}
@@ -587,9 +566,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	public Coroutine ClearMemory(bool clearObjCaches, bool clearPreloaded)
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Expected O, but got Unknown
-		return this.StartCoroutine(DoClearMemory(clearObjCaches, clearPreloaded));
+		return StartCoroutine(DoClearMemory(clearObjCaches, clearPreloaded));
 	}
 
 	private IEnumerator DoClearMemory(bool clearObjCaches, bool clearPreloaded)
@@ -619,9 +596,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	public Coroutine ClearEnemyAssets()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Expected O, but got Unknown
-		return this.StartCoroutine(DoClearEnemyAssets());
+		return StartCoroutine(DoClearEnemyAssets());
 	}
 
 	private IEnumerator DoClearEnemyAssets()
@@ -657,9 +632,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	public Coroutine UnloadUnusedAssets(bool need_gc_collect)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Expected O, but got Unknown
-		return this.StartCoroutine(DoUnloadUnusedAssets(need_gc_collect));
+		return StartCoroutine(DoUnloadUnusedAssets(need_gc_collect));
 	}
 
 	private IEnumerator DoUnloadUnusedAssets(bool need_gc_collect)
@@ -669,7 +642,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 			yield return (object)null;
 		}
 		isExecutingUnloadUnusedAssets = true;
-		frameExecutedUnloadUnusedAssets = Time.get_frameCount();
+		frameExecutedUnloadUnusedAssets = Time.frameCount;
 		if (need_gc_collect)
 		{
 			GC.Collect();
@@ -704,10 +677,9 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	public void Reset(bool need_clear_cache, bool need_predownload)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<ResourceManager>.IsValid())
 		{
-			this.StartCoroutine(DoReset(need_clear_cache, need_predownload));
+			StartCoroutine(DoReset(need_clear_cache, need_predownload));
 		}
 	}
 
@@ -730,16 +702,16 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		}
 		if (MonoBehaviourSingleton<PredownloadManager>.IsValid())
 		{
-			Object.DestroyImmediate(MonoBehaviourSingleton<PredownloadManager>.I);
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<PredownloadManager>.I);
 		}
 		if (MonoBehaviourSingleton<LoadingProcess>.IsValid())
 		{
-			Object.DestroyImmediate(MonoBehaviourSingleton<LoadingProcess>.I);
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<LoadingProcess>.I);
 		}
 		if (MonoBehaviourSingleton<DataTableManager>.IsValid())
 		{
 			MonoBehaviourSingleton<DataTableManager>.I.Clear();
-			Object.DestroyImmediate(MonoBehaviourSingleton<DataTableManager>.I);
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<DataTableManager>.I);
 		}
 		if (MonoBehaviourSingleton<ResourceManager>.IsValid())
 		{
@@ -753,17 +725,17 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		SceneManager.LoadScene("Empty");
 		if (need_clear_cache)
 		{
-			if (Singleton<StringTable>.IsValid() && MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.loading != null)
+			if (Singleton<StringTable>.IsValid() && MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.loading != (UnityEngine.Object)null)
 			{
 				MonoBehaviourSingleton<UIManager>.I.loading.ShowSystemMessage(StringTable.Get(STRING_CATEGORY.COMMON, 20u));
 			}
 			yield return (object)UnloadUnusedAssets(true);
 			PlayerPrefs.SetInt("AppMain.Reset", (need_clear_cache ? 1 : 0) | (need_predownload ? 2 : 0));
-			yield return (object)this.StartCoroutine(ResourceManager.ClearCache());
+			yield return (object)StartCoroutine(ResourceManager.ClearCache());
 			yield return (object)new WaitForSeconds(1f);
-			if (need_predownload && Singleton<StringTable>.IsValid() && MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.loading != null)
+			if (need_predownload && Singleton<StringTable>.IsValid() && MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.loading != (UnityEngine.Object)null)
 			{
-				this.get_gameObject().AddComponent<PredownloadManager>();
+				base.gameObject.AddComponent<PredownloadManager>();
 				while (MonoBehaviourSingleton<PredownloadManager>.I.totalCount == 0)
 				{
 					yield return (object)null;
@@ -784,32 +756,32 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 			}
 			PlayerPrefs.SetInt("AppMain.Reset", 0);
 		}
-		this.get_gameObject().BroadcastMessage("OnApplicationQuit", 1);
-		MonoBehaviour[] monos = this.GetComponents<MonoBehaviour>();
-		for (int i = base._transform.get_childCount() - 1; i >= 0; i--)
+		base.gameObject.BroadcastMessage("OnApplicationQuit", SendMessageOptions.DontRequireReceiver);
+		MonoBehaviour[] monos = GetComponents<MonoBehaviour>();
+		for (int i = base._transform.childCount - 1; i >= 0; i--)
 		{
-			base._transform.GetChild(i).get_gameObject().SetActive(false);
+			base._transform.GetChild(i).gameObject.SetActive(false);
 		}
 		MonoBehaviour[] array = monos;
 		foreach (MonoBehaviour mono in array)
 		{
-			if (mono != this)
+			if ((UnityEngine.Object)mono != (UnityEngine.Object)this)
 			{
-				mono.set_enabled(false);
+				mono.enabled = false;
 			}
 		}
 		SetMainCamera(null);
-		for (int j = base._transform.get_childCount() - 1; j >= 0; j--)
+		for (int j = base._transform.childCount - 1; j >= 0; j--)
 		{
-			GameObject game_object = base._transform.GetChild(j).get_gameObject();
-			Object.DestroyImmediate(game_object);
+			GameObject game_object = base._transform.GetChild(j).gameObject;
+			UnityEngine.Object.DestroyImmediate(game_object);
 		}
 		MonoBehaviour[] array2 = monos;
 		foreach (MonoBehaviour mono2 in array2)
 		{
-			if (mono2 != this)
+			if ((UnityEngine.Object)mono2 != (UnityEngine.Object)this)
 			{
-				Object.DestroyImmediate(mono2);
+				UnityEngine.Object.DestroyImmediate(mono2);
 			}
 		}
 		CreateDefaultCamera();
@@ -852,7 +824,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 				showingTableLoadError = false;
 				if (btn == "YES")
 				{
-					retry.Invoke();
+					retry();
 				}
 				else
 				{
@@ -877,10 +849,9 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	public static void Delay(float sec, Action func)
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		if (object.ReferenceEquals(MonoBehaviourSingleton<AppMain>.I, null))
 		{
-			func.Invoke();
+			func();
 		}
 		else
 		{
@@ -891,7 +862,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 	private IEnumerator _Delay(float sec, Action func)
 	{
 		yield return (object)new WaitForSeconds(sec);
-		func.Invoke();
+		func();
 	}
 
 	private void ApplicationResume()
@@ -999,21 +970,13 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	public void ChangeScene(string scene, string section, Action callback)
 	{
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(CRChangeScene(scene, section, callback));
+		StartCoroutine(CRChangeScene(scene, section, callback));
 	}
 
-	private unsafe IEnumerator CRChangeScene(string scene, string section, Action callback)
+	private IEnumerator CRChangeScene(string scene, string section, Action callback)
 	{
-		if (_003CCRChangeScene_003Ec__Iterator24A._003C_003Ef__am_0024cache8 == null)
-		{
-			_003CCRChangeScene_003Ec__Iterator24A._003C_003Ef__am_0024cache8 = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		yield return (object)new WaitUntil(_003CCRChangeScene_003Ec__Iterator24A._003C_003Ef__am_0024cache8);
-		if (callback != null)
-		{
-			callback.Invoke();
-		}
+		yield return (object)new WaitUntil(() => MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing);
+		callback?.Invoke();
 		MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene(scene, section, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
 	}
 }

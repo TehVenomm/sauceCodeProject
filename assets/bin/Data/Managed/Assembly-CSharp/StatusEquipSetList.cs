@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class StatusEquipSetList : SkillInfoBase
@@ -58,9 +57,12 @@ public class StatusEquipSetList : SkillInfoBase
 		base.Initialize();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
-		SetDynamicList((Enum)UI.GRD_SET_LIST, "StatusEquipSetListItem", equipSetMax, false, null, null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetDynamicList(UI.GRD_SET_LIST, "StatusEquipSetListItem", equipSetMax, false, null, null, delegate(int i, Transform t, bool isRecycle)
+		{
+			SetEquipSetInfo(t, i);
+		});
 	}
 
 	protected override int GetCurrentEquipSetNo()

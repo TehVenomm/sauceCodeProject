@@ -2,8 +2,8 @@ using System;
 using System.Diagnostics;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/NGUI Widget")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/NGUI Widget")]
 public class UIWidget : UIRect
 {
 	public enum Pivot
@@ -34,7 +34,7 @@ public class UIWidget : UIRect
 
 	[HideInInspector]
 	[SerializeField]
-	protected Color mColor = Color.get_white();
+	protected Color mColor = Color.white;
 
 	[HideInInspector]
 	[SerializeField]
@@ -44,12 +44,12 @@ public class UIWidget : UIRect
 	[HideInInspector]
 	protected int mWidth = 100;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected int mHeight = 100;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected int mDepth;
 
 	public OnDimensionsChanged onChange;
@@ -105,7 +105,7 @@ public class UIWidget : UIRect
 	public UIDrawCall drawCall;
 
 	[NonSerialized]
-	protected Vector3[] mCorners = (Vector3[])new Vector3[4];
+	protected Vector3[] mCorners = new Vector3[4];
 
 	[NonSerialized]
 	private int mAlphaFrameID = -1;
@@ -126,13 +126,13 @@ public class UIWidget : UIRect
 		{
 			if ((MulticastDelegate)mOnRender != (MulticastDelegate)value)
 			{
-				if (drawCall != null && drawCall.onRender != null && mOnRender != null)
+				if ((UnityEngine.Object)drawCall != (UnityEngine.Object)null && drawCall.onRender != null && mOnRender != null)
 				{
 					UIDrawCall uIDrawCall = drawCall;
 					uIDrawCall.onRender = (UIDrawCall.OnRenderCallback)Delegate.Remove(uIDrawCall.onRender, mOnRender);
 				}
 				mOnRender = value;
-				if (drawCall != null)
+				if ((UnityEngine.Object)drawCall != (UnityEngine.Object)null)
 				{
 					UIDrawCall uIDrawCall2 = drawCall;
 					uIDrawCall2.onRender = (UIDrawCall.OnRenderCallback)Delegate.Combine(uIDrawCall2.onRender, value);
@@ -145,15 +145,10 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			return mDrawRegion;
 		}
 		set
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			if (mDrawRegion != value)
 			{
 				mDrawRegion = value;
@@ -185,7 +180,7 @@ public class UIWidget : UIRect
 			{
 				if (isAnchoredHorizontally)
 				{
-					if (leftAnchor.target != null && rightAnchor.target != null)
+					if ((UnityEngine.Object)leftAnchor.target != (UnityEngine.Object)null && (UnityEngine.Object)rightAnchor.target != (UnityEngine.Object)null)
 					{
 						if (mPivot == Pivot.BottomLeft || mPivot == Pivot.Left || mPivot == Pivot.TopLeft)
 						{
@@ -205,7 +200,7 @@ public class UIWidget : UIRect
 							}
 						}
 					}
-					else if (leftAnchor.target != null)
+					else if ((UnityEngine.Object)leftAnchor.target != (UnityEngine.Object)null)
 					{
 						NGUIMath.AdjustWidget(this, 0f, 0f, (float)(value - mWidth), 0f);
 					}
@@ -239,7 +234,7 @@ public class UIWidget : UIRect
 			{
 				if (isAnchoredVertically)
 				{
-					if (bottomAnchor.target != null && topAnchor.target != null)
+					if ((UnityEngine.Object)bottomAnchor.target != (UnityEngine.Object)null && (UnityEngine.Object)topAnchor.target != (UnityEngine.Object)null)
 					{
 						if (mPivot == Pivot.BottomLeft || mPivot == Pivot.Bottom || mPivot == Pivot.BottomRight)
 						{
@@ -259,7 +254,7 @@ public class UIWidget : UIRect
 							}
 						}
 					}
-					else if (bottomAnchor.target != null)
+					else if ((UnityEngine.Object)bottomAnchor.target != (UnityEngine.Object)null)
 					{
 						NGUIMath.AdjustWidget(this, 0f, 0f, 0f, (float)(value - mHeight));
 					}
@@ -280,15 +275,10 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			return mColor;
 		}
 		set
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 			if (mColor != value)
 			{
 				bool includeChildren = mColor.a != value.a;
@@ -346,36 +336,24 @@ public class UIWidget : UIRect
 		}
 		set
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
 			if (mPivot != value)
 			{
-				Vector3 val = worldCorners[0];
+				Vector3 vector = worldCorners[0];
 				mPivot = value;
 				mChanged = true;
-				Vector3 val2 = worldCorners[0];
+				Vector3 vector2 = worldCorners[0];
 				Transform cachedTransform = base.cachedTransform;
-				Vector3 val3 = cachedTransform.get_position();
-				Vector3 localPosition = cachedTransform.get_localPosition();
+				Vector3 vector3 = cachedTransform.position;
+				Vector3 localPosition = cachedTransform.localPosition;
 				float z = localPosition.z;
-				val3.x += val.x - val2.x;
-				val3.y += val.y - val2.y;
-				base.cachedTransform.set_position(val3);
-				val3 = base.cachedTransform.get_localPosition();
-				val3.x = Mathf.Round(val3.x);
-				val3.y = Mathf.Round(val3.y);
-				val3.z = z;
-				base.cachedTransform.set_localPosition(val3);
+				vector3.x += vector.x - vector2.x;
+				vector3.y += vector.y - vector2.y;
+				base.cachedTransform.position = vector3;
+				vector3 = base.cachedTransform.localPosition;
+				vector3.x = Mathf.Round(vector3.x);
+				vector3.y = Mathf.Round(vector3.y);
+				vector3.z = z;
+				base.cachedTransform.localPosition = vector3;
 			}
 		}
 	}
@@ -390,15 +368,15 @@ public class UIWidget : UIRect
 		{
 			if (mDepth != value)
 			{
-				if (panel != null)
+				if ((UnityEngine.Object)panel != (UnityEngine.Object)null)
 				{
 					panel.RemoveWidget(this);
 				}
 				mDepth = value;
-				if (panel != null)
+				if ((UnityEngine.Object)panel != (UnityEngine.Object)null)
 				{
 					panel.AddWidget(this);
-					if (!Application.get_isPlaying())
+					if (!Application.isPlaying)
 					{
 						panel.SortWidgets();
 						panel.RebuildAllDrawCalls();
@@ -412,11 +390,11 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			if (panel == null)
+			if ((UnityEngine.Object)panel == (UnityEngine.Object)null)
 			{
 				CreatePanel();
 			}
-			return (!(panel != null)) ? mDepth : (mDepth + panel.depth * 1000);
+			return (!((UnityEngine.Object)panel != (UnityEngine.Object)null)) ? mDepth : (mDepth + panel.depth * 1000);
 		}
 	}
 
@@ -424,25 +402,15 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 			Vector2 pivotOffset = this.pivotOffset;
 			float num = (0f - pivotOffset.x) * (float)mWidth;
 			float num2 = (0f - pivotOffset.y) * (float)mHeight;
-			float num3 = num + (float)mWidth;
-			float num4 = num2 + (float)mHeight;
+			float x = num + (float)mWidth;
+			float y = num2 + (float)mHeight;
 			mCorners[0] = new Vector3(num, num2);
-			mCorners[1] = new Vector3(num, num4);
-			mCorners[2] = new Vector3(num3, num4);
-			mCorners[3] = new Vector3(num3, num2);
+			mCorners[1] = new Vector3(num, y);
+			mCorners[2] = new Vector3(x, y);
+			mCorners[3] = new Vector3(x, num2);
 			return mCorners;
 		}
 	}
@@ -451,12 +419,8 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			Vector3[] localCorners = this.localCorners;
-			return Vector2.op_Implicit(localCorners[2] - localCorners[0]);
+			return localCorners[2] - localCorners[0];
 		}
 	}
 
@@ -464,9 +428,6 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			Vector3[] localCorners = this.localCorners;
 			return Vector3.Lerp(localCorners[0], localCorners[2], 0.5f);
 		}
@@ -476,26 +437,16 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
 			Vector2 pivotOffset = this.pivotOffset;
 			float num = (0f - pivotOffset.x) * (float)mWidth;
 			float num2 = (0f - pivotOffset.y) * (float)mHeight;
-			float num3 = num + (float)mWidth;
-			float num4 = num2 + (float)mHeight;
+			float x = num + (float)mWidth;
+			float y = num2 + (float)mHeight;
 			Transform cachedTransform = base.cachedTransform;
 			mCorners[0] = cachedTransform.TransformPoint(num, num2, 0f);
-			mCorners[1] = cachedTransform.TransformPoint(num, num4, 0f);
-			mCorners[2] = cachedTransform.TransformPoint(num3, num4, 0f);
-			mCorners[3] = cachedTransform.TransformPoint(num3, num2, 0f);
+			mCorners[1] = cachedTransform.TransformPoint(num, y, 0f);
+			mCorners[2] = cachedTransform.TransformPoint(x, y, 0f);
+			mCorners[3] = cachedTransform.TransformPoint(x, num2, 0f);
 			return mCorners;
 		}
 	}
@@ -506,9 +457,6 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
 			Vector2 pivotOffset = this.pivotOffset;
 			float num = (0f - pivotOffset.x) * (float)mWidth;
 			float num2 = (0f - pivotOffset.y) * (float)mHeight;
@@ -534,17 +482,13 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 			Material material = this.material;
-			if (material != null && material.get_shader() != null && !material.get_shader().get_isSupported())
+			if ((UnityEngine.Object)material != (UnityEngine.Object)null && (UnityEngine.Object)material.shader != (UnityEngine.Object)null && !material.shader.isSupported)
 			{
-				Log.Error("[UIWidget] no support shader : {0} : {1}", material.get_shader().get_name(), this.get_name());
+				Log.Error("[UIWidget] no support shader : {0} : {1}", material.shader.name, base.name);
 				return null;
 			}
-			return (!(material != null)) ? null : material.get_mainTexture();
+			return (!((UnityEngine.Object)material != (UnityEngine.Object)null)) ? null : material.mainTexture;
 		}
 		set
 		{
@@ -556,9 +500,8 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			Material material = this.material;
-			return (!(material != null)) ? null : material.get_shader();
+			return (!((UnityEngine.Object)material != (UnityEngine.Object)null)) ? null : material.shader;
 		}
 		set
 		{
@@ -571,8 +514,7 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			return Vector2.get_one();
+			return Vector2.one;
 		}
 	}
 
@@ -580,12 +522,12 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			BoxCollider val = this.GetComponent<Collider>() as BoxCollider;
-			if (val != null)
+			BoxCollider x = GetComponent<Collider>() as BoxCollider;
+			if ((UnityEngine.Object)x != (UnityEngine.Object)null)
 			{
 				return true;
 			}
-			return this.GetComponent<BoxCollider2D>() != null;
+			return (UnityEngine.Object)GetComponent<BoxCollider2D>() != (UnityEngine.Object)null;
 		}
 	}
 
@@ -597,8 +539,7 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			return Vector4.get_zero();
+			return Vector4.zero;
 		}
 		set
 		{
@@ -634,32 +575,19 @@ public class UIWidget : UIRect
 
 	public override Vector3[] GetSides(Transform relativeTo)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
 		Vector2 pivotOffset = this.pivotOffset;
 		float num = (0f - pivotOffset.x) * (float)mWidth;
 		float num2 = (0f - pivotOffset.y) * (float)mHeight;
 		float num3 = num + (float)mWidth;
 		float num4 = num2 + (float)mHeight;
-		float num5 = (num + num3) * 0.5f;
-		float num6 = (num2 + num4) * 0.5f;
+		float x = (num + num3) * 0.5f;
+		float y = (num2 + num4) * 0.5f;
 		Transform cachedTransform = base.cachedTransform;
-		mCorners[0] = cachedTransform.TransformPoint(num, num6, 0f);
-		mCorners[1] = cachedTransform.TransformPoint(num5, num4, 0f);
-		mCorners[2] = cachedTransform.TransformPoint(num3, num6, 0f);
-		mCorners[3] = cachedTransform.TransformPoint(num5, num2, 0f);
-		if (relativeTo != null)
+		mCorners[0] = cachedTransform.TransformPoint(num, y, 0f);
+		mCorners[1] = cachedTransform.TransformPoint(x, num4, 0f);
+		mCorners[2] = cachedTransform.TransformPoint(num3, y, 0f);
+		mCorners[3] = cachedTransform.TransformPoint(x, num2, 0f);
+		if ((UnityEngine.Object)relativeTo != (UnityEngine.Object)null)
 		{
 			for (int i = 0; i < 4; i++)
 			{
@@ -688,7 +616,7 @@ public class UIWidget : UIRect
 		else
 		{
 			UIRect parent = base.parent;
-			finalAlpha = ((!(parent != null)) ? mColor.a : (parent.CalculateFinalAlpha(frameID) * mColor.a));
+			finalAlpha = ((!((UnityEngine.Object)parent != (UnityEngine.Object)null)) ? mColor.a : (parent.CalculateFinalAlpha(frameID) * mColor.a));
 		}
 	}
 
@@ -696,11 +624,11 @@ public class UIWidget : UIRect
 	{
 		mChanged = true;
 		mAlphaFrameID = -1;
-		if (panel != null)
+		if ((UnityEngine.Object)panel != (UnityEngine.Object)null)
 		{
 			bool visibleByPanel = (!hideIfOffScreen && !panel.hasCumulativeClipping) || panel.IsVisible(this);
-			UpdateVisibility(CalculateCumulativeAlpha(Time.get_frameCount()) > 0.001f, visibleByPanel);
-			UpdateFinalAlpha(Time.get_frameCount());
+			UpdateVisibility(CalculateCumulativeAlpha(Time.frameCount) > 0.001f, visibleByPanel);
+			UpdateFinalAlpha(Time.frameCount);
 			if (includeChildren)
 			{
 				base.Invalidate(true);
@@ -711,18 +639,11 @@ public class UIWidget : UIRect
 	public float CalculateCumulativeAlpha(int frameID)
 	{
 		UIRect parent = base.parent;
-		return (!(parent != null)) ? mColor.a : (parent.CalculateFinalAlpha(frameID) * mColor.a);
+		return (!((UnityEngine.Object)parent != (UnityEngine.Object)null)) ? mColor.a : (parent.CalculateFinalAlpha(frameID) * mColor.a);
 	}
 
 	public override void SetRect(float x, float y, float width, float height)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Expected O, but got Unknown
 		Vector2 pivotOffset = this.pivotOffset;
 		float num = Mathf.Lerp(x, x + width, pivotOffset.x);
 		float num2 = Mathf.Lerp(y, y + height, pivotOffset.y);
@@ -737,7 +658,7 @@ public class UIWidget : UIRect
 			num4 = num4 >> 1 << 1;
 		}
 		Transform cachedTransform = base.cachedTransform;
-		Vector3 localPosition = cachedTransform.get_localPosition();
+		Vector3 localPosition = cachedTransform.localPosition;
 		localPosition.x = Mathf.Floor(num + 0.5f);
 		localPosition.y = Mathf.Floor(num2 + 0.5f);
 		if (num3 < minWidth)
@@ -748,25 +669,25 @@ public class UIWidget : UIRect
 		{
 			num4 = minHeight;
 		}
-		cachedTransform.set_localPosition(localPosition);
+		cachedTransform.localPosition = localPosition;
 		this.width = num3;
 		this.height = num4;
 		if (base.isAnchored)
 		{
-			cachedTransform = cachedTransform.get_parent();
-			if (Object.op_Implicit(leftAnchor.target))
+			cachedTransform = cachedTransform.parent;
+			if ((bool)leftAnchor.target)
 			{
 				leftAnchor.SetHorizontal(cachedTransform, x);
 			}
-			if (Object.op_Implicit(rightAnchor.target))
+			if ((bool)rightAnchor.target)
 			{
 				rightAnchor.SetHorizontal(cachedTransform, x + width);
 			}
-			if (Object.op_Implicit(bottomAnchor.target))
+			if ((bool)bottomAnchor.target)
 			{
 				bottomAnchor.SetVertical(cachedTransform, y);
 			}
-			if (Object.op_Implicit(topAnchor.target))
+			if ((bool)topAnchor.target)
 			{
 				topAnchor.SetVertical(cachedTransform, y + height);
 			}
@@ -775,11 +696,9 @@ public class UIWidget : UIRect
 
 	public void ResizeCollider()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
 		if (NGUITools.GetActive(this))
 		{
-			NGUITools.UpdateWidgetCollider(this.get_gameObject());
+			NGUITools.UpdateWidgetCollider(base.gameObject);
 		}
 	}
 
@@ -805,15 +724,15 @@ public class UIWidget : UIRect
 		}
 		Material material = left.material;
 		Material material2 = right.material;
-		if (material == material2)
+		if ((UnityEngine.Object)material == (UnityEngine.Object)material2)
 		{
 			return 0;
 		}
-		if (material != null)
+		if ((UnityEngine.Object)material != (UnityEngine.Object)null)
 		{
 			return -1;
 		}
-		if (material2 != null)
+		if ((UnityEngine.Object)material2 != (UnityEngine.Object)null)
 		{
 			return 1;
 		}
@@ -822,39 +741,24 @@ public class UIWidget : UIRect
 
 	public Bounds CalculateBounds()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		return CalculateBounds(null);
 	}
 
 	public Bounds CalculateBounds(Transform relativeParent)
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		if (relativeParent == null)
+		if ((UnityEngine.Object)relativeParent == (UnityEngine.Object)null)
 		{
 			Vector3[] localCorners = this.localCorners;
-			Bounds result = default(Bounds);
-			result._002Ector(localCorners[0], Vector3.get_zero());
+			Bounds result = new Bounds(localCorners[0], Vector3.zero);
 			for (int i = 1; i < 4; i++)
 			{
 				result.Encapsulate(localCorners[i]);
 			}
 			return result;
 		}
-		Matrix4x4 worldToLocalMatrix = relativeParent.get_worldToLocalMatrix();
+		Matrix4x4 worldToLocalMatrix = relativeParent.worldToLocalMatrix;
 		Vector3[] worldCorners = this.worldCorners;
-		Bounds result2 = default(Bounds);
-		result2._002Ector(worldToLocalMatrix.MultiplyPoint3x4(worldCorners[0]), Vector3.get_zero());
+		Bounds result2 = new Bounds(worldToLocalMatrix.MultiplyPoint3x4(worldCorners[0]), Vector3.zero);
 		for (int j = 1; j < 4; j++)
 		{
 			result2.Encapsulate(worldToLocalMatrix.MultiplyPoint3x4(worldCorners[j]));
@@ -864,7 +768,7 @@ public class UIWidget : UIRect
 
 	public void SetDirty()
 	{
-		if (drawCall != null)
+		if ((UnityEngine.Object)drawCall != (UnityEngine.Object)null)
 		{
 			drawCall.isDirty = true;
 		}
@@ -876,7 +780,7 @@ public class UIWidget : UIRect
 
 	public void RemoveFromPanel()
 	{
-		if (panel != null)
+		if ((UnityEngine.Object)panel != (UnityEngine.Object)null)
 		{
 			panel.RemoveWidget(this);
 			panel = null;
@@ -886,12 +790,10 @@ public class UIWidget : UIRect
 
 	public virtual void MarkAsChanged()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Expected O, but got Unknown
 		if (NGUITools.GetActive(this))
 		{
 			mChanged = true;
-			if (panel != null && this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && !mPlayMode)
+			if ((UnityEngine.Object)panel != (UnityEngine.Object)null && base.enabled && NGUITools.GetActive(base.gameObject) && !mPlayMode)
 			{
 				SetDirty();
 				CheckLayer();
@@ -901,12 +803,10 @@ public class UIWidget : UIRect
 
 	public UIPanel CreatePanel()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
-		if (mStarted && panel == null && this.get_enabled() && NGUITools.GetActive(this.get_gameObject()))
+		if (mStarted && (UnityEngine.Object)panel == (UnityEngine.Object)null && base.enabled && NGUITools.GetActive(base.gameObject))
 		{
-			panel = UIPanel.Find(base.cachedTransform, true, base.cachedGameObject.get_layer());
-			if (panel != null)
+			panel = UIPanel.Find(base.cachedTransform, true, base.cachedGameObject.layer);
+			if ((UnityEngine.Object)panel != (UnityEngine.Object)null)
 			{
 				mParentFound = false;
 				panel.AddWidget(this);
@@ -919,24 +819,20 @@ public class UIWidget : UIRect
 
 	public void CheckLayer()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		if (panel != null && panel.get_gameObject().get_layer() != this.get_gameObject().get_layer())
+		if ((UnityEngine.Object)panel != (UnityEngine.Object)null && panel.gameObject.layer != base.gameObject.layer)
 		{
-			Debug.LogWarning((object)"You can't place widgets on a layer different than the UIPanel that manages them.\nIf you want to move widgets to a different layer, parent them to a new panel instead.", this);
-			this.get_gameObject().set_layer(panel.get_gameObject().get_layer());
+			UnityEngine.Debug.LogWarning("You can't place widgets on a layer different than the UIPanel that manages them.\nIf you want to move widgets to a different layer, parent them to a new panel instead.", this);
+			base.gameObject.layer = panel.gameObject.layer;
 		}
 	}
 
 	public override void ParentHasChanged()
 	{
 		base.ParentHasChanged();
-		if (panel != null)
+		if ((UnityEngine.Object)panel != (UnityEngine.Object)null)
 		{
-			UIPanel uIPanel = UIPanel.Find(base.cachedTransform, true, base.cachedGameObject.get_layer());
-			if (panel != uIPanel)
+			UIPanel y = UIPanel.Find(base.cachedTransform, true, base.cachedGameObject.layer);
+			if ((UnityEngine.Object)panel != (UnityEngine.Object)y)
 			{
 				RemoveFromPanel();
 				CreatePanel();
@@ -946,42 +842,29 @@ public class UIWidget : UIRect
 
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		mGo = this.get_gameObject();
-		mPlayMode = Application.get_isPlaying();
+		mGo = base.gameObject;
+		mPlayMode = Application.isPlaying;
 	}
 
 	protected override void OnInit()
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 		base.OnInit();
 		RemoveFromPanel();
 		mMoved = true;
-		if (mWidth == 100 && mHeight == 100)
+		if (mWidth == 100 && mHeight == 100 && base.cachedTransform.localScale.magnitude > 8f)
 		{
-			Vector3 localScale = base.cachedTransform.get_localScale();
-			if (localScale.get_magnitude() > 8f)
-			{
-				UpgradeFrom265();
-				base.cachedTransform.set_localScale(Vector3.get_one());
-			}
+			UpgradeFrom265();
+			base.cachedTransform.localScale = Vector3.one;
 		}
 		_Update();
 	}
 
 	protected virtual void UpgradeFrom265()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Expected O, but got Unknown
-		Vector3 localScale = base.cachedTransform.get_localScale();
+		Vector3 localScale = base.cachedTransform.localScale;
 		mWidth = Mathf.Abs(Mathf.RoundToInt(localScale.x));
 		mHeight = Mathf.Abs(Mathf.RoundToInt(localScale.y));
-		NGUITools.UpdateWidgetCollider(this.get_gameObject(), true);
+		NGUITools.UpdateWidgetCollider(base.gameObject, true);
 	}
 
 	protected override void OnStart()
@@ -991,37 +874,17 @@ public class UIWidget : UIRect
 
 	protected override void OnAnchor()
 	{
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Expected O, but got Unknown
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0334: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0339: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0490: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0495: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05d7: Unknown result type (might be due to invalid IL or missing references)
 		Transform cachedTransform = base.cachedTransform;
-		Transform val = cachedTransform.get_parent();
-		Vector3 localPosition = cachedTransform.get_localPosition();
+		Transform parent = cachedTransform.parent;
+		Vector3 localPosition = cachedTransform.localPosition;
 		Vector2 pivotOffset = this.pivotOffset;
 		float num;
 		float num2;
 		float num3;
 		float num4;
-		if (leftAnchor.target == bottomAnchor.target && leftAnchor.target == rightAnchor.target && leftAnchor.target == topAnchor.target)
+		if ((UnityEngine.Object)leftAnchor.target == (UnityEngine.Object)bottomAnchor.target && (UnityEngine.Object)leftAnchor.target == (UnityEngine.Object)rightAnchor.target && (UnityEngine.Object)leftAnchor.target == (UnityEngine.Object)topAnchor.target)
 		{
-			Vector3[] sides = leftAnchor.GetSides(val);
+			Vector3[] sides = leftAnchor.GetSides(parent);
 			if (sides != null)
 			{
 				num = NGUIMath.Lerp(sides[0].x, sides[2].x, leftAnchor.relative) + (float)leftAnchor.absolute;
@@ -1032,7 +895,7 @@ public class UIWidget : UIRect
 			}
 			else
 			{
-				Vector3 localPos = GetLocalPos(leftAnchor, val);
+				Vector3 localPos = GetLocalPos(leftAnchor, parent);
 				num = localPos.x + (float)leftAnchor.absolute;
 				num3 = localPos.y + (float)bottomAnchor.absolute;
 				num2 = localPos.x + (float)rightAnchor.absolute;
@@ -1043,16 +906,16 @@ public class UIWidget : UIRect
 		else
 		{
 			mIsInFront = true;
-			if (Object.op_Implicit(leftAnchor.target))
+			if ((bool)leftAnchor.target)
 			{
-				Vector3[] sides2 = leftAnchor.GetSides(val);
+				Vector3[] sides2 = leftAnchor.GetSides(parent);
 				if (sides2 != null)
 				{
 					num = NGUIMath.Lerp(sides2[0].x, sides2[2].x, leftAnchor.relative) + (float)leftAnchor.absolute;
 				}
 				else
 				{
-					Vector3 localPos2 = GetLocalPos(leftAnchor, val);
+					Vector3 localPos2 = GetLocalPos(leftAnchor, parent);
 					num = localPos2.x + (float)leftAnchor.absolute;
 				}
 			}
@@ -1060,16 +923,16 @@ public class UIWidget : UIRect
 			{
 				num = localPosition.x - pivotOffset.x * (float)mWidth;
 			}
-			if (Object.op_Implicit(rightAnchor.target))
+			if ((bool)rightAnchor.target)
 			{
-				Vector3[] sides3 = rightAnchor.GetSides(val);
+				Vector3[] sides3 = rightAnchor.GetSides(parent);
 				if (sides3 != null)
 				{
 					num2 = NGUIMath.Lerp(sides3[0].x, sides3[2].x, rightAnchor.relative) + (float)rightAnchor.absolute;
 				}
 				else
 				{
-					Vector3 localPos3 = GetLocalPos(rightAnchor, val);
+					Vector3 localPos3 = GetLocalPos(rightAnchor, parent);
 					num2 = localPos3.x + (float)rightAnchor.absolute;
 				}
 			}
@@ -1077,16 +940,16 @@ public class UIWidget : UIRect
 			{
 				num2 = localPosition.x - pivotOffset.x * (float)mWidth + (float)mWidth;
 			}
-			if (Object.op_Implicit(bottomAnchor.target))
+			if ((bool)bottomAnchor.target)
 			{
-				Vector3[] sides4 = bottomAnchor.GetSides(val);
+				Vector3[] sides4 = bottomAnchor.GetSides(parent);
 				if (sides4 != null)
 				{
 					num3 = NGUIMath.Lerp(sides4[3].y, sides4[1].y, bottomAnchor.relative) + (float)bottomAnchor.absolute;
 				}
 				else
 				{
-					Vector3 localPos4 = GetLocalPos(bottomAnchor, val);
+					Vector3 localPos4 = GetLocalPos(bottomAnchor, parent);
 					num3 = localPos4.y + (float)bottomAnchor.absolute;
 				}
 			}
@@ -1094,16 +957,16 @@ public class UIWidget : UIRect
 			{
 				num3 = localPosition.y - pivotOffset.y * (float)mHeight;
 			}
-			if (Object.op_Implicit(topAnchor.target))
+			if ((bool)topAnchor.target)
 			{
-				Vector3[] sides5 = topAnchor.GetSides(val);
+				Vector3[] sides5 = topAnchor.GetSides(parent);
 				if (sides5 != null)
 				{
 					num4 = NGUIMath.Lerp(sides5[3].y, sides5[1].y, topAnchor.relative) + (float)topAnchor.absolute;
 				}
 				else
 				{
-					Vector3 localPos5 = GetLocalPos(topAnchor, val);
+					Vector3 localPos5 = GetLocalPos(topAnchor, parent);
 					num4 = localPos5.y + (float)topAnchor.absolute;
 				}
 			}
@@ -1112,10 +975,9 @@ public class UIWidget : UIRect
 				num4 = localPosition.y - pivotOffset.y * (float)mHeight + (float)mHeight;
 			}
 		}
-		Vector3 val2 = default(Vector3);
-		val2._002Ector(Mathf.Lerp(num, num2, pivotOffset.x), Mathf.Lerp(num3, num4, pivotOffset.y), localPosition.z);
-		val2.x = Mathf.Round(val2.x);
-		val2.y = Mathf.Round(val2.y);
+		Vector3 vector = new Vector3(Mathf.Lerp(num, num2, pivotOffset.x), Mathf.Lerp(num3, num4, pivotOffset.y), localPosition.z);
+		vector.x = Mathf.Round(vector.x);
+		vector.y = Mathf.Round(vector.y);
 		int num5 = Mathf.FloorToInt(num2 - num + 0.5f);
 		int num6 = Mathf.FloorToInt(num4 - num3 + 0.5f);
 		if (keepAspectRatio != 0 && aspectRatio != 0f)
@@ -1137,9 +999,9 @@ public class UIWidget : UIRect
 		{
 			num6 = minHeight;
 		}
-		if (Vector3.SqrMagnitude(localPosition - val2) > 0.001f)
+		if (Vector3.SqrMagnitude(localPosition - vector) > 0.001f)
 		{
-			base.cachedTransform.set_localPosition(val2);
+			base.cachedTransform.localPosition = vector;
 			if (mIsInFront)
 			{
 				mChanged = true;
@@ -1162,7 +1024,7 @@ public class UIWidget : UIRect
 
 	protected override void OnUpdate()
 	{
-		if (panel == null)
+		if ((UnityEngine.Object)panel == (UnityEngine.Object)null)
 		{
 			CreatePanel();
 		}
@@ -1201,64 +1063,38 @@ public class UIWidget : UIRect
 
 	public bool UpdateTransform(int frame)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01be: Unknown result type (might be due to invalid IL or missing references)
 		Transform cachedTransform = base.cachedTransform;
-		mPlayMode = Application.get_isPlaying();
+		mPlayMode = Application.isPlaying;
 		if (mMoved)
 		{
 			mMoved = true;
 			mMatrixFrame = -1;
-			cachedTransform.set_hasChanged(false);
+			cachedTransform.hasChanged = false;
 			Vector2 pivotOffset = this.pivotOffset;
 			float num = (0f - pivotOffset.x) * (float)mWidth;
 			float num2 = (0f - pivotOffset.y) * (float)mHeight;
-			float num3 = num + (float)mWidth;
-			float num4 = num2 + (float)mHeight;
+			float x = num + (float)mWidth;
+			float y = num2 + (float)mHeight;
 			mOldV0 = panel.worldToLocal.MultiplyPoint3x4(cachedTransform.TransformPoint(num, num2, 0f));
-			mOldV1 = panel.worldToLocal.MultiplyPoint3x4(cachedTransform.TransformPoint(num3, num4, 0f));
+			mOldV1 = panel.worldToLocal.MultiplyPoint3x4(cachedTransform.TransformPoint(x, y, 0f));
 		}
-		else if (!panel.widgetsAreStatic && cachedTransform.get_hasChanged())
+		else if (!panel.widgetsAreStatic && cachedTransform.hasChanged)
 		{
 			mMoved = true;
 			mMatrixFrame = -1;
-			cachedTransform.set_hasChanged(false);
+			cachedTransform.hasChanged = false;
 			Vector2 pivotOffset2 = this.pivotOffset;
-			float num5 = (0f - pivotOffset2.x) * (float)mWidth;
-			float num6 = (0f - pivotOffset2.y) * (float)mHeight;
-			float num7 = num5 + (float)mWidth;
-			float num8 = num6 + (float)mHeight;
-			Vector3 val = panel.worldToLocal.MultiplyPoint3x4(cachedTransform.TransformPoint(num5, num6, 0f));
-			Vector3 val2 = panel.worldToLocal.MultiplyPoint3x4(cachedTransform.TransformPoint(num7, num8, 0f));
-			if (Vector3.SqrMagnitude(mOldV0 - val) > 1E-06f || Vector3.SqrMagnitude(mOldV1 - val2) > 1E-06f)
+			float num3 = (0f - pivotOffset2.x) * (float)mWidth;
+			float num4 = (0f - pivotOffset2.y) * (float)mHeight;
+			float x2 = num3 + (float)mWidth;
+			float y2 = num4 + (float)mHeight;
+			Vector3 b = panel.worldToLocal.MultiplyPoint3x4(cachedTransform.TransformPoint(num3, num4, 0f));
+			Vector3 b2 = panel.worldToLocal.MultiplyPoint3x4(cachedTransform.TransformPoint(x2, y2, 0f));
+			if (Vector3.SqrMagnitude(mOldV0 - b) > 1E-06f || Vector3.SqrMagnitude(mOldV1 - b2) > 1E-06f)
 			{
 				mMoved = true;
-				mOldV0 = val;
-				mOldV1 = val2;
+				mOldV0 = b;
+				mOldV1 = b2;
 			}
 		}
 		if (mMoved && onChange != null)
@@ -1270,16 +1106,6 @@ public class UIWidget : UIRect
 
 	public bool UpdateGeometry(int frame)
 	{
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
 		float num = CalculateFinalAlpha(frame);
 		if (mIsVisibleByAlpha && mLastAlpha != num)
 		{
@@ -1289,7 +1115,7 @@ public class UIWidget : UIRect
 		if (mChanged)
 		{
 			mChanged = false;
-			if (mIsVisibleByAlpha && num > 0.001f && shader != null)
+			if (mIsVisibleByAlpha && num > 0.001f && (UnityEngine.Object)shader != (UnityEngine.Object)null)
 			{
 				bool hasVertices = geometry.hasVertices;
 				if (fillGeometry)
@@ -1301,7 +1127,7 @@ public class UIWidget : UIRect
 				{
 					if (mMatrixFrame != frame)
 					{
-						mLocalToPanel = panel.worldToLocal * base.cachedTransform.get_localToWorldMatrix();
+						mLocalToPanel = panel.worldToLocal * base.cachedTransform.localToWorldMatrix;
 						mMatrixFrame = frame;
 					}
 					geometry.ApplyTransform(mLocalToPanel, panel.generateNormals);
@@ -1324,7 +1150,7 @@ public class UIWidget : UIRect
 		{
 			if (mMatrixFrame != frame)
 			{
-				mLocalToPanel = panel.worldToLocal * base.cachedTransform.get_localToWorldMatrix();
+				mLocalToPanel = panel.worldToLocal * base.cachedTransform.localToWorldMatrix;
 				mMatrixFrame = frame;
 			}
 			geometry.ApplyTransform(mLocalToPanel, panel.generateNormals);
@@ -1342,19 +1168,13 @@ public class UIWidget : UIRect
 
 	public virtual void MakePixelPerfect()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 localPosition = base.cachedTransform.get_localPosition();
+		Vector3 localPosition = base.cachedTransform.localPosition;
 		localPosition.z = Mathf.Round(localPosition.z);
 		localPosition.x = Mathf.Round(localPosition.x);
 		localPosition.y = Mathf.Round(localPosition.y);
-		base.cachedTransform.set_localPosition(localPosition);
-		Vector3 localScale = base.cachedTransform.get_localScale();
-		base.cachedTransform.set_localScale(new Vector3(Mathf.Sign(localScale.x), Mathf.Sign(localScale.y), 1f));
+		base.cachedTransform.localPosition = localPosition;
+		Vector3 localScale = base.cachedTransform.localScale;
+		base.cachedTransform.localScale = new Vector3(Mathf.Sign(localScale.x), Mathf.Sign(localScale.y), 1f);
 	}
 
 	public virtual void OnFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)

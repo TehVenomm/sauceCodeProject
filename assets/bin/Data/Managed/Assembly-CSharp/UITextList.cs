@@ -3,7 +3,7 @@ using System.Text;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/UI/Text List")]
-public class UITextList
+public class UITextList : MonoBehaviour
 {
 	public enum Style
 	{
@@ -47,16 +47,16 @@ public class UITextList
 	{
 		get
 		{
-			if (mParagraphs == null && !mHistory.TryGetValue(this.get_name(), out mParagraphs))
+			if (mParagraphs == null && !mHistory.TryGetValue(base.name, out mParagraphs))
 			{
 				mParagraphs = new BetterList<Paragraph>();
-				mHistory.Add(this.get_name(), mParagraphs);
+				mHistory.Add(base.name, mParagraphs);
 			}
 			return mParagraphs;
 		}
 	}
 
-	public bool isValid => textLabel != null && textLabel.ambigiousFont != null;
+	public bool isValid => (Object)textLabel != (Object)null && textLabel.ambigiousFont != (Object)null;
 
 	public float scrollValue
 	{
@@ -69,7 +69,7 @@ public class UITextList
 			value = Mathf.Clamp01(value);
 			if (isValid && mScroll != value)
 			{
-				if (scrollBar != null)
+				if ((Object)scrollBar != (Object)null)
 				{
 					scrollBar.value = value;
 				}
@@ -82,7 +82,7 @@ public class UITextList
 		}
 	}
 
-	protected float lineHeight => (!(textLabel != null)) ? 20f : ((float)textLabel.fontSize + textLabel.effectiveSpacingY);
+	protected float lineHeight => (!((Object)textLabel != (Object)null)) ? 20f : ((float)textLabel.fontSize + textLabel.effectiveSpacingY);
 
 	protected int scrollHeight
 	{
@@ -97,11 +97,6 @@ public class UITextList
 		}
 	}
 
-	public UITextList()
-		: this()
-	{
-	}
-
 	public void Clear()
 	{
 		paragraphs.Clear();
@@ -110,11 +105,11 @@ public class UITextList
 
 	private void Start()
 	{
-		if (textLabel == null)
+		if ((Object)textLabel == (Object)null)
 		{
-			textLabel = this.GetComponentInChildren<UILabel>();
+			textLabel = GetComponentInChildren<UILabel>();
 		}
-		if (scrollBar != null)
+		if ((Object)scrollBar != (Object)null)
 		{
 			EventDelegate.Add(scrollBar.onChange, OnScrollBar);
 		}
@@ -210,10 +205,10 @@ public class UITextList
 			{
 				mTotalLines += mParagraphs.buffer[j].lines.Length;
 			}
-			if (scrollBar != null)
+			if ((Object)scrollBar != (Object)null)
 			{
 				UIScrollBar uIScrollBar = scrollBar as UIScrollBar;
-				if (uIScrollBar != null)
+				if ((Object)uIScrollBar != (Object)null)
 				{
 					uIScrollBar.barSize = ((mTotalLines != 0) ? (1f - (float)scrollHeight / (float)mTotalLines) : 1f);
 				}

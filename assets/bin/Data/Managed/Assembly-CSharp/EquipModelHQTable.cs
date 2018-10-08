@@ -1,6 +1,7 @@
 using System;
+using UnityEngine;
 
-public class EquipModelHQTable
+public class EquipModelHQTable : ScriptableObject
 {
 	[Serializable]
 	public class Data
@@ -17,11 +18,6 @@ public class EquipModelHQTable
 	}
 
 	public Data[] weaponDatas;
-
-	public EquipModelHQTable()
-		: this()
-	{
-	}
 
 	public byte GetWeaponFlag(int id)
 	{

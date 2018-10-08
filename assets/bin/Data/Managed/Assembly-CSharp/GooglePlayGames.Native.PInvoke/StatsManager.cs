@@ -48,10 +48,10 @@ namespace GooglePlayGames.Native.PInvoke
 			mServices = Misc.CheckNotNull(services);
 		}
 
-		internal unsafe void FetchForPlayer(Action<FetchForPlayerResponse> callback)
+		internal void FetchForPlayer(Action<FetchForPlayerResponse> callback)
 		{
 			Misc.CheckNotNull(callback);
-			GooglePlayGames.Native.Cwrapper.StatsManager.StatsManager_FetchForPlayer(mServices.AsHandle(), Types.DataSource.CACHE_OR_NETWORK, InternalFetchForPlayerCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, FetchForPlayerResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			GooglePlayGames.Native.Cwrapper.StatsManager.StatsManager_FetchForPlayer(mServices.AsHandle(), Types.DataSource.CACHE_OR_NETWORK, InternalFetchForPlayerCallback, Callbacks.ToIntPtr(callback, FetchForPlayerResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.StatsManager.FetchForPlayerCallback))]

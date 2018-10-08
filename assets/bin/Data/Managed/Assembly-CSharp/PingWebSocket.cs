@@ -1,8 +1,8 @@
 using BestHTTP.WebSocket;
 using System;
-using System.Runtime.CompilerServices;
+using UnityEngine;
 
-public class PingWebSocket
+public class PingWebSocket : MonoBehaviour
 {
 	private const float HEARTBEAT_TIMEOUT = 5f;
 
@@ -14,68 +14,15 @@ public class PingWebSocket
 
 	private bool isConnect;
 
-	public event Action OnOpen
-	{
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		add
-		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Expected O, but got Unknown
-			this.OnOpen = Delegate.Combine((Delegate)this.OnOpen, (Delegate)value);
-		}
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		remove
-		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Expected O, but got Unknown
-			this.OnOpen = Delegate.Remove((Delegate)this.OnOpen, (Delegate)value);
-		}
-	}
+	public event Action OnOpen;
 
-	public event Action OnClosed
-	{
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		add
-		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Expected O, but got Unknown
-			this.OnClosed = Delegate.Combine((Delegate)this.OnClosed, (Delegate)value);
-		}
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		remove
-		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Expected O, but got Unknown
-			this.OnClosed = Delegate.Remove((Delegate)this.OnClosed, (Delegate)value);
-		}
-	}
+	public event Action OnClosed;
 
-	public event Action OnError
-	{
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		add
-		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Expected O, but got Unknown
-			this.OnError = Delegate.Combine((Delegate)this.OnError, (Delegate)value);
-		}
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		remove
-		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Expected O, but got Unknown
-			this.OnError = Delegate.Remove((Delegate)this.OnError, (Delegate)value);
-		}
-	}
+	public event Action OnError;
 
 	public event Action<double> OnPong;
 
-	public PingWebSocket()
-		: this()
-	{
-	}
-
-	public unsafe void Connect(string relayServer)
+	public void Connect(string relayServer)
 	{
 		sock = new WebSocket(new Uri(relayServer));
 		WebSocket webSocket = sock;
@@ -85,15 +32,35 @@ public class PingWebSocket
 			isConnect = true;
 			if (this.OnOpen != null)
 			{
-				this.OnOpen.Invoke();
+				this.OnOpen();
 			}
 		});
 		WebSocket webSocket2 = sock;
-		webSocket2.OnClosed = Delegate.Combine((Delegate)webSocket2.OnClosed, (Delegate)new Action<WebSocket, ushort, string>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		webSocket2.OnClosed = (Action<WebSocket, ushort, string>)Delegate.Combine(webSocket2.OnClosed, (Action<WebSocket, ushort, string>)delegate
+		{
+			isConnect = false;
+			if (this.OnClosed != null)
+			{
+				this.OnClosed();
+			}
+		});
 		WebSocket webSocket3 = sock;
-		webSocket3.OnError = Delegate.Combine((Delegate)webSocket3.OnError, (Delegate)new Action<WebSocket, Exception>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		webSocket3.OnError = (Action<WebSocket, Exception>)Delegate.Combine(webSocket3.OnError, (Action<WebSocket, Exception>)delegate
+		{
+			if (this.OnError != null)
+			{
+				this.OnError();
+			}
+		});
 		WebSocket webSocket4 = sock;
-		webSocket4.OnPong = Delegate.Combine((Delegate)webSocket4.OnPong, (Delegate)new Action<WebSocket, byte[]>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		webSocket4.OnPong = (Action<WebSocket, byte[]>)Delegate.Combine(webSocket4.OnPong, (Action<WebSocket, byte[]>)delegate
+		{
+			if (this.OnPong != null)
+			{
+				this.OnPong((DateTime.Now - lastPacketReceivedTime).TotalMilliseconds - 1000.0);
+			}
+			lastPacketReceivedTime = DateTime.Now;
+		});
 		sock.StartPingThread = true;
 		sock.PingFrequency = 1000;
 		sock.Open();

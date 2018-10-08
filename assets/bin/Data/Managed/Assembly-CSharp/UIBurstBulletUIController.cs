@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIBurstBulletUIController
+public class UIBurstBulletUIController : MonoBehaviour
 {
 	public class InitParam
 	{
@@ -50,15 +50,8 @@ public class UIBurstBulletUIController
 
 	private BoxCollider m_boxCol;
 
-	public UIBurstBulletUIController()
-		: this()
-	{
-	}
-
 	public bool Initialize(InitParam _param)
 	{
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
 		m_currentMaxBulletIconCount = _param.MaxBulletCount;
 		m_currentRestBulletIconCount = _param.CurrentRestBulletCount;
 		for (int i = 0; i < m_currentMaxBulletIconCount; i++)
@@ -85,36 +78,34 @@ public class UIBurstBulletUIController
 		}
 		SetEmptyAppeal(m_currentRestBulletIconCount == 0);
 		InitUISpriteParameter();
-		if (m_boxCol == null && m_baseSprite != null)
+		if ((Object)m_boxCol == (Object)null && (Object)m_baseSprite != (Object)null)
 		{
 			m_boxCol = m_baseSprite.GetComponent<BoxCollider>();
 		}
-		m_boxCol.set_size(new Vector3((float)m_baseSprite.width, (float)m_baseSprite.height, 1f));
-		m_boxCol.set_center(new Vector3((float)m_baseSprite.width / 2f, 0f, 0f));
+		m_boxCol.size = new Vector3((float)m_baseSprite.width, (float)m_baseSprite.height, 1f);
+		m_boxCol.center = new Vector3((float)m_baseSprite.width / 2f, 0f, 0f);
 		return true;
 	}
 
 	private bool CreateBulletIcon(int index)
 	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (index < 0 || 15 <= index)
 		{
 			return false;
 		}
-		Transform val = ResourceUtility.Realizes(Resources.Load(BULLET_ICON_PATH), m_bulletIconRoot, -1);
-		if (val == null)
+		Transform transform = ResourceUtility.Realizes(Resources.Load(BULLET_ICON_PATH), m_bulletIconRoot, -1);
+		if ((Object)transform == (Object)null)
 		{
 			return false;
 		}
-		UIBurstBulletIconController component = val.GetComponent<UIBurstBulletIconController>();
-		if (component == null)
+		UIBurstBulletIconController component = transform.GetComponent<UIBurstBulletIconController>();
+		if ((Object)component == (Object)null)
 		{
 			return false;
 		}
 		UIBurstBulletIconController.InitParam initParam = new UIBurstBulletIconController.InitParam();
 		initParam.IconIndex = index;
-		initParam.DepthOffset = ((!(m_baseSprite == null)) ? (m_baseSprite.depth + 1) : 0);
+		initParam.DepthOffset = ((!((Object)m_baseSprite == (Object)null)) ? (m_baseSprite.depth + 1) : 0);
 		UIBurstBulletIconController.InitParam param = initParam;
 		component.Initialize(param);
 		m_bulletIcons.Add(component);
@@ -123,10 +114,7 @@ public class UIBurstBulletUIController
 
 	private void InitUISpriteParameter()
 	{
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		if (!(m_baseSprite == null))
+		if (!((Object)m_baseSprite == (Object)null))
 		{
 			int num = m_baseSprite.depth + 2 * (m_currentMaxBulletIconCount + 1) + 1;
 			m_diamondIcon_L.depth = num;
@@ -135,7 +123,7 @@ public class UIBurstBulletUIController
 			int num2 = 74 + 28 * m_currentMaxBulletIconCount;
 			m_baseSprite.width = num2;
 			m_emptyEffect.width = num2 + -30;
-			m_diamondIcon_R.get_transform().set_localPosition(Vector3.get_right() * (16.2f + 39.5f * (float)m_currentMaxBulletIconCount));
+			m_diamondIcon_R.transform.localPosition = Vector3.right * (16.2f + 39.5f * (float)m_currentMaxBulletIconCount);
 		}
 	}
 
@@ -207,7 +195,7 @@ public class UIBurstBulletUIController
 
 	private bool SwitchActivateIconRoot(bool _isActivate)
 	{
-		if (m_iconRoot == null || m_iconRoot.get_activeSelf() == _isActivate)
+		if ((Object)m_iconRoot == (Object)null || m_iconRoot.activeSelf == _isActivate)
 		{
 			return false;
 		}
@@ -240,11 +228,11 @@ public class UIBurstBulletUIController
 
 	private bool SetEmptyAppeal(bool _isValid)
 	{
-		if (m_emptyEffect == null || m_emptyEffect.get_enabled() == _isValid)
+		if ((Object)m_emptyEffect == (Object)null || m_emptyEffect.enabled == _isValid)
 		{
 			return false;
 		}
-		m_emptyEffect.set_enabled(_isValid);
+		m_emptyEffect.enabled = _isValid;
 		return true;
 	}
 
@@ -254,7 +242,7 @@ public class UIBurstBulletUIController
 		{
 			return false;
 		}
-		if (m_bulletIcons[_targetIconIndex] == null)
+		if ((Object)m_bulletIcons[_targetIconIndex] == (Object)null)
 		{
 			return false;
 		}
@@ -266,7 +254,7 @@ public class UIBurstBulletUIController
 		if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
 		{
 			Player targetPlayer = MonoBehaviourSingleton<UIPlayerStatus>.I.targetPlayer;
-			if (!(targetPlayer == null) && targetPlayer.thsCtrl != null)
+			if (!((Object)targetPlayer == (Object)null) && targetPlayer.thsCtrl != null)
 			{
 				targetPlayer.thsCtrl.TryFirstReloadAction();
 			}

@@ -53,7 +53,7 @@ public class PlayingSoundList
 		{
 			num = seData.intervalLimit;
 		}
-		float time = Time.get_time();
+		float time = Time.time;
 		if (playingObjects.ContainsKey(clip_id))
 		{
 			int count = playingObjects[clip_id].Count;

@@ -168,9 +168,6 @@ namespace MsgPack
 
 		public object Unpack(MsgPackReader reader)
 		{
-			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
 			if (reader.Read())
 			{
 				switch (reader.Type)
@@ -251,28 +248,28 @@ namespace MsgPack
 					case 81:
 						if (reader.Length == 16)
 						{
-							float num3 = reader.ReadSingle();
-							float num4 = reader.ReadSingle();
-							float num5 = reader.ReadSingle();
-							float num6 = reader.ReadSingle();
-							return new Quaternion(num3, num4, num5, num6);
+							float x2 = reader.ReadSingle();
+							float y2 = reader.ReadSingle();
+							float z = reader.ReadSingle();
+							float w = reader.ReadSingle();
+							return new Quaternion(x2, y2, z, w);
 						}
 						break;
 					case 86:
 						if (reader.Length == 12)
 						{
-							float num7 = reader.ReadSingle();
-							float num8 = reader.ReadSingle();
-							float num9 = reader.ReadSingle();
-							return new Vector3(num7, num8, num9);
+							float x3 = reader.ReadSingle();
+							float y3 = reader.ReadSingle();
+							float z2 = reader.ReadSingle();
+							return new Vector3(x3, y3, z2);
 						}
 						break;
 					case 87:
 						if (reader.Length == 8)
 						{
-							float num = reader.ReadSingle();
-							float num2 = reader.ReadSingle();
-							return new Vector2(num, num2);
+							float x = reader.ReadSingle();
+							float y = reader.ReadSingle();
+							return new Vector2(x, y);
 						}
 						break;
 					}

@@ -34,7 +34,7 @@ public class LoadObject
 		isLoading = false;
 		if (!string.IsNullOrEmpty(resource_name))
 		{
-			if (resLoad == null)
+			if ((Object)resLoad == (Object)null)
 			{
 				resLoad = ResourceLoad.GetResourceLoad(mono_behaviour, false);
 			}
@@ -44,7 +44,7 @@ public class LoadObject
 				loadedObject = cachedResourceObject.obj;
 				resLoad.SetReference(cachedResourceObject);
 			}
-			if (loadedObject == null)
+			if (loadedObject == (Object)null)
 			{
 				isLoading = true;
 				MonoBehaviourSingleton<ResourceManager>.I.Load(resLoad, category, resource_name, OnLoadComplate, OnLoadError, cache_package, null);
@@ -75,7 +75,7 @@ public class LoadObject
 				}
 			}
 		}
-		if (resLoad == null)
+		if ((Object)resLoad == (Object)null)
 		{
 			resLoad = ResourceLoad.GetResourceLoad(mono_behaviour, false);
 		}
@@ -133,14 +133,12 @@ public class LoadObject
 
 	public Coroutine Wait(MonoBehaviour mono_behaviour)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Expected O, but got Unknown
 		return mono_behaviour.StartCoroutine(DoWait());
 	}
 
 	public virtual Transform Realizes(Transform parent = null, int layer = -1)
 	{
-		if (resLoad == null || loadedObject == null)
+		if ((Object)resLoad == (Object)null || loadedObject == (Object)null)
 		{
 			Log.Error("it is not loaded.");
 			return null;
@@ -172,7 +170,7 @@ public class LoadObject
 				MonoBehaviourSingleton<ResourceManager>.I.cache.ReleaseResourceObjects(loadedObjects);
 				loadedObjects = null;
 			}
-			if (resLoad != null)
+			if ((Object)resLoad != (Object)null)
 			{
 				resLoad.ReleaseAllResources();
 				resLoad = null;

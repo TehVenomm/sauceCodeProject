@@ -15,16 +15,10 @@ public class BulletControllerEnemyPresent : BulletControllerBase
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam skillParam, Vector3 pos, Quaternion rot)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(bullet, skillParam, pos, rot);
 		bulletData = bullet;
-		this.get_gameObject().set_name("EnemyPresentBullet");
-		this.get_gameObject().set_layer(31);
+		base.gameObject.name = "EnemyPresentBullet";
+		base.gameObject.layer = 31;
 		if (!bullet.dataEnemyPresent.isHitEnemyAttack)
 		{
 			ignoreLayerMask |= 8192;
@@ -39,34 +33,31 @@ public class BulletControllerEnemyPresent : BulletControllerBase
 		{
 			ignoreLayerMask |= 2490880;
 		}
-		cachedCollider = this.get_gameObject().AddComponent<SphereCollider>();
-		cachedCollider.set_radius(bullet.data.radius);
-		cachedCollider.set_center(bullet.data.hitOffset);
-		cachedCollider.set_isTrigger(true);
-		cachedCollider.set_enabled(true);
+		cachedCollider = base.gameObject.AddComponent<SphereCollider>();
+		cachedCollider.radius = bullet.data.radius;
+		cachedCollider.center = bullet.data.hitOffset;
+		cachedCollider.isTrigger = true;
+		cachedCollider.enabled = true;
 		isPicked = false;
 	}
 
 	public override bool IsHit(Collider collider)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 		if (isPicked)
 		{
 			return false;
 		}
-		int layer = collider.get_gameObject().get_layer();
+		int layer = collider.gameObject.layer;
 		if (((1 << layer) & ignoreLayerMask) > 0)
 		{
 			return false;
 		}
-		if (layer == 8 && collider.get_gameObject().GetComponent<DangerRader>() != null)
+		if (layer == 8 && (Object)collider.gameObject.GetComponent<DangerRader>() != (Object)null)
 		{
 			return false;
 		}
-		Self component = collider.get_gameObject().GetComponent<Self>();
-		if (component == null)
+		Self component = collider.gameObject.GetComponent<Self>();
+		if ((Object)component == (Object)null)
 		{
 			return false;
 		}
@@ -75,19 +66,18 @@ public class BulletControllerEnemyPresent : BulletControllerBase
 
 	public override void OnHit(Collider collider)
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		isPicked = true;
-		if (cachedCollider != null)
+		if ((Object)cachedCollider != (Object)null)
 		{
-			cachedCollider.set_enabled(false);
+			cachedCollider.enabled = false;
 		}
-		Self component = collider.get_gameObject().GetComponent<Self>();
-		if (component != null)
+		Self component = collider.gameObject.GetComponent<Self>();
+		if ((Object)component != (Object)null)
 		{
 			_ExecHeal(component);
 			_ExecBuff(component);
 		}
-		if (bulletObject != null)
+		if ((Object)bulletObject != (Object)null)
 		{
 			bulletObject.NotifyBroken(false);
 		}

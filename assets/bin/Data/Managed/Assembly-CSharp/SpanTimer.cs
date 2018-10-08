@@ -23,7 +23,7 @@ public class SpanTimer
 		{
 			return true;
 		}
-		if (nextTime > Time.get_time())
+		if (nextTime > Time.time)
 		{
 			return false;
 		}
@@ -33,12 +33,12 @@ public class SpanTimer
 
 	public void ResetNextTime()
 	{
-		nextTime = Time.get_time() + span;
+		nextTime = Time.time + span;
 	}
 
 	public void SetTempSpan(float temp_span)
 	{
-		nextTime = Time.get_time() + temp_span;
+		nextTime = Time.time + temp_span;
 	}
 
 	public void PauseOn()

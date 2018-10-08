@@ -1,6 +1,7 @@
 using System;
+using UnityEngine;
 
-public abstract class ControllerBase
+public abstract class ControllerBase : MonoBehaviour
 {
 	[Flags]
 	public enum DISABLE_FLAG
@@ -28,7 +29,6 @@ public abstract class ControllerBase
 	}
 
 	public ControllerBase()
-		: this()
 	{
 		disableFlag = DISABLE_FLAG.NONE;
 	}
@@ -40,13 +40,13 @@ public abstract class ControllerBase
 
 	protected virtual void Awake()
 	{
-		character = this.GetComponentInParent<Character>();
-		if (character != null)
+		character = GetComponentInParent<Character>();
+		if ((UnityEngine.Object)character != (UnityEngine.Object)null)
 		{
 			character.controller = this;
 			if (character.isLoading)
 			{
-				this.set_enabled(false);
+				base.enabled = false;
 			}
 		}
 	}
@@ -61,12 +61,10 @@ public abstract class ControllerBase
 
 	protected virtual T AttachBrain<T>() where T : Brain
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		brain = this.get_gameObject().GetComponent<T>();
-		if (brain == null)
+		brain = base.gameObject.GetComponent<T>();
+		if ((UnityEngine.Object)brain == (UnityEngine.Object)null)
 		{
-			brain = this.get_gameObject().AddComponent<T>();
+			brain = base.gameObject.AddComponent<T>();
 		}
 		return brain as T;
 	}
@@ -103,9 +101,9 @@ public abstract class ControllerBase
 
 	protected virtual void OnEnable()
 	{
-		if (brain != null)
+		if ((UnityEngine.Object)brain != (UnityEngine.Object)null)
 		{
-			brain.set_enabled(true);
+			brain.enabled = true;
 		}
 		if (IsEnableControll())
 		{
@@ -115,9 +113,9 @@ public abstract class ControllerBase
 
 	protected virtual void OnDisable()
 	{
-		if (brain != null)
+		if ((UnityEngine.Object)brain != (UnityEngine.Object)null)
 		{
-			brain.set_enabled(false);
+			brain.enabled = false;
 		}
 		if (IsEnableControll())
 		{
@@ -127,7 +125,7 @@ public abstract class ControllerBase
 
 	public virtual void OnDetachedObject(StageObject stage_object)
 	{
-		if (brain != null)
+		if ((UnityEngine.Object)brain != (UnityEngine.Object)null)
 		{
 			brain.HandleEvent(BRAIN_EVENT.DESTROY_OBJECT, stage_object);
 		}
@@ -135,7 +133,7 @@ public abstract class ControllerBase
 
 	public virtual void OnCharacterInitialized()
 	{
-		if (brain != null)
+		if ((UnityEngine.Object)brain != (UnityEngine.Object)null)
 		{
 			brain.Initialize();
 		}
@@ -143,7 +141,7 @@ public abstract class ControllerBase
 
 	public virtual void OnCharacterPlayMotion(int motion_id)
 	{
-		if (brain != null)
+		if ((UnityEngine.Object)brain != (UnityEngine.Object)null)
 		{
 			brain.HandleEvent(BRAIN_EVENT.PLAY_MOTION, motion_id);
 		}
@@ -151,7 +149,7 @@ public abstract class ControllerBase
 
 	public virtual void OnCharacterEndAction(int action_id)
 	{
-		if (brain != null)
+		if ((UnityEngine.Object)brain != (UnityEngine.Object)null)
 		{
 			brain.HandleEvent(BRAIN_EVENT.END_ACTION, action_id);
 		}
@@ -159,7 +157,7 @@ public abstract class ControllerBase
 
 	public virtual void OnCharacterAttackedHitOwner(AttackedHitStatusOwner status)
 	{
-		if (brain != null)
+		if ((UnityEngine.Object)brain != (UnityEngine.Object)null)
 		{
 			if (status.downAddWeak > 0f)
 			{

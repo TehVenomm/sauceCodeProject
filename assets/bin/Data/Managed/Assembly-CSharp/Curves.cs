@@ -16,55 +16,38 @@ public static class Curves
 
 	public static AnimationCurve CreateSinCurve()
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Expected O, but got Unknown
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		AnimationCurve val = new AnimationCurve();
-		val.AddKey(new Keyframe(0.25f, 1f, 0f, 0f));
-		val.AddKey(new Keyframe(0.75f, -1f, 0f, 0f));
-		val.set_preWrapMode(4);
-		val.set_postWrapMode(4);
-		return val;
+		AnimationCurve animationCurve = new AnimationCurve();
+		animationCurve.AddKey(new Keyframe(0.25f, 1f, 0f, 0f));
+		animationCurve.AddKey(new Keyframe(0.75f, -1f, 0f, 0f));
+		animationCurve.preWrapMode = WrapMode.PingPong;
+		animationCurve.postWrapMode = WrapMode.PingPong;
+		return animationCurve;
 	}
 
 	public static AnimationCurve CreateSinHalfCurve()
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Expected O, but got Unknown
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		AnimationCurve val = new AnimationCurve();
-		val.AddKey(new Keyframe(0f, 0f, 0f, 0f));
-		val.AddKey(new Keyframe(0.5f, 1f, 0f, 0f));
-		val.set_preWrapMode(4);
-		val.set_postWrapMode(4);
-		return val;
+		AnimationCurve animationCurve = new AnimationCurve();
+		animationCurve.AddKey(new Keyframe(0f, 0f, 0f, 0f));
+		animationCurve.AddKey(new Keyframe(0.5f, 1f, 0f, 0f));
+		animationCurve.preWrapMode = WrapMode.PingPong;
+		animationCurve.postWrapMode = WrapMode.PingPong;
+		return animationCurve;
 	}
 
 	public static AnimationCurve CreateEaseInCurve()
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Expected O, but got Unknown
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		AnimationCurve val = new AnimationCurve();
-		val.AddKey(new Keyframe(0f, 0f, 0f, 0f));
-		val.AddKey(new Keyframe(1f, 1f, 2f, 1f));
-		return val;
+		AnimationCurve animationCurve = new AnimationCurve();
+		animationCurve.AddKey(new Keyframe(0f, 0f, 0f, 0f));
+		animationCurve.AddKey(new Keyframe(1f, 1f, 2f, 1f));
+		return animationCurve;
 	}
 
 	public static AnimationCurve CreateArcHalfCurve()
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Expected O, but got Unknown
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		AnimationCurve val = new AnimationCurve();
-		val.AddKey(new Keyframe(0f, 0f, 0f, 4f));
-		val.AddKey(new Keyframe(0.5f, 1f, 0f, 0f));
-		val.AddKey(new Keyframe(1f, 0f, -4f, 0f));
-		return val;
+		AnimationCurve animationCurve = new AnimationCurve();
+		animationCurve.AddKey(new Keyframe(0f, 0f, 0f, 4f));
+		animationCurve.AddKey(new Keyframe(0.5f, 1f, 0f, 0f));
+		animationCurve.AddKey(new Keyframe(1f, 0f, -4f, 0f));
+		return animationCurve;
 	}
 }

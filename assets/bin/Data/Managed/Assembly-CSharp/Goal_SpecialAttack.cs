@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class Goal_SpecialAttack : Goal
 {
 	protected override GOAL_TYPE GetGoalType()
@@ -35,7 +37,7 @@ public class Goal_SpecialAttack : Goal
 		if (ev == BRAIN_EVENT.END_ACTION)
 		{
 			int num = (int)param;
-			if (player != null && num == 6)
+			if ((Object)player != (Object)null && num == 6)
 			{
 				if (player.attackMode == Player.ATTACK_MODE.ARROW && brain.weaponCtrl.isFullCharge)
 				{

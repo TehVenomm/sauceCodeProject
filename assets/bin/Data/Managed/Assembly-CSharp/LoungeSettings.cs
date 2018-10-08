@@ -1,5 +1,3 @@
-using System;
-
 public class LoungeSettings : GameSection
 {
 	private enum UI
@@ -12,11 +10,11 @@ public class LoungeSettings : GameSection
 	public override void Initialize()
 	{
 		string loungeNumber = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetLoungeNumber();
-		SetLabelText((Enum)UI.LBL_ROOM_ID, loungeNumber);
+		SetLabelText(UI.LBL_ROOM_ID, loungeNumber);
 		int ownerUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetOwnerUserId();
 		bool flag = ownerUserId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-		SetActive((Enum)UI.BTN_SETTING, flag);
-		SetActive((Enum)UI.SPR_SETTING_GRAY, !flag);
+		SetActive(UI.BTN_SETTING, flag);
+		SetActive(UI.SPR_SETTING_GRAY, !flag);
 		base.Initialize();
 	}
 

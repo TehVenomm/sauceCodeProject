@@ -1,5 +1,4 @@
 using Network;
-using System;
 
 public class GuildSearchSettings : GameSection
 {
@@ -14,29 +13,27 @@ public class GuildSearchSettings : GameSection
 
 	public override void Initialize()
 	{
-		SetActive((Enum)UI.LBL_DEFAULT, string.IsNullOrEmpty(mSearchKeywork));
-		SetInput((Enum)UI.IPT_NAME, mSearchKeywork, 16, (EventDelegate.Callback)OnChangeKeywork);
+		SetActive(UI.LBL_DEFAULT, string.IsNullOrEmpty(mSearchKeywork));
+		SetInput(UI.IPT_NAME, mSearchKeywork, 16, OnChangeKeywork);
 		base.Initialize();
 	}
 
-	private unsafe void OnQuery_SEARCH()
+	private void OnQuery_SEARCH()
 	{
 		MonoBehaviourSingleton<GuildManager>.I.mSearchKeywork = mSearchKeywork;
 		GameSection.StayEvent();
-		GuildManager i = MonoBehaviourSingleton<GuildManager>.I;
-		if (_003C_003Ef__am_0024cache1 == null)
+		MonoBehaviourSingleton<GuildManager>.I.SendSearch(delegate(bool is_success, Error err)
 		{
-			_003C_003Ef__am_0024cache1 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		i.SendSearch(_003C_003Ef__am_0024cache1, true);
+			GameSection.ResumeEvent(is_success, null);
+		}, true);
 	}
 
 	protected void OnChangeKeywork()
 	{
-		string inputValue = GetInputValue((Enum)UI.IPT_NAME);
+		string inputValue = GetInputValue(UI.IPT_NAME);
 		inputValue = inputValue.Replace(" ", string.Empty);
 		inputValue = inputValue.Replace("\u3000", string.Empty);
-		SetActive((Enum)UI.LBL_DEFAULT, string.IsNullOrEmpty(inputValue));
+		SetActive(UI.LBL_DEFAULT, string.IsNullOrEmpty(inputValue));
 		mSearchKeywork = inputValue;
 	}
 }

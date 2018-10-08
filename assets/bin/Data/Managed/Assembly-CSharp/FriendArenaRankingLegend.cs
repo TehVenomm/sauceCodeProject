@@ -78,8 +78,8 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetActive((Enum)UI.BTN_OWN, false);
-		SetActive((Enum)UI.OBJ_OWN_ON, false);
+		SetActive(UI.BTN_OWN, false);
+		SetActive(UI.OBJ_OWN_ON, false);
 	}
 
 	protected override void SetRankiItem(int i, Transform t)
@@ -99,7 +99,7 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 		SetActive(t, UI.LBL_RANK, false);
 	}
 
-	protected unsafe override void UpdateDynamicList()
+	protected override void UpdateDynamicList()
 	{
 		FriendCharaInfo[] info = null;
 		int item_num = 0;
@@ -111,8 +111,10 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 				item_num = info.Length;
 			}
 		}
-		_003CUpdateDynamicList_003Ec__AnonStorey2F2 _003CUpdateDynamicList_003Ec__AnonStorey2F;
-		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetDynamicList(UI.GRD_LIST, GetListItemName, item_num, false, null, null, delegate(int i, Transform t, bool is_recycle)
+		{
+			SetListItem(i, t, is_recycle, info[i]);
+		});
 	}
 
 	private void SetArenaName(Transform t, int index)
@@ -120,10 +122,18 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 		SetLabelText(t, UI.LBL_ITEM_ARENA_NAME, eventDataList[index].name);
 	}
 
-	protected unsafe override void SendGetList(int page, Action<bool> callback)
+	protected override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey2F3 _003CSendGetList_003Ec__AnonStorey2F;
-		MonoBehaviourSingleton<FriendManager>.I.SendGetLegendRanking(new Action<bool, List<ArenaLegendRankingModel.Param>>((object)_003CSendGetList_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<FriendManager>.I.SendGetLegendRanking(delegate(bool is_success, List<ArenaLegendRankingModel.Param> recv_data)
+		{
+			if (is_success)
+			{
+				UpdateLists(recv_data);
+				recvList = ChangeData(CreateFriendCharaInfoList(rankingDataList));
+				nowPage = page;
+			}
+			callback(is_success);
+		});
 	}
 
 	public override void OnQuery_FOLLOW_INFO()

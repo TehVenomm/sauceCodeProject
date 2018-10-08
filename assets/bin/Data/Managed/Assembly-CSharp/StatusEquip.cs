@@ -259,9 +259,9 @@ public class StatusEquip : EquipSelectBase
 			equipSetInfo.item[selectEquipSetData.index] = select_item;
 		}
 		MonoBehaviourSingleton<StatusManager>.I.CalcSelfStatusParam(equipSetInfo, out int _atk, out int _def, out int _hp, out int _, out int _);
-		SetLabelText((Enum)UI.LBL_STATUS_ATK, _atk.ToString());
-		SetLabelText((Enum)UI.LBL_STATUS_DEF, _def.ToString());
-		SetLabelText((Enum)UI.LBL_STATUS_HP, _hp.ToString());
+		SetLabelText(UI.LBL_STATUS_ATK, _atk.ToString());
+		SetLabelText(UI.LBL_STATUS_DEF, _def.ToString());
+		SetLabelText(UI.LBL_STATUS_HP, _hp.ToString());
 		int atk = 0;
 		int def = 0;
 		int hp = 0;
@@ -288,20 +288,20 @@ public class StatusEquip : EquipSelectBase
 			int num3 = (select_item != null) ? (select_item.atk + select_item.elemAtk + atk2) : 0;
 			int num4 = num3 - num2;
 			string format = (num4 <= 0) ? "{0}" : base.sectionData.GetText("DISP_PLUS");
-			SetLabelCompareParam((Enum)UI.LBL_STATUS_ADD_ATK, num3, num2, string.Format(format, num4));
-			SetActive((Enum)UI.LBL_STATUS_ADD_ATK, num4 != 0);
+			SetLabelCompareParam(UI.LBL_STATUS_ADD_ATK, num3, num2, string.Format(format, num4));
+			SetActive(UI.LBL_STATUS_ADD_ATK, num4 != 0);
 			int num5 = (compareItemData != null) ? (compareItemData.def + def) : 0;
 			int num6 = (select_item != null) ? (select_item.def + def2) : 0;
 			int num7 = num6 - num5;
 			string format2 = (num7 <= 0) ? "{0}" : base.sectionData.GetText("DISP_PLUS");
-			SetLabelCompareParam((Enum)UI.LBL_STATUS_ADD_DEF, num6, num5, string.Format(format2, num7));
-			SetActive((Enum)UI.LBL_STATUS_ADD_DEF, num7 != 0);
+			SetLabelCompareParam(UI.LBL_STATUS_ADD_DEF, num6, num5, string.Format(format2, num7));
+			SetActive(UI.LBL_STATUS_ADD_DEF, num7 != 0);
 			int num8 = (compareItemData != null) ? (compareItemData.hp + hp) : 0;
 			int num9 = (select_item != null) ? (select_item.hp + hp2) : 0;
 			int num10 = num9 - num8;
 			string format3 = (num10 <= 0) ? "{0}" : base.sectionData.GetText("DISP_PLUS");
-			SetLabelCompareParam((Enum)UI.LBL_STATUS_ADD_HP, num9, num8, string.Format(format3, num10));
-			SetActive((Enum)UI.LBL_STATUS_ADD_HP, num10 != 0);
+			SetLabelCompareParam(UI.LBL_STATUS_ADD_HP, num9, num8, string.Format(format3, num10));
+			SetActive(UI.LBL_STATUS_ADD_HP, num10 != 0);
 		}
 		else
 		{
@@ -309,22 +309,22 @@ public class StatusEquip : EquipSelectBase
 			int num12 = atk2;
 			int num13 = num12 - num11;
 			string format4 = (num13 <= 0) ? "{0}" : base.sectionData.GetText("DISP_PLUS");
-			SetLabelCompareParam((Enum)UI.LBL_STATUS_ADD_ATK, num12, num11, string.Format(format4, num13));
-			SetActive((Enum)UI.LBL_STATUS_ADD_ATK, num13 != 0);
+			SetLabelCompareParam(UI.LBL_STATUS_ADD_ATK, num12, num11, string.Format(format4, num13));
+			SetActive(UI.LBL_STATUS_ADD_ATK, num13 != 0);
 			int num14 = def;
 			int num15 = def2;
 			int num16 = num15 - num14;
 			string format5 = (num16 <= 0) ? "{0}" : base.sectionData.GetText("DISP_PLUS");
-			SetLabelCompareParam((Enum)UI.LBL_STATUS_ADD_DEF, num15, num14, string.Format(format5, num16));
-			SetActive((Enum)UI.LBL_STATUS_ADD_DEF, num16 != 0);
+			SetLabelCompareParam(UI.LBL_STATUS_ADD_DEF, num15, num14, string.Format(format5, num16));
+			SetActive(UI.LBL_STATUS_ADD_DEF, num16 != 0);
 			int num17 = hp;
 			int num18 = hp2;
 			int num19 = num18 - num17;
 			string format6 = (num19 <= 0) ? "{0}" : base.sectionData.GetText("DISP_PLUS");
-			SetLabelCompareParam((Enum)UI.LBL_STATUS_ADD_HP, num18, num17, string.Format(format6, num19));
-			SetActive((Enum)UI.LBL_STATUS_ADD_HP, num19 != 0);
+			SetLabelCompareParam(UI.LBL_STATUS_ADD_HP, num18, num17, string.Format(format6, num19));
+			SetActive(UI.LBL_STATUS_ADD_HP, num19 != 0);
 		}
-		SetActive((Enum)UI.OBJ_SELL_ROOT, false);
+		SetActive(UI.OBJ_SELL_ROOT, false);
 		if (select_item == null)
 		{
 			string text = base.sectionData.GetText("NON_DATA");
@@ -332,40 +332,40 @@ public class StatusEquip : EquipSelectBase
 			{
 				if (compareItemData.tableData.IsWeapon())
 				{
-					SetActive((Enum)UI.OBJ_ELEM_ROOT, compareItemData.elemAtk > 0);
-					SetElementSprite((Enum)UI.SPR_ELEM, compareItemData.GetElemAtkType());
-					SetLabelCompareParam((Enum)UI.LBL_ATK, -compareItemData.atk, 0, 0);
-					SetLabelCompareParam((Enum)UI.LBL_ELEM, -compareItemData.elemAtk, 0, 0);
+					SetActive(UI.OBJ_ELEM_ROOT, compareItemData.elemAtk > 0);
+					SetElementSprite(UI.SPR_ELEM, compareItemData.GetElemAtkType());
+					SetLabelCompareParam(UI.LBL_ATK, -compareItemData.atk, 0, 0);
+					SetLabelCompareParam(UI.LBL_ELEM, -compareItemData.elemAtk, 0, 0);
 				}
 				else
 				{
-					SetActive((Enum)UI.OBJ_ELEM_ROOT, compareItemData.elemDef > 0);
-					SetDefElementSprite((Enum)UI.SPR_ELEM, compareItemData.GetElemDefType());
-					SetLabelCompareParam((Enum)UI.LBL_DEF, -compareItemData.def, 0, 0);
-					SetLabelCompareParam((Enum)UI.LBL_ELEM, -compareItemData.elemDef, 0, 0);
+					SetActive(UI.OBJ_ELEM_ROOT, compareItemData.elemDef > 0);
+					SetDefElementSprite(UI.SPR_ELEM, compareItemData.GetElemDefType());
+					SetLabelCompareParam(UI.LBL_DEF, -compareItemData.def, 0, 0);
+					SetLabelCompareParam(UI.LBL_ELEM, -compareItemData.elemDef, 0, 0);
 				}
 			}
 			else
 			{
 				bool flag2 = selectEquipSetData.index < 3;
-				SetLabelCompareParam((Enum)UI.LBL_ATK, 0, 0, -1);
-				SetLabelCompareParam((Enum)UI.LBL_DEF, 0, 0, -1);
-				SetActive((Enum)UI.OBJ_ATK_ROOT, flag2);
-				SetActive((Enum)UI.OBJ_DEF_ROOT, !flag2);
-				SetActive((Enum)UI.OBJ_ELEM_ROOT, false);
+				SetLabelCompareParam(UI.LBL_ATK, 0, 0, -1);
+				SetLabelCompareParam(UI.LBL_DEF, 0, 0, -1);
+				SetActive(UI.OBJ_ATK_ROOT, flag2);
+				SetActive(UI.OBJ_DEF_ROOT, !flag2);
+				SetActive(UI.OBJ_ELEM_ROOT, false);
 			}
-			SetLabelText((Enum)UI.LBL_NAME, base.sectionData.GetText("EMPTY"));
-			SetLabelCompareParam((Enum)UI.LBL_LV_NOW, 0, 0, text);
-			SetLabelCompareParam((Enum)UI.LBL_LV_MAX, 0, 0, text);
-			SetActive((Enum)UI.OBJ_SKILL_BUTTON_ROOT, false);
-			SetActive((Enum)UI.TBL_ABILITY, false);
-			SetActive((Enum)UI.STR_NON_ABILITY, false);
-			SetActive((Enum)UI.SPR_IS_EVOLVE, false);
-			SetEquipmentTypeIcon((Enum)UI.SPR_TYPE_ICON, (Enum)UI.SPR_TYPE_ICON_BG, (Enum)UI.SPR_TYPE_ICON_RARITY, (EquipItemTable.EquipItemData)null);
+			SetLabelText(UI.LBL_NAME, base.sectionData.GetText("EMPTY"));
+			SetLabelCompareParam(UI.LBL_LV_NOW, 0, 0, text);
+			SetLabelCompareParam(UI.LBL_LV_MAX, 0, 0, text);
+			SetActive(UI.OBJ_SKILL_BUTTON_ROOT, false);
+			SetActive(UI.TBL_ABILITY, false);
+			SetActive(UI.STR_NON_ABILITY, false);
+			SetActive(UI.SPR_IS_EVOLVE, false);
+			SetEquipmentTypeIcon(UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, null);
 		}
 		else
 		{
-			SetActive((Enum)UI.TBL_ABILITY, true);
+			SetActive(UI.TBL_ABILITY, true);
 			base.EquipParam();
 		}
 	}
@@ -426,12 +426,12 @@ public class StatusEquip : EquipSelectBase
 		return selectEquipSetData.index != 0 && selectEquipSetData.index != 3;
 	}
 
-	protected unsafe override void LocalInventory()
+	protected override void LocalInventory()
 	{
 		SetupEnableInventoryUI();
 		if (localInventoryEquipData != null)
 		{
-			SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
+			SetLabelText(UI.LBL_SORT, sortSettings.GetSortLabel());
 			bool created_remove_btn = false;
 			EquipItemInfo equipping_item = GetCompareItemData();
 			int find_index = -1;
@@ -446,8 +446,107 @@ public class StatusEquip : EquipSelectBase
 			created_remove_btn = IsCreateRemoveButton();
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
-			_003CLocalInventory_003Ec__AnonStorey40C _003CLocalInventory_003Ec__AnonStorey40C;
-			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length + 2, false, new Func<int, bool>((object)_003CLocalInventory_003Ec__AnonStorey40C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CLocalInventory_003Ec__AnonStorey40C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetDynamicList(InventoryUI, null, localInventoryEquipData.Length + 2, false, delegate(int i)
+			{
+				if (created_remove_btn && i == 0)
+				{
+					return true;
+				}
+				bool flag2 = false;
+				bool flag3 = true;
+				int num3 = i;
+				if (created_remove_btn)
+				{
+					num3--;
+				}
+				if (find_index >= 0)
+				{
+					if (num3 == 0)
+					{
+						flag2 = true;
+					}
+					else
+					{
+						num3--;
+					}
+				}
+				if (!flag2 && (num3 >= localInventoryEquipData.Length || (find_index >= 0 && num3 == find_index)))
+				{
+					flag3 = false;
+				}
+				if (flag3)
+				{
+					SortCompareData sortCompareData = localInventoryEquipData[num3];
+					if (sortCompareData == null || !sortCompareData.IsPriority(sortSettings.orderTypeAsc))
+					{
+						flag3 = false;
+					}
+				}
+				return flag3;
+			}, null, delegate(int i, Transform t, bool is_recycle)
+			{
+				if (i == 0 && created_remove_btn)
+				{
+					CreateRemoveIcon(t, "TRY_ON", -1, 100, selectInventoryIndex == -1, base.sectionData.GetText("STR_DETACH"));
+				}
+				else
+				{
+					int num = i;
+					if (created_remove_btn)
+					{
+						num--;
+					}
+					bool flag = false;
+					if (find_index >= 0)
+					{
+						if (num == 0)
+						{
+							num = find_index;
+							flag = true;
+						}
+						else
+						{
+							num--;
+						}
+					}
+					SetActive(t, true);
+					EquipItemSortData equipItemSortData = localInventoryEquipData[num] as EquipItemSortData;
+					EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(equipItemSortData.GetTableID());
+					int num2 = selectEquipSetData.EquippingIndexOf(equipItemSortData.equipData);
+					bool is_select = num == selectInventoryIndex;
+					ITEM_ICON_TYPE iconType = equipItemSortData.GetIconType();
+					SkillSlotUIData[] skillSlotData = GetSkillSlotData(equipItemSortData.GetItemData() as EquipItemInfo);
+					bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, equipItemSortData.GetUniqID());
+					ItemIcon itemIcon;
+					if (IsNotEquip(num2 == -1, flag))
+					{
+						itemIcon = CreateItemIconDetail(equipItemSortData, skillSlotData, base.IsShowMainStatus, t, "TRY_ON", num, ItemIconDetail.ICON_STATUS.NONE, is_new, 100, is_select, -1);
+					}
+					else
+					{
+						int equip_index = -1;
+						if (num2 > -1 || flag)
+						{
+							equip_index = (equipItemData.IsWeapon() ? (num2 + 1) : 0);
+						}
+						if (equipItemSortData != null && equipping_item != null && equipItemSortData.GetUniqID() == equipping_item.uniqueID)
+						{
+							equipItemSortData.SetItem(equipping_item);
+						}
+						itemIcon = CreateItemIconDetail(equipItemSortData, skillSlotData, base.IsShowMainStatus, t, "TRY_ON", num, ItemIconDetail.ICON_STATUS.NONE, is_new, 100, is_select, equip_index);
+					}
+					if ((UnityEngine.Object)itemIcon != (UnityEngine.Object)null)
+					{
+						itemIcon.SetItemID(equipItemSortData.GetTableID());
+						itemIcon.SetInitData(equipItemSortData);
+						if (!m_generatedIconList.Contains(itemIcon))
+						{
+							m_generatedIconList.Add(itemIcon);
+						}
+					}
+					SetLongTouch(itemIcon.transform, "DETAIL", num);
+				}
+			});
 		}
 	}
 
@@ -528,10 +627,8 @@ public class StatusEquip : EquipSelectBase
 		}
 	}
 
-	protected unsafe bool OnSelectItemAndChekIsGoStatus()
+	protected bool OnSelectItemAndChekIsGoStatus()
 	{
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Expected O, but got Unknown
 		EquipItemInfo equipItem = EquipItem;
 		ulong num = (equipItem == null) ? 0 : equipItem.uniqueID;
 		if (num == 0L && !IsCreateRemoveButton())
@@ -560,7 +657,7 @@ public class StatusEquip : EquipSelectBase
 		ulong num3 = (compareItemData == null) ? 0 : compareItemData.uniqueID;
 		if (num3 != num)
 		{
-			if (equipItem != null && !MonoBehaviourSingleton<GameSceneManager>.I.CheckEquipItemAndOpenUpdateAppDialog(equipItem.tableData, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+			if (equipItem != null && !MonoBehaviourSingleton<GameSceneManager>.I.CheckEquipItemAndOpenUpdateAppDialog(equipItem.tableData, OnCancelSelect))
 			{
 				GameSection.StopEvent();
 				return false;
@@ -744,9 +841,8 @@ public class StatusEquip : EquipSelectBase
 		MonoBehaviourSingleton<StatusManager>.I.SwapWeapon(num, index);
 	}
 
-	protected unsafe virtual void OnQuery_StatusMigrationSkillConfirm_YES()
+	protected virtual void OnQuery_StatusMigrationSkillConfirm_YES()
 	{
-		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
 		List<SkillItemInfo> list = new List<SkillItemInfo>();
 		List<MigrationSkillData> list2 = new List<MigrationSkillData>();
 		for (int i = 0; i < migrationOldItem.GetMaxSlot(); i++)
@@ -765,8 +861,7 @@ public class StatusEquip : EquipSelectBase
 						{
 							toSlot = migrationSelectItem.GetExceedSkillSlotNo(j);
 						}
-						_003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey40D _003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey40D;
-						if (list2.All(new Func<MigrationSkillData, bool>((object)_003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey40D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+						if (list2.All((MigrationSkillData x) => x.toSlotNo != toSlot))
 						{
 							MigrationSkillData item = new MigrationSkillData(migrationSelectItem.uniqueID, toSlot, skillItem);
 							list2.Add(item);
@@ -784,7 +879,7 @@ public class StatusEquip : EquipSelectBase
 		migrationSendCount = list2.Count + list.Count;
 		GameSection.SetEventData(new ChangeEquipData(selectEquipSetData.setNo, selectEquipSetData.index, migrationSelectItem));
 		GameSection.StayEvent();
-		this.StartCoroutine(SendReplacementSkill(list2, list));
+		StartCoroutine(SendReplacementSkill(list2, list));
 	}
 
 	private IEnumerator SendReplacementSkill(List<MigrationSkillData> migrationSkill, List<SkillItemInfo> detachSkill)
@@ -795,8 +890,8 @@ public class StatusEquip : EquipSelectBase
 			MigrationSkillData i = item;
 			MonoBehaviourSingleton<StatusManager>.I.SendSetSkill(i.toUniqueId, i.skill.uniqueID, i.toSlotNo, MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo(), delegate(bool isSucces)
 			{
-				((_003CSendReplacementSkill_003Ec__Iterator128)/*Error near IL_00ac: stateMachine*/)._003C_003Ef__this.MigrationSkillCallback(isSucces);
-				((_003CSendReplacementSkill_003Ec__Iterator128)/*Error near IL_00ac: stateMachine*/)._003CisSendFinish_003E__0 = true;
+				((_003CSendReplacementSkill_003Ec__Iterator12A)/*Error near IL_00ac: stateMachine*/)._003C_003Ef__this.MigrationSkillCallback(isSucces);
+				((_003CSendReplacementSkill_003Ec__Iterator12A)/*Error near IL_00ac: stateMachine*/)._003CisSendFinish_003E__0 = true;
 			});
 			if (!isSendFinish2)
 			{
@@ -810,8 +905,8 @@ public class StatusEquip : EquipSelectBase
 			EquipSetSkillData setInfo = d.equipSetSkill.Find((EquipSetSkillData x) => x.equipSetNo == MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo());
 			MonoBehaviourSingleton<StatusManager>.I.SendDetachSkill(setInfo.equipItemUniqId, setInfo.equipSlotNo, setInfo.equipSetNo, delegate(bool isSucces)
 			{
-				((_003CSendReplacementSkill_003Ec__Iterator128)/*Error near IL_01a9: stateMachine*/)._003C_003Ef__this.MigrationSkillCallback(isSucces);
-				((_003CSendReplacementSkill_003Ec__Iterator128)/*Error near IL_01a9: stateMachine*/)._003CisSendFinish_003E__0 = true;
+				((_003CSendReplacementSkill_003Ec__Iterator12A)/*Error near IL_01a9: stateMachine*/)._003C_003Ef__this.MigrationSkillCallback(isSucces);
+				((_003CSendReplacementSkill_003Ec__Iterator12A)/*Error near IL_01a9: stateMachine*/)._003CisSendFinish_003E__0 = true;
 			});
 			if (!isSendFinish2)
 			{
@@ -843,13 +938,12 @@ public class StatusEquip : EquipSelectBase
 
 	protected void RequestRemoveAllSkillFromCurrentEquipment()
 	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		GameSection.SetEventData(new ChangeEquipData(selectEquipSetData.setNo, selectEquipSetData.index, migrationSelectItem));
 		if (migrationOldItem != null)
 		{
 			int currentEquipSetNo = MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo();
 			GameSection.StayEvent();
-			this.StartCoroutine(SendRemoveAllSkill(migrationOldItem.uniqueID, currentEquipSetNo));
+			StartCoroutine(SendRemoveAllSkill(migrationOldItem.uniqueID, currentEquipSetNo));
 		}
 	}
 
@@ -859,8 +953,8 @@ public class StatusEquip : EquipSelectBase
 		migrationSendCount = 1;
 		MonoBehaviourSingleton<StatusManager>.I.SendDetachAllSkill(_equipmentId, _setNo, delegate(bool isSucces)
 		{
-			((_003CSendRemoveAllSkill_003Ec__Iterator129)/*Error near IL_0045: stateMachine*/)._003C_003Ef__this.MigrationSkillCallback(isSucces);
-			((_003CSendRemoveAllSkill_003Ec__Iterator129)/*Error near IL_0045: stateMachine*/)._003CisSendFinish_003E__0 = true;
+			((_003CSendRemoveAllSkill_003Ec__Iterator12B)/*Error near IL_0045: stateMachine*/)._003C_003Ef__this.MigrationSkillCallback(isSucces);
+			((_003CSendRemoveAllSkill_003Ec__Iterator12B)/*Error near IL_0045: stateMachine*/)._003CisSendFinish_003E__0 = true;
 		});
 		if (!isSendFinish)
 		{

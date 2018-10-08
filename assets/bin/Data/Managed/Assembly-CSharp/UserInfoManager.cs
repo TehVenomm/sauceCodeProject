@@ -349,7 +349,7 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 	{
 		if (userInfo != null && userInfo.id > 0 && userInfo.constDefine.ALIVE_CHECK_SEC > 0)
 		{
-			float num = Time.get_time() - MonoBehaviourSingleton<NetworkManager>.I.lastRequestTime;
+			float num = Time.time - MonoBehaviourSingleton<NetworkManager>.I.lastRequestTime;
 			if (num >= (float)userInfo.constDefine.ALIVE_CHECK_SEC)
 			{
 				SendAlive(null);
@@ -556,13 +556,11 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 
 	public Color GetSkinColor()
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		return MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetSkinColor(userStatus.skinId);
 	}
 
 	public Color GetHairColor()
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		return MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetHairColor(userStatus.hairColorId);
 	}
 
@@ -584,14 +582,14 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		sendForm.appStr = AppMain.appStr;
 		Protocol.Send(HomeInfoModel.URL, sendForm, delegate(HomeInfoModel ret)
 		{
-			bool flag = false;
-			bool flag2 = false;
-			int num = 0;
+			bool arg = false;
+			bool arg2 = false;
+			int arg3 = 0;
 			if (ret.Error == Error.None)
 			{
-				flag = true;
+				arg = true;
 				isAcquiredUserInfo = true;
-				flag2 = ret.result.loginBonus;
+				arg2 = ret.result.loginBonus;
 				oncePurchaseGachaProductId = ret.result.productId;
 				needShowOneTimesOfferSS = ret.result.isOneTimesOfferActive;
 				if (MonoBehaviourSingleton<UserInfoManager>.I.showJoinClanInGame)
@@ -644,7 +642,7 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 				{
 					MonoBehaviourSingleton<LoungeMatchingManager>.I.SetOpenLounge(ret.result.isLoungeOpen);
 				}
-				num = ret.result.task;
+				arg3 = ret.result.task;
 				if (MonoBehaviourSingleton<DeliveryManager>.IsValid())
 				{
 					MonoBehaviourSingleton<DeliveryManager>.I.UpdateDeliveryReaminTime(ret.result.dailyRemainTime, ret.result.weeklyRemainTime);
@@ -666,15 +664,15 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 				}
 				if (!string.IsNullOrEmpty(ret.result.blackShopEndDate))
 				{
-					int num2 = (int)GoGameTimeManager.GetRemainTime(ret.result.blackShopEndDate).TotalSeconds;
-					if (num2 > 0)
+					int num = (int)GoGameTimeManager.GetRemainTime(ret.result.blackShopEndDate).TotalSeconds;
+					if (num > 0)
 					{
 						if (!GameSaveData.instance.resetMarketTime.Equals(ret.result.blackShopEndDate))
 						{
 							GameSaveData.instance.canShowNoteDarkMarket = true;
 							GameSaveData.instance.resetMarketTime = ret.result.blackShopEndDate;
 						}
-						MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.InitTime(num2);
+						MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.InitTime(num);
 					}
 				}
 				else
@@ -682,7 +680,7 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 					GameSaveData.instance.resetMarketTime = string.Empty;
 				}
 			}
-			call_back.Invoke(flag, flag2, num);
+			call_back(arg, arg2, arg3);
 		}, string.Empty);
 	}
 
@@ -996,10 +994,10 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		requestSendForm.eventId = eventId;
 		Protocol.Send(GatherItemUserRecordModel.URL, requestSendForm, delegate(GatherItemUserRecordModel ret)
 		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
 			if (call_back != null)
 			{
-				call_back.Invoke(flag, ret);
+				call_back(arg, ret);
 			}
 		}, string.Empty);
 	}
@@ -1175,7 +1173,7 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 				MonoBehaviourSingleton<NativeGameService>.I.SignInFirstTime();
 				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_equip_end, "Tutorial");
 			}
-			if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.tutorialMessage != null)
+			if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.tutorialMessage != (UnityEngine.Object)null)
 			{
 				MonoBehaviourSingleton<UIManager>.I.tutorialMessage.SetErrorResendQuestGachaFlag();
 			}

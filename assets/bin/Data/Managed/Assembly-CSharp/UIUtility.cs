@@ -31,7 +31,6 @@ public static class UIUtility
 
 	public static Vector2 GetGridItemsBoundSize(UIGrid grid, int item_num)
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		GetGridSize(grid, item_num, out int grid_w, out int grid_h);
 		int num = (int)grid.cellWidth;
 		int num2 = (int)grid.cellHeight;
@@ -40,81 +39,53 @@ public static class UIUtility
 
 	public static void SetGridItemsDraggableWidget(UIScrollView scroll_view, UIGrid grid, int item_num)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Expected O, but got Unknown
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Expected O, but got Unknown
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = scroll_view.get_transform().FindChild("_DRAG_SCROLL_");
+		Transform transform = scroll_view.transform.FindChild("_DRAG_SCROLL_");
 		UIWidget uIWidget;
-		BoxCollider val2;
-		if (val == null)
+		BoxCollider boxCollider;
+		if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
 		{
-			uIWidget = NGUITools.AddChild<UIWidget>(scroll_view.get_gameObject());
-			uIWidget.get_gameObject().set_name("_DRAG_SCROLL_");
-			uIWidget.get_gameObject().AddComponent<UIDragScrollView>();
+			uIWidget = NGUITools.AddChild<UIWidget>(scroll_view.gameObject);
+			uIWidget.gameObject.name = "_DRAG_SCROLL_";
+			uIWidget.gameObject.AddComponent<UIDragScrollView>();
 			uIWidget.depth = -1;
 			uIWidget.pivot = UIWidget.Pivot.TopLeft;
-			val2 = uIWidget.get_gameObject().AddComponent<BoxCollider>();
-			val = uIWidget.get_transform();
+			boxCollider = uIWidget.gameObject.AddComponent<BoxCollider>();
+			transform = uIWidget.transform;
 		}
 		else
 		{
-			val2 = val.GetComponent<BoxCollider>();
-			uIWidget = val.GetComponent<UIWidget>();
+			boxCollider = transform.GetComponent<BoxCollider>();
+			uIWidget = transform.GetComponent<UIWidget>();
 		}
-		Vector3 size = Vector2.op_Implicit(GetGridItemsBoundSize(grid, item_num));
-		val2.set_size(size);
-		val2.set_center(new Vector3(size.x * 0.5f, (0f - size.y) * 0.5f));
-		Vector3 localPosition = grid.get_transform().get_localPosition() + new Vector3((0f - grid.cellWidth) * 0.5f, grid.cellHeight * 0.5f);
+		Vector3 vector2 = boxCollider.size = GetGridItemsBoundSize(grid, item_num);
+		boxCollider.center = new Vector3(vector2.x * 0.5f, (0f - vector2.y) * 0.5f);
+		Vector3 localPosition = grid.transform.localPosition + new Vector3((0f - grid.cellWidth) * 0.5f, grid.cellHeight * 0.5f);
 		if (grid.pivot != 0)
 		{
 			Vector2 pivotOffset = NGUIMath.GetPivotOffset(grid.pivot);
-			localPosition.x -= Mathf.Lerp(0f, size.x - grid.cellWidth, pivotOffset.x);
-			localPosition.y -= Mathf.Lerp(0f - (size.y - grid.cellHeight), 0f, pivotOffset.y);
+			localPosition.x -= Mathf.Lerp(0f, vector2.x - grid.cellWidth, pivotOffset.x);
+			localPosition.y -= Mathf.Lerp(0f - (vector2.y - grid.cellHeight), 0f, pivotOffset.y);
 		}
-		val.set_localPosition(localPosition);
-		uIWidget.SetDimensions((int)size.x, (int)size.y);
+		transform.localPosition = localPosition;
+		uIWidget.SetDimensions((int)vector2.x, (int)vector2.y);
 	}
 
 	public static void AddCenterOnClickChild(Transform t)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 		UICenterOnClick componentInChildren = t.GetComponentInChildren<UICenterOnClick>();
-		if (componentInChildren != null)
+		if ((UnityEngine.Object)componentInChildren != (UnityEngine.Object)null)
 		{
-			Transform val = componentInChildren.get_transform();
+			Transform transform = componentInChildren.transform;
 			int i = 0;
-			for (int childCount = val.get_childCount(); i < childCount; i++)
+			for (int childCount = transform.childCount; i < childCount; i++)
 			{
-				val.GetChild(i).GetComponentsInChildren<BoxCollider>(true, Temporary.boxColliderList);
+				transform.GetChild(i).GetComponentsInChildren(true, Temporary.boxColliderList);
 				int j = 0;
 				for (int count = Temporary.boxColliderList.Count; j < count; j++)
 				{
-					if (Temporary.boxColliderList[j].GetComponent<UICenterOnClickChild>() == null)
+					if ((UnityEngine.Object)Temporary.boxColliderList[j].GetComponent<UICenterOnClickChild>() == (UnityEngine.Object)null)
 					{
-						Temporary.boxColliderList[j].get_gameObject().AddComponent<UICenterOnClickChild>();
+						Temporary.boxColliderList[j].gameObject.AddComponent<UICenterOnClickChild>();
 					}
 				}
 				Temporary.boxColliderList.Clear();
@@ -124,10 +95,10 @@ public static class UIUtility
 
 	public static void SetActiveAndAlphaFade(GameObject go, bool is_active)
 	{
-		bool activeSelf = go.get_activeSelf();
+		bool activeSelf = go.activeSelf;
 		go.SetActive(true);
 		TweenAlpha component = go.GetComponent<TweenAlpha>();
-		if (component == null)
+		if ((UnityEngine.Object)component == (UnityEngine.Object)null)
 		{
 			go.SetActive(false);
 		}
@@ -157,19 +128,15 @@ public static class UIUtility
 
 	public static float GetWorldTopY(UIWidget w)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		object cachedTransform = (object)w.cachedTransform;
+		Transform cachedTransform = w.cachedTransform;
 		Vector2 pivotOffset = w.pivotOffset;
-		Vector3 val = cachedTransform.TransformPoint(0f, (0f - pivotOffset.y) * (float)w.height + (float)w.height, 0f);
-		return val.y;
+		Vector3 vector = cachedTransform.TransformPoint(0f, (0f - pivotOffset.y) * (float)w.height + (float)w.height, 0f);
+		return vector.y;
 	}
 
 	public static void UpdateAnchors(Transform root)
 	{
-		root.GetComponentsInChildren<UIRect>(true, Temporary.uiRectList);
+		root.GetComponentsInChildren(true, Temporary.uiRectList);
 		int i = 0;
 		for (int count = Temporary.uiRectList.Count; i < count; i++)
 		{

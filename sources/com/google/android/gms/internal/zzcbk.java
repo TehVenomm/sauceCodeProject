@@ -371,10 +371,8 @@ public final class zzcbk extends zzcdm {
 
     @TargetApi(11)
     public final List<zza> zzdv(int i) {
-        Object e;
         Cursor cursor;
         SQLiteDatabase sQLiteDatabase;
-        Cursor cursor2;
         SQLiteDatabase sQLiteDatabase2;
         SQLiteException sQLiteException;
         SQLiteDatabase sQLiteDatabase3;
@@ -394,7 +392,9 @@ public final class zzcbk extends zzcdm {
         int i3 = 5;
         int i4 = 0;
         while (i4 < 5) {
+            Cursor cursor2;
             SQLiteDatabase sQLiteDatabase4 = null;
+            Object e;
             try {
                 sQLiteDatabase4 = getWritableDatabase();
                 if (sQLiteDatabase4 == null) {

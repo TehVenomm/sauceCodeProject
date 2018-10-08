@@ -264,7 +264,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			float num = MonoBehaviourSingleton<InGameSettingsManager>.I.inGameProgress.victoryIntervalTime;
 			if (startVictoryIntervalTime >= 0f)
 			{
-				num -= Time.get_time() - startVictoryIntervalTime;
+				num -= Time.time - startVictoryIntervalTime;
 			}
 			if (num < 0f)
 			{
@@ -461,7 +461,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 					}
 					return;
 				}
-				npcCheckTimeCount -= Time.get_deltaTime();
+				npcCheckTimeCount -= Time.deltaTime;
 				if (npcCheckTimeCount <= 0f)
 				{
 					if (MonoBehaviourSingleton<CoopManager>.IsValid())
@@ -534,7 +534,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 						return;
 					}
 					SetExploreHostDCTimer(5f, true);
-					if (MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopRoom != null && MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender != null)
+					if (MonoBehaviourSingleton<CoopManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<CoopManager>.I.coopRoom != (UnityEngine.Object)null && (UnityEngine.Object)MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender != (UnityEngine.Object)null)
 					{
 						MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendExploreAliveRequest();
 					}
@@ -610,7 +610,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				int k = 0;
 				for (int count = gatherPointList.Count; k < count; k++)
 				{
-					gatherPointList[k].UpdateTargetMarker(gatherPointList[k] == nearestPoint);
+					gatherPointList[k].UpdateTargetMarker((UnityEngine.Object)gatherPointList[k] == (UnityEngine.Object)nearestPoint);
 				}
 			}
 			if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
@@ -621,13 +621,13 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 					Enemy enemy = enemyList[l];
 					if (enemy.isHiding)
 					{
-						bool isNear = enemy == nearestEnemy;
+						bool isNear = (UnityEngine.Object)enemy == (UnityEngine.Object)nearestEnemy;
 						enemy.UpdateGatherTargetMarker(isNear);
 					}
 				}
 			}
 			_UpdateGimmickTargetMarker();
-			if (!isEndFieldBuffAnnounce && MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid() && MonoBehaviourSingleton<UIEnemyAnnounce>.I.get_isActiveAndEnabled())
+			if (!isEndFieldBuffAnnounce && MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid() && MonoBehaviourSingleton<UIEnemyAnnounce>.I.isActiveAndEnabled)
 			{
 				MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestFieldBuffAnnounce();
 				isEndFieldBuffAnnounce = true;
@@ -651,10 +651,6 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	private void GetNearestGatherPoint(out float distance, out GatherPointObject nearestPoint)
 	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 		float num = 3.40282347E+38f;
 		GatherPointObject gatherPointObject = null;
@@ -662,8 +658,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		for (int count = gatherPointList.Count; i < count; i++)
 		{
 			GatherPointObject gatherPointObject2 = gatherPointList[i];
-			Vector3 val = gatherPointObject2._transform.get_position() - self._position;
-			float magnitude = val.get_magnitude();
+			float magnitude = (gatherPointObject2._transform.position - self._position).magnitude;
 			if (!gatherPointObject2.isGathered && magnitude < num && magnitude < gatherPointObject2.viewData.targetRadius)
 			{
 				gatherPointObject = gatherPointObject2;
@@ -676,13 +671,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	private void GetNearestCamouflagingEnemy(out float nearestDistance, out Enemy nearestEnemy)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 position = MonoBehaviourSingleton<StageObjectManager>.I.self._transform.get_position();
+		Vector3 position = MonoBehaviourSingleton<StageObjectManager>.I.self._transform.position;
 		nearestDistance = 3.40282347E+38f;
 		nearestEnemy = null;
 		List<Enemy> enemyList = MonoBehaviourSingleton<StageObjectManager>.I.EnemyList;
@@ -691,7 +680,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			Enemy enemy = enemyList[i];
 			if (enemy.isHiding)
 			{
-				Vector3 position2 = enemy._transform.get_position();
+				Vector3 position2 = enemy._transform.position;
 				float num = Vector3.Distance(position, position2);
 				if (num < nearestDistance)
 				{
@@ -727,10 +716,10 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 	public void UpdatGatherGimmickInfo(int id, int playerId, bool isUsed)
 	{
 		FieldGatherGimmickObject fieldGatherGimmickObject = GetFieldGimmickObj(eFieldGimmick.GatherGimmick, id) as FieldGatherGimmickObject;
-		if (!(fieldGatherGimmickObject == null))
+		if (!((UnityEngine.Object)fieldGatherGimmickObject == (UnityEngine.Object)null))
 		{
 			Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(playerId) as Player;
-			if (!(player == null))
+			if (!((UnityEngine.Object)player == (UnityEngine.Object)null))
 			{
 				if (isUsed)
 				{
@@ -782,10 +771,6 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	private void _SearchNearestGimmickPoint(int typeIndex)
 	{
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 		if (!fieldGimmickList[typeIndex].IsNullOrEmpty())
 		{
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
@@ -794,8 +779,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			for (int count = fieldGimmickList[typeIndex].Count; i < count; i++)
 			{
 				IFieldGimmickObject fieldGimmickObject = fieldGimmickList[typeIndex][i];
-				Vector3 val = fieldGimmickObject.GetTransform().get_position() - self._position;
-				float sqrMagnitude = val.get_sqrMagnitude();
+				float sqrMagnitude = (fieldGimmickObject.GetTransform().position - self._position).sqrMagnitude;
 				float targetSqrRadius = fieldGimmickObject.GetTargetSqrRadius();
 				if (sqrMagnitude < num && sqrMagnitude < targetSqrRadius)
 				{
@@ -1315,8 +1299,6 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	public bool OnRecvWaveMatchDropCreate(Coop_Model_WaveMatchDropCreate model)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 		if (wmDropResource != null)
 		{
 			wmDropResource.OnCreate(model.managedId, model.dataId, model.basePos, model.offset, model.sec, false);
@@ -1372,13 +1354,8 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		PlayAudio(AUDIO.QUEST_START);
 	}
 
-	public unsafe bool BattleComplete(bool forceComplete = false)
+	public bool BattleComplete(bool forceComplete = false)
 	{
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Expected O, but got Unknown
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
 		this.forceComplete = forceComplete;
 		if (!forceComplete && (!isBattleStart || progressEndType != 0))
 		{
@@ -1397,10 +1374,15 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			if (MonoBehaviourSingleton<GameSceneManager>.IsValid())
 			{
 				InGameMain gameMain = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection() as InGameMain;
-				if (gameMain != null)
+				if ((UnityEngine.Object)gameMain != (UnityEngine.Object)null)
 				{
-					_003CBattleComplete_003Ec__AnonStorey5FD _003CBattleComplete_003Ec__AnonStorey5FD;
-					gameMain.cutScenePlayer.Play(new Action((object)_003CBattleComplete_003Ec__AnonStorey5FD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					gameMain.cutScenePlayer.Play(delegate
+					{
+						if (!gameMain.cutScenePlayer.hasStory)
+						{
+							MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameMain", base.gameObject, "HOME", null, null, true);
+						}
+					});
 				}
 				return true;
 			}
@@ -1410,12 +1392,12 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		if (flag)
 		{
 			SendRushProgress();
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.RUSH_INTERVAL));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.RUSH_INTERVAL));
 		}
 		else if (flag2)
 		{
 			SendArenaProgress();
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.ARENA_INTERVAL));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.ARENA_INTERVAL));
 		}
 		else
 		{
@@ -1436,15 +1418,13 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			{
 				MonoBehaviourSingleton<CoopManager>.I.coopStage.SetQuestClose(true);
 			}
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.QUEST_VICTORY));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.QUEST_VICTORY));
 		}
 		return true;
 	}
 
 	public bool PortalNext(uint next_portal_id)
 	{
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 		if (next_portal_id == 0)
 		{
 			return false;
@@ -1461,19 +1441,19 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			isGameProgressStop = true;
 			MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.ForEach(delegate(CoopClient x)
 			{
-				if (x.GetPlayer() != null)
+				if ((UnityEngine.Object)x.GetPlayer() != (UnityEngine.Object)null)
 				{
 					MonoBehaviourSingleton<QuestManager>.I.UpdateExplorePlayerStatus(x);
 				}
 			});
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.EXPLORE_MOVE_INTERVAL));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.EXPLORE_MOVE_INTERVAL));
 			return true;
 		}
 		if (MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestSeriesNum() > 1)
 		{
 			isGameProgressStop = true;
 			StopTimer();
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.QUEST_SERIES_INTERVAL));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.QUEST_SERIES_INTERVAL));
 			return true;
 		}
 		bool flag = false;
@@ -1507,8 +1487,6 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	public bool FieldMapInterval(uint to_portal_id)
 	{
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 		if (!isBattleStart || progressEndType != 0)
 		{
 			return false;
@@ -1517,18 +1495,17 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		isGameProgressStop = true;
 		if (MonoBehaviourSingleton<FieldManager>.I.isTutorialField)
 		{
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_MAP_INTERVAL_TUTORIAL));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_MAP_INTERVAL_TUTORIAL));
 		}
 		else
 		{
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_MAP_INTERVAL));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_MAP_INTERVAL));
 		}
 		return true;
 	}
 
 	public bool FieldToQuestInterval(uint to_quest_id, uint from_portal_id, bool is_gate)
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 		if (!isBattleStart || progressEndType != 0)
 		{
 			return false;
@@ -1546,39 +1523,36 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				type = PROGRESS_END_TYPE.FIELD_TO_STORY;
 			}
 		}
-		this.StartCoroutine(OnProgressEnd(type));
+		StartCoroutine(OnProgressEnd(type));
 		return true;
 	}
 
 	public bool FieldReadStory(int storyId, bool isSend)
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		if (!isBattleStart || progressEndType != 0)
 		{
 			return false;
 		}
 		fieldReadStoryId = storyId;
 		isFieldReadStorySend = isSend;
-		this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_READ_STORY));
+		StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_READ_STORY));
 		return true;
 	}
 
 	public bool ExploreFieldToQuestInterval()
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		if (!isBattleStart || progressEndType != 0)
 		{
 			return false;
 		}
 		isGameProgressStop = true;
 		PROGRESS_END_TYPE type = PROGRESS_END_TYPE.EXPLORE_HAPPEN_INTERVAL;
-		this.StartCoroutine(OnProgressEnd(type));
+		StartCoroutine(OnProgressEnd(type));
 		return true;
 	}
 
 	public bool FieldToHome()
 	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		if (!isBattleStart || progressEndType != 0)
 		{
 			return false;
@@ -1591,13 +1565,12 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		{
 			return false;
 		}
-		this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_TO_HOME));
+		StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_TO_HOME));
 		return true;
 	}
 
 	public bool FieldToHomeTimeout()
 	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		if (!isBattleStart || progressEndType != 0)
 		{
 			return false;
@@ -1610,14 +1583,12 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		{
 			return false;
 		}
-		this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_TO_HOME_TIMEOUT));
+		StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_TO_HOME_TIMEOUT));
 		return true;
 	}
 
 	public bool InviteInQuest()
 	{
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 		if (!isBattleStart || progressEndType != 0)
 		{
 			return false;
@@ -1645,19 +1616,17 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				SendRetire();
 			}
 			MonoBehaviourSingleton<CoopManager>.I.coopStage.SetRetireQuestClose();
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.QUEST_INVITEQUIT));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.QUEST_INVITEQUIT));
 		}
 		else
 		{
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_TO_HOME));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_TO_HOME));
 		}
 		return true;
 	}
 
 	public bool QuestToField(uint fieldPortalID)
 	{
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
 		if (!isBattleStart || progressEndType != 0)
 		{
 			return false;
@@ -1686,32 +1655,29 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				SendRetire();
 			}
 			MonoBehaviourSingleton<CoopManager>.I.coopStage.SetRetireQuestClose();
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.QUEST_TO_FIELD));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.QUEST_TO_FIELD));
 		}
 		else
 		{
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_TO_HOME));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_TO_HOME));
 		}
 		return true;
 	}
 
 	public bool QuestRepeat()
 	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		if (progressEndType != PROGRESS_END_TYPE.QUEST_VICTORY)
 		{
 			return false;
 		}
 		isGameProgressStop = true;
 		PROGRESS_END_TYPE type = PROGRESS_END_TYPE.QUEST_TO_QUEST_REPEAT;
-		this.StartCoroutine(OnProgressEnd(type));
+		StartCoroutine(OnProgressEnd(type));
 		return true;
 	}
 
 	public bool BattleRetire()
 	{
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 		if (!isBattleStart || progressEndType != 0)
 		{
 			return false;
@@ -1738,18 +1704,17 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				SendRetire();
 			}
 			MonoBehaviourSingleton<CoopManager>.I.coopStage.SetRetireQuestClose();
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.QUEST_RETIRE));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.QUEST_RETIRE));
 		}
 		else
 		{
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_RETIRE));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_RETIRE));
 		}
 		return true;
 	}
 
 	public bool BattleRetry()
 	{
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 		if (!isBattleStart || progressEndType != 0)
 		{
 			return false;
@@ -1768,14 +1733,13 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				SendArenaRetire();
 			}
 			MonoBehaviourSingleton<CoopManager>.I.coopStage.SetRetireQuestClose();
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.QUEST_RETRY));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.QUEST_RETRY));
 		}
 		return true;
 	}
 
-	public unsafe bool BattleForceDefeatsEvent()
+	public bool BattleForceDefeatsEvent()
 	{
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
 		if (!isBattleStart || progressEndType != 0)
 		{
 			return false;
@@ -1786,21 +1750,34 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			list.Add(new List<int>());
 			list[i].Add(0);
 		}
-		MonoBehaviourSingleton<QuestManager>.I.SendQuestComplete(list, null, null, 0f, null, new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<QuestManager>.I.SendQuestComplete(list, null, null, 0f, null, delegate(bool is_success, Error result)
+		{
+			isRecvQuestComplete = true;
+			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.EndBattle();
+			int status = 0;
+			ClearStatusQuest clearStatusQuest = MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.Find((ClearStatusQuest data) => data.questId == MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
+			if (clearStatusQuest != null)
+			{
+				status = clearStatusQuest.questStatus;
+			}
+			if (is_success)
+			{
+				MonoBehaviourSingleton<QuestManager>.I.SaveLastNewClearQuest(status);
+			}
+		});
 		if (MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
 			MonoBehaviourSingleton<CoopManager>.I.coopStage.SetQuestClose(true);
 		}
 		if (QuestManager.IsValidInGame())
 		{
-			this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FORCE_DEFEAT));
+			StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FORCE_DEFEAT));
 		}
 		return true;
 	}
 
 	public bool BattleTimeup()
 	{
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 		if (!isBattleStart || progressEndType != 0)
 		{
 			return false;
@@ -1823,7 +1800,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		{
 			SendRetire();
 		}
-		this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.QUEST_TIMEUP));
+		StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.QUEST_TIMEUP));
 		return true;
 	}
 
@@ -1837,7 +1814,6 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	public bool FieldReentry()
 	{
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
 		if (progressEndType != 0)
 		{
 			return false;
@@ -1862,7 +1838,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		else
 		{
 			Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-			if (isBattleStart && Object.op_Implicit(boss))
+			if (isBattleStart && (bool)boss)
 			{
 				MonoBehaviourSingleton<QuestManager>.I.UpdateExploreBossStatus(boss);
 			}
@@ -1871,7 +1847,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		{
 			MonoBehaviourSingleton<CoopManager>.I.coopStage.SetIsEnterFieldEnemyBossBattle(MonoBehaviourSingleton<CoopManager>.I.coopStage.GetIsInFieldEnemyBossBattle());
 		}
-		this.StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_REENTRY));
+		StartCoroutine(OnProgressEnd(PROGRESS_END_TYPE.FIELD_REENTRY));
 		return true;
 	}
 
@@ -1892,7 +1868,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		if (progressEndType == PROGRESS_END_TYPE.QUEST_VICTORY && QuestManager.IsValidInGameExplore())
 		{
 			Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-			if (Object.op_Implicit(boss))
+			if ((bool)boss)
 			{
 				yield return (object)null;
 				MonoBehaviourSingleton<QuestManager>.I.UpdateExploreBossStatus(boss);
@@ -1906,7 +1882,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		{
 			yield return (object)null;
 		}
-		if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+		if ((UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null)
 		{
 			if (progressEndType == PROGRESS_END_TYPE.QUEST_VICTORY || progressEndType == PROGRESS_END_TYPE.QUEST_SERIES_INTERVAL || progressEndType == PROGRESS_END_TYPE.RUSH_INTERVAL || progressEndType == PROGRESS_END_TYPE.ARENA_INTERVAL)
 			{
@@ -1915,7 +1891,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			else
 			{
 				MonoBehaviourSingleton<StageObjectManager>.I.self.hitOffFlag |= StageObject.HIT_OFF_FLAG.FORCE;
-				if (MonoBehaviourSingleton<StageObjectManager>.I.self.controller != null)
+				if ((UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self.controller != (UnityEngine.Object)null)
 				{
 					MonoBehaviourSingleton<StageObjectManager>.I.self.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.BATTLE_END);
 				}
@@ -1934,25 +1910,25 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		if (progressEndType == PROGRESS_END_TYPE.QUEST_VICTORY || progressEndType == PROGRESS_END_TYPE.QUEST_SERIES_INTERVAL || needRushIntervalEffects || needArenaIntervalEffects)
 		{
 			InGameMain inGameMain = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentScreen() as InGameMain;
-			if (inGameMain != null)
+			if ((UnityEngine.Object)inGameMain != (UnityEngine.Object)null)
 			{
 				Transform menu_btn = inGameMain.GetCtrl(InGameMain.UI.BTN_QUEST_MENU);
-				if (menu_btn != null)
+				if ((UnityEngine.Object)menu_btn != (UnityEngine.Object)null)
 				{
-					menu_btn.get_gameObject().SetActive(false);
+					menu_btn.gameObject.SetActive(false);
 				}
 			}
 			if (MonoBehaviourSingleton<UIInGameMenu>.IsValid())
 			{
-				MonoBehaviourSingleton<UIInGameMenu>.I.get_gameObject().SetActive(false);
+				MonoBehaviourSingleton<UIInGameMenu>.I.gameObject.SetActive(false);
 			}
 			if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
 			{
-				MonoBehaviourSingleton<UIEnemyStatus>.I.get_gameObject().SetActive(false);
+				MonoBehaviourSingleton<UIEnemyStatus>.I.gameObject.SetActive(false);
 			}
 			if (MonoBehaviourSingleton<UIInGameSelfAnnounceManager>.IsValid())
 			{
-				MonoBehaviourSingleton<UIInGameSelfAnnounceManager>.I.get_gameObject().SetActive(false);
+				MonoBehaviourSingleton<UIInGameSelfAnnounceManager>.I.gameObject.SetActive(false);
 			}
 			if (MonoBehaviourSingleton<UIQuestRepeat>.IsValid())
 			{
@@ -1963,16 +1939,16 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		{
 			ViewUI(false);
 		}
-		yield return (object)this.StartCoroutine(DoCloseDialog());
+		yield return (object)StartCoroutine(DoCloseDialog());
 		if (MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
 		{
 			MonoBehaviourSingleton<TargetMarkerManager>.I.showMarker = false;
 		}
-		if ((progressEndType == PROGRESS_END_TYPE.QUEST_VICTORY || progressEndType == PROGRESS_END_TYPE.QUEST_SERIES_INTERVAL || needRushIntervalEffects || needArenaIntervalEffects) && MonoBehaviourSingleton<StageObjectManager>.I.boss != null && !MonoBehaviourSingleton<StageObjectManager>.I.boss.isDead)
+		if ((progressEndType == PROGRESS_END_TYPE.QUEST_VICTORY || progressEndType == PROGRESS_END_TYPE.QUEST_SERIES_INTERVAL || needRushIntervalEffects || needArenaIntervalEffects) && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.boss != (UnityEngine.Object)null && !MonoBehaviourSingleton<StageObjectManager>.I.boss.isDead)
 		{
 			MonoBehaviourSingleton<StageObjectManager>.I.boss.ActDead(false, false);
 		}
-		if ((progressEndType == PROGRESS_END_TYPE.QUEST_RETIRE || progressEndType == PROGRESS_END_TYPE.QUEST_TIMEUP) && MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null && MonoBehaviourSingleton<QuestManager>.IsValid() && !MonoBehaviourSingleton<QuestManager>.I.IsTutorialOrderQuest(MonoBehaviourSingleton<QuestManager>.I.currentQuestID))
+		if ((progressEndType == PROGRESS_END_TYPE.QUEST_RETIRE || progressEndType == PROGRESS_END_TYPE.QUEST_TIMEUP) && MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null && MonoBehaviourSingleton<QuestManager>.IsValid() && !MonoBehaviourSingleton<QuestManager>.I.IsTutorialOrderQuest(MonoBehaviourSingleton<QuestManager>.I.currentQuestID))
 		{
 			MonoBehaviourSingleton<UIManager>.I.mainChat.ShowOpenButton();
 		}
@@ -1995,7 +1971,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			SetBattleEndAllCharacters();
 			SetBattleEndAllPlayers();
 		}
-		while (viewFx != null)
+		while ((UnityEngine.Object)viewFx != (UnityEngine.Object)null)
 		{
 			yield return (object)null;
 		}
@@ -2053,7 +2029,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			CreateUIEffect(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.questTimeUp);
 			MonoBehaviourSingleton<SoundManager>.I.TransitionTo("QuestFailed", 0.1f);
 			PlayAudio(AUDIO.RESULT_LOSE);
-			while (viewFx != null)
+			while ((UnityEngine.Object)viewFx != (UnityEngine.Object)null)
 			{
 				yield return (object)null;
 			}
@@ -2077,13 +2053,13 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			}
 			break;
 		case PROGRESS_END_TYPE.QUEST_TO_QUEST_REPEAT:
-			if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null && MonoBehaviourSingleton<QuestManager>.IsValid() && !MonoBehaviourSingleton<QuestManager>.I.IsTutorialOrderQuest(MonoBehaviourSingleton<QuestManager>.I.currentQuestID))
+			if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null && MonoBehaviourSingleton<QuestManager>.IsValid() && !MonoBehaviourSingleton<QuestManager>.I.IsTutorialOrderQuest(MonoBehaviourSingleton<QuestManager>.I.currentQuestID))
 			{
 				MonoBehaviourSingleton<UIManager>.I.mainChat.HideOpenButton();
 			}
 			break;
 		}
-		while (viewFx != null)
+		while ((UnityEngine.Object)viewFx != (UnityEngine.Object)null)
 		{
 			yield return (object)null;
 		}
@@ -2122,13 +2098,13 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			}
 			else
 			{
-				if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null && !MonoBehaviourSingleton<UIManager>.I.mainChat.IsOpeningWindow())
+				if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null && !MonoBehaviourSingleton<UIManager>.I.mainChat.IsOpeningWindow())
 				{
 					MonoBehaviourSingleton<UIManager>.I.mainChat.ShowInputOnly();
 				}
 				SoundManager.RequestBGM(14, true);
 				enableVictoryIntervalTime = true;
-				startVictoryIntervalTime = Time.get_time();
+				startVictoryIntervalTime = Time.time;
 				while (victoryIntervalTime > 0f)
 				{
 					yield return (object)null;
@@ -2138,13 +2114,13 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				SetBattleEndAllCharacters();
 				SetBattleEndAllPlayers();
 				ViewUI(false);
-				if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null && MonoBehaviourSingleton<QuestManager>.IsValid() && !MonoBehaviourSingleton<QuestManager>.I.IsTutorialOrderQuest(MonoBehaviourSingleton<QuestManager>.I.currentQuestID))
+				if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null && MonoBehaviourSingleton<QuestManager>.IsValid() && !MonoBehaviourSingleton<QuestManager>.I.IsTutorialOrderQuest(MonoBehaviourSingleton<QuestManager>.I.currentQuestID))
 				{
 					MonoBehaviourSingleton<UIManager>.I.mainChat.ShowOpenButton();
 				}
 			}
 		}
-		waitNetworkCoroutine = this.StartCoroutine(DoWaitNetwork());
+		waitNetworkCoroutine = StartCoroutine(DoWaitNetwork());
 		if (progressEndType == PROGRESS_END_TYPE.QUEST_VICTORY || progressEndType == PROGRESS_END_TYPE.QUEST_RETIRE || progressEndType == PROGRESS_END_TYPE.QUEST_INVITEQUIT || progressEndType == PROGRESS_END_TYPE.QUEST_TIMEUP || progressEndType == PROGRESS_END_TYPE.QUEST_TO_FIELD)
 		{
 			while (!isRecvQuestComplete)
@@ -2159,8 +2135,8 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		}
 		if (progressEndType != PROGRESS_END_TYPE.FIELD_REENTRY)
 		{
-			float start_time = Time.get_time();
-			while (MonoBehaviourSingleton<KtbWebSocket>.IsValid() && !MonoBehaviourSingleton<KtbWebSocket>.I.IsCompleteSendAll() && !(Time.get_time() - start_time > MonoBehaviourSingleton<InGameSettingsManager>.I.inGameProgress.checkCompleteSendTimeout))
+			float start_time = Time.time;
+			while (MonoBehaviourSingleton<KtbWebSocket>.IsValid() && !MonoBehaviourSingleton<KtbWebSocket>.I.IsCompleteSendAll() && !(Time.time - start_time > MonoBehaviourSingleton<InGameSettingsManager>.I.inGameProgress.checkCompleteSendTimeout))
 			{
 				yield return (object)0;
 			}
@@ -2329,7 +2305,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			bool wait2 = true;
 			MonoBehaviourSingleton<CoopManager>.I.coopStage.fieldRewardPool.SendFieldDrop(delegate
 			{
-				((_003COnProgressEnd_003Ec__Iterator229)/*Error near IL_1386: stateMachine*/)._003Cwait_003E__22 = false;
+				((_003COnProgressEnd_003Ec__Iterator22B)/*Error near IL_1386: stateMachine*/)._003Cwait_003E__22 = false;
 			});
 			while (wait2)
 			{
@@ -2343,7 +2319,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			bool wait = true;
 			MonoBehaviourSingleton<CoopApp>.I.Leave(delegate
 			{
-				((_003COnProgressEnd_003Ec__Iterator229)/*Error near IL_140c: stateMachine*/)._003Cwait_003E__25 = false;
+				((_003COnProgressEnd_003Ec__Iterator22B)/*Error near IL_140c: stateMachine*/)._003Cwait_003E__25 = false;
 			}, toHome, fieldRetire);
 			while (wait)
 			{
@@ -2367,7 +2343,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		}
 		goto IL_14a5;
 		IL_14a5:
-		this.StopCoroutine(waitNetworkCoroutine);
+		StopCoroutine(waitNetworkCoroutine);
 		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.MANUAL_NETWORK, false);
 		if (progressEndType != PROGRESS_END_TYPE.FIELD_REENTRY)
 		{
@@ -2461,7 +2437,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 					mapID = MonoBehaviourSingleton<FieldManager>.I.currentMapID
 				};
 				Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-				if (self != null)
+				if ((UnityEngine.Object)self != (UnityEngine.Object)null)
 				{
 					FieldManager.FieldTransitionInfo fieldTransitionInfo7 = trans_info;
 					Vector3 position9 = self._position;
@@ -2470,8 +2446,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 					Vector3 position10 = self._position;
 					fieldTransitionInfo8.mapZ = position10.z;
 					FieldManager.FieldTransitionInfo fieldTransitionInfo9 = trans_info;
-					Quaternion rotation5 = self._rotation;
-					Vector3 eulerAngles5 = rotation5.get_eulerAngles();
+					Vector3 eulerAngles5 = self._rotation.eulerAngles;
 					fieldTransitionInfo9.mapDir = eulerAngles5.y;
 				}
 				MonoBehaviourSingleton<InGameManager>.I.backTransitionInfo = trans_info;
@@ -2483,7 +2458,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			if (InGameManager.IsReentryMapId())
 			{
 				Self self3 = MonoBehaviourSingleton<StageObjectManager>.I.self;
-				if (self3 != null)
+				if ((UnityEngine.Object)self3 != (UnityEngine.Object)null)
 				{
 					FieldManager i2 = MonoBehaviourSingleton<FieldManager>.I;
 					uint currentMapID = MonoBehaviourSingleton<FieldManager>.I.currentMapID;
@@ -2491,8 +2466,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 					float x = position3.x;
 					Vector3 position4 = self3._position;
 					float z = position4.z;
-					Quaternion rotation2 = self3._rotation;
-					Vector3 eulerAngles2 = rotation2.get_eulerAngles();
+					Vector3 eulerAngles2 = self3._rotation.eulerAngles;
 					i2.SetCurrentFieldMapID(currentMapID, x, z, eulerAngles2.y);
 				}
 				MonoBehaviourSingleton<InGameManager>.I.isTransitionFieldReentry = true;
@@ -2501,7 +2475,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			else if (MonoBehaviourSingleton<FieldManager>.IsValid())
 			{
 				Self self2 = MonoBehaviourSingleton<StageObjectManager>.I.self;
-				if (self2 != null)
+				if ((UnityEngine.Object)self2 != (UnityEngine.Object)null)
 				{
 					FieldManager i3 = MonoBehaviourSingleton<FieldManager>.I;
 					uint currentPortalID = MonoBehaviourSingleton<FieldManager>.I.currentPortalID;
@@ -2509,8 +2483,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 					float x2 = position5.x;
 					Vector3 position6 = self2._position;
 					float z2 = position6.z;
-					Quaternion rotation3 = self2._rotation;
-					Vector3 eulerAngles3 = rotation3.get_eulerAngles();
+					Vector3 eulerAngles3 = self2._rotation.eulerAngles;
 					i3.SetCurrentFieldMapPortalID(currentPortalID, x2, z2, eulerAngles3.y);
 				}
 				MonoBehaviourSingleton<InGameManager>.I.isTransitionFieldReentry = true;
@@ -2549,7 +2522,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 					mapID = MonoBehaviourSingleton<FieldManager>.I.currentMapID
 				};
 				Self self4 = MonoBehaviourSingleton<StageObjectManager>.I.self;
-				if (self4 != null)
+				if ((UnityEngine.Object)self4 != (UnityEngine.Object)null)
 				{
 					FieldManager.FieldTransitionInfo fieldTransitionInfo4 = trans_info2;
 					Vector3 position7 = self4._position;
@@ -2558,8 +2531,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 					Vector3 position8 = self4._position;
 					fieldTransitionInfo5.mapZ = position8.z;
 					FieldManager.FieldTransitionInfo fieldTransitionInfo6 = trans_info2;
-					Quaternion rotation4 = self4._rotation;
-					Vector3 eulerAngles4 = rotation4.get_eulerAngles();
+					Vector3 eulerAngles4 = self4._rotation.eulerAngles;
 					fieldTransitionInfo6.mapDir = eulerAngles4.y;
 				}
 				MonoBehaviourSingleton<InGameManager>.I.backTransitionInfo = trans_info2;
@@ -2580,7 +2552,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 					mapID = MonoBehaviourSingleton<FieldManager>.I.currentMapID
 				};
 				Self self5 = MonoBehaviourSingleton<StageObjectManager>.I.self;
-				if (self5 != null)
+				if ((UnityEngine.Object)self5 != (UnityEngine.Object)null)
 				{
 					FieldManager.FieldTransitionInfo fieldTransitionInfo = trans_info3;
 					Vector3 position = self5._position;
@@ -2589,8 +2561,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 					Vector3 position2 = self5._position;
 					fieldTransitionInfo2.mapZ = position2.z;
 					FieldManager.FieldTransitionInfo fieldTransitionInfo3 = trans_info3;
-					Quaternion rotation = self5._rotation;
-					Vector3 eulerAngles = rotation.get_eulerAngles();
+					Vector3 eulerAngles = self5._rotation.eulerAngles;
 					fieldTransitionInfo3.mapDir = eulerAngles.y;
 				}
 				MonoBehaviourSingleton<InGameManager>.I.backTransitionInfo = trans_info3;
@@ -2636,8 +2607,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	public void RealizesLinkResourcesFieldEnemyBoss(Action callback)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(_RealizesLinkResourcesFieldEnemyBoss(callback));
+		StartCoroutine(_RealizesLinkResourcesFieldEnemyBoss(callback));
 	}
 
 	public IEnumerator _RealizesLinkResourcesFieldEnemyBoss(Action callback)
@@ -2679,42 +2649,36 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	private void CreateUIEffect(string effect_name)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		if (viewFx != null)
+		if ((UnityEngine.Object)viewFx != (UnityEngine.Object)null)
 		{
-			Object.DestroyImmediate(viewFx.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(viewFx.gameObject);
 		}
 		viewFx = EffectManager.GetUIEffect(effect_name);
-		if (!(viewFx == null))
+		if (!((UnityEngine.Object)viewFx == (UnityEngine.Object)null))
 		{
-			DisableNotifyMonoBehaviour disableNotifyMonoBehaviour = viewFx.get_gameObject().AddComponent<DisableNotifyMonoBehaviour>();
+			DisableNotifyMonoBehaviour disableNotifyMonoBehaviour = viewFx.gameObject.AddComponent<DisableNotifyMonoBehaviour>();
 			disableNotifyMonoBehaviour.SetNotifyMaster(this);
 		}
 	}
 
 	private void CreateUIEffect(GameObject obj)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		if (viewFx != null)
+		if ((UnityEngine.Object)viewFx != (UnityEngine.Object)null)
 		{
-			Object.DestroyImmediate(viewFx.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(viewFx.gameObject);
 		}
 		viewFx = ResourceUtility.Realizes(obj, MonoBehaviourSingleton<GameSceneManager>.I.GetLastSectionExcludeCommonDialog()._transform, -1);
-		if (!(viewFx == null))
+		if (!((UnityEngine.Object)viewFx == (UnityEngine.Object)null))
 		{
-			DisableNotifyMonoBehaviour disableNotifyMonoBehaviour = viewFx.get_gameObject().AddComponent<DisableNotifyMonoBehaviour>();
+			DisableNotifyMonoBehaviour disableNotifyMonoBehaviour = viewFx.gameObject.AddComponent<DisableNotifyMonoBehaviour>();
 			disableNotifyMonoBehaviour.SetNotifyMaster(this);
 		}
 	}
 
 	protected override void OnDetachServant(DisableNotifyMonoBehaviour servant)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		base.OnDetachServant(servant);
-		if (viewFx.get_gameObject() == servant.get_gameObject())
+		if ((UnityEngine.Object)viewFx.gameObject == (UnityEngine.Object)servant.gameObject)
 		{
 			viewFx = null;
 		}
@@ -2722,13 +2686,13 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	private void ViewUI(bool enable)
 	{
-		Transform val = MonoBehaviourSingleton<UIManager>.I.Find("InGameMain");
-		if (val != null)
+		Transform transform = MonoBehaviourSingleton<UIManager>.I.Find("InGameMain");
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			val.GetComponent<UIBehaviour>().uiVisible = enable;
+			transform.GetComponent<UIBehaviour>().uiVisible = enable;
 			if (enable)
 			{
-				UIRect[] componentsInChildren = val.GetComponentsInChildren<UIRect>();
+				UIRect[] componentsInChildren = transform.GetComponentsInChildren<UIRect>();
 				int i = 0;
 				for (int num = componentsInChildren.Length; i < num; i++)
 				{
@@ -2736,7 +2700,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				}
 			}
 		}
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null)
 		{
 			if (enable)
 			{
@@ -2747,7 +2711,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				MonoBehaviourSingleton<UIManager>.I.mainChat.HideAll();
 			}
 		}
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != null)
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != (UnityEngine.Object)null)
 		{
 			if (enable && MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite)
 			{
@@ -2791,7 +2755,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		if (FieldManager.IsValidInGame() && MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
 			Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-			if (boss != null)
+			if ((UnityEngine.Object)boss != (UnityEngine.Object)null)
 			{
 				if (boss.isDead)
 				{
@@ -2806,7 +2770,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		else
 		{
 			Enemy boss2 = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-			if (boss2 == null)
+			if ((UnityEngine.Object)boss2 == (UnityEngine.Object)null)
 			{
 				return false;
 			}
@@ -2820,18 +2784,18 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	private void SetBattleEndCharacter(Character character)
 	{
-		if (!(character == null))
+		if (!((UnityEngine.Object)character == (UnityEngine.Object)null))
 		{
 			character.hitOffFlag |= StageObject.HIT_OFF_FLAG.FORCE;
-			if (character.controller != null)
+			if ((UnityEngine.Object)character.controller != (UnityEngine.Object)null)
 			{
 				character.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.BATTLE_END);
 			}
-			if (character.packetSender != null)
+			if ((UnityEngine.Object)character.packetSender != (UnityEngine.Object)null)
 			{
 				character.packetSender.enableSend = false;
 			}
-			if (character.packetReceiver != null)
+			if ((UnityEngine.Object)character.packetReceiver != (UnityEngine.Object)null)
 			{
 				character.packetReceiver.SetStopPacketUpdate(true);
 			}
@@ -2850,7 +2814,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	private void SetBattleEndAllPlayer(Player player)
 	{
-		if (!(player == null))
+		if (!((UnityEngine.Object)player == (UnityEngine.Object)null))
 		{
 			player.ClearStoreEffect();
 		}
@@ -2867,10 +2831,9 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	public void DeliveryAddCheck()
 	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<DeliveryManager>.IsValid() && MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtInGame.Count > 0 && !isHappenQuestDirection)
 		{
-			this.StartCoroutine(WaitQuestDetail());
+			StartCoroutine(WaitQuestDetail());
 		}
 	}
 
@@ -2882,7 +2845,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		}
 		int id = MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtInGame[0];
 		MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtInGame.RemoveAt(0);
-		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "QUEST_DETAIL", id, null, true);
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", base.gameObject, "QUEST_DETAIL", id, null, true);
 		while (GameSceneEvent.current.eventName == "QUEST_DETAIL")
 		{
 			yield return (object)null;
@@ -2892,11 +2855,10 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	private void SendComplete()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoSendComplete());
+		StartCoroutine(DoSendComplete());
 	}
 
-	private unsafe IEnumerator DoSendComplete()
+	private IEnumerator DoSendComplete()
 	{
 		if (MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
@@ -2905,7 +2867,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			if (QuestManager.IsValidInGameExplore())
 			{
 				Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-				if (Object.op_Implicit(boss))
+				if ((bool)boss)
 				{
 					MonoBehaviourSingleton<QuestManager>.I.UpdateExploreBossStatus(boss);
 				}
@@ -2914,8 +2876,8 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			{
 				yield return (object)null;
 			}
-			float start_time = Time.get_time();
-			while (!MonoBehaviourSingleton<CoopManager>.I.coopRoom.IsValidBattleComplete() && Time.get_time() - start_time < MonoBehaviourSingleton<InGameSettingsManager>.I.inGameProgress.waitCompleteOwnerTimeout)
+			float start_time = Time.time;
+			while (!MonoBehaviourSingleton<CoopManager>.I.coopRoom.IsValidBattleComplete() && Time.time - start_time < MonoBehaviourSingleton<InGameSettingsManager>.I.inGameProgress.waitCompleteOwnerTimeout)
 			{
 				yield return (object)null;
 			}
@@ -2925,17 +2887,28 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			}
 			int? nullable = MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.Find((ClearStatusQuest data) => data.questId == MonoBehaviourSingleton<QuestManager>.I.currentQuestID)?.questStatus;
 			OverwritePlayerRecorderForExplore(true);
-			CoopApp.QuestComplete(new Action<bool, Error>((object)/*Error near IL_0196: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			CoopApp.QuestComplete(delegate(bool is_success, Error result)
+			{
+				((_003CDoSendComplete_003Ec__Iterator22F)/*Error near IL_0196: stateMachine*/)._003C_003Ef__this.isRecvQuestComplete = true;
+				MonoBehaviourSingleton<CoopManager>.I.coopMyClient.EndBattle();
+				if (is_success)
+				{
+					MonoBehaviourSingleton<QuestManager>.I.SaveLastNewClearQuest(((_003CDoSendComplete_003Ec__Iterator22F)/*Error near IL_0196: stateMachine*/)._003Cstatus_003E__2);
+				}
+				else
+				{
+					((_003CDoSendComplete_003Ec__Iterator22F)/*Error near IL_0196: stateMachine*/)._003C_003Ef__this.isSendCompleteError = true;
+				}
+			});
 		}
 	}
 
 	private void SendArenaComplete()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoSendArenaComplete());
+		StartCoroutine(DoSendArenaComplete());
 	}
 
-	private unsafe IEnumerator DoSendArenaComplete()
+	private IEnumerator DoSendArenaComplete()
 	{
 		if (MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
@@ -2945,8 +2918,8 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			{
 				yield return (object)null;
 			}
-			float startTime = Time.get_time();
-			while (!MonoBehaviourSingleton<CoopManager>.I.coopRoom.IsValidBattleComplete() && Time.get_time() - startTime < MonoBehaviourSingleton<InGameSettingsManager>.I.inGameProgress.waitCompleteOwnerTimeout)
+			float startTime = Time.time;
+			while (!MonoBehaviourSingleton<CoopManager>.I.coopRoom.IsValidBattleComplete() && Time.time - startTime < MonoBehaviourSingleton<InGameSettingsManager>.I.inGameProgress.waitCompleteOwnerTimeout)
 			{
 				yield return (object)null;
 			}
@@ -2955,14 +2928,24 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				yield return (object)null;
 			}
 			int? nullable = MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.Find((ClearStatusQuest data) => data.questId == MonoBehaviourSingleton<QuestManager>.I.currentQuestID)?.questStatus;
-			CoopApp.ArenaComplete(new Action<bool, Error>((object)/*Error near IL_0155: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			CoopApp.ArenaComplete(delegate(bool isSuccess, Error result)
+			{
+				((_003CDoSendArenaComplete_003Ec__Iterator230)/*Error near IL_0155: stateMachine*/)._003C_003Ef__this.isRecvQuestComplete = true;
+				if (isSuccess)
+				{
+					MonoBehaviourSingleton<QuestManager>.I.SaveLastNewClearQuest(((_003CDoSendArenaComplete_003Ec__Iterator230)/*Error near IL_0155: stateMachine*/)._003Cstatus_003E__1);
+				}
+				else
+				{
+					((_003CDoSendArenaComplete_003Ec__Iterator230)/*Error near IL_0155: stateMachine*/)._003C_003Ef__this.isSendCompleteError = true;
+				}
+			});
 		}
 	}
 
 	private void SendArenaRetire()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoSendArenaRetire());
+		StartCoroutine(DoSendArenaRetire());
 	}
 
 	private IEnumerator DoSendArenaRetire()
@@ -2975,14 +2958,13 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		bool isTimeout = remaindTime <= 0f;
 		CoopApp.ArenaRetire(isTimeout, delegate
 		{
-			((_003CDoSendArenaRetire_003Ec__Iterator22F)/*Error near IL_0075: stateMachine*/)._003C_003Ef__this.isRecvQuestComplete = true;
+			((_003CDoSendArenaRetire_003Ec__Iterator231)/*Error near IL_0075: stateMachine*/)._003C_003Ef__this.isRecvQuestComplete = true;
 		});
 	}
 
 	private void SendRetire()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoSendRetire());
+		StartCoroutine(DoSendRetire());
 	}
 
 	private IEnumerator DoSendRetire()
@@ -2995,17 +2977,16 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		bool is_timeout = remaindTime <= 0f;
 		CoopApp.QuestRetire(is_timeout, delegate
 		{
-			((_003CDoSendRetire_003Ec__Iterator230)/*Error near IL_0075: stateMachine*/)._003C_003Ef__this.isRecvQuestComplete = true;
+			((_003CDoSendRetire_003Ec__Iterator232)/*Error near IL_0075: stateMachine*/)._003C_003Ef__this.isRecvQuestComplete = true;
 		});
 	}
 
 	private void SendRushProgress()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoSendRushProgress());
+		StartCoroutine(DoSendRushProgress());
 	}
 
-	private unsafe IEnumerator DoSendRushProgress()
+	private IEnumerator DoSendRushProgress()
 	{
 		yield return (object)null;
 		int wave = MonoBehaviourSingleton<InGameManager>.I.GetCurrentWaveNum();
@@ -3022,16 +3003,22 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		isRecvRushProgress = false;
 		MonoBehaviourSingleton<InGameManager>.I.RecordRushWaveSyncData();
 		yield return (object)null;
-		MonoBehaviourSingleton<QuestManager>.I.SendQuestRushProgress(wave, remainSec, breakIds, clearMissions, memIds, hpRate, logs, new Action<bool, Error>((object)/*Error near IL_0142: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<QuestManager>.I.SendQuestRushProgress(wave, remainSec, breakIds, clearMissions, memIds, hpRate, logs, delegate
+		{
+			((_003CDoSendRushProgress_003Ec__Iterator233)/*Error near IL_0142: stateMachine*/)._003C_003Ef__this.isRecvRushProgress = true;
+			if (((_003CDoSendRushProgress_003Ec__Iterator233)/*Error near IL_0142: stateMachine*/)._003C_003Ef__this.progressEndType == PROGRESS_END_TYPE.QUEST_VICTORY)
+			{
+				((_003CDoSendRushProgress_003Ec__Iterator233)/*Error near IL_0142: stateMachine*/)._003C_003Ef__this.SendComplete();
+			}
+		});
 	}
 
 	private void SendArenaProgress()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoSendArenaProgress());
+		StartCoroutine(DoSendArenaProgress());
 	}
 
-	private unsafe IEnumerator DoSendArenaProgress()
+	private IEnumerator DoSendArenaProgress()
 	{
 		yield return (object)null;
 		ArenaProgressModel.RequestSendForm requestData = new ArenaProgressModel.RequestSendForm
@@ -3043,7 +3030,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			logs = MonoBehaviourSingleton<CoopManager>.I.coopStage.battleUserLog.list,
 			enemyHp = MonoBehaviourSingleton<InGameRecorder>.I.GetTotalEnemyHP()
 		};
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null)
 		{
 			requestData.actioncount = MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.GetTaskCount();
 			MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.Clear();
@@ -3055,7 +3042,14 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		}
 		isRecvArenaProgress = false;
 		yield return (object)null;
-		MonoBehaviourSingleton<QuestManager>.I.SendQuestArenaProgress(requestData, new Action<bool, Error>((object)/*Error near IL_01a7: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<QuestManager>.I.SendQuestArenaProgress(requestData, delegate
+		{
+			((_003CDoSendArenaProgress_003Ec__Iterator234)/*Error near IL_01a7: stateMachine*/)._003C_003Ef__this.isRecvArenaProgress = true;
+			if (((_003CDoSendArenaProgress_003Ec__Iterator234)/*Error near IL_01a7: stateMachine*/)._003C_003Ef__this.progressEndType == PROGRESS_END_TYPE.QUEST_VICTORY)
+			{
+				((_003CDoSendArenaProgress_003Ec__Iterator234)/*Error near IL_01a7: stateMachine*/)._003C_003Ef__this.SendArenaComplete();
+			}
+		});
 	}
 
 	public void OnDamage(AttackedHitStatusFix status, Character chara)
@@ -3076,8 +3070,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	private void ChangeSceneToInterval()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoChangeSceneToInterval());
+		StartCoroutine(DoChangeSceneToInterval());
 	}
 
 	private IEnumerator DoChangeSceneToInterval()
@@ -3087,7 +3080,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			MonoBehaviourSingleton<UIManager>.I.loading.SetActiveDragon(true);
 			yield return (object)new WaitForEndOfFrame();
 		}
-		yield return (object)this.StartCoroutine(DoCloseDialog());
+		yield return (object)StartCoroutine(DoCloseDialog());
 		yield return (object)MonoBehaviourSingleton<AppMain>.I.ClearEnemyAssets();
 		if (MonoBehaviourSingleton<UIManager>.IsValid())
 		{
@@ -3096,21 +3089,20 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			yield return (object)new WaitForEndOfFrame();
 		}
 		isGameProgressStop = false;
-		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "INTERVAL", null, null, true);
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", base.gameObject, "INTERVAL", null, null, true);
 	}
 
 	private void ChangeSceneToFieldQuestStory()
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 		MonoBehaviourSingleton<InGameManager>.I.SaveQuestTransferInfo();
-		this.StartCoroutine(DoChangeSceneToFieldQuestStory());
+		StartCoroutine(DoChangeSceneToFieldQuestStory());
 	}
 
 	private IEnumerator DoChangeSceneToFieldQuestStory()
 	{
-		yield return (object)this.StartCoroutine(DoCloseDialog());
+		yield return (object)StartCoroutine(DoCloseDialog());
 		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
-		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "STORY", new object[3]
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", base.gameObject, "STORY", new object[3]
 		{
 			questData.storyId,
 			0,
@@ -3120,15 +3112,14 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	private void ChangeSceneToResult()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoChangeSceneToResult());
+		StartCoroutine(DoChangeSceneToResult());
 	}
 
 	private IEnumerator DoChangeSceneToResult()
 	{
 		MonoBehaviourSingleton<UIManager>.I.loading.SetActiveDragon(true);
 		yield return (object)new WaitForEndOfFrame();
-		yield return (object)this.StartCoroutine(DoCloseDialog());
+		yield return (object)StartCoroutine(DoCloseDialog());
 		string event_name = (!MonoBehaviourSingleton<InGameRecorder>.IsValid() || !MonoBehaviourSingleton<InGameRecorder>.I.isVictory) ? "FRIEND" : "RESULT";
 		if (MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.IsRush())
 		{
@@ -3146,18 +3137,17 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		{
 			event_name = ((!MonoBehaviourSingleton<InGameRecorder>.IsValid() || !MonoBehaviourSingleton<InGameRecorder>.I.isVictory) ? "TRIAL_RETIRE" : "TRIAL_RESULT");
 		}
-		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), event_name, null, null, true);
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", base.gameObject, event_name, null, null, true);
 	}
 
 	public void ReloadScene()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoReloadScene());
+		StartCoroutine(DoReloadScene());
 	}
 
 	private IEnumerator DoReloadScene()
 	{
-		yield return (object)this.StartCoroutine(DoCloseDialog());
+		yield return (object)StartCoroutine(DoCloseDialog());
 		isBattleStart = false;
 		progressEndType = PROGRESS_END_TYPE.NONE;
 		isGameProgressStop = false;
@@ -3175,30 +3165,28 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	private void ChangeSceneToHome()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoChangeSceneToHome());
+		StartCoroutine(DoChangeSceneToHome());
 	}
 
 	private IEnumerator DoChangeSceneToHome()
 	{
-		yield return (object)this.StartCoroutine(DoCloseDialog());
-		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "HOME", null, null, true);
+		yield return (object)StartCoroutine(DoCloseDialog());
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", base.gameObject, "HOME", null, null, true);
 	}
 
 	private void ChangeSceneToStory(uint deliveryID)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoChangeSceneToStory(deliveryID));
+		StartCoroutine(DoChangeSceneToStory(deliveryID));
 	}
 
-	private unsafe IEnumerator DoChangeSceneToStory(uint deliveryID)
+	private IEnumerator DoChangeSceneToStory(uint deliveryID)
 	{
-		yield return (object)this.StartCoroutine(DoCloseDialog());
+		yield return (object)StartCoroutine(DoCloseDialog());
 		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData(deliveryID);
 		Delivery[] deliveryList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList(true);
 		Delivery delivery = Array.Find(deliveryList, delegate(Delivery o)
 		{
-			if (o.dId == (int)((_003CDoChangeSceneToStory_003Ec__Iterator238)/*Error near IL_0077: stateMachine*/).deliveryID)
+			if (o.dId == (int)((_003CDoChangeSceneToStory_003Ec__Iterator23A)/*Error near IL_0077: stateMachine*/).deliveryID)
 			{
 				return true;
 			}
@@ -3213,21 +3201,62 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			int clearEventID = (int)deliveryTableData.clearEventID;
 			bool enable_clear_event = 0 != clearEventID;
 			bool flag = !TutorialStep.HasFirstDeliveryCompleted();
-			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(delivery.uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)/*Error near IL_00ef: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(delivery.uId, enable_clear_event, delegate(bool is_success, DeliveryRewardList recv_reward)
+			{
+				if (is_success)
+				{
+					List<FieldMapTable.PortalTableData> deliveryRelationPortalData = Singleton<FieldMapTable>.I.GetDeliveryRelationPortalData(((_003CDoChangeSceneToStory_003Ec__Iterator23A)/*Error near IL_00ef: stateMachine*/).deliveryID);
+					for (int i = 0; i < deliveryRelationPortalData.Count; i++)
+					{
+						GameSaveData.instance.newReleasePortals.Add(deliveryRelationPortalData[i].portalID);
+					}
+					if (((_003CDoChangeSceneToStory_003Ec__Iterator23A)/*Error near IL_00ef: stateMachine*/)._003Cis_tutorial_003E__5)
+					{
+						TutorialStep.isSendFirstRewardComplete = true;
+					}
+					if (((_003CDoChangeSceneToStory_003Ec__Iterator23A)/*Error near IL_00ef: stateMachine*/)._003Cis_tutorial_003E__5 && ((_003CDoChangeSceneToStory_003Ec__Iterator23A)/*Error near IL_00ef: stateMachine*/)._003CclearEventID_003E__3 == 10000002)
+					{
+						object[] data = new object[2]
+						{
+							(int)((_003CDoChangeSceneToStory_003Ec__Iterator23A)/*Error near IL_00ef: stateMachine*/).deliveryID,
+							recv_reward
+						};
+						EventData[] autoEvents = new EventData[2]
+						{
+							new EventData("MAIN_MENU_HOME", null),
+							new EventData("DELIVERY_CLEAR_REWARD", data)
+						};
+						MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
+					}
+					else
+					{
+						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", ((_003CDoChangeSceneToStory_003Ec__Iterator23A)/*Error near IL_00ef: stateMachine*/)._003C_003Ef__this.gameObject, "STORY", new object[3]
+						{
+							((_003CDoChangeSceneToStory_003Ec__Iterator23A)/*Error near IL_00ef: stateMachine*/)._003CclearEventID_003E__3,
+							(int)((_003CDoChangeSceneToStory_003Ec__Iterator23A)/*Error near IL_00ef: stateMachine*/).deliveryID,
+							recv_reward
+						}, null, true);
+					}
+					MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtInGame.Clear();
+				}
+				else
+				{
+					((_003CDoChangeSceneToStory_003Ec__Iterator23A)/*Error near IL_00ef: stateMachine*/)._003C_003Ef__this.ChangeSceneToHome();
+				}
+			});
 		}
 	}
 
 	private void ChangeSceneFieldReadStory()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		MonoBehaviourSingleton<InGameManager>.I.SaveQuestTransferInfo();
-		this.StartCoroutine(DoChangeSceneFieldReadStory(fieldReadStoryId));
+		StartCoroutine(DoChangeSceneFieldReadStory(fieldReadStoryId));
 	}
 
 	private IEnumerator DoChangeSceneFieldReadStory(int storyId)
 	{
-		yield return (object)this.StartCoroutine(DoCloseDialog());
-		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "STORY", new object[3]
+		yield return (object)StartCoroutine(DoCloseDialog());
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", base.gameObject, "STORY", new object[3]
 		{
 			storyId,
 			0,
@@ -3237,13 +3266,12 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	public void CloseDialog()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoCloseDialog());
+		StartCoroutine(DoCloseDialog());
 	}
 
 	private IEnumerator DoCloseDialog()
 	{
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null && MonoBehaviourSingleton<UIManager>.I.mainChat.IsOpeningWindow())
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null && MonoBehaviourSingleton<UIManager>.I.mainChat.IsOpeningWindow())
 		{
 			MonoBehaviourSingleton<UIManager>.I.mainChat.HideAll();
 		}
@@ -3251,7 +3279,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		{
 			MonoBehaviourSingleton<UIInGameMenu>.I.Close();
 		}
-		yield return (object)this.StartCoroutine(_DoCloseDialog());
+		yield return (object)StartCoroutine(_DoCloseDialog());
 	}
 
 	private IEnumerator _DoCloseDialog()
@@ -3262,8 +3290,8 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		}
 		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionType().IsDialog())
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "[BACK]", null, null, true);
-			yield return (object)this.StartCoroutine(_DoCloseDialog());
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", base.gameObject, "[BACK]", null, null, true);
+			yield return (object)StartCoroutine(_DoCloseDialog());
 		}
 	}
 
@@ -3273,7 +3301,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		{
 			UIInGameFieldMenu.I.SetDisableButtons(disable);
 			InGameMain inGameMain = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentScreen() as InGameMain;
-			if (inGameMain != null)
+			if ((UnityEngine.Object)inGameMain != (UnityEngine.Object)null)
 			{
 				inGameMain.SetMapButtonState();
 			}
@@ -3290,27 +3318,27 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		{
 			MonoBehaviourSingleton<UIContinueButton>.I.SetDisableButtons(disable);
 		}
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != null)
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != (UnityEngine.Object)null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.SetDisableButton(disable);
 		}
 		InGameMain inGameMain2 = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentScreen() as InGameMain;
-		if (inGameMain2 != null)
+		if ((UnityEngine.Object)inGameMain2 != (UnityEngine.Object)null)
 		{
 			Transform ctrl = inGameMain2.GetCtrl(InGameMain.UI.BTN_CHAT);
-			if (ctrl != null)
+			if ((UnityEngine.Object)ctrl != (UnityEngine.Object)null)
 			{
 				UIButton component = ctrl.GetComponent<UIButton>();
-				if (component != null)
+				if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 				{
 					component.isEnabled = !disable;
 				}
 			}
 			Transform ctrl2 = inGameMain2.GetCtrl(InGameMain.UI.BTN_QUEST_MENU);
-			if (ctrl2 != null)
+			if ((UnityEngine.Object)ctrl2 != (UnityEngine.Object)null)
 			{
 				UIButton component2 = ctrl2.GetComponent<UIButton>();
-				if (component2 != null)
+				if ((UnityEngine.Object)component2 != (UnityEngine.Object)null)
 				{
 					component2.isEnabled = !disable;
 				}
@@ -3324,7 +3352,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		{
 			isInitStartTime = true;
 			elapsedTime = elapsed_time;
-			startTime = Time.get_time();
+			startTime = Time.time;
 			stopTime = -1f;
 			MonoBehaviourSingleton<InGameManager>.I.StopIntervalTransferInfoRemaindTimeUpdate();
 			bool flag = QuestManager.IsValidInGameExplore() || MonoBehaviourSingleton<InGameManager>.I.IsRush() || QuestManager.IsValidInGameSeries() || QuestManager.IsValidInGameWaveMatch(false);
@@ -3372,7 +3400,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 	{
 		if (enableLimitTime)
 		{
-			float num = Time.get_time() - startTime;
+			float num = Time.time - startTime;
 			elapsedTime = elapsed_time - num;
 		}
 	}
@@ -3390,11 +3418,11 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		float num = 0f;
 		if (IsStartTimer())
 		{
-			num += Time.get_time() - startTime + elapsedTime;
+			num += Time.time - startTime + elapsedTime;
 		}
 		if (IsStopTimer())
 		{
-			num -= Time.get_time() - stopTime;
+			num -= Time.time - stopTime;
 		}
 		if (num < 0f)
 		{
@@ -3426,14 +3454,14 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	public void StopTimer()
 	{
-		stopTime = Time.get_time();
+		stopTime = Time.time;
 	}
 
 	public void RestartTimer()
 	{
 		if (isInitStartTime && IsStopTimer())
 		{
-			startTime += Time.get_time() - stopTime;
+			startTime += Time.time - stopTime;
 			stopTime = -1f;
 		}
 	}
@@ -3595,7 +3623,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 	{
 		if (MonoBehaviourSingleton<FieldManager>.IsValid() && !(remainedAfkTime <= 0f))
 		{
-			afkTime -= Time.get_deltaTime();
+			afkTime -= Time.deltaTime;
 		}
 	}
 
@@ -3610,7 +3638,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 	{
 		if (!(bossMoveRemainTime <= 0f))
 		{
-			bossMoveRemainTime -= Time.get_deltaTime();
+			bossMoveRemainTime -= Time.deltaTime;
 		}
 	}
 
@@ -3628,15 +3656,14 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	private void ProgressExploreHostDCTimer()
 	{
-		exploreHostDCRemainTime -= Time.get_deltaTime();
+		exploreHostDCRemainTime -= Time.deltaTime;
 	}
 
 	public void ExploreHappenQuestDirection()
 	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 		if (progressEndType == PROGRESS_END_TYPE.NONE && MonoBehaviourSingleton<QuestManager>.I.GetExploreBossAppearMapId() == (int)MonoBehaviourSingleton<FieldManager>.I.currentMapID)
 		{
-			this.StartCoroutine(DoExploreHappenQuestDirection());
+			StartCoroutine(DoExploreHappenQuestDirection());
 		}
 	}
 
@@ -3644,7 +3671,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 	{
 		isGameProgressStop = true;
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		if (self != null)
+		if ((UnityEngine.Object)self != (UnityEngine.Object)null)
 		{
 			self.hitOffFlag |= StageObject.HIT_OFF_FLAG.FORCE;
 		}
@@ -3663,7 +3690,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				yield return (object)null;
 			}
 			SetDisableUIOpen(true);
-			yield return (object)this.StartCoroutine(DoCloseDialog());
+			yield return (object)StartCoroutine(DoCloseDialog());
 			PartyModel.ExploreInfo exploreData = MonoBehaviourSingleton<PartyManager>.I.partyData.quest.explore;
 			int rareType = 0;
 			if (exploreData != null)
@@ -3676,7 +3703,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			}
 			yield return (object)new WaitForSeconds(3f);
 			SetDisableUIOpen(false);
-			if (self != null && self.controller != null)
+			if ((UnityEngine.Object)self != (UnityEngine.Object)null && (UnityEngine.Object)self.controller != (UnityEngine.Object)null)
 			{
 				self.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.BATTLE_END);
 			}
@@ -3686,7 +3713,6 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 
 	public bool HappenQuestDirection(uint link_quest_id, QuestInfoData.Quest.Reward[] reward = null, int rareBossType = 0)
 	{
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 		if (progressEndType != 0)
 		{
 			return false;
@@ -3712,16 +3738,16 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			return false;
 		}
 		isHappenQuestDirection = true;
-		this.StartCoroutine(DoHappenQuestDirection(link_quest_id, reward, rareBossType));
+		StartCoroutine(DoHappenQuestDirection(link_quest_id, reward, rareBossType));
 		return true;
 	}
 
-	private unsafe IEnumerator DoHappenQuestDirection(uint link_quest_id, QuestInfoData.Quest.Reward[] reward = null, int rareBossType = 0)
+	private IEnumerator DoHappenQuestDirection(uint link_quest_id, QuestInfoData.Quest.Reward[] reward = null, int rareBossType = 0)
 	{
 		InGameSettingsManager.HappenQuestDirection parameter = MonoBehaviourSingleton<InGameSettingsManager>.I.happenQuestDirection;
 		isGameProgressStop = true;
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		if (self != null)
+		if ((UnityEngine.Object)self != (UnityEngine.Object)null)
 		{
 			self.hitOffFlag |= StageObject.HIT_OFF_FLAG.FORCE;
 		}
@@ -3738,7 +3764,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			yield return (object)null;
 		}
 		SetDisableUIOpen(true);
-		yield return (object)this.StartCoroutine(DoCloseDialog());
+		yield return (object)StartCoroutine(DoCloseDialog());
 		uint enemy_id = 0u;
 		QuestTable.QuestTableData quest_data = Singleton<QuestTable>.I.GetQuestData(link_quest_id);
 		if (quest_data == null)
@@ -3758,8 +3784,8 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		{
 			MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.Play(enemy_data.type, rareBossType, false);
 		}
-		float before_time = Time.get_time();
-		while (Time.get_time() - before_time < parameter.warningTime && !endHappenQuestDirection)
+		float before_time = Time.time;
+		while (Time.time - before_time < parameter.warningTime && !endHappenQuestDirection)
 		{
 			yield return (object)null;
 		}
@@ -3771,12 +3797,12 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 		{
 			if (MonoBehaviourSingleton<UIInGameFieldQuestWarning>.IsValid())
 			{
-				MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.get_gameObject().SetActive(false);
+				MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.gameObject.SetActive(false);
 			}
 			if (progressEndType == PROGRESS_END_TYPE.NONE)
 			{
 				isGameProgressStop = false;
-				if (self != null)
+				if ((UnityEngine.Object)self != (UnityEngine.Object)null)
 				{
 					self.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.FORCE;
 				}
@@ -3789,7 +3815,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			yield return (object)MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.BLACK);
 			SetDisableUIOpen(false);
 			ViewUI(false);
-			if (self != null && self.controller != null)
+			if ((UnityEngine.Object)self != (UnityEngine.Object)null && (UnityEngine.Object)self.controller != (UnityEngine.Object)null)
 			{
 				self.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.BATTLE_END);
 			}
@@ -3804,15 +3830,15 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			Transform model = null;
 			EnemyLoader enemy_loader = null;
 			EnemyAnimCtrl anim_ctrl = null;
-			Vector3 enemyInitPos = Vector3.get_zero();
+			Vector3 enemyInitPos = Vector3.zero;
 			LoadObject lo_cam_portrait = null;
 			LoadObject lo_cam_landscape = null;
 			Vector3[] camera_offsets = null;
 			if (enemy_data != null)
 			{
-				model = Utility.CreateGameObject("HappenQuestModel", this.get_transform(), -1);
-				enemy_loader = model.get_gameObject().AddComponent<EnemyLoader>();
-				model.set_position(Vector3.get_zero());
+				model = Utility.CreateGameObject("HappenQuestModel", base.transform, -1);
+				enemy_loader = model.gameObject.AddComponent<EnemyLoader>();
+				model.position = Vector3.zero;
 				int anim_id = enemy_data.animId;
 				OutGameSettingsManager.EnemyDisplayInfo dispInfoAnim = MonoBehaviourSingleton<OutGameSettingsManager>.I.SearchEnemyDisplayInfoForQuestSelect(enemy_data);
 				InGameSettingsManager.HappenQuestDirection.EnemyDisplayInfo disp_info;
@@ -3833,7 +3859,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 					anim_id = dispInfoAnim.animID;
 				}
 				enemyInitPos = parameter.enemyInitPos;
-				if (disp_info != null && disp_info.modelOffset != Vector3.get_zero())
+				if (disp_info != null && disp_info.modelOffset != Vector3.zero)
 				{
 					enemyInitPos = disp_info.modelOffset;
 				}
@@ -3848,7 +3874,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				}
 				if (disp_info != null)
 				{
-					Vector3[] temp_offsets = (Vector3[])new Vector3[2]
+					Vector3[] temp_offsets = new Vector3[2]
 					{
 						disp_info.cameraOffsetPortrait,
 						disp_info.cameraOffsetLandscape
@@ -3858,14 +3884,14 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				bool load_finish = false;
 				enemy_loader.StartLoad(enemy_data.modelId, anim_id, enemy_data.modelScale, enemy_data.baseEffectName, enemy_data.baseEffectNode, true, true, true, ShaderGlobal.GetCharacterShaderType(), 18, null, true, false, delegate
 				{
-					((_003CDoHappenQuestDirection_003Ec__Iterator23D)/*Error near IL_068b: stateMachine*/)._003Cload_finish_003E__18 = true;
+					((_003CDoHappenQuestDirection_003Ec__Iterator23F)/*Error near IL_068b: stateMachine*/)._003Cload_finish_003E__18 = true;
 				});
 				while (!load_finish)
 				{
 					yield return (object)null;
 				}
 				yield return (object)load_queue.Wait();
-				anim_ctrl = model.get_gameObject().AddComponent<EnemyAnimCtrl>();
+				anim_ctrl = model.gameObject.AddComponent<EnemyAnimCtrl>();
 				anim_ctrl.Init(enemy_loader, null, true);
 				Utility.SetLayerWithChildren(model, 18);
 			}
@@ -3877,41 +3903,44 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 				int j = 0;
 				for (int len2 = stage_objects.Length; j < len2; j++)
 				{
-					if (stage_objects[j].get_gameObject().get_layer() == 0)
+					if (stage_objects[j].gameObject.layer == 0)
 					{
-						stage_objects[j].get_gameObject().set_layer(18);
-						change_layer_list.Add(stage_objects[j].get_gameObject());
+						stage_objects[j].gameObject.layer = 18;
+						change_layer_list.Add(stage_objects[j].gameObject);
 					}
-					if (stage_objects[j].get_name().Contains("HideObjects"))
+					if (stage_objects[j].name.Contains("HideObjects"))
 					{
-						stage_objects[j].get_gameObject().SetActive(false);
-						hideObjectList.Add(stage_objects[j].get_gameObject());
+						stage_objects[j].gameObject.SetActive(false);
+						hideObjectList.Add(stage_objects[j].gameObject);
 					}
 				}
 			}
-			if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && enemy_loader != null && enemy_loader.body != null)
+			if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && (UnityEngine.Object)enemy_loader != (UnityEngine.Object)null && (UnityEngine.Object)enemy_loader.body != (UnityEngine.Object)null)
 			{
-				Object[] cameras = (Object[])new Object[2]
+				UnityEngine.Object[] cameras = new UnityEngine.Object[2]
 				{
 					lo_cam_portrait.loadedObject,
 					lo_cam_landscape.loadedObject
 				};
 				MonoBehaviourSingleton<InGameCameraManager>.I.OnHappenQuestDirection(true, enemy_loader.body, cameras, camera_offsets);
 			}
-			if (model != null && enemy_loader != null && enemy_loader.body != null)
+			if ((UnityEngine.Object)model != (UnityEngine.Object)null && (UnityEngine.Object)enemy_loader != (UnityEngine.Object)null && (UnityEngine.Object)enemy_loader.body != (UnityEngine.Object)null)
 			{
-				model.get_transform().set_position(Vector3.Scale(enemyInitPos, enemy_loader.body.get_lossyScale()));
-				model.get_transform().set_rotation(Quaternion.AngleAxis(parameter.enemyInitDir, Vector3.get_up()));
+				model.transform.position = Vector3.Scale(enemyInitPos, enemy_loader.body.lossyScale);
+				model.transform.rotation = Quaternion.AngleAxis(parameter.enemyInitDir, Vector3.up);
 			}
 			bool anim_end = false;
-			anim_ctrl.PlayQuestStartAnim(new Action((object)/*Error near IL_0933: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			anim_ctrl.PlayQuestStartAnim(delegate
+			{
+				((_003CDoHappenQuestDirection_003Ec__Iterator23F)/*Error near IL_0933: stateMachine*/)._003Canim_end_003E__25 = true;
+			});
 			if (!forceComplete)
 			{
 				yield return (object)MonoBehaviourSingleton<TransitionManager>.I.In();
 			}
 			if (MonoBehaviourSingleton<UIInGameFieldQuestWarning>.IsValid())
 			{
-				MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.get_gameObject().SetActive(false);
+				MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.gameObject.SetActive(false);
 			}
 			while (!anim_end && !endHappenQuestDirection)
 			{
@@ -3930,7 +3959,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 					questData = quest_data,
 					reward = reward
 				};
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "HAPPEN_QUEST", desc, null, true);
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", base.gameObject, "HAPPEN_QUEST", desc, null, true);
 				while (!MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 				{
 					yield return (object)null;
@@ -3945,7 +3974,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 						}
 						if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection() is InGameFieldQuestConfirm)
 						{
-							MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "[BACK]", null, null, true);
+							MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", base.gameObject, "[BACK]", null, null, true);
 						}
 						break;
 					}
@@ -3969,23 +3998,23 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 					MonoBehaviourSingleton<InGameManager>.I.disableHappenQuestIdList.Add(link_quest_id);
 				}
 				yield return (object)MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.BLACK);
-				if (enemy_loader != null)
+				if ((UnityEngine.Object)enemy_loader != (UnityEngine.Object)null)
 				{
 					enemy_loader.DeleteLoadedObjects();
-					Object.DestroyImmediate(enemy_loader);
+					UnityEngine.Object.DestroyImmediate(enemy_loader);
 				}
-				if (model != null)
+				if ((UnityEngine.Object)model != (UnityEngine.Object)null)
 				{
-					Object.Destroy(model.get_gameObject());
+					UnityEngine.Object.Destroy(model.gameObject);
 				}
 				int i = 0;
 				for (int len = change_layer_list.Count; i < len; i++)
 				{
-					change_layer_list[i].set_layer(0);
+					change_layer_list[i].layer = 0;
 				}
 				foreach (GameObject item in hideObjectList)
 				{
-					if (item != null)
+					if ((UnityEngine.Object)item != (UnityEngine.Object)null)
 					{
 						item.SetActive(true);
 					}
@@ -4002,10 +4031,10 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 					{
 						MonoBehaviourSingleton<DropTargetMarkerManeger>.I.active = true;
 					}
-					if (self != null)
+					if ((UnityEngine.Object)self != (UnityEngine.Object)null)
 					{
 						self.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.FORCE;
-						if (self.controller != null)
+						if ((UnityEngine.Object)self.controller != (UnityEngine.Object)null)
 						{
 							self.controller.SetEnableControll(true, ControllerBase.DISABLE_FLAG.BATTLE_END);
 						}
@@ -4077,7 +4106,7 @@ public class InGameProgress : MonoBehaviourSingleton<InGameProgress>
 			{
 				MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.ForEach(delegate(CoopClient x)
 				{
-					if (x.GetPlayer() != null)
+					if ((UnityEngine.Object)x.GetPlayer() != (UnityEngine.Object)null)
 					{
 						MonoBehaviourSingleton<QuestManager>.I.UpdateExplorePlayerStatus(x);
 					}

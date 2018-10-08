@@ -6,7 +6,7 @@ using UnityEngine.SocialPlatforms;
 
 namespace GooglePlayGames
 {
-	public class PlayGamesLeaderboard
+	public class PlayGamesLeaderboard : ILeaderboard
 	{
 		private string mId;
 
@@ -56,13 +56,10 @@ namespace GooglePlayGames
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return mUserScope;
 			}
 			set
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 				mUserScope = value;
 			}
 		}
@@ -71,13 +68,10 @@ namespace GooglePlayGames
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return mRange;
 			}
 			set
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 				mRange = value;
 			}
 		}
@@ -86,13 +80,10 @@ namespace GooglePlayGames
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return mTimeScope;
 			}
 			set
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 				mTimeScope = value;
 			}
 		}
@@ -107,7 +98,7 @@ namespace GooglePlayGames
 			{
 				PlayGamesScore[] array = new PlayGamesScore[mScoreList.Count];
 				mScoreList.CopyTo(array);
-				return (IScore[])array;
+				return array;
 			}
 		}
 
@@ -134,14 +125,14 @@ namespace GooglePlayGames
 		{
 			if (data.Valid)
 			{
-				Debug.Log((object)("Setting leaderboard from: " + data));
+				Debug.Log("Setting leaderboard from: " + data);
 				SetMaxRange(data.ApproximateCount);
 				SetTitle(data.Title);
 				SetLocalUserScore((PlayGamesScore)data.PlayerScore);
 				IScore[] scores = data.Scores;
-				foreach (IScore val in scores)
+				foreach (IScore score in scores)
 				{
-					AddScore((PlayGamesScore)val);
+					AddScore((PlayGamesScore)score);
 				}
 				mLoading = (data.Scores.Length == 0 || HasAllScores());
 			}

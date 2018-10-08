@@ -45,18 +45,18 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 		}
 		if (array == null || array.Length == 0)
 		{
-			SetActive((Enum)UI.STR_NON_LIST, true);
-			SetActive((Enum)UI.GRD_LIST, false);
+			SetActive(UI.STR_NON_LIST, true);
+			SetActive(UI.GRD_LIST, false);
 		}
 		else
 		{
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			SetActive((Enum)UI.GRD_LIST, true);
+			SetActive(UI.STR_NON_LIST, false);
+			SetActive(UI.GRD_LIST, true);
 			UpdateDynamicList();
 		}
 	}
 
-	protected unsafe virtual void UpdateDynamicList()
+	protected virtual void UpdateDynamicList()
 	{
 		FriendCharaInfo[] info = null;
 		int item_num = 0;
@@ -68,8 +68,10 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 				item_num = info.Length;
 			}
 		}
-		_003CUpdateDynamicList_003Ec__AnonStorey318 _003CUpdateDynamicList_003Ec__AnonStorey;
-		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetDynamicList(UI.GRD_LIST, GetListItemName, item_num, false, null, null, delegate(int i, Transform t, bool is_recycle)
+		{
+			SetListItem(i, t, is_recycle, info[i]);
+		});
 	}
 
 	protected virtual void SetListItem(int i, Transform t, bool is_recycle, FriendCharaInfo data)
@@ -80,10 +82,6 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 
 	protected void SetCharaInfo(FriendCharaInfo data, int i, Transform t, bool is_recycle, bool isGM)
 	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
 		object[] event_data = new object[2]
 		{
 			data.userId,
@@ -205,10 +203,21 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 		ListUI();
 	}
 
-	protected unsafe override void SendGetList(int page, Action<bool> callback)
+	protected override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey31A _003CSendGetList_003Ec__AnonStorey31A;
-		MonoBehaviourSingleton<FriendManager>.I.SendGetFollowList(page, new Action<bool, FriendFollowListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey31A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<FriendManager>.I.SendGetFollowList(page, delegate(bool is_success, FriendFollowListModel.Param recv_data)
+		{
+			if (is_success)
+			{
+				recvList = recv_data.follow;
+				nowPage = page;
+				pageNumMax = recv_data.pageNumMax;
+			}
+			if (callback != null)
+			{
+				callback(is_success);
+			}
+		});
 	}
 
 	protected override void PostSendGetListByReopen(int page)
@@ -235,10 +244,26 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 		return NOTIFY_FLAG.UPDATE_FRIEND_LIST;
 	}
 
-	private unsafe void OnQuery_CREATE()
+	private void OnQuery_CREATE()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildManager>.I.SendCreate(mInviteFriendIDs, new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<GuildManager>.I.SendCreate(mInviteFriendIDs, delegate(bool is_success, Error err)
+		{
+			GuildInformationStep3 guildInformationStep = this;
+			DoWaitProtocolBusyFinish(delegate
+			{
+				GameSection.ResumeEvent(true, null);
+				if (is_success)
+				{
+					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("GuildInformationStep3", guildInformationStep.gameObject, "STORY", new object[3]
+					{
+						80000001,
+						0,
+						0
+					}, null, true);
+				}
+			});
+		});
 	}
 
 	private void OnQuery_CLOSE()

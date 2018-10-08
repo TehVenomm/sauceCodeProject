@@ -61,7 +61,7 @@ public class GrabController
 	{
 		if (!IsGrabing())
 		{
-			grabStartTime = Time.get_realtimeSinceStartup();
+			grabStartTime = Time.realtimeSinceStartup;
 			duration = _duration;
 			releaseActionId = releaseActId;
 			releaseByWeakHit = _releaseByWeakHit;
@@ -78,7 +78,7 @@ public class GrabController
 
 	public bool IsReadyForRelease()
 	{
-		return IsGrabing() && Time.get_realtimeSinceStartup() - grabStartTime >= duration;
+		return IsGrabing() && Time.realtimeSinceStartup - grabStartTime >= duration;
 	}
 
 	public bool IsAliveGrabbedPlayerAll()
@@ -89,7 +89,7 @@ public class GrabController
 		}
 		for (int i = 0; i < grabbedPlayers.Count; i++)
 		{
-			if (grabbedPlayers[i] != null && !grabbedPlayers[i].isDead)
+			if ((Object)grabbedPlayers[i] != (Object)null && !grabbedPlayers[i].isDead)
 			{
 				return true;
 			}

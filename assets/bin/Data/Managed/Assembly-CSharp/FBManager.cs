@@ -95,11 +95,11 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 
 	private bool isActionExecuting;
 
-	public bool isInitialized => FB.get_IsInitialized();
+	public bool isInitialized => FB.IsInitialized;
 
-	public bool isLoggedIn => FB.get_IsLoggedIn();
+	public bool isLoggedIn => FB.IsLoggedIn;
 
-	public string accessToken => AccessToken.get_CurrentAccessToken().get_TokenString();
+	public string accessToken => AccessToken.CurrentAccessToken.TokenString;
 
 	public InvitableFriendInfo invitableFriendInfo
 	{
@@ -113,21 +113,18 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 		set;
 	}
 
-	protected unsafe override void Awake()
+	protected override void Awake()
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Expected O, but got Unknown
-		if (FB.get_IsInitialized())
+		if (FB.IsInitialized)
 		{
 			FB.ActivateApp();
 		}
 		else
 		{
-			if (_003C_003Ef__am_0024cache4 == null)
+			FB.Init(delegate
 			{
-				_003C_003Ef__am_0024cache4 = new InitDelegate((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			FB.Init(_003C_003Ef__am_0024cache4, null, (string)null);
+				FB.ActivateApp();
+			}, null, null);
 		}
 	}
 
@@ -153,14 +150,14 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 
 	private bool CheckLogin(Action<bool> callback)
 	{
-		if (!FB.get_IsLoggedIn())
+		if (!FB.IsLoggedIn)
 		{
 			return false;
 		}
 		return true;
 	}
 
-	public unsafe void LoginWithReadPermission(Action<bool, string> callback = null)
+	public void LoginWithReadPermission(Action<bool, string> callback = null)
 	{
 		if (CheckAndSetActionExecuting())
 		{
@@ -169,29 +166,28 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 			list.Add("public_profile");
 			list.Add("email");
 			list.Add("user_friends");
-			FB.LogInWithReadPermissions((IEnumerable<string>)list, new FacebookDelegate<ILoginResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			FB.LogInWithReadPermissions(list, _OnActionComplete);
 		}
 	}
 
-	public unsafe void LoginWithPublishPermission(Action<bool, string> callback = null)
+	public void LoginWithPublishPermission(Action<bool, string> callback = null)
 	{
 		if (CheckAndSetActionExecuting())
 		{
 			OnActionCallback = callback;
 			List<string> list = new List<string>();
 			list.Add("publish_actions");
-			FB.LogInWithPublishPermissions((IEnumerable<string>)list, new FacebookDelegate<ILoginResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			FB.LogInWithPublishPermissions(list, _OnActionComplete);
 		}
 	}
 
 	public void Logout(Action<bool, string> callback = null)
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		if (CheckAndSetActionExecuting())
 		{
 			OnActionCallback = callback;
 			FB.LogOut();
-			this.StartCoroutine(CheckLogOutStatus());
+			StartCoroutine(CheckLogOutStatus());
 		}
 	}
 
@@ -199,9 +195,9 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 	{
 		float timecount = 0f;
 		bool success = true;
-		while (FB.get_IsLoggedIn())
+		while (FB.IsLoggedIn)
 		{
-			timecount += Time.get_deltaTime();
+			timecount += Time.deltaTime;
 			if (!(timecount < 5f))
 			{
 				success = false;
@@ -212,18 +208,18 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 		SetActionExecutingFlag(false);
 		if (OnActionCallback != null)
 		{
-			OnActionCallback.Invoke(success, (string)null);
+			OnActionCallback(success, null);
 		}
 	}
 
-	public unsafe void ShareLink(string url, string contentTitle = "", string contentDescription = "", string photoURL = "", Action<bool, string> callback = null)
+	public void ShareLink(string url, string contentTitle = "", string contentDescription = "", string photoURL = "", Action<bool, string> callback = null)
 	{
 		if (CheckAndSetActionExecuting())
 		{
 			OnActionCallback = callback;
 			try
 			{
-				FB.ShareLink(new Uri(url), contentTitle, contentDescription, new Uri(photoURL), new FacebookDelegate<IShareResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				FB.ShareLink(new Uri(url), contentTitle, contentDescription, new Uri(photoURL), _OnActionComplete);
 			}
 			catch
 			{
@@ -232,14 +228,14 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 		}
 	}
 
-	public unsafe void ShareFeed(string told = "", string url = "", string title = "", string caption = "", string description = "", string pictureUrl = "", string mediaSource = "", Action<bool, string> callback = null)
+	public void ShareFeed(string told = "", string url = "", string title = "", string caption = "", string description = "", string pictureUrl = "", string mediaSource = "", Action<bool, string> callback = null)
 	{
 		if (CheckAndSetActionExecuting())
 		{
 			OnActionCallback = callback;
 			try
 			{
-				FB.FeedShare(told, new Uri(url), title, caption, description, new Uri(pictureUrl), mediaSource, new FacebookDelegate<IShareResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				FB.FeedShare(told, new Uri(url), title, caption, description, new Uri(pictureUrl), mediaSource, _OnActionComplete);
 			}
 			catch
 			{
@@ -248,14 +244,14 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 		}
 	}
 
-	public unsafe void AppInvite(Action<bool, string> callback = null)
+	public void AppInvite(Action<bool, string> callback = null)
 	{
 		if (CheckAndSetActionExecuting())
 		{
 			OnActionCallback = callback;
 			try
 			{
-				Mobile.AppInvite(new Uri("https://fb.me/892708710750483"), new Uri("http://i.imgur.com/zkYlB.jpg"), new FacebookDelegate<IAppInviteResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				FB.Mobile.AppInvite(new Uri("https://fb.me/892708710750483"), new Uri("http://i.imgur.com/zkYlB.jpg"), _OnActionComplete);
 			}
 			catch (Exception)
 			{
@@ -264,33 +260,74 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 		}
 	}
 
-	public unsafe void AppRequest(string message, List<string> to, string data, string title, Action<bool, AppRequestResult> callback = null)
+	public void AppRequest(string message, List<string> to, string data, string title, Action<bool, AppRequestResult> callback = null)
 	{
 		if (CheckAndSetActionExecuting())
 		{
-			_003CAppRequest_003Ec__AnonStorey7B4 _003CAppRequest_003Ec__AnonStorey7B;
-			OnActionCallback = new Action<bool, string>((object)_003CAppRequest_003Ec__AnonStorey7B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			FB.AppRequest(message, (IEnumerable<string>)to, (IEnumerable<object>)null, (IEnumerable<string>)null, (int?)null, data, title, new FacebookDelegate<IAppRequestResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			OnActionCallback = delegate(bool success, string json)
+			{
+				AppRequestResult arg = null;
+				if (success)
+				{
+					arg = JSONSerializer.Deserialize<AppRequestResult>(json);
+				}
+				callback(success, arg);
+			};
+			FB.AppRequest(message, to, null, null, null, data, title, _OnActionComplete);
 		}
 	}
 
-	public unsafe void GetInvitableFriends(Action<bool> callback)
+	public void GetInvitableFriends(Action<bool> callback)
 	{
 		if (CheckAndSetActionExecuting())
 		{
-			_003CGetInvitableFriends_003Ec__AnonStorey7B5 _003CGetInvitableFriends_003Ec__AnonStorey7B;
-			OnActionCallback = new Action<bool, string>((object)_003CGetInvitableFriends_003Ec__AnonStorey7B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			FB.API("/me/invitable_friends?fields=id,name,picture&pretty=0&limit=5000", 0, new FacebookDelegate<IGraphResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), (IDictionary<string, string>)null);
+			OnActionCallback = delegate(bool success, string data)
+			{
+				if (success)
+				{
+					try
+					{
+						invitableFriendInfo = JsonUtility.FromJson<InvitableFriendInfo>(data);
+						callback(true);
+					}
+					catch (Exception)
+					{
+						callback(false);
+					}
+				}
+				else
+				{
+					callback(false);
+				}
+			};
+			FB.API("/me/invitable_friends?fields=id,name,picture&pretty=0&limit=5000", HttpMethod.GET, (FacebookDelegate<IGraphResult>)_OnActionComplete, (IDictionary<string, string>)null);
 		}
 	}
 
-	public unsafe void GetFriends(Action<bool> callback)
+	public void GetFriends(Action<bool> callback)
 	{
 		if (CheckAndSetActionExecuting())
 		{
-			_003CGetFriends_003Ec__AnonStorey7B6 _003CGetFriends_003Ec__AnonStorey7B;
-			OnActionCallback = new Action<bool, string>((object)_003CGetFriends_003Ec__AnonStorey7B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			FB.API("/me/friends?fields=id,name,picture&pretty=0&limit=5000", 0, new FacebookDelegate<IGraphResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), (IDictionary<string, string>)null);
+			OnActionCallback = delegate(bool success, string data)
+			{
+				if (success)
+				{
+					try
+					{
+						friendInfo = JsonUtility.FromJson<FriendInfo>(data);
+						callback(true);
+					}
+					catch (Exception)
+					{
+						callback(false);
+					}
+				}
+				else
+				{
+					callback(false);
+				}
+			};
+			FB.API("/me/friends?fields=id,name,picture&pretty=0&limit=5000", HttpMethod.GET, (FacebookDelegate<IGraphResult>)_OnActionComplete, (IDictionary<string, string>)null);
 		}
 	}
 
@@ -303,23 +340,23 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 		}
 		else if (result == null)
 		{
-			OnActionCallback.Invoke(false, (string)null);
+			OnActionCallback(false, null);
 		}
-		else if (!string.IsNullOrEmpty(result.get_Error()))
+		else if (!string.IsNullOrEmpty(result.Error))
 		{
-			OnActionCallback.Invoke(false, result.get_Error());
+			OnActionCallback(false, result.Error);
 		}
-		else if (result.get_Cancelled())
+		else if (result.Cancelled)
 		{
-			OnActionCallback.Invoke(false, result.get_RawResult());
+			OnActionCallback(false, result.RawResult);
 		}
-		else if (!string.IsNullOrEmpty(result.get_RawResult()))
+		else if (!string.IsNullOrEmpty(result.RawResult))
 		{
-			OnActionCallback.Invoke(true, result.get_RawResult());
+			OnActionCallback(true, result.RawResult);
 		}
 		else
 		{
-			OnActionCallback.Invoke(false, (string)null);
+			OnActionCallback(false, null);
 		}
 	}
 }

@@ -28,7 +28,7 @@ public class SpearController : IWeaponController
 	{
 		get
 		{
-			if (owner == null)
+			if ((UnityEngine.Object)owner == (UnityEngine.Object)null)
 			{
 				return 0f;
 			}
@@ -36,7 +36,7 @@ public class SpearController : IWeaponController
 		}
 		set
 		{
-			if (!(owner == null))
+			if (!((UnityEngine.Object)owner == (UnityEngine.Object)null))
 			{
 				owner.spActionGauge[owner.weaponIndex] = value;
 			}
@@ -45,7 +45,7 @@ public class SpearController : IWeaponController
 
 	public void Init(Player player)
 	{
-		if (!(player == null) && MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
+		if (!((UnityEngine.Object)player == (UnityEngine.Object)null) && MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
 		{
 			owner = player;
 			spearInfo = MonoBehaviourSingleton<InGameSettingsManager>.I.player.spearActionInfo;
@@ -109,10 +109,10 @@ public class SpearController : IWeaponController
 
 	private void UpdateSpActionGauge()
 	{
-		if (isCtrlActive && !(owner == null) && owner.CheckSpAttackType(SP_ATTACK_TYPE.SOUL) && owner.isBoostMode)
+		if (isCtrlActive && !((UnityEngine.Object)owner == (UnityEngine.Object)null) && owner.CheckSpAttackType(SP_ATTACK_TYPE.SOUL) && owner.isBoostMode)
 		{
 			float num = 0f;
-			num = ((!owner.enableInputCharge) ? (spearInfo.Soul_BoostModeGaugeDecreasePerSecond * Time.get_deltaTime()) : (spearInfo.Soul_BoostModeGaugeDecreasePerSecondOnSpActionCharging * Time.get_deltaTime()));
+			num = ((!owner.enableInputCharge) ? (spearInfo.Soul_BoostModeGaugeDecreasePerSecond * Time.deltaTime) : (spearInfo.Soul_BoostModeGaugeDecreasePerSecondOnSpActionCharging * Time.deltaTime));
 			float num2 = 1f + owner.buffParam.GetGaugeDecreaseRate();
 			spActionGauge -= num * num2;
 			if (spActionGauge <= 0f)
@@ -150,7 +150,7 @@ public class SpearController : IWeaponController
 			{
 				MonoBehaviourSingleton<UIDamageManager>.I.CreatePlayerDamage(owner, sacrificedHP, UIPlayerDamageNum.DAMAGE_COLOR.DAMAGE);
 			}
-			if (owner.playerSender != null)
+			if ((UnityEngine.Object)owner.playerSender != (UnityEngine.Object)null)
 			{
 				owner.playerSender.OnSacrificedHp(sacrificedHP);
 			}
@@ -304,11 +304,9 @@ public class SpearController : IWeaponController
 
 	public void ClearBladeEffect()
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Expected O, but got Unknown
-		if (MonoBehaviourSingleton<EffectManager>.IsValid() && !(bladeEffectTrans == null))
+		if (MonoBehaviourSingleton<EffectManager>.IsValid() && !((UnityEngine.Object)bladeEffectTrans == (UnityEngine.Object)null))
 		{
-			EffectManager.ReleaseEffect(bladeEffectTrans.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(bladeEffectTrans.gameObject, true, false);
 			bladeEffectTrans = null;
 		}
 	}

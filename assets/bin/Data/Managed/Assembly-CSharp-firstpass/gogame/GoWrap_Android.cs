@@ -10,52 +10,27 @@ namespace gogame
 
 		private void runOnUiThread(AndroidJavaRunnable runnable)
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
 			{
-				AndroidJavaObject @static = val.GetStatic<AndroidJavaObject>("currentActivity");
-				try
+				using (AndroidJavaObject androidJavaObject = androidJavaClass.GetStatic<AndroidJavaObject>("currentActivity"))
 				{
-					@static.Call("runOnUiThread", new object[1]
-					{
-						runnable
-					});
+					androidJavaObject.Call("runOnUiThread", runnable);
 				}
-				finally
-				{
-					((IDisposable)@static)?.Dispose();
-				}
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
 			}
 		}
 
-		public unsafe void initGoWrap(string objName)
+		public void initGoWrap(string objName)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Expected O, but got Unknown
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Expected O, but got Unknown
-			if (_003C_003Ef__am_0024cache1 == null)
+			runOnUiThread(delegate
 			{
-				_003C_003Ef__am_0024cache1 = new AndroidJavaRunnable((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			runOnUiThread(_003C_003Ef__am_0024cache1);
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.unity.GoWrapUnityPlugin");
-			try
-			{
-				val.CallStatic("initialize", new object[1]
+				using (AndroidJavaClass androidJavaClass2 = new AndroidJavaClass("net.gogame.gowrap.Bootstrap"))
 				{
-					objName
-				});
-			}
-			finally
+					androidJavaClass2.CallStatic("unityInit");
+				}
+			});
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.unity.GoWrapUnityPlugin"))
 			{
-				((IDisposable)val)?.Dispose();
+				androidJavaClass.CallStatic("initialize", objName);
 			}
 		}
 
@@ -71,130 +46,74 @@ namespace gogame
 
 		public void setGuid(string guid)
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 			{
-				val.CallStatic("setGuid", new object[1]
-				{
-					guid
-				});
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
+				androidJavaClass.CallStatic("setGuid", guid);
 			}
 		}
 
 		public void setVipStatus(VipStatus vipStatus)
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 			{
 				if (vipStatus != null)
 				{
-					AndroidJavaObject val2 = new AndroidJavaObject("net.gogame.gowrap.sdk.VipStatus", new object[0]);
-					try
+					using (AndroidJavaObject androidJavaObject = new AndroidJavaObject("net.gogame.gowrap.sdk.VipStatus"))
 					{
-						val2.Call("setVip", new object[1]
-						{
-							vipStatus.vip
-						});
-						val2.Call("setSuspended", new object[1]
-						{
-							vipStatus.suspended
-						});
-						val2.Call("setSuspensionMessage", new object[1]
-						{
-							vipStatus.suspensionMessage
-						});
-						val.CallStatic("setVipStatus", new object[1]
-						{
-							val2
-						});
-					}
-					finally
-					{
-						((IDisposable)val2)?.Dispose();
+						androidJavaObject.Call("setVip", vipStatus.vip);
+						androidJavaObject.Call("setSuspended", vipStatus.suspended);
+						androidJavaObject.Call("setSuspensionMessage", vipStatus.suspensionMessage);
+						androidJavaClass.CallStatic("setVipStatus", androidJavaObject);
 					}
 				}
 				else
 				{
-					val.CallStatic("setVipStatus", (object[])null);
+					androidJavaClass.CallStatic("setVipStatus", null);
 				}
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
 			}
 		}
 
 		public bool hasOffers()
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 			{
-				return val.CallStatic<bool>("hasOffers", new object[0]);
+				return androidJavaClass.CallStatic<bool>("hasOffers", new object[0]);
 				IL_0022:
 				bool result;
 				return result;
 			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
-			}
 		}
 
-		public unsafe void showOffers()
+		public void showOffers()
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Expected O, but got Unknown
-			if (_003C_003Ef__am_0024cache2 == null)
+			runOnUiThread(delegate
 			{
-				_003C_003Ef__am_0024cache2 = new AndroidJavaRunnable((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			runOnUiThread(_003C_003Ef__am_0024cache2);
+				using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
+				{
+					androidJavaClass.CallStatic("showOffers");
+				}
+			});
 		}
 
 		public bool hasBannerAds()
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 			{
-				return val.CallStatic<bool>("hasBannerAds", new object[0]);
+				return androidJavaClass.CallStatic<bool>("hasBannerAds", new object[0]);
 				IL_0022:
 				bool result;
 				return result;
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
 			}
 		}
 
 		public bool hasBannerAds(BannerAdSize size)
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap");
-			try
+			using (AndroidJavaClass androidJavaClass2 = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 			{
-				AndroidJavaClass val2 = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap$BannerAdSize");
-				try
+				using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap$BannerAdSize"))
 				{
-					AndroidJavaObject @static = val2.GetStatic<AndroidJavaObject>(size.ToString());
-					return val.CallStatic<bool>("hasBannerAds", new object[1]
+					AndroidJavaObject @static = androidJavaClass.GetStatic<AndroidJavaObject>(size.ToString());
+					return androidJavaClass2.CallStatic<bool>("hasBannerAds", new object[1]
 					{
 						@static
 					});
@@ -202,432 +121,245 @@ namespace gogame
 					bool result;
 					return result;
 				}
-				finally
+			}
+		}
+
+		public void showBannerAd()
+		{
+			runOnUiThread(delegate
+			{
+				using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 				{
-					((IDisposable)val2)?.Dispose();
+					androidJavaClass.CallStatic("showBannerAd");
 				}
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
-			}
+			});
 		}
 
-		public unsafe void showBannerAd()
+		public void showBannerAd(BannerAdSize size)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Expected O, but got Unknown
-			if (_003C_003Ef__am_0024cache3 == null)
+			runOnUiThread(delegate
 			{
-				_003C_003Ef__am_0024cache3 = new AndroidJavaRunnable((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			runOnUiThread(_003C_003Ef__am_0024cache3);
+				using (AndroidJavaClass androidJavaClass2 = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
+				{
+					using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap$BannerAdSize"))
+					{
+						AndroidJavaObject @static = androidJavaClass.GetStatic<AndroidJavaObject>(size.ToString());
+						androidJavaClass2.CallStatic("showBannerAd", @static);
+					}
+				}
+			});
 		}
 
-		public unsafe void showBannerAd(BannerAdSize size)
+		public void hideBannerAd()
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Expected O, but got Unknown
-			_003CshowBannerAd_003Ec__AnonStorey3 _003CshowBannerAd_003Ec__AnonStorey;
-			runOnUiThread(new AndroidJavaRunnable((object)_003CshowBannerAd_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-		}
-
-		public unsafe void hideBannerAd()
-		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Expected O, but got Unknown
-			if (_003C_003Ef__am_0024cache4 == null)
+			runOnUiThread(delegate
 			{
-				_003C_003Ef__am_0024cache4 = new AndroidJavaRunnable((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			runOnUiThread(_003C_003Ef__am_0024cache4);
+				using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
+				{
+					androidJavaClass.CallStatic("hideBannerAd");
+				}
+			});
 		}
 
 		public bool hasInterstitialAds()
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 			{
-				return val.CallStatic<bool>("hasInterstitialAds", new object[0]);
+				return androidJavaClass.CallStatic<bool>("hasInterstitialAds", new object[0]);
 				IL_0022:
 				bool result;
 				return result;
 			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
-			}
 		}
 
-		public unsafe void showInterstitialAd()
+		public void showInterstitialAd()
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Expected O, but got Unknown
-			if (_003C_003Ef__am_0024cache5 == null)
+			runOnUiThread(delegate
 			{
-				_003C_003Ef__am_0024cache5 = new AndroidJavaRunnable((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			runOnUiThread(_003C_003Ef__am_0024cache5);
+				using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
+				{
+					androidJavaClass.CallStatic("showInterstitialAd");
+				}
+			});
 		}
 
 		public bool hasRewardedAds()
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 			{
-				return val.CallStatic<bool>("hasRewardedAds", new object[0]);
+				return androidJavaClass.CallStatic<bool>("hasRewardedAds", new object[0]);
 				IL_0022:
 				bool result;
 				return result;
 			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
-			}
 		}
 
-		public unsafe void showRewardedAd()
+		public void showRewardedAd()
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Expected O, but got Unknown
-			if (_003C_003Ef__am_0024cache6 == null)
+			runOnUiThread(delegate
 			{
-				_003C_003Ef__am_0024cache6 = new AndroidJavaRunnable((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			runOnUiThread(_003C_003Ef__am_0024cache6);
+				using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
+				{
+					androidJavaClass.CallStatic("showRewardedAd");
+				}
+			});
 		}
 
 		public void showMenu()
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 			{
-				val.CallStatic("showMenu", new object[0]);
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
+				androidJavaClass.CallStatic("showMenu");
 			}
 		}
 
 		public void trackEvent(string name, string category)
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 			{
-				val.CallStatic("trackEvent", new object[2]
-				{
-					category,
-					name
-				});
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
+				androidJavaClass.CallStatic("trackEvent", category, name);
 			}
 		}
 
 		public void trackEvent(string name, string category, long value)
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 			{
-				val.CallStatic("trackEvent", new object[3]
-				{
-					category,
-					name,
-					value
-				});
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
+				androidJavaClass.CallStatic("trackEvent", category, name, value);
 			}
 		}
 
 		private AndroidJavaObject toAndroidJavaObject(object value)
 		{
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Expected O, but got Unknown
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Expected O, but got Unknown
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Expected O, but got Unknown
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Expected O, but got Unknown
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Expected O, but got Unknown
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Expected O, but got Unknown
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Expected O, but got Unknown
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Expected O, but got Unknown
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Expected O, but got Unknown
-			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017d: Expected O, but got Unknown
-			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ab: Expected O, but got Unknown
-			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01da: Expected O, but got Unknown
-			//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fa: Expected O, but got Unknown
-			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0214: Expected O, but got Unknown
 			if (value == null)
 			{
 				return null;
 			}
 			if (value is bool)
 			{
-				return new AndroidJavaObject("java.lang.Boolean", new object[1]
-				{
-					value
-				});
+				return new AndroidJavaObject("java.lang.Boolean", value);
 			}
 			if (value is decimal)
 			{
 				decimal value2 = (decimal)value;
-				return new AndroidJavaObject("java.lang.Double", new object[1]
-				{
-					(double)value2
-				});
+				return new AndroidJavaObject("java.lang.Double", (double)value2);
 			}
 			if (value is double)
 			{
-				return new AndroidJavaObject("java.lang.Double", new object[1]
-				{
-					value
-				});
+				return new AndroidJavaObject("java.lang.Double", value);
 			}
 			if (value is float)
 			{
-				return new AndroidJavaObject("java.lang.Float", new object[1]
-				{
-					value
-				});
+				return new AndroidJavaObject("java.lang.Float", value);
 			}
 			if (value is int)
 			{
-				return new AndroidJavaObject("java.lang.Integer", new object[1]
-				{
-					value
-				});
+				return new AndroidJavaObject("java.lang.Integer", value);
 			}
 			if (value is uint)
 			{
 				uint num = (uint)value;
-				return new AndroidJavaObject("java.lang.Long", new object[1]
-				{
-					(long)num
-				});
+				return new AndroidJavaObject("java.lang.Long", (long)num);
 			}
 			if (value is long)
 			{
-				return new AndroidJavaObject("java.lang.Long", new object[1]
-				{
-					value
-				});
+				return new AndroidJavaObject("java.lang.Long", value);
 			}
 			if (value is ulong)
 			{
 				ulong num2 = (ulong)value;
-				return new AndroidJavaObject("java.lang.Long", new object[1]
-				{
-					(long)num2
-				});
+				return new AndroidJavaObject("java.lang.Long", (long)num2);
 			}
 			if (value is short)
 			{
-				return new AndroidJavaObject("java.lang.Short", new object[1]
-				{
-					value
-				});
+				return new AndroidJavaObject("java.lang.Short", value);
 			}
 			if (value is ushort)
 			{
 				ushort num3 = (ushort)value;
-				return new AndroidJavaObject("java.lang.Integer", new object[1]
-				{
-					(int)num3
-				});
+				return new AndroidJavaObject("java.lang.Integer", (int)num3);
 			}
 			if (value is byte)
 			{
 				byte b = (byte)value;
-				return new AndroidJavaObject("java.lang.Short", new object[1]
-				{
-					(short)b
-				});
+				return new AndroidJavaObject("java.lang.Short", (short)b);
 			}
 			if (value is sbyte)
 			{
 				sbyte b2 = (sbyte)value;
-				return new AndroidJavaObject("java.lang.Short", new object[1]
-				{
-					(short)b2
-				});
+				return new AndroidJavaObject("java.lang.Short", (short)b2);
 			}
 			if (value is string)
 			{
-				return new AndroidJavaObject("java.lang.String", new object[1]
-				{
-					value
-				});
+				return new AndroidJavaObject("java.lang.String", value);
 			}
-			return new AndroidJavaObject("java.lang.String", new object[1]
-			{
-				value.ToString()
-			});
+			return new AndroidJavaObject("java.lang.String", value.ToString());
 		}
 
 		private AndroidJavaObject toJavaMap(Dictionary<string, object> values)
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Expected O, but got Unknown
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Expected O, but got Unknown
-			AndroidJavaObject val = new AndroidJavaObject("java.util.HashMap", new object[0]);
-			IntPtr methodID = AndroidJNIHelper.GetMethodID(val.GetRawClass(), "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+			AndroidJavaObject androidJavaObject = new AndroidJavaObject("java.util.HashMap");
+			IntPtr methodID = AndroidJNIHelper.GetMethodID(androidJavaObject.GetRawClass(), "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
 			object[] array = new object[2];
 			foreach (KeyValuePair<string, object> value in values)
 			{
-				AndroidJavaObject val2 = new AndroidJavaObject("java.lang.String", new object[1]
+				using (AndroidJavaObject androidJavaObject3 = new AndroidJavaObject("java.lang.String", value.Key))
 				{
-					value.Key
-				});
-				try
-				{
-					AndroidJavaObject val3 = toAndroidJavaObject(value.Value);
-					if (val3 != null)
+					AndroidJavaObject androidJavaObject2 = toAndroidJavaObject(value.Value);
+					if (androidJavaObject2 != null)
 					{
-						AndroidJavaObject val4 = val3;
-						try
+						using (androidJavaObject2)
 						{
-							array[0] = val2;
-							array[1] = val3;
-							AndroidJNI.CallObjectMethod(val.GetRawObject(), methodID, AndroidJNIHelper.CreateJNIArgArray(array));
-						}
-						finally
-						{
-							((IDisposable)val4)?.Dispose();
+							array[0] = androidJavaObject3;
+							array[1] = androidJavaObject2;
+							AndroidJNI.CallObjectMethod(androidJavaObject.GetRawObject(), methodID, AndroidJNIHelper.CreateJNIArgArray(array));
 						}
 					}
 				}
-				finally
-				{
-					((IDisposable)val2)?.Dispose();
-				}
 			}
-			return val;
+			return androidJavaObject;
 		}
 
 		public void trackEvent(string name, string category, Dictionary<string, object> values)
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 			{
-				AndroidJavaObject val2 = toJavaMap(values);
-				try
+				using (AndroidJavaObject androidJavaObject = toJavaMap(values))
 				{
-					val.CallStatic("trackEvent", new object[3]
-					{
-						category,
-						name,
-						val2
-					});
+					androidJavaClass.CallStatic("trackEvent", category, name, androidJavaObject);
 				}
-				finally
-				{
-					((IDisposable)val2)?.Dispose();
-				}
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
 			}
 		}
 
 		public void trackPurchase(string productId, string currencyCode, double price)
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 			{
-				val.CallStatic("trackPurchase", new object[3]
-				{
-					productId,
-					currencyCode,
-					price
-				});
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
+				androidJavaClass.CallStatic("trackPurchase", productId, currencyCode, price);
 			}
 		}
 
 		public void trackPurchase(string productId, string currencyCode, double price, string purchaseData, string signature)
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 			{
-				val.CallStatic("trackPurchase", new object[5]
-				{
-					productId,
-					currencyCode,
-					price,
-					purchaseData,
-					signature
-				});
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
+				androidJavaClass.CallStatic("trackPurchase", productId, currencyCode, price, purchaseData, signature);
 			}
 		}
 
 		public void setCustomUrlSchemes(List<string> schemes)
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("net.gogame.gowrap.sdk.GoWrap"))
 			{
-				AndroidJavaObject val2 = new AndroidJavaObject("java.util.ArrayList", new object[0]);
-				IntPtr methodID = AndroidJNIHelper.GetMethodID(val2.GetRawClass(), "add", "(Ljava/lang/Object;)Z");
+				AndroidJavaObject androidJavaObject = new AndroidJavaObject("java.util.ArrayList");
+				IntPtr methodID = AndroidJNIHelper.GetMethodID(androidJavaObject.GetRawClass(), "add", "(Ljava/lang/Object;)Z");
 				object[] array = new object[1];
 				foreach (string scheme in schemes)
 				{
 					string text = (string)(array[0] = scheme);
-					AndroidJNI.CallBooleanMethod(val2.GetRawObject(), methodID, AndroidJNIHelper.CreateJNIArgArray(array));
+					AndroidJNI.CallBooleanMethod(androidJavaObject.GetRawObject(), methodID, AndroidJNIHelper.CreateJNIArgArray(array));
 				}
-				val.CallStatic("setCustomUrlSchemes", new object[1]
-				{
-					val2
-				});
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
+				androidJavaClass.CallStatic("setCustomUrlSchemes", androidJavaObject);
 			}
 		}
 

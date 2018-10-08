@@ -21,12 +21,12 @@ class BundleCompatGingerbread {
     }
 
     public static IBinder getBinder(Bundle bundle, String str) {
-        Throwable e;
         if (!sGetIBinderMethodFetched) {
             try {
                 sGetIBinderMethod = Bundle.class.getMethod("getIBinder", new Class[]{String.class});
                 sGetIBinderMethod.setAccessible(true);
-            } catch (Throwable e2) {
+            } catch (Throwable e) {
+                Throwable e2;
                 Log.i(TAG, "Failed to retrieve getIBinder method", e2);
             }
             sGetIBinderMethodFetched = true;

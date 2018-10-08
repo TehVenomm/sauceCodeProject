@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using UnityEngine;
 
 public class InGameQuestAreaDeliveryList : QuestAreaDeliveryList
 {
@@ -23,7 +24,7 @@ public class InGameQuestAreaDeliveryList : QuestAreaDeliveryList
 
 	protected override IEnumerator DoInitialize()
 	{
-		SetActive((Enum)UI.OBJ_IMAGE, false);
+		SetActive(UI.OBJ_IMAGE, false);
 		GetDeliveryList();
 		EndInitialize();
 		yield break;
@@ -48,12 +49,8 @@ public class InGameQuestAreaDeliveryList : QuestAreaDeliveryList
 		base.UpdateUI();
 	}
 
-	private unsafe void Reposition(bool isPortrait)
+	private void Reposition(bool isPortrait)
 	{
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Expected O, but got Unknown
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Expected O, but got Unknown
 		UIScreenRotationHandler[] components = GetCtrl(UI.OBJ_FRAME).GetComponents<UIScreenRotationHandler>();
 		for (int i = 0; i < components.Length; i++)
 		{
@@ -65,20 +62,23 @@ public class InGameQuestAreaDeliveryList : QuestAreaDeliveryList
 		UIScrollView component = GetCtrl(UI.SCR_DELIVERY_QUEST).GetComponent<UIScrollView>();
 		component.ResetPosition();
 		AppMain i2 = MonoBehaviourSingleton<AppMain>.I;
-		i2.onDelayCall = Delegate.Combine((Delegate)i2.onDelayCall, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		i2.onDelayCall = (Action)Delegate.Combine(i2.onDelayCall, (Action)delegate
+		{
+			RefreshUI();
+			UIPanel component2 = GetCtrl(UI.SCR_DELIVERY_QUEST).GetComponent<UIPanel>();
+			component2.Refresh();
+		});
 	}
 
 	private void OnScreenRotate(bool isPortrait)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		if (base.transferUI != null)
+		if ((UnityEngine.Object)base.transferUI != (UnityEngine.Object)null)
 		{
-			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
 		}
 		else
 		{
-			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
 		}
 		if (!isInActiveRotate)
 		{

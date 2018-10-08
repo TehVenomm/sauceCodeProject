@@ -1,7 +1,6 @@
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
@@ -37,7 +36,7 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 	private void InitData()
 	{
 		Singleton<AchievementIdTable>.Create();
-		Singleton<AchievementIdTable>.I.CreateTable(null);
+		Singleton<AchievementIdTable>.I.CreateTable((TextAsset)null);
 	}
 
 	public void SetOldUserLogin()
@@ -75,8 +74,8 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 				}
 				if (taskInos[num].progress > 0)
 				{
-					double num2 = (double)taskInos[num].progress * 100.0 / (double)data.goalNum;
-					Social.ReportProgress(data.key, num2, (Action<bool>)delegate
+					double progress = (double)taskInos[num].progress * 100.0 / (double)data.goalNum;
+					Social.ReportProgress(data.key, progress, delegate
 					{
 					});
 				}
@@ -108,29 +107,34 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 		}
 	}
 
-	private unsafe void Login()
+	private void Login()
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 		if (CryptoPrefs.GetInt("signin_game_service_auto", 0) != -1 && !isRunLogin)
 		{
 			isRunLogin = true;
 			PlayGamesPlatform.Activate();
-			Social.get_localUser().Authenticate((Action<bool>)delegate(bool success)
+			Social.localUser.Authenticate(delegate(bool success)
 			{
-				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001b: Expected O, but got Unknown
 				if (success)
 				{
 					CryptoPrefs.SetInt("signin_game_service_auto", 1);
 				}
 				else
 				{
-					PlayGamesLocalUser obj = (PlayGamesLocalUser)Social.get_localUser();
-					if (_003C_003Ef__am_0024cache8 == null)
+					((PlayGamesLocalUser)Social.localUser).GetStats(delegate(CommonStatusCodes rc, PlayerStats stats)
 					{
-						_003C_003Ef__am_0024cache8 = new Action<CommonStatusCodes, PlayerStats>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-					}
-					obj.GetStats(_003C_003Ef__am_0024cache8);
+						if (rc == CommonStatusCodes.SignInRequired || rc == CommonStatusCodes.ServiceDisabled)
+						{
+							if (CryptoPrefs.GetInt("signin_game_service_auto", 0) != 1)
+							{
+								CryptoPrefs.SetInt("signin_game_service_auto", -1);
+							}
+						}
+						else
+						{
+							CryptoPrefs.SetInt("signin_game_service_auto", 2);
+						}
+					});
 				}
 			});
 		}
@@ -138,8 +142,7 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 
 	private bool isConnected()
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		return Social.get_localUser().get_authenticated();
+		return Social.localUser.authenticated;
 	}
 
 	public void SetAchievementStep(int taskID, int currentStep, int oldStep)
@@ -152,14 +155,14 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 				int goalNum = byTask.goalNum;
 				if (currentStep < goalNum)
 				{
-					double num = (double)currentStep * 100.0 / (double)goalNum;
-					Social.ReportProgress(byTask.key, num, (Action<bool>)delegate
+					double progress = (double)currentStep * 100.0 / (double)goalNum;
+					Social.ReportProgress(byTask.key, progress, delegate
 					{
 					});
 				}
 				else
 				{
-					Social.ReportProgress(byTask.key, 100.0, (Action<bool>)delegate
+					Social.ReportProgress(byTask.key, 100.0, delegate
 					{
 					});
 				}
@@ -179,11 +182,11 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 	{
 		if (isConnected())
 		{
-			Social.LoadAchievementDescriptions((Action<IAchievementDescription[]>)delegate(IAchievementDescription[] descriptions)
+			Social.LoadAchievementDescriptions(delegate(IAchievementDescription[] descriptions)
 			{
 				if (descriptions.Length > 0)
 				{
-					foreach (IAchievementDescription val in descriptions)
+					foreach (IAchievementDescription achievementDescription in descriptions)
 					{
 					}
 				}
@@ -202,7 +205,7 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 			AchievementIdTable.AchievementIdData byTask = Singleton<AchievementIdTable>.I.GetByTask(taskID);
 			if (byTask != null)
 			{
-				Social.ReportProgress(byTask.key, 100.0, (Action<bool>)delegate(bool success)
+				Social.ReportProgress(byTask.key, 100.0, delegate(bool success)
 				{
 					if (!success)
 					{

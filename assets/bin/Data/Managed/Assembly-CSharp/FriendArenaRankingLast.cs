@@ -80,14 +80,14 @@ public class FriendArenaRankingLast : FriendArenaRankingBase
 	{
 		if (nameEventData == null)
 		{
-			SetLabelText((Enum)UI.LBL_ARENA_NAME, string.Empty);
-			SetLabelText((Enum)UI.LBL_END_DATE, string.Empty);
+			SetLabelText(UI.LBL_ARENA_NAME, string.Empty);
+			SetLabelText(UI.LBL_END_DATE, string.Empty);
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_ARENA_NAME, nameEventData.name);
+			SetLabelText(UI.LBL_ARENA_NAME, nameEventData.name);
 			string endDateString = QuestUtility.GetEndDateString(nameEventData);
-			SetLabelText((Enum)UI.LBL_END_DATE, endDateString);
+			SetLabelText(UI.LBL_END_DATE, endDateString);
 		}
 	}
 
@@ -153,11 +153,22 @@ public class FriendArenaRankingLast : FriendArenaRankingBase
 		return myRank >= 1;
 	}
 
-	protected unsafe override void SendGetList(int nowPage, Action<bool> callback)
+	protected override void SendGetList(int nowPage, Action<bool> callback)
 	{
 		int isContaionSelf = isOwn ? 1 : 0;
-		_003CSendGetList_003Ec__AnonStorey2F1 _003CSendGetList_003Ec__AnonStorey2F;
-		MonoBehaviourSingleton<FriendManager>.I.SendGetLastRanking(-1, isContaionSelf, new Action<bool, ArenaLastRankingModel.Param>((object)_003CSendGetList_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<FriendManager>.I.SendGetLastRanking(-1, isContaionSelf, delegate(bool is_success, ArenaLastRankingModel.Param recv_data)
+		{
+			if (is_success)
+			{
+				recvList = ChangeData(CreateFriendCharaInfoList(recv_data.rankingDataList));
+				rankingDataList = recv_data.rankingDataList;
+				lastEventData = recv_data.eventData;
+				CacheLists(recvList, rankingDataList);
+				SetArenaName(lastEventData);
+				myRank = recv_data.myRank;
+			}
+			callback(is_success);
+		});
 	}
 
 	public override void OnQuery_FOLLOW_INFO()

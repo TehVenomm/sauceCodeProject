@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class EquipSortBase : SortBase
@@ -166,38 +165,27 @@ public class EquipSortBase : SortBase
 
 	public override void UpdateUI()
 	{
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Expected O, but got Unknown
-		//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f5: Expected O, but got Unknown
-		//IL_042c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0433: Expected O, but got Unknown
-		//IL_057c: Unknown result type (might be due to invalid IL or missing references)
 		if (sortOrder.dialogType == DIALOG_TYPE.STORAGE_SKILL || sortOrder.dialogType == DIALOG_TYPE.SKILL)
 		{
-			SetActive((Enum)UI.OBJ_TYPE_SKILL, true);
-			SetActive((Enum)UI.OBJ_TYPE_EQUIP, false);
-			UIWidget component = base.GetComponent<UIWidget>((Enum)UI.OBJ_FRAME);
-			if (component != null)
+			SetActive(UI.OBJ_TYPE_SKILL, true);
+			SetActive(UI.OBJ_TYPE_EQUIP, false);
+			UIWidget component = GetComponent<UIWidget>(UI.OBJ_FRAME);
+			if ((Object)component != (Object)null)
 			{
 				component.height = 812;
-				component.get_transform().set_localPosition(new Vector3(0f, 408f, 0f));
+				component.transform.localPosition = new Vector3(0f, 408f, 0f);
 				component.UpdateAnchors();
 			}
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_TYPE_SKILL, false);
-			SetActive((Enum)UI.OBJ_TYPE_EQUIP, true);
-			UIWidget component2 = base.GetComponent<UIWidget>((Enum)UI.OBJ_FRAME);
-			if (component2 != null)
+			SetActive(UI.OBJ_TYPE_SKILL, false);
+			SetActive(UI.OBJ_TYPE_EQUIP, true);
+			UIWidget component2 = GetComponent<UIWidget>(UI.OBJ_FRAME);
+			if ((Object)component2 != (Object)null)
 			{
 				component2.height = 752;
-				component2.get_transform().set_localPosition(new Vector3(0f, 383f, 0f));
+				component2.transform.localPosition = new Vector3(0f, 383f, 0f);
 				component2.UpdateAnchors();
 			}
 		}
@@ -205,8 +193,8 @@ public class EquipSortBase : SortBase
 		for (int num = rarityButton.Length; i < num; i++)
 		{
 			bool value = (sortOrder.rarity & (1 << i)) != 0;
-			SetEvent((Enum)rarityButton[i], "RARITY", i);
-			SetToggle(GetCtrl(rarityButton[i]).get_parent(), value);
+			SetEvent(rarityButton[i], "RARITY", i);
+			SetToggle(GetCtrl(rarityButton[i]).parent, value);
 		}
 		UI?[] array = typeButton;
 		UI?[] array2 = null;
@@ -258,8 +246,8 @@ public class EquipSortBase : SortBase
 					if ((num2 & (1 << j)) != 0)
 					{
 						bool value2 = (sortOrder.type & (1 << j)) != 0;
-						SetEvent((Enum)array[j], event_name, j);
-						SetToggle(GetCtrl(array[j]).get_parent(), value2);
+						SetEvent(array[j], event_name, j);
+						SetToggle(GetCtrl(array[j]).parent, value2);
 					}
 					else if (MonoBehaviourSingleton<GameSceneManager>.I.GetPrevSectionNameFromHistory() == "SmithGrowSkillSelectMaterial")
 					{
@@ -268,15 +256,15 @@ public class EquipSortBase : SortBase
 							UI? nullable2 = array2[j];
 							if (nullable2.HasValue)
 							{
-								SetActive((Enum)array[j], false);
-								SetActive((Enum)array2[j], true);
+								SetActive(array[j], false);
+								SetActive(array2[j], true);
 							}
 						}
 					}
 					else
 					{
-						SetActive((Enum)array[j], false);
-						SetActive((Enum)array2[j], false);
+						SetActive(array[j], false);
+						SetActive(array2[j], false);
 					}
 				}
 			}
@@ -287,8 +275,8 @@ public class EquipSortBase : SortBase
 			for (int num5 = array3.Length; k < num5; k++)
 			{
 				bool value3 = (sortOrder.element & (1 << k)) != 0;
-				SetEvent((Enum)array3[k], "ELEMENT", k);
-				SetToggle(GetCtrl(array3[k]).get_parent(), value3);
+				SetEvent(array3[k], "ELEMENT", k);
+				SetToggle(GetCtrl(array3[k]).parent, value3);
 			}
 		}
 		UI? nullable3 = null;
@@ -302,20 +290,20 @@ public class EquipSortBase : SortBase
 				if ((num7 & num3) != 0)
 				{
 					bool value4 = sortOrder.requirement == (SORT_REQUIREMENT)num7;
-					SetEvent((Enum)requirementButton[l], "REQUIREMENT", num7);
-					SetToggle((Enum)requirementButton[l], value4);
+					SetEvent(requirementButton[l], "REQUIREMENT", num7);
+					SetToggle(requirementButton[l], value4);
 					nullable3 = requirementButton[l];
 				}
 				else
 				{
-					SetActive((Enum)requirementButton[l], false);
+					SetActive(requirementButton[l], false);
 				}
 			}
 		}
 		if (nullable3.HasValue)
 		{
-			base.GetComponent<UIGrid>((Enum)UI.GRD_REQUIREMENT).Reposition();
-			GetCtrl(UI.OBJ_HEIGHT_ANCHOR).set_position(GetCtrl(nullable3).get_position());
+			GetComponent<UIGrid>(UI.GRD_REQUIREMENT).Reposition();
+			GetCtrl(UI.OBJ_HEIGHT_ANCHOR).position = GetCtrl(nullable3).position;
 		}
 		int m = 0;
 		for (int num8 = ascButton.Length; m < num8; m++)
@@ -325,40 +313,32 @@ public class EquipSortBase : SortBase
 			{
 				value5 = true;
 			}
-			SetEvent((Enum)ascButton[m], "ORDER_TYPE", m);
-			SetToggle((Enum)ascButton[m], value5);
+			SetEvent(ascButton[m], "ORDER_TYPE", m);
+			SetToggle(ascButton[m], value5);
 		}
 	}
 
 	protected void OnQuery_RARITY()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
 		OnQueryEvent_Rarity(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl(rarityButton[_index]).get_parent(), _is_enable);
+		SetToggle(GetCtrl(rarityButton[_index]).parent, _is_enable);
 	}
 
 	protected void OnQuery_TYPE()
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
 		OnQueryEvent_Type(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl(typeButton[_index]).get_parent(), _is_enable);
+		SetToggle(GetCtrl(typeButton[_index]).parent, _is_enable);
 	}
 
 	protected void OnQuery_SKILL_TYPE()
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
 		OnQueryEvent_Type(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl(typeSkillButton[_index]).get_parent(), _is_enable);
+		SetToggle(GetCtrl(typeSkillButton[_index]).parent, _is_enable);
 	}
 
 	protected void OnQuery_ELEMENT()
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
 		OnQueryEvent_Element(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl(elementButton[_index]).get_parent(), _is_enable);
+		SetToggle(GetCtrl(elementButton[_index]).parent, _is_enable);
 	}
 }

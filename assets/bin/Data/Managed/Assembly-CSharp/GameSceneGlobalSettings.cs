@@ -85,7 +85,7 @@ public class GameSceneGlobalSettings
 
 	public void ChangeSection(GameSceneTables.SceneData scene_data, GameSceneTables.SectionData section_data)
 	{
-		if (MonoBehaviourSingleton<UIManager>.I.npcMessage != null)
+		if ((UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.npcMessage != (UnityEngine.Object)null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.npcMessage.UpdateMessage(section_data, false);
 		}
@@ -224,7 +224,7 @@ public class GameSceneGlobalSettings
 			{
 				result = false;
 			}
-			if (MonoBehaviourSingleton<UIManager>.I.mainMenu != null)
+			if ((UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainMenu != (UnityEngine.Object)null)
 			{
 				MonoBehaviourSingleton<UIManager>.I.mainMenu.UpdateSceneButtons(next_scene_name);
 			}
@@ -412,7 +412,7 @@ public class GameSceneGlobalSettings
 	public void SectionSetup(string scene_name, string section_name, GameSceneTables.SectionData section_data)
 	{
 		InitCamera(scene_name, section_name);
-		if (MonoBehaviourSingleton<UIManager>.I.npcMessage != null)
+		if ((UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.npcMessage != (UnityEngine.Object)null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.npcMessage.UpdateMessage(section_data, true);
 		}
@@ -420,7 +420,7 @@ public class GameSceneGlobalSettings
 
 	public void SectionStart(string scene_name, string section_name, bool is_new_section)
 	{
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.tutorialMessage != null)
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.tutorialMessage != (UnityEngine.Object)null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.Run(scene_name, section_name, is_new_section, false, null);
 		}
@@ -428,7 +428,6 @@ public class GameSceneGlobalSettings
 
 	private void InitGlobal(string scene_name, string section_name, GameSceneTables.SectionData section_data)
 	{
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 		if (scene_name != "InGameScene" && !ExistSection("QuestAcceptRoom") && !ExistSection("WorldMapOpenNewField") && MonoBehaviourSingleton<CoopApp>.IsValid())
 		{
 			MonoBehaviourSingleton<CoopApp>.I.LeaveWithParty(null, false, false);
@@ -438,12 +437,12 @@ public class GameSceneGlobalSettings
 		{
 			if (!MonoBehaviourSingleton<OutGameEffectManager>.IsValid())
 			{
-				MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<OutGameEffectManager>();
+				MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<OutGameEffectManager>();
 			}
 		}
 		else if (MonoBehaviourSingleton<OutGameEffectManager>.IsValid())
 		{
-			Object.DestroyImmediate(MonoBehaviourSingleton<OutGameEffectManager>.I);
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<OutGameEffectManager>.I);
 		}
 		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
 		{
@@ -461,10 +460,6 @@ public class GameSceneGlobalSettings
 
 	private void InitGlobalStage(string scene_name, string section_name, GameSceneTables.SectionData section_data)
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
 		if (needHomeManager)
 		{
 			if (!MonoBehaviourSingleton<HomeManager>.IsValid())
@@ -474,7 +469,7 @@ public class GameSceneGlobalSettings
 		}
 		else if (MonoBehaviourSingleton<HomeManager>.IsValid())
 		{
-			Object.DestroyImmediate(MonoBehaviourSingleton<HomeManager>.I.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<HomeManager>.I.gameObject);
 		}
 		if (needLoungeManager)
 		{
@@ -485,7 +480,7 @@ public class GameSceneGlobalSettings
 		}
 		else if (MonoBehaviourSingleton<LoungeManager>.IsValid())
 		{
-			Object.DestroyImmediate(MonoBehaviourSingleton<LoungeManager>.I.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<LoungeManager>.I.gameObject);
 		}
 		if (needGuildManager)
 		{
@@ -496,7 +491,7 @@ public class GameSceneGlobalSettings
 		}
 		else if (MonoBehaviourSingleton<GuildStageManager>.IsValid())
 		{
-			Object.DestroyImmediate(MonoBehaviourSingleton<GuildStageManager>.I.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<GuildStageManager>.I.gameObject);
 		}
 		if (needStatusStageManager)
 		{
@@ -508,7 +503,7 @@ public class GameSceneGlobalSettings
 		}
 		else if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
 		{
-			Object.DestroyImmediate(MonoBehaviourSingleton<StatusStageManager>.I.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<StatusStageManager>.I.gameObject);
 		}
 		if (MonoBehaviourSingleton<StageManager>.IsValid())
 		{
@@ -519,9 +514,9 @@ public class GameSceneGlobalSettings
 					MonoBehaviourSingleton<StageManager>.I.UnloadStage();
 					stageForceLoad = false;
 				}
-				if (MonoBehaviourSingleton<StageManager>.I.LoadStage(stageName) && cameraAnim != null)
+				if (MonoBehaviourSingleton<StageManager>.I.LoadStage(stageName) && (UnityEngine.Object)cameraAnim != (UnityEngine.Object)null)
 				{
-					cameraAnim.set_enabled(false);
+					cameraAnim.enabled = false;
 				}
 			}
 			else if (stageImageID > 0)
@@ -546,19 +541,8 @@ public class GameSceneGlobalSettings
 		return scene_name == "InGameScene" && (section_name.StartsWith("InGame") || section_name == "WorldMap" || section_name == "RegionMap" || section_name == "RegionMapDescriptionList" || section_name == "RegionMapDescriptionDetailDelivery" || section_name == "WorldMapOpenNewField" || section_name == "WorldMapOpenNewRegion" || section_name.StartsWith("ExploreMap") || section_name == "InformationDialog") && section_name != "InGameStoryMain";
 	}
 
-	public unsafe static void SetOrientation(bool ingame)
+	public static void SetOrientation(bool ingame)
 	{
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Invalid comparison between Unknown and I4
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Invalid comparison between Unknown and I4
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Invalid comparison between Unknown and I4
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0109: Expected O, but got Unknown
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Expected O, but got Unknown
 		bool flag = ingame;
 		if (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.userInfo != null && MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name == "/colopl_rob")
 		{
@@ -578,96 +562,60 @@ public class GameSceneGlobalSettings
 		}
 		if (flag)
 		{
-			Screen.set_autorotateToLandscapeLeft(true);
-			Screen.set_autorotateToLandscapeRight(true);
-			Screen.set_autorotateToPortrait(true);
-			Screen.set_autorotateToPortraitUpsideDown(true);
-			Screen.set_orientation(5);
+			Screen.autorotateToLandscapeLeft = true;
+			Screen.autorotateToLandscapeRight = true;
+			Screen.autorotateToPortrait = true;
+			Screen.autorotateToPortraitUpsideDown = true;
+			Screen.orientation = ScreenOrientation.AutoRotation;
 		}
 		else
 		{
-			Screen.set_autorotateToLandscapeLeft(false);
-			Screen.set_autorotateToLandscapeRight(false);
-			Screen.set_autorotateToPortrait(true);
-			Screen.set_autorotateToPortraitUpsideDown(true);
-			if ((int)Screen.get_orientation() == 0 || (int)Screen.get_orientation() == 3 || (int)Screen.get_orientation() == 3 || (int)Screen.get_orientation() == 4)
+			Screen.autorotateToLandscapeLeft = false;
+			Screen.autorotateToLandscapeRight = false;
+			Screen.autorotateToPortrait = true;
+			Screen.autorotateToPortraitUpsideDown = true;
+			if (Screen.orientation == ScreenOrientation.Unknown || Screen.orientation == ScreenOrientation.LandscapeLeft || Screen.orientation == ScreenOrientation.LandscapeLeft || Screen.orientation == ScreenOrientation.LandscapeRight)
 			{
-				Screen.set_orientation(1);
+				Screen.orientation = ScreenOrientation.Portrait;
 				MonoBehaviourSingleton<AppMain>.I.UpdateResolution(true);
 				AppMain i = MonoBehaviourSingleton<AppMain>.I;
-				Action onDelayCall = i.onDelayCall;
-				if (_003C_003Ef__am_0024cacheE == null)
+				i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
 				{
-					_003C_003Ef__am_0024cacheE = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-				}
-				i.onDelayCall = Delegate.Combine((Delegate)onDelayCall, (Delegate)_003C_003Ef__am_0024cacheE);
+					Screen.orientation = ScreenOrientation.AutoRotation;
+				});
 			}
 			else
 			{
-				Screen.set_orientation(5);
+				Screen.orientation = ScreenOrientation.AutoRotation;
 			}
 		}
 	}
 
 	private void InitCamera(string scene_name, string section_name)
 	{
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Expected O, but got Unknown
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Expected O, but got Unknown
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018f: Expected O, but got Unknown
-		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e0: Expected O, but got Unknown
-		//IL_021e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0241: Expected O, but got Unknown
-		//IL_025c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027f: Expected O, but got Unknown
-		//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0304: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0313: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0318: Expected O, but got Unknown
-		//IL_03aa: Unknown result type (might be due to invalid IL or missing references)
 		Camera mainCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
-		if (mainCamera == null || !mainCamera.get_enabled() || !MonoBehaviourSingleton<StageManager>.IsValid())
+		if ((UnityEngine.Object)mainCamera == (UnityEngine.Object)null || !mainCamera.enabled || !MonoBehaviourSingleton<StageManager>.IsValid())
 		{
 			return;
 		}
-		mainCamera.set_cullingMask(mainCameraCullingMask);
+		mainCamera.cullingMask = mainCameraCullingMask;
 		if (saveCameraNear == -3.40282347E+38f)
 		{
-			saveCameraNear = mainCamera.get_nearClipPlane();
-			saveCameraFar = mainCamera.get_farClipPlane();
+			saveCameraNear = mainCamera.nearClipPlane;
+			saveCameraFar = mainCamera.farClipPlane;
 		}
 		float nearClipPlane = saveCameraNear;
 		float farClipPlane = saveCameraFar;
-		Color black = Color.get_black();
-		CameraClearFlags clearFlags = 2;
-		if (MonoBehaviourSingleton<StageManager>.I.stageObject == null)
+		Color black = Color.black;
+		CameraClearFlags clearFlags = CameraClearFlags.Color;
+		if ((UnityEngine.Object)MonoBehaviourSingleton<StageManager>.I.stageObject == (UnityEngine.Object)null)
 		{
 			nearClipPlane = 0.01f;
 		}
-		mainCamera.set_nearClipPlane(nearClipPlane);
-		mainCamera.set_farClipPlane(farClipPlane);
-		mainCamera.set_clearFlags(clearFlags);
-		mainCamera.set_backgroundColor(black);
+		mainCamera.nearClipPlane = nearClipPlane;
+		mainCamera.farClipPlane = farClipPlane;
+		mainCamera.clearFlags = clearFlags;
+		mainCamera.backgroundColor = black;
 		if (!MonoBehaviourSingleton<StatusStageManager>.IsValid())
 		{
 			if (ExistSection("CharaMake"))
@@ -675,42 +623,42 @@ public class GameSceneGlobalSettings
 				Vector3 pos = default(Vector3);
 				Vector3 rot = default(Vector3);
 				CharaMake.GetCameraPosRot(out pos, out rot, ExistHistorySection("StatusTop") || ExistHistorySection("ProfileTop"));
-				mainCamera.get_transform().Set(pos, rot);
+				mainCamera.transform.Set(pos, rot);
 			}
 			else if (scene_name == "StoryScene" || section_name == "InGameStoryMain")
 			{
-				Utility.Set(mainCamera.get_transform(), new Vector3(0f, MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.cameraHeight, 0f), Vector3.get_zero());
+				mainCamera.transform.Set(new Vector3(0f, MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.cameraHeight, 0f), Vector3.zero);
 			}
 			else if (scene_name == "ProfileScene")
 			{
-				mainCamera.get_transform().Set(MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.friendPos, MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.friendRot);
+				mainCamera.transform.Set(MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.friendPos, MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.friendRot);
 			}
 			else if (MonoBehaviourSingleton<StageManager>.I.currentStageName == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage)
 			{
-				mainCamera.get_transform().Set(MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createCameraPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createCameraRot);
+				mainCamera.transform.Set(MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createCameraPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createCameraRot);
 			}
 			else if (MonoBehaviourSingleton<StageManager>.I.currentStageName == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillStage && section_name != "SmithGrowSkillResult")
 			{
-				mainCamera.get_transform().Set(MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillCameraPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillCameraRot);
+				mainCamera.transform.Set(MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillCameraPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillCameraRot);
 			}
 			else if (scene_name == "StatusScene")
 			{
-				mainCamera.get_transform().Set(MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.myhousePos, MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.myhouseRot);
+				mainCamera.transform.Set(MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.myhousePos, MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.myhouseRot);
 			}
 			else if (section_name == "GachaPerformanceSkill" || section_name == "GachaPerformanceQuest")
 			{
-				if (AnimationDirector.I != null)
+				if ((UnityEngine.Object)AnimationDirector.I != (UnityEngine.Object)null)
 				{
 					AnimationDirector.I.SetLinkCamera(true);
 				}
 			}
 			else if (section_name == "ShopTop")
 			{
-				if (AnimationDirector.I != null)
+				if ((UnityEngine.Object)AnimationDirector.I != (UnityEngine.Object)null)
 				{
 					AnimationDirector.I.SetLinkCamera(false);
 				}
-				mainCamera.get_transform().Set(MonoBehaviourSingleton<OutGameSettingsManager>.I.shopScene.cameraPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.shopScene.cameraRot);
+				mainCamera.transform.Set(MonoBehaviourSingleton<OutGameSettingsManager>.I.shopScene.cameraPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.shopScene.cameraRot);
 			}
 			else if (!(section_name == "QuestResultFriend"))
 			{
@@ -728,15 +676,15 @@ public class GameSceneGlobalSettings
 		if (text != null)
 		{
 			AnimationClip linkResource = SceneSettingsManager.GetLinkResource<AnimationClip>(text);
-			if (linkResource != null)
+			if ((UnityEngine.Object)linkResource != (UnityEngine.Object)null)
 			{
-				if (cameraAnimClip != linkResource)
+				if ((UnityEngine.Object)cameraAnimClip != (UnityEngine.Object)linkResource)
 				{
-					if (cameraAnim == null)
+					if ((UnityEngine.Object)cameraAnim == (UnityEngine.Object)null)
 					{
-						cameraAnim = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_gameObject().AddComponent<Animation>();
+						cameraAnim = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.gameObject.AddComponent<Animation>();
 					}
-					if (cameraAnimClip != null)
+					if ((UnityEngine.Object)cameraAnimClip != (UnityEngine.Object)null)
 					{
 						cameraAnim.RemoveClip(cameraAnimClip);
 					}
@@ -745,9 +693,9 @@ public class GameSceneGlobalSettings
 					cameraAnim.Stop();
 					cameraAnim.Play(text);
 				}
-				if (cameraAnim != null)
+				if ((UnityEngine.Object)cameraAnim != (UnityEngine.Object)null)
 				{
-					cameraAnim.set_enabled(true);
+					cameraAnim.enabled = true;
 				}
 			}
 			else
@@ -758,9 +706,9 @@ public class GameSceneGlobalSettings
 		if (text == null)
 		{
 			cameraAnimClip = null;
-			if (cameraAnim != null)
+			if ((UnityEngine.Object)cameraAnim != (UnityEngine.Object)null)
 			{
-				Object.Destroy(cameraAnim);
+				UnityEngine.Object.Destroy(cameraAnim);
 				cameraAnim = null;
 			}
 		}
@@ -770,9 +718,9 @@ public class GameSceneGlobalSettings
 	{
 		mainCameraCullingMask = mask;
 		Camera mainCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
-		if (!(mainCamera == null))
+		if (!((UnityEngine.Object)mainCamera == (UnityEngine.Object)null))
 		{
-			mainCamera.set_cullingMask(mask);
+			mainCamera.cullingMask = mask;
 		}
 	}
 
@@ -783,7 +731,7 @@ public class GameSceneGlobalSettings
 
 	private void UpdateCameraFieldOfView(string scene_name, string section_name, Camera camera, bool is_portrait)
 	{
-		if (!(camera == null) && camera.get_enabled() && MonoBehaviourSingleton<OutGameSettingsManager>.IsValid())
+		if (!((UnityEngine.Object)camera == (UnityEngine.Object)null) && camera.enabled && MonoBehaviourSingleton<OutGameSettingsManager>.IsValid())
 		{
 			float num = -1f;
 			string a = null;
@@ -848,7 +796,7 @@ public class GameSceneGlobalSettings
 					GlobalSettingsManager.CameraParam cameraParam3 = MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam;
 					num = cameraParam3.outGameFieldOfView;
 				}
-				camera.set_fieldOfView(num);
+				camera.fieldOfView = num;
 			}
 		}
 	}
@@ -1045,7 +993,7 @@ public class GameSceneGlobalSettings
 
 	private static bool ExistSection(string section_name)
 	{
-		return MonoBehaviourSingleton<GameSceneManager>.I.FindSection(section_name) != null;
+		return (UnityEngine.Object)MonoBehaviourSingleton<GameSceneManager>.I.FindSection(section_name) != (UnityEngine.Object)null;
 	}
 
 	private static bool ExistHistorySection(string section_name)
@@ -1118,7 +1066,7 @@ public class GameSceneGlobalSettings
 		{
 			string text = section_name;
 			GameSection lastSectionExcludeDialog = MonoBehaviourSingleton<GameSceneManager>.I.GetLastSectionExcludeDialog();
-			if (lastSectionExcludeDialog != null && lastSectionExcludeDialog.sectionData != (GameSceneTables.SectionData)null)
+			if ((UnityEngine.Object)lastSectionExcludeDialog != (UnityEngine.Object)null && lastSectionExcludeDialog.sectionData != (GameSceneTables.SectionData)null)
 			{
 				text = lastSectionExcludeDialog.sectionData.sectionName;
 			}
@@ -1171,7 +1119,7 @@ public class GameSceneGlobalSettings
 	{
 		string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
 		GameSection currentSection = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection();
-		if (!(currentSection != null) || !(currentSection.sectionData != (GameSceneTables.SectionData)null) || !currentSection.sectionData.type.IsDialog())
+		if (!((UnityEngine.Object)currentSection != (UnityEngine.Object)null) || !(currentSection.sectionData != (GameSceneTables.SectionData)null) || !currentSection.sectionData.type.IsDialog())
 		{
 			switch (currentSectionName)
 			{

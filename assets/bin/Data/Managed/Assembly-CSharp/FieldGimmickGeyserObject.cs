@@ -64,14 +64,10 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 
 	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(pointData);
 		actionData = Singleton<FieldMapTable>.I.GetFieldGimmickActionData((uint)base.m_pointData.value1);
-		Transform effect = EffectManager.GetEffect("ef_btl_bg_geyser_01", this.get_transform());
-		if (effect != null)
+		Transform effect = EffectManager.GetEffect("ef_btl_bg_geyser_01", base.transform);
+		if ((UnityEngine.Object)effect != (UnityEngine.Object)null)
 		{
 			effectCtrl = effect.GetComponent<EffectCtrl>();
 		}
@@ -79,24 +75,23 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 		{
 			self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 		}
-		if (self != null)
+		if ((UnityEngine.Object)self != (UnityEngine.Object)null)
 		{
-			selfInstanceId = self.get_gameObject().GetInstanceID();
+			selfInstanceId = self.gameObject.GetInstanceID();
 		}
 		reactionType = actionData.reactionType;
-		actCollider = this.get_gameObject().AddComponent<CapsuleCollider>();
+		actCollider = base.gameObject.AddComponent<CapsuleCollider>();
 		Reset();
 	}
 
 	public void Reset()
 	{
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 		state = STATE.IDLE;
 		if (actionData != null)
 		{
 			if (actionData.start < 0f)
 			{
-				timer = Random.get_value() * INTERVAL;
+				timer = UnityEngine.Random.value * INTERVAL;
 			}
 			else
 			{
@@ -105,27 +100,25 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 			INTERVAL = actionData.interval;
 			DURATION = actionData.duration;
 		}
-		if (actCollider != null)
+		if ((UnityEngine.Object)actCollider != (UnityEngine.Object)null)
 		{
 			float num = (actionData == null) ? 1f : actionData.radius;
 			float num2 = num * 2f + 3f;
-			actCollider.set_radius(num);
-			actCollider.set_height(num2);
-			actCollider.set_center(new Vector3(0f, num2 / 2f - num, 0f));
-			actCollider.set_isTrigger(true);
-			actCollider.set_enabled(false);
+			actCollider.radius = num;
+			actCollider.height = num2;
+			actCollider.center = new Vector3(0f, num2 / 2f - num, 0f);
+			actCollider.isTrigger = true;
+			actCollider.enabled = false;
 		}
-		this.set_enabled(true);
+		base.enabled = true;
 	}
 
 	public override void RequestDestroy()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Expected O, but got Unknown
 		SetEnableAction(false);
-		if (effectCtrl != null)
+		if ((UnityEngine.Object)effectCtrl != (UnityEngine.Object)null)
 		{
-			EffectManager.ReleaseEffect(effectCtrl.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(effectCtrl.gameObject, true, false);
 		}
 		base.RequestDestroy();
 	}
@@ -139,23 +132,22 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 
 	private void SetEnableAction(bool value)
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_enabled() != value)
+		if (base.enabled != value)
 		{
 			Reset();
 		}
-		this.set_enabled(value);
-		if (effectCtrl != null)
+		base.enabled = value;
+		if ((UnityEngine.Object)effectCtrl != (UnityEngine.Object)null)
 		{
-			effectCtrl.get_gameObject().SetActive(value);
+			effectCtrl.gameObject.SetActive(value);
 		}
 	}
 
 	private void Update()
 	{
-		if (!(effectCtrl == null))
+		if (!((UnityEngine.Object)effectCtrl == (UnityEngine.Object)null))
 		{
-			timer += Time.get_deltaTime();
+			timer += Time.deltaTime;
 			switch (state)
 			{
 			case STATE.IDLE:
@@ -168,14 +160,14 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 			case STATE.READY:
 				if (effectCtrl.IsCurrentState(ACTION_ANIM_HASH))
 				{
-					actCollider.set_enabled(true);
+					actCollider.enabled = true;
 					NextState();
 				}
 				break;
 			case STATE.ACTION:
 				if (timer > DURATION)
 				{
-					actCollider.set_enabled(false);
+					actCollider.enabled = false;
 					effectCtrl.CrossFade(IDLE_ANIM_HASH, 0.3f);
 					NextState();
 				}
@@ -200,35 +192,16 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 
 	public void SetEnableCollider(bool value)
 	{
-		if (actCollider != null)
+		if ((UnityEngine.Object)actCollider != (UnityEngine.Object)null)
 		{
-			actCollider.set_enabled(value);
+			actCollider.enabled = value;
 		}
 	}
 
 	public void ReactPlayer(Player self)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
 		self.isGatherInterruption = true;
-		Vector3 val = self._transform.get_position() - m_transform.get_position();
-		Vector3 normalized = val.get_normalized();
+		Vector3 normalized = (self._transform.position - m_transform.position).normalized;
 		switch (reactionType)
 		{
 		case Character.REACTION_TYPE.BLOW:
@@ -249,9 +222,7 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 
 	private void OnTriggerEnter(Collider other)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		if (selfInstanceId == other.get_gameObject().GetInstanceID() && self != null)
+		if (selfInstanceId == other.gameObject.GetInstanceID() && (UnityEngine.Object)self != (UnityEngine.Object)null)
 		{
 			bool flag = self.hitOffFlag == StageObject.HIT_OFF_FLAG.NONE;
 			Character.ACTION_ID actionID = self.actionID;
@@ -263,10 +234,10 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 			{
 				flag = true;
 			}
-			if (flag && this.get_enabled())
+			if (flag && base.enabled)
 			{
 				SetEnableCollider(false);
-				this.StartCoroutine(SetEnableCollider(true, 1f));
+				StartCoroutine(SetEnableCollider(true, 1f));
 				ReactPlayer(self);
 			}
 		}

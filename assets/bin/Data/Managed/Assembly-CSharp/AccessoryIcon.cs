@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AccessoryIcon
+public class AccessoryIcon : MonoBehaviour
 {
 	[SerializeField]
 	public UITexture texIcon;
@@ -14,15 +14,10 @@ public class AccessoryIcon
 	[SerializeField]
 	public UISprite sprRarity;
 
-	public AccessoryIcon()
-		: this()
-	{
-	}
-
 	public static Transform Create(uint accessoryId, RARITY_TYPE rarity, GET_TYPE getType)
 	{
-		Transform val = ResourceUtility.Realizes(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.accessoryIconPrefab, null, -1);
-		AccessoryIcon ai = val.GetComponent<AccessoryIcon>();
+		Transform transform = ResourceUtility.Realizes(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.accessoryIconPrefab, null, -1);
+		AccessoryIcon ai = transform.GetComponent<AccessoryIcon>();
 		ResourceLoad.LoadIconTexture(ai, RESOURCE_CATEGORY.ICON_ACCESSORY, ResourceName.GetAccessoryIcon((int)accessoryId), null, delegate(Texture tex)
 		{
 			ai.texIcon.mainTexture = tex;
@@ -40,6 +35,6 @@ public class AccessoryIcon
 		ai.sprRarity.spriteName = text;
 		string spriteName = (rarity != 0 && rarity != RARITY_TYPE.C) ? ("EquipIconFrame_" + rarity.ToString()) : "EquipIconFrame_CD";
 		ai.sprFrame.spriteName = spriteName;
-		return val;
+		return transform;
 	}
 }

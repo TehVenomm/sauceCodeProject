@@ -4,23 +4,23 @@ using UnityEngine;
 
 public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 {
-	private class Pool_InstantiateData
+	private class Pool_InstantiateData : rymTPool<InstantiateData>
 	{
 	}
 
-	private class Pool_StockData
+	private class Pool_StockData : rymTPool<StockData>
 	{
 	}
 
 	public class InstantiateData
 	{
-		public Object master;
+		public UnityEngine.Object master;
 
 		public Action<InstantiateData> callback;
 
-		public Object originalObject;
+		public UnityEngine.Object originalObject;
 
-		public Object instantiatedObject;
+		public UnityEngine.Object instantiatedObject;
 
 		public bool isInactivateInstantiatedObject;
 
@@ -48,9 +48,9 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 
 		public string name;
 
-		public Object originalObject;
+		public UnityEngine.Object originalObject;
 
-		public Object instantiatedObject;
+		public UnityEngine.Object instantiatedObject;
 
 		public void Clear()
 		{
@@ -92,11 +92,10 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 
 	protected override void Awake()
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		inactiveRoot = Utility.CreateGameObject("InactiveRoot", base._transform, -1);
-		inactiveRoot.get_gameObject().SetActive(false);
-		this.set_enabled(false);
+		inactiveRoot.gameObject.SetActive(false);
+		base.enabled = false;
 	}
 
 	protected override void OnDestroySingleton()
@@ -112,7 +111,7 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 		DoInstantiate(ref data);
 		if (requests.size == 0)
 		{
-			this.set_enabled(false);
+			base.enabled = false;
 		}
 	}
 
@@ -121,7 +120,7 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 		if (data.stockData != null)
 		{
 			data.stockData.originalObject = data.originalObject;
-			Object instantiatedObject = data.instantiatedObject;
+			UnityEngine.Object instantiatedObject = data.instantiatedObject;
 			data.stockData.instantiatedObject = instantiatedObject;
 			stocks.Add(data.stockData);
 			data.stockData = null;
@@ -144,7 +143,7 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 			StockData stockData = stocks.buffer[num];
 			if (stockData.hashCode == hash_code && stockData.category == category && stockData.name == name)
 			{
-				if (stockData.instantiatedObject != null)
+				if (stockData.instantiatedObject != (UnityEngine.Object)null)
 				{
 					return num;
 				}
@@ -175,14 +174,14 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 
 	private void RemoveStockAt(int idx, bool with_destroy)
 	{
-		StockData stockData = stocks.buffer[idx];
-		if (with_destroy && stockData.instantiatedObject != null)
+		StockData obj = stocks.buffer[idx];
+		if (with_destroy && obj.instantiatedObject != (UnityEngine.Object)null)
 		{
-			Object.DestroyImmediate(stockData.instantiatedObject);
+			UnityEngine.Object.DestroyImmediate(obj.instantiatedObject);
 		}
 		stocks.RemoveAt(idx);
-		stockData.Clear();
-		rymTPool<StockData>.Release(ref stockData);
+		obj.Clear();
+		rymTPool<StockData>.Release(ref obj);
 	}
 
 	public void ClearStocks()
@@ -190,9 +189,9 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 		int i = 0;
 		for (int size = stocks.size; i < size; i++)
 		{
-			if (stocks[i].instantiatedObject != null)
+			if (stocks[i].instantiatedObject != (UnityEngine.Object)null)
 			{
-				Object.DestroyImmediate(stocks[i].instantiatedObject);
+				UnityEngine.Object.DestroyImmediate(stocks[i].instantiatedObject);
 			}
 		}
 		stocks.Release();
@@ -200,24 +199,21 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 
 	private static void DoInstantiate(ref InstantiateData data)
 	{
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Expected O, but got Unknown
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		if (data.master != null && data.callback != null)
+		if (data.master != (UnityEngine.Object)null && data.callback != null)
 		{
 			if (data.isInactivateInstantiatedObject)
 			{
-				GameObject val = data.originalObject as GameObject;
-				data.instantiatedObject = ResourceUtility.Instantiate<Object>(data.originalObject);
-				if (val != null)
+				GameObject x = data.originalObject as GameObject;
+				data.instantiatedObject = ResourceUtility.Instantiate(data.originalObject);
+				if ((UnityEngine.Object)x != (UnityEngine.Object)null)
 				{
-					GameObject val2 = data.instantiatedObject;
-					val2.get_transform().set_parent(MonoBehaviourSingleton<InstantiateManager>.I.inactiveRoot);
+					GameObject gameObject = (GameObject)data.instantiatedObject;
+					gameObject.transform.parent = MonoBehaviourSingleton<InstantiateManager>.I.inactiveRoot;
 				}
 			}
 			else
 			{
-				data.instantiatedObject = ResourceUtility.Instantiate<Object>(data.originalObject);
+				data.instantiatedObject = ResourceUtility.Instantiate(data.originalObject);
 			}
 			data.callback(data);
 		}
@@ -245,7 +241,7 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 					}
 				}
 			}
-			MonoBehaviourSingleton<InstantiateManager>.I.set_enabled(true);
+			MonoBehaviourSingleton<InstantiateManager>.I.enabled = true;
 		}
 		else
 		{
@@ -253,9 +249,9 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 		}
 	}
 
-	public static void Request(Object master, Object original_object, Action<InstantiateData> callback, bool is_inactivate_instantiated_object = false)
+	public static void Request(UnityEngine.Object master, UnityEngine.Object original_object, Action<InstantiateData> callback, bool is_inactivate_instantiated_object = false)
 	{
-		if (!(original_object == null))
+		if (!(original_object == (UnityEngine.Object)null))
 		{
 			InstantiateData instantiateData = rymTPool<InstantiateData>.Get();
 			instantiateData.master = master;
@@ -266,9 +262,9 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 		}
 	}
 
-	public static void RequestStock(RESOURCE_CATEGORY category, Object original_object, string name, bool is_one)
+	public static void RequestStock(RESOURCE_CATEGORY category, UnityEngine.Object original_object, string name, bool is_one)
 	{
-		if (MonoBehaviourSingleton<InstantiateManager>.IsValid() && !(original_object == null))
+		if (MonoBehaviourSingleton<InstantiateManager>.IsValid() && !(original_object == (UnityEngine.Object)null))
 		{
 			int hashCode = name.GetHashCode();
 			if (!is_one || (MonoBehaviourSingleton<InstantiateManager>.I.FindStockRequestIndex(category, name, hashCode) == -1 && MonoBehaviourSingleton<InstantiateManager>.I.FindStockIndex(category, name, hashCode) == -1))
@@ -287,7 +283,7 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 		}
 	}
 
-	public static Object FindStock(RESOURCE_CATEGORY category, string name)
+	public static UnityEngine.Object FindStock(RESOURCE_CATEGORY category, string name)
 	{
 		if (!MonoBehaviourSingleton<InstantiateManager>.IsValid())
 		{
@@ -299,10 +295,10 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 			return null;
 		}
 		StockData stockData = MonoBehaviourSingleton<InstantiateManager>.I.stocks.buffer[num];
-		Object instantiatedObject = stockData.instantiatedObject;
-		Object originalObject = stockData.originalObject;
+		UnityEngine.Object instantiatedObject = stockData.instantiatedObject;
+		UnityEngine.Object originalObject = stockData.originalObject;
 		MonoBehaviourSingleton<InstantiateManager>.I.RemoveStockAt(num, false);
-		if ((category == RESOURCE_CATEGORY.EFFECT_ACTION || category == RESOURCE_CATEGORY.EFFECT_UI) && originalObject != null)
+		if ((category == RESOURCE_CATEGORY.EFFECT_ACTION || category == RESOURCE_CATEGORY.EFFECT_UI) && originalObject != (UnityEngine.Object)null)
 		{
 			RequestStock(category, originalObject, name, false);
 		}
@@ -311,27 +307,25 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 
 	public static Transform Realizes(ref GameObject inactive_inctance, Transform parent, int layer)
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Expected O, but got Unknown
-		if (inactive_inctance == null)
+		if ((UnityEngine.Object)inactive_inctance == (UnityEngine.Object)null)
 		{
 			return null;
 		}
-		string name = inactive_inctance.get_name();
+		string name = inactive_inctance.name;
 		name = ResourceName.Normalize(name);
 		name = name.Replace("(Clone)", string.Empty);
-		inactive_inctance.set_name(name);
-		Transform val = inactive_inctance.get_transform();
-		if (parent != null)
+		inactive_inctance.name = name;
+		Transform transform = inactive_inctance.transform;
+		if ((UnityEngine.Object)parent != (UnityEngine.Object)null)
 		{
-			Utility.Attach(parent, val);
+			Utility.Attach(parent, transform);
 		}
 		if (layer != -1)
 		{
-			Utility.SetLayerWithChildren(val, layer);
+			Utility.SetLayerWithChildren(transform, layer);
 		}
-		inactive_inctance.set_hideFlags(0);
+		inactive_inctance.hideFlags = HideFlags.None;
 		inactive_inctance = null;
-		return val;
+		return transform;
 	}
 }

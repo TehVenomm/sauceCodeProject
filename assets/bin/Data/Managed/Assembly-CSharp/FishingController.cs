@@ -1,5 +1,4 @@
 using Network;
-using System;
 using UnityEngine;
 
 public class FishingController
@@ -121,7 +120,7 @@ public class FishingController
 		sendTime = 0f;
 		timing = -1;
 		isSend = false;
-		owner._rigidbody.set_isKinematic(true);
+		owner._rigidbody.isKinematic = true;
 		_ShowWeapon(false);
 		_SetExclamation();
 		ChangeState(eState.Wait);
@@ -131,9 +130,9 @@ public class FishingController
 	{
 		if (state != 0)
 		{
-			owner._rigidbody.set_isKinematic(false);
+			owner._rigidbody.isKinematic = false;
 			_ShowWeapon(true);
-			if (effectHookTrans != null)
+			if ((Object)effectHookTrans != (Object)null)
 			{
 				EffectManager.ReleaseEffect(ref effectHookTrans);
 			}
@@ -146,13 +145,11 @@ public class FishingController
 
 	public void Get()
 	{
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 		if (state == eState.Hit && hitType != eHitType.Enemy)
 		{
 			if (hitType == eHitType.Item || hitType == eHitType.GatherItem)
 			{
-				EffectManager.OneShot("ef_btl_fishing_03", owner.FindNode("L_Hand").get_position(), Quaternion.get_identity(), false);
+				EffectManager.OneShot("ef_btl_fishing_03", owner.FindNode("L_Hand").position, Quaternion.identity, false);
 			}
 			if (isSelf)
 			{
@@ -186,7 +183,7 @@ public class FishingController
 			break;
 		}
 		state = s;
-		if (isSelf && owner != null && owner.playerSender != null)
+		if (isSelf && (Object)owner != (Object)null && (Object)owner.playerSender != (Object)null)
 		{
 			owner.playerSender.OnGatherGimmickState((int)state);
 		}
@@ -235,7 +232,7 @@ public class FishingController
 
 	private void _UpdateWait()
 	{
-		waitTime -= Time.get_deltaTime();
+		waitTime -= Time.deltaTime;
 		if (waitTime <= 0f)
 		{
 			ChangeState(eState.Omen);
@@ -255,13 +252,11 @@ public class FishingController
 
 	private void _UpdateOmen()
 	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		omenInterval -= Time.get_deltaTime();
+		omenInterval -= Time.deltaTime;
 		if (omenInterval <= 0f)
 		{
 			SoundManager.PlayOneShotSE(param.omenSeId, owner, owner.FindNode(string.Empty));
-			EffectManager.OneShot("ef_btl_fishing_01", gatherGimickTrans.get_position(), Quaternion.get_identity(), false);
+			EffectManager.OneShot("ef_btl_fishing_01", gatherGimickTrans.position, Quaternion.identity, false);
 			if (--omenNum < 0)
 			{
 				ChangeState(eState.Hook);
@@ -281,7 +276,7 @@ public class FishingController
 
 	private void _UpdateHook()
 	{
-		hookTime -= Time.get_deltaTime();
+		hookTime -= Time.deltaTime;
 		if (hookTime <= 0f)
 		{
 			ChangeState(eState.Send);
@@ -294,7 +289,7 @@ public class FishingController
 		ChangeState(eState.Send);
 	}
 
-	private unsafe void _ChangeSend()
+	private void _ChangeSend()
 	{
 		_DispExclamation(false);
 		owner.SetNextTrigger(0);
@@ -304,8 +299,83 @@ public class FishingController
 		isSend = false;
 		if (isSelf)
 		{
-			MonoBehaviourSingleton<FieldManager>.I.SendFieldGatherGimmick(lotId, timing, isPop, new Action<bool, FieldGatherRewardList>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-			if (effectHookTrans != null)
+			MonoBehaviourSingleton<FieldManager>.I.SendFieldGatherGimmick(lotId, timing, isPop, delegate(bool is_success, FieldGatherRewardList list)
+			{
+				isSend = true;
+				if (list != null && list.fieldGather != null)
+				{
+					if (!list.fieldGather.gatherItem.IsNullOrEmpty())
+					{
+						int i = 0;
+						for (int count = list.fieldGather.gatherItem.Count; i < count; i++)
+						{
+							QuestCompleteReward.GatherItem gatherItem = list.fieldGather.gatherItem[i];
+							if (gatherItem != null)
+							{
+								GatherItemTable.GatherItemData data = Singleton<GatherItemTable>.I.GetData((uint)gatherItem.gatherItemId);
+								if (data != null)
+								{
+									sendTime += param.sendSec[2];
+									sendTime += param.sendCrownTypeSec[gatherItem.maxCrownType];
+									if (data.isRare == 1)
+									{
+										sendTime += param.sendRareSec;
+									}
+									string arg = GatherItemRecord.ShapeSize(gatherItem.score);
+									hitStr = string.Format(StringTable.Get(STRING_CATEGORY.FISHING, (uint)gatherItem.status), data.name, arg);
+									if (gatherItem.psig != null)
+									{
+										enemyHitStr = hitStr;
+										hitType = eHitType.Enemy;
+										popInfo = gatherItem.psig;
+									}
+									else
+									{
+										hitType = eHitType.GatherItem;
+									}
+									return;
+								}
+							}
+						}
+					}
+					int j = 0;
+					for (int count2 = list.fieldGather.item.Count; j < count2; j++)
+					{
+						QuestCompleteReward.Item item = list.fieldGather.item[j];
+						if (item != null)
+						{
+							ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)item.itemId);
+							if (itemData != null)
+							{
+								hitStr = string.Format(StringTable.Get(STRING_CATEGORY.FISHING, kItemHitStringId), itemData.name, MonoBehaviourSingleton<InventoryManager>.I.GetHaveingItemNum((uint)item.itemId));
+								hitType = eHitType.Item;
+								sendTime += param.sendSec[1];
+								return;
+							}
+						}
+					}
+					int k = 0;
+					for (int count3 = list.fieldGather.accessoryItem.Count; k < count3; k++)
+					{
+						QuestCompleteReward.AccessoryItem accessoryItem = list.fieldGather.accessoryItem[k];
+						if (accessoryItem != null)
+						{
+							AccessoryTable.AccessoryData data2 = Singleton<AccessoryTable>.I.GetData((uint)accessoryItem.accessoryId);
+							if (data2 != null)
+							{
+								hitStr = string.Format(StringTable.Get(STRING_CATEGORY.FISHING, kAccessoryHitStringId), data2.name);
+								hitType = eHitType.Item;
+								sendTime += param.sendSec[1];
+								return;
+							}
+						}
+					}
+				}
+				hitStr = StringTable.Get(STRING_CATEGORY.FISHING, kDontHitStringId);
+				hitType = eHitType.None;
+				sendTime += param.sendSec[0];
+			});
+			if ((Object)effectHookTrans != (Object)null)
 			{
 				EffectManager.ReleaseEffect(ref effectHookTrans);
 			}
@@ -315,27 +385,27 @@ public class FishingController
 
 	private void _UpdateSend()
 	{
-		sendTime -= Time.get_deltaTime();
+		sendTime -= Time.deltaTime;
 		if (sendTime <= 0f && isSend)
 		{
 			ChangeState(eState.Hit);
 		}
 	}
 
-	private unsafe void _ChangeHit()
+	private void _ChangeHit()
 	{
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Expected O, but got Unknown
-		if (effectHookTrans != null)
+		if ((Object)effectHookTrans != (Object)null)
 		{
 			EffectManager.ReleaseEffect(ref effectHookTrans);
 		}
 		effectHookTrans = null;
 		if (hitType == eHitType.Enemy)
 		{
-			MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyForcePop(popInfo, gatherGimickTrans.get_position());
-			AppMain.Delay(param.delayEnemyFishing, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyForcePop(popInfo, gatherGimickTrans.position);
+			AppMain.Delay(param.delayEnemyFishing, delegate
+			{
+				UIInGamePopupDialog.PushOpen(enemyHitStr, false, 1.8f);
+			});
 		}
 		owner.SetNextTrigger(0);
 	}
@@ -347,8 +417,7 @@ public class FishingController
 
 	private void _SetExclamation()
 	{
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		if (isSelf && !(owner == null) && !(owner.uiPlayerStatusGizmo == null) && owner.uiPlayerStatusGizmo.get_gameObject().get_activeInHierarchy())
+		if (isSelf && !((Object)owner == (Object)null) && !((Object)owner.uiPlayerStatusGizmo == (Object)null) && owner.uiPlayerStatusGizmo.gameObject.activeInHierarchy)
 		{
 			owner.uiPlayerStatusGizmo.SetEmotionDuration(param.hookSec);
 		}
@@ -356,8 +425,7 @@ public class FishingController
 
 	private void _DispExclamation(bool isDisp)
 	{
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		if (isSelf && !(owner == null) && !(owner.uiPlayerStatusGizmo == null) && owner.uiPlayerStatusGizmo.get_gameObject().get_activeInHierarchy())
+		if (isSelf && !((Object)owner == (Object)null) && !((Object)owner.uiPlayerStatusGizmo == (Object)null) && owner.uiPlayerStatusGizmo.gameObject.activeInHierarchy)
 		{
 			owner.uiPlayerStatusGizmo.OnDispEmotion(isDisp);
 			if (isDisp)

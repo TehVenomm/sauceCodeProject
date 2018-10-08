@@ -78,24 +78,17 @@ public class TwoHandSwordSoulController : IWeaponController
 
 	public void Update()
 	{
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
 		switch (iaiState)
 		{
 		case eIaiState.In:
-			iaiCounter += Time.get_deltaTime();
+			iaiCounter += Time.deltaTime;
 			if (iaiCounter >= m_actionInfo.soulIaiInSec)
 			{
 				m_owner.SetEnableNodeRenderer(string.Empty, false);
 				m_owner.EventMoveEnd();
 				m_owner.SetEnableEventMove(true);
 				m_owner.SetEnableAddForce(false);
-				m_owner.SetEventMoveVelocity(Vector3.get_forward() * GetIaiMoveSpeed(m_owner.ChargeRate) * m_owner.buffParam.GetDistanceRateIai());
+				m_owner.SetEventMoveVelocity(Vector3.forward * GetIaiMoveSpeed(m_owner.ChargeRate) * m_owner.buffParam.GetDistanceRateIai());
 				m_owner.SetVelocity(Quaternion.LookRotation(m_owner.GetTransformForward()) * m_owner.EventMoveVelocity, Character.VELOCITY_TYPE.EVENT_MOVE);
 				m_owner.SetEventMoveTimeCount(m_actionInfo.soulIaiMoveSec);
 				iaiCounter = 0f;
@@ -103,7 +96,7 @@ public class TwoHandSwordSoulController : IWeaponController
 			}
 			break;
 		case eIaiState.Hide:
-			iaiCounter += Time.get_deltaTime();
+			iaiCounter += Time.deltaTime;
 			if (iaiCounter >= m_actionInfo.soulIaiHideSec)
 			{
 				m_owner.SetEnableNodeRenderer(string.Empty, true);
@@ -117,7 +110,7 @@ public class TwoHandSwordSoulController : IWeaponController
 
 	public void OnEndAction()
 	{
-		if (m_owner != null)
+		if ((Object)m_owner != (Object)null)
 		{
 			m_owner.ReleaseEffect(ref twoHandSwordsChargeMaxEffect, true);
 		}
@@ -139,7 +132,7 @@ public class TwoHandSwordSoulController : IWeaponController
 
 	public void SetChargeRelease()
 	{
-		if (!(m_owner == null))
+		if (!((Object)m_owner == (Object)null))
 		{
 			m_owner.ReleaseEffect(ref twoHandSwordsChargeMaxEffect, true);
 			iaiCounter = 0f;

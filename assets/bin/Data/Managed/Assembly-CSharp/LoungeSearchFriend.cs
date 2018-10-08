@@ -78,31 +78,47 @@ public class LoungeSearchFriend : FollowListBase
 		UpdateListUI();
 	}
 
-	protected unsafe override void SendGetList(int page, Action<bool> callback)
+	protected override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey3D1 _003CSendGetList_003Ec__AnonStorey3D;
-		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendSearchFollowerRoom(new Action<bool, List<LoungeSearchFollowerRoomModel.LoungeFollowerModel>, List<int>>((object)_003CSendGetList_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendSearchFollowerRoom(delegate(bool isSuccess, List<LoungeSearchFollowerRoomModel.LoungeFollowerModel> lounges, List<int> firstMetUserIds)
+		{
+			if (isSuccess)
+			{
+				nowPage = 1;
+				pageNumMax = 1;
+				loungeFollowers = lounges;
+				this.firstMetUserIds = firstMetUserIds;
+			}
+			if (callback != null)
+			{
+				callback(isSuccess);
+			}
+		});
 	}
 
-	private unsafe void UpdateListUI()
+	private void UpdateListUI()
 	{
 		if (loungeFollowers == null || loungeFollowers.Count == 0)
 		{
-			SetActive((Enum)UI.LBL_NON_LIST, true);
-			SetActive((Enum)UI.GRD_LIST, false);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_PREV, false);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_NEXT, false);
-			SetLabelText((Enum)UI.LBL_NOW, "0");
-			SetLabelText((Enum)UI.LBL_MAX, "0");
+			SetActive(UI.LBL_NON_LIST, true);
+			SetActive(UI.GRD_LIST, false);
+			SetButtonEnabled(UI.BTN_PAGE_PREV, false);
+			SetButtonEnabled(UI.BTN_PAGE_NEXT, false);
+			SetLabelText(UI.LBL_NOW, "0");
+			SetLabelText(UI.LBL_MAX, "0");
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_NOW, (nowPage + 1).ToString());
-			SetActive((Enum)UI.LBL_NON_LIST, false);
-			SetActive((Enum)UI.GRD_LIST, true);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_PREV, nowPage > 0);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_NEXT, nowPage + 1 < pageNumMax);
-			SetDynamicList((Enum)UI.GRD_LIST, "LoungeSearchFriendItem", loungeFollowers.Count, false, null, null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetLabelText(UI.LBL_NOW, (nowPage + 1).ToString());
+			SetActive(UI.LBL_NON_LIST, false);
+			SetActive(UI.GRD_LIST, true);
+			SetButtonEnabled(UI.BTN_PAGE_PREV, nowPage > 0);
+			SetButtonEnabled(UI.BTN_PAGE_NEXT, nowPage + 1 < pageNumMax);
+			SetDynamicList(UI.GRD_LIST, "LoungeSearchFriendItem", loungeFollowers.Count, false, null, null, delegate(int i, Transform t, bool is_recycle)
+			{
+				LoungeSearchFollowerRoomModel.LoungeFollowerModel data = loungeFollowers[i];
+				SetupListItem(data, i, t);
+			});
 		}
 	}
 
@@ -115,8 +131,6 @@ public class LoungeSearchFriend : FollowListBase
 
 	private void SetFollowerInfo(LoungeSearchFollowerRoomModel.LoungeFollowerModel data, Transform t)
 	{
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 		CharaInfo charaInfo = null;
 		for (int i = 0; i < data.slotInfos.Count; i++)
 		{
@@ -149,14 +163,13 @@ public class LoungeSearchFriend : FollowListBase
 		return false;
 	}
 
-	private unsafe void SetLoungeInfo(LoungeSearchFollowerRoomModel.LoungeFollowerModel data, Transform t)
+	private void SetLoungeInfo(LoungeSearchFollowerRoomModel.LoungeFollowerModel data, Transform t)
 	{
 		SetLabelText(t, UI.LBL_LOUNGE_NAME, data.name);
 		string text = StringTable.Get(STRING_CATEGORY.LOUNGE_LABEL, (uint)data.label);
 		SetLabelText(t, UI.LBL_LABEL, text);
 		int num = data.num + 1;
-		_003CSetLoungeInfo_003Ec__AnonStorey3D2 _003CSetLoungeInfo_003Ec__AnonStorey3D;
-		int num2 = data.slotInfos.Count(new Func<LoungeModel.SlotInfo, bool>((object)_003CSetLoungeInfo_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		int num2 = data.slotInfos.Count((LoungeModel.SlotInfo slotInfo) => slotInfo != null && slotInfo.userInfo != null && slotInfo.userInfo.userId != data.ownerUserId);
 		for (int i = 0; i < 7; i++)
 		{
 			bool is_visible = i < num - 1;

@@ -170,7 +170,7 @@ public class StatusAutoEquipDialog : GameSection
 
 	private void OnQuery_QuestAcceptArenaRoomAutoEquipWarningElementDialog_OK()
 	{
-		Debug.Log((object)"OnQuery_QuestAcceptArenaRoomAutoEquipWarningElementDialog_OK");
+		Debug.Log("OnQuery_QuestAcceptArenaRoomAutoEquipWarningElementDialog_OK");
 		GameSection.SetEventData(newEquipments);
 	}
 
@@ -381,7 +381,7 @@ public class StatusAutoEquipDialog : GameSection
 		{
 			Transform ctrl = GetCtrl(uiArray[i]);
 			UIToggle component = ctrl.GetComponent<UIToggle>();
-			if (!(component == null) && component.value)
+			if (!((Object)component == (Object)null) && component.value)
 			{
 				result = i;
 				break;

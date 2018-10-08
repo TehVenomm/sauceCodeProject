@@ -33,60 +33,40 @@ public class ItemIconEquipMaterial : ItemIcon
 
 	public void SetVisibleBG(bool is_visible)
 	{
-		baseBG.set_enabled(is_visible);
+		baseBG.enabled = is_visible;
 	}
 
 	public void EquipTypeIconInit(EquipItemTable.EquipItemData equip_table = null)
 	{
 		if (equip_table == null)
 		{
-			spriteValueType.set_enabled(false);
+			spriteValueType.enabled = false;
 		}
 		else
 		{
-			spriteValueType.set_enabled(true);
+			spriteValueType.enabled = true;
 			spriteValueType.spriteName = ((!equip_table.IsWeapon()) ? ItemIcon.SPR_TYPE_DEF : ItemIcon.SPR_TYPE_ATK);
 		}
 	}
 
 	public void SelectUniqueID(ulong id)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
 		selectedUniqueID = id;
 		if (selectedUniqueID == 0L)
 		{
-			strUnselect.get_gameObject().SetActive(true);
-			lblHave.get_transform().get_parent().get_gameObject()
-				.SetActive(true);
-			lblLv.get_transform().get_parent().get_gameObject()
-				.SetActive(false);
-			spriteValueType.get_gameObject().SetActive(false);
+			strUnselect.gameObject.SetActive(true);
+			lblHave.transform.parent.gameObject.SetActive(true);
+			lblLv.transform.parent.gameObject.SetActive(false);
+			spriteValueType.gameObject.SetActive(false);
 			lblText.text = "0";
 			lblLv.text = "0";
 		}
 		else
 		{
-			strUnselect.get_gameObject().SetActive(false);
-			lblHave.get_transform().get_parent().get_gameObject()
-				.SetActive(false);
-			lblLv.get_transform().get_parent().get_gameObject()
-				.SetActive(true);
-			spriteValueType.get_gameObject().SetActive(true);
+			strUnselect.gameObject.SetActive(false);
+			lblHave.transform.parent.gameObject.SetActive(false);
+			lblLv.transform.parent.gameObject.SetActive(true);
+			spriteValueType.gameObject.SetActive(true);
 			EquipItemInfo equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(id);
 			if (equipItemInfo != null)
 			{

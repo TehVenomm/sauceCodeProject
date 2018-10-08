@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class NodeObject
+public class NodeObject : MonoBehaviour
 {
 	protected float timeCount;
 
@@ -28,11 +28,6 @@ public class NodeObject
 		protected set;
 	}
 
-	public NodeObject()
-		: this()
-	{
-	}
-
 	protected virtual bool triggerColliderIsRequired()
 	{
 		return true;
@@ -40,42 +35,38 @@ public class NodeObject
 
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		_transform = this.get_transform();
-		_rigidbody = this.GetComponent<Rigidbody>();
+		_transform = base.transform;
+		_rigidbody = GetComponent<Rigidbody>();
 		_collider = GetCollider();
-		if (_collider != null && triggerColliderIsRequired())
+		if ((Object)_collider != (Object)null && triggerColliderIsRequired())
 		{
-			if (_rigidbody == null)
+			if ((Object)_rigidbody == (Object)null)
 			{
-				_rigidbody = this.get_gameObject().AddComponent<Rigidbody>();
+				_rigidbody = base.gameObject.AddComponent<Rigidbody>();
 			}
-			_rigidbody.set_isKinematic(true);
+			_rigidbody.isKinematic = true;
 		}
 	}
 
 	protected Collider GetCollider()
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		Collider component = this.GetComponent<Collider>();
-		if (component == null)
+		Collider component = GetComponent<Collider>();
+		if ((Object)component == (Object)null)
 		{
 			return null;
 		}
 		bool flag = triggerColliderIsRequired();
-		if (component.get_isTrigger() == flag)
+		if (component.isTrigger == flag)
 		{
 			return component;
 		}
-		Collider[] components = this.get_gameObject().GetComponents<Collider>();
+		Collider[] components = base.gameObject.GetComponents<Collider>();
 		Collider[] array = components;
-		foreach (Collider val in array)
+		foreach (Collider collider in array)
 		{
-			if (val.get_isTrigger() == flag)
+			if (collider.isTrigger == flag)
 			{
-				return val;
+				return collider;
 			}
 		}
 		return null;
@@ -83,30 +74,26 @@ public class NodeObject
 
 	protected virtual void Start()
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 		if (triggerColliderIsRequired())
 		{
-			stageObject = this.get_gameObject().GetComponentInParent<StageObject>();
+			stageObject = base.gameObject.GetComponentInParent<StageObject>();
 		}
 	}
 
 	protected virtual void Update()
 	{
-		if (_collider != null && _collider.get_enabled())
+		if ((Object)_collider != (Object)null && _collider.enabled)
 		{
-			timeCount += Time.get_deltaTime();
+			timeCount += Time.deltaTime;
 		}
 	}
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		if (!(_collider == null) && _collider.get_enabled() && !collider.get_isTrigger() && !(stageObject == null) && !(collider.get_gameObject() == this.get_gameObject()))
+		if (!((Object)_collider == (Object)null) && _collider.enabled && !collider.isTrigger && !((Object)stageObject == (Object)null) && !((Object)collider.gameObject == (Object)base.gameObject))
 		{
-			StageObject componentInParent = collider.get_gameObject().GetComponentInParent<StageObject>();
-			if (!(componentInParent == null) && !(componentInParent == stageObject))
+			StageObject componentInParent = collider.gameObject.GetComponentInParent<StageObject>();
+			if (!((Object)componentInParent == (Object)null) && !((Object)componentInParent == (Object)stageObject))
 			{
 				OnHitTrigger(collider, componentInParent);
 			}
@@ -119,9 +106,9 @@ public class NodeObject
 
 	public void SetEnableTrigger(bool enable, bool init = true)
 	{
-		if (_collider != null && _collider.get_isTrigger())
+		if ((Object)_collider != (Object)null && _collider.isTrigger)
 		{
-			_collider.set_enabled(enable);
+			_collider.enabled = enable;
 		}
 		if (enable && init)
 		{

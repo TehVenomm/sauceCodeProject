@@ -1,6 +1,7 @@
 using System;
+using UnityEngine;
 
-public class UIToggleButton
+public class UIToggleButton : MonoBehaviour
 {
 	public UIButton activeButton;
 
@@ -10,22 +11,15 @@ public class UIToggleButton
 
 	public Action<bool> onChanged;
 
-	public UIToggleButton()
-		: this()
-	{
-	}
-
 	public void Initialize()
 	{
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		if (!(activeButton == null) && !(inactiveButton == null))
+		if (!((UnityEngine.Object)activeButton == (UnityEngine.Object)null) && !((UnityEngine.Object)inactiveButton == (UnityEngine.Object)null))
 		{
 			EventDelegate item = new EventDelegate(OnChange);
-			activeButton.get_gameObject().SetActive(isActive);
+			activeButton.gameObject.SetActive(isActive);
 			activeButton.onClick.Clear();
 			activeButton.onClick.Add(item);
-			inactiveButton.get_gameObject().SetActive(!isActive);
+			inactiveButton.gameObject.SetActive(!isActive);
 			inactiveButton.onClick.Clear();
 			inactiveButton.onClick.Add(item);
 		}
@@ -33,16 +27,14 @@ public class UIToggleButton
 
 	public void Change()
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		isActive = !isActive;
-		if (activeButton != null)
+		if ((UnityEngine.Object)activeButton != (UnityEngine.Object)null)
 		{
-			activeButton.get_gameObject().SetActive(isActive);
+			activeButton.gameObject.SetActive(isActive);
 		}
-		if (inactiveButton != null)
+		if ((UnityEngine.Object)inactiveButton != (UnityEngine.Object)null)
 		{
-			inactiveButton.get_gameObject().SetActive(!isActive);
+			inactiveButton.gameObject.SetActive(!isActive);
 		}
 	}
 

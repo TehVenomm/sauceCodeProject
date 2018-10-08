@@ -29,12 +29,8 @@ public class GuildSmithGrowItemSelect : SmithEquipSelectBase
 
 	public override void UpdateUI()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Expected O, but got Unknown
-		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).get_parent(), false);
-		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).get_parent(), false);
+		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).parent, false);
+		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).parent, false);
 		if (MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>() == null)
 		{
 			MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();

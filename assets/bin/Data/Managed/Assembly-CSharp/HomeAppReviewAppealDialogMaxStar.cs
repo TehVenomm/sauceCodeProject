@@ -1,5 +1,3 @@
-using System;
-
 public class HomeAppReviewAppealDialogMaxStar : HomeAppReviewAppealDialogBase
 {
 	protected new enum UI
@@ -28,15 +26,12 @@ public class HomeAppReviewAppealDialogMaxStar : HomeAppReviewAppealDialogBase
 		DisableStarButton();
 	}
 
-	protected unsafe override void OnQuery_YES()
+	protected override void OnQuery_YES()
 	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Expected O, but got Unknown
-		if (_003C_003Ef__am_0024cache0 == null)
+		SendInfo(3, delegate
 		{
-			_003C_003Ef__am_0024cache0 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		SendInfo(3, _003C_003Ef__am_0024cache0);
+			Native.launchMyselfMarket();
+		});
 	}
 
 	protected override void OnQuery_NO()

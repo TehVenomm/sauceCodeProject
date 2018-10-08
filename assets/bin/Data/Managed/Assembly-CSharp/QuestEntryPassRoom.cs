@@ -1,5 +1,4 @@
 using Network;
-using System;
 
 public class QuestEntryPassRoom : GameSection
 {
@@ -39,12 +38,12 @@ public class QuestEntryPassRoom : GameSection
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.STR_NON_SETTINGS, false);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_1, passCode[0]);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_2, passCode[1]);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_3, passCode[2]);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_4, passCode[3]);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_5, passCode[4]);
+		SetActive(UI.STR_NON_SETTINGS, false);
+		SetLabelText(UI.LBL_INPUT_PASS_1, passCode[0]);
+		SetLabelText(UI.LBL_INPUT_PASS_2, passCode[1]);
+		SetLabelText(UI.LBL_INPUT_PASS_3, passCode[2]);
+		SetLabelText(UI.LBL_INPUT_PASS_4, passCode[3]);
+		SetLabelText(UI.LBL_INPUT_PASS_5, passCode[4]);
 	}
 
 	protected override void OnOpen()
@@ -134,19 +133,33 @@ public class QuestEntryPassRoom : GameSection
 		SendApply(0);
 	}
 
-	protected unsafe void SendApply(int questId = 0)
+	protected void SendApply(int questId = 0)
 	{
 		GameSection.SetEventData(new object[1]
 		{
 			true
 		});
 		GameSection.StayEvent();
-		PartyManager i = MonoBehaviourSingleton<PartyManager>.I;
-		string partyNumber = string.Join(string.Empty, passCode);
-		if (_003C_003Ef__am_0024cache3 == null)
+		MonoBehaviourSingleton<PartyManager>.I.SendApply(string.Join(string.Empty, passCode), delegate(bool is_apply, Error ret_code)
 		{
-			_003C_003Ef__am_0024cache3 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		i.SendApply(partyNumber, _003C_003Ef__am_0024cache3, questId);
+			if (is_apply && !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(MonoBehaviourSingleton<PartyManager>.I.GetQuestId(), true))
+			{
+				Protocol.Force(delegate
+				{
+					MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate
+					{
+					});
+				});
+			}
+			else if (ret_code == Error.WRN_PARTY_SEARCH_NOT_FOUND_PARTY || ret_code == Error.WRN_PARTY_OWNER_REJOIN)
+			{
+				GameSection.ChangeStayEvent("NOT_FOUND_PARTY", null);
+				GameSection.ResumeEvent(true, null);
+			}
+			else
+			{
+				GameSection.ResumeEvent(is_apply, null);
+			}
+		}, questId);
 	}
 }

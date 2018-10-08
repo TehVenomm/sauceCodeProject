@@ -14,13 +14,13 @@ public class PointShopManager
 	{
 		Protocol.Send(PointShopModel.URL, null, delegate(PointShopModel ret)
 		{
-			bool flag = false;
+			bool arg = false;
 			if (ret.Error == Error.None)
 			{
 				pointShopList = ret.result;
-				flag = true;
+				arg = true;
 			}
-			call_back.Invoke(flag, pointShopList);
+			call_back(arg, pointShopList);
 		}, string.Empty);
 	}
 

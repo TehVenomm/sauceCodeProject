@@ -37,7 +37,7 @@ public class TutorialMessageTable : Singleton<TutorialMessageTable>, IDataTable
 
 			public CursorType cursorType;
 
-			public Vector2 cursorOffset = Vector2.get_zero();
+			public Vector2 cursorOffset = Vector2.zero;
 
 			public int cursorRotDeg;
 
@@ -158,12 +158,12 @@ public class TutorialMessageTable : Singleton<TutorialMessageTable>, IDataTable
 		return TutorialStep.HasAllTutorialCompleted();
 	}
 
-	public unsafe static void SendTutorialBit(TUTORIAL_MENU_BIT bit, Action<bool> callback = null)
+	public static void SendTutorialBit(TUTORIAL_MENU_BIT bit, Action<bool> callback = null)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Expected O, but got Unknown
-		_003CSendTutorialBit_003Ec__AnonStorey78E _003CSendTutorialBit_003Ec__AnonStorey78E;
-		Protocol.Force(new Action((object)_003CSendTutorialBit_003Ec__AnonStorey78E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		Protocol.Force(delegate
+		{
+			MonoBehaviourSingleton<UserInfoManager>.I.SendTutorialBit(bit, callback);
+		});
 	}
 
 	public int[] GetTutorialIds()
@@ -279,7 +279,7 @@ public class TutorialMessageTable : Singleton<TutorialMessageTable>, IDataTable
 							{
 								int index = o.messageData.Count - 1;
 								o.messageData[index].waitEventName = o.messageData[index].waitEventName.Replace("_DETAIL", string.Empty);
-								Debug.LogWarning((object)("replace : " + o.messageData[index].waitEventName));
+								Debug.LogWarning("replace : " + o.messageData[index].waitEventName);
 							}
 						}
 						list.Add(o);

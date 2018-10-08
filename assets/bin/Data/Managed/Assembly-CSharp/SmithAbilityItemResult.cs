@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -30,16 +29,15 @@ public class SmithAbilityItemResult : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		equipItemInfo = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>().selectEquipData;
-		Transform val = SetPrefab((Enum)UI.OBJ_ABILITY_LIST_ROOT, "AbilityChangeAbilityList");
-		abilityList = val.get_gameObject().AddComponent<AbilityChangeAbilityList>();
+		Transform transform = SetPrefab(UI.OBJ_ABILITY_LIST_ROOT, "AbilityChangeAbilityList");
+		abilityList = transform.gameObject.AddComponent<AbilityChangeAbilityList>();
 		abilityList.uiVisible = true;
-		SetRenderEquipModel((Enum)UI.TEX_MODEL, equipItemInfo.tableID, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, -1, 1f);
-		SetLabelText((Enum)UI.STR_NEXT_REFLECT, base.sectionData.GetText("STR_NEXT"));
-		ResetTween((Enum)UI.OBJ_DELAY_2, 0);
+		SetRenderEquipModel(UI.TEX_MODEL, equipItemInfo.tableID, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, -1, 1f);
+		SetLabelText(UI.STR_NEXT_REFLECT, base.sectionData.GetText("STR_NEXT"));
+		ResetTween(UI.OBJ_DELAY_2, 0);
 		MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = false;
-		SetFullScreenButton((Enum)UI.BTN_TAP_FULL_SCREEN);
+		SetFullScreenButton(UI.BTN_TAP_FULL_SCREEN);
 		m_isFirstOpen = true;
 		base.Initialize();
 	}
@@ -49,7 +47,7 @@ public class SmithAbilityItemResult : GameSection
 		abilityList.InitUI();
 		abilityList.Open(UITransition.TYPE.OPEN);
 		PlayTween(callback: PlayDirection, ctrl_enum: UI.OBJ_DELAY_1, forward: true, is_input_block: true, tween_ctrl_id: 0);
-		SetActive((Enum)UI.OBJ_DELAY_2, false);
+		SetActive(UI.OBJ_DELAY_2, false);
 		base.OnOpen();
 	}
 
@@ -60,17 +58,16 @@ public class SmithAbilityItemResult : GameSection
 
 	private void EndAllDirection()
 	{
-		SetActive((Enum)UI.OBJ_DELAY_2, true);
-		ResetTween((Enum)UI.OBJ_DELAY_2, 0);
-		PlayTween((Enum)UI.OBJ_DELAY_2, true, (EventDelegate.Callback)null, true, 0);
-		SetActive((Enum)UI.TEX_MODEL, false);
+		SetActive(UI.OBJ_DELAY_2, true);
+		ResetTween(UI.OBJ_DELAY_2, 0);
+		PlayTween(UI.OBJ_DELAY_2, true, null, true, 0);
+		SetActive(UI.TEX_MODEL, false);
 		RefreshUI();
 	}
 
 	private void PlayDirection()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(_PlayDirection());
+		StartCoroutine(_PlayDirection());
 	}
 
 	private IEnumerator _PlayDirection()
@@ -86,8 +83,8 @@ public class SmithAbilityItemResult : GameSection
 
 	private void PlayDirection(UI directionObj, UI label, string text)
 	{
-		SetFontStyle((Enum)label, 2);
-		SetLabelText((Enum)label, text);
+		SetFontStyle(label, FontStyle.Italic);
+		SetLabelText(label, text);
 		PlayTween(callback: EndAllDirection, ctrl_enum: directionObj, forward: true, is_input_block: false, tween_ctrl_id: 0);
 	}
 

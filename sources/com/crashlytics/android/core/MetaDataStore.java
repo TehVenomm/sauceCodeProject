@@ -111,12 +111,12 @@ class MetaDataStore {
     }
 
     public UserMetaData readUserData(String str) {
+        Closeable fileInputStream;
         Throwable e;
         File userDataFileForSession = getUserDataFileForSession(str);
         if (!userDataFileForSession.exists()) {
             return UserMetaData.EMPTY;
         }
-        Closeable fileInputStream;
         try {
             fileInputStream = new FileInputStream(userDataFileForSession);
             try {

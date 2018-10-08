@@ -1,7 +1,7 @@
 using Network;
 using UnityEngine;
 
-public class PointShopItemList
+public class PointShopItemList : MonoBehaviour
 {
 	public UILabel tradeNum;
 
@@ -15,11 +15,6 @@ public class PointShopItemList
 
 	public Transform itemIconRoot;
 
-	public PointShopItemList()
-		: this()
-	{
-	}
-
 	public void SetUp(PointShopItem item, uint pointId, bool isChangable)
 	{
 		SetUpText(item, isChangable);
@@ -29,8 +24,6 @@ public class PointShopItemList
 
 	protected void SetUpText(PointShopItem item, bool isChangable)
 	{
-		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
 		itemName.text = item.name;
 		if (item.hasLimit)
 		{
@@ -55,7 +48,7 @@ public class PointShopItemList
 			tradeNum.text = StringTable.Get(STRING_CATEGORY.POINT_SHOP, 0u);
 		}
 		pointNum.text = string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), item.needPoint);
-		pointNum.color = ((!isChangable) ? Color.get_red() : Color.get_white());
+		pointNum.color = ((!isChangable) ? Color.red : Color.white);
 		remainingTime.text = item.expire;
 	}
 

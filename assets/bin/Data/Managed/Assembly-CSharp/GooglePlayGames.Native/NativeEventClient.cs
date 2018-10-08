@@ -19,18 +19,18 @@ namespace GooglePlayGames.Native
 
 		public void FetchAllEvents(DataSource source, Action<ResponseStatus, List<IEvent>> callback)
 		{
-			Misc.CheckNotNull<Action<ResponseStatus, List<IEvent>>>(callback);
-			callback = CallbackUtils.ToOnGameThread<ResponseStatus, List<IEvent>>(callback);
+			Misc.CheckNotNull(callback);
+			callback = CallbackUtils.ToOnGameThread(callback);
 			mEventManager.FetchAll(ConversionUtils.AsDataSource(source), delegate(EventManager.FetchAllResponse response)
 			{
-				ResponseStatus responseStatus = ConversionUtils.ConvertResponseStatus(response.ResponseStatus());
+				ResponseStatus arg = ConversionUtils.ConvertResponseStatus(response.ResponseStatus());
 				if (!response.RequestSucceeded())
 				{
-					callback.Invoke(responseStatus, new List<IEvent>());
+					callback(arg, new List<IEvent>());
 				}
 				else
 				{
-					callback.Invoke(responseStatus, response.Data().Cast<IEvent>().ToList());
+					callback(arg, response.Data().Cast<IEvent>().ToList());
 				}
 			});
 		}
@@ -38,17 +38,17 @@ namespace GooglePlayGames.Native
 		public void FetchEvent(DataSource source, string eventId, Action<ResponseStatus, IEvent> callback)
 		{
 			Misc.CheckNotNull(eventId);
-			Misc.CheckNotNull<Action<ResponseStatus, IEvent>>(callback);
+			Misc.CheckNotNull(callback);
 			mEventManager.Fetch(ConversionUtils.AsDataSource(source), eventId, delegate(EventManager.FetchResponse response)
 			{
-				ResponseStatus responseStatus = ConversionUtils.ConvertResponseStatus(response.ResponseStatus());
+				ResponseStatus arg = ConversionUtils.ConvertResponseStatus(response.ResponseStatus());
 				if (!response.RequestSucceeded())
 				{
-					callback.Invoke(responseStatus, (IEvent)null);
+					callback(arg, null);
 				}
 				else
 				{
-					callback.Invoke(responseStatus, (IEvent)response.Data());
+					callback(arg, response.Data());
 				}
 			});
 		}

@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -52,7 +51,7 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 	protected TweenPosition[] startAction;
 
 	[SerializeField]
-	protected Color[] colors = (Color[])new Color[11];
+	protected Color[] colors = new Color[11];
 
 	[SerializeField]
 	protected UIStaticPanelChanger panelChange;
@@ -69,29 +68,22 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 
 	protected override void Awake()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		retireTweenPos = retireButton.GetComponent<TweenPosition>();
 		orgRetirePos = retireTweenPos.to;
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(false);
 	}
 
 	public void Initialize()
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if (!(self == null))
+			if (!((Object)self == (Object)null))
 			{
 				MonoBehaviourSingleton<InGameProgress>.I.CloseDialog();
 				MonoBehaviourSingleton<InGameProgress>.I.SetDisableUIOpen(false);
-				this.get_gameObject().SetActive(true);
+				base.gameObject.SetActive(true);
 				int num = 0;
 				int num2 = 0;
 				if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
@@ -120,12 +112,12 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 					}
 					SetupContinueButton(isEnableContinue, num2, num);
 				}
-				continueButton.get_gameObject().SetActive(!flag);
-				restartButton.get_gameObject().SetActive(flag);
+				continueButton.gameObject.SetActive(!flag);
+				restartButton.gameObject.SetActive(flag);
 				float rescueTime = self.rescueTime;
-				if (continueCount != null)
+				if ((Object)continueCount != (Object)null)
 				{
-					continueCount.color = Color.get_white();
+					continueCount.color = Color.white;
 					continueCount.text = StringTable.Format(STRING_CATEGORY.IN_GAME, 1000u, rescueTime.ToString("F2"));
 				}
 				int i = 0;
@@ -140,23 +132,11 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 
 	private void SetupContinueButton(bool isEnableContinue, int crystal_use, int crystal_num)
 	{
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0212: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0234: Unknown result type (might be due to invalid IL or missing references)
-		if (continueButton != null)
+		if ((Object)continueButton != (Object)null)
 		{
 			continueButton.isEnabled = isEnableContinue;
 		}
-		if (continueButtonLabel != null)
+		if ((Object)continueButtonLabel != (Object)null)
 		{
 			if (isEnableContinue)
 			{
@@ -164,7 +144,7 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 				continueButtonLabel.gradientTop = colors[0];
 				continueButtonLabel.gradientBottom = colors[1];
 				continueButtonLabel.effectColor = colors[2];
-				continueButtonLabel.color = Color.get_white();
+				continueButtonLabel.color = Color.white;
 			}
 			else
 			{
@@ -181,7 +161,7 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 				continueButtonLabel.text = StringTable.Format(STRING_CATEGORY.IN_GAME, 1003u, crystal_use);
 			}
 		}
-		if (continueButtonCrystalNum != null)
+		if ((Object)continueButtonCrystalNum != (Object)null)
 		{
 			continueButtonCrystalNum.text = StringTable.Format(STRING_CATEGORY.IN_GAME, 1004u, crystal_num);
 			if (isEnableContinue)
@@ -195,7 +175,7 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 				continueButtonCrystalNum.effectColor = colors[8];
 			}
 		}
-		if (continueButtonIcon != null)
+		if ((Object)continueButtonIcon != (Object)null)
 		{
 			if (isEnableContinue)
 			{
@@ -206,7 +186,7 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 				continueButtonIcon.color = colors[10];
 			}
 		}
-		if (continueButtonEffect != null)
+		if ((Object)continueButtonEffect != (Object)null)
 		{
 			continueButtonEffect.SetActive(isEnableContinue);
 		}
@@ -214,17 +194,11 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 
 	private void SetupRestartButton(bool isEnableRestart)
 	{
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		if (restartButton != null)
+		if ((Object)restartButton != (Object)null)
 		{
 			restartButton.isEnabled = isEnableRestart;
 		}
-		if (continueButtonLabel != null)
+		if ((Object)continueButtonLabel != (Object)null)
 		{
 			if (isEnableRestart)
 			{
@@ -232,7 +206,7 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 				restartButtonLabel.gradientTop = colors[0];
 				restartButtonLabel.gradientBottom = colors[1];
 				restartButtonLabel.effectColor = colors[2];
-				restartButtonLabel.color = Color.get_white();
+				restartButtonLabel.color = Color.white;
 			}
 			else
 			{
@@ -245,7 +219,7 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 
 	private void OnEnable()
 	{
-		if (panelChange != null)
+		if ((Object)panelChange != (Object)null)
 		{
 			panelChange.UnLock();
 		}
@@ -254,7 +228,7 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 	protected override void OnDisable()
 	{
 		base.OnDisable();
-		if (panelChange != null)
+		if ((Object)panelChange != (Object)null)
 		{
 			panelChange.Lock();
 		}
@@ -271,7 +245,7 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 			return false;
 		}
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		if (self == null)
+		if ((Object)self == (Object)null)
 		{
 			return false;
 		}
@@ -297,18 +271,15 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 
 	private void Update()
 	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
 		if (!CheckVisible())
 		{
 			MonoBehaviourSingleton<InGameProgress>.I.CloseDialog();
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(false);
 		}
 		else
 		{
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if (!(self == null))
+			if (!((Object)self == (Object)null))
 			{
 				if (IsContiueable())
 				{
@@ -316,7 +287,7 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 					if (num > 0f)
 					{
 						continueCount.text = StringTable.Format(STRING_CATEGORY.IN_GAME, 1000u, num.ToString("F2"));
-						continueCount.color = Color.get_white();
+						continueCount.color = Color.white;
 					}
 					else
 					{
@@ -333,7 +304,7 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 						}
 						num = self.continueTime;
 						continueCount.text = StringTable.Format(STRING_CATEGORY.IN_GAME, 1001u, num.ToString("F2"));
-						continueCount.color = Color.get_red();
+						continueCount.color = Color.red;
 					}
 				}
 				else
@@ -346,34 +317,28 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 
 	protected bool IsContiueable()
 	{
-		return continueCount != null && !MonoBehaviourSingleton<CoopManager>.I.coopStage.IsPresentQuest();
+		return (Object)continueCount != (Object)null && !MonoBehaviourSingleton<CoopManager>.I.coopStage.IsPresentQuest();
 	}
 
 	public void OnClickRetire()
 	{
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Expected O, but got Unknown
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Expected O, but got Unknown
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 		{
 			if (FieldManager.IsValidInGameNoBoss())
 			{
 				Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-				if (self != null && self.rescueTime > 0f && !MonoBehaviourSingleton<CoopManager>.I.coopStage.IsPresentQuest())
+				if ((Object)self != (Object)null && self.rescueTime > 0f && !MonoBehaviourSingleton<CoopManager>.I.coopStage.IsPresentQuest())
 				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRetire", this.get_gameObject(), "RETIRE", StringTable.Get(STRING_CATEGORY.IN_GAME, 1008u), null, true);
+					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRetire", base.gameObject, "RETIRE", StringTable.Get(STRING_CATEGORY.IN_GAME, 1008u), null, true);
 				}
 				else
 				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRetire", this.get_gameObject(), "RETIRE", StringTable.Get(STRING_CATEGORY.IN_GAME, 1009u), null, true);
+					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRetire", base.gameObject, "RETIRE", StringTable.Get(STRING_CATEGORY.IN_GAME, 1009u), null, true);
 				}
 			}
 			else
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRetire", this.get_gameObject(), "RETIRE", null, null, true);
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRetire", base.gameObject, "RETIRE", null, null, true);
 			}
 		}
 	}
@@ -396,15 +361,13 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 
 	public void OnClickContinue()
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickContinue", this.get_gameObject(), "CONTINUE", null, null, true);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickContinue", base.gameObject, "CONTINUE", null, null, true);
 		}
 	}
 
-	public unsafe void DoContinue()
+	public void DoContinue()
 	{
 		if (CheckVisible())
 		{
@@ -413,18 +376,17 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 			MonoBehaviourSingleton<InGameProgress>.I.isWaitContinueProtocol = true;
 			if (QuestManager.IsValidInGame())
 			{
-				MonoBehaviourSingleton<QuestManager>.I.SendQuestContinue(new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				MonoBehaviourSingleton<QuestManager>.I.SendQuestContinue(CallBackContinue);
 			}
 			else
 			{
-				MonoBehaviourSingleton<FieldManager>.I.SendFieldContinue(new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				MonoBehaviourSingleton<FieldManager>.I.SendFieldContinue(CallBackContinue);
 			}
 		}
 	}
 
 	private void CallBackContinue(bool res, Error error)
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
 			MonoBehaviourSingleton<InGameProgress>.I.isWaitContinueProtocol = false;
@@ -432,7 +394,7 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 		if (res)
 		{
 			OnContinueSelf();
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(false);
 		}
 		else
 		{
@@ -445,7 +407,7 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 				UIInGamePopupDialog.PushOpen(empty, true, 1.8f);
 			}
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if (self != null && self.actionID == (Character.ACTION_ID)23 && self.continueTime <= 0f && MonoBehaviourSingleton<InGameProgress>.IsValid())
+			if ((Object)self != (Object)null && self.actionID == (Character.ACTION_ID)23 && self.continueTime <= 0f && MonoBehaviourSingleton<InGameProgress>.IsValid())
 			{
 				MonoBehaviourSingleton<InGameProgress>.I.BattleRetire();
 			}
@@ -454,11 +416,9 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 
 	public void OnClickRestart()
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRestart", this.get_gameObject(), "RESTART", null, null, true);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRestart", base.gameObject, "RESTART", null, null, true);
 		}
 	}
 
@@ -502,7 +462,7 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 				for (int count = playerList.Count; i < count; i++)
 				{
 					Player player = playerList[i] as Player;
-					if (player != self)
+					if ((Object)player != (Object)self)
 					{
 						Character.HealData healData = new Character.HealData(Mathf.FloorToInt((float)player.hpMax * continueHealRate), HEAL_TYPE.NONE, HEAL_EFFECT_TYPE.BASIS, null);
 						player.OnHealReceive(healData);
@@ -515,11 +475,11 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 	public void SetDisableButtons(bool disable)
 	{
 		isDisableButtons = disable;
-		if (retireButton != null)
+		if ((Object)retireButton != (Object)null)
 		{
 			retireButton.isEnabled = !disable;
 		}
-		if (continueButton != null)
+		if ((Object)continueButton != (Object)null)
 		{
 			continueButton.isEnabled = !disable;
 		}
@@ -527,22 +487,14 @@ public class UIContinueButton : MonoBehaviourSingleton<UIContinueButton>
 
 	public void SetContinueButton(bool enable)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		if (enable)
 		{
-			continueButton.get_gameObject().SetActive(true);
+			continueButton.gameObject.SetActive(true);
 			retireTweenPos.to = orgRetirePos;
 		}
 		else
 		{
-			continueButton.get_gameObject().SetActive(false);
+			continueButton.gameObject.SetActive(false);
 			Vector3 to = retireTweenPos.to;
 			to.x = 0f;
 			retireTweenPos.to = to;

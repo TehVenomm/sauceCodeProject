@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class DataLoadRequest
 {
@@ -72,39 +71,11 @@ public class DataLoadRequest
 		private set;
 	}
 
-	public event Action onComplete
-	{
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		add
-		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Expected O, but got Unknown
-			this.onComplete = Delegate.Combine((Delegate)this.onComplete, (Delegate)value);
-		}
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		remove
-		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Expected O, but got Unknown
-			this.onComplete = Delegate.Remove((Delegate)this.onComplete, (Delegate)value);
-		}
-	}
+	public event Action onComplete;
 
 	public event Action<DataTableLoadError> onError;
 
-	public event Func<string, bool> onVerifyError
-	{
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		add
-		{
-			this.onVerifyError = Delegate.Combine((Delegate)this.onVerifyError, (Delegate)value);
-		}
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		remove
-		{
-			this.onVerifyError = Delegate.Remove((Delegate)this.onVerifyError, (Delegate)value);
-		}
-	}
+	public event Func<string, bool> onVerifyError;
 
 	public DataLoadRequest(string name, IDataTableRequestHash hash, string directory, bool downloadOnly)
 	{
@@ -150,7 +121,7 @@ public class DataLoadRequest
 		isCompleted = true;
 		if (this.onComplete != null)
 		{
-			this.onComplete.Invoke();
+			this.onComplete();
 		}
 	}
 
@@ -162,7 +133,7 @@ public class DataLoadRequest
 
 	public bool OnVerifyError(string hash)
 	{
-		return this.onVerifyError.Invoke(hash);
+		return this.onVerifyError(hash);
 	}
 
 	public void SetupLoadBinary(DataTableManifest manifest, Action<byte[]> processBinary)

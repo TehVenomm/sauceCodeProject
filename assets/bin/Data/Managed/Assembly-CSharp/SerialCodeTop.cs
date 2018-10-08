@@ -36,21 +36,20 @@ public class SerialCodeTop : GameSection
 		requestSendForm.code = code;
 		Protocol.Send(SerialInputModel.URL, requestSendForm, delegate(SerialInputModel ret)
 		{
-			bool flag = false;
-			string text = string.Empty;
+			bool arg = false;
+			string arg2 = string.Empty;
 			if (ret.Error == Error.None)
 			{
-				flag = true;
-				text = ret.result.message;
+				arg = true;
+				arg2 = ret.result.message;
 			}
-			callback.Invoke(flag, text);
+			callback(arg, arg2);
 		}, string.Empty);
 	}
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -58,7 +57,7 @@ public class SerialCodeTop : GameSection
 		bool wait = true;
 		SendGetSerialCodeList(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator145)/*Error near IL_002e: stateMachine*/)._003Cwait_003E__0 = false;
+			((_003CDoInitialize_003Ec__Iterator147)/*Error near IL_002e: stateMachine*/)._003Cwait_003E__0 = false;
 		});
 		while (wait)
 		{
@@ -67,17 +66,21 @@ public class SerialCodeTop : GameSection
 		base.Initialize();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
 		base.UpdateUI();
 		int count = serialList.serials.Count;
-		SetTable(UI.TBL_LIST, "SerialCodeListItem", count, false, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetTable(UI.TBL_LIST, "SerialCodeListItem", count, false, delegate(int i, Transform t, bool b)
+		{
+			SerialListModel.Serials serials = serialList.serials[i];
+			SetInput(t, UI.IPT_CODE, string.Empty, 64, null);
+			SetLabelText(t, UI.LBL_NAME, serials.name);
+			SetEvent(t, UI.BTN_SEND, "SEND", i);
+		});
 	}
 
-	private unsafe void OnQuery_SEND()
+	private void OnQuery_SEND()
 	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Expected O, but got Unknown
 		int index = (int)GameSection.GetEventData();
 		Transform t = GetCtrl(UI.TBL_LIST).FindChild(index.ToString());
 		string inputValue = GetInputValue(t, UI.IPT_CODE);
@@ -88,8 +91,15 @@ public class SerialCodeTop : GameSection
 		else
 		{
 			GameSection.StayEvent();
-			_003COnQuery_SEND_003Ec__AnonStorey432 _003COnQuery_SEND_003Ec__AnonStorey;
-			SendInputSerialCode(serialList.serials[index].serialId, inputValue, new Action<bool, string>((object)_003COnQuery_SEND_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SendInputSerialCode(serialList.serials[index].serialId, inputValue, delegate(bool is_success, string msg)
+			{
+				if (is_success)
+				{
+					GameSection.SetEventData(msg);
+					SetInputValue(t, UI.IPT_CODE, string.Empty);
+				}
+				GameSection.ResumeEvent(is_success, null);
+			});
 		}
 	}
 }

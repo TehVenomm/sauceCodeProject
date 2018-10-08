@@ -31,7 +31,7 @@ public abstract class ChatUITweenGroup
 
 	public ChatUITweenGroup(UIRect root)
 	{
-		if (Object.op_Implicit(root))
+		if ((bool)root)
 		{
 			this.root = root;
 		}
@@ -55,34 +55,32 @@ public abstract class ChatUITweenGroup
 
 	public void Open(Action on_finished)
 	{
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		if (!Object.op_Implicit(root))
+		if (!(bool)root)
 		{
 			state = STATE.OPENED;
 		}
 		else
 		{
-			if (closeTween.get_enabled())
+			if (closeTween.enabled)
 			{
 				closeTween.SetOnFinished((EventDelegate)null);
 				closeTween.SetStartToCurrentValue();
 				closeTween.ResetToBeginning();
-				closeTween.set_enabled(false);
+				closeTween.enabled = false;
 			}
-			if (!openTween.get_gameObject().get_activeSelf())
+			if (!openTween.gameObject.activeSelf)
 			{
-				openTween.get_gameObject().SetActive(true);
+				openTween.gameObject.SetActive(true);
 			}
 			state = STATE.OPENING;
-			openTween.set_enabled(true);
+			openTween.enabled = true;
 			openTween.SetStartToCurrentValue();
 			openTween.ResetToBeginning();
 			openTween.SetOnFinished(delegate
 			{
 				state = STATE.OPENED;
 				OnPostOpen();
-				on_finished.Invoke();
+				on_finished();
 			});
 			openTween.PlayForward();
 		}
@@ -90,7 +88,7 @@ public abstract class ChatUITweenGroup
 
 	public void OpenImmediately()
 	{
-		if (!Object.op_Implicit(root))
+		if (!(bool)root)
 		{
 			state = STATE.OPENED;
 		}
@@ -103,37 +101,35 @@ public abstract class ChatUITweenGroup
 
 	public void Close(Action on_finished)
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		if (!Object.op_Implicit(root))
+		if (!(bool)root)
 		{
 			state = STATE.CLOSED;
 		}
 		else
 		{
 			OnPreClose();
-			if (!openTween.get_gameObject().get_activeSelf())
+			if (!openTween.gameObject.activeSelf)
 			{
-				on_finished.Invoke();
+				on_finished();
 			}
 			else
 			{
-				if (openTween.get_enabled())
+				if (openTween.enabled)
 				{
 					openTween.SetOnFinished((EventDelegate)null);
 					openTween.SetStartToCurrentValue();
 					openTween.ResetToBeginning();
-					openTween.set_enabled(false);
+					openTween.enabled = false;
 				}
 				state = STATE.CLOSING;
-				closeTween.set_enabled(true);
+				closeTween.enabled = true;
 				closeTween.SetStartToCurrentValue();
 				closeTween.ResetToBeginning();
 				closeTween.SetOnFinished(delegate
 				{
-					//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 					state = STATE.CLOSED;
-					root.get_gameObject().SetActive(false);
-					on_finished.Invoke();
+					root.gameObject.SetActive(false);
+					on_finished();
 				});
 				closeTween.PlayForward();
 			}
@@ -142,7 +138,7 @@ public abstract class ChatUITweenGroup
 
 	public void CloseImmediately()
 	{
-		if (!Object.op_Implicit(root))
+		if (!(bool)root)
 		{
 			state = STATE.CLOSED;
 		}
@@ -162,12 +158,11 @@ public abstract class ChatUITweenGroup<T> : ChatUITweenGroup where T : UITweener
 
 	protected override UITweener CreateTween(bool isOpenTween)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		if (base.rootRect == null)
+		if ((UnityEngine.Object)base.rootRect == (UnityEngine.Object)null)
 		{
 			return null;
 		}
-		T val = base.rootRect.get_gameObject().AddComponent<T>();
+		T val = base.rootRect.gameObject.AddComponent<T>();
 		InitTween(val, isOpenTween);
 		return val;
 	}

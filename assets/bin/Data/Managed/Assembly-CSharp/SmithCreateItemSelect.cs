@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class SmithCreateItemSelect : SmithEquipSelectBase
@@ -65,8 +64,8 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 		base.Initialize();
 		pickupWeapon = Singleton<CreatePickupItemTable>.I.GetPickupItemAry(SortBase.TYPE.WEAPON_ALL);
 		pickupArmor = Singleton<CreatePickupItemTable>.I.GetPickupItemAry(SortBase.TYPE.ARMOR_ALL);
-		SetActive((Enum)UI.BTN_WEAPON_PICKUP, pickupWeapon.Length > 0);
-		SetActive((Enum)UI.BTN_ARMOR_PICKUP, pickupArmor.Length > 0);
+		SetActive(UI.BTN_WEAPON_PICKUP, pickupWeapon.Length > 0);
+		SetActive(UI.BTN_ARMOR_PICKUP, pickupArmor.Length > 0);
 		selectTypeIndex = (int)Mathf.Log((float)smithCreateData.selectCreateEquipItemType, 2f);
 		string caption = (!MonoBehaviourSingleton<InventoryManager>.I.IsWeaponInventoryType(base.selectInventoryType)) ? base.sectionData.GetText("CAPTION_DEFENCE") : base.sectionData.GetText("CAPTION_WEAPON");
 		InitializeCaption(caption);
@@ -93,28 +92,24 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 
 	public override void UpdateUI()
 	{
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Expected O, but got Unknown
-		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0193: Expected O, but got Unknown
 		SmithManager.SmithBadgeData smithBadgeData = MonoBehaviourSingleton<SmithManager>.I.smithBadgeData;
-		SetBadge((Enum)UI.BTN_HELM, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.HELM), 6, 0, 0, true);
-		SetBadge((Enum)UI.BTN_ARMOR, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ARMOR), 6, 0, 0, true);
-		SetBadge((Enum)UI.BTN_ARM, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ARM), 6, 0, 0, true);
-		SetBadge((Enum)UI.BTN_LEG, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.LEG), 6, 0, 0, true);
-		SetBadge((Enum)UI.BTN_WEAPON_1, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ONE_HAND_SWORD), 6, 0, 0, true);
-		SetBadge((Enum)UI.BTN_WEAPON_2, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.TWO_HAND_SWORD), 6, 0, 0, true);
-		SetBadge((Enum)UI.BTN_WEAPON_3, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.SPEAR), 6, 0, 0, true);
-		SetBadge((Enum)UI.BTN_WEAPON_4, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.PAIR_SWORDS), 6, 0, 0, true);
-		SetBadge((Enum)UI.BTN_WEAPON_5, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ARROW), 6, 0, 0, true);
-		SetBadge((Enum)UI.BTN_WEAPON_PICKUP, smithBadgeData.GetPickupBadgeNum(true), 6, 0, 0, true);
-		SetBadge((Enum)UI.BTN_ARMOR_PICKUP, smithBadgeData.GetPickupBadgeNum(false), 6, 0, 0, true);
-		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).get_parent(), pickupWeapon != null && pickupWeapon.Length > 0);
-		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).get_parent(), pickupArmor != null && pickupArmor.Length > 0);
-		base.GetComponent<UIGrid>((Enum)UI.GRD_WEAPON).Reposition();
-		base.GetComponent<UIGrid>((Enum)UI.GRD_ARMOR).Reposition();
+		SetBadge(UI.BTN_HELM, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.HELM), SpriteAlignment.BottomLeft, 0, 0, true);
+		SetBadge(UI.BTN_ARMOR, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ARMOR), SpriteAlignment.BottomLeft, 0, 0, true);
+		SetBadge(UI.BTN_ARM, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ARM), SpriteAlignment.BottomLeft, 0, 0, true);
+		SetBadge(UI.BTN_LEG, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.LEG), SpriteAlignment.BottomLeft, 0, 0, true);
+		SetBadge(UI.BTN_WEAPON_1, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ONE_HAND_SWORD), SpriteAlignment.BottomLeft, 0, 0, true);
+		SetBadge(UI.BTN_WEAPON_2, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.TWO_HAND_SWORD), SpriteAlignment.BottomLeft, 0, 0, true);
+		SetBadge(UI.BTN_WEAPON_3, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.SPEAR), SpriteAlignment.BottomLeft, 0, 0, true);
+		SetBadge(UI.BTN_WEAPON_4, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.PAIR_SWORDS), SpriteAlignment.BottomLeft, 0, 0, true);
+		SetBadge(UI.BTN_WEAPON_5, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ARROW), SpriteAlignment.BottomLeft, 0, 0, true);
+		SetBadge(UI.BTN_WEAPON_PICKUP, smithBadgeData.GetPickupBadgeNum(true), SpriteAlignment.BottomLeft, 0, 0, true);
+		SetBadge(UI.BTN_ARMOR_PICKUP, smithBadgeData.GetPickupBadgeNum(false), SpriteAlignment.BottomLeft, 0, 0, true);
+		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).parent, pickupWeapon != null && pickupWeapon.Length > 0);
+		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).parent, pickupArmor != null && pickupArmor.Length > 0);
+		GetComponent<UIGrid>(UI.GRD_WEAPON).Reposition();
+		GetComponent<UIGrid>(UI.GRD_ARMOR).Reposition();
 		base.UpdateUI();
-		if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.FORGE_ITEM) && MonoBehaviourSingleton<UIManager>.I.tutorialMessage != null)
+		if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.FORGE_ITEM) && (Object)MonoBehaviourSingleton<UIManager>.I.tutorialMessage != (Object)null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName(), "CreateItem", null);
 		}
@@ -129,17 +124,17 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 		{
 			flag = true;
 		}
-		SetActive((Enum)UI.OBJ_ATK_ROOT, flag);
-		SetActive((Enum)UI.OBJ_DEF_ROOT, !flag);
-		SetToggleButton((Enum)UI.TGL_BUTTON_ROOT, flag, (Action<bool>)delegate(bool is_active)
+		SetActive(UI.OBJ_ATK_ROOT, flag);
+		SetActive(UI.OBJ_DEF_ROOT, !flag);
+		SetToggleButton(UI.TGL_BUTTON_ROOT, flag, delegate(bool is_active)
 		{
 			SmithManager.SmithCreateData smithData2 = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>();
 			smithData2.selectCreateEquipItemType = (is_active ? SortBase.TYPE.ONE_HAND_SWORD : SortBase.TYPE.HELM);
 			int num = (!is_active) ? 1 : 0;
-			ResetTween((Enum)tabAnimTarget[num], 0);
-			PlayTween((Enum)tabAnimTarget[num], true, (EventDelegate.Callback)null, false, 0);
-			SetActive((Enum)UI.OBJ_ATK_ROOT, is_active);
-			SetActive((Enum)UI.OBJ_DEF_ROOT, !is_active);
+			ResetTween(tabAnimTarget[num], 0);
+			PlayTween(tabAnimTarget[num], true, null, false, 0);
+			SetActive(UI.OBJ_ATK_ROOT, is_active);
+			SetActive(UI.OBJ_DEF_ROOT, !is_active);
 			selectTypeIndex = (int)Mathf.Log((float)smithData2.selectCreateEquipItemType, 2f);
 			SetDirty(InventoryUI);
 			InitSort();
@@ -153,18 +148,75 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 		});
 	}
 
-	protected unsafe override void LocalInventory()
+	protected override void LocalInventory()
 	{
 		SetupEnableInventoryUI();
-		SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
+		SetLabelText(UI.LBL_SORT, sortSettings.GetSortLabel());
 		if (localInventoryEquipData != null)
 		{
 			SortBase.TYPE tYPE = TranslateInventoryType(selectTypeIndex);
 			bool _is_pickup = tYPE == SortBase.TYPE.WEAPON_ALL || tYPE == SortBase.TYPE.ARMOR_ALL;
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
-			_003CLocalInventory_003Ec__AnonStorey450 _003CLocalInventory_003Ec__AnonStorey;
-			SetDynamicList((Enum)InventoryUI, string.Empty, localInventoryEquipData.Length, false, new Func<int, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetDynamicList(InventoryUI, string.Empty, localInventoryEquipData.Length, false, delegate(int check_index)
+			{
+				SmithCreateItemInfo smithCreateItemInfo = localInventoryEquipData[check_index].GetItemData() as SmithCreateItemInfo;
+				if (smithCreateItemInfo == null)
+				{
+					return false;
+				}
+				if (!MonoBehaviourSingleton<InventoryManager>.I.IsHaveingKeyMaterial(smithCreateItemInfo.smithCreateTableData.needKeyOrder, smithCreateItemInfo.smithCreateTableData.needMaterial))
+				{
+					return false;
+				}
+				if ((int)smithCreateItemInfo.smithCreateTableData.researchLv > MonoBehaviourSingleton<UserInfoManager>.I.userStatus.researchLv)
+				{
+					return false;
+				}
+				if (localInventoryEquipData[check_index].GetTableID() == 0)
+				{
+					return false;
+				}
+				SortCompareData sortCompareData = localInventoryEquipData[check_index];
+				if (sortCompareData == null || !sortCompareData.IsPriority(sortSettings.orderTypeAsc))
+				{
+					return false;
+				}
+				return true;
+			}, null, delegate(int i, Transform t, bool is_recycle)
+			{
+				SmithCreateItemInfo create_info = localInventoryEquipData[i].GetItemData() as SmithCreateItemInfo;
+				uint tableID = localInventoryEquipData[i].GetTableID();
+				if (tableID == 0)
+				{
+					SetActive(t, false);
+				}
+				else
+				{
+					SetActive(t, true);
+					SmithCreateSortData smithCreateSortData = localInventoryEquipData[i] as SmithCreateSortData;
+					if (smithCreateSortData != null && smithCreateSortData.IsPriority(sortSettings.orderTypeAsc))
+					{
+						EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(tableID);
+						ITEM_ICON_TYPE iconType = localInventoryEquipData[i].GetIconType();
+						SkillSlotUIData[] skillSlotData = GetSkillSlotData(equipItemData, 0);
+						bool flag = false;
+						flag = MonoBehaviourSingleton<SmithManager>.I.NeedSmithBadge(create_info, _is_pickup);
+						ItemIcon itemIcon = CreateSmithCreateItemIconDetail(getType: smithCreateSortData.GetGetType(), icon_type: iconType, icon_id: equipItemData.GetIconID(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex), rarity: equipItemData.rarity, item_data: smithCreateSortData, skill_slot_data: skillSlotData, is_show_main_status: base.IsShowMainStatus, parent: t, event_name: "SELECT_ITEM", event_data: i, icon_status: smithCreateSortData.GetIconStatus(), is_new: flag, toggle_group: -1, is_select: false);
+						itemIcon.SetItemID(smithCreateSortData.GetTableID());
+						itemIcon.SetButtonColor(localInventoryEquipData[i].IsPriority(sortSettings.orderTypeAsc), true);
+						SetLongTouch(itemIcon.transform, "DETAIL", i);
+						if ((Object)itemIcon != (Object)null && smithCreateSortData != null)
+						{
+							itemIcon.SetInitData(smithCreateSortData);
+						}
+						if ((Object)itemIcon != (Object)null && !m_generatedIconList.Contains(itemIcon))
+						{
+							m_generatedIconList.Add(itemIcon);
+						}
+					}
+				}
+			});
 		}
 	}
 

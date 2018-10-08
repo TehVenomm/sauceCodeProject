@@ -226,12 +226,12 @@ public class AppEventsLogger {
         }
 
         static void saveAppSessionInformation(Context context) {
+            Closeable objectOutputStream;
             Throwable th;
             Exception e;
             synchronized (staticLock) {
                 try {
                     if (hasChanges) {
-                        Closeable objectOutputStream;
                         try {
                             objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(context.openFileOutput(PERSISTED_SESSION_INFO_FILENAME, 0)));
                             try {

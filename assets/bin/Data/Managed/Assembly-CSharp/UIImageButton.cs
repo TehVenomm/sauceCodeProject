@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/UI/Image Button")]
-public class UIImageButton
+public class UIImageButton : MonoBehaviour
 {
 	public UISprite target;
 
@@ -19,39 +19,32 @@ public class UIImageButton
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			Collider component = this.get_gameObject().GetComponent<Collider>();
-			return Object.op_Implicit(component) && component.get_enabled();
+			Collider component = base.gameObject.GetComponent<Collider>();
+			return (bool)component && component.enabled;
 		}
 		set
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			Collider component = this.get_gameObject().GetComponent<Collider>();
-			if (Object.op_Implicit(component) && component.get_enabled() != value)
+			Collider component = base.gameObject.GetComponent<Collider>();
+			if ((bool)component && component.enabled != value)
 			{
-				component.set_enabled(value);
+				component.enabled = value;
 				UpdateImage();
 			}
 		}
 	}
 
-	public UIImageButton()
-		: this()
-	{
-	}
-
 	private void OnEnable()
 	{
-		if (target == null)
+		if ((Object)target == (Object)null)
 		{
-			target = this.GetComponentInChildren<UISprite>();
+			target = GetComponentInChildren<UISprite>();
 		}
 		UpdateImage();
 	}
 
 	private void OnValidate()
 	{
-		if (target != null)
+		if ((Object)target != (Object)null)
 		{
 			if (string.IsNullOrEmpty(normalSprite))
 			{
@@ -74,13 +67,11 @@ public class UIImageButton
 
 	private void UpdateImage()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
-		if (target != null)
+		if ((Object)target != (Object)null)
 		{
 			if (isEnabled)
 			{
-				SetSprite((!UICamera.IsHighlighted(this.get_gameObject())) ? normalSprite : hoverSprite);
+				SetSprite((!UICamera.IsHighlighted(base.gameObject)) ? normalSprite : hoverSprite);
 			}
 			else
 			{
@@ -91,7 +82,7 @@ public class UIImageButton
 
 	private void OnHover(bool isOver)
 	{
-		if (isEnabled && target != null)
+		if (isEnabled && (Object)target != (Object)null)
 		{
 			SetSprite((!isOver) ? normalSprite : hoverSprite);
 		}
@@ -111,7 +102,7 @@ public class UIImageButton
 
 	private void SetSprite(string sprite)
 	{
-		if (!(target.atlas == null) && target.atlas.GetSprite(sprite) != null)
+		if (!((Object)target.atlas == (Object)null) && target.atlas.GetSprite(sprite) != null)
 		{
 			target.spriteName = sprite;
 			if (pixelSnap)

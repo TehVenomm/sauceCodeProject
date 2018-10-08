@@ -1,7 +1,5 @@
-public class UITweenAddCtrlChild
+using UnityEngine;
+
+public class UITweenAddCtrlChild : MonoBehaviour
 {
-	public UITweenAddCtrlChild()
-		: this()
-	{
-	}
 }

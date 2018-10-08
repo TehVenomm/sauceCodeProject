@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class QuestAcceptOrderCounterCondition : QuestSearchRoomCondition
@@ -6,8 +5,8 @@ public class QuestAcceptOrderCounterCondition : QuestSearchRoomCondition
 	public override void Initialize()
 	{
 		base.Initialize();
-		SetActive((Enum)UI.OBJ_SEARCH, false);
-		SetActive((Enum)UI.OBJ_MY_SEARCH, true);
+		SetActive(UI.OBJ_SEARCH, false);
+		SetActive(UI.OBJ_MY_SEARCH, true);
 	}
 
 	protected override void CopySearchRequestParam()
@@ -62,12 +61,12 @@ public class QuestAcceptOrderCounterCondition : QuestSearchRoomCondition
 		searchRequest.rarityBit = PlayerPrefs.GetInt("MY_GACHA_SEARCH_RAIRTY_KEY", 8388607);
 		searchRequest.elementBit = PlayerPrefs.GetInt("MY_GACHA_SEARCH_ELEMENT_KEY", 8388607);
 		searchRequest.enemyLevelMin = PlayerPrefs.GetInt("MY_GACHA_SEARCH_LEVEL_MIN_KEY", 1);
-		int num = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_LEVEL_MAX;
+		int defaultValue = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_LEVEL_MAX;
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_EXTRA_LEVEL_MAX > 0)
 		{
-			num = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_EXTRA_LEVEL_MAX;
+			defaultValue = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_EXTRA_LEVEL_MAX;
 		}
-		searchRequest.enemyLevelMax = PlayerPrefs.GetInt("MY_GACHA_SEARCH_LEVEL_MAX_KEY", num);
-		searchRequest.targetEnemySpeciesName = PlayerPrefs.GetString("MY_GACHA_SEARCH_SPECIES_KEY", (string)null);
+		searchRequest.enemyLevelMax = PlayerPrefs.GetInt("MY_GACHA_SEARCH_LEVEL_MAX_KEY", defaultValue);
+		searchRequest.targetEnemySpeciesName = PlayerPrefs.GetString("MY_GACHA_SEARCH_SPECIES_KEY", null);
 	}
 }

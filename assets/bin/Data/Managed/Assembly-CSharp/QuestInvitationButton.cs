@@ -1,5 +1,3 @@
-using System;
-
 public class QuestInvitationButton : UIBehaviour
 {
 	private enum UI
@@ -9,7 +7,7 @@ public class QuestInvitationButton : UIBehaviour
 
 	protected override void OnOpen()
 	{
-		PlayTween((Enum)UI.OBJ_TWEEN, true, (EventDelegate.Callback)null, false, 0);
+		PlayTween(UI.OBJ_TWEEN, true, null, false, 0);
 		if (MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.isOpen)
 		{
 			MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.OnInvitationBtnOpen(true);

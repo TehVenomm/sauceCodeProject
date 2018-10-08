@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class Goal_Prayer : Goal
 {
 	private Character target;
@@ -24,7 +26,7 @@ public class Goal_Prayer : Goal
 
 	protected override STATUS Process(Brain brain)
 	{
-		if (target == null)
+		if ((Object)target == (Object)null)
 		{
 			SetStatus(STATUS.COMPLETED);
 			return status;
@@ -44,7 +46,7 @@ public class Goal_Prayer : Goal
 	protected override void Terminate(Brain brain)
 	{
 		brain.moveCtrl.StopOff();
-		if (target != null)
+		if ((Object)target != (Object)null)
 		{
 			target = null;
 		}
@@ -55,8 +57,8 @@ public class Goal_Prayer : Goal
 		base.HandleEvent(brain, ev, param);
 		if (ev == BRAIN_EVENT.DESTROY_OBJECT)
 		{
-			StageObject stageObject = (StageObject)param;
-			if (target == stageObject)
+			StageObject y = (StageObject)param;
+			if ((Object)target == (Object)y)
 			{
 				target = null;
 			}

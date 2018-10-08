@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,18 +37,14 @@ public class ProfileChangeDegreeFrame : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
-	private unsafe IEnumerator DoInitialize()
+	private IEnumerator DoInitialize()
 	{
-		List<DegreeTable.DegreeData> all = Singleton<DegreeTable>.I.GetAll();
-		if (_003CDoInitialize_003Ec__Iterator106._003C_003Ef__am_0024cache3 == null)
-		{
-			_003CDoInitialize_003Ec__Iterator106._003C_003Ef__am_0024cache3 = new Func<DegreeTable.DegreeData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		allData = all.Where(_003CDoInitialize_003Ec__Iterator106._003C_003Ef__am_0024cache3).ToList();
+		allData = (from x in Singleton<DegreeTable>.I.GetAll()
+		where x.type == DEGREE_TYPE.FRAME || x.type == DEGREE_TYPE.SPECIAL_FRAME
+		select x).ToList();
 		allData.Sort((DegreeTable.DegreeData a, DegreeTable.DegreeData b) => (int)(a.id - b.id));
 		if (!MonoBehaviourSingleton<UserInfoManager>.IsValid() || allData.Count == 0)
 		{
@@ -58,12 +53,9 @@ public class ProfileChangeDegreeFrame : GameSection
 		}
 		else
 		{
-			List<DegreeTable.DegreeData> source = allData;
-			if (_003CDoInitialize_003Ec__Iterator106._003C_003Ef__am_0024cache5 == null)
-			{
-				_003CDoInitialize_003Ec__Iterator106._003C_003Ef__am_0024cache5 = new Func<DegreeTable.DegreeData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			userHaveData = source.Where(_003CDoInitialize_003Ec__Iterator106._003C_003Ef__am_0024cache5).ToList();
+			userHaveData = (from x in allData
+			where x.IsUnlcok(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds)
+			select x).ToList();
 			showAll = true;
 			currentPage = 1;
 			yield return (object)0;
@@ -71,7 +63,7 @@ public class ProfileChangeDegreeFrame : GameSection
 		}
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
 		base.UpdateUI();
 		List<DegreeTable.DegreeData> currentShow = (!showAll) ? userHaveData : allData;
@@ -81,14 +73,35 @@ public class ProfileChangeDegreeFrame : GameSection
 			maxPage++;
 		}
 		int item_num = Mathf.Min(GameDefine.DEGREE_FRAME_CHANGE_LIST_COUNT, currentShow.Count - (currentPage - 1) * GameDefine.DEGREE_FRAME_CHANGE_LIST_COUNT);
-		_003CUpdateUI_003Ec__AnonStorey3DC _003CUpdateUI_003Ec__AnonStorey3DC;
-		SetGrid(UI.GRD_FRAME, "DegreePlate", item_num, true, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3DC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-		SetLabelText((Enum)UI.LBL_SORT, (!showAll) ? StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 21u) : StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 20u));
+		SetGrid(UI.GRD_FRAME, "DegreePlate", item_num, true, delegate(int i, Transform t, bool b)
+		{
+			int index = i + (currentPage - 1) * GameDefine.DEGREE_FRAME_CHANGE_LIST_COUNT;
+			DegreePlate component = t.GetComponent<DegreePlate>();
+			DegreeTable.DegreeData degreeData = currentShow[index];
+			SetEvent(t, "FRAME_SELECT", degreeData);
+			if (degreeData.IsUnlcok(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds))
+			{
+				component.SetFrame((int)degreeData.id);
+				component.GetComponent<Collider>().enabled = true;
+				component.gameObject.AddComponent<UIDragScrollView>();
+			}
+			else if (degreeData.IsSecretName(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds))
+			{
+				component.SetUnknownFrame();
+				component.GetComponent<Collider>().enabled = false;
+			}
+			else
+			{
+				component.SetFrame((int)degreeData.id);
+				component.GetComponent<Collider>().enabled = false;
+			}
+		});
+		SetLabelText(UI.LBL_SORT, (!showAll) ? StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 21u) : StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 20u));
 		bool flag = maxPage > 1;
-		SetActive((Enum)UI.OBJ_ACTIVE_ARROW_ROOT, flag);
-		SetActive((Enum)UI.OBJ_INACTIVE_ARROW_ROOT, !flag);
-		SetLabelText((Enum)UI.LBL_ARROW_NOW, currentPage.ToString());
-		SetLabelText((Enum)UI.LBL_ARROW_MAX, maxPage.ToString());
+		SetActive(UI.OBJ_ACTIVE_ARROW_ROOT, flag);
+		SetActive(UI.OBJ_INACTIVE_ARROW_ROOT, !flag);
+		SetLabelText(UI.LBL_ARROW_NOW, currentPage.ToString());
+		SetLabelText(UI.LBL_ARROW_MAX, maxPage.ToString());
 	}
 
 	private void OnQuery_SORT()

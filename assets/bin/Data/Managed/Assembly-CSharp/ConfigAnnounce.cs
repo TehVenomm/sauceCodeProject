@@ -1,5 +1,3 @@
-using System;
-
 public class ConfigAnnounce : GameSection
 {
 	private enum UI
@@ -26,11 +24,9 @@ public class ConfigAnnounce : GameSection
 
 	private void Update()
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Expected O, but got Unknown
 		if (autoClose && !MonoBehaviourSingleton<GameSceneManager>.I.isWaiting)
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("ConfigAnnounce", this.get_gameObject(), "CLOSE", null, null, true);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("ConfigAnnounce", base.gameObject, "CLOSE", null, null, true);
 			autoClose = false;
 		}
 	}
@@ -47,28 +43,28 @@ public class ConfigAnnounce : GameSection
 	private void UpdateUI_Event()
 	{
 		bool flag = (pushEnable & 1) != 0;
-		SetToggle((Enum)UI.TGL_EVENT_ON, flag);
-		SetToggle((Enum)UI.TGL_EVENT_OFF, !flag);
-		SetButtonEnabled((Enum)UI.BTN_EVENT_ON, !flag);
-		SetButtonEnabled((Enum)UI.BTN_EVENT_OFF, flag);
+		SetToggle(UI.TGL_EVENT_ON, flag);
+		SetToggle(UI.TGL_EVENT_OFF, !flag);
+		SetButtonEnabled(UI.BTN_EVENT_ON, !flag);
+		SetButtonEnabled(UI.BTN_EVENT_OFF, flag);
 	}
 
 	private void UpdateUI_Friend()
 	{
 		bool flag = (pushEnable & 2) != 0;
-		SetToggle((Enum)UI.TGL_FRIEND_ON, flag);
-		SetToggle((Enum)UI.TGL_FRIEND_OFF, !flag);
-		SetButtonEnabled((Enum)UI.BTN_FRIEND_ON, !flag);
-		SetButtonEnabled((Enum)UI.BTN_FRIEND_OFF, flag);
+		SetToggle(UI.TGL_FRIEND_ON, flag);
+		SetToggle(UI.TGL_FRIEND_OFF, !flag);
+		SetButtonEnabled(UI.BTN_FRIEND_ON, !flag);
+		SetButtonEnabled(UI.BTN_FRIEND_OFF, flag);
 	}
 
 	private void UpdateUI_GuildRequest()
 	{
 		bool localPushFlag = MonoBehaviourSingleton<GuildRequestManager>.I.GetLocalPushFlag();
-		SetToggle((Enum)UI.TGL_GUILD_REQUEST_ON, localPushFlag);
-		SetToggle((Enum)UI.TGL_GUILD_REQUEST_OFF, !localPushFlag);
-		SetButtonEnabled((Enum)UI.BTN_GUILD_REQUEST_ON, !localPushFlag);
-		SetButtonEnabled((Enum)UI.BTN_GUILD_REQUEST_OFF, localPushFlag);
+		SetToggle(UI.TGL_GUILD_REQUEST_ON, localPushFlag);
+		SetToggle(UI.TGL_GUILD_REQUEST_OFF, !localPushFlag);
+		SetButtonEnabled(UI.BTN_GUILD_REQUEST_ON, !localPushFlag);
+		SetButtonEnabled(UI.BTN_GUILD_REQUEST_OFF, localPushFlag);
 	}
 
 	private void updateNoticeFlag()

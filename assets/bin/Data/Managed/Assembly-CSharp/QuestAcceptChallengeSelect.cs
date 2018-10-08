@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,16 +29,19 @@ public class QuestAcceptChallengeSelect : QuestAcceptSelect
 
 	public override void Initialize()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		root = SetPrefab(base.collectUI, "QuestAcceptChallengeSelect", true);
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
-	private unsafe IEnumerator DoInitialize()
+	private IEnumerator DoInitialize()
 	{
 		yield return (object)_Initialize();
 		bool sended = false;
-		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeEnmey(questInfo.questData.tableData.enemyID[0], new Action<bool, QuestChallengeEnemyModel.Param>((object)/*Error near IL_006a: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeEnmey(questInfo.questData.tableData.enemyID[0], delegate(bool isSuccess, QuestChallengeEnemyModel.Param result)
+		{
+			((_003CDoInitialize_003Ec__Iterator124)/*Error near IL_006a: stateMachine*/)._003C_003Ef__this.OnSendFinished(isSuccess, result);
+			((_003CDoInitialize_003Ec__Iterator124)/*Error near IL_006a: stateMachine*/)._003Csended_003E__0 = true;
+		});
 		if (!sended)
 		{
 			yield return (object)null;
@@ -63,49 +65,41 @@ public class QuestAcceptChallengeSelect : QuestAcceptSelect
 	private void UpdateEnemyLevelLabel()
 	{
 		string text = StringTable.Format(STRING_CATEGORY.MAIN_STATUS, 1u, GetSelectedQuestDataSet().tableData.enemyLv[0]);
-		SetLabelText((Enum)UI.LBL_ENEMY_LEVEL, text);
+		SetLabelText(UI.LBL_ENEMY_LEVEL, text);
 	}
 
 	private void UpdateEnemyLevelButton()
 	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
 		if (selectedQuestIndex >= enableQuestList.Count - 1)
 		{
-			SetColor((Enum)UI.OBJ_LEVEL_R, Color.get_clear());
-			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_R, true);
+			SetColor(UI.OBJ_LEVEL_R, Color.clear);
+			SetActive(UI.OBJ_LEVEL_INACTIVE_R, true);
 		}
 		else
 		{
-			SetColor((Enum)UI.OBJ_LEVEL_R, Color.get_white());
-			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_R, false);
+			SetColor(UI.OBJ_LEVEL_R, Color.white);
+			SetActive(UI.OBJ_LEVEL_INACTIVE_R, false);
 		}
 		if (selectedQuestIndex <= 0)
 		{
-			SetColor((Enum)UI.OBJ_LEVEL_L, Color.get_clear());
-			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_L, true);
+			SetColor(UI.OBJ_LEVEL_L, Color.clear);
+			SetActive(UI.OBJ_LEVEL_INACTIVE_L, true);
 		}
 		else
 		{
-			SetColor((Enum)UI.OBJ_LEVEL_L, Color.get_white());
-			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_L, false);
+			SetColor(UI.OBJ_LEVEL_L, Color.white);
+			SetActive(UI.OBJ_LEVEL_INACTIVE_L, false);
 		}
 	}
 
 	private void UpdateButtons()
 	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
-			GetCtrl(UI.BTN_GUILD_REQUEST).set_localPosition(new Vector3(136f, 10f, 0f));
-			GetCtrl(UI.BTN_GUILD_REQUEST).set_localScale(new Vector3(0.462f, 0.462f, 0f));
-			GetCtrl(UI.BTN_PARTY).set_localPosition(new Vector3(-34f, 10f, 0f));
-			GetCtrl(UI.BTN_PARTY).set_localScale(new Vector3(0.462f, 0.462f, 0f));
+			GetCtrl(UI.BTN_GUILD_REQUEST).localPosition = new Vector3(136f, 10f, 0f);
+			GetCtrl(UI.BTN_GUILD_REQUEST).localScale = new Vector3(0.462f, 0.462f, 0f);
+			GetCtrl(UI.BTN_PARTY).localPosition = new Vector3(-34f, 10f, 0f);
+			GetCtrl(UI.BTN_PARTY).localScale = new Vector3(0.462f, 0.462f, 0f);
 		}
 	}
 

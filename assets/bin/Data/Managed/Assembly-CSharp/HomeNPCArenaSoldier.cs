@@ -15,7 +15,6 @@ public class HomeNPCArenaSoldier : HomeNPCCharacter
 
 	protected override void PlayNearAnim(HomeNPCCharacter npc)
 	{
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<UserInfoManager>.I.isArenaOpen)
 		{
 			animCtrl.Play(npc.nearAnim, false);
@@ -28,7 +27,7 @@ public class HomeNPCArenaSoldier : HomeNPCCharacter
 		{
 			if (!isTurned)
 			{
-				this.StartCoroutine(PlayThroughTurn());
+				StartCoroutine(PlayThroughTurn());
 				isTurned = true;
 			}
 		}
@@ -42,7 +41,7 @@ public class HomeNPCArenaSoldier : HomeNPCCharacter
 	{
 		animCtrl.Play(PLCA.THROUGH_TURN, false);
 		int turnSign = (base.npcInfo.scaleX > 0f) ? 1 : (-1);
-		Vector3 eulerAngles = base._transform.get_eulerAngles();
+		Vector3 eulerAngles = base._transform.eulerAngles;
 		float beforeTurnRot = eulerAngles.y;
 		while (rotatedDegree <= 90f)
 		{
@@ -52,7 +51,7 @@ public class HomeNPCArenaSoldier : HomeNPCCharacter
 				rotatedDegree = 90f;
 			}
 			float rotateY = beforeTurnRot + rotatedDegree * (float)turnSign;
-			base._transform.set_rotation(Quaternion.Euler(0f, rotateY, 0f));
+			base._transform.rotation = Quaternion.Euler(0f, rotateY, 0f);
 			yield return (object)null;
 		}
 	}

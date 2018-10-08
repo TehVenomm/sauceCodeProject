@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class ChatState_Init : ChatState
 {
@@ -6,7 +7,7 @@ public class ChatState_Init : ChatState
 	{
 		base.Enter(_manager);
 		EndInitialize();
-		if (m_manager != null)
+		if ((UnityEngine.Object)m_manager != (UnityEngine.Object)null)
 		{
 			m_manager.PushNextState(typeof(ChatState_HomeTab));
 		}
@@ -14,7 +15,7 @@ public class ChatState_Init : ChatState
 
 	public override Type GetNextState()
 	{
-		if (!base.IsInitialized || m_manager == null)
+		if (!base.IsInitialized || (UnityEngine.Object)m_manager == (UnityEngine.Object)null)
 		{
 			return base.GetNextState();
 		}

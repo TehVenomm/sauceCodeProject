@@ -38,7 +38,7 @@ public class UIChatButton : UIChatButtonBase
 
 	protected override void chat(int id)
 	{
-		if (id != -1 && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+		if (id != -1 && (Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (Object)null)
 		{
 			MonoBehaviourSingleton<StageObjectManager>.I.self.ChatSay(id);
 		}

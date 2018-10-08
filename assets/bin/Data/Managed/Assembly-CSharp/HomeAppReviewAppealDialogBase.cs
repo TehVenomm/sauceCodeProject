@@ -112,7 +112,7 @@ public class HomeAppReviewAppealDialogBase : GameSection
 		int num = StarButtons.Length;
 		for (int i = 0; i < num; i++)
 		{
-			SetEvent((Enum)StarButtons[i], "STAR", i);
+			SetEvent(StarButtons[i], "STAR", i);
 		}
 	}
 }

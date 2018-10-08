@@ -91,12 +91,12 @@ public class GrowEnemyTable : Singleton<GrowEnemyTable>, IDataTable
 			Log.Warning("GetGrowEnemyData: growId {0}, Lv {1} Lerp error", growId, level);
 			return _defaultData;
 		}
-		float num = (float)(level - (int)prev.level) / (float)((int)next.level - (int)prev.level);
+		float t = (float)(level - (int)prev.level) / (float)((int)next.level - (int)prev.level);
 		growEnemyData = new GrowEnemyData();
 		growEnemyData.growId = growId;
 		growEnemyData.level = level;
-		growEnemyData.hp = Mathf.FloorToInt(Mathf.Lerp((float)(int)prev.hp, (float)(int)next.hp, num));
-		growEnemyData.atk = Mathf.FloorToInt(Mathf.Lerp((float)(int)prev.atk, (float)(int)next.atk, num));
+		growEnemyData.hp = Mathf.FloorToInt(Mathf.Lerp((float)(int)prev.hp, (float)(int)next.hp, t));
+		growEnemyData.atk = Mathf.FloorToInt(Mathf.Lerp((float)(int)prev.atk, (float)(int)next.atk, t));
 		return growEnemyData;
 	}
 }

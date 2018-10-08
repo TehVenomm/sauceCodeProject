@@ -283,7 +283,6 @@ public final class C0190c implements C0189c {
         RequestId fromString;
         ProductDataResponse.RequestStatus valueOf;
         Set linkedHashSet;
-        Map hashMap;
         Throwable e;
         Map map = null;
         ProductDataResponse.RequestStatus requestStatus = ProductDataResponse.RequestStatus.FAILED;
@@ -294,6 +293,7 @@ public final class C0190c implements C0189c {
                 valueOf = ProductDataResponse.RequestStatus.valueOf(jSONObject.optString("status"));
                 try {
                     if (valueOf != ProductDataResponse.RequestStatus.FAILED) {
+                        Map hashMap;
                         linkedHashSet = new LinkedHashSet();
                         try {
                             hashMap = new HashMap();

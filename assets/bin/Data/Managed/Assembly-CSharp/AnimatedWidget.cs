@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class AnimatedWidget
+public class AnimatedWidget : MonoBehaviour
 {
 	public float width = 1f;
 
@@ -9,20 +9,15 @@ public class AnimatedWidget
 
 	private UIWidget mWidget;
 
-	public AnimatedWidget()
-		: this()
-	{
-	}
-
 	private void OnEnable()
 	{
-		mWidget = this.GetComponent<UIWidget>();
+		mWidget = GetComponent<UIWidget>();
 		LateUpdate();
 	}
 
 	private void LateUpdate()
 	{
-		if (mWidget != null)
+		if ((Object)mWidget != (Object)null)
 		{
 			mWidget.width = Mathf.RoundToInt(width);
 			mWidget.height = Mathf.RoundToInt(height);

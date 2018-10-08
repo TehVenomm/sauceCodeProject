@@ -13,7 +13,7 @@ public class InGameConfigGraphics : ConfigGraphics
 		{
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
 			isInActiveRotate = true;
-			GetCtrl(UI.DSV_ROOT).GetComponent<Collider>().set_enabled(!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
+			GetCtrl(UI.DSV_ROOT).GetComponent<Collider>().enabled = !MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait;
 		}
 	}
 
@@ -36,33 +36,32 @@ public class InGameConfigGraphics : ConfigGraphics
 		base.UpdateUI();
 	}
 
-	private unsafe void Reposition(bool isPortrait)
+	private void Reposition(bool isPortrait)
 	{
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Expected O, but got Unknown
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Expected O, but got Unknown
 		GetCtrl(UI.SPR_BG_FRAME).GetComponent<UIScreenRotationHandler>().InvokeRotate();
 		GetCtrl(UI.SCR_ROOT).GetComponent<UIScreenRotationHandler>().InvokeRotate();
 		UpdateAnchors();
 		UIScrollView component = GetCtrl(UI.SCR_ROOT).GetComponent<UIScrollView>();
 		component.ResetPosition();
 		AppMain i = MonoBehaviourSingleton<AppMain>.I;
-		i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-		GetCtrl(UI.DSV_ROOT).GetComponent<Collider>().set_enabled(!isPortrait);
+		i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+		{
+			RefreshUI();
+			UIPanel component2 = GetCtrl(UI.SCR_ROOT).GetComponent<UIPanel>();
+			component2.Refresh();
+		});
+		GetCtrl(UI.DSV_ROOT).GetComponent<Collider>().enabled = !isPortrait;
 	}
 
 	private void OnScreenRotate(bool isPortrait)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		if (base.transferUI != null)
+		if ((UnityEngine.Object)base.transferUI != (UnityEngine.Object)null)
 		{
-			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
 		}
 		else
 		{
-			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
 		}
 		if (!isInActiveRotate)
 		{

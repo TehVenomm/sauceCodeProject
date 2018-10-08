@@ -93,7 +93,6 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 
 	public bool LoadStage(string id)
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		if (isLoadingStage)
 		{
 			Log.Error(LOG.GAMESCENE, "can't load stage.");
@@ -103,7 +102,7 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 		{
 			return false;
 		}
-		this.StartCoroutine(LoadStageCoroutine(id));
+		StartCoroutine(LoadStageCoroutine(id));
 		return true;
 	}
 
@@ -113,7 +112,7 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 		insideColliderData = null;
 		isValidInside = false;
 		UnloadStage();
-		Input.get_gyro().set_enabled(false);
+		Input.gyro.enabled = false;
 		currentStageName = id;
 		StageTable.StageData data = null;
 		if (!string.IsNullOrEmpty(id))
@@ -161,26 +160,26 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 			{
 				yield return (object)load_queue.Wait();
 			}
-			while (!ao.get_isDone())
+			while (!ao.isDone)
 			{
 				yield return (object)null;
 			}
 			EffectObject.wait = false;
-			if (asset_bundle != null)
+			if ((Object)asset_bundle != (Object)null)
 			{
 				asset_bundle.Unload(false);
 			}
 			if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
 			{
-				stageObject = MonoBehaviourSingleton<SceneSettingsManager>.I.get_transform();
-				stageObject.set_parent(base._transform);
+				stageObject = MonoBehaviourSingleton<SceneSettingsManager>.I.transform;
+				stageObject.parent = base._transform;
 			}
 			if (lo_sky != null)
 			{
 				skyObject = ResourceUtility.Realizes(lo_sky.loadedObject, base._transform, -1);
 			}
 			bool is_field_stage = id.StartsWith("FI");
-			if (stageObject != null && is_field_stage && (!MonoBehaviourSingleton<SceneSettingsManager>.IsValid() || !MonoBehaviourSingleton<SceneSettingsManager>.I.forceFogON))
+			if ((Object)stageObject != (Object)null && is_field_stage && (!MonoBehaviourSingleton<SceneSettingsManager>.IsValid() || !MonoBehaviourSingleton<SceneSettingsManager>.I.forceFogON))
 			{
 				ChangeLightShader(base._transform);
 			}
@@ -191,7 +190,7 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 			{
 				MonoBehaviourSingleton<SceneSettingsManager>.I.attributeID = data.attributeID;
 				SceneParameter sp = MonoBehaviourSingleton<SceneSettingsManager>.I.GetComponent<SceneParameter>();
-				if (sp != null)
+				if ((Object)sp != (Object)null)
 				{
 					sp.Apply();
 				}
@@ -217,18 +216,18 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 		{
 			ShaderGlobal.lightProbe = true;
 		}
-		ShaderGlobal.lightProbe = (LightmapSettings.get_lightProbes() != null);
+		ShaderGlobal.lightProbe = ((Object)LightmapSettings.lightProbes != (Object)null);
 		currentStageData = data;
 		if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
 		{
 			WeatherController weatherController = MonoBehaviourSingleton<SceneSettingsManager>.I.weatherController;
-			if (cameraLinkEffect != null)
+			if ((Object)cameraLinkEffect != (Object)null)
 			{
-				cameraLinkEffect.get_gameObject().SetActive(!weatherController.cameraLinkEffectEnable);
+				cameraLinkEffect.gameObject.SetActive(!weatherController.cameraLinkEffectEnable);
 			}
-			if (cameraLinkEffectY0 != null)
+			if ((Object)cameraLinkEffectY0 != (Object)null)
 			{
-				cameraLinkEffectY0.get_gameObject().SetActive(!weatherController.cameraLinkEffectY0Enable);
+				cameraLinkEffectY0.gameObject.SetActive(!weatherController.cameraLinkEffectY0Enable);
 			}
 			if (MonoBehaviourSingleton<FieldManager>.IsValid() && MonoBehaviourSingleton<FieldManager>.I.fieldData != null)
 			{
@@ -240,14 +239,13 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 
 	public void LoadBackgoundImage(int image_id)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		if (isLoadingBackgoundImage)
 		{
 			Log.Error(LOG.GAMESCENE, "can't load stage.");
 		}
 		else if (backgroundImageID != image_id)
 		{
-			this.StartCoroutine(DoLoadBackgoundImage(image_id));
+			StartCoroutine(DoLoadBackgoundImage(image_id));
 		}
 	}
 
@@ -265,9 +263,8 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 			yield return (object)load_queue.Wait();
 		}
 		Transform bg = ResourceUtility.Realizes(lo_bg.loadedObject, base._transform, 0);
-		bg.get_gameObject().GetComponent<MeshRenderer>().get_material()
-			.set_mainTexture(lo_tex.loadedObject as Texture);
-		bg.get_gameObject().AddComponent<FixedViewQuad>();
+		bg.gameObject.GetComponent<MeshRenderer>().material.mainTexture = (lo_tex.loadedObject as Texture);
+		bg.gameObject.AddComponent<FixedViewQuad>();
 		backgroundImageID = image_id;
 		backgroundImage = bg;
 		isLoadingBackgoundImage = false;
@@ -275,12 +272,6 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 
 	public void UnloadStage()
 	{
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<EffectManager>.IsValid())
 		{
 			MonoBehaviourSingleton<EffectManager>.I.DeleteManagerChildrenEffects();
@@ -289,118 +280,109 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 		{
 			MonoBehaviourSingleton<InstantiateManager>.I.ClearStocks();
 		}
-		if (stageObject != null)
+		if ((Object)stageObject != (Object)null)
 		{
-			stageObject.set_parent(null);
+			stageObject.parent = null;
 			SceneManager.LoadScene("Empty");
 			stageObject = null;
 			ShaderGlobal.Initialize();
 			MonoBehaviourSingleton<GlobalSettingsManager>.I.ResetLightRot();
 			MonoBehaviourSingleton<GlobalSettingsManager>.I.ResetAmbientColor();
-			Input.get_gyro().set_enabled(true);
+			Input.gyro.enabled = true;
 		}
-		if (skyObject != null)
+		if ((Object)skyObject != (Object)null)
 		{
-			Object.Destroy(skyObject.get_gameObject());
+			Object.Destroy(skyObject.gameObject);
 			skyObject = null;
 		}
-		if (rootEffect != null)
+		if ((Object)rootEffect != (Object)null)
 		{
-			Object.Destroy(rootEffect.get_gameObject());
+			Object.Destroy(rootEffect.gameObject);
 			rootEffect = null;
 		}
-		if (cameraLinkEffect != null)
+		if ((Object)cameraLinkEffect != (Object)null)
 		{
-			Object.Destroy(cameraLinkEffect.get_gameObject());
+			Object.Destroy(cameraLinkEffect.gameObject);
 			cameraLinkEffect = null;
 		}
-		if (cameraLinkEffectY0 != null)
+		if ((Object)cameraLinkEffectY0 != (Object)null)
 		{
-			Object.Destroy(cameraLinkEffectY0.get_gameObject());
+			Object.Destroy(cameraLinkEffectY0.gameObject);
 			cameraLinkEffectY0 = null;
 		}
 		currentStageName = null;
 		currentStageData = null;
 		backgroundImageID = 0;
-		if (backgroundImage != null)
+		if ((Object)backgroundImage != (Object)null)
 		{
-			Object.Destroy(backgroundImage.get_gameObject());
+			Object.Destroy(backgroundImage.gameObject);
 			backgroundImage = null;
 		}
 	}
 
 	public static float GetHeight(Vector3 pos)
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageManager>.IsValid())
 		{
 			return 0f;
 		}
 		StageManager i = MonoBehaviourSingleton<StageManager>.I;
 		Terrain terrain = i.terrain;
-		if (terrain == null)
+		if ((Object)terrain == (Object)null)
 		{
 			return 0f;
 		}
-		Vector3 position = i.terrainTransform.get_position();
-		return terrain.get_terrainData().GetInterpolatedHeight((pos.x - position.x) * i.terrainDataSizeInvX, (pos.z - position.z) * i.terrainDataSizeInvZ);
+		Vector3 position = i.terrainTransform.position;
+		return terrain.terrainData.GetInterpolatedHeight((pos.x - position.x) * i.terrainDataSizeInvX, (pos.z - position.z) * i.terrainDataSizeInvZ);
 	}
 
 	public static Vector3 FitHeight(Vector3 pos)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 		pos.y = GetHeight(pos);
 		return pos;
 	}
 
 	public static void ChangeLightShader(Transform root)
 	{
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Expected O, but got Unknown
 		UIntKeyTable<Material> uIntKeyTable = new UIntKeyTable<Material>();
 		List<Renderer> list = new List<Renderer>();
-		root.GetComponentsInChildren<Renderer>(true, list);
+		root.GetComponentsInChildren(true, list);
 		int i = 0;
 		for (int count = list.Count; i < count; i++)
 		{
-			Renderer val = list[i];
-			Material[] sharedMaterials = val.get_sharedMaterials();
+			Renderer renderer = list[i];
+			Material[] sharedMaterials = renderer.sharedMaterials;
 			int j = 0;
 			for (int num = sharedMaterials.Length; j < num; j++)
 			{
-				Material val2 = sharedMaterials[j];
-				if (val2 != null && val2.get_shader() != null)
+				Material material = sharedMaterials[j];
+				if ((Object)material != (Object)null && (Object)material.shader != (Object)null)
 				{
-					Material val3 = uIntKeyTable.Get((uint)val2.GetInstanceID());
-					if (val3 != null)
+					Material material2 = uIntKeyTable.Get((uint)material.GetInstanceID());
+					if ((Object)material2 != (Object)null)
 					{
-						sharedMaterials[j] = val3;
+						sharedMaterials[j] = material2;
 					}
 					else
 					{
-						string name = val2.get_shader().get_name();
+						string name = material.shader.name;
 						if (!name.EndsWith("__l"))
 						{
-							Shader val4 = ResourceUtility.FindShader(name + "__l");
-							if (val4 != null)
+							Shader shader = ResourceUtility.FindShader(name + "__l");
+							if ((Object)shader != (Object)null)
 							{
-								val3 = new Material(val2);
-								val3.set_shader(val4);
-								sharedMaterials[j] = val3;
-								uIntKeyTable.Add((uint)val2.GetInstanceID(), val3);
+								material2 = new Material(material);
+								material2.shader = shader;
+								sharedMaterials[j] = material2;
+								uIntKeyTable.Add((uint)material.GetInstanceID(), material2);
 								continue;
 							}
 						}
-						uIntKeyTable.Add((uint)val2.GetInstanceID(), val2);
+						uIntKeyTable.Add((uint)material.GetInstanceID(), material);
 					}
 				}
 			}
-			val.set_sharedMaterials(sharedMaterials);
+			renderer.sharedMaterials = sharedMaterials;
 		}
 		uIntKeyTable.Clear();
 		list.Clear();
@@ -447,8 +429,6 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 
 	public Vector3 ClampInside(Vector3 pos)
 	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 		if (insideColliderData == null)
 		{
 			return pos;
@@ -458,33 +438,12 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 
 	public Vector3 GetRandomPosByInsideInfo(Vector3 center, float max_radius, float min_radius = 0f)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		bool valid = false;
 		return GetRandomPosByInsideInfo(center, max_radius, min_radius, ref valid);
 	}
 
 	public Vector3 GetRandomPosByInsideInfo(Vector3 center, float max_radius, float min_radius, ref bool valid)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020f: Unknown result type (might be due to invalid IL or missing references)
 		valid = false;
 		if (!isValidInside)
 		{
@@ -515,17 +474,12 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 		{
 			for (int j = 0; j < num2; j++)
 			{
-				Vector3 zero = Vector3.get_zero();
+				Vector3 zero = Vector3.zero;
 				zero.x = (float)(num3 + i) * insideColliderData.chipSize + insideColliderData.chipSize * 0.5f;
 				zero.z = (float)(num4 + j) * insideColliderData.chipSize + insideColliderData.chipSize * 0.5f;
-				Vector3 val = zero - center;
-				if (!(val.get_sqrMagnitude() >= max_radius * max_radius))
+				if (!((zero - center).sqrMagnitude >= max_radius * max_radius) && !((zero - center).sqrMagnitude <= min_radius * min_radius) && CheckPosInside(zero))
 				{
-					Vector3 val2 = zero - center;
-					if (!(val2.get_sqrMagnitude() <= min_radius * min_radius) && CheckPosInside(zero))
-					{
-						insideChipList.Add(zero);
-					}
+					insideChipList.Add(zero);
 				}
 			}
 		}
@@ -533,9 +487,9 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 		{
 			return center;
 		}
-		Vector3 result = insideChipList[(int)((float)insideChipList.Count * Random.get_value())];
-		result.x += insideColliderData.chipSize * (Random.get_value() - 0.5f);
-		result.z += insideColliderData.chipSize * (Random.get_value() - 0.5f);
+		Vector3 result = insideChipList[(int)((float)insideChipList.Count * Random.value)];
+		result.x += insideColliderData.chipSize * (Random.value - 0.5f);
+		result.z += insideColliderData.chipSize * (Random.value - 0.5f);
 		valid = true;
 		return result;
 	}

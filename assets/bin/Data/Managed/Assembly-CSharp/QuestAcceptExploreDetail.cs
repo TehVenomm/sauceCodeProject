@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -116,7 +115,7 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_CLEAR_REWARD, true);
+		SetActive(UI.OBJ_CLEAR_REWARD, true);
 		base.UpdateUI();
 		questTableData = info.GetQuestData();
 		if (questTableData != null)
@@ -126,19 +125,19 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 			{
 				ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY), ELEMENT_TYPE.MAX, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY, ELEMENT_TYPE.MAX);
 				itemIcon.SetDepth(7);
-				SetElementSprite((Enum)UI.SPR_ENM_ELEMENT, (int)enemyData.element);
-				SetElementSprite((Enum)UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
-				SetActive((Enum)UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
+				SetElementSprite(UI.SPR_ENM_ELEMENT, (int)enemyData.element);
+				SetElementSprite(UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
+				SetActive(UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
 				int num = (int)questTableData.limitTime;
-				SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num / 60:D2}:{num % 60:D2}");
+				SetLabelText(UI.LBL_LIMIT_TIME, $"{num / 60:D2}:{num % 60:D2}");
 				if ((base.isComplete || isNotice) && !isCompletedEventDelivery)
 				{
-					SetActive((Enum)UI.BTN_CREATE_OFF, false);
+					SetActive(UI.BTN_CREATE_OFF, false);
 				}
 				else
 				{
-					SetActive((Enum)UI.BTN_CREATE, IsCreatableRoom());
-					SetActive((Enum)UI.BTN_CREATE_OFF, !IsCreatableRoom());
+					SetActive(UI.BTN_CREATE, IsCreatableRoom());
+					SetActive(UI.BTN_CREATE_OFF, !IsCreatableRoom());
 				}
 				SetDifficultySprite();
 				SetSprite(baseRoot, UI.SPR_WINDOW, "RequestWindowBase_Explorer");
@@ -165,14 +164,11 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 
 	private void OnQuery_SWITCH_SUBMISSION()
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		if (Object.op_Implicit(targetFrame) && Object.op_Implicit(submissionFrame))
+		if ((bool)targetFrame && (bool)submissionFrame)
 		{
-			bool activeSelf = targetFrame.get_gameObject().get_activeSelf();
-			targetFrame.get_gameObject().SetActive(!activeSelf);
-			submissionFrame.get_gameObject().SetActive(activeSelf);
+			bool activeSelf = targetFrame.gameObject.activeSelf;
+			targetFrame.gameObject.SetActive(!activeSelf);
+			submissionFrame.gameObject.SetActive(activeSelf);
 			isCompletedEventDelivery = true;
 			RefreshUI();
 		}
@@ -207,7 +203,7 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.needs[0].questId, true);
 	}
 
-	private unsafe void OnQuery_MATCHING()
+	private void OnQuery_MATCHING()
 	{
 		GameSection.SetEventData(new object[1]
 		{
@@ -216,14 +212,60 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 		GameSection.StayEvent();
 		int retryCount = 0;
 		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 1);
-		_003COnQuery_MATCHING_003Ec__AnonStorey401 _003COnQuery_MATCHING_003Ec__AnonStorey;
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, true, new Action<bool, int, bool, float>((object)_003COnQuery_MATCHING_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, true, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
+		{
+			if (!is_success)
+			{
+				GameSection.ResumeEvent(false, null);
+			}
+			else if (maxRetryCount > 0)
+			{
+				retryCount++;
+				StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
+			}
+			else if (!isJoined)
+			{
+				OnQuery_AUTO_CREATE_ROOM();
+			}
+			else
+			{
+				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
+				GameSection.ResumeEvent(true, null);
+			}
+		});
 	}
 
-	private unsafe IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
+	private IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
 	{
 		yield return (object)new WaitForSeconds(time);
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, true, new Action<bool, int, bool, float>((object)/*Error near IL_0061: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, true, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
+		{
+			if (!is_success)
+			{
+				GameSection.ResumeEvent(false, null);
+			}
+			else if (maxRetryCount > 0)
+			{
+				if (((_003CMatchAtRandom_003Ec__Iterator125)/*Error near IL_0061: stateMachine*/).retryCount >= maxRetryCount)
+				{
+					((_003CMatchAtRandom_003Ec__Iterator125)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.OnQuery_AUTO_CREATE_ROOM();
+				}
+				else
+				{
+					((_003CMatchAtRandom_003Ec__Iterator125)/*Error near IL_0061: stateMachine*/).retryCount++;
+					((_003CMatchAtRandom_003Ec__Iterator125)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.StartCoroutine(((_003CMatchAtRandom_003Ec__Iterator125)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.MatchAtRandom(((_003CMatchAtRandom_003Ec__Iterator125)/*Error near IL_0061: stateMachine*/).setting, ((_003CMatchAtRandom_003Ec__Iterator125)/*Error near IL_0061: stateMachine*/).retryCount, waitTime));
+				}
+			}
+			else if (!isJoined)
+			{
+				((_003CMatchAtRandom_003Ec__Iterator125)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.OnQuery_AUTO_CREATE_ROOM();
+			}
+			else
+			{
+				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(((_003CMatchAtRandom_003Ec__Iterator125)/*Error near IL_0061: stateMachine*/).setting);
+				GameSection.ResumeEvent(true, null);
+			}
+		});
 	}
 
 	private void OnQuery_AUTO_CREATE_ROOM()
@@ -245,6 +287,6 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 	private void SetDifficultySprite()
 	{
 		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryID);
-		SetActive((Enum)UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
+		SetActive(UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
 	}
 }

@@ -21,7 +21,7 @@ public class JSONParser
 		SkipWhitespace();
 		if (reader.Peek() != 123)
 		{
-			Debug.LogError((object)"malformed json: no starting '{'");
+			Debug.LogError("malformed json: no starting '{'");
 			return null;
 		}
 		reader.Read();
@@ -107,7 +107,7 @@ public class JSONParser
 				{
 					return string.Empty;
 				}
-				Debug.LogError((object)"malformed json: read '}' before reading ':'");
+				Debug.LogError("malformed json: read '}' before reading ':'");
 				return null;
 			case ':':
 				if (flag && (text.EndsWith("'") || text.EndsWith("\"")))

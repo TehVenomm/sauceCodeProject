@@ -297,17 +297,11 @@ public class StageObject : ControlObject, IBulletObserver
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			Vector3 position = _position;
 			return new Vector2(position.x, position.z);
 		}
 		set
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			Vector3 position = _position;
 			position.x = value.x;
 			position.z = value.y;
@@ -319,9 +313,6 @@ public class StageObject : ControlObject, IBulletObserver
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			Vector3 forward = _forward;
 			return new Vector2(forward.x, forward.z);
 		}
@@ -370,8 +361,7 @@ public class StageObject : ControlObject, IBulletObserver
 
 	public void AddController<T>() where T : ControllerBase
 	{
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		if (controller == null)
+		if ((UnityEngine.Object)controller == (UnityEngine.Object)null)
 		{
 			if (!CoopStageObjectUtility.CanControll(this))
 			{
@@ -379,25 +369,22 @@ public class StageObject : ControlObject, IBulletObserver
 			}
 			else
 			{
-				this.get_gameObject().AddComponent<T>();
+				base.gameObject.AddComponent<T>();
 			}
 		}
 	}
 
 	public void RemoveController()
 	{
-		if (controller != null)
+		if ((UnityEngine.Object)controller != (UnityEngine.Object)null)
 		{
 			controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.DEFAULT);
-			Object.Destroy(controller);
+			UnityEngine.Object.Destroy(controller);
 		}
 	}
 
 	public virtual void LookAt(Vector3 pos, bool isBlindEnable = false)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 		Vector3 position = _position;
 		pos.y = position.y;
 		_LookAt(pos);
@@ -428,8 +415,8 @@ public class StageObject : ControlObject, IBulletObserver
 	protected override void Awake()
 	{
 		base.Awake();
-		_rigidbody = this.GetComponent<Rigidbody>();
-		_collider = this.GetComponent<Collider>();
+		_rigidbody = GetComponent<Rigidbody>();
+		_collider = GetComponent<Collider>();
 		if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
 		{
 			objectParameter = MonoBehaviourSingleton<InGameSettingsManager>.I.stageObject;
@@ -438,11 +425,11 @@ public class StageObject : ControlObject, IBulletObserver
 		{
 			objectParameter = new InGameSettingsManager.StageObjectParam();
 		}
-		if (packetReceiver == null)
+		if ((UnityEngine.Object)packetReceiver == (UnityEngine.Object)null)
 		{
 			packetReceiver = ObjectPacketReceiver.SetupComponent(this);
 		}
-		if (packetSender == null)
+		if ((UnityEngine.Object)packetSender == (UnityEngine.Object)null)
 		{
 			packetSender = ObjectPacketSender.SetupComponent(this);
 		}
@@ -468,8 +455,8 @@ public class StageObject : ControlObject, IBulletObserver
 		nodeCache.Clear();
 		hitOffFlag &= ~HIT_OFF_FLAG.LOAD;
 		isLoading = false;
-		_rigidbody = this.GetComponent<Rigidbody>();
-		_collider = this.GetComponent<Collider>();
+		_rigidbody = GetComponent<Rigidbody>();
+		_collider = GetComponent<Collider>();
 		if (!isInitialized)
 		{
 			Initialize();
@@ -498,9 +485,8 @@ public class StageObject : ControlObject, IBulletObserver
 
 	public virtual bool DestroyObject()
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 		isDestroyWaitFlag = false;
-		if (packetSender != null)
+		if ((UnityEngine.Object)packetSender != (UnityEngine.Object)null)
 		{
 			packetSender.OnDestroyObject();
 		}
@@ -508,7 +494,7 @@ public class StageObject : ControlObject, IBulletObserver
 		{
 			MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(this);
 		}
-		Object.Destroy(this.get_gameObject());
+		UnityEngine.Object.Destroy(base.gameObject);
 		return true;
 	}
 
@@ -517,7 +503,7 @@ public class StageObject : ControlObject, IBulletObserver
 		int num = 0;
 		while (num < hitOffTimers.Count)
 		{
-			if (hitOffTimers[num].endTime <= Time.get_time())
+			if (hitOffTimers[num].endTime <= Time.time)
 			{
 				hitOffFlag &= ~hitOffTimers[num].hitOffFlag;
 				hitOffTimers.RemoveAt(num);
@@ -527,11 +513,11 @@ public class StageObject : ControlObject, IBulletObserver
 				num++;
 			}
 		}
-		if (packetReceiver != null)
+		if ((UnityEngine.Object)packetReceiver != (UnityEngine.Object)null)
 		{
 			packetReceiver.OnUpdate();
 		}
-		if (packetSender != null)
+		if ((UnityEngine.Object)packetSender != (UnityEngine.Object)null)
 		{
 			packetSender.OnUpdate();
 		}
@@ -555,11 +541,11 @@ public class StageObject : ControlObject, IBulletObserver
 	{
 		if (isWallStay)
 		{
-			wallStayTimer += Time.get_deltaTime();
+			wallStayTimer += Time.deltaTime;
 		}
 		else
 		{
-			wallStayTimer -= Time.get_deltaTime() * 0.5f;
+			wallStayTimer -= Time.deltaTime * 0.5f;
 			if (wallStayTimer < 0f)
 			{
 				wallStayTimer = 0f;
@@ -578,7 +564,7 @@ public class StageObject : ControlObject, IBulletObserver
 			int j = 0;
 			for (int count = hitIntervalList.Count; j < count; j++)
 			{
-				hitIntervalList[j].hitIntervalTimer -= Time.get_deltaTime();
+				hitIntervalList[j].hitIntervalTimer -= Time.deltaTime;
 			}
 		}
 	}
@@ -589,10 +575,7 @@ public class StageObject : ControlObject, IBulletObserver
 
 	protected virtual void OnCollisionStay(Collision collision)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		if (collision.get_gameObject().get_layer() == 9 || collision.get_gameObject().get_layer() == 17 || collision.get_gameObject().get_layer() == 18)
+		if (collision.gameObject.layer == 9 || collision.gameObject.layer == 17 || collision.gameObject.layer == 18)
 		{
 			isWallStay = true;
 		}
@@ -631,12 +614,6 @@ public class StageObject : ControlObject, IBulletObserver
 
 	public virtual void OnAttackedHit(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
 	{
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
 		AttackedHitStatus attackedHitStatus = new AttackedHitStatus();
 		attackedHitStatus.hitParam = hit_param;
 		attackedHitStatus.attackInfo = info;
@@ -666,7 +643,7 @@ public class StageObject : ControlObject, IBulletObserver
 			OnAttackedHitLocal(new AttackedHitStatusLocal(attackedHitStatus));
 			if (IsMirror() || IsPuppet())
 			{
-				if (packetSender != null)
+				if ((UnityEngine.Object)packetSender != (UnityEngine.Object)null)
 				{
 					packetSender.OnAttackedHitOwner(new AttackedHitStatusOwner(attackedHitStatus));
 				}
@@ -676,7 +653,7 @@ public class StageObject : ControlObject, IBulletObserver
 				OnAttackedHitOwner(new AttackedHitStatusOwner(attackedHitStatus));
 				AttackedHitStatusFix status = new AttackedHitStatusFix(attackedHitStatus);
 				OnAttackedHitFix(status);
-				if (packetSender != null)
+				if ((UnityEngine.Object)packetSender != (UnityEngine.Object)null)
 				{
 					packetSender.OnAttackedHitFix(status);
 				}
@@ -767,7 +744,7 @@ public class StageObject : ControlObject, IBulletObserver
 		int i = 0;
 		for (int count = continuationList.Count; i < count; i++)
 		{
-			if (continuationList[i].attackInfo == info && continuationList[i].fromCollider == from_collider)
+			if (continuationList[i].attackInfo == info && (UnityEngine.Object)continuationList[i].fromCollider == (UnityEngine.Object)from_collider)
 			{
 				return false;
 			}
@@ -777,7 +754,7 @@ public class StageObject : ControlObject, IBulletObserver
 		attackedContinuationStatus.fromObject = from_object;
 		attackedContinuationStatus.fromCollider = from_collider;
 		attackedContinuationStatus.hitTime = time;
-		attackedContinuationStatus.hitStartTime = Time.get_time();
+		attackedContinuationStatus.hitStartTime = Time.time;
 		continuationList.Add(attackedContinuationStatus);
 		OnAttackedContinuationStart(attackedContinuationStatus);
 		return true;
@@ -793,7 +770,7 @@ public class StageObject : ControlObject, IBulletObserver
 			{
 				return;
 			}
-			if (continuationList[num].attackInfo == info && continuationList[num].fromCollider == from_collider)
+			if (continuationList[num].attackInfo == info && (UnityEngine.Object)continuationList[num].fromCollider == (UnityEngine.Object)from_collider)
 			{
 				break;
 			}
@@ -825,7 +802,7 @@ public class StageObject : ControlObject, IBulletObserver
 		{
 			return 1f;
 		}
-		float num = status.hitTime + Time.get_time() - status.hitStartTime;
+		float num = status.hitTime + Time.time - status.hitStartTime;
 		float result = 1f;
 		AttackInfo.TimeChange timeChange = status.attackInfo.timeChange;
 		if (timeChange.intervalTime > 0f)
@@ -846,15 +823,12 @@ public class StageObject : ControlObject, IBulletObserver
 
 	public virtual Vector3 GetCameraTargetPos()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		return _position + new Vector3(0f, 1f, 0f);
 	}
 
 	protected void IgnoreColliders(Collider[] colliders)
 	{
-		if (!(_collider == null) && colliders != null)
+		if (!((UnityEngine.Object)_collider == (UnityEngine.Object)null) && colliders != null)
 		{
 			if (ignoreColliders != null)
 			{
@@ -867,7 +841,7 @@ public class StageObject : ControlObject, IBulletObserver
 
 	protected void ResetIgnoreColliders()
 	{
-		if (!(_collider == null) && ignoreColliders != null)
+		if (!((UnityEngine.Object)_collider == (UnityEngine.Object)null) && ignoreColliders != null)
 		{
 			Utility.IgnoreCollision(_collider, ignoreColliders, false);
 			ignoreColliders = null;
@@ -915,14 +889,13 @@ public class StageObject : ControlObject, IBulletObserver
 		{
 			return nodeItem.value as Transform;
 		}
-		Transform val = Utility.Find(base._transform, name);
-		nodeCache.Add(name, val);
-		return val;
+		Transform transform = Utility.Find(base._transform, name);
+		nodeCache.Add(name, transform);
+		return transform;
 	}
 
 	public virtual void OnAnimEvent(AnimEventData.EventData data)
 	{
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 		switch (data.id)
 		{
 		case AnimEventFormat.ID.SHAKE_CAMERA:
@@ -976,7 +949,7 @@ public class StageObject : ControlObject, IBulletObserver
 			return;
 		}
 		}
-		Log.Error(LOG.INGAME, "AnimEvent Error! Event={0} Object={1}", data.name, this.get_name());
+		Log.Error(LOG.INGAME, "AnimEvent Error! Event={0} Object={1}", data.name, base.name);
 	}
 
 	public virtual AttackInfo[] GetAttackInfos()
@@ -1052,7 +1025,7 @@ public class StageObject : ControlObject, IBulletObserver
 		if (!(time <= 0f) && flag != 0)
 		{
 			hitOffFlag |= flag;
-			float num = Time.get_time() + time;
+			float num = Time.time + time;
 			int i = 0;
 			for (int count = hitOffTimers.Count; i < count; i++)
 			{
@@ -1078,7 +1051,7 @@ public class StageObject : ControlObject, IBulletObserver
 		{
 			WaitingPacketParam waitingPacketParam = new WaitingPacketParam();
 			waitingPacketParam.type = type;
-			waitingPacketParam.startTime = Time.get_time();
+			waitingPacketParam.startTime = Time.time;
 			waitingPacketParam.keepSync = keep_sync;
 			waitingPacketParam.addMarginTime = add_margin_time;
 			waitingPacketParams[(int)type] = waitingPacketParam;
@@ -1115,7 +1088,7 @@ public class StageObject : ControlObject, IBulletObserver
 					}
 					if (IsOriginal())
 					{
-						if (waitingPacketParam.keepSync && Time.get_time() >= waitingPacketParam.startTime + objectParameter.waitingPacketIntervalTime)
+						if (waitingPacketParam.keepSync && Time.time >= waitingPacketParam.startTime + objectParameter.waitingPacketIntervalTime)
 						{
 							KeepWaitingPacket(waitingPacketParam.type);
 						}
@@ -1127,7 +1100,7 @@ public class StageObject : ControlObject, IBulletObserver
 						{
 							num3 += objectParameter.waitingPacketIntervalTime;
 						}
-						if (Time.get_time() > waitingPacketParam.startTime + num3)
+						if (Time.time > waitingPacketParam.startTime + num3)
 						{
 							OnFailedWaitingPacket(waitingPacketParam.type);
 						}
@@ -1144,8 +1117,8 @@ public class StageObject : ControlObject, IBulletObserver
 		WaitingPacketParam waitingPacketParam = waitingPacketParams[(int)type];
 		if (waitingPacketParam != null)
 		{
-			waitingPacketParam.startTime = Time.get_time();
-			if (packetSender != null)
+			waitingPacketParam.startTime = Time.time;
+			if ((UnityEngine.Object)packetSender != (UnityEngine.Object)null)
 			{
 				packetSender.OnKeepWaitingPacket(waitingPacketParam.type);
 			}
@@ -1164,43 +1137,15 @@ public class StageObject : ControlObject, IBulletObserver
 
 	public static Vector3 GetAppearToTargetPos(Vector3 from_pos, Vector3 target_pos, Vector3 col_offset, float col_radius, float appear_distance, float appear_margin)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		bool just_appear;
 		return _GetAppearToTargetPos(from_pos, target_pos, col_offset, col_radius, appear_distance, appear_margin, true, true, out just_appear);
 	}
 
 	private static Vector3 _GetAppearToTargetPos(Vector3 from_pos, Vector3 target_pos, Vector3 col_offset, float col_radius, float appear_distance, float appear_margin, bool from_inside, bool target_inside, out bool just_appear)
 	{
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Expected O, but got Unknown
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014e: Expected O, but got Unknown
-		//IL_0367: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0369: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0373: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0378: Unknown result type (might be due to invalid IL or missing references)
 		just_appear = false;
-		Vector3 val = target_pos - from_pos;
-		float magnitude = val.get_magnitude();
+		Vector3 vector = target_pos - from_pos;
+		float magnitude = vector.magnitude;
 		if (magnitude <= 0f)
 		{
 			just_appear = true;
@@ -1215,14 +1160,14 @@ public class StageObject : ControlObject, IBulletObserver
 			col_offset.y = 0.1f;
 		}
 		List<CastHitInfo> list = new List<CastHitInfo>();
-		RaycastHit[] array = Physics.RaycastAll(target_pos + col_offset, -val, magnitude, 393728);
+		RaycastHit[] array = Physics.RaycastAll(target_pos + col_offset, -vector, magnitude, 393728);
 		int i = 0;
 		for (int num = array.Length; i < num; i++)
 		{
 			CastHitInfo castHitInfo = new CastHitInfo();
-			castHitInfo.distance = array[i].get_distance() - col_radius;
+			castHitInfo.distance = array[i].distance - col_radius;
 			castHitInfo.faceToTarget = true;
-			castHitInfo.collider = array[i].get_collider();
+			castHitInfo.collider = array[i].collider;
 			list.Add(castHitInfo);
 		}
 		CastHitInfo castHitInfo2 = new CastHitInfo();
@@ -1230,14 +1175,14 @@ public class StageObject : ControlObject, IBulletObserver
 		castHitInfo2.faceToTarget = !target_inside;
 		castHitInfo2.collider = null;
 		list.Add(castHitInfo2);
-		array = Physics.RaycastAll(from_pos + col_offset, val, magnitude, 393728);
+		array = Physics.RaycastAll(from_pos + col_offset, vector, magnitude, 393728);
 		int j = 0;
 		for (int num2 = array.Length; j < num2; j++)
 		{
 			CastHitInfo castHitInfo3 = new CastHitInfo();
-			castHitInfo3.distance = magnitude - array[j].get_distance() + col_radius;
+			castHitInfo3.distance = magnitude - array[j].distance + col_radius;
 			castHitInfo3.faceToTarget = false;
-			castHitInfo3.collider = array[j].get_collider();
+			castHitInfo3.collider = array[j].collider;
 			list.Add(castHitInfo3);
 		}
 		CastHitInfo castHitInfo4 = new CastHitInfo();
@@ -1262,7 +1207,7 @@ public class StageObject : ControlObject, IBulletObserver
 		for (int count = list.Count; k < count; k++)
 		{
 			CastHitInfo castHitInfo5 = list[k];
-			if (!castHitInfo5.checkCollider && !(castHitInfo5.collider == null))
+			if (!castHitInfo5.checkCollider && !((UnityEngine.Object)castHitInfo5.collider == (UnityEngine.Object)null))
 			{
 				int num3 = k;
 				while (0 <= num3 && num3 < count)
@@ -1270,7 +1215,7 @@ public class StageObject : ControlObject, IBulletObserver
 					CastHitInfo castHitInfo6 = list[num3];
 					if (num3 != k)
 					{
-						if (castHitInfo6.collider == castHitInfo5.collider)
+						if ((UnityEngine.Object)castHitInfo6.collider == (UnityEngine.Object)castHitInfo5.collider)
 						{
 							castHitInfo6.checkCollider = true;
 							break;
@@ -1309,14 +1254,12 @@ public class StageObject : ControlObject, IBulletObserver
 		{
 			return from_pos;
 		}
-		return target_pos - val.get_normalized() * num4;
+		return target_pos - vector.normalized * num4;
 	}
 
 	public virtual Vector3 GetPredictivePosition()
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		if ((IsPuppet() || IsMirror()) && packetReceiver != null && packetReceiver.GetPredictivePosition(out Vector3 pos))
+		if ((IsPuppet() || IsMirror()) && (UnityEngine.Object)packetReceiver != (UnityEngine.Object)null && packetReceiver.GetPredictivePosition(out Vector3 pos))
 		{
 			return pos;
 		}
@@ -1325,21 +1268,16 @@ public class StageObject : ControlObject, IBulletObserver
 
 	public virtual Vector3 GetTargetPosition(StageObject target)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		if (target == null)
+		if ((UnityEngine.Object)target == (UnityEngine.Object)null)
 		{
-			return Vector3.get_zero();
+			return Vector3.zero;
 		}
 		return target._position;
 	}
 
 	public virtual void ApplySyncPosition(Vector3 pos, float dir, bool force_sync = false)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		_rotation = Quaternion.AngleAxis(dir, Vector3.get_up());
+		_rotation = Quaternion.AngleAxis(dir, Vector3.up);
 		_position = pos;
 	}
 
@@ -1364,7 +1302,7 @@ public class StageObject : ControlObject, IBulletObserver
 		else if (MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
 			CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(coopClientId);
-			if (coopClient != null && !coopClient.IsBattleStart())
+			if ((UnityEngine.Object)coopClient != (UnityEngine.Object)null && !coopClient.IsBattleStart())
 			{
 				result = true;
 			}
@@ -1404,7 +1342,7 @@ public class StageObject : ControlObject, IBulletObserver
 		if (!bulletObservableIdList.Contains(observedID))
 		{
 			bulletObservableIdList.Add(observedID);
-			if (packetSender != null)
+			if ((UnityEngine.Object)packetSender != (UnityEngine.Object)null)
 			{
 				packetSender.OnBulletObservableSet(observedID);
 			}
@@ -1428,7 +1366,7 @@ public class StageObject : ControlObject, IBulletObserver
 		int i = 0;
 		for (int count = hitIntervalList.Count; i < count; i++)
 		{
-			if (hitIntervalList[i].fromCollider == fromCollider)
+			if ((UnityEngine.Object)hitIntervalList[i].fromCollider == (UnityEngine.Object)fromCollider)
 			{
 				if (hitIntervalList[i].hitIntervalTimer > 0f)
 				{
@@ -1446,7 +1384,7 @@ public class StageObject : ControlObject, IBulletObserver
 		int i = 0;
 		for (int count = hitIntervalList.Count; i < count; i++)
 		{
-			if (hitIntervalList[i].fromCollider == fromCollider)
+			if ((UnityEngine.Object)hitIntervalList[i].fromCollider == (UnityEngine.Object)fromCollider)
 			{
 				return;
 			}

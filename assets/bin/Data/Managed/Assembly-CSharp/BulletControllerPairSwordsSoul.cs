@@ -7,16 +7,12 @@ public class BulletControllerPairSwordsSoul : BulletControllerBase, IObservable
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam _skillInfoParam, Vector3 pos, Quaternion rot)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(bullet, _skillInfoParam, pos, rot);
 	}
 
 	public override void OnHit(Collider collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		if (collider.get_gameObject().get_layer() == 11 || collider.get_gameObject().get_layer() == 10)
+		if (collider.gameObject.layer == 11 || collider.gameObject.layer == 10)
 		{
 			NotifyObservers();
 		}

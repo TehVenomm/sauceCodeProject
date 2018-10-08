@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class YesNoCloseDialog : CommonDialog
@@ -28,31 +27,23 @@ public class YesNoCloseDialog : CommonDialog
 		}
 		int num = array.Length;
 		string text = (num <= 0) ? string.Empty : array[0];
-		SetLabelText((Enum)UI.LBL_TITLE_U, text);
-		SetLabelText((Enum)UI.LBL_TITLE_D, text);
-		SetLabelText((Enum)UI.MESSAGE, (num <= 1) ? string.Empty : array[1]);
+		SetLabelText(UI.LBL_TITLE_U, text);
+		SetLabelText(UI.LBL_TITLE_D, text);
+		SetLabelText(UI.MESSAGE, (num <= 1) ? string.Empty : array[1]);
 		if (num > 2)
 		{
-			SetLabelText((Enum)UI.LBL_BTN_0, array[2]);
-			SetLabelText((Enum)UI.LBL_BTN_0_R, array[2]);
+			SetLabelText(UI.LBL_BTN_0, array[2]);
+			SetLabelText(UI.LBL_BTN_0_R, array[2]);
 		}
 		if (num > 3)
 		{
-			SetLabelText((Enum)UI.LBL_BTN_1, _msgs[3]);
-			SetLabelText((Enum)UI.LBL_BTN_1_R, _msgs[3]);
+			SetLabelText(UI.LBL_BTN_1, _msgs[3]);
+			SetLabelText(UI.LBL_BTN_1_R, _msgs[3]);
 		}
 	}
 
 	protected void AutoUILayout()
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.BG);
 		int height = GetHeight(UI.MESSAGE);
 		if (height >= 100)
@@ -60,17 +51,17 @@ public class YesNoCloseDialog : CommonDialog
 			int num = height - 100;
 			int height2 = GetHeight(UI.BG);
 			float num2 = (float)num;
-			Vector3 localScale = ctrl.get_localScale();
+			Vector3 localScale = ctrl.localScale;
 			int height3 = height2 + (int)(num2 / localScale.y);
-			SetHeight((Enum)UI.BG, height3);
+			SetHeight(UI.BG, height3);
 			ctrl = GetCtrl(UI.HEADER);
-			Vector3 position = ctrl.get_position();
+			Vector3 position = ctrl.position;
 			position.y += (float)(num / 2);
-			ctrl.set_position(position);
+			ctrl.position = position;
 			ctrl = GetCtrl(UI.FOOTER);
-			position = ctrl.get_position();
+			position = ctrl.position;
 			position.y -= (float)(num / 2);
-			ctrl.set_position(position);
+			ctrl.position = position;
 			UpdateAnchors();
 		}
 	}

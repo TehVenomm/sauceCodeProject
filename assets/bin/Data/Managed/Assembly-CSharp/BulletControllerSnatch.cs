@@ -15,16 +15,12 @@ public class BulletControllerSnatch : BulletControllerBase
 
 	private STATE state;
 
-	private Vector3 startPos = Vector3.get_zero();
+	private Vector3 startPos = Vector3.zero;
 
 	private float maxDistance;
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam _skillInfoParam, Vector3 pos, Quaternion rot)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(bullet, _skillInfoParam, pos, rot);
 		maxDistance = bullet.dataSnatch.maxDistance;
 		startPos = pos;
@@ -33,29 +29,14 @@ public class BulletControllerSnatch : BulletControllerBase
 
 	public override void Update()
 	{
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-		base.timeCount += Time.get_deltaTime();
+		base.timeCount += Time.deltaTime;
 		switch (state)
 		{
 		case STATE.FORWARD:
 		{
 			float velocity = Mathf.Max(0f, base.initialVelocity - base.initialVelocity * base.timeCount * base.timeCount);
 			SetVelocity(velocity);
-			Vector3 val = base._transform.get_position() - startPos;
-			if (val.get_magnitude() > maxDistance)
+			if ((base._transform.position - startPos).magnitude > maxDistance)
 			{
 				SetVelocity(0f);
 				SetState(STATE.MISS);
@@ -63,17 +44,17 @@ public class BulletControllerSnatch : BulletControllerBase
 			break;
 		}
 		case STATE.MISS:
-			if (base._collider != null)
+			if ((Object)base._collider != (Object)null)
 			{
-				base._collider.set_enabled(false);
+				base._collider.enabled = false;
 			}
 			owner.snatchCtrl.OnReach();
 			SetState(STATE.DESTROY);
 			break;
 		case STATE.SNATCH:
-			if (base._collider != null)
+			if ((Object)base._collider != (Object)null)
 			{
-				base._collider.set_enabled(false);
+				base._collider.enabled = false;
 			}
 			SetVelocity(0f);
 			SetState(STATE.DESTROY);
@@ -83,26 +64,23 @@ public class BulletControllerSnatch : BulletControllerBase
 			SetState(STATE.NONE);
 			break;
 		}
-		Vector3 forward = Vector3.get_forward();
-		forward = base._transform.get_rotation() * forward;
+		Vector3 forward = Vector3.forward;
+		forward = base._transform.rotation * forward;
 		forward *= base.speed;
-		base._rigidbody.set_velocity(forward);
+		base._rigidbody.velocity = forward;
 	}
 
 	public override bool IsHit(Collider collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		int layer = collider.get_gameObject().get_layer();
+		int layer = collider.gameObject.layer;
 		switch (layer)
 		{
 		case 31:
 			return false;
 		case 8:
 		{
-			DangerRader component = collider.get_gameObject().GetComponent<DangerRader>();
-			if (component != null)
+			DangerRader component = collider.gameObject.GetComponent<DangerRader>();
+			if ((Object)component != (Object)null)
 			{
 				return false;
 			}
@@ -111,8 +89,8 @@ public class BulletControllerSnatch : BulletControllerBase
 		}
 		if (layer == 11 || layer == 10)
 		{
-			EnemyColliderSettings component2 = collider.get_gameObject().GetComponent<EnemyColliderSettings>();
-			if (component2 != null && component2.targetCollider.GetInstanceID() == collider.GetInstanceID())
+			EnemyColliderSettings component2 = collider.gameObject.GetComponent<EnemyColliderSettings>();
+			if ((Object)component2 != (Object)null && component2.targetCollider.GetInstanceID() == collider.GetInstanceID())
 			{
 				return false;
 			}
@@ -122,17 +100,15 @@ public class BulletControllerSnatch : BulletControllerBase
 
 	public override void OnHit(Collider collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		int layer = collider.get_gameObject().get_layer();
+		int layer = collider.gameObject.layer;
 		if (layer != 11 && layer != 10)
 		{
 			SetState(STATE.MISS);
 		}
 		else
 		{
-			AttackRestraintObject component = collider.get_gameObject().GetComponent<AttackRestraintObject>();
-			if (component != null)
+			AttackRestraintObject component = collider.gameObject.GetComponent<AttackRestraintObject>();
+			if ((Object)component != (Object)null)
 			{
 				SetState(STATE.MISS);
 			}
@@ -151,7 +127,7 @@ public class BulletControllerSnatch : BulletControllerBase
 	public override void RegisterFromObject(StageObject obj)
 	{
 		owner = (obj as Player);
-		if (owner != null)
+		if ((Object)owner != (Object)null)
 		{
 			owner.snatchCtrl.SetSnatchBulletTrans(base._transform);
 		}

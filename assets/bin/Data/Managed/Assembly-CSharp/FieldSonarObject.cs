@@ -21,45 +21,26 @@ public class FieldSonarObject : FieldGimmickObject
 
 	public override void UpdateTargetMarker(bool isNear)
 	{
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Expected O, but got Unknown
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		if (isNear && self != null && self.IsChangeableAction((Character.ACTION_ID)34))
+		if (isNear && (Object)self != (Object)null && self.IsChangeableAction((Character.ACTION_ID)34))
 		{
 			string sonarTargetEffect = ResourceName.GetSonarTargetEffect();
-			if (targetMarker == null && !string.IsNullOrEmpty(sonarTargetEffect))
+			if ((Object)targetMarker == (Object)null && !string.IsNullOrEmpty(sonarTargetEffect))
 			{
 				targetMarker = EffectManager.GetEffect(sonarTargetEffect, _transform);
 			}
-			if (targetMarker != null)
+			if ((Object)targetMarker != (Object)null)
 			{
 				Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-				Vector3 position = cameraTransform.get_position();
-				Quaternion rotation = cameraTransform.get_rotation();
-				Vector3 val = position - _transform.get_position();
-				Vector3 pos = val.get_normalized() + Vector3.get_up() + _transform.get_position();
+				Vector3 position = cameraTransform.position;
+				Quaternion rotation = cameraTransform.rotation;
+				Vector3 pos = (position - _transform.position).normalized + Vector3.up + _transform.position;
 				targetMarker.Set(pos, rotation);
 			}
 		}
-		else if (targetMarker != null)
+		else if ((Object)targetMarker != (Object)null)
 		{
-			EffectManager.ReleaseEffect(targetMarker.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(targetMarker.gameObject, true, false);
 		}
 	}
 
@@ -78,32 +59,27 @@ public class FieldSonarObject : FieldGimmickObject
 
 	public void StartSonar()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		if (IsValidSonar())
 		{
-			this.StartCoroutine(ActSonar());
+			StartCoroutine(ActSonar());
 		}
 	}
 
 	public override void RequestDestroy()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		if (sonarEffect != null)
+		if ((Object)sonarEffect != (Object)null)
 		{
-			if (sonarEffect.get_gameObject() != null)
+			if ((Object)sonarEffect.gameObject != (Object)null)
 			{
-				Object.Destroy(sonarEffect.get_gameObject());
+				Object.Destroy(sonarEffect.gameObject);
 			}
 			sonarEffect = null;
 		}
-		if (sonarTouchEffect != null)
+		if ((Object)sonarTouchEffect != (Object)null)
 		{
-			if (sonarTouchEffect.get_gameObject() != null)
+			if ((Object)sonarTouchEffect.gameObject != (Object)null)
 			{
-				Object.Destroy(sonarTouchEffect.get_gameObject());
+				Object.Destroy(sonarTouchEffect.gameObject);
 			}
 			sonarTouchEffect = null;
 		}
@@ -117,27 +93,23 @@ public class FieldSonarObject : FieldGimmickObject
 
 	protected override void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
-		_transform = this.get_transform();
-		Utility.SetLayerWithChildren(this.get_transform(), 19);
+		_transform = base.transform;
+		Utility.SetLayerWithChildren(base.transform, 19);
 	}
 
 	private IEnumerator ActSonar()
 	{
 		acting = true;
 		SoundManager.PlayOneShotSE(40000107, MonoBehaviourSingleton<StageObjectManager>.I.self._position);
-		if (sonarTouchEffect == null)
+		if ((Object)sonarTouchEffect == (Object)null)
 		{
 			sonarTouchEffect = EffectManager.GetEffect("ef_btl_sonar_02", modelTrans);
 		}
-		sonarTouchEffect.get_gameObject().SetActive(true);
+		sonarTouchEffect.gameObject.SetActive(true);
 		yield return (object)new WaitForSeconds(0.9f);
 		if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("FieldSonarObject.OnTriggerEnter", this.get_gameObject(), "EXPLOREMAP", ExploreMap.OPEN_MAP_TYPE.SONAR, null, true);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("FieldSonarObject.OnTriggerEnter", base.gameObject, "EXPLOREMAP", ExploreMap.OPEN_MAP_TYPE.SONAR, null, true);
 		}
 		acting = false;
 	}
@@ -161,7 +133,7 @@ public class FieldSonarObject : FieldGimmickObject
 			return false;
 		}
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		if (self == null)
+		if ((Object)self == (Object)null)
 		{
 			return false;
 		}

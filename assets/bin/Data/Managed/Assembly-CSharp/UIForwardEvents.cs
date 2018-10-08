@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Forward Events (Legacy)")]
-public class UIForwardEvents
+public class UIForwardEvents : MonoBehaviour
 {
 	public GameObject target;
 
@@ -23,81 +23,75 @@ public class UIForwardEvents
 
 	public bool onScroll;
 
-	public UIForwardEvents()
-		: this()
-	{
-	}
-
 	private void OnHover(bool isOver)
 	{
-		if (onHover && target != null)
+		if (onHover && (Object)target != (Object)null)
 		{
-			target.SendMessage("OnHover", (object)isOver, 1);
+			target.SendMessage("OnHover", isOver, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
 	private void OnPress(bool pressed)
 	{
-		if (onPress && target != null)
+		if (onPress && (Object)target != (Object)null)
 		{
-			target.SendMessage("OnPress", (object)pressed, 1);
+			target.SendMessage("OnPress", pressed, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
 	private void OnClick()
 	{
-		if (onClick && target != null)
+		if (onClick && (Object)target != (Object)null)
 		{
-			target.SendMessage("OnClick", 1);
+			target.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
 	private void OnDoubleClick()
 	{
-		if (onDoubleClick && target != null)
+		if (onDoubleClick && (Object)target != (Object)null)
 		{
-			target.SendMessage("OnDoubleClick", 1);
+			target.SendMessage("OnDoubleClick", SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
 	private void OnSelect(bool selected)
 	{
-		if (onSelect && target != null)
+		if (onSelect && (Object)target != (Object)null)
 		{
-			target.SendMessage("OnSelect", (object)selected, 1);
+			target.SendMessage("OnSelect", selected, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
 	private void OnDrag(Vector2 delta)
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		if (onDrag && target != null)
+		if (onDrag && (Object)target != (Object)null)
 		{
-			target.SendMessage("OnDrag", (object)delta, 1);
+			target.SendMessage("OnDrag", delta, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
 	private void OnDrop(GameObject go)
 	{
-		if (onDrop && target != null)
+		if (onDrop && (Object)target != (Object)null)
 		{
-			target.SendMessage("OnDrop", (object)go, 1);
+			target.SendMessage("OnDrop", go, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
 	private void OnSubmit()
 	{
-		if (onSubmit && target != null)
+		if (onSubmit && (Object)target != (Object)null)
 		{
-			target.SendMessage("OnSubmit", 1);
+			target.SendMessage("OnSubmit", SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
 	private void OnScroll(float delta)
 	{
-		if (onScroll && target != null)
+		if (onScroll && (Object)target != (Object)null)
 		{
-			target.SendMessage("OnScroll", (object)delta, 1);
+			target.SendMessage("OnScroll", delta, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 }

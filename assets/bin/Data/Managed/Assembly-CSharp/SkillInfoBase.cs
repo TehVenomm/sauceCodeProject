@@ -1,6 +1,7 @@
 using Network;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public abstract class SkillInfoBase : GameSection
 {
@@ -276,7 +277,7 @@ public abstract class SkillInfoBase : GameSection
 
 	protected void ObserveItemListNewIcon(ItemIcon _icon)
 	{
-		if (!(_icon == null) && _icon.InitData != null && _icon.IsVisbleNewIcon() && !m_newIconUpdateTargetList.Contains(_icon.InitData))
+		if (!((UnityEngine.Object)_icon == (UnityEngine.Object)null) && _icon.InitData != null && _icon.IsVisbleNewIcon() && !m_newIconUpdateTargetList.Contains(_icon.InitData))
 		{
 			m_newIconUpdateTargetList.Add(_icon.InitData);
 		}

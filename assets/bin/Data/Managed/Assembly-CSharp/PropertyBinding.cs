@@ -1,8 +1,8 @@
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Internal/Property Binding")]
 [ExecuteInEditMode]
-public class PropertyBinding
+[AddComponentMenu("NGUI/Internal/Property Binding")]
+public class PropertyBinding : MonoBehaviour
 {
 	public enum UpdateCondition
 	{
@@ -31,17 +31,12 @@ public class PropertyBinding
 
 	private object mLastValue;
 
-	public PropertyBinding()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
 		UpdateTarget();
 		if (update == UpdateCondition.OnStart)
 		{
-			this.set_enabled(false);
+			base.enabled = false;
 		}
 	}
 

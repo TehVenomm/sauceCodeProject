@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using UnityEngine;
 
-public class CoopRoomPacketSender
+public class CoopRoomPacketSender : MonoBehaviour
 {
 	private CoopRoom coopRoom
 	{
@@ -8,15 +9,9 @@ public class CoopRoomPacketSender
 		set;
 	}
 
-	public CoopRoomPacketSender()
-		: this()
-	{
-	}
-
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		coopRoom = this.get_gameObject().GetComponent<CoopRoom>();
+		coopRoom = base.gameObject.GetComponent<CoopRoom>();
 	}
 
 	protected virtual void Start()
@@ -146,8 +141,8 @@ public class CoopRoomPacketSender
 
 	public void SendSyncPlayerStatus(Self self, int toClientId = -1)
 	{
-		CoopClient coopClient = coopRoom.clients.Find((CoopClient x) => x.stageId != MonoBehaviourSingleton<CoopManager>.I.coopMyClient.stageId);
-		if (!(coopClient == null))
+		CoopClient x2 = coopRoom.clients.Find((CoopClient x) => x.stageId != MonoBehaviourSingleton<CoopManager>.I.coopMyClient.stageId);
+		if (!((Object)x2 == (Object)null))
 		{
 			Coop_Model_RoomSyncPlayerStatus coop_Model_RoomSyncPlayerStatus = new Coop_Model_RoomSyncPlayerStatus();
 			coop_Model_RoomSyncPlayerStatus.id = 1001;

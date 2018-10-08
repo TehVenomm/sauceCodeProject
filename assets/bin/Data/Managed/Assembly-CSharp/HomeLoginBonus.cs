@@ -1,5 +1,4 @@
 using Network;
-using System;
 using UnityEngine;
 
 public class HomeLoginBonus : GameSection
@@ -42,11 +41,11 @@ public class HomeLoginBonus : GameSection
 		if (loginBonus != null)
 		{
 			MonoBehaviourSingleton<AccountManager>.I.logInBonus.Remove(loginBonus);
-			SetLabelText((Enum)UI.LBL_LOGIN_DAYS, loginBonus.total.ToString());
+			SetLabelText(UI.LBL_LOGIN_DAYS, loginBonus.total.ToString());
 			if (loginBonus.reward.Count > 0)
 			{
 				LoginBonus.LoginBonusReward loginBonusReward = loginBonus.reward[0];
-				SetLabelText((Enum)UI.LBL_GET_ITEM, loginBonusReward.name);
+				SetLabelText(UI.LBL_GET_ITEM, loginBonusReward.name);
 				float rotateSpeed = 35f;
 				if (loginBonusReward.type == 5)
 				{
@@ -96,10 +95,9 @@ public class HomeLoginBonus : GameSection
 
 	private void OnQuery_CLOSE()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (null != glowModel_)
+		if ((Object)null != (Object)glowModel_)
 		{
-			glowModel_.get_gameObject().SetActive(false);
+			glowModel_.gameObject.SetActive(false);
 		}
 		if (MonoBehaviourSingleton<AccountManager>.I.logInBonus.Count > 0)
 		{

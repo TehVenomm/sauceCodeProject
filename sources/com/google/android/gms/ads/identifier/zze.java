@@ -11,6 +11,7 @@ import java.util.Map;
 
 public final class zze {
     public final void zzb(Map<String, String> map) {
+        HttpURLConnection httpURLConnection;
         String message;
         Throwable e;
         Builder buildUpon = Uri.parse("https://pagead2.googlesyndication.com/pagead/gen_204?id=gmob-apps").buildUpon();
@@ -18,7 +19,6 @@ public final class zze {
             buildUpon.appendQueryParameter(str, (String) map.get(str));
         }
         String uri = buildUpon.build().toString();
-        HttpURLConnection httpURLConnection;
         try {
             httpURLConnection = (HttpURLConnection) new URL(uri).openConnection();
             int responseCode = httpURLConnection.getResponseCode();

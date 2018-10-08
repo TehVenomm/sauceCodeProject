@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,11 +18,19 @@ public class ShopGachaReward : GameSection
 		base.Initialize();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
 		QuestItem.SellItem[] data_ary = sellItem.ToArray();
 		int item_num = data_ary.Length;
-		_003CUpdateUI_003Ec__AnonStorey435 _003CUpdateUI_003Ec__AnonStorey;
-		SetGrid(UI.GRD_ICON, null, item_num, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetGrid(UI.GRD_ICON, null, item_num, false, delegate(int i, Transform t, bool is_recycle)
+		{
+			uint itemId = (uint)data_ary[i].itemId;
+			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)data_ary[i].type, itemId, t, data_ary[i].num, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
+			if ((Object)itemIcon != (Object)null)
+			{
+				itemIcon.SetRewardBG(true);
+				SetMaterialInfo(itemIcon.transform, (REWARD_TYPE)data_ary[i].type, itemId, null);
+			}
+		});
 	}
 }

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChatStampAll
+public class ChatStampAll : MonoBehaviour
 {
 	public UIGrid grid;
 
@@ -21,18 +21,11 @@ public class ChatStampAll
 
 	private bool initailized;
 
-	public ChatStampAll()
-		: this()
-	{
-	}
-
 	public void Open()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(true);
 		tweenCtrl.Play(true, null);
-		this.StartCoroutine(DoOpen());
+		StartCoroutine(DoOpen());
 	}
 
 	private IEnumerator DoOpen()
@@ -60,56 +53,52 @@ public class ChatStampAll
 	{
 		tweenCtrl.Play(false, delegate
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(false);
 		});
 	}
 
 	private void CreateStampList()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
 		for (int i = createIcons.Count; i < MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count + currentUnlockStamps.Count; i++)
 		{
-			Transform val = CreateStampItem(grid.get_transform());
-			val.set_name(i.ToString());
-			createIcons.Add(val);
+			Transform transform = CreateStampItem(grid.transform);
+			transform.name = i.ToString();
+			createIcons.Add(transform);
 		}
 		grid.Reposition();
 		scroll.ResetPosition();
 	}
 
-	private unsafe void InitStampList()
+	private void InitStampList()
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Expected O, but got Unknown
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Expected O, but got Unknown
 		for (int i = 0; i < MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count + currentUnlockStamps.Count; i++)
 		{
 			Transform iTransform = createIcons[i];
 			if (MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count > i)
 			{
-				int index2 = i;
-				_003CInitStampList_003Ec__AnonStorey2C1 _003CInitStampList_003Ec__AnonStorey2C;
-				InitStampItem(MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[index2], iTransform, new Action((object)_003CInitStampList_003Ec__AnonStorey2C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				int index = i;
+				InitStampItem(MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[index], iTransform, delegate
+				{
+					OnClickIcon(MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[index]);
+				});
 			}
 			else
 			{
-				int index = i - MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count;
-				_003CInitStampList_003Ec__AnonStorey2C2 _003CInitStampList_003Ec__AnonStorey2C2;
-				InitStampItem((int)currentUnlockStamps[index].id, iTransform, new Action((object)_003CInitStampList_003Ec__AnonStorey2C2, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				int index2 = i - MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count;
+				InitStampItem((int)currentUnlockStamps[index2].id, iTransform, delegate
+				{
+					OnClickIcon((int)currentUnlockStamps[index2].id);
+				});
 			}
 		}
 	}
 
 	private Transform CreateStampItem(Transform parent)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = ResourceUtility.Realizes(mChatStampPrefab, 5);
-		val.set_parent(parent);
-		val.set_localScale(Vector3.get_one());
-		return val;
+		Transform transform = ResourceUtility.Realizes(mChatStampPrefab, 5);
+		transform.parent = parent;
+		transform.localScale = Vector3.one;
+		return transform;
 	}
 
 	private void InitStampItem(int stampId, Transform iTransform, Action onClick)

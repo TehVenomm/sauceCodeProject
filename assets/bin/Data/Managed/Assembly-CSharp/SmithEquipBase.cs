@@ -45,62 +45,36 @@ public abstract class SmithEquipBase : SkillInfoBase
 		base.Initialize();
 	}
 
-	private unsafe void SetupUIFunc()
+	private void SetupUIFunc()
 	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Expected O, but got Unknown
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Expected O, but got Unknown
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Expected O, but got Unknown
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Expected O, but got Unknown
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Expected O, but got Unknown
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Expected O, but got Unknown
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Expected O, but got Unknown
-		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f2: Expected O, but got Unknown
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Expected O, but got Unknown
-		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0126: Expected O, but got Unknown
-		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0130: Expected O, but got Unknown
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014e: Expected O, but got Unknown
-		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0158: Expected O, but got Unknown
 		updateTopAreaUI = null;
 		switch (type)
 		{
 		default:
-			updateTopAreaUI = Delegate.Combine((Delegate)updateTopAreaUI, (Delegate)GetEquipInfoFunc());
-			updateTopAreaUI = Delegate.Combine((Delegate)updateTopAreaUI, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdVirtFtn*/));
+			updateTopAreaUI = (Action)Delegate.Combine(updateTopAreaUI, GetEquipInfoFunc());
+			updateTopAreaUI = (Action)Delegate.Combine(updateTopAreaUI, new Action(EquipImg));
 			break;
 		case EquipDialogType.RESULT:
-			updateTopAreaUI = Delegate.Combine((Delegate)updateTopAreaUI, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdVirtFtn*/));
+			updateTopAreaUI = (Action)Delegate.Combine(updateTopAreaUI, new Action(EquipImg));
 			break;
 		}
 		updateMiddleAreaUI = null;
 		switch (type)
 		{
 		default:
-			updateMiddleAreaUI = Delegate.Combine((Delegate)updateMiddleAreaUI, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdVirtFtn*/));
+			updateMiddleAreaUI = (Action)Delegate.Combine(updateMiddleAreaUI, new Action(LocalInventory));
 			break;
 		case EquipDialogType.MATERIAL:
-			updateMiddleAreaUI = Delegate.Combine((Delegate)updateMiddleAreaUI, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdVirtFtn*/));
+			updateMiddleAreaUI = (Action)Delegate.Combine(updateMiddleAreaUI, new Action(NeededMaterial));
 			break;
 		case EquipDialogType.RESULT:
 			if (smithType != SmithType.SKILL_GROW)
 			{
-				updateMiddleAreaUI = Delegate.Combine((Delegate)updateMiddleAreaUI, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdVirtFtn*/));
+				updateMiddleAreaUI = (Action)Delegate.Combine(updateMiddleAreaUI, new Action(ResultEquipInfo));
 			}
 			else
 			{
-				updateMiddleAreaUI = Delegate.Combine((Delegate)updateMiddleAreaUI, (Delegate)new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdVirtFtn*/));
+				updateMiddleAreaUI = (Action)Delegate.Combine(updateMiddleAreaUI, new Action(ResultSKillInfo));
 			}
 			break;
 		}
@@ -110,31 +84,25 @@ public abstract class SmithEquipBase : SkillInfoBase
 	{
 		if (updateTopAreaUI != null)
 		{
-			updateTopAreaUI.Invoke();
+			updateTopAreaUI();
 		}
 		if (updateMiddleAreaUI != null)
 		{
-			updateMiddleAreaUI.Invoke();
+			updateMiddleAreaUI();
 		}
 	}
 
-	private unsafe Action GetEquipInfoFunc()
+	private Action GetEquipInfoFunc()
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Expected O, but got Unknown
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Expected O, but got Unknown
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Expected O, but got Unknown
 		if (smithType == SmithType.GENERATE && (type == EquipDialogType.MATERIAL || type == EquipDialogType.SELECT))
 		{
-			return new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdVirtFtn*/);
+			return EquipTableParam;
 		}
 		if (smithType == SmithType.EVOLVE && type == EquipDialogType.MATERIAL)
 		{
-			return new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdVirtFtn*/);
+			return EquipTableParam;
 		}
-		return new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdVirtFtn*/);
+		return EquipParam;
 	}
 
 	protected virtual void EquipParam()

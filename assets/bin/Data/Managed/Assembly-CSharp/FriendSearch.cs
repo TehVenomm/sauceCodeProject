@@ -88,9 +88,8 @@ public class FriendSearch : FollowListBase
 		});
 	}
 
-	protected unsafe override void SendGetList(int page, Action<bool> callback)
+	protected override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey301 _003CSendGetList_003Ec__AnonStorey;
 		switch (searchType)
 		{
 		case SEARCH_TYPE.NAME:
@@ -100,7 +99,16 @@ public class FriendSearch : FollowListBase
 			}
 			else
 			{
-				MonoBehaviourSingleton<FriendManager>.I.SendSearchName(searchName, page, new Action<bool, FriendSearchResult>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				MonoBehaviourSingleton<FriendManager>.I.SendSearchName(searchName, page, delegate(bool is_success, FriendSearchResult recv_data)
+				{
+					if (is_success)
+					{
+						recvList = ChangeData(recv_data.search);
+						pageNumMax = recv_data.pageNumMax;
+						nowPage = page;
+					}
+					callback(is_success);
+				});
 			}
 			break;
 		case SEARCH_TYPE.ID:
@@ -110,11 +118,29 @@ public class FriendSearch : FollowListBase
 			}
 			else
 			{
-				MonoBehaviourSingleton<FriendManager>.I.SendSearchID(searchID, new Action<bool, FriendSearchResult>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				MonoBehaviourSingleton<FriendManager>.I.SendSearchID(searchID, delegate(bool is_success, FriendSearchResult recv_data)
+				{
+					if (is_success)
+					{
+						recvList = ChangeData(recv_data.search);
+						pageNumMax = recv_data.pageNumMax;
+						nowPage = page;
+					}
+					callback(is_success);
+				});
 			}
 			break;
 		case SEARCH_TYPE.AUTO:
-			MonoBehaviourSingleton<FriendManager>.I.SendSearchLevel(page, new Action<bool, FriendSearchResult>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			MonoBehaviourSingleton<FriendManager>.I.SendSearchLevel(page, delegate(bool is_success, FriendSearchResult recv_data)
+			{
+				if (is_success)
+				{
+					recvList = ChangeData(recv_data.search);
+					pageNumMax = recv_data.pageNumMax;
+					nowPage = page;
+				}
+				callback(is_success);
+			});
 			break;
 		}
 	}

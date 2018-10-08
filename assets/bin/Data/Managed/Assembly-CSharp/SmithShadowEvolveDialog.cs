@@ -1,5 +1,4 @@
 using Network;
-using System;
 
 public class SmithShadowEvolveDialog : GameSection
 {
@@ -36,8 +35,8 @@ public class SmithShadowEvolveDialog : GameSection
 			bool flag = haveingItemNum >= num;
 			ItemIcon itemIcon = ItemIconMaterial.CreateMaterialIcon(ItemIcon.GetItemIconType(itemData.type), itemData, GetCtrl(UI.OBJ_ICON_ROOT), haveingItemNum, num, "MATERIAL", 0, false);
 			SetMaterialInfo(itemIcon._transform, REWARD_TYPE.ITEM, itemData.id, null);
-			SetActive((Enum)UI.BTN_OK, flag);
-			SetActive((Enum)UI.BTN_INACTIVE, !flag);
+			SetActive(UI.BTN_OK, flag);
+			SetActive(UI.BTN_INACTIVE, !flag);
 			base.UpdateUI();
 		}
 	}
@@ -65,12 +64,26 @@ public class SmithShadowEvolveDialog : GameSection
 		});
 	}
 
-	private unsafe void OnQuery_SmithShadowEvolveConfirm_YES()
+	private void OnQuery_SmithShadowEvolveConfirm_YES()
 	{
 		SmithManager.ResultData result_data = CreateResultData();
 		GameSection.SetEventData(result_data);
 		GameSection.StayEvent();
-		_003COnQuery_SmithShadowEvolveConfirm_YES_003Ec__AnonStorey468 _003COnQuery_SmithShadowEvolveConfirm_YES_003Ec__AnonStorey;
-		MonoBehaviourSingleton<SmithManager>.I.SendShadowEvolveEquipItem(itemInfo.uniqueID, createData.needMaterial[0].itemID, new Action<Error, EquipItemInfo>((object)_003COnQuery_SmithShadowEvolveConfirm_YES_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<SmithManager>.I.SendShadowEvolveEquipItem(itemInfo.uniqueID, createData.needMaterial[0].itemID, delegate(Error error, EquipItemInfo info)
+		{
+			if (error == Error.None)
+			{
+				result_data.itemData = info;
+				SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
+				smithData.selectEquipData = info;
+				MonoBehaviourSingleton<SmithManager>.I.CreateLocalInventory();
+				MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
+				GameSection.ResumeEvent(true, null);
+			}
+			else
+			{
+				GameSection.ResumeEvent(false, null);
+			}
+		});
 	}
 }

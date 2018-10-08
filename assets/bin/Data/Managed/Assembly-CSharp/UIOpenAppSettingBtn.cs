@@ -1,13 +1,8 @@
 using UnityEngine;
 
-public class UIOpenAppSettingBtn
+public class UIOpenAppSettingBtn : MonoBehaviour
 {
 	private BootProcess currentBootProcess;
-
-	public UIOpenAppSettingBtn()
-		: this()
-	{
-	}
 
 	public void SetBootProcess(BootProcess pro)
 	{
@@ -33,8 +28,7 @@ public class UIOpenAppSettingBtn
 
 	private void OnEnable()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		currentBootProcess = MonoBehaviourSingleton<AppMain>.I.get_gameObject().GetComponent<BootProcess>();
+		currentBootProcess = MonoBehaviourSingleton<AppMain>.I.gameObject.GetComponent<BootProcess>();
 	}
 
 	private void OnDisable()

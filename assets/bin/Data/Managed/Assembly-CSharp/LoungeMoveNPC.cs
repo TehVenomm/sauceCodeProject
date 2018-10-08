@@ -1,5 +1,3 @@
-using System;
-
 public class LoungeMoveNPC : HomeCharacterBase
 {
 	private NPCTable.NPCData npcData;
@@ -18,17 +16,15 @@ public class LoungeMoveNPC : HomeCharacterBase
 
 	protected override ModelLoaderBase LoadModel()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Expected O, but got Unknown
 		bool useSpecialModel = false;
 		if (npcData.specialModelID > 0)
 		{
 			useSpecialModel = true;
 		}
-		return npcData.LoadModel(this.get_gameObject(), true, true, null, useSpecialModel);
+		return npcData.LoadModel(base.gameObject, true, true, null, useSpecialModel);
 	}
 
-	protected unsafe override void InitAnim()
+	protected override void InitAnim()
 	{
 		PLCA default_anim = PLCA.IDLE_01;
 		string loopAnim = npcInfo.GetLoopAnim();
@@ -36,7 +32,7 @@ public class LoungeMoveNPC : HomeCharacterBase
 		{
 			default_anim = PlayerAnimCtrl.StringToEnum(loopAnim);
 		}
-		animCtrl = PlayerAnimCtrl.Get(animator, default_anim, new Action<PlayerAnimCtrl, PLCA>((object)this, (IntPtr)(void*)/*OpCode not supported: LdVirtFtn*/), null, new Action<PlayerAnimCtrl, PLCA>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		animCtrl = PlayerAnimCtrl.Get(animator, default_anim, OnAnimPlay, null, base.OnAnimEnd);
 	}
 
 	protected override void InitCollider()

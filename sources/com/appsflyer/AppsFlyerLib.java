@@ -247,10 +247,11 @@ public class AppsFlyerLib implements C0259b {
         }
 
         public void run() {
-            HttpURLConnection httpURLConnection;
+            Map ˋ;
             Throwable e;
             if (this.f130 != null && this.f130.length() != 0 && !this.f134.isTrackingStopped()) {
                 this.f133.incrementAndGet();
+                HttpURLConnection httpURLConnection;
                 try {
                     Context context = (Context) this.f131.get();
                     if (context == null) {
@@ -271,7 +272,6 @@ public class AppsFlyerLib implements C0259b {
                     C0300y.m378().m391(append.toString(), "");
                     C02695.m293(new StringBuilder("Calling server for attribution url: ").append(append.toString()).toString());
                     httpURLConnection = (HttpURLConnection) new URL(append.toString()).openConnection();
-                    Map ˋ;
                     Map ˎ;
                     try {
                         httpURLConnection.setRequestMethod(HttpRequest.METHOD_GET);
@@ -3450,12 +3450,12 @@ public class AppsFlyerLib implements C0259b {
 
     /* renamed from: ˋ */
     private static String m222(File file, String str) {
+        Reader fileReader;
         Throwable th;
         Throwable th2;
         Throwable th3;
         Reader reader;
         String str2 = null;
-        Reader fileReader;
         try {
             Properties properties = new Properties();
             fileReader = new FileReader(file);

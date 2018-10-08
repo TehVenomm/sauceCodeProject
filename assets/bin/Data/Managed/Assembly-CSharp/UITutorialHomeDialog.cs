@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class UITutorialHomeDialog
+public class UITutorialHomeDialog : MonoBehaviour
 {
 	private const int oneLine = 0;
 
@@ -37,11 +37,6 @@ public class UITutorialHomeDialog
 
 	public GameObject AfterGacha2Tutorial;
 
-	public UITutorialHomeDialog()
-		: this()
-	{
-	}
-
 	public void OpenAfterGacha2()
 	{
 		AfterGacha2Tutorial.SetActive(true);
@@ -56,10 +51,10 @@ public class UITutorialHomeDialog
 		{
 			ta.AddOnFinished(delegate
 			{
-				Object.DestroyImmediate(ta);
+				UnityEngine.Object.DestroyImmediate(ta);
 				if (onClose != null)
 				{
-					onClose.Invoke();
+					onClose();
 				}
 			});
 		}
@@ -67,55 +62,39 @@ public class UITutorialHomeDialog
 
 	public void Open(int atlasIndex0, string spriteName0)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Expected O, but got Unknown
-		root[2].get_gameObject().SetActive(false);
-		root[1].get_gameObject().SetActive(false);
-		if (!root[0].get_gameObject().get_activeInHierarchy())
+		root[2].gameObject.SetActive(false);
+		root[1].gameObject.SetActive(false);
+		if (!root[0].gameObject.activeInHierarchy)
 		{
-			root[0].get_gameObject().SetActive(true);
+			root[0].gameObject.SetActive(true);
 		}
 		messageLine0[0].atlas = atlases[atlasIndex0];
 		messageLine0[0].spriteName = spriteName0;
 		root[0].alpha = 0f;
-		TweenAlpha.Begin(root[0].get_gameObject(), 0.3f, 1f);
+		TweenAlpha.Begin(root[0].gameObject, 0.3f, 1f);
 	}
 
 	public void Open(int atlasIndex0, string spriteName0, int atlasIndex1, string spriteName1)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Expected O, but got Unknown
-		root[2].get_gameObject().SetActive(false);
-		if (!root[1].get_gameObject().get_activeInHierarchy())
+		root[2].gameObject.SetActive(false);
+		if (!root[1].gameObject.activeInHierarchy)
 		{
-			root[1].get_gameObject().SetActive(true);
+			root[1].gameObject.SetActive(true);
 		}
 		messageLine0[1].atlas = atlases[atlasIndex0];
 		messageLine0[1].spriteName = spriteName0;
 		messageLine1[1].atlas = atlases[atlasIndex1];
 		messageLine1[1].spriteName = spriteName1;
 		root[1].alpha = 0f;
-		TweenAlpha.Begin(root[1].get_gameObject(), 0.3f, 1f);
+		TweenAlpha.Begin(root[1].gameObject, 0.3f, 1f);
 	}
 
 	public void Open(int atlasIndex0, string spriteName0, int atlasIndex1, string spriteName1, int atlasIndex2, string spriteName2)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Expected O, but got Unknown
-		root[1].get_gameObject().SetActive(false);
-		if (!root[2].get_gameObject().get_activeInHierarchy())
+		root[1].gameObject.SetActive(false);
+		if (!root[2].gameObject.activeInHierarchy)
 		{
-			root[2].get_gameObject().SetActive(true);
+			root[2].gameObject.SetActive(true);
 		}
 		messageLine0[2].atlas = atlases[atlasIndex0];
 		messageLine0[2].spriteName = spriteName0;
@@ -124,7 +103,7 @@ public class UITutorialHomeDialog
 		messageLine2[2].atlas = atlases[atlasIndex2];
 		messageLine2[2].spriteName = spriteName2;
 		root[2].alpha = 0f;
-		TweenAlpha.Begin(root[2].get_gameObject(), 0.3f, 1f);
+		TweenAlpha.Begin(root[2].gameObject, 0.3f, 1f);
 	}
 
 	public void SetLastTutorialAtlas(UIAtlas atlas)
@@ -134,18 +113,14 @@ public class UITutorialHomeDialog
 
 	public void OpenLastTutorial()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Expected O, but got Unknown
-		if (lastTutorialAtlas != null)
+		if ((UnityEngine.Object)lastTutorialAtlas != (UnityEngine.Object)null)
 		{
-			lastTutorialPanel.get_gameObject().SetActive(true);
-			lastTutorialSprite.get_gameObject().SetActive(true);
+			lastTutorialPanel.gameObject.SetActive(true);
+			lastTutorialSprite.gameObject.SetActive(true);
 			lastTutorialSprite.atlas = lastTutorialAtlas;
 			lastTutorialSprite.spriteName = "Tutorial_Matome";
 			lastTutorialButton.onClick.Clear();
-			TweenAlpha tweenAlpha = TweenAlpha.Begin(lastTutorialSprite.get_gameObject(), 0.3f, 1f);
+			TweenAlpha tweenAlpha = TweenAlpha.Begin(lastTutorialSprite.gameObject, 0.3f, 1f);
 			tweenAlpha.AddOnFinished(delegate
 			{
 				lastTutorialButton.onClick.Add(new EventDelegate(CloseLastTutorial));
@@ -155,18 +130,15 @@ public class UITutorialHomeDialog
 
 	public void CloseLastTutorial()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
-		TweenAlpha ta = TweenAlpha.Begin(lastTutorialSprite.get_gameObject(), 0.3f, 0f);
+		TweenAlpha ta = TweenAlpha.Begin(lastTutorialSprite.gameObject, 0.3f, 0f);
 		ta.AddOnFinished(delegate
 		{
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			if (lastTutorialAtlas != null)
+			if ((UnityEngine.Object)lastTutorialAtlas != (UnityEngine.Object)null)
 			{
-				Object.DestroyObject(lastTutorialAtlas);
+				UnityEngine.Object.DestroyObject(lastTutorialAtlas);
 			}
-			Object.DestroyImmediate(ta);
-			Object.DestroyImmediate(lastTutorialSprite.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(ta);
+			UnityEngine.Object.DestroyImmediate(lastTutorialSprite.gameObject);
 			lastTutorialSprite = null;
 			lastTutorialButton = null;
 			lastTutorialAtlas = null;
@@ -175,22 +147,19 @@ public class UITutorialHomeDialog
 
 	public void Close(int lineIndex = 0, Action onClose = null)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Expected O, but got Unknown
-		if (AfterGacha2Tutorial.get_gameObject().get_activeSelf())
+		if (AfterGacha2Tutorial.gameObject.activeSelf)
 		{
 			CloseAfterGacha2(onClose);
 		}
-		TweenAlpha ta = TweenAlpha.Begin(root[lineIndex].get_gameObject(), 0.3f, 0f);
+		TweenAlpha ta = TweenAlpha.Begin(root[lineIndex].gameObject, 0.3f, 0f);
 		if (onClose != null)
 		{
 			ta.AddOnFinished(delegate
 			{
-				Object.DestroyImmediate(ta);
+				UnityEngine.Object.DestroyImmediate(ta);
 				if (onClose != null)
 				{
-					onClose.Invoke();
+					onClose();
 				}
 			});
 		}

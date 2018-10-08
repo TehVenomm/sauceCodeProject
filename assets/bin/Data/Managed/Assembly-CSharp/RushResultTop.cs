@@ -182,9 +182,9 @@ public class RushResultTop : QuestResultTop
 
 	public override void Initialize()
 	{
-		SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, false);
-		SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, false);
-		material_info_t = CreateMaterialInfo((Enum)UI.PNL_MATERIAL_INFO);
+		SetActive(UI.OBJ_ARRIVAL_EFFECT_ROOT, false);
+		SetActive(UI.OBJ_ARRIVAL_BONUS, false);
+		material_info_t = CreateMaterialInfo(UI.PNL_MATERIAL_INFO);
 		base.Initialize();
 	}
 
@@ -286,34 +286,37 @@ public class RushResultTop : QuestResultTop
 		dropLineNum = (dropItemNum - 1) / 5 + 1;
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
-		//IL_031e: Unknown result type (might be due to invalid IL or missing references)
-		SetFullScreenButton((Enum)UI.BTN_SKIP_FULL_SCREEN);
-		SetHeight((Enum)UI.BTN_SKIP_IN_SCROLL, dropLineNum * 100);
-		SetActive((Enum)UI.BTN_NEXT, false);
+		SetFullScreenButton(UI.BTN_SKIP_FULL_SCREEN);
+		SetHeight(UI.BTN_SKIP_IN_SCROLL, dropLineNum * 100);
+		SetActive(UI.BTN_NEXT, false);
 		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
-		SetLabelText((Enum)UI.LBL_QUEST_NAME, questData.questText);
+		SetLabelText(UI.LBL_QUEST_NAME, questData.questText);
 		string text = string.Format(StringTable.Get(STRING_CATEGORY.RUSH_WAVE, 10004400u), MonoBehaviourSingleton<InGameManager>.I.GetCurrentWaveNum());
-		SetLabelText((Enum)UI.LBL_WAVE, text);
-		SetLabelText((Enum)UI.LBL_TIME, MonoBehaviourSingleton<InGameRecorder>.I.rushRemainTimeToString);
-		SetActive((Enum)UI.GET_ITEM, true);
+		SetLabelText(UI.LBL_WAVE, text);
+		SetLabelText(UI.LBL_TIME, MonoBehaviourSingleton<InGameRecorder>.I.rushRemainTimeToString);
+		SetActive(UI.GET_ITEM, true);
 		int num = 0;
 		if (isVictory)
 		{
 			List<QuestCompleteRewardList> rushRewards = MonoBehaviourSingleton<InGameManager>.I.rushRewards;
-			SetTable(GetCtrl(UI.OBJ_TREASURE_ROOT), UI.TBL_DROP_ITEM, "RushWaveDropItem", resultRewards.Length, true, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-			for (int i = 0; i < rushRewards.Count; i++)
+			SetTable(GetCtrl(UI.OBJ_TREASURE_ROOT), UI.TBL_DROP_ITEM, "RushWaveDropItem", resultRewards.Length, true, delegate(int i, Transform t, bool is_recycle)
 			{
-				QuestCompleteRewardList questCompleteRewardList = rushRewards[i];
-				QuestCompleteReward dropReward = resultRewards[i].dropReward;
+				t.name = "wave" + MonoBehaviourSingleton<InGameManager>.I.GetWaveNum(i);
+				SetDropItemIcon(resultRewards[i].dropItemIconData, t, MonoBehaviourSingleton<InGameManager>.I.GetWaveNum(i));
+			});
+			for (int j = 0; j < rushRewards.Count; j++)
+			{
+				QuestCompleteRewardList questCompleteRewardList = rushRewards[j];
+				QuestCompleteReward dropReward = resultRewards[j].dropReward;
 				QuestCompleteReward breakReward = questCompleteRewardList.breakReward;
 				QuestCompleteReward order = questCompleteRewardList.order;
 				num = num + dropReward.money + breakReward.money + order.money;
 			}
 			if (firstRewards.Length > 0)
 			{
-				SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, true);
+				SetActive(UI.OBJ_ARRIVAL_EFFECT_ROOT, true);
 				int index = MonoBehaviourSingleton<InGameManager>.I.GetRushIndex() - ((MonoBehaviourSingleton<InGameRecorder>.I.progressEndType != InGameProgress.PROGRESS_END_TYPE.QUEST_VICTORY) ? 1 : 0);
 				int waveNum = MonoBehaviourSingleton<InGameManager>.I.GetWaveNum(index);
 				UISprite component = GetCtrl(UI.SPR_WAVE_01).GetComponent<UISprite>();
@@ -323,20 +326,45 @@ public class RushResultTop : QuestResultTop
 				component.spriteName = "RushArrival_Wave_Txt_" + text2[2];
 				component2.spriteName = "RushArrival_Wave_Txt_" + text2[1];
 				component3.spriteName = ((waveNum < 100) ? string.Empty : ("RushArrival_Wave_Txt_" + text2[0]));
-				SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, false);
-				SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, true);
-				SetGrid(UI.GRD_ARRIVAL_ITEM_ICON, "ItemIconReward", firstRewards.Length, true, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-				SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, false);
+				SetActive(UI.OBJ_ARRIVAL_EFFECT_ROOT, false);
+				SetActive(UI.OBJ_ARRIVAL_BONUS, true);
+				SetGrid(UI.GRD_ARRIVAL_ITEM_ICON, "ItemIconReward", firstRewards.Length, true, delegate(int i, Transform t, bool is_recycle)
+				{
+					PointEventCurrentData.Reward reward = firstRewards[i];
+					ItemIcon.CreateRewardItemIcon((REWARD_TYPE)reward.type, (uint)reward.itemId, t, reward.num, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
+					t.FindChild("itemNum").GetComponent<UILabel>().text = "×" + firstRewards[i].num;
+				});
+				SetActive(UI.OBJ_ARRIVAL_BONUS, false);
 			}
 		}
-		SetLabelText((Enum)UI.LBL_REWARD_GOLD, num.ToString("N0"));
+		SetLabelText(UI.LBL_REWARD_GOLD, num.ToString("N0"));
 		bool flag = pointShopResultData.Count > 0;
-		SetActive((Enum)UI.OBJ_POINT_SHOP_RESULT_ROOT, flag);
+		SetActive(UI.OBJ_POINT_SHOP_RESULT_ROOT, flag);
 		if (flag)
 		{
-			SetGrid(UI.OBJ_POINT_SHOP_RESULT_ROOT, "QuestResultPointShop", pointShopResultData.Count, true, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetGrid(UI.OBJ_POINT_SHOP_RESULT_ROOT, "QuestResultPointShop", pointShopResultData.Count, true, delegate(int i, Transform t, bool b)
+			{
+				ResetTween(t, 0);
+				PointShopResultData pointShopResultData = base.pointShopResultData[i];
+				SetActive(t, UI.OBJ_NORMAL_POINT_SHOP_ROOT, !pointShopResultData.isEvent);
+				if (!pointShopResultData.isEvent)
+				{
+					SetLabelText(t, UI.LBL_NORMAL_GET_POINT_SHOP, string.Format("+" + StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.getPoint));
+					SetLabelText(t, UI.LBL_NORMAL_TOTAL_POINT_SHOP, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.totalPoint));
+					UITexture component4 = FindCtrl(t, UI.TEX_NORMAL_POINT_SHOP_ICON).GetComponent<UITexture>();
+					ResourceLoad.LoadPointIconImageTexture(component4, (uint)pointShopResultData.pointShopId);
+				}
+				SetActive(t, UI.OBJ_EVENT_POINT_SHOP_ROOT, pointShopResultData.isEvent);
+				if (pointShopResultData.isEvent)
+				{
+					SetLabelText(t, UI.LBL_EVENT_GET_POINT_SHOP, string.Format("+" + StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.getPoint));
+					SetLabelText(t, UI.LBL_EVENT_TOTAL_POINT_SHOP, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.totalPoint));
+					UITexture component5 = FindCtrl(t, UI.TEX_EVENT_POINT_SHOP_ICON).GetComponent<UITexture>();
+					ResourceLoad.LoadPointIconImageTexture(component5, (uint)pointShopResultData.pointShopId);
+				}
+			});
 		}
-		this.StartCoroutine(PlayAnimation());
+		StartCoroutine(PlayAnimation());
 	}
 
 	private ItemIcon CreateItemIcon(SortCompareData dropItem, Transform o, string event_name, int i)
@@ -415,7 +443,7 @@ public class RushResultTop : QuestResultTop
 		return itemIcon;
 	}
 
-	private unsafe void SetDropItemIcon(SortCompareData[] dropItemList, Transform t_grid, int wave)
+	private void SetDropItemIcon(SortCompareData[] dropItemList, Transform t_grid, int wave)
 	{
 		if (dropItemList != null)
 		{
@@ -424,8 +452,33 @@ public class RushResultTop : QuestResultTop
 			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)MonoBehaviourSingleton<InGameManager>.I.GetRushQuestId(wave));
 			string text2 = "Lv" + questData.GetMainEnemyLv().ToString() + Singleton<EnemyTable>.I.GetEnemyName((uint)questData.GetMainEnemyID());
 			SetLabelText(t_grid, UI.LBL_BOSS_NAME, text2);
-			_003CSetDropItemIcon_003Ec__AnonStorey42E _003CSetDropItemIcon_003Ec__AnonStorey42E;
-			SetGrid(t_grid, UI.GRD_DROP_ITEM, null, dropItemList.Length, true, new Action<int, Transform, bool>((object)_003CSetDropItemIcon_003Ec__AnonStorey42E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetGrid(t_grid, UI.GRD_DROP_ITEM, null, dropItemList.Length, true, delegate(int i, Transform o, bool is_recycle)
+			{
+				ItemIcon icon = null;
+				if (i < dropItemList.Length)
+				{
+					icon = CreateItemIcon(dropItemList[i], o, "DROP", i);
+				}
+				Transform transform = SetPrefab(o, "QuestResultDropIconOpener", true);
+				QuestResultDropIconOpener.Info info2 = new QuestResultDropIconOpener.Info
+				{
+					IsRare = ResultUtility.IsRare(dropItemList[i]),
+					IsBroken = ResultUtility.IsBreakReward(dropItemList[i])
+				};
+				transform.GetComponent<QuestResultDropIconOpener>().Initialized(icon, info2, delegate(Transform t, QuestResultDropIconOpener.Info info, bool is_skip)
+				{
+					string ui_effect_name = "ef_ui_dropitem_silver_01";
+					if (info.IsBroken)
+					{
+						ui_effect_name = "ef_ui_dropitem_red_01";
+					}
+					else if (info.IsRare)
+					{
+						ui_effect_name = "ef_ui_dropitem_gold_01";
+					}
+					SetVisibleWidgetOneShotEffect(GetCtrl(UI.OBJ_SCROLL_VIEW), t, ui_effect_name);
+				});
+			});
 		}
 	}
 
@@ -433,14 +486,14 @@ public class RushResultTop : QuestResultTop
 	{
 	}
 
-	private unsafe IEnumerator PlayAnimation()
+	private IEnumerator PlayAnimation()
 	{
 		is_skip = false;
 		animState = RESULT_ANIM_STATE.TITLE;
 		PlayAudio(AUDIO.ADVENT);
-		PlayTween((Enum)UI.OBJ_TITLE, true, (EventDelegate.Callback)delegate
+		PlayTween(UI.OBJ_TITLE, true, delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator143)/*Error near IL_0073: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			((_003CPlayAnimation_003Ec__Iterator145)/*Error near IL_0073: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 		}, false, 0);
 		while (animState != 0 && !is_skip)
 		{
@@ -448,9 +501,9 @@ public class RushResultTop : QuestResultTop
 		}
 		animState = RESULT_ANIM_STATE.WAVE;
 		PlayAudio(AUDIO.ACHIEVEMENT);
-		PlayTween((Enum)UI.OBJ_WAVE, true, (EventDelegate.Callback)delegate
+		PlayTween(UI.OBJ_WAVE, true, delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator143)/*Error near IL_00e8: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			((_003CPlayAnimation_003Ec__Iterator145)/*Error near IL_00e8: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 		}, false, 0);
 		while (animState != 0 && !is_skip)
 		{
@@ -458,9 +511,9 @@ public class RushResultTop : QuestResultTop
 		}
 		animState = RESULT_ANIM_STATE.TIME;
 		PlayAudio(AUDIO.ACHIEVEMENT);
-		PlayTween((Enum)UI.OBJ_TIME, true, (EventDelegate.Callback)delegate
+		PlayTween(UI.OBJ_TIME, true, delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator143)/*Error near IL_015d: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			((_003CPlayAnimation_003Ec__Iterator145)/*Error near IL_015d: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 		}, false, 0);
 		while (animState != 0 && !is_skip)
 		{
@@ -469,52 +522,51 @@ public class RushResultTop : QuestResultTop
 		if (firstRewards.Length > 0)
 		{
 			animState = RESULT_ANIM_STATE.ARRIVAL;
-			SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, true);
-			SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, true);
+			SetActive(UI.OBJ_ARRIVAL_EFFECT_ROOT, true);
+			SetActive(UI.OBJ_ARRIVAL_BONUS, true);
 			PlayAudio(AUDIO.ARRIVAL);
-			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, (EventDelegate.Callback)null, false, 1);
-			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, (EventDelegate.Callback)delegate
+			PlayTween(UI.OBJ_ARRIVAL_EFFECT, true, null, false, 1);
+			PlayTween(UI.OBJ_ARRIVAL_EFFECT, true, delegate
 			{
-				((_003CPlayAnimation_003Ec__Iterator143)/*Error near IL_0221: stateMachine*/)._003C_003Ef__this.PlayAudio(AUDIO.ARRIVAL_WAVE);
+				((_003CPlayAnimation_003Ec__Iterator145)/*Error near IL_0221: stateMachine*/)._003C_003Ef__this.PlayAudio(AUDIO.ARRIVAL_WAVE);
 			}, false, 2);
-			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, (EventDelegate.Callback)delegate
+			PlayTween(UI.OBJ_ARRIVAL_EFFECT, true, delegate
 			{
-				((_003CPlayAnimation_003Ec__Iterator143)/*Error near IL_0242: stateMachine*/)._003C_003Ef__this.PlayAudio(AUDIO.ARRIVAL_WAVE);
+				((_003CPlayAnimation_003Ec__Iterator145)/*Error near IL_0242: stateMachine*/)._003C_003Ef__this.PlayAudio(AUDIO.ARRIVAL_WAVE);
 			}, false, 3);
-			PlayTween((Enum)UI.OBJ_ARRIVAL_BONUS, true, (EventDelegate.Callback)null, false, 0);
-			SetActive((Enum)UI.BTN_NEXT, true);
+			PlayTween(UI.OBJ_ARRIVAL_BONUS, true, null, false, 0);
+			SetActive(UI.BTN_NEXT, true);
 			is_skip = false;
 			while (!is_skip)
 			{
 				yield return (object)null;
 			}
 			animState = RESULT_ANIM_STATE.ARRIVAL_NEXT;
-			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, (EventDelegate.Callback)delegate
+			PlayTween(UI.OBJ_ARRIVAL_EFFECT, true, delegate
 			{
-				((_003CPlayAnimation_003Ec__Iterator143)/*Error near IL_02cc: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+				((_003CPlayAnimation_003Ec__Iterator145)/*Error near IL_02cc: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 			}, false, 4);
 			while (animState != 0 && !is_skip)
 			{
 				yield return (object)null;
 			}
 			is_skip = false;
-			SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, false);
-			SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, false);
+			SetActive(UI.OBJ_ARRIVAL_EFFECT_ROOT, false);
+			SetActive(UI.OBJ_ARRIVAL_BONUS, false);
 		}
 		animState = RESULT_ANIM_STATE.TREASURE;
 		PlayAudio(AUDIO.ACHIEVEMENT);
 		if (pointShopResultData.Count > 0)
 		{
-			foreach (Transform item in GetCtrl(UI.OBJ_POINT_SHOP_RESULT_ROOT).get_transform())
+			foreach (Transform item in GetCtrl(UI.OBJ_POINT_SHOP_RESULT_ROOT).transform)
 			{
-				Transform t = item;
-				PlayTween(t, true, null, true, 0);
+				PlayTween(item, true, null, true, 0);
 			}
 		}
-		PlayTween((Enum)UI.OBJ_MONEY, true, (EventDelegate.Callback)null, true, 0);
-		PlayTween((Enum)UI.OBJ_TREASURE_ROOT, true, (EventDelegate.Callback)delegate
+		PlayTween(UI.OBJ_MONEY, true, null, true, 0);
+		PlayTween(UI.OBJ_TREASURE_ROOT, true, delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator143)/*Error near IL_041c: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			((_003CPlayAnimation_003Ec__Iterator145)/*Error near IL_041c: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 		}, false, 0);
 		while (animState != 0 && !is_skip)
 		{
@@ -522,13 +574,22 @@ public class RushResultTop : QuestResultTop
 		}
 		is_skip = false;
 		animState = RESULT_ANIM_STATE.ITEM_ICON;
-		this.StartCoroutine(PlayItemAnimation(new Action((object)/*Error near IL_048b: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+		StartCoroutine(PlayItemAnimation(delegate
+		{
+			((_003CPlayAnimation_003Ec__Iterator145)/*Error near IL_048b: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+		}));
 		while (animState != 0 && !is_skip)
 		{
 			yield return (object)null;
 		}
 		animState = RESULT_ANIM_STATE.EVENT;
-		OpenAllEventRewardDialog(new Action((object)/*Error near IL_04ec: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		OpenAllEventRewardDialog(delegate
+		{
+			((_003CPlayAnimation_003Ec__Iterator145)/*Error near IL_04ec: stateMachine*/)._003C_003Ef__this.OpenMutualFollowBonusDialog(delegate
+			{
+				((_003CPlayAnimation_003Ec__Iterator145)/*Error near IL_04ec: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			});
+		});
 		while (animState != 0 && !is_skip)
 		{
 			yield return (object)null;
@@ -540,9 +601,9 @@ public class RushResultTop : QuestResultTop
 
 	protected override void VisibleEndButton()
 	{
-		SetActive((Enum)UI.BTN_NEXT, true);
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, false);
-		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL, false);
+		SetActive(UI.BTN_NEXT, true);
+		SetActive(UI.BTN_SKIP_FULL_SCREEN, false);
+		SetActive(UI.BTN_SKIP_IN_SCROLL, false);
 	}
 
 	private IEnumerator PlayItemAnimation(Action callback)
@@ -553,14 +614,14 @@ public class RushResultTop : QuestResultTop
 			{
 				Transform t_scrollView = GetCtrl(UI.OBJ_SCROLL_VIEW);
 				t_scrollView.GetComponent<UIScrollView>().ResetPosition();
-				preScrollViewPosition = t_scrollView.get_localPosition();
+				preScrollViewPosition = t_scrollView.localPosition;
 			}
 			else
 			{
 				animTimer = 0f;
 				while (animTimer < 0.4f && !is_skip)
 				{
-					animTimer += Time.get_deltaTime();
+					animTimer += Time.deltaTime;
 					yield return (object)null;
 				}
 				int preWaveIconRowNum = Mathf.CeilToInt((float)resultRewards[wave - 1].dropItemIconData.Length / 5f);
@@ -572,39 +633,28 @@ public class RushResultTop : QuestResultTop
 				animTimer = 0f;
 				while (animTimer < 0.4f && !is_skip)
 				{
-					animTimer += Time.get_deltaTime();
+					animTimer += Time.deltaTime;
 					yield return (object)null;
 				}
 				VisibleItemIcon(wave, i, is_skip);
 			}
 		}
-		callback.Invoke();
+		callback();
 	}
 
 	private void Scroll(float delta)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Expected O, but got Unknown
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 pos = preScrollViewPosition + Vector3.get_up() * delta;
-		SpringPanel.Begin(GetCtrl(UI.OBJ_SCROLL_VIEW).get_gameObject(), pos, 8f);
+		Vector3 pos = preScrollViewPosition + Vector3.up * delta;
+		SpringPanel.Begin(GetCtrl(UI.OBJ_SCROLL_VIEW).gameObject, pos, 8f);
 		preScrollViewPosition = pos;
 	}
 
 	private void VisibleItemIcon(int wave, int index, bool is_skip = false)
 	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		Transform child = GetChild((Enum)UI.TBL_DROP_ITEM, wave);
+		Transform child = GetChild(UI.TBL_DROP_ITEM, wave);
 		Transform child2 = GetChild(child, UI.GRD_DROP_ITEM, index);
-		QuestResultDropIconOpener componentInChildren = child2.get_gameObject().GetComponentInChildren<QuestResultDropIconOpener>();
-		if (!(componentInChildren == null))
+		QuestResultDropIconOpener componentInChildren = child2.gameObject.GetComponentInChildren<QuestResultDropIconOpener>();
+		if (!((UnityEngine.Object)componentInChildren == (UnityEngine.Object)null))
 		{
 			PlayAudio(AUDIO.DROPITEM);
 			componentInChildren.StartEffect(is_skip);
@@ -705,21 +755,21 @@ public class RushResultTop : QuestResultTop
 		case RESULT_ANIM_STATE.WAVE:
 		case RESULT_ANIM_STATE.TIME:
 		case RESULT_ANIM_STATE.ARRIVAL:
-			SkipTween((Enum)UI.OBJ_TITLE, true, 0);
-			SkipTween((Enum)UI.OBJ_WAVE, true, 0);
-			SkipTween((Enum)UI.OBJ_TIME, true, 0);
-			SkipTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, 1);
-			SkipTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, 2);
-			SkipTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, 3);
+			SkipTween(UI.OBJ_TITLE, true, 0);
+			SkipTween(UI.OBJ_WAVE, true, 0);
+			SkipTween(UI.OBJ_TIME, true, 0);
+			SkipTween(UI.OBJ_ARRIVAL_EFFECT, true, 1);
+			SkipTween(UI.OBJ_ARRIVAL_EFFECT, true, 2);
+			SkipTween(UI.OBJ_ARRIVAL_EFFECT, true, 3);
 			break;
 		case RESULT_ANIM_STATE.ARRIVAL_NEXT:
-			SkipTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, 4);
-			SkipTween((Enum)UI.OBJ_ARRIVAL_BONUS, true, 0);
+			SkipTween(UI.OBJ_ARRIVAL_EFFECT, true, 4);
+			SkipTween(UI.OBJ_ARRIVAL_BONUS, true, 0);
 			break;
 		case RESULT_ANIM_STATE.TREASURE:
-			SkipTween((Enum)UI.OBJ_POINT_SHOP_RESULT_ROOT, true, 0);
-			SkipTween((Enum)UI.OBJ_MONEY, true, 0);
-			SkipTween((Enum)UI.OBJ_TREASURE_ROOT, true, 0);
+			SkipTween(UI.OBJ_POINT_SHOP_RESULT_ROOT, true, 0);
+			SkipTween(UI.OBJ_MONEY, true, 0);
+			SkipTween(UI.OBJ_TREASURE_ROOT, true, 0);
 			break;
 		}
 		is_skip = true;
@@ -815,10 +865,7 @@ public class RushResultTop : QuestResultTop
 		}
 		if (eventRewardList.Count == 0)
 		{
-			if (endCallback != null)
-			{
-				endCallback.Invoke();
-			}
+			endCallback?.Invoke();
 		}
 		else
 		{
@@ -827,11 +874,8 @@ public class RushResultTop : QuestResultTop
 		}
 	}
 
-	private unsafe void OpenMutualFollowBonusDialog(Action end_callback)
+	private void OpenMutualFollowBonusDialog(Action end_callback)
 	{
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Expected O, but got Unknown
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
 		if (base.followReward != null)
 		{
 			QuestCompleteReward followReward = base.followReward;
@@ -847,18 +891,22 @@ public class RushResultTop : QuestResultTop
 			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, followReward.questItem, REWARD_CATEGORY.DROP);
 			if (ResultUtility.SetDropData(tmp, start_ary_index, followReward.accessoryItem, REWARD_CATEGORY.DROP) == 0 && crystal == 0 && gold == 0 && exp == 0)
 			{
-				if (end_callback != null)
-				{
-					end_callback.Invoke();
-				}
+				end_callback?.Invoke();
 			}
 			else
 			{
 				followBonusCallback = end_callback;
 				if (!QuestResultTop.IsExecuteNowSceneEvent(GetSceneName()))
 				{
-					_003COpenMutualFollowBonusDialog_003Ec__AnonStorey42F _003COpenMutualFollowBonusDialog_003Ec__AnonStorey42F;
-					this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenMutualFollowBonusDialog_003Ec__AnonStorey42F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+					StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
+					{
+						DispatchEvent("MUTUAL_FOLLOW_BONUS", new object[3]
+						{
+							tmp,
+							gold,
+							crystal
+						});
+					}));
 				}
 				else
 				{
@@ -871,9 +919,9 @@ public class RushResultTop : QuestResultTop
 				}
 			}
 		}
-		else if (end_callback != null)
+		else
 		{
-			end_callback.Invoke();
+			end_callback?.Invoke();
 		}
 	}
 

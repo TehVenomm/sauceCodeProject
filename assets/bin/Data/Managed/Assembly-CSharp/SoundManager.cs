@@ -26,7 +26,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 			private set;
 		}
 
-		public AudioRolloffMode rollOffMode => 0;
+		public AudioRolloffMode rollOffMode => AudioRolloffMode.Logarithmic;
 
 		public AudioPreset(string _name, float _minDistance, float _maxDistance)
 		{
@@ -245,43 +245,39 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	public void TransitionTo(string snapshotName, float transitionTime = 1f)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
-		if (!(audioMixer == null))
+		if (!((UnityEngine.Object)audioMixer == (UnityEngine.Object)null))
 		{
-			AudioMixerSnapshot val = audioMixer.FindSnapshot(snapshotName);
-			if (!(val == null) && !(mixerCurrent == val))
+			AudioMixerSnapshot audioMixerSnapshot = audioMixer.FindSnapshot(snapshotName);
+			if (!((UnityEngine.Object)audioMixerSnapshot == (UnityEngine.Object)null) && !((UnityEngine.Object)mixerCurrent == (UnityEngine.Object)audioMixerSnapshot))
 			{
-				val.TransitionTo(transitionTime);
-				mixerCurrent = val;
+				audioMixerSnapshot.TransitionTo(transitionTime);
+				mixerCurrent = audioMixerSnapshot;
 			}
 		}
 	}
 
 	private void TransitionTo(AudioMixerSnapshot current, AudioMixerSnapshot next, float transitionTime = 1f)
 	{
-		if (!(current == null) && !(next == null) && !(audioMixer == null))
+		if (!((UnityEngine.Object)current == (UnityEngine.Object)null) && !((UnityEngine.Object)next == (UnityEngine.Object)null) && !((UnityEngine.Object)audioMixer == (UnityEngine.Object)null))
 		{
-			AudioMixerSnapshot[] array = (AudioMixerSnapshot[])new AudioMixerSnapshot[2]
+			AudioMixerSnapshot[] snapshots = new AudioMixerSnapshot[2]
 			{
 				current,
 				next
 			};
-			float[] array2 = new float[2]
+			float[] weights = new float[2]
 			{
 				0f,
 				1f
 			};
-			audioMixer.TransitionToSnapshots(array, array2, transitionTime);
+			audioMixer.TransitionToSnapshots(snapshots, weights, transitionTime);
 		}
 	}
 
 	public void SetAudioMixer(AudioMixer audio_mixer)
 	{
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Expected O, but got Unknown
 		audioMixer = audio_mixer;
-		if (audio_mixer != null)
+		if ((UnityEngine.Object)audio_mixer != (UnityEngine.Object)null)
 		{
 			mixerGroupMaster = GetAudioMixerGroup("Master");
 			mixerGroupBGM = GetAudioMixerGroup("Master/CONFIG_BGM/BGM");
@@ -321,11 +317,11 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	public void SetupAudioControlGroup()
 	{
-		if (audioControlSESelf == null)
+		if ((UnityEngine.Object)audioControlSESelf == (UnityEngine.Object)null)
 		{
 			audioControlSESelf = AudioControlGroup.Create(AudioControlGroup.CullingTypes.NONE, 2147483647);
 		}
-		if (audioControlJingle == null)
+		if ((UnityEngine.Object)audioControlJingle == (UnityEngine.Object)null)
 		{
 			audioControlJingle = AudioControlGroup.Create(AudioControlGroup.CullingTypes.NONE, 2147483647);
 		}
@@ -355,18 +351,18 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 					lo_bgm = new LoadObject(this, RESOURCE_CATEGORY.SOUND_BGM, ResourceName.GetBGM(requestBGMID), false);
 					ResourceManager.enableCache = true;
 				}
-				if (audioSourceBGM != null && audioSourceBGM.get_isPlaying())
+				if ((UnityEngine.Object)audioSourceBGM != (UnityEngine.Object)null && audioSourceBGM.isPlaying)
 				{
 					bool is_play_fadeout = true;
 					EventDelegate.Callback OnFinishedCallBack = delegate
 					{
-						((_003CStart_003Ec__Iterator279)/*Error near IL_00f3: stateMachine*/)._003Cis_play_fadeout_003E__1 = false;
+						((_003CStart_003Ec__Iterator27B)/*Error near IL_00f3: stateMachine*/)._003Cis_play_fadeout_003E__1 = false;
 					};
-					TweenVolume fadeout = TweenVolume.Begin(this.get_gameObject(), fadeOutTime, 0f);
+					TweenVolume fadeout = TweenVolume.Begin(base.gameObject, fadeOutTime, 0f);
 					EventDelegate.Add(fadeout.onFinished, OnFinishedCallBack);
 					while (is_play_fadeout)
 					{
-						audioSourceBGM.set_volume(fadeout.value);
+						audioSourceBGM.volume = fadeout.value;
 						yield return (object)null;
 					}
 					EventDelegate.Remove(fadeout.onFinished, OnFinishedCallBack);
@@ -377,32 +373,32 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 					{
 						yield return (object)lo_bgm.Wait(this);
 					}
-					if (!(lo_bgm.loadedObject != null))
+					if (!(lo_bgm.loadedObject != (UnityEngine.Object)null))
 					{
 						int num3 = playingBGMID = (requestBGMID = 0);
 					}
 					else
 					{
-						if (audioSourceBGM == null)
+						if ((UnityEngine.Object)audioSourceBGM == (UnityEngine.Object)null)
 						{
-							audioSourceBGM = this.get_gameObject().AddComponent<AudioSource>();
+							audioSourceBGM = base.gameObject.AddComponent<AudioSource>();
 						}
-						if (audioSourceBGM != null)
+						if ((UnityEngine.Object)audioSourceBGM != (UnityEngine.Object)null)
 						{
-							audioSourceBGM.set_priority(0);
-							audioSourceBGM.set_reverbZoneMix(0f);
-							audioSourceBGM.set_spread(360f);
-							audioSourceBGM.set_spatialBlend(0f);
-							audioSourceBGM.set_outputAudioMixerGroup(mixerGroupBGM);
-							audioSourceBGM.set_loop(m_IsNextBGMLoop);
-							audioSourceBGM.set_enabled(true);
-							audioSourceBGM.set_clip(lo_bgm.loadedObject as AudioClip);
-							audioSourceBGM.set_volume(volumeBGM);
+							audioSourceBGM.priority = 0;
+							audioSourceBGM.reverbZoneMix = 0f;
+							audioSourceBGM.spread = 360f;
+							audioSourceBGM.spatialBlend = 0f;
+							audioSourceBGM.outputAudioMixerGroup = mixerGroupBGM;
+							audioSourceBGM.loop = m_IsNextBGMLoop;
+							audioSourceBGM.enabled = true;
+							audioSourceBGM.clip = (lo_bgm.loadedObject as AudioClip);
+							audioSourceBGM.volume = volumeBGM;
 							audioSourceBGM.Play(0uL);
 						}
 					}
 				}
-				if (playingBGMID == 0 && audioSourceBGM != null)
+				if (playingBGMID == 0 && (UnityEngine.Object)audioSourceBGM != (UnityEngine.Object)null)
 				{
 					audioSourceBGM.Stop();
 				}
@@ -413,7 +409,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	public void UpdateConfigVolume()
 	{
-		if (audioMixer != null && GameSaveData.instance != null)
+		if ((UnityEngine.Object)audioMixer != (UnityEngine.Object)null && GameSaveData.instance != null)
 		{
 			ApplyVolume("ConfigBGMVolume", GameSaveData.instance.volumeBGM);
 			ApplyVolume("ConfigSEVolume", GameSaveData.instance.volumeSE);
@@ -422,10 +418,10 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	private void ApplyVolume(string volumeLabel, float configValue = 1f)
 	{
-		if (!(audioMixer == null))
+		if (!((UnityEngine.Object)audioMixer == (UnityEngine.Object)null))
 		{
-			float num = Utility.VolumeToDecibel(configValue);
-			audioMixer.SetFloat(volumeLabel, num);
+			float value = Utility.VolumeToDecibel(configValue);
+			audioMixer.SetFloat(volumeLabel, value);
 		}
 	}
 
@@ -443,32 +439,29 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 	{
 		if (MonoBehaviourSingleton<SoundManager>.I.m_SystemSEClips != null)
 		{
-			AudioClip val = MonoBehaviourSingleton<SoundManager>.I.m_SystemSEClips.Get((uint)SEType);
-			if (!(val == null))
+			AudioClip audioClip = MonoBehaviourSingleton<SoundManager>.I.m_SystemSEClips.Get((uint)SEType);
+			if (!((UnityEngine.Object)audioClip == (UnityEngine.Object)null))
 			{
-				PlayUISE(val, volume, false, null, (int)SEType);
+				PlayUISE(audioClip, volume, false, null, (int)SEType);
 			}
 		}
 	}
 
 	public static AudioObject PlaySE(AudioClip clip, bool loop, Transform parent)
 	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
 			return null;
 		}
-		if (clip == null)
+		if ((UnityEngine.Object)clip == (UnityEngine.Object)null)
 		{
 			return null;
 		}
-		string s = (!string.IsNullOrEmpty(clip.get_name())) ? clip.get_name().Substring(3) : string.Empty;
+		string s = (!string.IsNullOrEmpty(clip.name)) ? clip.name.Substring(3) : string.Empty;
 		int result = 0;
 		if (int.TryParse(s, out result))
 		{
-			Vector3 position = parent.get_position();
+			Vector3 position = parent.position;
 			return MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(clip, result, MonoBehaviourSingleton<SoundManager>.I.volumeSE, loop, MonoBehaviourSingleton<SoundManager>.I.mixerGroupSE, true, null, null, position);
 		}
 		return AudioObject.Create(clip, 0, MonoBehaviourSingleton<SoundManager>.I.volumeSE, loop, MonoBehaviourSingleton<SoundManager>.I.mixerGroupSE, MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf, true, null, parent, null);
@@ -476,7 +469,6 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	public static void PlayOneShotSE(int se_id, Vector3 pos)
 	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
 			MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(GetSEAudioClip(se_id), se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupSE, true, null, null, pos);
@@ -509,7 +501,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	public static void PlayOneShotUISE(AudioClip clip, int se_id)
 	{
-		if (MonoBehaviourSingleton<SoundManager>.IsValid() && !(clip == null))
+		if (MonoBehaviourSingleton<SoundManager>.IsValid() && !((UnityEngine.Object)clip == (UnityEngine.Object)null))
 		{
 			MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(clip, se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupUISE, false, null, null, null);
 		}
@@ -555,7 +547,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 	public static void StopVoice(uint ch_id = 0, int fadeout_frame = 2)
 	{
 		AudioControlGroup audioControlVoice = MonoBehaviourSingleton<SoundManager>.I.GetAudioControlVoice(ch_id);
-		if (!(audioControlVoice == null))
+		if (!((UnityEngine.Object)audioControlVoice == (UnityEngine.Object)null))
 		{
 			audioControlVoice.StopAll(fadeout_frame);
 		}
@@ -563,14 +555,14 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	public static void PlayVoice(AudioClip audio_clip, int voice_id, float volume = 1f, uint ch_id = 0, DisableNotifyMonoBehaviour master = null, Transform parent = null)
 	{
-		if (GameSaveData.instance.voiceOption != 2 && MonoBehaviourSingleton<SoundManager>.IsValid() && !(audio_clip == null))
+		if (GameSaveData.instance.voiceOption != 2 && MonoBehaviourSingleton<SoundManager>.IsValid() && !((UnityEngine.Object)audio_clip == (UnityEngine.Object)null))
 		{
 			float num = volume * MonoBehaviourSingleton<SoundManager>.I.volumeVOICE;
 			if (!(num < 0.05f))
 			{
-				bool is3DSound = (!(parent == null)) ? true : false;
+				bool is3DSound = (!((UnityEngine.Object)parent == (UnityEngine.Object)null)) ? true : false;
 				AudioControlGroup audioControlVoice = MonoBehaviourSingleton<SoundManager>.I.GetAudioControlVoice(ch_id);
-				if (!(audioControlVoice == null))
+				if (!((UnityEngine.Object)audioControlVoice == (UnityEngine.Object)null))
 				{
 					audioControlVoice.CreateAudio(audio_clip, voice_id, num, false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupVoice, is3DSound, master, parent, null);
 				}
@@ -611,7 +603,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 	{
 		if (MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
-			bool is3DSound = (!(parent == null)) ? true : false;
+			bool is3DSound = (!((UnityEngine.Object)parent == (UnityEngine.Object)null)) ? true : false;
 			MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(GetSEAudioClip(se_id), se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, true, MonoBehaviourSingleton<SoundManager>.I.mixerGroupSE, is3DSound, master, parent, null);
 		}
 	}
@@ -630,7 +622,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 				}
 				audioObject = (enumerator.Current as AudioObject);
 			}
-			while (!(audioObject != null) || audioObject.clipId != se_id);
+			while (!((UnityEngine.Object)audioObject != (UnityEngine.Object)null) || audioObject.clipId != se_id);
 			audioObject.Stop(0);
 		}
 	}
@@ -649,7 +641,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 				}
 				audioObject = (enumerator.Current as AudioObject);
 			}
-			while (!(audioObject != null) || audioObject.clipId != se_id || !audioObject.GetLoopFlag());
+			while (!((UnityEngine.Object)audioObject != (UnityEngine.Object)null) || audioObject.clipId != se_id || !audioObject.GetLoopFlag());
 			audioObject.SetLoopFlag(false);
 		}
 	}
@@ -666,35 +658,27 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	private static AudioClip GetAudioClip(RESOURCE_CATEGORY category, string name)
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
-		return MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedObject(category, name);
+		return (AudioClip)MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedObject(category, name);
 	}
 
 	private static AudioClip GetAudioClip(RESOURCE_CATEGORY category, string package_name, string name)
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Expected O, but got Unknown
-		return MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedObject(category, package_name, name);
+		return (AudioClip)MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedObject(category, package_name, name);
 	}
 
 	private static AudioClip GetActionVoiceAudioClip(int voice_id)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
-		return MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedObject(RESOURCE_CATEGORY.SOUND_VOICE, ResourceName.GetActionVoicePackageNameFromVoiceID(voice_id), ResourceName.GetActionVoiceName(voice_id));
+		return (AudioClip)MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedObject(RESOURCE_CATEGORY.SOUND_VOICE, ResourceName.GetActionVoicePackageNameFromVoiceID(voice_id), ResourceName.GetActionVoiceName(voice_id));
 	}
 
 	public static AudioClip GetStoryVoiceAudioClip(int voice_id)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
-		return MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedObject(RESOURCE_CATEGORY.SOUND_VOICE, ResourceName.GetStoryVoicePackageNameFromVoiceID(voice_id), ResourceName.GetStoryVoiceName(voice_id));
+		return (AudioClip)MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedObject(RESOURCE_CATEGORY.SOUND_VOICE, ResourceName.GetStoryVoicePackageNameFromVoiceID(voice_id), ResourceName.GetStoryVoiceName(voice_id));
 	}
 
 	public uint GetVoiceChannel(StageObject stageObject)
 	{
-		if (stageObject == null)
+		if ((UnityEngine.Object)stageObject == (UnityEngine.Object)null)
 		{
 			return 0u;
 		}
@@ -707,7 +691,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 			return 2u;
 		}
 		Player player = stageObject as Player;
-		if (player != null)
+		if ((UnityEngine.Object)player != (UnityEngine.Object)null)
 		{
 			return GetReservedChannel(player);
 		}
@@ -716,10 +700,10 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	public void OnDetachedObject(StageObject stageObject)
 	{
-		if (!(stageObject == null))
+		if (!((UnityEngine.Object)stageObject == (UnityEngine.Object)null))
 		{
 			Player player = stageObject as Player;
-			if (player != null)
+			if ((UnityEngine.Object)player != (UnityEngine.Object)null)
 			{
 				ChancelResavationChannel(player);
 			}
@@ -728,7 +712,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	private uint GetReservedChannel(Player player)
 	{
-		if (player == null)
+		if ((UnityEngine.Object)player == (UnityEngine.Object)null)
 		{
 			return 0u;
 		}
@@ -755,7 +739,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	private void ChancelResavationChannel(Player player)
 	{
-		if (!(player == null) && m_dicReservedVoiceChannel != null && m_dicReservedVoiceChannel.ContainsKey(player.id))
+		if (!((UnityEngine.Object)player == (UnityEngine.Object)null) && m_dicReservedVoiceChannel != null && m_dicReservedVoiceChannel.ContainsKey(player.id))
 		{
 			m_dicReservedVoiceChannel.Remove(player.id);
 		}
@@ -763,16 +747,13 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	public void LoadParmanentAudioClip()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		m_IsLoading = true;
-		this.StartCoroutine(DoLoading());
+		StartCoroutine(DoLoading());
 	}
 
 	public Coroutine WaitLoading()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Expected O, but got Unknown
-		return this.StartCoroutine(DoWaitLoading());
+		return StartCoroutine(DoWaitLoading());
 	}
 
 	public bool IsLoadingAudioClip()
@@ -819,12 +800,12 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	public static AudioClip GetAttachedAudio(GameObject go, string filter = null)
 	{
-		if (go == null)
+		if ((UnityEngine.Object)go == (UnityEngine.Object)null)
 		{
 			return null;
 		}
 		ResourceLink component = go.GetComponent<ResourceLink>();
-		if (component == null)
+		if ((UnityEngine.Object)component == (UnityEngine.Object)null)
 		{
 			return null;
 		}
@@ -842,9 +823,9 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 				LoadObject loadObject = null;
 				foreach (LoadObject lo in los)
 				{
-					if (lo != null && lo.loadedObject != null && !string.IsNullOrEmpty(lo.loadedObject.get_name()))
+					if (lo != null && lo.loadedObject != (UnityEngine.Object)null && !string.IsNullOrEmpty(lo.loadedObject.name))
 					{
-						string b = ResourceName.Normalize(lo.loadedObject.get_name());
+						string b = ResourceName.Normalize(lo.loadedObject.name);
 						if (sE == b)
 						{
 							loadObject = lo;
@@ -853,10 +834,10 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 				}
 				if (loadObject != null)
 				{
-					AudioClip val = loadObject.loadedObject as AudioClip;
-					if (val != null)
+					AudioClip audioClip = loadObject.loadedObject as AudioClip;
+					if ((UnityEngine.Object)audioClip != (UnityEngine.Object)null)
 					{
-						m_SystemSEClips.Add((uint)num, val);
+						m_SystemSEClips.Add((uint)num, audioClip);
 					}
 				}
 			}

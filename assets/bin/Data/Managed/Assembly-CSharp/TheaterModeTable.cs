@@ -66,12 +66,13 @@ public class TheaterModeTable : MonoBehaviourSingleton<TheaterModeTable>, IDataT
 		LoadTable();
 	}
 
-	private unsafe void LoadTable()
+	private void LoadTable()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
 		isLoading = true;
-		MonoBehaviourSingleton<DataTableManager>.I.RequestLoadTable("TheaterModeTable", this, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
+		MonoBehaviourSingleton<DataTableManager>.I.RequestLoadTable("TheaterModeTable", this, delegate
+		{
+			isLoading = false;
+		}, false);
 	}
 
 	public void CreateTable(string csv)

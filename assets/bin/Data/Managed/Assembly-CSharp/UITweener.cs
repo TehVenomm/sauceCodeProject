@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class UITweener
+public abstract class UITweener : MonoBehaviour
 {
 	public enum Method
 	{
@@ -31,11 +31,7 @@ public abstract class UITweener
 	public Style style;
 
 	[HideInInspector]
-	public AnimationCurve animationCurve = new AnimationCurve((Keyframe[])new Keyframe[2]
-	{
-		new Keyframe(0f, 0f, 0f, 1f),
-		new Keyframe(1f, 1f, 1f, 0f)
-	});
+	public AnimationCurve animationCurve = new AnimationCurve(new Keyframe(0f, 0f, 0f, 1f), new Keyframe(1f, 1f, 1f, 0f));
 
 	[HideInInspector]
 	public bool ignoreTimeScale = true;
@@ -100,17 +96,6 @@ public abstract class UITweener
 
 	public Direction direction => (!(amountPerDelta < 0f)) ? Direction.Forward : Direction.Reverse;
 
-	protected UITweener()
-		: this()
-	{
-	}//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-	//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0056: Expected O, but got Unknown
-
-
 	private void Reset()
 	{
 		if (!mStarted)
@@ -128,8 +113,8 @@ public abstract class UITweener
 	private void Update()
 	{
 		bool flag = false;
-		float num = (!ignoreTimeScale) ? Time.get_deltaTime() : RealTime.deltaTime;
-		float num2 = (!ignoreTimeScale) ? Time.get_time() : RealTime.time;
+		float num = (!ignoreTimeScale) ? Time.deltaTime : RealTime.deltaTime;
+		float num2 = (!ignoreTimeScale) ? Time.time : RealTime.time;
 		if (!mStarted)
 		{
 			flag = true;
@@ -168,14 +153,14 @@ public abstract class UITweener
 					Sample(mFactor, false);
 					if (duration == 0f)
 					{
-						this.set_enabled(false);
+						base.enabled = false;
 					}
 				}
 				else
 				{
 					Sample(mFactor, true);
-					this.set_enabled(false);
-					if (current == null)
+					base.enabled = false;
+					if ((UnityEngine.Object)current == (UnityEngine.Object)null)
 					{
 						UITweener uITweener = current;
 						current = this;
@@ -194,9 +179,9 @@ public abstract class UITweener
 							}
 							mTemp = null;
 						}
-						if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
+						if ((UnityEngine.Object)eventReceiver != (UnityEngine.Object)null && !string.IsNullOrEmpty(callWhenFinished))
 						{
-							eventReceiver.SendMessage(callWhenFinished, (object)this, 1);
+							eventReceiver.SendMessage(callWhenFinished, this, SendMessageOptions.DontRequireReceiver);
 						}
 						current = uITweener;
 					}
@@ -318,7 +303,7 @@ public abstract class UITweener
 		{
 			mAmountPerDelta = 0f - mAmountPerDelta;
 		}
-		this.set_enabled(true);
+		base.enabled = true;
 		Update();
 	}
 
@@ -339,21 +324,15 @@ public abstract class UITweener
 		{
 			mAmountPerDelta = Mathf.Abs(amountPerDelta);
 		}
-		this.set_enabled(true);
+		base.enabled = true;
 	}
 
 	protected abstract void OnUpdate(float factor, bool isFinished);
 
 	public static T Begin<T>(GameObject go, float duration, bool overrideAnimationCurve = true) where T : UITweener
 	{
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019a: Expected O, but got Unknown
 		T val = go.GetComponent<T>();
-		if (val != null && val.tweenGroup != 0)
+		if ((UnityEngine.Object)val != (UnityEngine.Object)null && val.tweenGroup != 0)
 		{
 			val = (T)null;
 			T[] components = go.GetComponents<T>();
@@ -361,19 +340,19 @@ public abstract class UITweener
 			for (int num = components.Length; i < num; i++)
 			{
 				val = components[i];
-				if (val != null && val.tweenGroup == 0)
+				if ((UnityEngine.Object)val != (UnityEngine.Object)null && val.tweenGroup == 0)
 				{
 					break;
 				}
 				val = (T)null;
 			}
 		}
-		if (val == null)
+		if ((UnityEngine.Object)val == (UnityEngine.Object)null)
 		{
 			val = go.AddComponent<T>();
-			if (val == null)
+			if ((UnityEngine.Object)val == (UnityEngine.Object)null)
 			{
-				Debug.LogError((object)("Unable to add " + typeof(T) + " to " + NGUITools.GetHierarchy(go)), go);
+				Debug.LogError("Unable to add " + typeof(T) + " to " + NGUITools.GetHierarchy(go), go);
 				return (T)null;
 			}
 		}
@@ -384,15 +363,11 @@ public abstract class UITweener
 		val.style = Style.Once;
 		if (overrideAnimationCurve)
 		{
-			val.animationCurve = new AnimationCurve((Keyframe[])new Keyframe[2]
-			{
-				new Keyframe(0f, 0f, 0f, 1f),
-				new Keyframe(1f, 1f, 1f, 0f)
-			});
+			val.animationCurve = new AnimationCurve(new Keyframe(0f, 0f, 0f, 1f), new Keyframe(1f, 1f, 1f, 0f));
 		}
 		val.eventReceiver = null;
 		val.callWhenFinished = null;
-		val.set_enabled(true);
+		val.enabled = true;
 		return val;
 	}
 

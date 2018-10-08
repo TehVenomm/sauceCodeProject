@@ -35,18 +35,18 @@ public class PointShopBuy : GameSection
 			currentItem = (array[0] as PointShopItem);
 			pointShop = (array[1] as PointShop);
 			onBuy = (array[2] as Action<PointShopItem, int>);
-			int num = (!currentItem.hasLimit) ? 2147483647 : (currentItem.limit - currentItem.buyCount);
-			changableNum = Mathf.Min(Mathf.Min(num, pointShop.userPoint / currentItem.needPoint), GameDefine.POINT_SHOP_MAX_BUY_LIMIT);
+			int a = (!currentItem.hasLimit) ? 2147483647 : (currentItem.limit - currentItem.buyCount);
+			changableNum = Mathf.Min(Mathf.Min(a, pointShop.userPoint / currentItem.needPoint), GameDefine.POINT_SHOP_MAX_BUY_LIMIT);
 		}
 		if (changableNum == 1)
 		{
-			SetActive((Enum)UI.BTN_L, false);
-			SetActive((Enum)UI.BTN_R, false);
+			SetActive(UI.BTN_L, false);
+			SetActive(UI.BTN_R, false);
 		}
 		else
 		{
-			SetRepeatButton((Enum)UI.BTN_L, "L", (object)null);
-			SetRepeatButton((Enum)UI.BTN_R, "R", (object)null);
+			SetRepeatButton(UI.BTN_L, "L", null);
+			SetRepeatButton(UI.BTN_R, "R", null);
 		}
 		base.Initialize();
 	}
@@ -56,13 +56,13 @@ public class PointShopBuy : GameSection
 		base.UpdateUI();
 		if (currentItem != null)
 		{
-			SetLabelText((Enum)UI.LBL_ITEM_NAME, currentItem.name);
+			SetLabelText(UI.LBL_ITEM_NAME, currentItem.name);
 			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)currentItem.type, (uint)currentItem.itemId, GetCtrl(UI.OBJ_ITEM_ICON_ROOT), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
 			itemIcon.SetEnableCollider(false);
 			ResourceLoad.LoadPointIconImageTexture(GetCtrl(UI.TEX_POINT_ICON).GetComponent<UITexture>(), (uint)pointShop.pointShopId);
 		}
-		SetLabelText((Enum)UI.LBL_CURRENT_CHANGE_NUM, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), currentNum));
-		SetLabelText((Enum)UI.LBL_NEED_POINT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), currentItem.needPoint * currentNum));
+		SetLabelText(UI.LBL_CURRENT_CHANGE_NUM, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), currentNum));
+		SetLabelText(UI.LBL_NEED_POINT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), currentItem.needPoint * currentNum));
 	}
 
 	private void OnQuery_R()
@@ -100,7 +100,7 @@ public class PointShopBuy : GameSection
 	{
 		if (onBuy != null && currentNum > 0)
 		{
-			onBuy.Invoke(currentItem, currentNum);
+			onBuy(currentItem, currentNum);
 		}
 	}
 }

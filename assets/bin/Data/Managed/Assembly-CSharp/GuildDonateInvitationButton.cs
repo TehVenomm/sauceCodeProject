@@ -1,5 +1,3 @@
-using System;
-
 public class GuildDonateInvitationButton : UIBehaviour
 {
 	private enum UI
@@ -9,7 +7,7 @@ public class GuildDonateInvitationButton : UIBehaviour
 
 	protected override void OnOpen()
 	{
-		PlayTween((Enum)UI.OBJ_TWEEN, true, (EventDelegate.Callback)null, false, 0);
+		PlayTween(UI.OBJ_TWEEN, true, null, false, 0);
 		base.OnOpen();
 	}
 }

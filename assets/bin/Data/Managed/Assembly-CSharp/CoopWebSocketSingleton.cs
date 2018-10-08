@@ -236,7 +236,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 		NativeConnect(relayServer);
 	}
 
-	private unsafe void NativeConnect(string relayServer)
+	private void NativeConnect(string relayServer)
 	{
 		sock = new WebSocket(new Uri(relayServer));
 		CurrentConnectionStatus = CONNECTION_STATUS.OPENING;
@@ -247,28 +247,51 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 		WebSocket webSocket = sock;
 		webSocket.OnOpen = (Action<WebSocket>)Delegate.Combine(webSocket.OnOpen, (Action<WebSocket>)delegate(WebSocket ws)
 		{
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
 			LogDebug("OnOpen {0}", ws.InternalRequest.Uri);
 			ClearLastPacketReceivedTime();
 			isConnect = true;
 			CurrentConnectionStatus = CONNECTION_STATUS.CONNECTED;
-			packetSendTime = Time.get_time();
-			this.StartCoroutine("Heartbeat");
+			packetSendTime = Time.time;
+			StartCoroutine("Heartbeat");
 			ReceivePacketAction = (Action<CoopPacket>)Delegate.Combine(ReceivePacketAction, new Action<CoopPacket>(CheckAndSendAck));
-			this.StartCoroutine("ResendMonitor");
+			StartCoroutine("ResendMonitor");
 			ReceivePacketAction = (Action<CoopPacket>)Delegate.Combine(ReceivePacketAction, new Action<CoopPacket>(RemoveResendPacket));
 		});
 		WebSocket webSocket2 = sock;
-		webSocket2.OnBinary = Delegate.Combine((Delegate)webSocket2.OnBinary, (Delegate)new Action<WebSocket, byte[]>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		webSocket2.OnBinary = (Action<WebSocket, byte[]>)Delegate.Combine(webSocket2.OnBinary, (Action<WebSocket, byte[]>)delegate(WebSocket ws, byte[] binary)
+		{
+			ClearLastPacketReceivedTime();
+			temporaryQueue.Enqueue(new PacketStream(binary));
+		});
 		WebSocket webSocket3 = sock;
-		webSocket3.OnMessage = Delegate.Combine((Delegate)webSocket3.OnMessage, (Delegate)new Action<WebSocket, string>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		webSocket3.OnMessage = (Action<WebSocket, string>)Delegate.Combine(webSocket3.OnMessage, (Action<WebSocket, string>)delegate(WebSocket ws, string message)
+		{
+			ClearLastPacketReceivedTime();
+			temporaryQueue.Enqueue(new PacketStream(message));
+		});
 		WebSocket webSocket4 = sock;
-		webSocket4.OnClosed = Delegate.Combine((Delegate)webSocket4.OnClosed, (Delegate)new Action<WebSocket, ushort, string>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		webSocket4.OnClosed = (Action<WebSocket, ushort, string>)Delegate.Combine(webSocket4.OnClosed, (Action<WebSocket, ushort, string>)delegate(WebSocket ws, ushort code, string message)
+		{
+			OnPrepareClose(code, message);
+			temporaryQueue.Clear();
+			RemoveAllResendPackets();
+			OnCloseOccurred(code, message);
+			LogDebug("OnClosed Code {0}", code);
+			LogDebug("OnClosed Message {0}", message);
+		});
 		WebSocket webSocket5 = sock;
-		webSocket5.OnError = Delegate.Combine((Delegate)webSocket5.OnError, (Delegate)new Action<WebSocket, Exception>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		webSocket5.OnError = (Action<WebSocket, Exception>)Delegate.Combine(webSocket5.OnError, (Action<WebSocket, Exception>)delegate(WebSocket ws, Exception ex)
+		{
+			CurrentConnectionStatus = CONNECTION_STATUS.ERROR;
+			OnErrorOccurred(ex);
+			LogDebug("OnError Message {0}", ex.Message);
+			LogDebug("OnError StackTrace {0}", ex.StackTrace);
+		});
 		WebSocket webSocket6 = sock;
-		webSocket6.OnPong = Delegate.Combine((Delegate)webSocket6.OnPong, (Delegate)new Action<WebSocket, byte[]>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		webSocket6.OnPong = (Action<WebSocket, byte[]>)Delegate.Combine(webSocket6.OnPong, (Action<WebSocket, byte[]>)delegate
+		{
+			ClearLastPacketReceivedTime();
+		});
 		sock.StartPingThread = true;
 		sock.PingFrequency = 3000;
 		sock.Open();
@@ -289,7 +312,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 		{
 			if (PrepareCloseOccurred != null)
 			{
-				PrepareCloseOccurred.Invoke(code, msg);
+				PrepareCloseOccurred(code, msg);
 			}
 			ReceivePacketAction = delegate
 			{
@@ -303,7 +326,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 	{
 		if (CloseOccurred != null)
 		{
-			CloseOccurred.Invoke(code, message);
+			CloseOccurred(code, message);
 		}
 	}
 
@@ -317,7 +340,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 
 	public int Send<T>(T model, int to_id, bool promise = true) where T : Coop_Model_Base
 	{
-		return this.Send((Coop_Model_Base)model, typeof(T), to_id, promise, null, null);
+		return this.Send((Coop_Model_Base)model, typeof(T), to_id, promise, (Func<Coop_Model_ACK, bool>)null, (Func<Coop_Model_Base, bool>)null);
 	}
 
 	public int Send(Coop_Model_Base model, Type type, int to_id, bool promise = true, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null)
@@ -358,7 +381,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 		{
 			sock.Send(stream.ToString());
 		}
-		packetSendTime = Time.get_time();
+		packetSendTime = Time.time;
 	}
 
 	private void ReceivePacket(PacketStream stream)
@@ -370,7 +393,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 			{
 				if (coopPacket.model == null || coopPacket.header == null)
 				{
-					Debug.LogWarning((object)"Packet model or header is null");
+					Debug.LogWarning("Packet model or header is null");
 				}
 				else
 				{
@@ -408,7 +431,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 		LogDebug("OnHeartbeatDisconnected.");
 		if (HeartbeatDisconnected != null)
 		{
-			HeartbeatDisconnected.Invoke();
+			HeartbeatDisconnected();
 		}
 	}
 
@@ -433,7 +456,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 		packet.model.r = true;
 		ResendPacket resendPacket = new ResendPacket();
 		resendPacket.resendCount = 0;
-		resendPacket.lastSendTime = Time.get_time();
+		resendPacket.lastSendTime = Time.time;
 		resendPacket.onReceiveAck = onReceiveAck;
 		resendPacket.onPreResend = onPreResend;
 		resendPacket.packet = packet;
@@ -453,7 +476,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 					bool flag = coop_Model_ACK.positive;
 					if (resendPacket.onReceiveAck != null)
 					{
-						flag = resendPacket.onReceiveAck.Invoke(coop_Model_ACK);
+						flag = resendPacket.onReceiveAck(coop_Model_ACK);
 					}
 					if (flag)
 					{
@@ -471,7 +494,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 		{
 			if (resend.onReceiveAck != null)
 			{
-				resend.onReceiveAck.Invoke((Coop_Model_ACK)null);
+				resend.onReceiveAck(null);
 			}
 		});
 		resendPackets.Clear();
@@ -486,7 +509,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 			{
 				if (resend.onReceiveAck != null)
 				{
-					resend.onReceiveAck.Invoke((Coop_Model_ACK)null);
+					resend.onReceiveAck(null);
 				}
 				delete_keys.Add((uint)resend.packet.sequenceNo);
 				LogDebug("Remove resend packet: packet={0}", resend.packet);
@@ -504,13 +527,13 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 		{
 			while (this.IsConnected())
 			{
-				Time.get_time();
+				float time = Time.time;
 				List<uint> delete_keys = new List<uint>();
 				this.resendPackets.ForEach((Action<ResendPacket>)delegate(ResendPacket resend)
 				{
-					if (((_003CResendMonitor_003Ec__Iterator217)/*Error near IL_0058: stateMachine*/)._003Cnow_003E__0 - resend.lastSendTime > ((_003CResendMonitor_003Ec__Iterator217)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.resendInterval)
+					if (((_003CResendMonitor_003Ec__Iterator219)/*Error near IL_0058: stateMachine*/)._003Cnow_003E__0 - resend.lastSendTime > ((_003CResendMonitor_003Ec__Iterator219)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.resendInterval)
 					{
-						((_003CResendMonitor_003Ec__Iterator217)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.LogDebug("Resend packet: {0}", new object[1]
+						((_003CResendMonitor_003Ec__Iterator219)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.LogDebug("Resend packet: {0}", new object[1]
 						{
 							resend.packet
 						});
@@ -519,7 +542,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 							bool flag = true;
 							try
 							{
-								flag = resend.onPreResend.Invoke(resend.packet.model);
+								flag = resend.onPreResend(resend.packet.model);
 							}
 							catch (Exception ex)
 							{
@@ -528,30 +551,30 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 							}
 							if (!flag)
 							{
-								((_003CResendMonitor_003Ec__Iterator217)/*Error near IL_0058: stateMachine*/)._003Cdelete_keys_003E__1.Add((uint)resend.packet.sequenceNo);
-								((_003CResendMonitor_003Ec__Iterator217)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.LogDebug("Delete resend packet: sequence={0}", new object[1]
+								((_003CResendMonitor_003Ec__Iterator219)/*Error near IL_0058: stateMachine*/)._003Cdelete_keys_003E__1.Add((uint)resend.packet.sequenceNo);
+								((_003CResendMonitor_003Ec__Iterator219)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.LogDebug("Delete resend packet: sequence={0}", new object[1]
 								{
 									resend.packet.sequenceNo
 								});
 								return;
 							}
 						}
-						PacketStream stream = ((_003CResendMonitor_003Ec__Iterator217)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.serializer.Serialize(resend.packet);
-						((_003CResendMonitor_003Ec__Iterator217)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.NativeSend(stream);
-						resend.lastSendTime = ((_003CResendMonitor_003Ec__Iterator217)/*Error near IL_0058: stateMachine*/)._003Cnow_003E__0;
+						PacketStream stream = ((_003CResendMonitor_003Ec__Iterator219)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.serializer.Serialize(resend.packet);
+						((_003CResendMonitor_003Ec__Iterator219)/*Error near IL_0058: stateMachine*/)._003C_003Ef__this.NativeSend(stream);
+						resend.lastSendTime = ((_003CResendMonitor_003Ec__Iterator219)/*Error near IL_0058: stateMachine*/)._003Cnow_003E__0;
 						resend.resendCount++;
 					}
 				});
 				delete_keys.ForEach((Action<uint>)delegate(uint key)
 				{
-					((_003CResendMonitor_003Ec__Iterator217)/*Error near IL_006f: stateMachine*/)._003C_003Ef__this.resendPackets.Remove(key);
+					((_003CResendMonitor_003Ec__Iterator219)/*Error near IL_006f: stateMachine*/)._003C_003Ef__this.resendPackets.Remove(key);
 				});
 				yield return (object)new WaitForSeconds(this.resendInterval);
 			}
 		}
 		finally
 		{
-			((_003CResendMonitor_003Ec__Iterator217)/*Error near IL_00bd: stateMachine*/)._003C_003E__Finally0();
+			((_003CResendMonitor_003Ec__Iterator219)/*Error near IL_00bd: stateMachine*/)._003C_003E__Finally0();
 		}
 	}
 

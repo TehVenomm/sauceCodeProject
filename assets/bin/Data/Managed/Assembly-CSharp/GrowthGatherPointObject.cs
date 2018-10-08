@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -40,11 +39,59 @@ public class GrowthGatherPointObject : GatherPointObject
 		base.Initialize(point_data);
 	}
 
-	public unsafe override void Gather()
+	public override void Gather()
 	{
 		if (CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected())
 		{
-			MonoBehaviourSingleton<FieldManager>.I.SendFieldGather((int)base.pointData.pointID, new Action<bool, FieldGatherRewardList>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			MonoBehaviourSingleton<FieldManager>.I.SendFieldGather((int)base.pointData.pointID, delegate(bool b, FieldGatherRewardList list)
+			{
+				if (b)
+				{
+					ObjectMode = OBJECT_MODE.Rest;
+				}
+				localElapsedTime = 0f;
+				calcGrowth();
+				UpdateView();
+				if (MonoBehaviourSingleton<UIDropAnnounce>.IsValid())
+				{
+					int i = 0;
+					for (int count = list.fieldGather.accessoryItem.Count; i < count; i++)
+					{
+						QuestCompleteReward.AccessoryItem accessoryItem = list.fieldGather.accessoryItem[i];
+						bool is_rare = false;
+						MonoBehaviourSingleton<UIDropAnnounce>.I.Announce(UIDropAnnounce.DropAnnounceInfo.CreateAccessoryItemInfo((uint)accessoryItem.accessoryId, accessoryItem.num, out is_rare));
+						int se_id = 40000154;
+						SoundManager.PlayOneShotUISE(se_id);
+					}
+					int j = 0;
+					for (int count2 = list.fieldGather.skillItem.Count; j < count2; j++)
+					{
+						QuestCompleteReward.SkillItem skillItem = list.fieldGather.skillItem[j];
+						bool is_rare2 = false;
+						MonoBehaviourSingleton<UIDropAnnounce>.I.Announce(UIDropAnnounce.DropAnnounceInfo.CreateSkillItemInfo((uint)skillItem.skillItemId, skillItem.num, out is_rare2));
+						int se_id2 = 40000154;
+						SoundManager.PlayOneShotUISE(se_id2);
+					}
+					int k = 0;
+					for (int count3 = list.fieldGather.equipItem.Count; k < count3; k++)
+					{
+						QuestCompleteReward.EquipItem equipItem = list.fieldGather.equipItem[k];
+						bool is_rare3 = false;
+						MonoBehaviourSingleton<UIDropAnnounce>.I.Announce(UIDropAnnounce.DropAnnounceInfo.CreateEquipItemInfo((uint)equipItem.equipItemId, equipItem.num, out is_rare3));
+						int se_id3 = 40000154;
+						SoundManager.PlayOneShotUISE(se_id3);
+					}
+					int l = 0;
+					for (int count4 = list.fieldGather.item.Count; l < count4; l++)
+					{
+						QuestCompleteReward.Item item = list.fieldGather.item[l];
+						bool is_rare4 = false;
+						MonoBehaviourSingleton<UIDropAnnounce>.I.Announce(UIDropAnnounce.DropAnnounceInfo.CreateItemInfo((uint)item.itemId, item.num, out is_rare4));
+						int se_id4 = (!is_rare4) ? 40000153 : 40000154;
+						SoundManager.PlayOneShotUISE(se_id4);
+					}
+				}
+			});
 		}
 	}
 
@@ -52,10 +99,10 @@ public class GrowthGatherPointObject : GatherPointObject
 	{
 		if (base.pointData != null && ObjectMode != 0)
 		{
-			localTimer += Time.get_deltaTime();
+			localTimer += Time.deltaTime;
 			if (ObjectMode == OBJECT_MODE.Growth)
 			{
-				localElapsedTime += Time.get_deltaTime();
+				localElapsedTime += Time.deltaTime;
 			}
 			if (localTimer > 1f)
 			{
@@ -117,25 +164,22 @@ public class GrowthGatherPointObject : GatherPointObject
 
 	public override void UpdateView()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		if (gatherEffect != null)
+		if ((Object)gatherEffect != (Object)null)
 		{
-			gatherEffect.get_gameObject().SetActive(!base.isGathered);
+			gatherEffect.gameObject.SetActive(!base.isGathered);
 		}
-		if (modelView != null && !string.IsNullOrEmpty(base.viewData.modelHideNodeName))
+		if ((Object)modelView != (Object)null && !string.IsNullOrEmpty(base.viewData.modelHideNodeName))
 		{
-			Transform val = Utility.Find(modelView, base.viewData.modelHideNodeName);
-			if (val != null)
+			Transform transform = Utility.Find(modelView, base.viewData.modelHideNodeName);
+			if ((Object)transform != (Object)null)
 			{
 				if (ObjectMode != 0)
 				{
-					val.get_gameObject().SetActive(true);
+					transform.gameObject.SetActive(true);
 				}
 				else
 				{
-					val.get_gameObject().SetActive(false);
+					transform.gameObject.SetActive(false);
 				}
 			}
 		}
@@ -173,7 +217,7 @@ public class GrowthGatherPointObject : GatherPointObject
 			base.isGathered = true;
 		}
 		tmpGrowth.max = (int)base.pointData.maxNumRate;
-		if (gimmick != null)
+		if ((Object)gimmick != (Object)null)
 		{
 			gimmick.OnNotify(tmpGrowth);
 		}

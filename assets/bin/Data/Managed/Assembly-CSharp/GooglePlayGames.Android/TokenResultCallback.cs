@@ -16,7 +16,7 @@ namespace GooglePlayGames.Android
 		{
 			if (callback != null)
 			{
-				callback.Invoke(arg_Result_1.getStatusCode(), arg_Result_1.getAuthCode(), arg_Result_1.getEmail(), arg_Result_1.getIdToken());
+				callback(arg_Result_1.getStatusCode(), arg_Result_1.getAuthCode(), arg_Result_1.getEmail(), arg_Result_1.getIdToken());
 			}
 		}
 

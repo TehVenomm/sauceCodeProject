@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Tween/Tween Volume")]
 [RequireComponent(typeof(AudioSource))]
+[AddComponentMenu("NGUI/Tween/Tween Volume")]
 public class TweenVolume : UITweener
 {
 	[Range(0f, 1f)]
@@ -17,16 +17,16 @@ public class TweenVolume : UITweener
 	{
 		get
 		{
-			if (mSource == null)
+			if ((UnityEngine.Object)mSource == (UnityEngine.Object)null)
 			{
-				mSource = this.GetComponent<AudioSource>();
-				if (mSource == null)
+				mSource = GetComponent<AudioSource>();
+				if ((UnityEngine.Object)mSource == (UnityEngine.Object)null)
 				{
-					mSource = this.GetComponent<AudioSource>();
-					if (mSource == null)
+					mSource = GetComponent<AudioSource>();
+					if ((UnityEngine.Object)mSource == (UnityEngine.Object)null)
 					{
-						Debug.LogError((object)"TweenVolume needs an AudioSource to work with", this);
-						this.set_enabled(false);
+						Debug.LogError("TweenVolume needs an AudioSource to work with", this);
+						base.enabled = false;
 					}
 				}
 			}
@@ -51,13 +51,13 @@ public class TweenVolume : UITweener
 	{
 		get
 		{
-			return (!(audioSource != null)) ? 0f : mSource.get_volume();
+			return (!((UnityEngine.Object)audioSource != (UnityEngine.Object)null)) ? 0f : mSource.volume;
 		}
 		set
 		{
-			if (audioSource != null)
+			if ((UnityEngine.Object)audioSource != (UnityEngine.Object)null)
 			{
-				mSource.set_volume(value);
+				mSource.volume = value;
 			}
 		}
 	}
@@ -65,7 +65,7 @@ public class TweenVolume : UITweener
 	protected override void OnUpdate(float factor, bool isFinished)
 	{
 		value = from * (1f - factor) + to * factor;
-		mSource.set_enabled(mSource.get_volume() > 0.01f);
+		mSource.enabled = (mSource.volume > 0.01f);
 	}
 
 	public static TweenVolume Begin(GameObject go, float duration, float targetVolume)

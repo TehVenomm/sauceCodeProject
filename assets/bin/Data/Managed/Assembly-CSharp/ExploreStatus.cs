@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class ExploreStatus
@@ -83,23 +82,7 @@ public class ExploreStatus
 		private set;
 	}
 
-	public event Action onChangeExploreMemberList
-	{
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		add
-		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Expected O, but got Unknown
-			this.onChangeExploreMemberList = Delegate.Combine((Delegate)this.onChangeExploreMemberList, (Delegate)value);
-		}
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		remove
-		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Expected O, but got Unknown
-			this.onChangeExploreMemberList = Delegate.Remove((Delegate)this.onChangeExploreMemberList, (Delegate)value);
-		}
-	}
+	public event Action onChangeExploreMemberList;
 
 	public ExploreStatus(PartyModel.ExploreInfo exploreInfo, bool host)
 	{
@@ -123,7 +106,7 @@ public class ExploreStatus
 		int currentBossMapId = GetCurrentBossMapId();
 		if (currentBossMapId < 0)
 		{
-			int num = Random.Range(0, exploreInfo.mapIds.Count - 1);
+			int num = UnityEngine.Random.Range(0, exploreInfo.mapIds.Count - 1);
 			int item = exploreInfo.mapIds[num];
 			if (num == 0 && exploreInfo.mapIds.Count > 1)
 			{
@@ -153,7 +136,7 @@ public class ExploreStatus
 				}
 				if (list.Count > 0)
 				{
-					int index = Random.Range(0, list.Count);
+					int index = UnityEngine.Random.Range(0, list.Count);
 					int num2 = list[index];
 					int beforeBossMapId = GetBeforeBossMapId();
 					if (beforeBossMapId == num2 && list.Count > 1)
@@ -405,7 +388,7 @@ public class ExploreStatus
 
 	private ExplorePlayerStatus GetPlayerStatus(CoopClient coopClient)
 	{
-		if (Object.op_Implicit(coopClient))
+		if ((bool)coopClient)
 		{
 			return GetPlayerStatus(coopClient.userId);
 		}
@@ -444,7 +427,7 @@ public class ExploreStatus
 		playerStatuses[num] = null;
 		if (this.onChangeExploreMemberList != null)
 		{
-			this.onChangeExploreMemberList.Invoke();
+			this.onChangeExploreMemberList();
 		}
 	}
 
@@ -464,7 +447,7 @@ public class ExploreStatus
 		explorePlayerStatus.Activate(coopClient);
 		if (this.onChangeExploreMemberList != null)
 		{
-			this.onChangeExploreMemberList.Invoke();
+			this.onChangeExploreMemberList();
 		}
 	}
 
@@ -477,7 +460,7 @@ public class ExploreStatus
 	{
 		ExplorePlayerStatus playerStatus = GetPlayerStatus(coopClient);
 		Player player = coopClient.GetPlayer();
-		if (playerStatus != null && Object.op_Implicit(player))
+		if (playerStatus != null && (bool)player)
 		{
 			playerStatus.SyncFromPlayer(player);
 		}

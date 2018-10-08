@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIHGauge
+public class UIHGauge : MonoBehaviour
 {
 	public enum ANIM_PHASE
 	{
@@ -34,14 +34,13 @@ public class UIHGauge
 	}
 
 	public UIHGauge()
-		: this()
 	{
 		nowPercent = 1f;
 	}
 
 	private void Awake()
 	{
-		if (gaugeUI != null)
+		if ((Object)gaugeUI != (Object)null)
 		{
 			initialized = true;
 		}
@@ -76,7 +75,7 @@ public class UIHGauge
 	{
 		if (animPhase == ANIM_PHASE.WAIT)
 		{
-			animTime -= Time.get_deltaTime();
+			animTime -= Time.deltaTime;
 			if (animTime <= 0f)
 			{
 				animPhase = ANIM_PHASE.MOVE;
@@ -85,7 +84,7 @@ public class UIHGauge
 		}
 		else if (animPhase == ANIM_PHASE.MOVE)
 		{
-			animTime -= Time.get_deltaTime();
+			animTime -= Time.deltaTime;
 			if (animTime <= 0f)
 			{
 				animPhase = ANIM_PHASE.NONE;
@@ -97,10 +96,10 @@ public class UIHGauge
 
 	protected virtual void UpdateGauge()
 	{
-		if (Object.op_Implicit(gaugeUI))
+		if ((bool)gaugeUI)
 		{
 			gaugeUI.value = nowPercent;
-			if (gaugeEffectUI != null)
+			if ((Object)gaugeEffectUI != (Object)null)
 			{
 				float value = nowPercent;
 				if (animPhase == ANIM_PHASE.WAIT)
@@ -118,16 +117,10 @@ public class UIHGauge
 
 	public Transform GetGaugeTransform()
 	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Expected O, but got Unknown
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Expected O, but got Unknown
-		if (Object.op_Implicit(gaugeUI))
+		if ((bool)gaugeUI)
 		{
-			return gaugeUI.get_gameObject().get_transform();
+			return gaugeUI.gameObject.transform;
 		}
-		return this.get_gameObject().get_transform();
+		return base.gameObject.transform;
 	}
 }

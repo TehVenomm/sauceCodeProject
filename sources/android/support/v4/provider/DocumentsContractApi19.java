@@ -46,9 +46,9 @@ class DocumentsContractApi19 {
     }
 
     public static boolean exists(Context context, Uri uri) {
+        AutoCloseable query;
         Object e;
         Throwable th;
-        AutoCloseable query;
         try {
             query = context.getContentResolver().query(uri, new String[]{"document_id"}, null, null, null);
             try {
@@ -128,9 +128,9 @@ class DocumentsContractApi19 {
     }
 
     private static long queryForLong(Context context, Uri uri, String str, long j) {
-        AutoCloseable query;
         Object e;
         Throwable th;
+        AutoCloseable query;
         try {
             query = context.getContentResolver().query(uri, new String[]{str}, null, null, null);
             try {

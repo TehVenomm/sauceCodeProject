@@ -131,8 +131,8 @@ final class AccessTokenManager {
             final AccessTokenRefreshCallback accessTokenRefreshCallback2 = accessTokenRefreshCallback;
             graphRequestBatch.addCallback(new GraphRequestBatch.Callback() {
                 public void onBatchCompleted(GraphRequestBatch graphRequestBatch) {
-                    AccessToken accessToken;
                     Throwable th;
+                    AccessToken accessToken;
                     try {
                         if (AccessTokenManager.getInstance().getCurrentAccessToken() == null || AccessTokenManager.getInstance().getCurrentAccessToken().getUserId() != accessToken.getUserId()) {
                             if (accessTokenRefreshCallback2 != null) {

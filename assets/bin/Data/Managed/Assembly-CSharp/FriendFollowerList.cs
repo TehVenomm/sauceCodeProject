@@ -33,22 +33,22 @@ public class FriendFollowerList : FollowListBase
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_FOLLOW_NUMBER_ROOT, true);
-		SetLabelText((Enum)UI.LBL_FOLLOW_NUMBER_NOW, m_currentFollowerCount.ToString());
-		SetLabelText((Enum)UI.LBL_FOLLOW_NUMBER_MAX, m_maxFollowerCount.ToString());
+		SetActive(UI.OBJ_FOLLOW_NUMBER_ROOT, true);
+		SetLabelText(UI.LBL_FOLLOW_NUMBER_NOW, m_currentFollowerCount.ToString());
+		SetLabelText(UI.LBL_FOLLOW_NUMBER_MAX, m_maxFollowerCount.ToString());
 		ListUI();
 	}
 
-	protected unsafe override void UpdateDynamicList()
+	protected override void UpdateDynamicList()
 	{
 		FriendCharaInfo[] currentUserArray = GetCurrentUserArray();
 		if (!currentUserArray.IsNullOrEmpty())
 		{
 			int currentPageItemLength = GetCurrentPageItemLength();
 			FriendCharaInfo[] currentList = new FriendCharaInfo[currentPageItemLength];
-			for (int i = 0; i < currentPageItemLength; i++)
+			for (int j = 0; j < currentPageItemLength; j++)
 			{
-				currentList[i] = currentUserArray[nowPage * 10 + i];
+				currentList[j] = currentUserArray[nowPage * 10 + j];
 			}
 			if (GameDefine.ACTIVE_DEGREE)
 			{
@@ -56,8 +56,10 @@ public class FriendFollowerList : FollowListBase
 				component.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 			}
 			CleanItemList();
-			_003CUpdateDynamicList_003Ec__AnonStorey2F7 _003CUpdateDynamicList_003Ec__AnonStorey2F;
-			SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, currentPageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetDynamicList(UI.GRD_LIST, GetListItemName, currentPageItemLength, false, null, null, delegate(int i, Transform t, bool is_recycle)
+			{
+				SetListItem(i, t, is_recycle, currentList[i]);
+			});
 		}
 	}
 
@@ -80,14 +82,37 @@ public class FriendFollowerList : FollowListBase
 		return Mathf.FloorToInt((float)(pageIndex * 10 / m_chunkSize));
 	}
 
-	protected unsafe override void SendGetList(int page, Action<bool> callback)
+	protected override void SendGetList(int page, Action<bool> callback)
 	{
 		if (!IsConnect)
 		{
 			int chunkIndex = GetChunkIndex(page);
 			IsConnect = true;
-			_003CSendGetList_003Ec__AnonStorey2F8 _003CSendGetList_003Ec__AnonStorey2F;
-			MonoBehaviourSingleton<FriendManager>.I.SendGetFollowerList(chunkIndex, (int)m_currentSortType, new Action<bool, FriendFollowerListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			MonoBehaviourSingleton<FriendManager>.I.SendGetFollowerList(chunkIndex, (int)m_currentSortType, delegate(bool is_success, FriendFollowerListModel.Param recv_data)
+			{
+				if (is_success)
+				{
+					m_chunkSize = recv_data.chunkSize;
+					m_currentFollowerCount = recv_data.follow.Count;
+					int num = chunkIndex * m_chunkSize;
+					int i = 0;
+					for (int count = recv_data.follow.Count; i < count; i++)
+					{
+						FriendCharaInfo[] currentUserArray = GetCurrentUserArray();
+						if (currentUserArray.IsNullOrEmpty())
+						{
+							break;
+						}
+						currentUserArray[num + i] = recv_data.follow[i];
+					}
+					pageNumMax = Mathf.CeilToInt((float)m_currentFollowerCount / 10f);
+				}
+				if (callback != null)
+				{
+					callback(is_success);
+				}
+				IsConnect = false;
+			});
 		}
 	}
 

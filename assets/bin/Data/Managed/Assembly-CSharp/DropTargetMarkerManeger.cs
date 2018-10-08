@@ -47,36 +47,14 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 
 	public static void Create()
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
 		{
-			MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().AddComponent<DropTargetMarkerManeger>();
+			MonoBehaviourSingleton<AppMain>.I.mainCamera.gameObject.AddComponent<DropTargetMarkerManeger>();
 		}
 	}
 
 	protected override void Awake()
 	{
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Expected O, but got Unknown
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		active = true;
 		if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
@@ -87,24 +65,24 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 			defRot = Quaternion.Euler(param.rotOffset);
 		}
 		UpdateList();
-		if (!(drowMesh != null))
+		if (!((Object)drowMesh != (Object)null))
 		{
 			drowMesh = new Mesh();
-			drowMesh.set_vertices((Vector3[])new Vector3[4]
+			drowMesh.vertices = new Vector3[4]
 			{
 				new Vector3(0.03f, 0.03f, 0f),
 				new Vector3(-0.03f, -0.03f, 0f),
 				new Vector3(-0.03f, 0.03f, 0f),
 				new Vector3(0.03f, -0.03f, 0f)
-			});
-			drowMesh.set_uv((Vector2[])new Vector2[4]
+			};
+			drowMesh.uv = new Vector2[4]
 			{
 				new Vector2(1f, 1f),
 				new Vector2(0f, 0f),
 				new Vector2(0f, 1f),
 				new Vector2(1f, 0f)
-			});
-			drowMesh.set_triangles(new int[6]
+			};
+			drowMesh.triangles = new int[6]
 			{
 				0,
 				1,
@@ -112,7 +90,7 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 				3,
 				1,
 				0
-			});
+			};
 			drowMesh.RecalculateNormals();
 			drowMesh.RecalculateBounds();
 		}
@@ -231,7 +209,7 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 			int i = 0;
 			for (int count = targetList.Count; i < count; i++)
 			{
-				if (targetList[i].target == enemy._transform)
+				if ((Object)targetList[i].target == (Object)enemy._transform)
 				{
 					return;
 				}
@@ -257,12 +235,12 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 
 	public void CheckTarget(PortalObject portal)
 	{
-		if (!(portal == null))
+		if (!((Object)portal == (Object)null))
 		{
 			int i = 0;
 			for (int count = targetList.Count; i < count; i++)
 			{
-				if (targetList[i].target == portal._transform)
+				if ((Object)targetList[i].target == (Object)portal._transform)
 				{
 					return;
 				}
@@ -295,7 +273,7 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 			{
 				return;
 			}
-			if (!(targetList[num].target != target))
+			if (!((Object)targetList[num].target != (Object)target))
 			{
 				break;
 			}
@@ -308,56 +286,37 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 
 	private void Update()
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011e: Expected O, but got Unknown
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0273: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0293: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
 		if (active)
 		{
 			int i = 0;
 			for (int count = targetList.Count; i < count; i++)
 			{
-				if (targetList[i].target == null)
+				if ((Object)targetList[i].target == (Object)null)
 				{
 					delList.Add(targetList[i]);
 				}
-				else if (!targetList[i].target.get_gameObject().get_activeSelf())
+				else if (!targetList[i].target.gameObject.activeSelf)
 				{
 					targetList[i].active = false;
 				}
 				else
 				{
-					if (targetList[i].targetEnemy != null)
+					if ((Object)targetList[i].targetEnemy != (Object)null)
 					{
 						if (targetList[i].targetEnemy.isHiding)
 						{
 							targetList[i].active = false;
 							continue;
 						}
-						if (targetList[i].targetEnemy.uiEnemyStatusGizmo != null)
+						if ((Object)targetList[i].targetEnemy.uiEnemyStatusGizmo != (Object)null)
 						{
-							targetList[i].targetEnemy.uiEnemyStatusGizmo.SetTargetIcon(drowMaterial.get_mainTexture());
+							targetList[i].targetEnemy.uiEnemyStatusGizmo.SetTargetIcon(drowMaterial.mainTexture);
 							targetList[i].active = false;
 							continue;
 						}
 					}
-					Vector3 val = Camera.get_main().WorldToViewportPoint(targetList[i].target.get_position());
-					if (val.x < -0f || val.x > 1f || val.y < -0f || val.y > 1f)
+					Vector3 vector = Camera.main.WorldToViewportPoint(targetList[i].target.position);
+					if (vector.x < -0f || vector.x > 1f || vector.y < -0f || vector.y > 1f)
 					{
 						targetList[i].active = false;
 					}
@@ -371,9 +330,9 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 								targetList[i].initOffset = true;
 							}
 						}
-						targetList[i].pos = targetList[i].target.get_position() + targetList[i].offset + param.offset;
+						targetList[i].pos = targetList[i].target.position + targetList[i].offset + param.offset;
 						TargetInfo targetInfo = targetList[i];
-						Vector3 eulerAngles = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_eulerAngles();
+						Vector3 eulerAngles = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.eulerAngles;
 						targetInfo.rot = Quaternion.Euler(0f - eulerAngles.x, 0f, 0f) * defRot;
 						targetList[i].active = true;
 					}
@@ -391,26 +350,16 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 
 	private float CalcHight(Transform target)
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		target.GetComponentsInChildren<Collider>(Temporary.colliderList);
+		target.GetComponentsInChildren(Temporary.colliderList);
 		float num = 0f;
 		int i = 0;
 		for (int count = Temporary.colliderList.Count; i < count; i++)
 		{
-			Collider val = Temporary.colliderList[i];
-			Bounds bounds = val.get_bounds();
-			Vector3 center = bounds.get_center();
+			Collider collider = Temporary.colliderList[i];
+			Vector3 center = collider.bounds.center;
 			float y = center.y;
 			float num2 = y;
-			Bounds bounds2 = val.get_bounds();
-			Vector3 size = bounds2.get_size();
+			Vector3 size = collider.bounds.size;
 			y = num2 + size.y;
 			if (num < y)
 			{
@@ -423,9 +372,7 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 
 	public void OnPostRender()
 	{
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		if (active && !(drowMaterial == null))
+		if (active && !((Object)drowMaterial == (Object)null))
 		{
 			bool flag = false;
 			int i = 0;

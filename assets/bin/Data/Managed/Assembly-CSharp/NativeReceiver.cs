@@ -29,14 +29,14 @@ public class NativeReceiver : MonoBehaviourSingleton<NativeReceiver>
 
 	public void GCMRegistered(string RegistrationId)
 	{
-		Debug.Log((object)("============ GCMRegistered ==== " + RegistrationId));
+		Debug.Log("============ GCMRegistered ==== " + RegistrationId);
 	}
 
 	public void onAchievementUpdated(string json)
 	{
 		AchievementUpdated achievementUpdated = JSONSerializer.Deserialize<AchievementUpdated>(json);
-		Debug.Log((object)achievementUpdated.achievementId);
-		Debug.Log((object)achievementUpdated.statusCode);
+		Debug.Log(achievementUpdated.achievementId);
+		Debug.Log(achievementUpdated.statusCode);
 		if (achievementUpdated.statusCode == 0 || achievementUpdated.statusCode == 3003)
 		{
 			SendAchievementUnlock(achievementUpdated.achievementId);

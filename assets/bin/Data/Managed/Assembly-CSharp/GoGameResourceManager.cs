@@ -24,8 +24,7 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 
 	public void LoadVariantManifest()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(IELoadVariantManifest());
+		StartCoroutine(IELoadVariantManifest());
 	}
 
 	private IEnumerator IELoadVariantManifest()
@@ -37,19 +36,19 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 		string www_url = url;
 		WWW _www = new WWW(www_url);
 		yield return (object)_www;
-		string www_error = _www.get_error();
+		string www_error = _www.error;
 		if (!string.IsNullOrEmpty(www_error))
 		{
 			error_code = ((!www_error.Contains("404")) ? Error.AssetLoadFailed : Error.AssetNotFound);
 		}
-		else if (_www.get_bytes() != null)
+		else if (_www.bytes != null)
 		{
-			variantManifest = new ObjectPacker().Unpack<Dictionary<int, string>>(_www.get_bytes());
+			variantManifest = new ObjectPacker().Unpack<Dictionary<int, string>>(_www.bytes);
 		}
 		else
 		{
 			error_code = Error.AssetLoadFailed;
-			Log.Error(LOG.RESOURCE, _www.get_text());
+			Log.Error(LOG.RESOURCE, _www.text);
 		}
 		_www.Dispose();
 		switch (error_code)
@@ -98,23 +97,21 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 		return string.Empty;
 	}
 
-	public unsafe string GetFullBundleName(string bundleName)
+	public string GetFullBundleName(string bundleName)
 	{
 		string[] split = bundleName.Split('.');
-		_003CGetFullBundleName_003Ec__AnonStorey496 _003CGetFullBundleName_003Ec__AnonStorey;
-		if (!InGameManager.languageVariants.Any(new Func<string, bool>((object)_003CGetFullBundleName_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+		if (!InGameManager.languageVariants.Any((string s) => split[split.Length - 1].Equals(s)))
 		{
 			bundleName += GetVariantName(GetCategory(bundleName));
 		}
 		return bundleName;
 	}
 
-	public unsafe RESOURCE_CATEGORY? GetCategory(string fullBundleName)
+	public RESOURCE_CATEGORY? GetCategory(string fullBundleName)
 	{
 		fullBundleName = fullBundleName.ToUpper();
 		string[] names = Enum.GetNames(typeof(RESOURCE_CATEGORY));
-		_003CGetCategory_003Ec__AnonStorey497 _003CGetCategory_003Ec__AnonStorey;
-		string value = names.FirstOrDefault(new Func<string, bool>((object)_003CGetCategory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		string value = names.FirstOrDefault((string s) => fullBundleName.Contains(s + "/"));
 		if (string.IsNullOrEmpty(value))
 		{
 			return null;
@@ -122,11 +119,10 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 		return (RESOURCE_CATEGORY)(int)Enum.Parse(typeof(RESOURCE_CATEGORY), value);
 	}
 
-	public unsafe string GetBundleNameWithoutVariant(string fullBundleName)
+	public string GetBundleNameWithoutVariant(string fullBundleName)
 	{
 		string[] splits = fullBundleName.Split('.');
-		_003CGetBundleNameWithoutVariant_003Ec__AnonStorey498 _003CGetBundleNameWithoutVariant_003Ec__AnonStorey;
-		if (InGameManager.languageVariants.Any(new Func<string, bool>((object)_003CGetBundleNameWithoutVariant_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+		if (InGameManager.languageVariants.Any((string s) => splits[splits.Length - 1].Equals(s)))
 		{
 			return fullBundleName.Remove(fullBundleName.LastIndexOf("."));
 		}

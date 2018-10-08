@@ -21,15 +21,13 @@ public class UIQuestInfoArena : MonoBehaviourSingleton<UIQuestInfoArena>
 
 	private void Start()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsArena())
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(false);
 		}
 		else
 		{
-			this.get_gameObject().SetActive(true);
+			base.gameObject.SetActive(true);
 			m_inGameMgr = MonoBehaviourSingleton<InGameManager>.I;
 			m_inGameProgress = MonoBehaviourSingleton<InGameProgress>.I;
 			waveMax.text = $"/{m_inGameMgr.GetArenaWaveMax()}";

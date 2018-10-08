@@ -104,27 +104,9 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 
 	public bool IsLoadingObject => m_isLoadingObject;
 
-	protected UIPanel RootPanel => m_rootPanel ?? (m_rootPanel = this.get_transform().GetChild(0).GetComponent<UIPanel>());
+	protected UIPanel RootPanel => m_rootPanel ?? (m_rootPanel = base.transform.GetChild(0).GetComponent<UIPanel>());
 
-	protected GameObject TabRootObject
-	{
-		get
-		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Expected O, but got Unknown
-			//IL_0021: Expected O, but got Unknown
-			object obj = m_tabRootObject;
-			if (obj == null)
-			{
-				GameObject gameObject = GetCtrl(UI.HEADER_TABS).get_gameObject();
-				GameObject val = gameObject;
-				m_tabRootObject = gameObject;
-				obj = val;
-			}
-			return obj;
-		}
-	}
+	protected GameObject TabRootObject => m_tabRootObject ?? (m_tabRootObject = GetCtrl(UI.HEADER_TABS).gameObject);
 
 	protected UIPanel ScrollViewPanel => m_scrollViewPanel ?? (m_scrollViewPanel = GetCtrl(UI.SCR_LIST).GetComponent<UIPanel>());
 
@@ -142,14 +124,13 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 
 	public void Initialize(InitParam _param)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(InitCoroutine(_param));
+		StartCoroutine(InitCoroutine(_param));
 	}
 
 	private IEnumerator InitCoroutine(InitParam _param)
 	{
 		InitUI();
-		UIPanel[] panels = this.GetComponentsInChildren<UIPanel>(true);
+		UIPanel[] panels = GetComponentsInChildren<UIPanel>(true);
 		for (int j = 0; j < panels.Length; j++)
 		{
 			panels[j].depth += 6200;
@@ -244,24 +225,20 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 
 	public void UpdateAllUI(Action _action)
 	{
-		if (_action != null)
-		{
-			_action.Invoke();
-		}
+		_action?.Invoke();
 	}
 
 	public void InvokeCoroutine(IEnumerator _enumerator)
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		if (_enumerator != null)
 		{
-			this.StartCoroutine(_enumerator);
+			StartCoroutine(_enumerator);
 		}
 	}
 
 	private void SetRootAlpha(float _value)
 	{
-		if (!(RootPanel == null))
+		if (!((UnityEngine.Object)RootPanel == (UnityEngine.Object)null))
 		{
 			float alpha = Mathf.Clamp01(_value);
 			MainFramePanel.alpha = alpha;
@@ -300,7 +277,7 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 
 	private void SwitchTabRootObjActivation(bool _isActivate)
 	{
-		if (!(TabRootObject == null) && TabRootObject.get_activeSelf() != _isActivate)
+		if (!((UnityEngine.Object)TabRootObject == (UnityEngine.Object)null) && TabRootObject.activeSelf != _isActivate)
 		{
 			TabRootObject.SetActive(_isActivate);
 		}
@@ -324,11 +301,11 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 
 	private void SetTitleText(string _text)
 	{
-		if (m_titleText_Top != null)
+		if ((UnityEngine.Object)m_titleText_Top != (UnityEngine.Object)null)
 		{
 			m_titleText_Top.text = _text;
 		}
-		if (m_titleText_Bot != null)
+		if ((UnityEngine.Object)m_titleText_Bot != (UnityEngine.Object)null)
 		{
 			m_titleText_Bot.text = _text;
 		}
@@ -336,29 +313,27 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 
 	public override void UpdateUI()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 		int itemListDataCount = m_uiCtrlArray[(int)m_currentTabType].GetItemListDataCount();
 		if (itemListDataCount == 0)
 		{
-			UiGrid.get_gameObject().SetActive(false);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, true);
-			SetLabelText((Enum)UI.LBL_NOW, "0");
-			SetLabelText((Enum)UI.LBL_MAX, "0");
+			UiGrid.gameObject.SetActive(false);
+			SetActive(UI.OBJ_ACTIVE_ROOT, false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, true);
+			SetLabelText(UI.LBL_NOW, "0");
+			SetLabelText(UI.LBL_MAX, "0");
 			OnCompleteAllItemLoading(itemListDataCount);
 		}
 		else
 		{
-			UiGrid.get_gameObject().SetActive(true);
+			UiGrid.gameObject.SetActive(true);
 			bool flag = m_uiCtrlArray[(int)m_currentTabType].MaxPageNum > 1;
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
+			SetActive(UI.OBJ_ACTIVE_ROOT, flag);
+			SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
 			UpdateDynamicList();
 		}
 	}
 
-	protected unsafe void UpdateDynamicList()
+	protected void UpdateDynamicList()
 	{
 		int itemListDataCount = m_uiCtrlArray[(int)m_currentTabType].GetItemListDataCount();
 		if (GameDefine.ACTIVE_DEGREE)
@@ -370,32 +345,26 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 		string itemPrefabName = m_uiCtrlArray[(int)m_currentTabType].GetItemPrefabName();
 		int item_num = itemListDataCount;
 		ScrollItemListControllerBase obj = m_uiCtrlArray[(int)m_currentTabType];
-		SetDynamicList((Enum)grid_ctrl_enum, itemPrefabName, item_num, false, null, null, new Action<int, Transform, bool>((object)obj, (IntPtr)(void*)/*OpCode not supported: LdVirtFtn*/));
+		SetDynamicList((Enum)grid_ctrl_enum, itemPrefabName, item_num, false, null, null, obj.SetListItem);
 	}
 
 	private void OnScreenRotate(bool _isPortrait)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		Vector4 val = (!_isPortrait) ? WIDGET_ANCHOR_MAIN_FRAME_SPLIT_LANDSCAPE_SETTINGS : WIDGET_ANCHOR_MAIN_FRAME_DEFAULT_SETTINGS;
-		MainFramePanel.leftAnchor.Set(0f, val.x);
-		MainFramePanel.rightAnchor.Set(1f, val.y);
-		MainFramePanel.bottomAnchor.Set(0f, val.z);
-		MainFramePanel.topAnchor.Set(1f, val.w);
-		val = ((!_isPortrait) ? WIDGET_ANCHOR_BOT_BTN_ROOT_LANDSCAPE_SETTINGS : WIDGET_ANCHOR_BOT_BTN_ROOT_DEFAULT_SETTINGS);
-		WidgetBotButtonsRoot.leftAnchor.Set(0f, val.x);
-		WidgetBotButtonsRoot.rightAnchor.Set(1f, val.y);
-		WidgetBotButtonsRoot.bottomAnchor.Set(0f, val.z);
-		WidgetBotButtonsRoot.topAnchor.Set(0f, val.w);
+		Vector4 vector = (!_isPortrait) ? WIDGET_ANCHOR_MAIN_FRAME_SPLIT_LANDSCAPE_SETTINGS : WIDGET_ANCHOR_MAIN_FRAME_DEFAULT_SETTINGS;
+		MainFramePanel.leftAnchor.Set(0f, vector.x);
+		MainFramePanel.rightAnchor.Set(1f, vector.y);
+		MainFramePanel.bottomAnchor.Set(0f, vector.z);
+		MainFramePanel.topAnchor.Set(1f, vector.w);
+		vector = ((!_isPortrait) ? WIDGET_ANCHOR_BOT_BTN_ROOT_LANDSCAPE_SETTINGS : WIDGET_ANCHOR_BOT_BTN_ROOT_DEFAULT_SETTINGS);
+		WidgetBotButtonsRoot.leftAnchor.Set(0f, vector.x);
+		WidgetBotButtonsRoot.rightAnchor.Set(1f, vector.y);
+		WidgetBotButtonsRoot.bottomAnchor.Set(0f, vector.z);
+		WidgetBotButtonsRoot.topAnchor.Set(0f, vector.w);
 	}
 
 	public void OnClickBackButton()
 	{
-		if (!IsConnetingNetwork() && m_mainChat != null)
+		if (!IsConnetingNetwork() && (UnityEngine.Object)m_mainChat != (UnityEngine.Object)null)
 		{
 			m_mainChat.PopState();
 		}
@@ -403,7 +372,7 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 
 	public void OnClickItem()
 	{
-		if (!IsConnetingNetwork() && m_mainChat != null)
+		if (!IsConnetingNetwork() && (UnityEngine.Object)m_mainChat != (UnityEngine.Object)null)
 		{
 			m_mainChat.PopState();
 			m_mainChat.PushNextState(typeof(ChatState_PersonalMsgView));

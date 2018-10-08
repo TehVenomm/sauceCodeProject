@@ -98,20 +98,31 @@ public class GuildDonateMaterialSelectDialog : GameSection
 			itemInfo.num = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == id, 1, false);
 			itemList.Add(itemInfo);
 		});
-		SetLabelText((Enum)UI.LBL_NUMBER_REQUEST, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 34u), MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap, MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
+		SetLabelText(UI.LBL_NUMBER_REQUEST, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 34u), MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap, MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
 		SetSupportEncoding(UI.LBL_NUMBER_REQUEST, true);
 		base.Initialize();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
-		object grid_ctrl_enum = UI.GRD_INVENTORY;
-		int count = itemList.Count;
-		if (_003C_003Ef__am_0024cache5 == null)
+		SetDynamicList(UI.GRD_INVENTORY, "GuildDonateMaterialItem", itemList.Count, false, (int i) => true, null, delegate(int i, Transform t, bool is_recycre)
 		{
-			_003C_003Ef__am_0024cache5 = new Func<int, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		SetDynamicList((Enum)grid_ctrl_enum, "GuildDonateMaterialItem", count, false, _003C_003Ef__am_0024cache5, null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			GuildDonateMaterialSelectDialog guildDonateMaterialSelectDialog = this;
+			SetSprite(t, UI.SPR_RARITY_TEXT_ICON, ItemIcon.ITEM_ICON_ITEM_RARITY_ICON_SPRITE[(int)itemList[i].tableData.rarity]);
+			SetSprite(t, UI.SPR_RARITY, ItemIcon.ITEM_ICON_EQUIP_RARITY_FRAME_SPRITE[(int)itemList[i].tableData.rarity]);
+			SetLabelText(t, UI.LBL_NAME, itemList[i].tableData.name);
+			SetLabelText(t, UI.lbl_item_num, itemList[i].GetNum().ToString());
+			ResourceLoad.LoadIconTexture(this, RESOURCE_CATEGORY.ICON_ITEM, ResourceName.GetItemIcon(itemList[i].tableData.iconID), null, delegate(Texture tex)
+			{
+				guildDonateMaterialSelectDialog.SetTexture(t, UI.ICON, tex);
+			});
+			int iconBGID = ItemIcon.GetIconBGID(ITEM_ICON_TYPE.ITEM, itemList[i].tableData.iconID, itemList[i].tableData.rarity);
+			ResourceLoad.LoadIconTexture(this, RESOURCE_CATEGORY.ICON_ITEM, ResourceName.GetItemIcon(iconBGID), null, delegate(Texture tex)
+			{
+				guildDonateMaterialSelectDialog.SetTexture(t, UI.icon_bg, tex);
+			});
+			SetEvent(t, "CHOSE_MATERIAL", i);
+		});
 	}
 
 	private void OnQuery_CHOSE_MATERIAL()
@@ -131,14 +142,13 @@ public class GuildDonateMaterialSelectDialog : GameSection
 
 	private void OnCloseDialog_GuildDonateSendDialog()
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 		string s = GameSection.GetEventData() as string;
 		try
 		{
 			int num = int.Parse(s);
 			if (num > 0 && chooseIndex >= 0)
 			{
-				this.StartCoroutine(CRSendDonateRequest((int)itemList[chooseIndex].tableData.id, itemList[chooseIndex].tableData.name, string.Empty, num));
+				StartCoroutine(CRSendDonateRequest((int)itemList[chooseIndex].tableData.id, itemList[chooseIndex].tableData.name, string.Empty, num));
 				chooseIndex = -1;
 			}
 		}
@@ -148,20 +158,16 @@ public class GuildDonateMaterialSelectDialog : GameSection
 		chooseIndex = -1;
 	}
 
-	private unsafe IEnumerator CRSendDonateRequest(int itemID, string itemName, string request, int numRequest)
+	private IEnumerator CRSendDonateRequest(int itemID, string itemName, string request, int numRequest)
 	{
-		if (_003CCRSendDonateRequest_003Ec__Iterator53._003C_003Ef__am_0024cacheB == null)
-		{
-			_003CCRSendDonateRequest_003Ec__Iterator53._003C_003Ef__am_0024cacheB = new Func<bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		yield return (object)new WaitUntil(_003CCRSendDonateRequest_003Ec__Iterator53._003C_003Ef__am_0024cacheB);
+		yield return (object)new WaitUntil(() => !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible());
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest(itemID, itemName, request, numRequest, delegate(bool success)
 		{
 			GameSection.ResumeEvent(success, null);
 			if (success)
 			{
-				((_003CCRSendDonateRequest_003Ec__Iterator53)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;
+				((_003CCRSendDonateRequest_003Ec__Iterator55)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;
 			}
 		});
 	}

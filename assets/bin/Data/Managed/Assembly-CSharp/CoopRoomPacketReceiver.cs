@@ -8,8 +8,7 @@ public class CoopRoomPacketReceiver : PacketReceiver
 
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		coopRoom = this.get_gameObject().GetComponent<CoopRoom>();
+		coopRoom = base.gameObject.GetComponent<CoopRoom>();
 	}
 
 	protected override bool HandleCoopEvent(CoopPacket packet)

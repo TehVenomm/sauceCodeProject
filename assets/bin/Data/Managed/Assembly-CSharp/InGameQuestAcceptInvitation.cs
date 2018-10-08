@@ -166,22 +166,15 @@ public class InGameQuestAcceptInvitation : QuestAcceptInvitation
 		}
 	}
 
-	private unsafe void Reposition(bool isPortrait)
+	private void Reposition(bool isPortrait)
 	{
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Expected O, but got Unknown
-		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ed: Expected O, but got Unknown
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		if (!(base._transform == null))
+		if (!((UnityEngine.Object)base._transform == (UnityEngine.Object)null))
 		{
-			Transform val = Utility.Find(base._transform, "SCR_QUEST");
-			if (val != null)
+			Transform transform = Utility.Find(base._transform, "SCR_QUEST");
+			if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 			{
-				UIPanel panel = val.GetComponent<UIPanel>();
-				if (panel != null)
+				UIPanel panel = transform.GetComponent<UIPanel>();
+				if ((UnityEngine.Object)panel != (UnityEngine.Object)null)
 				{
 					if (isPortrait)
 					{
@@ -192,16 +185,19 @@ public class InGameQuestAcceptInvitation : QuestAcceptInvitation
 						panel.clipRange = new Vector4(0f, 0f, 460f, 260f);
 					}
 				}
-				UIScrollView component = val.GetComponent<UIScrollView>();
-				if (component != null)
+				UIScrollView component = transform.GetComponent<UIScrollView>();
+				if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 				{
 					component.ResetPosition();
 					AppMain i = MonoBehaviourSingleton<AppMain>.I;
-					_003CReposition_003Ec__AnonStorey3A3 _003CReposition_003Ec__AnonStorey3A;
-					i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003CReposition_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+					{
+						RefreshUI();
+						panel.Refresh();
+					});
 				}
 			}
-			UIScreenRotationHandler[] componentsInChildren = this.get_gameObject().GetComponentsInChildren<UIScreenRotationHandler>();
+			UIScreenRotationHandler[] componentsInChildren = base.gameObject.GetComponentsInChildren<UIScreenRotationHandler>();
 			for (int j = 0; j < componentsInChildren.Length; j++)
 			{
 				componentsInChildren[j].InvokeRotate();
@@ -212,15 +208,13 @@ public class InGameQuestAcceptInvitation : QuestAcceptInvitation
 
 	private void OnScreenRotate(bool isPortrait)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		if (base.transferUI != null)
+		if ((UnityEngine.Object)base.transferUI != (UnityEngine.Object)null)
 		{
-			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
 		}
-		else if (base.collectUI != null)
+		else if ((UnityEngine.Object)base.collectUI != (UnityEngine.Object)null)
 		{
-			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
 		}
 		if (!isInActiveRotate)
 		{

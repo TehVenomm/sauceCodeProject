@@ -1,20 +1,15 @@
 using UnityEngine;
 
-public class EffectInfoComponent
+public class EffectInfoComponent : MonoBehaviour
 {
 	[Tooltip("ル\u30fcプエンドによる削除設定")]
 	public bool destroyLoopEnd;
 
 	private AudioObject loopAudioObject;
 
-	public EffectInfoComponent()
-		: this()
-	{
-	}
-
 	public void SetLoopAudioObject(AudioObject ao)
 	{
-		if (loopAudioObject != null)
+		if ((Object)loopAudioObject != (Object)null)
 		{
 			loopAudioObject.Stop(0);
 		}

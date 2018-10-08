@@ -33,7 +33,7 @@ namespace MsgPack.Compiler
 			}
 			else
 			{
-				MemberInfo[] array = targetMemberSelector.Invoke(type);
+				MemberInfo[] array = targetMemberSelector(type);
 				il.EmitLd(variable);
 				il.EmitLdc(array.Length);
 				il.Emit(OpCodes.Callvirt, typeof(MsgPackWriter).GetMethod("WriteMapHeader", new Type[1]
@@ -44,7 +44,7 @@ namespace MsgPack.Compiler
 				{
 					Type memberType = memberInfo.GetMemberType();
 					il.EmitLd(variable);
-					il.EmitLdstr(memberNameFormatter.Invoke(memberInfo));
+					il.EmitLdstr(memberNameFormatter(memberInfo));
 					il.EmitLd_True();
 					il.Emit(OpCodes.Call, typeof(MsgPackWriter).GetMethod("Write", new Type[2]
 					{
@@ -98,7 +98,7 @@ namespace MsgPack.Compiler
 			il.Emit(meth: type.IsPrimitive ? typeof(MsgPackWriter).GetMethod("Write", new Type[1]
 			{
 				type
-			}) : ((currentType != type) ? lookupPackMethod.Invoke(type) : currentMethod), opcode: OpCodes.Call);
+			}) : ((currentType != type) ? lookupPackMethod(type) : currentMethod), opcode: OpCodes.Call);
 		}
 
 		public static void EmitUnpackCode(Type type, MethodInfo mi, ILGenerator il, Func<Type, MemberInfo[]> targetMemberSelector, Func<MemberInfo, string> memberNameFormatter, Func<Type, MethodInfo> lookupUnpackMethod, Func<Type, IDictionary<string, int>> lookupMemberMapping, MethodInfo lookupMemberMappingMethod)
@@ -116,11 +116,11 @@ namespace MsgPack.Compiler
 		private static void EmitUnpackMapCode(Type type, MethodInfo mi, ILGenerator il, Func<Type, MemberInfo[]> targetMemberSelector, Func<MemberInfo, string> memberNameFormatter, Func<Type, MethodInfo> lookupUnpackMethod, Func<Type, IDictionary<string, int>> lookupMemberMapping, MethodInfo lookupMemberMappingMethod)
 		{
 			MethodInfo method = typeof(PackILGenerator).GetMethod("UnpackFailed", BindingFlags.Static | BindingFlags.NonPublic);
-			MemberInfo[] array = targetMemberSelector.Invoke(type);
-			IDictionary<string, int> dictionary = lookupMemberMapping.Invoke(type);
+			MemberInfo[] array = targetMemberSelector(type);
+			IDictionary<string, int> dictionary = lookupMemberMapping(type);
 			for (int i = 0; i < array.Length; i++)
 			{
-				dictionary.Add(memberNameFormatter.Invoke(array[i]), i);
+				dictionary.Add(memberNameFormatter(array[i]), i);
 			}
 			Variable variable = Variable.CreateArg(0);
 			Variable v = Variable.CreateLocal(il.DeclareLocal(type));
@@ -173,7 +173,7 @@ namespace MsgPack.Compiler
 				il.MarkLabel(array2[k]);
 				MemberInfo memberInfo = array[k];
 				Type memberType = memberInfo.GetMemberType();
-				MethodInfo meth = lookupUnpackMethod.Invoke(memberType);
+				MethodInfo meth = lookupUnpackMethod(memberType);
 				il.EmitLd(v);
 				il.EmitLd(variable);
 				il.Emit(OpCodes.Call, meth);
@@ -218,7 +218,7 @@ namespace MsgPack.Compiler
 			}));
 			il.Emit(OpCodes.Castclass, arrayType);
 			il.EmitSt(variable2);
-			MethodInfo meth = lookupUnpackMethod.Invoke(elementType);
+			MethodInfo meth = lookupUnpackMethod(elementType);
 			Label label = il.DefineLabel();
 			Label label2 = il.DefineLabel();
 			il.EmitLdc(0);

@@ -509,8 +509,8 @@ public final class Utility {
     }
 
     public static long getContentSize(Uri uri) {
-        Cursor query;
         Throwable th;
+        Cursor query;
         try {
             query = FacebookSdk.getApplicationContext().getContentResolver().query(uri, null, null, null, null);
             try {
@@ -987,9 +987,9 @@ public final class Utility {
     }
 
     public static String readStreamToString(InputStream inputStream) throws IOException {
-        Closeable inputStreamReader;
-        Throwable th;
         Closeable bufferedInputStream;
+        Throwable th;
+        Closeable inputStreamReader;
         try {
             bufferedInputStream = new BufferedInputStream(inputStream);
             try {

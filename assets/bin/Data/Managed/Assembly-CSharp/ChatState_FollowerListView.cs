@@ -13,7 +13,7 @@ public class ChatState_FollowerListView : ChatState
 	public override void Enter(MainChat _manager)
 	{
 		base.Enter(_manager);
-		if (!(m_manager == null))
+		if (!((UnityEngine.Object)m_manager == (UnityEngine.Object)null))
 		{
 			m_manager.ExecCoroutine(InitializeCoroutine());
 		}
@@ -36,9 +36,9 @@ public class ChatState_FollowerListView : ChatState
 				yield return (object)load_queue.Wait();
 			}
 			GameObject go = lo.loadedObject as GameObject;
-			Transform newItem = ResourceUtility.Realizes(go, m_manager.get_transform(), 5);
+			Transform newItem = ResourceUtility.Realizes(go, m_manager.transform, 5);
 			m_ctrl = newItem.GetComponent<HomeVariableMemberListController>();
-			if (m_ctrl == null)
+			if ((UnityEngine.Object)m_ctrl == (UnityEngine.Object)null)
 			{
 				m_manager.PopState();
 				EndInitialize();
@@ -64,7 +64,7 @@ public class ChatState_FollowerListView : ChatState
 
 	public override Type GetNextState()
 	{
-		if (m_manager == null || !base.IsInitialized)
+		if ((UnityEngine.Object)m_manager == (UnityEngine.Object)null || !base.IsInitialized)
 		{
 			return base.GetNextState();
 		}
@@ -73,8 +73,7 @@ public class ChatState_FollowerListView : ChatState
 
 	public override void Exit()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		Object.Destroy(m_ctrl.get_gameObject());
+		UnityEngine.Object.Destroy(m_ctrl.gameObject);
 		m_ctrl = null;
 	}
 }

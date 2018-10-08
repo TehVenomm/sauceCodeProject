@@ -18,8 +18,7 @@ public class UIQuestInfoExplore : MonoBehaviourSingleton<UIQuestInfoExplore>
 
 	private void Start()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(IsEnable());
+		base.gameObject.SetActive(IsEnable());
 		timeExplore.SetActive(!IsBoss());
 		timeInBattle.SetActive(IsBoss());
 		prevExploreBossBattle = IsBoss();

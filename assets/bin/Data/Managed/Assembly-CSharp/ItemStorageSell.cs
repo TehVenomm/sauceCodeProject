@@ -91,12 +91,11 @@ public class ItemStorageSell : ItemStorageTop
 
 	private void InitializeCaption()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
-		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
-		if (component != null)
+		UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
+		if ((Object)component != (Object)null)
 		{
 			component.Reset();
 			int i = 0;

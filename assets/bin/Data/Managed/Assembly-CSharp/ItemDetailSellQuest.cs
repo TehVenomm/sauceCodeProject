@@ -1,5 +1,3 @@
-using System;
-
 public class ItemDetailSellQuest : ItemDetailSellBase
 {
 	public override void UpdateUI()
@@ -11,7 +9,7 @@ public class ItemDetailSellQuest : ItemDetailSellBase
 			if (questItem != null)
 			{
 				base.UpdateUI();
-				SetActive((Enum)UI.OBJ_MONEY_ROOT, false);
+				SetActive(UI.OBJ_MONEY_ROOT, false);
 			}
 		}
 	}

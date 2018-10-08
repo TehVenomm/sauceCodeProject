@@ -1,5 +1,4 @@
 using Network;
-using System;
 
 public class CrystalShopSpecialSold : GameSection
 {
@@ -22,7 +21,7 @@ public class CrystalShopSpecialSold : GameSection
 	{
 		if (_productData != null)
 		{
-			SetLabelText((Enum)UI.LBL_DAY, string.Format(base.sectionData.GetText("DAY"), _productData.remainingDay));
+			SetLabelText(UI.LBL_DAY, string.Format(base.sectionData.GetText("DAY"), _productData.remainingDay));
 		}
 	}
 

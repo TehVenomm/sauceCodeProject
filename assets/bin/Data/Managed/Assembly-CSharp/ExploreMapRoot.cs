@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class ExploreMapRoot
+public class ExploreMapRoot : MonoBehaviour
 {
 	[SerializeField]
 	private float _portraitScale = 1f;
@@ -72,17 +72,6 @@ public class ExploreMapRoot
 		private set;
 	}
 
-	public ExploreMapRoot()
-		: this()
-	{
-	}//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-	//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-	//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-
-
 	public ExploreMapLocation FindLocation(int id)
 	{
 		return Array.Find(locations, (ExploreMapLocation l) => l.mapId == id);
@@ -90,43 +79,36 @@ public class ExploreMapRoot
 
 	public Transform FindPortalNode(int mapId0, int mapId1)
 	{
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Expected O, but got Unknown
 		ExploreMapLocation exploreMapLocation = FindLocation(mapId0);
 		ExploreMapLocation exploreMapLocation2 = FindLocation(mapId1);
-		if (null == exploreMapLocation || null == exploreMapLocation2)
+		if ((UnityEngine.Object)null == (UnityEngine.Object)exploreMapLocation || (UnityEngine.Object)null == (UnityEngine.Object)exploreMapLocation2)
 		{
 			return null;
 		}
-		int locationIndex = GetLocationIndex(exploreMapLocation.get_name());
-		int locationIndex2 = GetLocationIndex(exploreMapLocation2.get_name());
+		int locationIndex = GetLocationIndex(exploreMapLocation.name);
+		int locationIndex2 = GetLocationIndex(exploreMapLocation2.name);
 		int num = Mathf.Min(locationIndex, locationIndex2);
 		int num2 = Mathf.Max(locationIndex, locationIndex2);
 		string str = "Portal" + num.ToString() + "_" + num2.ToString();
-		return this.get_transform().FindChild("Road/" + str);
+		return base.transform.FindChild("Road/" + str);
 	}
 
 	public Transform FindNode(int mapId, out Vector3 offset, out bool isBattle)
 	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Expected O, but got Unknown
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Expected O, but got Unknown
-		offset._002Ector(0f, 0f, 0f);
+		offset = new Vector3(0f, 0f, 0f);
 		isBattle = false;
 		ExploreMapLocation exploreMapLocation = FindLocation(mapId);
-		if (null != exploreMapLocation)
+		if ((UnityEngine.Object)null != (UnityEngine.Object)exploreMapLocation)
 		{
-			return exploreMapLocation.get_transform();
+			return exploreMapLocation.transform;
 		}
 		if (MonoBehaviourSingleton<QuestManager>.I.GetExploreBossBatlleMapId() == mapId)
 		{
 			isBattle = true;
 			exploreMapLocation = FindLocation(MonoBehaviourSingleton<QuestManager>.I.GetExploreBossAppearMapId());
-			if (exploreMapLocation != null)
+			if ((UnityEngine.Object)exploreMapLocation != (UnityEngine.Object)null)
 			{
-				return exploreMapLocation.get_transform();
+				return exploreMapLocation.transform;
 			}
 		}
 		return null;
@@ -134,24 +116,18 @@ public class ExploreMapRoot
 
 	public void UpdatePortals(bool isMiniMap)
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < portals.Length; i++)
 		{
-			Transform val = portals[i];
-			string name = val.get_name();
+			Transform transform = portals[i];
+			string name = transform.name;
 			FieldMapTable.PortalTableData portalData = GetPortalData(name);
 			if (portalData != null)
 			{
-				val.get_gameObject().SetActive(true);
-				UITexture[] componentsInChildren = val.GetComponentsInChildren<UITexture>();
+				transform.gameObject.SetActive(true);
+				UITexture[] componentsInChildren = transform.GetComponentsInChildren<UITexture>();
 				if (componentsInChildren == null || componentsInChildren.Length == 0)
 				{
-					val.get_gameObject().SetActive(false);
+					transform.gameObject.SetActive(false);
 				}
 				else if (MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledPortal(portalData.portalID))
 				{
@@ -164,7 +140,7 @@ public class ExploreMapRoot
 				else
 				{
 					componentsInChildren[0].color = unusedColor;
-					val.get_gameObject().SetActive(isMiniMap);
+					transform.gameObject.SetActive(isMiniMap);
 				}
 			}
 		}
@@ -172,12 +148,6 @@ public class ExploreMapRoot
 
 	public void SetMarkers(Transform[] markers, bool isMiniMap)
 	{
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Expected O, but got Unknown
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 		int[] exploreDisplayIndices = MonoBehaviourSingleton<QuestManager>.I.GetExploreDisplayIndices();
 		for (int i = 0; i < markers.Length; i++)
 		{
@@ -185,23 +155,23 @@ public class ExploreMapRoot
 			int exploreMapId = MonoBehaviourSingleton<QuestManager>.I.GetExploreMapId(i);
 			if (0 <= exploreMapId)
 			{
-				Transform val = markers[num];
+				Transform transform = markers[num];
 				Vector3 offset;
 				bool isBattle;
-				Transform val2 = FindNode(exploreMapId, out offset, out isBattle);
-				if (null != val2)
+				Transform transform2 = FindNode(exploreMapId, out offset, out isBattle);
+				if ((UnityEngine.Object)null != (UnityEngine.Object)transform2)
 				{
-					val.get_gameObject().SetActive(true);
-					Utility.Attach(val2, val.get_transform());
+					transform.gameObject.SetActive(true);
+					Utility.Attach(transform2, transform.transform);
 					if (isMiniMap)
 					{
-						val.GetComponent<ExplorePlayerMarkerMini>().SetIndex(num);
+						transform.GetComponent<ExplorePlayerMarkerMini>().SetIndex(num);
 					}
 					else
 					{
-						val.GetComponent<ExplorePlayerMarker>().SetIndex(num);
+						transform.GetComponent<ExplorePlayerMarker>().SetIndex(num);
 					}
-					val.set_localPosition(val.get_localPosition() + offset);
+					transform.localPosition += offset;
 					showBattleMarker |= isBattle;
 				}
 			}
@@ -210,21 +180,18 @@ public class ExploreMapRoot
 
 	public Vector3 GetPositionOnMap(int mapId)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		if (mapId < 0)
 		{
-			return Vector3.get_zero();
+			return Vector3.zero;
 		}
 		Vector3 offset;
 		bool isBattle;
-		Transform val = FindNode(mapId, out offset, out isBattle);
-		if (val == null)
+		Transform transform = FindNode(mapId, out offset, out isBattle);
+		if ((UnityEngine.Object)transform == (UnityEngine.Object)null)
 		{
-			return Vector3.get_zero();
+			return Vector3.zero;
 		}
-		return val.get_localPosition();
+		return transform.localPosition;
 	}
 
 	private static int GetLocationIndex(string name)
@@ -364,12 +331,9 @@ public class ExploreMapRoot
 
 	public Vector2 GetSonarScale()
 	{
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 		{
-			return Vector2.get_one();
+			return Vector2.one;
 		}
 		return (!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait) ? _landscaleSonarScale : _portraitSonarScale;
 	}

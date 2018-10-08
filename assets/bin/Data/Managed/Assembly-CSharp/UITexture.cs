@@ -13,17 +13,17 @@ public class UITexture : UIBasicSprite
 	[SerializeField]
 	private Texture mTexture;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Material mMat;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Shader mShader;
 
-	[SerializeField]
 	[HideInInspector]
-	private Vector4 mBorder = Vector4.get_zero();
+	[SerializeField]
+	private Vector4 mBorder = Vector4.zero;
 
 	[HideInInspector]
 	[SerializeField]
@@ -36,23 +36,21 @@ public class UITexture : UIBasicSprite
 	{
 		get
 		{
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Expected O, but got Unknown
-			if (mTexture != null)
+			if ((UnityEngine.Object)mTexture != (UnityEngine.Object)null)
 			{
 				return mTexture;
 			}
-			if (mMat != null)
+			if ((UnityEngine.Object)mMat != (UnityEngine.Object)null)
 			{
-				return mMat.get_mainTexture();
+				return mMat.mainTexture;
 			}
 			return null;
 		}
 		set
 		{
-			if (mTexture != value)
+			if ((UnityEngine.Object)mTexture != (UnityEngine.Object)value)
 			{
-				if (drawCall != null && drawCall.widgetCount == 1 && mMat == null)
+				if ((UnityEngine.Object)drawCall != (UnityEngine.Object)null && drawCall.widgetCount == 1 && (UnityEngine.Object)mMat == (UnityEngine.Object)null)
 				{
 					mTexture = value;
 					drawCall.mainTexture = value;
@@ -76,7 +74,7 @@ public class UITexture : UIBasicSprite
 		}
 		set
 		{
-			if (mMat != value)
+			if ((UnityEngine.Object)mMat != (UnityEngine.Object)value)
 			{
 				RemoveFromPanel();
 				mShader = null;
@@ -91,15 +89,11 @@ public class UITexture : UIBasicSprite
 	{
 		get
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Expected O, but got Unknown
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Expected O, but got Unknown
-			if (mMat != null)
+			if ((UnityEngine.Object)mMat != (UnityEngine.Object)null)
 			{
-				return mMat.get_shader();
+				return mMat.shader;
 			}
-			if (mShader == null)
+			if ((UnityEngine.Object)mShader == (UnityEngine.Object)null)
 			{
 				mShader = Shader.Find("Unlit/Transparent Colored");
 			}
@@ -107,9 +101,9 @@ public class UITexture : UIBasicSprite
 		}
 		set
 		{
-			if (mShader != value)
+			if ((UnityEngine.Object)mShader != (UnityEngine.Object)value)
 			{
-				if (drawCall != null && drawCall.widgetCount == 1 && mMat == null)
+				if ((UnityEngine.Object)drawCall != (UnityEngine.Object)null && drawCall.widgetCount == 1 && (UnityEngine.Object)mMat == (UnityEngine.Object)null)
 				{
 					mShader = value;
 					drawCall.shader = value;
@@ -130,12 +124,10 @@ public class UITexture : UIBasicSprite
 	{
 		get
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			if (mPMA == -1)
 			{
 				Material material = this.material;
-				mPMA = ((material != null && material.get_shader() != null && material.get_shader().get_name().Contains("Premultiplied")) ? 1 : 0);
+				mPMA = (((UnityEngine.Object)material != (UnityEngine.Object)null && (UnityEngine.Object)material.shader != (UnityEngine.Object)null && material.shader.name.Contains("Premultiplied")) ? 1 : 0);
 			}
 			return mPMA == 1;
 		}
@@ -145,15 +137,10 @@ public class UITexture : UIBasicSprite
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			return mBorder;
 		}
 		set
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			if (mBorder != value)
 			{
 				mBorder = value;
@@ -166,15 +153,10 @@ public class UITexture : UIBasicSprite
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			return mRect;
 		}
 		set
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			if (mRect != value)
 			{
 				mRect = value;
@@ -187,20 +169,15 @@ public class UITexture : UIBasicSprite
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
 			Vector2 pivotOffset = base.pivotOffset;
 			float num = (0f - pivotOffset.x) * (float)mWidth;
 			float num2 = (0f - pivotOffset.y) * (float)mHeight;
 			float num3 = num + (float)mWidth;
 			float num4 = num2 + (float)mHeight;
-			if (mTexture != null && mType != Type.Tiled)
+			if ((UnityEngine.Object)mTexture != (UnityEngine.Object)null && mType != Type.Tiled)
 			{
-				int width = mTexture.get_width();
-				int height = mTexture.get_height();
+				int width = mTexture.width;
+				int height = mTexture.height;
 				int num5 = 0;
 				int num6 = 0;
 				float num7 = 1f;
@@ -248,11 +225,11 @@ public class UITexture : UIBasicSprite
 				num9 = border.x + border.z;
 				num10 = border.y + border.w;
 			}
-			float num11 = Mathf.Lerp(num, num3 - num9, mDrawRegion.x);
-			float num12 = Mathf.Lerp(num2, num4 - num10, mDrawRegion.y);
-			float num13 = Mathf.Lerp(num + num9, num3, mDrawRegion.z);
-			float num14 = Mathf.Lerp(num2 + num10, num4, mDrawRegion.w);
-			return new Vector4(num11, num12, num13, num14);
+			float x = Mathf.Lerp(num, num3 - num9, mDrawRegion.x);
+			float y = Mathf.Lerp(num2, num4 - num10, mDrawRegion.y);
+			float z = Mathf.Lerp(num + num9, num3, mDrawRegion.z);
+			float w = Mathf.Lerp(num2 + num10, num4, mDrawRegion.w);
+			return new Vector4(x, y, z, w);
 		}
 	}
 
@@ -264,8 +241,6 @@ public class UITexture : UIBasicSprite
 		}
 		set
 		{
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			if (mFixedAspect != value)
 			{
 				mFixedAspect = value;
@@ -281,10 +256,10 @@ public class UITexture : UIBasicSprite
 		if (mType != Type.Tiled)
 		{
 			Texture mainTexture = this.mainTexture;
-			if (!(mainTexture == null) && (mType == Type.Simple || mType == Type.Filled || !base.hasBorder) && mainTexture != null)
+			if (!((UnityEngine.Object)mainTexture == (UnityEngine.Object)null) && (mType == Type.Simple || mType == Type.Filled || !base.hasBorder) && (UnityEngine.Object)mainTexture != (UnityEngine.Object)null)
 			{
-				int num = mainTexture.get_width();
-				int num2 = mainTexture.get_height();
+				int num = mainTexture.width;
+				int num2 = mainTexture.height;
 				if ((num & 1) == 1)
 				{
 					num++;
@@ -301,16 +276,14 @@ public class UITexture : UIBasicSprite
 
 	protected override void OnUpdate()
 	{
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
 		base.OnUpdate();
 		if (mFixedAspect)
 		{
 			Texture mainTexture = this.mainTexture;
-			if (mainTexture != null)
+			if ((UnityEngine.Object)mainTexture != (UnityEngine.Object)null)
 			{
-				int num = mainTexture.get_width();
-				int num2 = mainTexture.get_height();
+				int num = mainTexture.width;
+				int num2 = mainTexture.height;
 				if ((num & 1) == 1)
 				{
 					num++;
@@ -339,35 +312,28 @@ public class UITexture : UIBasicSprite
 
 	public override void OnFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
 		Texture mainTexture = this.mainTexture;
-		if (!(mainTexture == null))
+		if (!((UnityEngine.Object)mainTexture == (UnityEngine.Object)null))
 		{
-			Rect val = default(Rect);
-			val._002Ector(mRect.get_x() * (float)mainTexture.get_width(), mRect.get_y() * (float)mainTexture.get_height(), (float)mainTexture.get_width() * mRect.get_width(), (float)mainTexture.get_height() * mRect.get_height());
-			Rect inner = val;
+			Rect rect = new Rect(mRect.x * (float)mainTexture.width, mRect.y * (float)mainTexture.height, (float)mainTexture.width * mRect.width, (float)mainTexture.height * mRect.height);
+			Rect inner = rect;
 			Vector4 border = this.border;
-			inner.set_xMin(inner.get_xMin() + border.x);
-			inner.set_yMin(inner.get_yMin() + border.y);
-			inner.set_xMax(inner.get_xMax() - border.z);
-			inner.set_yMax(inner.get_yMax() - border.w);
-			float num = 1f / (float)mainTexture.get_width();
-			float num2 = 1f / (float)mainTexture.get_height();
-			val.set_xMin(val.get_xMin() * num);
-			val.set_xMax(val.get_xMax() * num);
-			val.set_yMin(val.get_yMin() * num2);
-			val.set_yMax(val.get_yMax() * num2);
-			inner.set_xMin(inner.get_xMin() * num);
-			inner.set_xMax(inner.get_xMax() * num);
-			inner.set_yMin(inner.get_yMin() * num2);
-			inner.set_yMax(inner.get_yMax() * num2);
+			inner.xMin += border.x;
+			inner.yMin += border.y;
+			inner.xMax -= border.z;
+			inner.yMax -= border.w;
+			float num = 1f / (float)mainTexture.width;
+			float num2 = 1f / (float)mainTexture.height;
+			rect.xMin *= num;
+			rect.xMax *= num;
+			rect.yMin *= num2;
+			rect.yMax *= num2;
+			inner.xMin *= num;
+			inner.xMax *= num;
+			inner.yMin *= num2;
+			inner.yMax *= num2;
 			int size = verts.size;
-			Fill(verts, uvs, cols, val, inner);
+			Fill(verts, uvs, cols, rect, inner);
 			if (onPostFill != null)
 			{
 				onPostFill(this, size, verts, uvs, cols);

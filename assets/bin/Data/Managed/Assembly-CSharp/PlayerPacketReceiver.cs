@@ -16,59 +16,6 @@ public class PlayerPacketReceiver : CharacterPacketReceiver
 
 	protected override bool HandleCoopEvent(CoopPacket packet)
 	{
-		//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_039f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0529: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0573: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0700: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0903: Unknown result type (might be due to invalid IL or missing references)
-		//IL_093b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_096f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a05: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a3d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a63: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a9b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ad1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ad8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b19: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b33: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b3a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ea6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ef8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0f35: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0f86: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0fd1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ff7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1141: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_114b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1162: Unknown result type (might be due to invalid IL or missing references)
-		//IL_119a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_11d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1261: Unknown result type (might be due to invalid IL or missing references)
-		//IL_12b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_12e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1313: Unknown result type (might be due to invalid IL or missing references)
-		//IL_132c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1483: Unknown result type (might be due to invalid IL or missing references)
-		//IL_14af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_1518: Unknown result type (might be due to invalid IL or missing references)
 		switch (packet.packetType)
 		{
 		case PACKET_TYPE.PLAYER_LOAD_COMPLETE:
@@ -76,7 +23,7 @@ public class PlayerPacketReceiver : CharacterPacketReceiver
 			{
 				return false;
 			}
-			if (player.playerSender != null)
+			if ((Object)player.playerSender != (Object)null)
 			{
 				player.playerSender.OnRecvLoadComplete(packet.fromClientId);
 			}
@@ -104,7 +51,7 @@ public class PlayerPacketReceiver : CharacterPacketReceiver
 				MonoBehaviourSingleton<InGameRecorder>.I.ApplySyncOwnerData(model50.id);
 			}
 			MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(player);
-			player.get_gameObject().SetActive(true);
+			player.gameObject.SetActive(true);
 			SetFilterMode(FILTER_MODE.NONE);
 			player.isCoopInitialized = true;
 			player.SetAppearPos(player._position);
@@ -122,10 +69,10 @@ public class PlayerPacketReceiver : CharacterPacketReceiver
 				flag = true;
 			}
 			CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(packet.fromClientId);
-			if (coopClient != null && !coopClient.IsBattleStart())
+			if ((Object)coopClient != (Object)null && !coopClient.IsBattleStart())
 			{
 				player.WaitBattleStart();
-				player.get_gameObject().SetActive(false);
+				player.gameObject.SetActive(false);
 				MonoBehaviourSingleton<StageObjectManager>.I.AddCacheObject(player);
 			}
 			else if (flag)
@@ -169,7 +116,7 @@ public class PlayerPacketReceiver : CharacterPacketReceiver
 			}
 			Coop_Model_PlayerAttackCombo model28 = packet.GetModel<Coop_Model_PlayerAttackCombo>();
 			base.owner._position = model28.pos;
-			base.owner._rotation = Quaternion.AngleAxis(model28.dir, Vector3.get_up());
+			base.owner._rotation = Quaternion.AngleAxis(model28.dir, Vector3.up);
 			player.ActAttack(_motionLayerName: model28.motionLayerName, id: model28.attack_id, send_packet: true, sync_immediately: false);
 			player.SetActionPosition(model28.act_pos, model28.act_pos_f);
 			break;
@@ -184,7 +131,7 @@ public class PlayerPacketReceiver : CharacterPacketReceiver
 			player.ApplySyncExRush(model32.isExRushCharge);
 			player.ApplySyncPosition(model32.pos, model32.dir, false);
 			player.SetChargeRelease(model32.charge_rate);
-			player.SetLerpRotation(Quaternion.AngleAxis(model32.lerp_dir, Vector3.get_up()) * Vector3.get_forward());
+			player.SetLerpRotation(Quaternion.AngleAxis(model32.lerp_dir, Vector3.up) * Vector3.forward);
 			player.SetActionPosition(model32.act_pos, model32.act_pos_f);
 			break;
 		}
@@ -297,7 +244,7 @@ public class PlayerPacketReceiver : CharacterPacketReceiver
 					}
 				}
 			}
-			if (gatherPointObject != null)
+			if ((Object)gatherPointObject != (Object)null)
 			{
 				player.ApplySyncPosition(model30.pos, model30.dir, false);
 				player.ActGather(gatherPointObject);
@@ -593,7 +540,7 @@ public class PlayerPacketReceiver : CharacterPacketReceiver
 			Coop_Model_PlayerChargeExpandRelease model40 = packet.GetModel<Coop_Model_PlayerChargeExpandRelease>();
 			player.ApplySyncPosition(model40.pos, model40.dir, false);
 			player.SetChargeExpandRelease(model40.charge_rate);
-			player.SetLerpRotation(Quaternion.AngleAxis(model40.lerp_dir, Vector3.get_up()) * Vector3.get_forward());
+			player.SetLerpRotation(Quaternion.AngleAxis(model40.lerp_dir, Vector3.up) * Vector3.forward);
 			player.SetActionPosition(model40.act_pos, model40.act_pos_f);
 			break;
 		}
@@ -763,7 +710,7 @@ public class PlayerPacketReceiver : CharacterPacketReceiver
 		if (QuestManager.IsValidInGameExplore())
 		{
 			CoopClient coopClient2 = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(packet.fromClientId);
-			if (coopClient2 != null)
+			if ((Object)coopClient2 != (Object)null)
 			{
 				MonoBehaviourSingleton<QuestManager>.I.UpdateExplorePlayerStatus(coopClient2);
 			}

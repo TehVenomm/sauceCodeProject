@@ -722,7 +722,7 @@ public class CSVReader
 
 	public PopResult PopColor24(ref Color32 value)
 	{
-		value._002Ector(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
+		value = new Color32(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
 		PopResult a = Pop(ref value.r);
 		PopResult a2 = Pop(ref value.g);
 		PopResult a3 = Pop(ref value.b);

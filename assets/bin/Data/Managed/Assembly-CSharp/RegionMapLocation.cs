@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RegionMapLocation
+public class RegionMapLocation : MonoBehaviour
 {
 	[SerializeField]
 	private int _mapId;
@@ -48,10 +48,5 @@ public class RegionMapLocation
 		{
 			_icon = value;
 		}
-	}
-
-	public RegionMapLocation()
-		: this()
-	{
 	}
 }

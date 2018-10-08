@@ -2,6 +2,7 @@ using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GuildMemberList : GameSection
@@ -52,11 +53,10 @@ public class GuildMemberList : GameSection
 
 	public override void Initialize()
 	{
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		SetActive((Enum)UI.OBJ_GUILD_NUMBER_ROOT, false);
+		SetActive(UI.OBJ_GUILD_NUMBER_ROOT, false);
 		MonoBehaviourSingleton<ChatManager>.I.clanChat.onJoin += OnJoinClanChat;
 		MonoBehaviourSingleton<ChatManager>.I.clanChat.onLeave += OnLeaveClanChat;
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	protected override void OnDestroy()
@@ -69,10 +69,13 @@ public class GuildMemberList : GameSection
 		}
 	}
 
-	private unsafe IEnumerator DoInitialize()
+	private IEnumerator DoInitialize()
 	{
 		bool is_finish = false;
-		GetListItem(new Action<bool, object>((object)/*Error near IL_002e: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		GetListItem(delegate
+		{
+			((_003CDoInitialize_003Ec__Iterator56)/*Error near IL_002e: stateMachine*/)._003Cis_finish_003E__0 = true;
+		});
 		while (!is_finish)
 		{
 			yield return (object)null;
@@ -80,30 +83,67 @@ public class GuildMemberList : GameSection
 		base.Initialize();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_GUILD_NUMBER_ROOT, true);
+		SetActive(UI.OBJ_GUILD_NUMBER_ROOT, true);
 		SetLabelText(UI.LBL_GUILD_NUMBER_MAX, allMember.Count);
 		if (allMember == null || allMember.Count == 0)
 		{
-			SetActive((Enum)UI.STR_NON_LIST, true);
-			SetActive((Enum)UI.GRD_LIST, false);
+			SetActive(UI.STR_NON_LIST, true);
+			SetActive(UI.GRD_LIST, false);
 		}
 		else
 		{
 			int online_count = 0;
-			_003CUpdateUI_003Ec__AnonStorey30E _003CUpdateUI_003Ec__AnonStorey30E;
-			SetDynamicList((Enum)UI.GRD_LIST, "GuildMemberListItem", allMember.Count, true, null, null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey30E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-			SetLabelText((Enum)UI.LBL_GUILD_NUMBER_NOW, online_count.ToString());
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			SetActive((Enum)UI.GRD_LIST, true);
+			SetDynamicList(UI.GRD_LIST, "GuildMemberListItem", allMember.Count, true, null, null, delegate(int i, Transform t, bool is_recycle)
+			{
+				FriendCharaInfo member = allMember[i];
+				bool flag = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(member.userId);
+				SetActive(t, UI.SPR_BLACKLIST_ICON, flag);
+				SetActive(t, UI.SPR_FOLLOW, !flag && member.following);
+				SetActive(t, UI.SPR_FOLLOWER, !flag && member.follower);
+				SetActive(t, UI.SPR_ICON_FIRST_MET, false);
+				SetCharaInfo(member, i, t, is_recycle, 0 == member.userId);
+				bool flag2 = status.Any((int st) => st == member.userId);
+				if (flag2)
+				{
+					online_count++;
+				}
+				if (requestMembers.Contains(member))
+				{
+					SetActive(t, UI.OBJ_OFFLINE_MASK, false);
+				}
+				else
+				{
+					SetActive(t, UI.OBJ_OFFLINE_MASK, !flag2);
+				}
+				SetActive(t, UI.OBJ_REQUEST_PENDING, requestMembers.Contains(member));
+				SetListItem(i, t, ListItemEvent, member);
+			});
+			SetLabelText(UI.LBL_GUILD_NUMBER_NOW, online_count.ToString());
+			SetActive(UI.STR_NON_LIST, false);
+			SetActive(UI.GRD_LIST, true);
 		}
 	}
 
-	protected unsafe virtual void GetListItem(Action<bool, object> callback)
+	protected virtual void GetListItem(Action<bool, object> callback)
 	{
-		_003CGetListItem_003Ec__AnonStorey30F _003CGetListItem_003Ec__AnonStorey30F;
-		MonoBehaviourSingleton<GuildManager>.I.SendMemberList(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId, new Action<bool, GuildMemberListModel>((object)_003CGetListItem_003Ec__AnonStorey30F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<GuildManager>.I.SendMemberList(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId, delegate(bool success, GuildMemberListModel ret)
+		{
+			allMember = new List<FriendCharaInfo>();
+			members = new List<FriendCharaInfo>(ret.result.list);
+			members.Remove(members.FirstOrDefault((FriendCharaInfo o) => o.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id));
+			requestMembers = new List<FriendCharaInfo>(ret.result.requesters);
+			requestMembers.Remove(requestMembers.FirstOrDefault((FriendCharaInfo o) => o.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id));
+			allMember.AddRange(requestMembers);
+			allMember.AddRange(members);
+			MonoBehaviourSingleton<GuildManager>.I.SendClanChatOnlineStatus(delegate(bool is_success, List<GuildMemberChatStatus> list)
+			{
+				status = (from o in list
+				select o.id).ToList();
+				callback(is_success, null);
+			});
+		});
 	}
 
 	protected virtual void SetListItem(int i, Transform t, string event_name, FriendCharaInfo member)
@@ -113,10 +153,6 @@ public class GuildMemberList : GameSection
 
 	protected void SetCharaInfo(FriendCharaInfo data, int i, Transform t, bool is_recycle, bool isGM)
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
 		if (isGM)
 		{
 			SetRenderNPCModel(t, UI.TEX_MODEL, 0, new Vector3(0f, -1.49f, 1.87f), new Vector3(0f, 154f, 0f), 10f, null);
@@ -179,19 +215,14 @@ public class GuildMemberList : GameSection
 
 	protected void OnQuery_GUILD_INFO()
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Expected O, but got Unknown
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
 		memberInfoData = (FriendCharaInfo)GameSection.GetEventData();
 		SetButton();
 		GameObject sender = GameSceneEvent.current.sender;
-		FindCtrl(base._transform, UI.SPR_GUILD_INFO).SetParent(FindCtrl(sender.get_transform(), UI.OBJ_GUILD_INFO));
-		FindCtrl(base._transform, UI.SPR_GUILD_INFO).set_localPosition(Vector3.get_zero());
-		FindCtrl(base._transform, UI.SPR_GUILD_INFO).set_localScale(Vector3.get_one());
-		Transform val = FindCtrl(base._transform, UI.SPR_GUILD_INFO);
-		SetActive(base._transform, UI.SPR_GUILD_INFO, !val.get_gameObject().get_activeSelf());
+		FindCtrl(base._transform, UI.SPR_GUILD_INFO).SetParent(FindCtrl(sender.transform, UI.OBJ_GUILD_INFO));
+		FindCtrl(base._transform, UI.SPR_GUILD_INFO).localPosition = Vector3.zero;
+		FindCtrl(base._transform, UI.SPR_GUILD_INFO).localScale = Vector3.one;
+		Transform transform = FindCtrl(base._transform, UI.SPR_GUILD_INFO);
+		SetActive(base._transform, UI.SPR_GUILD_INFO, !transform.gameObject.activeSelf);
 	}
 
 	private void SetButton()
@@ -222,35 +253,35 @@ public class GuildMemberList : GameSection
 		SetActive(base._transform, UI.SPR_GUILD_INFO, false);
 	}
 
-	private unsafe void OnQuery_MEMBER_ACCEPT()
+	private void OnQuery_MEMBER_ACCEPT()
 	{
 		SetActive(base._transform, UI.SPR_GUILD_INFO, false);
 		GameSection.StayEvent();
 		if (memberInfoData != null)
 		{
-			GuildManager i = MonoBehaviourSingleton<GuildManager>.I;
-			int requestId = memberInfoData.requestId;
-			if (_003C_003Ef__am_0024cache5 == null)
+			MonoBehaviourSingleton<GuildManager>.I.SendAdminJoin(memberInfoData.requestId, 1, delegate(bool is_success, Error err)
 			{
-				_003C_003Ef__am_0024cache5 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			i.SendAdminJoin(requestId, 1, _003C_003Ef__am_0024cache5);
+				MonoBehaviourSingleton<GuildManager>.I.SendMemberList(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId, delegate
+				{
+					GameSection.ResumeEvent(is_success, null);
+				});
+			});
 		}
 	}
 
-	private unsafe void OnQuery_MEMBER_REJECT()
+	private void OnQuery_MEMBER_REJECT()
 	{
 		SetActive(base._transform, UI.SPR_GUILD_INFO, false);
 		GameSection.StayEvent();
 		if (memberInfoData != null)
 		{
-			GuildManager i = MonoBehaviourSingleton<GuildManager>.I;
-			int requestId = memberInfoData.requestId;
-			if (_003C_003Ef__am_0024cache6 == null)
+			MonoBehaviourSingleton<GuildManager>.I.SendAdminJoin(memberInfoData.requestId, 0, delegate(bool is_success, Error err)
 			{
-				_003C_003Ef__am_0024cache6 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			i.SendAdminJoin(requestId, 0, _003C_003Ef__am_0024cache6);
+				MonoBehaviourSingleton<GuildManager>.I.SendMemberList(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId, delegate
+				{
+					GameSection.ResumeEvent(is_success, null);
+				});
+			});
 		}
 	}
 
@@ -259,16 +290,13 @@ public class GuildMemberList : GameSection
 		GameSection.SetEventData(memberInfoData);
 	}
 
-	private unsafe void OnQuery_BanReasonConfirm_YES()
+	private void OnQuery_BanReasonConfirm_YES()
 	{
 		GameSection.StayEvent();
-		GuildManager i = MonoBehaviourSingleton<GuildManager>.I;
-		int userId = memberInfoData.userId;
-		if (_003C_003Ef__am_0024cache7 == null)
+		MonoBehaviourSingleton<GuildManager>.I.SendKick(memberInfoData.userId, delegate(bool is_success, Error err)
 		{
-			_003C_003Ef__am_0024cache7 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		i.SendKick(userId, _003C_003Ef__am_0024cache7);
+			GameSection.ResumeEvent(is_success, null);
+		});
 	}
 
 	private void OnQuery_BanReasonConfirm_NO()

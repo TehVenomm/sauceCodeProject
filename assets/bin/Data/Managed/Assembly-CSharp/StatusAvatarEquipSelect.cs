@@ -1,5 +1,3 @@
-using System;
-
 public class StatusAvatarEquipSelect : StatusEquip
 {
 	private EQUIPMENT_TYPE changeTargetType;
@@ -68,7 +66,7 @@ public class StatusAvatarEquipSelect : StatusEquip
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_STATUS_ROOT, false);
+		SetActive(UI.OBJ_STATUS_ROOT, false);
 		base.UpdateUI();
 	}
 
@@ -80,20 +78,18 @@ public class StatusAvatarEquipSelect : StatusEquip
 	{
 		if (EquipItem != null)
 		{
-			SetRenderEquipModel((Enum)UI.TEX_MODEL, EquipItem.tableID, -1, -1, 1f);
+			SetRenderEquipModel(UI.TEX_MODEL, EquipItem.tableID, -1, -1, 1f);
 		}
 		else
 		{
-			ClearRenderModel((Enum)UI.TEX_MODEL);
+			ClearRenderModel(UI.TEX_MODEL);
 		}
 	}
 
-	protected unsafe override void OnQuery_TRY_ON()
+	protected override void OnQuery_TRY_ON()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
 		base.OnQuery_TRY_ON();
-		if (EquipItem != null && !MonoBehaviourSingleton<GameSceneManager>.I.CheckEquipItemAndOpenUpdateAppDialog(EquipItem.tableData, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+		if (EquipItem != null && !MonoBehaviourSingleton<GameSceneManager>.I.CheckEquipItemAndOpenUpdateAppDialog(EquipItem.tableData, base.OnCancelSelect))
 		{
 			GameSection.StopEvent();
 		}

@@ -68,38 +68,42 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 	public override void UpdateUI()
 	{
 		UpdateListUI();
-		SetToggle((Enum)UI.TGL_OK, selectedUserIdList.Count > 0);
-		SetLabelText((Enum)UI.LBL_SELECT_ALL, (!IsContainsAllUserInPage()) ? "全選択" : "選択解除");
+		SetToggle(UI.TGL_OK, selectedUserIdList.Count > 0);
+		SetLabelText(UI.LBL_SELECT_ALL, (!IsContainsAllUserInPage()) ? "全選択" : "選択解除");
 	}
 
-	protected unsafe void UpdateListUI()
+	protected void UpdateListUI()
 	{
-		SetLabelText((Enum)UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText((Enum)UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText((Enum)UI.LBL_SORT, StringTable.Get(STRING_CATEGORY.USER_SORT, (uint)m_currentSortType));
+		SetLabelText(UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.LBL_SORT, StringTable.Get(STRING_CATEGORY.USER_SORT, (uint)m_currentSortType));
 		if (inviteUsers == null || inviteUsers.Length == 0)
 		{
-			SetActive((Enum)UI.STR_NON_LIST, true);
-			SetActive((Enum)UI.GRD_LIST, false);
-			SetLabelText((Enum)UI.LBL_NOW, string.Format("{0}/{1}", "0", "0"));
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, pageNumMax > 1);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
+			SetActive(UI.STR_NON_LIST, true);
+			SetActive(UI.GRD_LIST, false);
+			SetLabelText(UI.LBL_NOW, string.Format("{0}/{1}", "0", "0"));
+			SetActive(UI.OBJ_ACTIVE_ROOT, pageNumMax > 1);
+			SetActive(UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_NOW, $"{nowPage + 1}/{pageNumMax}");
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, pageNumMax > 1);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			SetActive((Enum)UI.GRD_LIST, true);
+			SetLabelText(UI.LBL_NOW, $"{nowPage + 1}/{pageNumMax}");
+			SetActive(UI.OBJ_ACTIVE_ROOT, pageNumMax > 1);
+			SetActive(UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
+			SetActive(UI.STR_NON_LIST, false);
+			SetActive(UI.GRD_LIST, true);
 			int currentPageItemLength = GetCurrentPageItemLength();
 			PartyInviteCharaInfo[] currentList = new PartyInviteCharaInfo[currentPageItemLength];
-			for (int i = 0; i < currentPageItemLength; i++)
+			for (int j = 0; j < currentPageItemLength; j++)
 			{
-				currentList[i] = inviteUsers[nowPage * 10 + i];
+				currentList[j] = inviteUsers[nowPage * 10 + j];
 			}
-			_003CUpdateListUI_003Ec__AnonStorey31C _003CUpdateListUI_003Ec__AnonStorey31C;
-			SetDynamicList((Enum)UI.GRD_LIST, "QuestInviteeSelectListItem", currentPageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateListUI_003Ec__AnonStorey31C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetDynamicList(UI.GRD_LIST, "QuestInviteeSelectListItem", currentPageItemLength, false, null, null, delegate(int i, Transform t, bool is_recycle)
+			{
+				PartyInviteCharaInfo partyInviteCharaInfo = currentList[i];
+				SetupListItem(partyInviteCharaInfo, i, t, is_recycle);
+				SetFollowStatus(t, partyInviteCharaInfo.userId, partyInviteCharaInfo.following, partyInviteCharaInfo.follower);
+			});
 		}
 	}
 
@@ -144,10 +148,22 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 		SetActive(t, UI.OBJ_ROOMCONDITION, false);
 	}
 
-	protected unsafe override void SendGetList(int page, Action<bool> callback)
+	protected override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey31D _003CSendGetList_003Ec__AnonStorey31D;
-		MonoBehaviourSingleton<PartyManager>.I.SendInviteList(new Action<bool, PartyInviteCharaInfo[]>((object)_003CSendGetList_003Ec__AnonStorey31D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<PartyManager>.I.SendInviteList(delegate(bool is_success, PartyInviteCharaInfo[] recv_data)
+		{
+			if (is_success)
+			{
+				nowPage = 0;
+				pageNumMax = ((recv_data == null) ? 1 : Mathf.CeilToInt((float)recv_data.Length / 10f));
+				inviteUsers = recv_data;
+				SortArray();
+			}
+			if (callback != null)
+			{
+				callback(is_success);
+			}
+		});
 	}
 
 	public override void OnQuery_FOLLOW_INFO()
@@ -180,16 +196,13 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 		RefreshUI();
 	}
 
-	private unsafe void OnQuery_OK()
+	private void OnQuery_OK()
 	{
 		GameSection.StayEvent();
-		PartyManager i = MonoBehaviourSingleton<PartyManager>.I;
-		int[] userIds = selectedUserIdList.ToArray();
-		if (_003C_003Ef__am_0024cache2 == null)
+		MonoBehaviourSingleton<PartyManager>.I.SendInvite(selectedUserIdList.ToArray(), delegate(bool is_success, int[] invited_users)
 		{
-			_003C_003Ef__am_0024cache2 = new Action<bool, int[]>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		i.SendInvite(userIds, _003C_003Ef__am_0024cache2);
+			GameSection.ResumeEvent(is_success, null);
+		});
 	}
 
 	protected new void OnQuery_PAGE_PREV()

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -61,42 +60,40 @@ public class ItemDetailEquipMaxParamDialog : ItemDetailEquipDialog
 
 	private void DisableMagiSlotButton()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
 		Transform ctrl = GetCtrl(UI.OBJ_SKILL_BUTTON_ROOT);
-		Transform val = ctrl.FindChild("SkillIconButton");
-		base.SetEnabled<UIButton>(val, false);
-		val.GetComponent<BoxCollider>().set_enabled(false);
+		Transform transform = ctrl.FindChild("SkillIconButton");
+		SetEnabled<UIButton>(transform, false);
+		transform.GetComponent<BoxCollider>().enabled = false;
 	}
 
 	private void UpdatePaging()
 	{
 		bool is_visible = allEquipData.Count + allEquipData[currentEvolveStage].Count >= 2;
-		SetActive((Enum)UI.OBJ_EVOLVE_SELECT, true);
-		SetActive((Enum)UI.OBJ_ARROW_BTN_ROOT, is_visible);
+		SetActive(UI.OBJ_EVOLVE_SELECT, true);
+		SetActive(UI.OBJ_ARROW_BTN_ROOT, is_visible);
 		if (currentEvolveStage == 0)
 		{
-			SetActive((Enum)UI.LBL_EVOLVE_NORMAL, true);
-			SetLabelText((Enum)UI.LBL_EVOLVE_NORMAL, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 13u));
-			SetActive((Enum)UI.LBL_EVOLVE_ATTRIBUTE, false);
-			SetActive((Enum)UI.SPR_EVOLVE_ELEM, false);
+			SetActive(UI.LBL_EVOLVE_NORMAL, true);
+			SetLabelText(UI.LBL_EVOLVE_NORMAL, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 13u));
+			SetActive(UI.LBL_EVOLVE_ATTRIBUTE, false);
+			SetActive(UI.SPR_EVOLVE_ELEM, false);
 		}
 		else
 		{
 			EquipItemTable.EquipItemData currentEquipItemData = GetCurrentEquipItemData();
 			int targetElementPriorityToTable = (int)currentEquipItemData.GetTargetElementPriorityToTable();
 			bool flag = targetElementPriorityToTable == 6;
-			SetActive((Enum)UI.LBL_EVOLVE_NORMAL, flag);
-			SetActive((Enum)UI.LBL_EVOLVE_ATTRIBUTE, !flag);
-			SetActive((Enum)UI.SPR_EVOLVE_ELEM, !flag);
+			SetActive(UI.LBL_EVOLVE_NORMAL, flag);
+			SetActive(UI.LBL_EVOLVE_ATTRIBUTE, !flag);
+			SetActive(UI.SPR_EVOLVE_ELEM, !flag);
 			if (flag)
 			{
-				SetLabelText((Enum)UI.LBL_EVOLVE_NORMAL, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 14u), currentEvolveStage.ToString()));
+				SetLabelText(UI.LBL_EVOLVE_NORMAL, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 14u), currentEvolveStage.ToString()));
 			}
 			else
 			{
-				SetLabelText((Enum)UI.LBL_EVOLVE_ATTRIBUTE, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 15u), currentEvolveStage.ToString()));
-				SetElementSprite((Enum)UI.SPR_EVOLVE_ELEM, targetElementPriorityToTable);
+				SetLabelText(UI.LBL_EVOLVE_ATTRIBUTE, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 15u), currentEvolveStage.ToString()));
+				SetElementSprite(UI.SPR_EVOLVE_ELEM, targetElementPriorityToTable);
 			}
 		}
 	}

@@ -18,52 +18,21 @@ namespace Facebook.Unity.Example
 
 		protected void OnGUI()
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Invalid comparison between Unknown and I4
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Expected O, but got Unknown
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Expected O, but got Unknown
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Expected O, but got Unknown
-			GUILayout.BeginVertical((GUILayoutOption[])new GUILayoutOption[0]);
+			GUILayout.BeginVertical();
 			if (Button("Back"))
 			{
 				GoBack();
 			}
-			if (Input.get_touchCount() > 0)
+			if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
 			{
-				Touch touch = Input.GetTouch(0);
-				if ((int)touch.get_phase() == 1)
-				{
-					Vector2 scrollPosition = base.ScrollPosition;
-					float y = scrollPosition.y;
-					Touch touch2 = Input.GetTouch(0);
-					Vector2 deltaPosition = touch2.get_deltaPosition();
-					scrollPosition.y = y + deltaPosition.y;
-					base.ScrollPosition = scrollPosition;
-				}
+				Vector2 scrollPosition = base.ScrollPosition;
+				float y = scrollPosition.y;
+				Vector2 deltaPosition = Input.GetTouch(0).deltaPosition;
+				scrollPosition.y = y + deltaPosition.y;
+				base.ScrollPosition = scrollPosition;
 			}
-			base.ScrollPosition = GUILayout.BeginScrollView(base.ScrollPosition, (GUILayoutOption[])new GUILayoutOption[1]
-			{
-				GUILayout.MinWidth((float)ConsoleBase.MainWindowFullWidth)
-			});
-			GUILayout.TextArea(string.Join("\n", events.ToArray()), base.TextStyle, (GUILayoutOption[])new GUILayoutOption[2]
-			{
-				GUILayout.ExpandHeight(true),
-				GUILayout.MaxWidth((float)ConsoleBase.MainWindowWidth)
-			});
+			base.ScrollPosition = GUILayout.BeginScrollView(base.ScrollPosition, GUILayout.MinWidth((float)ConsoleBase.MainWindowFullWidth));
+			GUILayout.TextArea(string.Join("\n", events.ToArray()), base.TextStyle, GUILayout.ExpandHeight(true), GUILayout.MaxWidth((float)ConsoleBase.MainWindowWidth));
 			GUILayout.EndScrollView();
 			GUILayout.EndVertical();
 		}

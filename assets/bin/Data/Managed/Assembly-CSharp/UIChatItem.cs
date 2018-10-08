@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(UIButton))]
-public class UIChatItem
+public class UIChatItem : MonoBehaviour
 {
 	[SerializeField]
 	protected UILabel chatText;
@@ -10,26 +10,20 @@ public class UIChatItem
 
 	protected UIChatButtonBase chatButton;
 
-	public UIChatItem()
-		: this()
-	{
-	}
-
 	public void SetChatData(UIChatButtonBase parent, string str, int chat_id)
 	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		chatButton = parent;
 		chatID = chat_id;
-		if (chatText != null)
+		if ((Object)chatText != (Object)null)
 		{
 			chatText.text = str;
 		}
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(false);
 	}
 
 	private void OnDragOver(GameObject drag)
 	{
-		if (chatButton != null)
+		if ((Object)chatButton != (Object)null)
 		{
 			chatButton.ChatSay(chatID);
 		}
@@ -37,7 +31,7 @@ public class UIChatItem
 
 	private void OnDragOut(GameObject drag)
 	{
-		if (chatButton != null)
+		if ((Object)chatButton != (Object)null)
 		{
 			chatButton.ChatCancel(chatID);
 		}

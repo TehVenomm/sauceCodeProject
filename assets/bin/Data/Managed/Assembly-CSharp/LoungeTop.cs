@@ -1,7 +1,6 @@
 using Network;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -76,15 +75,15 @@ public class LoungeTop : HomeBase
 		base.StartSection();
 		roomPartyTimer = 4f;
 		MonoBehaviourSingleton<LoungeManager>.I.SetLoungeQuestBalloon(true);
-		SetActive((Enum)UI.OBJ_MENU_GG, true);
+		SetActive(UI.OBJ_MENU_GG, true);
 		CheckHighlightPurchase();
 		if (isHighlightPurchase || GameSaveData.instance.IsShowNewsNotification())
 		{
-			SetBadge((Enum)UI.BTN_MENU_GG_ON, -1, 3, 5, -25, false);
+			SetBadge(UI.BTN_MENU_GG_ON, -1, SpriteAlignment.TopRight, 5, -25, false);
 		}
 		else
 		{
-			SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
+			SetBadge(UI.BTN_MENU_GG_ON, 0, SpriteAlignment.TopRight, 0, 0, false);
 		}
 	}
 
@@ -95,17 +94,31 @@ public class LoungeTop : HomeBase
 
 	protected override IEnumerator WaitInitializeManager()
 	{
-		yield return (object)this.StartCoroutine(WaitForCheckpikeShop());
+		yield return (object)StartCoroutine(WaitForCheckpikeShop());
 		while (!MonoBehaviourSingleton<LoungeManager>.I.IsInitialized)
 		{
 			yield return (object)null;
 		}
 	}
 
-	protected unsafe override IEnumerator SendHomeInfo()
+	protected override IEnumerator SendHomeInfo()
 	{
 		bool wait = true;
-		MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(new Action<bool, bool, int>((object)/*Error near IL_002d: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<UserInfoManager>.I.SendHomeInfo(delegate(bool is_success, bool acquire_login_bonus, int taskBadgeNum)
+		{
+			if (acquire_login_bonus && MonoBehaviourSingleton<AccountManager>.IsValid())
+			{
+				MonoBehaviourSingleton<AccountManager>.I.SendLogInBonus(delegate
+				{
+					((_003CSendHomeInfo_003Ec__IteratorE7)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
+				});
+			}
+			else
+			{
+				((_003CSendHomeInfo_003Ec__IteratorE7)/*Error near IL_002d: stateMachine*/)._003Cwait_003E__0 = false;
+			}
+			((_003CSendHomeInfo_003Ec__IteratorE7)/*Error near IL_002d: stateMachine*/)._003C_003Ef__this.SetBadge(((_003CSendHomeInfo_003Ec__IteratorE7)/*Error near IL_002d: stateMachine*/)._003C_003Ef__this.GetCtrl(UI.BTN_MISSION), taskBadgeNum, SpriteAlignment.TopLeft, 8, -8, false);
+		});
 		while (wait)
 		{
 			yield return (object)null;
@@ -202,16 +215,12 @@ public class LoungeTop : HomeBase
 
 	protected override void SetIconAndBalloon()
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Expected O, but got Unknown
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<StageManager>.I.stageObject != null)
+		if ((UnityEngine.Object)MonoBehaviourSingleton<StageManager>.I.stageObject != (UnityEngine.Object)null)
 		{
-			Transform val = MonoBehaviourSingleton<StageManager>.I.stageObject.Find("Icons/LOUNGE_QUEST_ICON_POS");
-			if (val != null)
+			Transform transform = MonoBehaviourSingleton<StageManager>.I.stageObject.Find("Icons/LOUNGE_QUEST_ICON_POS");
+			if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 			{
-				loungeQuestIconPos = val.get_position();
+				loungeQuestIconPos = transform.position;
 			}
 		}
 		CreateLoungeBoardIcon();
@@ -220,15 +229,12 @@ public class LoungeTop : HomeBase
 
 	private void CreateLoungeBoardIcon()
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		loungeQuestBalloon = MonoBehaviourSingleton<UIManager>.I.common.CreateLoungeQuestBalloon(GetCtrl(UI.OBJ_BALOON_ROOT));
-		loungeQuestBalloon.get_parent().get_gameObject().SetActive(false);
+		loungeQuestBalloon.parent.gameObject.SetActive(false);
 	}
 
 	protected override void SetupLoginBonus()
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		if (validLoginBonus)
 		{
 			shouldFrameInNPC006 = true;
@@ -238,7 +244,7 @@ public class LoungeTop : HomeBase
 		{
 			HomeNPCCharacter homeNPCCharacter = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.GetHomeNPCCharacter(6);
 			homeNPCCharacter.HideShadow();
-			HomeDragonRandomMove homeDragonRandomMove = homeNPCCharacter.loader.GetAnimator().get_gameObject().AddComponent<HomeDragonRandomMove>();
+			HomeDragonRandomMove homeDragonRandomMove = homeNPCCharacter.loader.GetAnimator().gameObject.AddComponent<HomeDragonRandomMove>();
 			homeDragonRandomMove.Reset();
 		}
 	}
@@ -253,79 +259,75 @@ public class LoungeTop : HomeBase
 
 	private void Update()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		if (!(chairBtn == null) && chairBtn.get_gameObject().get_activeSelf() && !(nearChairPoint == null) && nearChairPoint.sittingChara != null)
+		if (!((UnityEngine.Object)chairBtn == (UnityEngine.Object)null) && chairBtn.gameObject.activeSelf && !((UnityEngine.Object)nearChairPoint == (UnityEngine.Object)null) && (UnityEngine.Object)nearChairPoint.sittingChara != (UnityEngine.Object)null)
 		{
-			SetActive((Enum)UI.BTN_CHAIR, false);
+			SetActive(UI.BTN_CHAIR, false);
 		}
 	}
 
 	protected override void LateUpdate()
 	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-		roomPartyTimer += Time.get_deltaTime();
+		roomPartyTimer += Time.deltaTime;
 		if (MonoBehaviourSingleton<LoungeManager>.I.NeedLoungeQuestBalloonUpdate)
 		{
 			MonoBehaviourSingleton<LoungeManager>.I.SetLoungeQuestBalloon(false);
 			if (roomPartyTimer > 3f)
 			{
-				this.StartCoroutine(UpdateLoungeQuestBalloon());
+				StartCoroutine(UpdateLoungeQuestBalloon());
 				roomPartyTimer = 0f;
 			}
 		}
-		if (loungeQuestBalloon != null && loungeQuestBalloon.get_gameObject().get_activeSelf())
+		if ((UnityEngine.Object)loungeQuestBalloon != (UnityEngine.Object)null && loungeQuestBalloon.gameObject.activeSelf)
 		{
 			SetBalloonPosition(loungeQuestBalloon, loungeQuestIconPos);
 		}
-		if (loungeQuestBalloon != null)
+		if ((UnityEngine.Object)loungeQuestBalloon != (UnityEngine.Object)null)
 		{
 			if (MonoBehaviourSingleton<UserInfoManager>.I.ExistsRallyInvite)
 			{
-				if (!loungeQuestBalloon.get_parent().get_gameObject().get_activeSelf())
+				if (!loungeQuestBalloon.parent.gameObject.activeSelf)
 				{
-					loungeQuestBalloon.get_parent().get_gameObject().SetActive(true);
+					loungeQuestBalloon.parent.gameObject.SetActive(true);
 					ResetTween(loungeQuestBalloon, 0);
 					PlayTween(loungeQuestBalloon, true, null, false, 0);
 				}
 			}
 			else if (MonoBehaviourSingleton<LoungeMatchingManager>.I.parties == null || MonoBehaviourSingleton<LoungeMatchingManager>.I.parties.Count == 0)
 			{
-				loungeQuestBalloon.get_parent().get_gameObject().SetActive(false);
+				loungeQuestBalloon.parent.gameObject.SetActive(false);
 			}
 		}
 		base.LateUpdate();
 	}
 
-	private unsafe IEnumerator UpdateLoungeQuestBalloon()
+	private IEnumerator UpdateLoungeQuestBalloon()
 	{
-		if (!(loungeQuestBalloon == null))
+		if (!((UnityEngine.Object)loungeQuestBalloon == (UnityEngine.Object)null))
 		{
 			bool wait = true;
-			Protocol.Try(new Action((object)/*Error near IL_0043: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			Protocol.Try(delegate
+			{
+				MonoBehaviourSingleton<LoungeMatchingManager>.I.SendRoomParty(delegate
+				{
+					((_003CUpdateLoungeQuestBalloon_003Ec__IteratorE9)/*Error near IL_0043: stateMachine*/)._003Cwait_003E__0 = false;
+				});
+			});
 			while (wait)
 			{
 				yield return (object)null;
 			}
 			if (MonoBehaviourSingleton<LoungeMatchingManager>.I.parties != null && MonoBehaviourSingleton<LoungeMatchingManager>.I.parties.Count > 0)
 			{
-				if (!loungeQuestBalloon.get_parent().get_gameObject().get_activeSelf())
+				if (!loungeQuestBalloon.parent.gameObject.activeSelf)
 				{
-					loungeQuestBalloon.get_parent().get_gameObject().SetActive(true);
+					loungeQuestBalloon.parent.gameObject.SetActive(true);
 					ResetTween(loungeQuestBalloon, 0);
 					PlayTween(loungeQuestBalloon, true, null, false, 0);
 				}
 			}
 			else
 			{
-				loungeQuestBalloon.get_parent().get_gameObject().SetActive(false);
+				loungeQuestBalloon.parent.gameObject.SetActive(false);
 			}
 		}
 	}
@@ -338,13 +340,13 @@ public class LoungeTop : HomeBase
 			if (MonoBehaviourSingleton<LoungeManager>.IsValid())
 			{
 				nearChairPoint = MonoBehaviourSingleton<LoungeManager>.I.TableSet.GetNearSitPoint(MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara);
-				if (nearChairPoint.sittingChara != null)
+				if ((UnityEngine.Object)nearChairPoint.sittingChara != (UnityEngine.Object)null)
 				{
-					SetActive((Enum)UI.BTN_CHAIR, false);
+					SetActive(UI.BTN_CHAIR, false);
 				}
 				else
 				{
-					SetActive((Enum)UI.BTN_CHAIR, active);
+					SetActive(UI.BTN_CHAIR, active);
 				}
 			}
 			break;
@@ -366,22 +368,19 @@ public class LoungeTop : HomeBase
 
 	protected override void CheckEventLock()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<LoungeManager>.IsValid() && !isEventLockLoading)
 		{
-			if (eventLockMesh == null)
+			if ((UnityEngine.Object)eventLockMesh == (UnityEngine.Object)null)
 			{
-				this.StartCoroutine(LoadEventLock());
+				StartCoroutine(LoadEventLock());
 			}
 			else if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level < MonoBehaviourSingleton<GlobalSettingsManager>.I.unlockEventLevel)
 			{
-				eventLockMesh.get_gameObject().SetActive(true);
+				eventLockMesh.gameObject.SetActive(true);
 			}
 			else
 			{
-				eventLockMesh.get_gameObject().SetActive(false);
+				eventLockMesh.gameObject.SetActive(false);
 			}
 		}
 	}
@@ -403,19 +402,19 @@ public class LoungeTop : HomeBase
 			yield return (object)null;
 		}
 		HomeNPCCharacter eventNPC = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.GetHomeNPCCharacter(6);
-		if (eventNPC != null)
+		if ((UnityEngine.Object)eventNPC != (UnityEngine.Object)null)
 		{
 			Vector3 MODEL_OFFSET = new Vector3(0f, 1.79f, 0.504f);
 			Transform banner = Utility.CreateGameObject("EventLockBanner", eventNPC._transform, -1);
 			ResourceUtility.Realizes(loadedArrow.loadedObject, banner, -1);
-			banner.set_localPosition(MODEL_OFFSET);
+			banner.localPosition = MODEL_OFFSET;
 			if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level < MonoBehaviourSingleton<GlobalSettingsManager>.I.unlockEventLevel)
 			{
-				banner.get_gameObject().SetActive(true);
+				banner.gameObject.SetActive(true);
 			}
 			else
 			{
-				banner.get_gameObject().SetActive(false);
+				banner.gameObject.SetActive(false);
 			}
 			eventLockMesh = banner;
 		}
@@ -491,64 +490,63 @@ public class LoungeTop : HomeBase
 		}
 	}
 
-	private unsafe void OnCloseDialog_KickedMessage()
+	private void OnCloseDialog_KickedMessage()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
-		if (_003C_003Ef__am_0024cache8 == null)
+		Protocol.Force(delegate
 		{
-			_003C_003Ef__am_0024cache8 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		Protocol.Force(_003C_003Ef__am_0024cache8);
+			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
+			{
+			}, false);
+		});
 	}
 
 	private void OnQuery_GOWRAP()
 	{
 		GameSaveData.instance.dayShowNewsNotification = DateTime.UtcNow.AddSeconds(-10800.0).Day;
-		SetBadge((Enum)UI.BTN_GOWRAP_GG, 0, 9, 0, 0, false);
+		SetBadge(UI.BTN_GOWRAP_GG, 0, SpriteAlignment.Custom, 0, 0, false);
 		MonoBehaviourSingleton<GoWrapManager>.I.ShowMenu();
 	}
 
 	private void OnQuery_MENU_ACTION()
 	{
 		bool flag = !IsActive(UI.SPR_MENU_GG);
-		SetActive((Enum)UI.SPR_MENU_GG, flag);
-		SetActive((Enum)UI.BTN_MENU_GG_ON, !flag);
-		SetActive((Enum)UI.BTN_MENU_GG_OFF, flag);
+		SetActive(UI.SPR_MENU_GG, flag);
+		SetActive(UI.BTN_MENU_GG_ON, !flag);
+		SetActive(UI.BTN_MENU_GG_OFF, flag);
 		if (flag)
 		{
 			if (GameSaveData.instance.IsShowNewsNotification())
 			{
-				SetBadge((Enum)UI.BTN_GOWRAP_GG, -1, 3, 0, -8, false);
+				SetBadge(UI.BTN_GOWRAP_GG, -1, SpriteAlignment.TopRight, 0, -8, false);
 			}
 			else
 			{
-				SetBadge((Enum)UI.BTN_GOWRAP_GG, 0, 3, 0, 0, false);
+				SetBadge(UI.BTN_GOWRAP_GG, 0, SpriteAlignment.TopRight, 0, 0, false);
 			}
 			if (isHighlightPurchase)
 			{
-				SetBadge((Enum)UI.BTN_CRYSTAL_SHOP_GG, -1, 3, 0, -8, false);
+				SetBadge(UI.BTN_CRYSTAL_SHOP_GG, -1, SpriteAlignment.TopRight, 0, -8, false);
 			}
 			else
 			{
-				SetBadge((Enum)UI.BTN_CRYSTAL_SHOP_GG, 0, 3, 0, -8, false);
+				SetBadge(UI.BTN_CRYSTAL_SHOP_GG, 0, SpriteAlignment.TopRight, 0, -8, false);
 			}
 			if (isHighlightPikeShop)
 			{
-				SetBadge((Enum)UI.BTN_POINT_SHOP_GG, -1, 3, 0, -8, false);
+				SetBadge(UI.BTN_POINT_SHOP_GG, -1, SpriteAlignment.TopRight, 0, -8, false);
 			}
 			else
 			{
-				SetBadge((Enum)UI.BTN_POINT_SHOP_GG, 0, 3, 0, -8, false);
+				SetBadge(UI.BTN_POINT_SHOP_GG, 0, SpriteAlignment.TopRight, 0, -8, false);
 			}
 		}
 		else if (isHighlightPurchase || GameSaveData.instance.IsShowNewsNotification() || isHighlightPikeShop)
 		{
-			SetBadge((Enum)UI.BTN_MENU_GG_ON, -1, 3, 5, -25, false);
+			SetBadge(UI.BTN_MENU_GG_ON, -1, SpriteAlignment.TopRight, 5, -25, false);
 		}
 		else
 		{
-			SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
+			SetBadge(UI.BTN_MENU_GG_ON, 0, SpriteAlignment.TopRight, 0, 0, false);
 		}
 	}
 
@@ -607,16 +605,16 @@ public class LoungeTop : HomeBase
 		{
 			if (GameSaveData.instance.IsShowNewsNotification())
 			{
-				SetBadge((Enum)UI.BTN_GOWRAP_GG, -1, 3, 0, -8, false);
+				SetBadge(UI.BTN_GOWRAP_GG, -1, SpriteAlignment.TopRight, 0, -8, false);
 			}
 			else
 			{
-				SetBadge((Enum)UI.BTN_GOWRAP_GG, 0, 3, 0, -8, false);
+				SetBadge(UI.BTN_GOWRAP_GG, 0, SpriteAlignment.TopRight, 0, -8, false);
 			}
 		}
 		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification() && !isHighlightPikeShop)
 		{
-			SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
+			SetBadge(UI.BTN_MENU_GG_ON, 0, SpriteAlignment.TopRight, 0, 0, false);
 		}
 	}
 
@@ -627,16 +625,16 @@ public class LoungeTop : HomeBase
 		{
 			if (isHighlightPurchase)
 			{
-				SetBadge((Enum)UI.BTN_CRYSTAL_SHOP_GG, -1, 3, 0, -8, false);
+				SetBadge(UI.BTN_CRYSTAL_SHOP_GG, -1, SpriteAlignment.TopRight, 0, -8, false);
 			}
 			else
 			{
-				SetBadge((Enum)UI.BTN_CRYSTAL_SHOP_GG, 0, 3, 0, -8, false);
+				SetBadge(UI.BTN_CRYSTAL_SHOP_GG, 0, SpriteAlignment.TopRight, 0, -8, false);
 			}
 		}
 		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification() && !isHighlightPikeShop)
 		{
-			SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
+			SetBadge(UI.BTN_MENU_GG_ON, 0, SpriteAlignment.TopRight, 0, 0, false);
 		}
 	}
 
@@ -644,16 +642,16 @@ public class LoungeTop : HomeBase
 	{
 		if (IsActive(UI.SPR_MENU_GG))
 		{
-			SetBadge((Enum)UI.BTN_POINT_SHOP_GG, 0, 3, 0, -8, false);
+			SetBadge(UI.BTN_POINT_SHOP_GG, 0, SpriteAlignment.TopRight, 0, -8, false);
 		}
 		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification())
 		{
-			SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
+			SetBadge(UI.BTN_MENU_GG_ON, 0, SpriteAlignment.TopRight, 0, 0, false);
 		}
 		isHighlightPikeShop = false;
 	}
 
-	private unsafe IEnumerator WaitForCheckpikeShop()
+	private IEnumerator WaitForCheckpikeShop()
 	{
 		isHighlightPikeShop = false;
 		bool isWait = true;
@@ -662,18 +660,12 @@ public class LoungeTop : HomeBase
 			if (ret.Error == Error.None)
 			{
 				bool flag = PlayerPrefs.GetInt("Pike_Shop_Event", 0) == 1;
-				LoungeTop _003C_003Ef__this = ((_003CWaitForCheckpikeShop_003Ec__IteratorE9)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this;
-				List<PointShop> result = ret.result;
-				if (_003CWaitForCheckpikeShop_003Ec__IteratorE9._003C_003Ef__am_0024cache4 == null)
-				{
-					_003CWaitForCheckpikeShop_003Ec__IteratorE9._003C_003Ef__am_0024cache4 = new Func<PointShop, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-				}
-				_003C_003Ef__this.isHighlightPikeShop = result.Any(_003CWaitForCheckpikeShop_003Ec__IteratorE9._003C_003Ef__am_0024cache4);
-				if (((_003CWaitForCheckpikeShop_003Ec__IteratorE9)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop)
+				((_003CWaitForCheckpikeShop_003Ec__IteratorEB)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop = ret.result.Any((PointShop x) => x.isEvent);
+				if (((_003CWaitForCheckpikeShop_003Ec__IteratorEB)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop)
 				{
 					if (flag)
 					{
-						((_003CWaitForCheckpikeShop_003Ec__IteratorE9)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop = false;
+						((_003CWaitForCheckpikeShop_003Ec__IteratorEB)/*Error near IL_003a: stateMachine*/)._003C_003Ef__this.isHighlightPikeShop = false;
 					}
 				}
 				else
@@ -681,7 +673,7 @@ public class LoungeTop : HomeBase
 					PlayerPrefs.SetInt("Pike_Shop_Event", 0);
 				}
 			}
-			((_003CWaitForCheckpikeShop_003Ec__IteratorE9)/*Error near IL_003a: stateMachine*/)._003CisWait_003E__0 = false;
+			((_003CWaitForCheckpikeShop_003Ec__IteratorEB)/*Error near IL_003a: stateMachine*/)._003CisWait_003E__0 = false;
 		}, string.Empty);
 		while (isWait)
 		{

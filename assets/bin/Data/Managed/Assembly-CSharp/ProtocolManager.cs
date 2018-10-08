@@ -8,18 +8,19 @@ public class ProtocolManager : MonoBehaviourSingleton<ProtocolManager>
 
 	public void Reserve(Action send)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
-		reserves = Delegate.Combine((Delegate)reserves, (Delegate)send);
+		reserves = (Action)Delegate.Combine(reserves, send);
 	}
 
-	private unsafe void Update()
+	private void Update()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Expected O, but got Unknown
 		if (reserves != null && !AppMain.isReset)
 		{
-			Protocol.Resend(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			Protocol.Resend(delegate
+			{
+				Action action = reserves;
+				reserves = null;
+				action();
+			});
 		}
 	}
 

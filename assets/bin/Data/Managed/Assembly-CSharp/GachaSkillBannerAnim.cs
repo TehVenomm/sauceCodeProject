@@ -11,7 +11,7 @@ public class GachaSkillBannerAnim : UIBehaviour
 	{
 		if (pattern == null)
 		{
-			pattern = this.GetComponentsInChildren<GachaSkillBannerAnimPattern>();
+			pattern = GetComponentsInChildren<GachaSkillBannerAnimPattern>();
 		}
 		if (pattern == null || pattern.Length <= anim_index)
 		{

@@ -95,19 +95,15 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 
 	public void UpdateDeliveryReaminTime(float daily, float weekly)
 	{
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Expected O, but got Unknown
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Expected O, but got Unknown
 		foreach (Coroutine item3 in remainTimeCoroutine)
 		{
-			this.StopCoroutine(item3);
+			StopCoroutine(item3);
 		}
 		remainTimeCoroutine = new List<Coroutine>();
 		if (!(daily < 0f) && !(weekly < 0f))
 		{
-			Coroutine item = this.StartCoroutine(CheckUpdateDeliveryItem(daily));
-			Coroutine item2 = this.StartCoroutine(CheckUpdateDeliveryItem(weekly));
+			Coroutine item = StartCoroutine(CheckUpdateDeliveryItem(daily));
+			Coroutine item2 = StartCoroutine(CheckUpdateDeliveryItem(weekly));
 			remainTimeCoroutine.Add(item);
 			remainTimeCoroutine.Add(item2);
 			dailyUpdateRemainTime = daily;
@@ -115,18 +111,19 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 		}
 	}
 
-	private unsafe IEnumerator CheckUpdateDeliveryItem(float remainTime)
+	private IEnumerator CheckUpdateDeliveryItem(float remainTime)
 	{
 		yield return (object)new WaitForSeconds(remainTime);
 		while (Protocol.isBusy)
 		{
 			yield return (object)null;
 		}
-		if (_003CCheckUpdateDeliveryItem_003Ec__Iterator221._003C_003Ef__am_0024cache4 == null)
+		Protocol.Force(delegate
 		{
-			_003CCheckUpdateDeliveryItem_003Ec__Iterator221._003C_003Ef__am_0024cache4 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		Protocol.Force(_003CCheckUpdateDeliveryItem_003Ec__Iterator221._003C_003Ef__am_0024cache4);
+			MonoBehaviourSingleton<QuestManager>.I.SendGetDeliveryList(delegate
+			{
+			});
+		});
 	}
 
 	public bool IsExistDelivery(DELIVERY_TYPE[] typeList)
@@ -362,34 +359,24 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 		return CountCompletableDeliveryNum(null, delivery_type);
 	}
 
-	public unsafe int GetCompletableEventDeliveryNum()
+	public int GetCompletableEventDeliveryNum()
 	{
-		if (_003C_003Ef__am_0024cache13 == null)
-		{
-			_003C_003Ef__am_0024cache13 = new Func<ClearStatusDelivery, DeliveryTable.DeliveryData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		return CountCompletableDeliveryNum(_003C_003Ef__am_0024cache13, null);
+		return CountCompletableDeliveryNum((ClearStatusDelivery clearStatus, DeliveryTable.DeliveryData table) => table.IsEvent(), null);
 	}
 
-	public unsafe int GetCompletableNormalDeliveryNum()
+	public int GetCompletableNormalDeliveryNum()
 	{
-		if (_003C_003Ef__am_0024cache14 == null)
-		{
-			_003C_003Ef__am_0024cache14 = new Func<ClearStatusDelivery, DeliveryTable.DeliveryData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		return CountCompletableDeliveryNum(_003C_003Ef__am_0024cache14, null);
+		return CountCompletableDeliveryNum((ClearStatusDelivery clearStatus, DeliveryTable.DeliveryData table) => !table.IsEvent(), null);
 	}
 
-	public unsafe int GetCompletableEventDeliveryNum(int event_id)
+	public int GetCompletableEventDeliveryNum(int event_id)
 	{
-		_003CGetCompletableEventDeliveryNum_003Ec__AnonStorey563 _003CGetCompletableEventDeliveryNum_003Ec__AnonStorey;
-		return CountCompletableDeliveryNum(new Func<ClearStatusDelivery, DeliveryTable.DeliveryData, bool>((object)_003CGetCompletableEventDeliveryNum_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
+		return CountCompletableDeliveryNum((ClearStatusDelivery clearStatus, DeliveryTable.DeliveryData table) => table.IsEvent() && table.eventID == event_id, null);
 	}
 
-	public unsafe int GetCompletableRegionDeliveryNum(int regionId, int groupId)
+	public int GetCompletableRegionDeliveryNum(int regionId, int groupId)
 	{
-		_003CGetCompletableRegionDeliveryNum_003Ec__AnonStorey564 _003CGetCompletableRegionDeliveryNum_003Ec__AnonStorey;
-		return CountCompletableDeliveryNum(new Func<ClearStatusDelivery, DeliveryTable.DeliveryData, bool>((object)_003CGetCompletableRegionDeliveryNum_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new DELIVERY_TYPE[2]
+		return CountCompletableDeliveryNum((ClearStatusDelivery clearStatus, DeliveryTable.DeliveryData table) => table.regionId == regionId || (groupId > 0 && table.regionId == groupId), new DELIVERY_TYPE[2]
 		{
 			DELIVERY_TYPE.STORY,
 			DELIVERY_TYPE.ONCE
@@ -437,7 +424,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 								return;
 							}
 						}
-						if (condition == null || condition.Invoke(data, deliveryTableData))
+						if (condition == null || condition(data, deliveryTableData))
 						{
 							num++;
 						}
@@ -840,13 +827,13 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 		Protocol.Send(DeliveryCompleteModel.URL, requestSendForm, delegate(DeliveryCompleteModel ret)
 		{
 			checkNewDeliveryAtHomeScene = false;
-			bool flag = false;
-			DeliveryRewardList deliveryRewardList = null;
+			bool arg = false;
+			DeliveryRewardList arg2 = null;
 			switch (ret.Error)
 			{
 			case Error.None:
-				flag = true;
-				deliveryRewardList = ret.result.reward;
+				arg = true;
+				arg2 = ret.result.reward;
 				if (ret.result.openRegionIds != null && ret.result.openRegionIds.Count > 0)
 				{
 					foreach (int openRegionId in ret.result.openRegionIds)
@@ -866,7 +853,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_DELIVERY_OVER);
 				break;
 			}
-			call_back.Invoke(flag, deliveryRewardList);
+			call_back(arg, arg2);
 		}, string.Empty);
 	}
 
@@ -895,12 +882,12 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 		requestSendForm.conditionTypes = list;
 		Protocol.Send(DeliveryGetClearStatusModel.URL, requestSendForm, delegate(DeliveryGetClearStatusModel ret)
 		{
-			bool flag = false;
+			bool arg = false;
 			if (ret.Error == Error.None)
 			{
-				flag = true;
+				arg = true;
 			}
-			call_back.Invoke(flag, ret.result);
+			call_back(arg, ret.result);
 		}, string.Empty);
 	}
 
@@ -943,12 +930,12 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 		requestSendForm.scriptNum = scriptId;
 		Protocol.Send(ReadStoryReadModel.URL, requestSendForm, delegate(ReadStoryReadModel ret)
 		{
-			bool flag = false;
+			bool arg = false;
 			if (ret.Error == Error.None)
 			{
-				flag = true;
+				arg = true;
 			}
-			call_back.Invoke(flag, ret.Error);
+			call_back(arg, ret.Error);
 		}, string.Empty);
 	}
 
@@ -1280,18 +1267,14 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 
 	public void CheckAnnouncePortalOpen()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
 		if (m_coroutinePortal == null)
 		{
-			m_coroutinePortal = this.StartCoroutine(CheckPortalOpen());
+			m_coroutinePortal = StartCoroutine(CheckPortalOpen());
 		}
 	}
 
 	public void CheckAnnounceHomeReturn(int delivery_id)
 	{
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Expected O, but got Unknown
 		if (m_compDeliveryId == 0)
 		{
 			DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)delivery_id);
@@ -1299,13 +1282,13 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 			{
 				if (m_coroutine != null)
 				{
-					this.StopCoroutine(m_coroutine);
+					StopCoroutine(m_coroutine);
 				}
 				if (deliveryTableData.IsEvent())
 				{
 					m_compDeliveryId = delivery_id;
 				}
-				m_coroutine = this.StartCoroutine(CheckRequestHomeReturn());
+				m_coroutine = StartCoroutine(CheckRequestHomeReturn());
 			}
 		}
 	}
@@ -1424,7 +1407,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 			}
 			yield return (object)null;
 		}
-		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameMain", this.get_gameObject(), "CLEARED_RETURN", null, null, true);
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameMain", base.gameObject, "CLEARED_RETURN", null, null, true);
 		m_coroutine = null;
 	}
 
@@ -1464,11 +1447,11 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 					if ((FieldManager.IsOpenPortalClearOrder(portalData) || FieldManager.IsOpenPortal(portalData)) && GameSaveData.instance.isNewReleasePortal(portalObjList[i].portalID))
 					{
 						PortalObject preObj = portalObjList[i];
-						portalObjList[i] = PortalObject.Create(preObj.portalInfo, preObj._transform.get_parent());
-						PortalUnlockEvent portalUnlockEvent = MonoBehaviourSingleton<InGameManager>.I.get_gameObject().AddComponent<PortalUnlockEvent>();
+						portalObjList[i] = PortalObject.Create(preObj.portalInfo, preObj._transform.parent);
+						PortalUnlockEvent portalUnlockEvent = MonoBehaviourSingleton<InGameManager>.I.gameObject.AddComponent<PortalUnlockEvent>();
 						portalUnlockEvent.AddPortal(portalObjList[i]);
 						GameSaveData.instance.newReleasePortals.Remove(portalObjList[i].portalID);
-						Object.Destroy(preObj.get_gameObject());
+						UnityEngine.Object.Destroy(preObj.gameObject);
 						isNewPortalOpen = true;
 					}
 				}

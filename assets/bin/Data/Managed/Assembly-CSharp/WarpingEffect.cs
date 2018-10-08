@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class WarpingEffect
+public class WarpingEffect : MonoBehaviour
 {
 	[SerializeField]
 	protected UISprite sprite;
@@ -12,14 +12,9 @@ public class WarpingEffect
 	[SerializeField]
 	protected Material atlasMaterial;
 
-	public WarpingEffect()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		if (atlasMaterial != null && sprite != null && sprite.atlas != null && sprite.atlas.spriteMaterial != null && atlasMaterial != sprite.atlas.spriteMaterial)
+		if ((UnityEngine.Object)atlasMaterial != (UnityEngine.Object)null && (UnityEngine.Object)sprite != (UnityEngine.Object)null && (UnityEngine.Object)sprite.atlas != (UnityEngine.Object)null && (UnityEngine.Object)sprite.atlas.spriteMaterial != (UnityEngine.Object)null && (UnityEngine.Object)atlasMaterial != (UnityEngine.Object)sprite.atlas.spriteMaterial)
 		{
 			atlasMaterial = sprite.atlas.spriteMaterial;
 		}
@@ -30,7 +25,7 @@ public class WarpingEffect
 		atlasMaterial.SetTexture("_SrcTex", rt);
 		foreach (UIDrawCall active in UIDrawCall.activeList)
 		{
-			if (active.baseMaterial == atlasMaterial)
+			if ((UnityEngine.Object)active.baseMaterial == (UnityEngine.Object)atlasMaterial)
 			{
 				active.dynamicMaterial.SetTexture("_SrcTex", rt);
 			}
@@ -39,7 +34,7 @@ public class WarpingEffect
 
 	protected virtual void OnDestroy()
 	{
-		if (cacher != null)
+		if ((UnityEngine.Object)cacher != (UnityEngine.Object)null)
 		{
 			RenderTargetCacher renderTargetCacher = cacher;
 			renderTargetCacher.onUpdateTexture = (Action<RenderTexture>)Delegate.Remove(renderTargetCacher.onUpdateTexture, new Action<RenderTexture>(OnUpdateTexture));

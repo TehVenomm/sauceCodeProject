@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -34,17 +33,20 @@ public class FriendArenaRankingInfoScore : GameSection
 
 	public override void Initialize()
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		object[] array = (object[])GameSection.GetEventData();
 		eventData = (array[0] as Network.EventData);
 		userId = (int)array[1];
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
-	private unsafe IEnumerator DoInitialize()
+	private IEnumerator DoInitialize()
 	{
 		bool isFinishGetRecord = false;
-		MonoBehaviourSingleton<QuestManager>.I.SendGetArenaUserRecord(userId, eventData.eventId, new Action<bool, ArenaUserRecordModel.Param>((object)/*Error near IL_0048: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<QuestManager>.I.SendGetArenaUserRecord(userId, eventData.eventId, delegate(bool b, ArenaUserRecordModel.Param result)
+		{
+			((_003CDoInitialize_003Ec__Iterator42)/*Error near IL_0048: stateMachine*/)._003CisFinishGetRecord_003E__0 = true;
+			((_003CDoInitialize_003Ec__Iterator42)/*Error near IL_0048: stateMachine*/)._003C_003Ef__this.record = result;
+		});
 		while (!isFinishGetRecord)
 		{
 			yield return (object)null;

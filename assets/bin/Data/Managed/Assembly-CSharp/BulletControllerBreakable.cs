@@ -28,8 +28,6 @@ public class BulletControllerBreakable : BulletControllerBase
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam _skillInfoParam, Vector3 pos, Quaternion rot)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(bullet, _skillInfoParam, pos, rot);
 		if (bullet.dataBreakable != null)
 		{
@@ -75,34 +73,10 @@ public class BulletControllerBreakable : BulletControllerBase
 
 	public override void Update()
 	{
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
 		if (moveType != 0)
 		{
-			base.timeCount += Time.get_deltaTime();
-			if (!(targetObject == null))
+			base.timeCount += Time.deltaTime;
+			if (!((Object)targetObject == (Object)null))
 			{
 				float velocity = base.initialVelocity + acceleration * base.timeCount;
 				SetVelocity(velocity);
@@ -115,9 +89,9 @@ public class BulletControllerBreakable : BulletControllerBase
 						num = 0f;
 					}
 				}
-				num *= Time.get_deltaTime();
-				Vector3 position = base._transform.get_position();
-				Vector3 position2 = targetObject._transform.get_position();
+				num *= Time.deltaTime;
+				Vector3 position = base._transform.position;
+				Vector3 position2 = targetObject._transform.position;
 				if (hightLock)
 				{
 					position2.y = 0f;
@@ -127,8 +101,8 @@ public class BulletControllerBreakable : BulletControllerBase
 				{
 					position2.y += 1f;
 				}
-				Vector3 val = position2 - position;
-				float num2 = Mathf.Abs(Vector3.Angle(base._transform.get_forward(), val));
+				Vector3 vector = position2 - position;
+				float num2 = Mathf.Abs(Vector3.Angle(base._transform.forward, vector));
 				if (num2 != 0f)
 				{
 					float num3 = num / num2;
@@ -136,15 +110,15 @@ public class BulletControllerBreakable : BulletControllerBase
 					{
 						num3 = 1f;
 					}
-					base._transform.set_rotation(Quaternion.Lerp(base._transform.get_rotation(), Quaternion.LookRotation(val), num3));
-					Vector3 val2 = Vector3.get_forward();
-					val2 = base._transform.get_rotation() * val2;
-					val2 *= base.speed;
+					base._transform.rotation = Quaternion.Lerp(base._transform.rotation, Quaternion.LookRotation(vector), num3);
+					Vector3 vector2 = Vector3.forward;
+					vector2 = base._transform.rotation * vector2;
+					vector2 *= base.speed;
 					if (hightLock)
 					{
-						val2.y = 0f;
+						vector2.y = 0f;
 					}
-					base._rigidbody.set_velocity(val2);
+					base._rigidbody.velocity = vector2;
 				}
 			}
 		}
@@ -152,20 +126,17 @@ public class BulletControllerBreakable : BulletControllerBase
 
 	public override void OnShot()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().set_layer(31);
+		base.gameObject.layer = 31;
 	}
 
 	public override bool IsHit(Collider collider)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		if (((1 << collider.get_gameObject().get_layer()) & ignoreLayerMask) > 0)
+		if (((1 << collider.gameObject.layer) & ignoreLayerMask) > 0)
 		{
 			return false;
 		}
-		DangerRader component = collider.get_gameObject().GetComponent<DangerRader>();
-		if (component != null)
+		DangerRader component = collider.gameObject.GetComponent<DangerRader>();
+		if ((Object)component != (Object)null)
 		{
 			return false;
 		}
@@ -174,8 +145,7 @@ public class BulletControllerBreakable : BulletControllerBase
 
 	public override bool IsBreak(Collider collider)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		if (((1 << collider.get_gameObject().get_layer()) & ignoreLayerMask) > 0)
+		if (((1 << collider.gameObject.layer) & ignoreLayerMask) > 0)
 		{
 			return false;
 		}
@@ -199,13 +169,12 @@ public class BulletControllerBreakable : BulletControllerBase
 
 	public override void OnLandHit()
 	{
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsDefenseBattle() && MonoBehaviourSingleton<InGameProgress>.IsValid() && !(MonoBehaviourSingleton<InGameProgress>.I.defenseBattleEndurance <= 0f))
 		{
 			MonoBehaviourSingleton<InGameProgress>.I.DamageToEndurance(damageToEndurance);
 			if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 			{
-				MonoBehaviourSingleton<InGameCameraManager>.I.SetShakeCamera(base._transform.get_position(), 1f, 0.2f);
+				MonoBehaviourSingleton<InGameCameraManager>.I.SetShakeCamera(base._transform.position, 1f, 0.2f);
 			}
 		}
 	}

@@ -1,5 +1,3 @@
-using System;
-
 public class QuestAcceptRoomSettingsLevel : QuestAcceptEntryPassRoom
 {
 	protected new enum UI
@@ -50,20 +48,20 @@ public class QuestAcceptRoomSettingsLevel : QuestAcceptEntryPassRoom
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.STR_NON_SETTINGS, false);
+		SetActive(UI.STR_NON_SETTINGS, false);
 		int i = 0;
 		for (int num = passCode.Length; i < num; i++)
 		{
-			SetLabelText((Enum)lblAry[i], string.Empty);
+			SetLabelText(lblAry[i], string.Empty);
 		}
 		string text = string.Join(string.Empty, passCode);
 		if (text.Length == 0)
 		{
-			SetActive((Enum)UI.STR_NON_SETTINGS, true);
+			SetActive(UI.STR_NON_SETTINGS, true);
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_INPUT_PASS_3, text);
+			SetLabelText(UI.LBL_INPUT_PASS_3, text);
 		}
 	}
 

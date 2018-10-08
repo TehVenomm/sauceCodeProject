@@ -61,11 +61,11 @@ public class NotificationCompatBase {
     }
 
     public static Notification add(Notification notification, Context context, CharSequence charSequence, CharSequence charSequence2, PendingIntent pendingIntent, PendingIntent pendingIntent2) {
-        Throwable e;
         if (sSetLatestEventInfo == null) {
             try {
                 sSetLatestEventInfo = Notification.class.getMethod("setLatestEventInfo", new Class[]{Context.class, CharSequence.class, CharSequence.class, PendingIntent.class});
-            } catch (Throwable e2) {
+            } catch (Throwable e) {
+                Throwable e2;
                 throw new RuntimeException(e2);
             }
         }

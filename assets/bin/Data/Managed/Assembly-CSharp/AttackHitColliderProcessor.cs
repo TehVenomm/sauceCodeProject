@@ -37,7 +37,7 @@ public class AttackHitColliderProcessor : AttackColliderProcessor
 
 		public DamageDistanceTable.DamageDistanceData damageDistanceData;
 
-		public Vector3 exHitPos = Vector3.get_zero();
+		public Vector3 exHitPos = Vector3.zero;
 	}
 
 	public class HitResult
@@ -76,7 +76,7 @@ public class AttackHitColliderProcessor : AttackColliderProcessor
 	{
 		if (stackList.Count > 0)
 		{
-			if (base.fromObject == null)
+			if ((Object)base.fromObject == (Object)null)
 			{
 				stackList.Clear();
 			}
@@ -110,7 +110,7 @@ public class AttackHitColliderProcessor : AttackColliderProcessor
 						else
 						{
 							Self self = base.fromObject as Self;
-							if (self != null)
+							if ((Object)self != (Object)null)
 							{
 								self.CancelHit();
 							}
@@ -132,7 +132,7 @@ public class AttackHitColliderProcessor : AttackColliderProcessor
 			}
 			else
 			{
-				m_hitInterval -= Time.get_deltaTime();
+				m_hitInterval -= Time.deltaTime;
 				if (!(m_hitInterval > 0f))
 				{
 					m_hitInterval = attackHitInfo.hitIntervalTime;
@@ -151,72 +151,19 @@ public class AttackHitColliderProcessor : AttackColliderProcessor
 
 	private void HitProc(Collider to_collider)
 	{
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0300: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0324: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0331: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0336: Unknown result type (might be due to invalid IL or missing references)
-		//IL_033a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_033c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0350: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0355: Unknown result type (might be due to invalid IL or missing references)
-		//IL_035a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_035f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0366: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0368: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0385: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0386: Unknown result type (might be due to invalid IL or missing references)
-		if ((base.colliderInterface == null || base.colliderInterface.IsEnable()) && !(base.fromCollider == null) && !(base.fromObject == null) && base.fromCollider.get_enabled() && !(to_collider.get_gameObject() == base.fromCollider.get_gameObject()))
+		if ((base.colliderInterface == null || base.colliderInterface.IsEnable()) && !((Object)base.fromCollider == (Object)null) && !((Object)base.fromObject == (Object)null) && base.fromCollider.enabled && !((Object)to_collider.gameObject == (Object)base.fromCollider.gameObject))
 		{
-			AnimEventCollider.AtkColliderHiter component = to_collider.get_gameObject().GetComponent<AnimEventCollider.AtkColliderHiter>();
-			if (!(component != null))
+			AnimEventCollider.AtkColliderHiter component = to_collider.gameObject.GetComponent<AnimEventCollider.AtkColliderHiter>();
+			if (!((Object)component != (Object)null))
 			{
-				DangerRader component2 = to_collider.get_gameObject().GetComponent<DangerRader>();
-				if (!(component2 != null))
+				DangerRader component2 = to_collider.gameObject.GetComponent<DangerRader>();
+				if (!((Object)component2 != (Object)null))
 				{
-					EscapePointObject component3 = to_collider.get_gameObject().GetComponent<EscapePointObject>();
-					if (!(component3 != null))
+					EscapePointObject component3 = to_collider.gameObject.GetComponent<EscapePointObject>();
+					if (!((Object)component3 != (Object)null))
 					{
-						StageObject to_object = to_collider.get_gameObject().GetComponentInParent<StageObject>();
-						if (!(to_object == null) && !(to_object == base.fromObject) && to_object.ignoreHitAttackColliders.IndexOf(to_collider) < 0)
+						StageObject to_object = to_collider.gameObject.GetComponentInParent<StageObject>();
+						if (!((Object)to_object == (Object)null) && !((Object)to_object == (Object)base.fromObject) && to_object.ignoreHitAttackColliders.IndexOf(to_collider) < 0)
 						{
 							if (m_isValidTriggerStay && m_isValidMultiHitInterval)
 							{
@@ -229,18 +176,17 @@ public class AttackHitColliderProcessor : AttackColliderProcessor
 							if ((base.colliderInterface == null || base.colliderInterface.CheckHitAttack(attackHitInfo, to_collider, to_object)) && base.fromObject.CheckHitAttack(attackHitInfo, to_collider, to_object))
 							{
 								Vector3 crossCheckPoint = base.colliderInterface.GetCrossCheckPoint(base.fromCollider);
-								Vector3 val = Utility.ClosestPointOnCollider(to_collider, crossCheckPoint);
-								Vector3 val2 = val - crossCheckPoint;
-								if (val2 == Vector3.get_zero())
+								Vector3 vector = Utility.ClosestPointOnCollider(to_collider, crossCheckPoint);
+								Vector3 vector2 = vector - crossCheckPoint;
+								if (vector2 == Vector3.zero)
 								{
-									Bounds bounds = to_collider.get_bounds();
-									val2 = bounds.get_center() - crossCheckPoint;
+									vector2 = to_collider.bounds.center - crossCheckPoint;
 								}
-								Quaternion rot = Quaternion.LookRotation(val2);
+								Quaternion rot = Quaternion.LookRotation(vector2);
 								HitResult hitResult = null;
 								stackList.ForEach(delegate(HitResult o)
 								{
-									if (o.target == to_object)
+									if ((Object)o.target == (Object)to_object)
 									{
 										hitResult = o;
 									}
@@ -262,28 +208,28 @@ public class AttackHitColliderProcessor : AttackColliderProcessor
 								hitParam.toObject = to_object;
 								hitParam.fromCollider = base.fromCollider;
 								hitParam.toCollider = to_collider;
-								hitParam.point = val;
+								hitParam.point = vector;
 								if (m_damageDistanceData != null)
 								{
-									Vector3 val3 = crossCheckPoint;
+									Vector3 vector3 = crossCheckPoint;
 									BulletObject bulletObject = base.colliderInterface as BulletObject;
-									if (bulletObject != null)
+									if ((Object)bulletObject != (Object)null)
 									{
-										val3 = bulletObject.startColliderPos;
+										vector3 = bulletObject.startColliderPos;
 									}
-									Vector3 val4 = Utility.ClosestPointOnColliderFix(to_collider, val3);
-									if (val3 == val4)
+									Vector3 vector4 = Utility.ClosestPointOnColliderFix(to_collider, vector3);
+									if (vector3 == vector4)
 									{
 										hitParam.distanceXZ = 0f;
 									}
 									else
 									{
-										Vector2 val5 = val4.ToVector2XZ();
-										Vector2 val6 = base.fromObject._position.ToVector2XZ();
-										hitParam.distanceXZ = Vector2.Distance(val5, val6);
+										Vector2 a = vector4.ToVector2XZ();
+										Vector2 b = base.fromObject._position.ToVector2XZ();
+										hitParam.distanceXZ = Vector2.Distance(a, b);
 									}
 								}
-								hitParam.exHitPos = base.fromCollider.get_gameObject().get_transform().get_position();
+								hitParam.exHitPos = base.fromCollider.gameObject.transform.position;
 								hitParam.rot = rot;
 								hitParam.time = time;
 								hitParam.targetPointList = base.targetPointList;
@@ -292,7 +238,7 @@ public class AttackHitColliderProcessor : AttackColliderProcessor
 								hitParam.damageDistanceData = m_damageDistanceData;
 								hitResult.hitParams.Add(hitParam);
 								Self self = base.fromObject as Self;
-								if (self != null && !isAlreadyCheckedTask)
+								if ((Object)self != (Object)null && !isAlreadyCheckedTask)
 								{
 									BattleCheckerBase.JudgementParam judgementParam = BattleCheckerBase.JudgementParam.Create(base.attackInfo, self);
 									self.taskChecker.OnAttackHit(base.attackInfo.name, judgementParam, 0);

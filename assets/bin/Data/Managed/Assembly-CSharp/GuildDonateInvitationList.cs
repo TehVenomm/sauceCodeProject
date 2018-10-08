@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,8 +27,7 @@ public class GuildDonateInvitationList : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -47,16 +45,46 @@ public class GuildDonateInvitationList : GameSection
 		base.Initialize();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.STR_NON_LIST, _donateList.Count <= 0);
-		object table_ctrl_enum = UI.TBL_QUEST;
-		int count = _donateList.Count;
-		if (_003C_003Ef__am_0024cache1 == null)
+		SetActive(UI.STR_NON_LIST, _donateList.Count <= 0);
+		SetTable(UI.TBL_QUEST, "GuildDonateInvitationListItem", _donateList.Count, true, (int i, Transform t) => null, delegate(int i, Transform t, bool b)
 		{
-			_003C_003Ef__am_0024cache1 = new Func<int, Transform, Transform>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		SetTable((Enum)table_ctrl_enum, "GuildDonateInvitationListItem", count, true, _003C_003Ef__am_0024cache1, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			GuildDonateInvitationList guildDonateInvitationList = this;
+			DonateInvitationInfo info = _donateList[i];
+			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1, false);
+			bool flag = info.itemNum >= info.quantity;
+			SetActive(t, UI.OBJ_FULL, flag);
+			SetActive(t, UI.OBJ_NORMAL, !flag);
+			SetLabelText(UI.LBL_CHAT_MESSAGE, info.msg);
+			SetLabelText(UI.LBL_USER_NAME, info.nickName);
+			SetLabelText(UI.LBL_MATERIAL_NAME, info.itemName);
+			SetLabelText(UI.LBL_QUATITY, itemNum);
+			SetLabelText(UI.LBL_DONATE_NUM, info.itemNum);
+			SetLabelText(UI.LBL_DONATE_MAX, info.quantity);
+			SetSliderValue(UI.SLD_PROGRESS, (float)info.itemNum / (float)info.quantity);
+			if (!flag && itemNum > 0 && info.itemNum < info.quantity)
+			{
+				SetButtonEvent(t, UI.BTN_GIFT, new EventDelegate(delegate
+				{
+					guildDonateInvitationList.DispatchEvent("SEND", info.ParseDonateInfo());
+				}));
+			}
+			else
+			{
+				SetButtonEnabled(t, UI.BTN_GIFT, false);
+			}
+			Transform ctrl = GetCtrl(UI.OBJ_MATERIAL_ICON);
+			ItemInfo item = ItemInfo.CreateItemInfo(new Item
+			{
+				uniqId = "0",
+				itemId = info.itemId,
+				num = info.itemNum
+			});
+			ItemSortData itemSortData = new ItemSortData();
+			itemSortData.SetItem(item);
+			SetItemIcon(ctrl, itemSortData, ctrl);
+		});
 	}
 
 	private void OnQuery_RELOAD()

@@ -51,7 +51,7 @@ public class StringKeyTable<T> : StringKeyTableBase
 			{
 				lists[i]?.ForEach(delegate(Item o)
 				{
-					action.Invoke(o.key, (T)o.value);
+					action(o.key, (T)o.value);
 				});
 			}
 		}

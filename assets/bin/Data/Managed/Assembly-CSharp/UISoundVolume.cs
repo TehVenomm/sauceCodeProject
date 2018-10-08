@@ -1,17 +1,12 @@
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Sound Volume")]
 [RequireComponent(typeof(UISlider))]
-public class UISoundVolume
+[AddComponentMenu("NGUI/Interaction/Sound Volume")]
+public class UISoundVolume : MonoBehaviour
 {
-	public UISoundVolume()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		UISlider component = this.GetComponent<UISlider>();
+		UISlider component = GetComponent<UISlider>();
 		component.value = NGUITools.soundVolume;
 		EventDelegate.Add(component.onChange, OnChange);
 	}

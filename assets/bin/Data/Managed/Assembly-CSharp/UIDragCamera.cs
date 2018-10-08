@@ -1,31 +1,22 @@
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Drag Camera")]
-public class UIDragCamera
+[ExecuteInEditMode]
+public class UIDragCamera : MonoBehaviour
 {
 	public UIDraggableCamera draggableCamera;
 
-	public UIDragCamera()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
-		if (draggableCamera == null)
+		if ((Object)draggableCamera == (Object)null)
 		{
-			draggableCamera = NGUITools.FindInParents<UIDraggableCamera>(this.get_gameObject());
+			draggableCamera = NGUITools.FindInParents<UIDraggableCamera>(base.gameObject);
 		}
 	}
 
 	private void OnPress(bool isPressed)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
-		if (this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && draggableCamera != null)
+		if (base.enabled && NGUITools.GetActive(base.gameObject) && (Object)draggableCamera != (Object)null)
 		{
 			draggableCamera.Press(isPressed);
 		}
@@ -33,10 +24,7 @@ public class UIDragCamera
 
 	private void OnDrag(Vector2 delta)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && draggableCamera != null)
+		if (base.enabled && NGUITools.GetActive(base.gameObject) && (Object)draggableCamera != (Object)null)
 		{
 			draggableCamera.Drag(delta);
 		}
@@ -44,9 +32,7 @@ public class UIDragCamera
 
 	private void OnScroll(float delta)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
-		if (this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && draggableCamera != null)
+		if (base.enabled && NGUITools.GetActive(base.gameObject) && (Object)draggableCamera != (Object)null)
 		{
 			draggableCamera.Scroll(delta);
 		}

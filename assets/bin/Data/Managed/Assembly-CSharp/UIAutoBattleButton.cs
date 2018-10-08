@@ -46,7 +46,6 @@ public class UIAutoBattleButton : UIBehaviour
 
 	private void SetupAutoButton(double timeLeft)
 	{
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 		self = (MonoBehaviourSingleton<UIPlayerStatus>.I.targetPlayer as Self);
 		if (timeLeft < 0.0)
 		{
@@ -57,11 +56,11 @@ public class UIAutoBattleButton : UIBehaviour
 		{
 			canUseAutoMode = true;
 		}
-		if (self == null)
+		if ((UnityEngine.Object)self == (UnityEngine.Object)null)
 		{
 			canUseAutoMode = false;
 		}
-		this.get_gameObject().SetActive(canUseAutoMode);
+		base.gameObject.SetActive(canUseAutoMode);
 		if (canUseAutoMode)
 		{
 			if (GameSaveData.instance.isAutoMode)
@@ -106,7 +105,7 @@ public class UIAutoBattleButton : UIBehaviour
 		}
 		if (updateTimer)
 		{
-			automodeStatus.SubTime((double)Time.get_deltaTime());
+			automodeStatus.SubTime((double)Time.deltaTime);
 			lblAutoTime.text = automodeStatus.GetRemainTime();
 			if (!automodeStatus.IsRemain())
 			{
@@ -114,7 +113,7 @@ public class UIAutoBattleButton : UIBehaviour
 			}
 			if (isAbleCountCycle)
 			{
-				stampCircle -= (double)Time.get_deltaTime();
+				stampCircle -= (double)Time.deltaTime;
 				if (stampCircle < 0.0)
 				{
 					isAbleCountCycle = false;
@@ -133,7 +132,6 @@ public class UIAutoBattleButton : UIBehaviour
 
 	private void UpdateButton()
 	{
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 		if (cachedAutoFlg)
 		{
 			sprAutoOn.SetActive(false);
@@ -152,7 +150,7 @@ public class UIAutoBattleButton : UIBehaviour
 		{
 			canUseAutoMode = false;
 		}
-		this.get_gameObject().SetActive(canUseAutoMode);
+		base.gameObject.SetActive(canUseAutoMode);
 	}
 
 	private bool IsAuto()
@@ -242,9 +240,9 @@ public class UIAutoBattleButton : UIBehaviour
 		requestSendForm.type = playState;
 		if (btnEnable)
 		{
-			if (btnCollider != null)
+			if ((UnityEngine.Object)btnCollider != (UnityEngine.Object)null)
 			{
-				btnCollider.set_enabled(false);
+				btnCollider.enabled = false;
 			}
 			btnEnable = false;
 			Protocol.Send(AutoPlaySwitchModel.URL, requestSendForm, delegate(AutoPlaySwitchModel ret)
@@ -254,9 +252,9 @@ public class UIAutoBattleButton : UIBehaviour
 				{
 					obj = true;
 					btnEnable = true;
-					if (btnCollider != null)
+					if ((UnityEngine.Object)btnCollider != (UnityEngine.Object)null)
 					{
-						btnCollider.set_enabled(true);
+						btnCollider.enabled = true;
 					}
 					Initialize(ret.result.timeLeft, playState == 0);
 				}
@@ -351,7 +349,6 @@ public class UIAutoBattleButton : UIBehaviour
 
 	public void OnUseItem(double timeleft)
 	{
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 		Initialize(timeleft, GameSaveData.instance.isAutoMode);
 		if (automodeStatus.IsRemain())
 		{
@@ -375,7 +372,7 @@ public class UIAutoBattleButton : UIBehaviour
 			}
 			else
 			{
-				this.get_gameObject().SetActive(false);
+				base.gameObject.SetActive(false);
 			}
 		}
 	}
@@ -386,9 +383,9 @@ public class UIAutoBattleButton : UIBehaviour
 		{
 			btnEnable = true;
 		}
-		if (!btnCollider.get_enabled())
+		if (!btnCollider.enabled)
 		{
-			btnCollider.set_enabled(true);
+			btnCollider.enabled = true;
 		}
 	}
 
@@ -398,9 +395,9 @@ public class UIAutoBattleButton : UIBehaviour
 		{
 			btnEnable = false;
 		}
-		if (btnCollider.get_enabled())
+		if (btnCollider.enabled)
 		{
-			btnCollider.set_enabled(false);
+			btnCollider.enabled = false;
 		}
 	}
 
@@ -415,7 +412,7 @@ public class UIAutoBattleButton : UIBehaviour
 		{
 			if (cachedAutoFlg)
 			{
-				if (self != null)
+				if ((UnityEngine.Object)self != (UnityEngine.Object)null)
 				{
 					self.SwitchAutoBattle(false);
 				}
@@ -425,7 +422,7 @@ public class UIAutoBattleButton : UIBehaviour
 		}
 		else if (cachedAutoFlg)
 		{
-			if (self != null)
+			if ((UnityEngine.Object)self != (UnityEngine.Object)null)
 			{
 				self.SwitchAutoBattle(false);
 			}
@@ -440,7 +437,7 @@ public class UIAutoBattleButton : UIBehaviour
 	{
 		if (cachedAutoFlg)
 		{
-			if (self != null)
+			if ((UnityEngine.Object)self != (UnityEngine.Object)null)
 			{
 				self.SwitchAutoBattle(false);
 			}

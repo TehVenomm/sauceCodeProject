@@ -21,13 +21,13 @@ internal class ChatSendLimitter
 
 	public void Touch()
 	{
-		entries[lastPos] = Time.get_unscaledTime() + limitSec;
+		entries[lastPos] = Time.unscaledTime + limitSec;
 		lastPos = Next(lastPos);
 	}
 
 	public void Update()
 	{
-		if (firstPos != lastPos && entries[firstPos] < Time.get_unscaledTime())
+		if (firstPos != lastPos && entries[firstPos] < Time.unscaledTime)
 		{
 			firstPos = Next(firstPos);
 		}

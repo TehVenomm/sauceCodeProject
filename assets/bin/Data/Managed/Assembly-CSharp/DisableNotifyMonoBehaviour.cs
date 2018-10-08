@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DisableNotifyMonoBehaviour
+public class DisableNotifyMonoBehaviour : MonoBehaviour
 {
 	public Transform _transform
 	{
@@ -21,16 +21,9 @@ public class DisableNotifyMonoBehaviour
 		private set;
 	}
 
-	public DisableNotifyMonoBehaviour()
-		: this()
-	{
-	}
-
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		_transform = this.get_transform();
+		_transform = base.transform;
 	}
 
 	protected virtual void OnDisable()
@@ -71,7 +64,7 @@ public class DisableNotifyMonoBehaviour
 
 	public void ResetNotifyMaster()
 	{
-		if (notifyMaster != null)
+		if ((Object)notifyMaster != (Object)null)
 		{
 			if (notifyMaster.notifyServants != null)
 			{

@@ -3,7 +3,7 @@ using UnityEngine;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/Root")]
-public class UIRoot
+public class UIRoot : MonoBehaviour
 {
 	public enum Scaling
 	{
@@ -79,10 +79,6 @@ public class UIRoot
 	{
 		get
 		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
 			if (activeScaling == Scaling.Flexible)
 			{
 				Vector2 screenSize = NGUITools.screenSize;
@@ -126,23 +122,16 @@ public class UIRoot
 	{
 		get
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			Vector2 screenSize = NGUITools.screenSize;
 			int num = Mathf.RoundToInt(screenSize.y);
 			return (num != -1) ? GetPixelSizeAdjustment(num) : 1f;
 		}
 	}
 
-	public UIRoot()
-		: this()
-	{
-	}
-
 	public static float GetPixelSizeAdjustment(GameObject go)
 	{
 		UIRoot uIRoot = NGUITools.FindInParents<UIRoot>(go);
-		return (!(uIRoot != null)) ? 1f : uIRoot.pixelSizeAdjustment;
+		return (!((Object)uIRoot != (Object)null)) ? 1f : uIRoot.pixelSizeAdjustment;
 	}
 
 	public float GetPixelSizeAdjustment(int height)
@@ -165,9 +154,7 @@ public class UIRoot
 
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		mTrans = this.get_transform();
+		mTrans = base.transform;
 	}
 
 	protected virtual void OnEnable()
@@ -182,16 +169,15 @@ public class UIRoot
 
 	protected virtual void Start()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		UIOrthoCamera componentInChildren = this.GetComponentInChildren<UIOrthoCamera>();
-		if (componentInChildren != null)
+		UIOrthoCamera componentInChildren = GetComponentInChildren<UIOrthoCamera>();
+		if ((Object)componentInChildren != (Object)null)
 		{
-			Debug.LogWarning((object)"UIRoot should not be active at the same time as UIOrthoCamera. Disabling UIOrthoCamera.", componentInChildren);
-			Camera component = componentInChildren.get_gameObject().GetComponent<Camera>();
-			componentInChildren.set_enabled(false);
-			if (component != null)
+			Debug.LogWarning("UIRoot should not be active at the same time as UIOrthoCamera. Disabling UIOrthoCamera.", componentInChildren);
+			Camera component = componentInChildren.gameObject.GetComponent<Camera>();
+			componentInChildren.enabled = false;
+			if ((Object)component != (Object)null)
 			{
-				component.set_orthographicSize(1f);
+				component.orthographicSize = 1f;
 			}
 		}
 		else
@@ -207,22 +193,19 @@ public class UIRoot
 
 	public void UpdateScale(bool updateAnchors = true)
 	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		if (mTrans != null)
+		if ((Object)mTrans != (Object)null)
 		{
 			float num = (float)activeHeight;
 			if (num > 0f)
 			{
 				float num2 = 2f / num;
-				Vector3 localScale = mTrans.get_localScale();
+				Vector3 localScale = mTrans.localScale;
 				if (!(Mathf.Abs(localScale.x - num2) <= 1.401298E-45f) || !(Mathf.Abs(localScale.y - num2) <= 1.401298E-45f) || !(Mathf.Abs(localScale.z - num2) <= 1.401298E-45f))
 				{
-					mTrans.set_localScale(new Vector3(num2, num2, num2));
+					mTrans.localScale = new Vector3(num2, num2, num2);
 					if (updateAnchors)
 					{
-						this.BroadcastMessage("UpdateAnchors");
+						BroadcastMessage("UpdateAnchors");
 					}
 				}
 			}
@@ -235,9 +218,9 @@ public class UIRoot
 		for (int count = list.Count; i < count; i++)
 		{
 			UIRoot uIRoot = list[i];
-			if (uIRoot != null)
+			if ((Object)uIRoot != (Object)null)
 			{
-				uIRoot.BroadcastMessage(funcName, 1);
+				uIRoot.BroadcastMessage(funcName, SendMessageOptions.DontRequireReceiver);
 			}
 		}
 	}
@@ -246,7 +229,7 @@ public class UIRoot
 	{
 		if (param == null)
 		{
-			Debug.LogError((object)"SendMessage is bugged when you try to pass 'null' in the parameter field. It behaves as if no parameter was specified.");
+			Debug.LogError("SendMessage is bugged when you try to pass 'null' in the parameter field. It behaves as if no parameter was specified.");
 		}
 		else
 		{
@@ -254,9 +237,9 @@ public class UIRoot
 			for (int count = list.Count; i < count; i++)
 			{
 				UIRoot uIRoot = list[i];
-				if (uIRoot != null)
+				if ((Object)uIRoot != (Object)null)
 				{
-					uIRoot.BroadcastMessage(funcName, param, 1);
+					uIRoot.BroadcastMessage(funcName, param, SendMessageOptions.DontRequireReceiver);
 				}
 			}
 		}

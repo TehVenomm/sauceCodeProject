@@ -2,9 +2,9 @@ using AnimationOrTween;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Play Tween")]
 [ExecuteInEditMode]
-public class UIPlayTween
+[AddComponentMenu("NGUI/Interaction/Play Tween")]
+public class UIPlayTween : MonoBehaviour
 {
 	public static UIPlayTween current;
 
@@ -28,8 +28,8 @@ public class UIPlayTween
 
 	public List<EventDelegate> onFinished = new List<EventDelegate>();
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private GameObject eventReceiver;
 
 	[SerializeField]
@@ -44,14 +44,9 @@ public class UIPlayTween
 
 	private bool mActivated;
 
-	public UIPlayTween()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		if (eventReceiver != null && EventDelegate.IsValid(onFinished))
+		if ((Object)eventReceiver != (Object)null && EventDelegate.IsValid(onFinished))
 		{
 			eventReceiver = null;
 			callWhenFinished = null;
@@ -60,38 +55,32 @@ public class UIPlayTween
 
 	private void Start()
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
 		mStarted = true;
-		if (tweenTarget == null)
+		if ((Object)tweenTarget == (Object)null)
 		{
-			tweenTarget = this.get_gameObject();
+			tweenTarget = base.gameObject;
 		}
 	}
 
 	private void OnEnable()
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 		if (mStarted)
 		{
-			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
+			OnHover(UICamera.IsHighlighted(base.gameObject));
 		}
 		if (UICamera.currentTouch != null)
 		{
 			if (trigger == Trigger.OnPress || trigger == Trigger.OnPressTrue)
 			{
-				mActivated = (UICamera.currentTouch.pressed == this.get_gameObject());
+				mActivated = ((Object)UICamera.currentTouch.pressed == (Object)base.gameObject);
 			}
 			if (trigger == Trigger.OnHover || trigger == Trigger.OnHoverTrue)
 			{
-				mActivated = (UICamera.currentTouch.current == this.get_gameObject());
+				mActivated = ((Object)UICamera.currentTouch.current == (Object)base.gameObject);
 			}
 		}
-		UIToggle component = this.GetComponent<UIToggle>();
-		if (component != null)
+		UIToggle component = GetComponent<UIToggle>();
+		if ((Object)component != (Object)null)
 		{
 			EventDelegate.Add(component.onChange, OnToggle);
 		}
@@ -99,8 +88,8 @@ public class UIPlayTween
 
 	private void OnDisable()
 	{
-		UIToggle component = this.GetComponent<UIToggle>();
-		if (component != null)
+		UIToggle component = GetComponent<UIToggle>();
+		if ((Object)component != (Object)null)
 		{
 			EventDelegate.Remove(component.onChange, OnToggle);
 		}
@@ -116,7 +105,7 @@ public class UIPlayTween
 
 	private void OnHover(bool isOver)
 	{
-		if (this.get_enabled() && (trigger == Trigger.OnHover || (trigger == Trigger.OnHoverTrue && isOver) || (trigger == Trigger.OnHoverFalse && !isOver)))
+		if (base.enabled && (trigger == Trigger.OnHover || (trigger == Trigger.OnHoverTrue && isOver) || (trigger == Trigger.OnHoverFalse && !isOver)))
 		{
 			mActivated = (isOver && trigger == Trigger.OnHover);
 			Play(isOver);
@@ -125,7 +114,7 @@ public class UIPlayTween
 
 	private void OnDragOut()
 	{
-		if (this.get_enabled() && mActivated)
+		if (base.enabled && mActivated)
 		{
 			mActivated = false;
 			Play(false);
@@ -134,7 +123,7 @@ public class UIPlayTween
 
 	private void OnPress(bool isPressed)
 	{
-		if (this.get_enabled() && (trigger == Trigger.OnPress || (trigger == Trigger.OnPressTrue && isPressed) || (trigger == Trigger.OnPressFalse && !isPressed)))
+		if (base.enabled && (trigger == Trigger.OnPress || (trigger == Trigger.OnPressTrue && isPressed) || (trigger == Trigger.OnPressFalse && !isPressed)))
 		{
 			mActivated = (isPressed && trigger == Trigger.OnPress);
 			Play(isPressed);
@@ -143,7 +132,7 @@ public class UIPlayTween
 
 	private void OnClick()
 	{
-		if (this.get_enabled() && trigger == Trigger.OnClick)
+		if (base.enabled && trigger == Trigger.OnClick)
 		{
 			Play(true);
 		}
@@ -151,7 +140,7 @@ public class UIPlayTween
 
 	private void OnDoubleClick()
 	{
-		if (this.get_enabled() && trigger == Trigger.OnDoubleClick)
+		if (base.enabled && trigger == Trigger.OnDoubleClick)
 		{
 			Play(true);
 		}
@@ -159,7 +148,7 @@ public class UIPlayTween
 
 	private void OnSelect(bool isSelected)
 	{
-		if (this.get_enabled() && (trigger == Trigger.OnSelect || (trigger == Trigger.OnSelectTrue && isSelected) || (trigger == Trigger.OnSelectFalse && !isSelected)))
+		if (base.enabled && (trigger == Trigger.OnSelect || (trigger == Trigger.OnSelectTrue && isSelected) || (trigger == Trigger.OnSelectFalse && !isSelected)))
 		{
 			mActivated = (isSelected && trigger == Trigger.OnSelect);
 			Play(isSelected);
@@ -168,7 +157,7 @@ public class UIPlayTween
 
 	private void OnToggle()
 	{
-		if (this.get_enabled() && !(UIToggle.current == null) && (trigger == Trigger.OnActivate || (trigger == Trigger.OnActivateTrue && UIToggle.current.value) || (trigger == Trigger.OnActivateFalse && !UIToggle.current.value)))
+		if (base.enabled && !((Object)UIToggle.current == (Object)null) && (trigger == Trigger.OnActivate || (trigger == Trigger.OnActivateTrue && UIToggle.current.value) || (trigger == Trigger.OnActivateFalse && !UIToggle.current.value)))
 		{
 			Play(UIToggle.current.value);
 		}
@@ -186,7 +175,7 @@ public class UIPlayTween
 				UITweener uITweener = mTweens[i];
 				if (uITweener.tweenGroup == tweenGroup)
 				{
-					if (uITweener.get_enabled())
+					if (uITweener.enabled)
 					{
 						flag = false;
 						break;
@@ -210,18 +199,17 @@ public class UIPlayTween
 
 	public void Play(bool forward)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		mActive = 0;
-		GameObject val = (!(tweenTarget == null)) ? ((object)tweenTarget) : ((object)this.get_gameObject());
-		if (!NGUITools.GetActive(val))
+		GameObject gameObject = (!((Object)tweenTarget == (Object)null)) ? tweenTarget : base.gameObject;
+		if (!NGUITools.GetActive(gameObject))
 		{
 			if (ifDisabledOnPlay != EnableCondition.EnableThenPlay)
 			{
 				return;
 			}
-			NGUITools.SetActive(val, true);
+			NGUITools.SetActive(gameObject, true);
 		}
-		mTweens = ((!includeChildren) ? val.GetComponents<UITweener>() : val.GetComponentsInChildren<UITweener>());
+		mTweens = ((!includeChildren) ? gameObject.GetComponents<UITweener>() : gameObject.GetComponentsInChildren<UITweener>());
 		if (mTweens.Length == 0)
 		{
 			if (disableWhenFinished != 0)
@@ -242,10 +230,10 @@ public class UIPlayTween
 				UITweener uITweener = mTweens[i];
 				if (uITweener.tweenGroup == tweenGroup)
 				{
-					if (!flag && !NGUITools.GetActive(val))
+					if (!flag && !NGUITools.GetActive(gameObject))
 					{
 						flag = true;
-						NGUITools.SetActive(val, true);
+						NGUITools.SetActive(gameObject, true);
 					}
 					mActive++;
 					if (playDirection == Direction.Toggle)
@@ -255,7 +243,7 @@ public class UIPlayTween
 					}
 					else
 					{
-						if (resetOnPlay || (resetIfDisabled && !uITweener.get_enabled()))
+						if (resetOnPlay || (resetIfDisabled && !uITweener.enabled))
 						{
 							uITweener.Play(forward);
 							uITweener.ResetToBeginning();
@@ -270,13 +258,13 @@ public class UIPlayTween
 
 	private void OnFinished()
 	{
-		if (--mActive == 0 && current == null)
+		if (--mActive == 0 && (Object)current == (Object)null)
 		{
 			current = this;
 			EventDelegate.Execute(onFinished);
-			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
+			if ((Object)eventReceiver != (Object)null && !string.IsNullOrEmpty(callWhenFinished))
 			{
-				eventReceiver.SendMessage(callWhenFinished, 1);
+				eventReceiver.SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
 			}
 			eventReceiver = null;
 			current = null;

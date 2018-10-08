@@ -1,6 +1,7 @@
 using System;
+using UnityEngine;
 
-public class CoopClientPacketSender
+public class CoopClientPacketSender : MonoBehaviour
 {
 	private CoopClient coopClient
 	{
@@ -8,15 +9,9 @@ public class CoopClientPacketSender
 		set;
 	}
 
-	public CoopClientPacketSender()
-		: this()
-	{
-	}
-
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		coopClient = this.get_gameObject().GetComponent<CoopClient>();
+		coopClient = base.gameObject.GetComponent<CoopClient>();
 	}
 
 	protected virtual void Start()
@@ -32,14 +27,20 @@ public class CoopClientPacketSender
 		return MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo(to_client_id, model, promise, onReceiveAck, onPreResend);
 	}
 
-	public unsafe void SendClientStatus(int to_client_id = 0)
+	public void SendClientStatus(int to_client_id = 0)
 	{
 		Coop_Model_ClientStatus model = new Coop_Model_ClientStatus();
 		model.id = 1003;
 		model.status = (int)coopClient.status;
 		model.joinType = (int)coopClient.joinType;
-		_003CSendClientStatus_003Ec__AnonStorey4B7 _003CSendClientStatus_003Ec__AnonStorey4B;
-		Send(model, true, to_client_id, null, new Func<Coop_Model_Base, bool>((object)_003CSendClientStatus_003Ec__AnonStorey4B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		Send(model, true, to_client_id, null, delegate
+		{
+			if (model.status != (int)coopClient.status)
+			{
+				return false;
+			}
+			return true;
+		});
 	}
 
 	public void SendClientBecameHost(int to_client_id = 0)

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -26,11 +25,15 @@ public class ProfilePlayData : GameSection
 		base.Initialize();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
 		base.UpdateUI();
 		PlayDataTable.PlayData[] nameList = Singleton<PlayDataTable>.I.GetSortedPlayData(MonoBehaviourSingleton<AchievementManager>.I.GetAchievementCounterList().ToArray());
-		_003CUpdateUI_003Ec__AnonStorey3DD _003CUpdateUI_003Ec__AnonStorey3DD;
-		SetGrid(UI.GRD_LIST, "ProfilePlaydataListItem", nameList.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3DD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetGrid(UI.GRD_LIST, "ProfilePlaydataListItem", nameList.Length, false, delegate(int i, Transform t, bool is_recycle)
+		{
+			PlayDataTable.PlayData playData = nameList[i];
+			SetLabelText(t, UI.LBL_NAME, playData.name);
+			SetLabelText(t, UI.LBL_NUM, string.Format(playData.format, playData.count));
+		});
 	}
 }

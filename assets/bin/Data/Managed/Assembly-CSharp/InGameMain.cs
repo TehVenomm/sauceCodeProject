@@ -74,10 +74,9 @@ public class InGameMain : GameSection
 
 	public override void OnPressBackKey()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		if (QuestManager.IsValidInGame())
 		{
-			if (MonoBehaviourSingleton<UIInGameMenu>.IsValid() && MonoBehaviourSingleton<UIInGameMenu>.I.get_gameObject().get_activeInHierarchy())
+			if (MonoBehaviourSingleton<UIInGameMenu>.IsValid() && MonoBehaviourSingleton<UIInGameMenu>.I.gameObject.activeInHierarchy)
 			{
 				MonoBehaviourSingleton<UIInGameMenu>.I.Close();
 			}
@@ -101,15 +100,14 @@ public class InGameMain : GameSection
 
 	public override void Initialize()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<ShopManager>.IsValid())
 		{
 			MonoBehaviourSingleton<ShopManager>.I.trackPlayerDie = false;
 		}
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
-	private unsafe IEnumerator DoInitialize()
+	private IEnumerator DoInitialize()
 	{
 		if (MonoBehaviourSingleton<InGameManager>.I.graphicOptionType <= 0)
 		{
@@ -129,11 +127,17 @@ public class InGameMain : GameSection
 			bool isWaitQuestLoad = true;
 			if (MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo())
 			{
-				CoopApp.EnterArenaQuestOffline(new Action<bool, bool, bool, bool>((object)/*Error near IL_00d3: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				CoopApp.EnterArenaQuestOffline(delegate(bool isMatching, bool isConnect, bool isRegist, bool isStart)
+				{
+					((_003CDoInitialize_003Ec__IteratorC3)/*Error near IL_00d3: stateMachine*/)._003CisWaitQuestLoad_003E__0 = !isStart;
+				});
 			}
 			else if (MonoBehaviourSingleton<StatusManager>.IsValid() && MonoBehaviourSingleton<StatusManager>.I.assignedCharaInfo != null && MonoBehaviourSingleton<StatusManager>.I.assignedEquipmentData != null)
 			{
-				CoopApp.EnterQuestOfflineAssignedEquipment(null, null, new Action<bool, bool, bool, bool>((object)/*Error near IL_0113: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				CoopApp.EnterQuestOfflineAssignedEquipment(null, null, delegate(bool isMatching, bool isConnect, bool isRegist, bool isStart)
+				{
+					((_003CDoInitialize_003Ec__IteratorC3)/*Error near IL_0113: stateMachine*/)._003CisWaitQuestLoad_003E__0 = !isStart;
+				});
 			}
 			while (isWaitQuestLoad)
 			{
@@ -146,7 +150,7 @@ public class InGameMain : GameSection
 			}
 			MonoBehaviourSingleton<InGameManager>.I.isRetry = false;
 		}
-		SetActive((Enum)UI.BTN_QUEST_MENU, QuestManager.IsValidInGame());
+		SetActive(UI.BTN_QUEST_MENU, QuestManager.IsValidInGame());
 		InitializeChatUI();
 		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 		{
@@ -162,15 +166,15 @@ public class InGameMain : GameSection
 		}
 		if (QuestManager.IsValidInGame() && MonoBehaviourSingleton<AppMain>.IsValid() && !MonoBehaviourSingleton<InGameRecorder>.IsValid())
 		{
-			MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<InGameRecorder>();
+			MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<InGameRecorder>();
 		}
 		if (MonoBehaviourSingleton<AppMain>.IsValid())
 		{
-			MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<AttackColliderManager>();
+			MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<AttackColliderManager>();
 		}
-		inGameMembers = new GameObject("InGameMembers").get_transform();
+		inGameMembers = new GameObject("InGameMembers").transform;
 		Transform _transform = inGameMembers;
-		_transform.get_transform().set_parent(MonoBehaviourSingleton<AppMain>.I._transform);
+		_transform.transform.parent = MonoBehaviourSingleton<AppMain>.I._transform;
 		inGameUIMembers = Utility.CreateGameObject("InGameUIMembers", MonoBehaviourSingleton<UIManager>.I._transform, 5);
 		LoadingQueue load_queue = new LoadingQueue(this);
 		ResourceManager.enableCache = false;
@@ -225,8 +229,8 @@ public class InGameMain : GameSection
 			{
 				GameObject questControllerObj = new GameObject("VorgonQuestController");
 				vorgonPreEventController = questControllerObj.AddComponent<VorgonPreEventController>();
-				vorgonPreEventController.set_enabled(false);
-				questControllerObj.get_transform().set_parent(_transform);
+				vorgonPreEventController.enabled = false;
+				questControllerObj.transform.parent = _transform;
 				if (vorgonQuestType == QuestManager.VorgonQuetType.BATTLE_WITH_WYBURN)
 				{
 					string path = "ev001_CutScene";
@@ -234,7 +238,7 @@ public class InGameMain : GameSection
 					cutScenePlayer = questControllerObj.AddComponent<CutScenePlayer>();
 					cutScenePlayer.Init(path, delegate
 					{
-						((_003CDoInitialize_003Ec__IteratorC1)/*Error near IL_04e0: stateMachine*/)._003Cwait_003E__12 = false;
+						((_003CDoInitialize_003Ec__IteratorC3)/*Error near IL_04e0: stateMachine*/)._003Cwait_003E__12 = false;
 					});
 					while (wait)
 					{
@@ -243,7 +247,7 @@ public class InGameMain : GameSection
 				}
 			}
 		}
-		bool isExploreMiniMapActive = MonoBehaviourSingleton<ExploreMiniMap>.IsValid() && MonoBehaviourSingleton<ExploreMiniMap>.I.get_gameObject().get_activeSelf();
+		bool isExploreMiniMapActive = MonoBehaviourSingleton<ExploreMiniMap>.IsValid() && MonoBehaviourSingleton<ExploreMiniMap>.I.gameObject.activeSelf;
 		if (isExploreMiniMapActive)
 		{
 			MonoBehaviourSingleton<ExploreMiniMap>.I.Preload(load_queue);
@@ -269,12 +273,12 @@ public class InGameMain : GameSection
 		ResourceObject[] loadedObjects = lo_prefabs.loadedObjects;
 		foreach (ResourceObject prefab in loadedObjects)
 		{
-			string name = prefab.obj.get_name();
+			string name = prefab.obj.name;
 			if (name.Contains("PlayerAttackInfo"))
 			{
 				if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
 				{
-					if (_setting_transform == null)
+					if ((UnityEngine.Object)_setting_transform == (UnityEngine.Object)null)
 					{
 						_setting_transform = MonoBehaviourSingleton<InGameSettingsManager>.I._transform;
 					}
@@ -283,7 +287,7 @@ public class InGameMain : GameSection
 						player_setting = MonoBehaviourSingleton<InGameSettingsManager>.I.player;
 						player_setting.attackInfosAll = new AttackInfo[0];
 					}
-					GameObject obj = ResourceUtility.Realizes(prefab.obj, _setting_transform, -1).get_gameObject();
+					GameObject obj = ResourceUtility.Realizes(prefab.obj, _setting_transform, -1).gameObject;
 					AttackInfos attack_infos = obj.GetComponent<AttackInfos>();
 					player_setting.weaponAttackInfoList.Add(attack_infos);
 					player_setting.attackInfosAll = Utility.CreateMergedArray(player_setting.attackInfosAll, attack_infos.attackHitInfos);
@@ -308,9 +312,9 @@ public class InGameMain : GameSection
 		Utility.CreateGameObjectAndComponent("TargetMarkerManager", _transform, -1);
 		Utility.CreateGameObjectAndComponent("InGameProgress", _transform, -1);
 		Utility.CreateGameObjectAndComponent("AIManager", _transform, -1);
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != null)
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != (UnityEngine.Object)null)
 		{
-			MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.get_gameObject().SetActive(true);
+			MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.gameObject.SetActive(true);
 			if (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite)
 			{
 				MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Open(UITransition.TYPE.OPEN);
@@ -319,10 +323,10 @@ public class InGameMain : GameSection
 		if (lo_tutorial_prefab != null)
 		{
 			Transform t = ResourceUtility.Realizes(lo_tutorial_prefab.loadedObject, inGameUIMembers, -1);
-			if (t != null)
+			if ((UnityEngine.Object)t != (UnityEngine.Object)null)
 			{
 				UITutorialFieldHelper h = t.GetComponent<UITutorialFieldHelper>();
-				if (h != null)
+				if ((UnityEngine.Object)h != (UnityEngine.Object)null)
 				{
 					h.Setup(this);
 				}
@@ -330,11 +334,11 @@ public class InGameMain : GameSection
 		}
 		if (MonoBehaviourSingleton<InGameManager>.I.IsRush() || QuestManager.IsValidInGameWaveMatch(true))
 		{
-			GameObject inGameRushUI = Object.Instantiate(lo_ingame_rush.loadedObject) as GameObject;
-			inGameRushUI.get_transform().set_parent(MonoBehaviourSingleton<UIContinueButton>.I._transform.get_parent());
-			inGameRushUI.get_transform().set_localPosition(Vector3.get_zero());
-			inGameRushUI.get_transform().set_localRotation(Quaternion.get_identity());
-			inGameRushUI.get_transform().set_localScale(Vector3.get_one());
+			GameObject inGameRushUI = UnityEngine.Object.Instantiate(lo_ingame_rush.loadedObject) as GameObject;
+			inGameRushUI.transform.parent = MonoBehaviourSingleton<UIContinueButton>.I._transform.parent;
+			inGameRushUI.transform.localPosition = Vector3.zero;
+			inGameRushUI.transform.localRotation = Quaternion.identity;
+			inGameRushUI.transform.localScale = Vector3.one;
 			UIStaticPanelChanger panelChanger = inGameRushUI.GetComponentInParent<UIStaticPanelChanger>();
 			MonoBehaviourSingleton<UISpectatorButton>.I.Initialize(panelChanger);
 		}
@@ -489,7 +493,7 @@ public class InGameMain : GameSection
 		{
 			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.SetLoadingPer(70);
 		}
-		yield return (object)this.StartCoroutine(MonoBehaviourSingleton<InGameManager>.I.InitializeEnemyPop());
+		yield return (object)StartCoroutine(MonoBehaviourSingleton<InGameManager>.I.InitializeEnemyPop());
 		InGameManager.IntervalTransferInfo interval_transfer_info = null;
 		if (MonoBehaviourSingleton<InGameManager>.IsValid())
 		{
@@ -508,7 +512,7 @@ public class InGameMain : GameSection
 		for (int len2 = MonoBehaviourSingleton<StageObjectManager>.I.characterList.Count; j < len2; j++)
 		{
 			Character character = MonoBehaviourSingleton<StageObjectManager>.I.characterList[j] as Character;
-			if (character.IsCoopNone() && character.isLoading && MonoBehaviourSingleton<StageObjectManager>.I.FindNonPlayer(character.id) == null)
+			if (character.IsCoopNone() && character.isLoading && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.FindNonPlayer(character.id) == (UnityEngine.Object)null)
 			{
 				load_check_list.Add(character);
 			}
@@ -522,7 +526,7 @@ public class InGameMain : GameSection
 				yield return (object)null;
 			}
 		}
-		if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+		if ((UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null)
 		{
 			MonoBehaviourSingleton<StageObjectManager>.I.self.hitOffFlag |= StageObject.HIT_OFF_FLAG.INITIALIZE;
 		}
@@ -574,20 +578,20 @@ public class InGameMain : GameSection
 		MonoBehaviourSingleton<InGameManager>.I.CheckStageInitialState();
 		if (MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
-			yield return (object)this.StartCoroutine(MonoBehaviourSingleton<CoopManager>.I.coopStage.DoActivate());
+			yield return (object)StartCoroutine(MonoBehaviourSingleton<CoopManager>.I.coopStage.DoActivate());
 		}
 		MonoBehaviourSingleton<StageObjectManager>.I.objectList.ForEach(delegate(StageObject o)
 		{
-			if (o.controller != null)
+			if ((UnityEngine.Object)o.controller != (UnityEngine.Object)null)
 			{
 				o.controller.SetEnableControll(true, ControllerBase.DISABLE_FLAG.BATTLE_START);
 			}
 		});
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		if (self != null)
+		if ((UnityEngine.Object)self != (UnityEngine.Object)null)
 		{
 			self.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.INITIALIZE;
-			if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
+			if ((UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.boss != (UnityEngine.Object)null)
 			{
 				self.SetActionTarget(MonoBehaviourSingleton<StageObjectManager>.I.boss, true);
 			}
@@ -595,14 +599,14 @@ public class InGameMain : GameSection
 		if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
 		{
 			prevLevel = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level;
-			if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.levelUp != null)
+			if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.levelUp != (UnityEngine.Object)null)
 			{
 				MonoBehaviourSingleton<UIManager>.I.levelUp.GetNowStatus();
 			}
 		}
 		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
-			if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+			if ((UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null)
 			{
 				MonoBehaviourSingleton<InGameCameraManager>.I.target = MonoBehaviourSingleton<StageObjectManager>.I.self._transform;
 			}
@@ -629,9 +633,9 @@ public class InGameMain : GameSection
 		}
 		yield return (object)0;
 		PredownloadManager.Stop(PredownloadManager.STOP_FLAG.INGAME_MAIN, false);
-		if (vorgonPreEventController != null)
+		if ((UnityEngine.Object)vorgonPreEventController != (UnityEngine.Object)null)
 		{
-			vorgonPreEventController.set_enabled(true);
+			vorgonPreEventController.enabled = true;
 		}
 		if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
 		{
@@ -641,7 +645,7 @@ public class InGameMain : GameSection
 		{
 			MonoBehaviourSingleton<UIEnduranceStatus>.I.ResetSpActionGaugeState();
 		}
-		if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+		if ((UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null)
 		{
 			MonoBehaviourSingleton<StageObjectManager>.I.self.ResetShadowSealingUI();
 		}
@@ -669,7 +673,7 @@ public class InGameMain : GameSection
 		{
 			MonoBehaviourSingleton<UIPlayerStatus>.I.autoBattleButton.GetAutoPlayTime(delegate
 			{
-				((_003CDoInitialize_003Ec__IteratorC1)/*Error near IL_18ec: stateMachine*/)._003CwaitGetAutoTime_003E__70 = false;
+				((_003CDoInitialize_003Ec__IteratorC3)/*Error near IL_18ec: stateMachine*/)._003CwaitGetAutoTime_003E__70 = false;
 			});
 		}
 		while (waitGetAutoTime)
@@ -721,21 +725,17 @@ public class InGameMain : GameSection
 
 	protected override void OnOpen()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		UIExplorePlayerStatusList componentInChildren = this.GetComponentInChildren<UIExplorePlayerStatusList>(true);
-		if (Object.op_Implicit(componentInChildren))
+		UIExplorePlayerStatusList componentInChildren = GetComponentInChildren<UIExplorePlayerStatusList>(true);
+		if ((bool)componentInChildren)
 		{
-			componentInChildren.get_gameObject().SetActive(false);
+			componentInChildren.gameObject.SetActive(false);
 		}
 		OnScreenRotate(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
 		base.OnOpen();
 	}
 
-	public unsafe override void StartSection()
+	public override void StartSection()
 	{
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Expected O, but got Unknown
 		if (UITutorialFieldHelper.IsValid())
 		{
 			MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_TUTORIAL, false);
@@ -759,10 +759,10 @@ public class InGameMain : GameSection
 			{
 				if (portalObjectList[i].isClearOrder && GameSaveData.instance.isNewReleasePortal(portalObjectList[i].portalID))
 				{
-					if (portalUnlockEvent == null)
+					if ((UnityEngine.Object)portalUnlockEvent == (UnityEngine.Object)null)
 					{
-						portalUnlockEvent = MonoBehaviourSingleton<InGameManager>.I.get_gameObject().AddComponent<PortalUnlockEvent>();
-						portalUnlockEvent.SetOnEndAllEvent(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+						portalUnlockEvent = MonoBehaviourSingleton<InGameManager>.I.gameObject.AddComponent<PortalUnlockEvent>();
+						portalUnlockEvent.SetOnEndAllEvent(SetCoopStageReady);
 					}
 					portalUnlockEvent.AddPortal(portalObjectList[i]);
 					GameSaveData.instance.newReleasePortals.Remove(portalObjectList[i].portalID);
@@ -773,7 +773,7 @@ public class InGameMain : GameSection
 		{
 			InitializeExplorePlayerStatuses();
 		}
-		if (portalUnlockEvent == null)
+		if ((UnityEngine.Object)portalUnlockEvent == (UnityEngine.Object)null)
 		{
 			SetCoopStageReady();
 		}
@@ -793,16 +793,16 @@ public class InGameMain : GameSection
 		int completableDeliveryNum = MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum();
 		int completableEventDeliveryNum = MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableEventDeliveryNum();
 		int num = completableDeliveryNum - completableEventDeliveryNum;
-		SetBadge((Enum)UI.BTN_REQUEST, num, 3, -5, -5, false);
-		SetBadge((Enum)UI.BTN_EVENT, completableEventDeliveryNum, 3, -5, -5, false);
+		SetBadge(UI.BTN_REQUEST, num, SpriteAlignment.TopRight, -5, -5, false);
+		SetBadge(UI.BTN_EVENT, completableEventDeliveryNum, SpriteAlignment.TopRight, -5, -5, false);
 		if (LoungeMatchingManager.IsValidInLounge())
 		{
 			int num2 = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetMemberCount() - 1;
-			SetBadge((Enum)UI.BTN_LOUNGE_MEMBER, num2, 3, -5, -5, false);
+			SetBadge(UI.BTN_LOUNGE_MEMBER, num2, SpriteAlignment.TopRight, -5, -5, false);
 		}
 		if (UIInGameFieldMenu.IsValid() && !UIInGameFieldMenu.I.IsPopMenu())
 		{
-			SetBadge((Enum)UI.BTN_INGAME_MENU, completableDeliveryNum, 3, -5, -5, false);
+			SetBadge(UI.BTN_INGAME_MENU, completableDeliveryNum, SpriteAlignment.TopRight, -5, -5, false);
 		}
 	}
 
@@ -818,11 +818,11 @@ public class InGameMain : GameSection
 			TutorialStep4_2();
 			if (!UIInGameFieldMenu.I.IsPopMenu())
 			{
-				SetBadge((Enum)UI.BTN_INGAME_MENU, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum(), 3, -5, -5, false);
+				SetBadge(UI.BTN_INGAME_MENU, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum(), SpriteAlignment.TopRight, -5, -5, false);
 			}
 			else
 			{
-				SetBadge((Enum)UI.BTN_INGAME_MENU, 0, 3, -5, -5, false);
+				SetBadge(UI.BTN_INGAME_MENU, 0, SpriteAlignment.TopRight, -5, -5, false);
 			}
 		}
 	}
@@ -834,7 +834,7 @@ public class InGameMain : GameSection
 			execTutorial4_1 = true;
 			MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_TUTORIAL, true);
 			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("InGameScene", "TutorialStep4_1_1", null);
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null)
 			{
 				MonoBehaviourSingleton<StageObjectManager>.I.self.hitOffFlag |= StageObject.HIT_OFF_FLAG.TUTORIAL;
 			}
@@ -867,22 +867,20 @@ public class InGameMain : GameSection
 
 	private void OnDisable()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		if (inGameMembers != null)
+		if ((UnityEngine.Object)inGameMembers != (UnityEngine.Object)null)
 		{
 			MonoBehaviourSingleton<InGameManager>.I.SetIntervalTransferSelf();
-			Object.DestroyImmediate(inGameMembers.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(inGameMembers.gameObject);
 			inGameMembers = null;
 		}
-		if (inGameUIMembers != null)
+		if ((UnityEngine.Object)inGameUIMembers != (UnityEngine.Object)null)
 		{
-			Object.DestroyImmediate(inGameUIMembers.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(inGameUIMembers.gameObject);
 			inGameUIMembers = null;
 		}
 		if (MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
 		{
-			Object.DestroyImmediate(MonoBehaviourSingleton<DropTargetMarkerManeger>.I);
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<DropTargetMarkerManeger>.I);
 		}
 		if (MonoBehaviourSingleton<EffectManager>.IsValid())
 		{
@@ -892,21 +890,21 @@ public class InGameMain : GameSection
 		{
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= OnScreenRotate;
 		}
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.mainChat.RemoveObserver(this);
 		}
 		if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
 		{
-			Object.DestroyImmediate(MonoBehaviourSingleton<AttackColliderManager>.I);
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<AttackColliderManager>.I);
 		}
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != null)
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != (UnityEngine.Object)null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Close(UITransition.TYPE.CLOSE);
 		}
 	}
 
-	private unsafe void OnQuery_BINGO()
+	private void OnQuery_BINGO()
 	{
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<QuestManager>.I.SendGetBingoEventList(delegate
@@ -919,8 +917,9 @@ public class InGameMain : GameSection
 					Network.EventData firstEvent = validBingoDataListInSection[0];
 					List<DeliveryTable.DeliveryData> deliveryTableDataList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryTableDataList(false);
 					List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
-					_003COnQuery_BINGO_003Ec__AnonStorey388 _003COnQuery_BINGO_003Ec__AnonStorey;
-					int num = deliveryTableDataList.Where(new Func<DeliveryTable.DeliveryData, bool>((object)_003COnQuery_BINGO_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
+					int num = (from d in deliveryTableDataList
+					where d.IsEvent() && d.eventID == firstEvent.eventId
+					select d).Count();
 					int num2 = 0;
 					for (int i = 0; i < clearStatusDelivery.Count; i++)
 					{
@@ -1114,15 +1113,14 @@ public class InGameMain : GameSection
 		}
 	}
 
-	private unsafe void OnCloseDialog_InGameKickedMessage()
+	private void OnCloseDialog_InGameKickedMessage()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
-		if (_003C_003Ef__am_0024cache8 == null)
+		Protocol.Force(delegate
 		{
-			_003C_003Ef__am_0024cache8 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		Protocol.Force(_003C_003Ef__am_0024cache8);
+			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
+			{
+			}, false);
+		});
 	}
 
 	private void OnQuery_QUEST_WINDOW()
@@ -1180,7 +1178,7 @@ public class InGameMain : GameSection
 	{
 		if ((NOTIFY_FLAG.UPDATE_USER_STATUS & flags) != (NOTIFY_FLAG)0L && (int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level != prevLevel)
 		{
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null)
 			{
 				MonoBehaviourSingleton<StageObjectManager>.I.self.OnSetPlayerStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.atk, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.def, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.hp, true, null);
 			}
@@ -1211,7 +1209,7 @@ public class InGameMain : GameSection
 		}
 		if ((flags & NOTIFY_FLAG.UPDATE_PARTY_INVITE) != (NOTIFY_FLAG)0L)
 		{
-			if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != null && TutorialStep.HasAllTutorialCompleted())
+			if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != (UnityEngine.Object)null && TutorialStep.HasAllTutorialCompleted())
 			{
 				if (MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite && !MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.isOpen && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "InGameMain")
 				{
@@ -1225,7 +1223,7 @@ public class InGameMain : GameSection
 		}
 		else if ((flags & NOTIFY_FLAG.UPDATE_RALLY_INVITE) != (NOTIFY_FLAG)0L)
 		{
-			if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != null && TutorialStep.HasAllTutorialCompleted())
+			if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != (UnityEngine.Object)null && TutorialStep.HasAllTutorialCompleted())
 			{
 				if (MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite && !MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.isOpen && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "InGameMain")
 				{
@@ -1258,7 +1256,7 @@ public class InGameMain : GameSection
 			}
 			if ((flags & NOTIFY_FLAG.TRANSITION_END) != (NOTIFY_FLAG)0L)
 			{
-				if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.knockDownRaidBoss != null)
+				if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.knockDownRaidBoss != (UnityEngine.Object)null)
 				{
 					MonoBehaviourSingleton<UIManager>.I.knockDownRaidBoss.ClearAnnounce();
 					if (MonoBehaviourSingleton<UIManager>.I.knockDownRaidBoss.IsKnockDownRaidBossByRaidBossHp())
@@ -1282,11 +1280,10 @@ public class InGameMain : GameSection
 
 	private void InitializeExplorePlayerStatuses()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		UIExplorePlayerStatusList componentInChildren = this.GetComponentInChildren<UIExplorePlayerStatusList>(true);
-		if (Object.op_Implicit(componentInChildren))
+		UIExplorePlayerStatusList componentInChildren = GetComponentInChildren<UIExplorePlayerStatusList>(true);
+		if ((bool)componentInChildren)
 		{
-			componentInChildren.get_gameObject().SetActive(true);
+			componentInChildren.gameObject.SetActive(true);
 			ExploreStatus exploreStatus = MonoBehaviourSingleton<QuestManager>.I.GetExploreStatus();
 			componentInChildren.Initialize(exploreStatus);
 		}
@@ -1294,18 +1291,16 @@ public class InGameMain : GameSection
 
 	private void InitializeChatUI()
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
 		MonoBehaviourSingleton<ChatManager>.I.CreateRoomChatWithCoopIfNeeded();
 		MonoBehaviourSingleton<ChatManager>.I.roomChat.JoinRoom(0);
 		UIButton component = GetCtrl(UI.BTN_CHAT).GetComponent<UIButton>();
-		if (!(component == null))
+		if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
 		{
 			if (!TutorialStep.HasAllTutorialCompleted())
 			{
-				component.get_gameObject().SetActive(false);
+				component.gameObject.SetActive(false);
 			}
-			else if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
+			else if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null)
 			{
 				MonoBehaviourSingleton<UIManager>.I.mainChat.addObserver(this);
 				component.onClick.Clear();
@@ -1314,14 +1309,14 @@ public class InGameMain : GameSection
 			}
 			else
 			{
-				component.get_gameObject().SetActive(false);
+				component.gameObject.SetActive(false);
 			}
 		}
 	}
 
 	private void CloseChatWindow()
 	{
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.mainChat.HideAll();
 		}
@@ -1329,53 +1324,46 @@ public class InGameMain : GameSection
 
 	public override void OnModifyChat(MainChat.NOTIFY_FLAG flag)
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainChat != (UnityEngine.Object)null)
 		{
 			if ((flag & MainChat.NOTIFY_FLAG.ARRIVED_MESSAGE) != 0)
 			{
-				SpriteAlignment align = LoungeMatchingManager.IsValidInLounge() ? 1 : 3;
-				SetBadge((Enum)UI.BTN_CHAT, MonoBehaviourSingleton<UIManager>.I.mainChat.GetPendingQueueNumWithoutRoom(), align, -5, -5, false);
+				SpriteAlignment align = LoungeMatchingManager.IsValidInLounge() ? SpriteAlignment.TopLeft : SpriteAlignment.TopRight;
+				SetBadge(UI.BTN_CHAT, MonoBehaviourSingleton<UIManager>.I.mainChat.GetPendingQueueNumWithoutRoom(), align, -5, -5, false);
 			}
 			if ((flag & MainChat.NOTIFY_FLAG.CLOSE_WINDOW) != 0)
 			{
-				GetCtrl(UI.BTN_CHAT).get_gameObject().SetActive(true);
+				GetCtrl(UI.BTN_CHAT).gameObject.SetActive(true);
 			}
 			if ((flag & MainChat.NOTIFY_FLAG.OPEN_WINDOW) != 0)
 			{
-				GetCtrl(UI.BTN_CHAT).get_gameObject().SetActive(false);
+				GetCtrl(UI.BTN_CHAT).gameObject.SetActive(false);
 			}
 			if ((flag & MainChat.NOTIFY_FLAG.OPEN_WINDOW_INPUT_ONLY) != 0)
 			{
-				GetCtrl(UI.BTN_CHAT).get_gameObject().SetActive(false);
+				GetCtrl(UI.BTN_CHAT).gameObject.SetActive(false);
 			}
 		}
 	}
 
-	private unsafe void OnScreenRotate(bool is_portrait)
+	private void OnScreenRotate(bool is_portrait)
 	{
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Expected O, but got Unknown
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Expected O, but got Unknown
 		float num = (!is_portrait) ? 10f : 323f;
 		UIWidget component = GetCtrl(UI.WGT_CHAT_PARENT).GetComponent<UIWidget>();
-		if (Object.op_Implicit(component))
+		if ((bool)component)
 		{
 			UIStaticPanelChanger staticPanelChanger = component.GetComponentInParent<UIStaticPanelChanger>();
-			if (Object.op_Implicit(staticPanelChanger))
+			if ((bool)staticPanelChanger)
 			{
 				staticPanelChanger.UnLock();
 				component.topAnchor.Set(0f, num + (float)component.height);
 				component.bottomAnchor.Set(0f, num);
 				component.UpdateAnchors();
 				AppMain i = MonoBehaviourSingleton<AppMain>.I;
-				_003COnScreenRotate_003Ec__AnonStorey389 _003COnScreenRotate_003Ec__AnonStorey;
-				i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003COnScreenRotate_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+				{
+					staticPanelChanger.Lock();
+				});
 			}
 		}
 	}

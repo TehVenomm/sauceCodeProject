@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SimplePingPongAlpha
+public class SimplePingPongAlpha : MonoBehaviour
 {
 	private enum eState
 	{
@@ -36,18 +36,8 @@ public class SimplePingPongAlpha
 
 	private Color color = default(Color);
 
-	public SimplePingPongAlpha()
-		: this()
-	{
-	}//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-	//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-
-
 	public void Initialize()
 	{
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
 		if (state == eState.None)
 		{
 			from = LimitValue(from);
@@ -60,7 +50,6 @@ public class SimplePingPongAlpha
 
 	public void Play(bool startDefaultValue)
 	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		if (state == eState.None)
 		{
 			Initialize();
@@ -75,15 +64,14 @@ public class SimplePingPongAlpha
 		}
 		nowCount = 0;
 		state = eState.Forward;
-		target.get_gameObject().SetActive(true);
+		target.gameObject.SetActive(true);
 	}
 
 	private void Update()
 	{
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 		if (state != 0 && state != eState.Idle)
 		{
-			float value = addValue * Time.get_deltaTime();
+			float value = addValue * Time.deltaTime;
 			if (state == eState.Forward)
 			{
 				if (AddValue(value))
@@ -97,7 +85,7 @@ public class SimplePingPongAlpha
 				{
 					if (endDisable)
 					{
-						target.get_gameObject().SetActive(false);
+						target.gameObject.SetActive(false);
 					}
 					state = eState.Idle;
 				}
@@ -111,14 +99,12 @@ public class SimplePingPongAlpha
 
 	private void SetValue(float value)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		color.a = value;
 		target.color = color;
 	}
 
 	private bool AddValue(float value)
 	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		bool result = false;
 		color.a += value;
 		if (color.a >= to)
@@ -132,7 +118,6 @@ public class SimplePingPongAlpha
 
 	private bool SubValue(float value)
 	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		bool result = false;
 		color.a -= value;
 		if (color.a <= from)

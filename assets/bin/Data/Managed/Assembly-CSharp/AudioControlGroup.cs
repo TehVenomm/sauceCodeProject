@@ -48,11 +48,9 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 
 	public static AudioControlGroup Create(CullingTypes type = CullingTypes.NONE, int LimitNum = int.MaxValue)
 	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Expected O, but got Unknown
-		GameObject val = new GameObject("AudioControlGroup");
-		AudioControlGroup audioControlGroup = val.AddComponent<AudioControlGroup>();
-		audioControlGroup._transform.set_parent(MonoBehaviourSingleton<SoundManager>.I._transform);
+		GameObject gameObject = new GameObject("AudioControlGroup");
+		AudioControlGroup audioControlGroup = gameObject.AddComponent<AudioControlGroup>();
+		audioControlGroup._transform.parent = MonoBehaviourSingleton<SoundManager>.I._transform;
 		audioControlGroup.Setup(type, LimitNum);
 		return audioControlGroup;
 	}
@@ -101,7 +99,7 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 
 	private void PrepareKeyOn(int clip_id)
 	{
-		if (m_bUnique && m_lastAudio != null)
+		if (m_bUnique && (Object)m_lastAudio != (Object)null)
 		{
 			m_lastAudio.Stop(0);
 			m_lastAudio = null;
@@ -136,7 +134,7 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 
 	public AudioObject CreateAudio(AudioClip clip, int clip_id, float volume, bool loop, AudioMixerGroup mixer_group, bool is3DSound = false, DisableNotifyMonoBehaviour master = null, Transform _parent = null, Vector3? initPos = default(Vector3?))
 	{
-		if (clip == null)
+		if ((Object)clip == (Object)null)
 		{
 			return null;
 		}
@@ -146,13 +144,13 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 			return null;
 		}
 		PrepareKeyOn(clip_id);
-		Transform parent = (!(_parent == null)) ? ((object)_parent) : ((object)base._transform);
+		Transform parent = (!((Object)_parent == (Object)null)) ? _parent : base._transform;
 		return m_lastAudio = AudioObject.Create(clip, clip_id, volume, loop, mixer_group, this, is3DSound, master, parent, initPos);
 	}
 
 	public void NotifyOnStart(AudioObject startAudio)
 	{
-		if (!(startAudio == null))
+		if (!((Object)startAudio == (Object)null))
 		{
 			JoinAudio(startAudio);
 		}
@@ -160,7 +158,7 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 
 	public void NotifyOnRelease(AudioObject releaseAudio)
 	{
-		if (!(releaseAudio == null))
+		if (!((Object)releaseAudio == (Object)null))
 		{
 			LeaveAudio(releaseAudio);
 		}
@@ -168,7 +166,7 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 
 	public void NotifyOnStop(AudioObject stoppedAudio)
 	{
-		if (!(stoppedAudio == null))
+		if (!((Object)stoppedAudio == (Object)null))
 		{
 			LeaveAudio(stoppedAudio);
 		}
@@ -184,7 +182,7 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 
 	private void LeaveAudio(AudioObject ao)
 	{
-		if (m_lastAudio != null && m_lastAudio == ao)
+		if ((Object)m_lastAudio != (Object)null && (Object)m_lastAudio == (Object)ao)
 		{
 			m_lastAudio = null;
 		}
@@ -196,7 +194,7 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 
 	public void StopAll(int fadeout_frames = 0)
 	{
-		if (m_lastAudio != null)
+		if ((Object)m_lastAudio != (Object)null)
 		{
 			m_lastAudio.Stop(fadeout_frames);
 			m_lastAudio = null;

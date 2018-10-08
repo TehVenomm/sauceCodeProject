@@ -24,9 +24,9 @@ namespace GooglePlayGames.Native.PInvoke
 			return GooglePlayGames.Native.Cwrapper.TurnBasedMatch.TurnBasedMatch_CreationTime(SelfPtr());
 		}
 
-		internal unsafe IEnumerable<MultiplayerParticipant> Participants()
+		internal IEnumerable<MultiplayerParticipant> Participants()
 		{
-			return PInvokeUtilities.ToEnumerable<MultiplayerParticipant>(GooglePlayGames.Native.Cwrapper.TurnBasedMatch.TurnBasedMatch_Participants_Length(SelfPtr()), new Func<UIntPtr, MultiplayerParticipant>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			return PInvokeUtilities.ToEnumerable(GooglePlayGames.Native.Cwrapper.TurnBasedMatch.TurnBasedMatch_Participants_Length(SelfPtr()), (UIntPtr index) => new MultiplayerParticipant(GooglePlayGames.Native.Cwrapper.TurnBasedMatch.TurnBasedMatch_Participants_GetElement(SelfPtr(), index)));
 		}
 
 		internal uint Version()

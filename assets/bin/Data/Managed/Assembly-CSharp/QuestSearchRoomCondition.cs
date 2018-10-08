@@ -220,8 +220,8 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 			searchRequest.enemyLevelMax = enemyLevelList[enemyLevelList.Count - 1];
 			searchRequest.enemyMaxLevelIndex = enemyLevelList.Count - 1;
 		}
-		SetActive((Enum)UI.OBJ_SEARCH, true);
-		SetActive((Enum)UI.OBJ_MY_SEARCH, false);
+		SetActive(UI.OBJ_SEARCH, true);
+		SetActive(UI.OBJ_MY_SEARCH, false);
 		GameSection.SetEventData(false);
 		base.Initialize();
 	}
@@ -252,7 +252,7 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 	{
 		for (int i = 0; i < rarityButton.Length; i++)
 		{
-			SetEvent((Enum)rarityButton[i], "RARITY", i);
+			SetEvent(rarityButton[i], "RARITY", i);
 		}
 	}
 
@@ -260,7 +260,7 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 	{
 		for (int i = 0; i < elementButton.Length; i++)
 		{
-			SetEvent((Enum)elementButton[i], "ELEMENT", i);
+			SetEvent(elementButton[i], "ELEMENT", i);
 		}
 	}
 
@@ -319,9 +319,7 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 
 	private Transform GetRairtyToggleTransform(int rarity)
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Expected O, but got Unknown
-		return GetCtrl(rarityButton[rarity]).get_parent();
+		return GetCtrl(rarityButton[rarity]).parent;
 	}
 
 	private void UpdateElementToggles()
@@ -330,7 +328,7 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 		foreach (int item in values)
 		{
 			Transform elementToggleTransform = GetElementToggleTransform(item);
-			if (elementToggleTransform != null)
+			if ((UnityEngine.Object)elementToggleTransform != (UnityEngine.Object)null)
 			{
 				SetToggle(elementToggleTransform, (searchRequest.elementBit & (1 << item)) != 0);
 			}
@@ -339,25 +337,23 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 
 	private Transform GetElementToggleTransform(int elementIndex)
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
 		if (elementIndex >= elementButton.Length || elementIndex < 0)
 		{
 			return null;
 		}
-		return GetCtrl(elementButton[elementIndex]).get_parent();
+		return GetCtrl(elementButton[elementIndex]).parent;
 	}
 
 	private void UpdateEnemyMinLevel()
 	{
 		int enemyMinLevelIndex = searchRequest.enemyMinLevelIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_MIN_LEVEL, enemyLevelNames[enemyMinLevelIndex]);
+		SetLabelText(UI.LBL_TARGET_MIN_LEVEL, enemyLevelNames[enemyMinLevelIndex]);
 	}
 
 	private void UpdateEnemyMaxLevel()
 	{
 		int enemyMaxLevelIndex = searchRequest.enemyMaxLevelIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_MAX_LEVEL, enemyLevelNames[enemyMaxLevelIndex]);
+		SetLabelText(UI.LBL_TARGET_MAX_LEVEL, enemyLevelNames[enemyMaxLevelIndex]);
 	}
 
 	private void UpdateEnemySpecies()
@@ -366,7 +362,7 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 		FilterSpeciesPopupOnElement(sortedTargetSpeciesData);
 		UpdateSelectingEnemySpecies();
 		int enemySpeciesIndex = searchRequest.enemySpeciesIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_ENEMY_TYPE, enemySpeciesNames[enemySpeciesIndex]);
+		SetLabelText(UI.LBL_TARGET_ENEMY_TYPE, enemySpeciesNames[enemySpeciesIndex]);
 	}
 
 	private void FilterSpeciesPopupOnRarity(GachaSearchEnemyTable.GachaSearchEnemyData[] targetData = null)
@@ -434,11 +430,11 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 
 	private void ShowEnemySpeciesPopup()
 	{
-		if (speciesPopup == null)
+		if ((UnityEngine.Object)speciesPopup == (UnityEngine.Object)null)
 		{
 			speciesPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_ENEMY_TYPE), false);
 		}
-		if (!(speciesPopup == null))
+		if (!((UnityEngine.Object)speciesPopup == (UnityEngine.Object)null))
 		{
 			bool[] array = new bool[enemySpeciesNames.Count];
 			for (int i = 0; i < array.Length; i++)
@@ -471,11 +467,11 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 
 	private void ShowMinLevelPopup()
 	{
-		if (minLevelPopup == null)
+		if ((UnityEngine.Object)minLevelPopup == (UnityEngine.Object)null)
 		{
 			minLevelPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_MIN_LEVEL), false);
 		}
-		if (!(minLevelPopup == null))
+		if (!((UnityEngine.Object)minLevelPopup == (UnityEngine.Object)null))
 		{
 			bool[] array = new bool[enemyLevelNames.Count];
 			for (int i = 0; i < array.Length; i++)
@@ -505,11 +501,11 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 
 	private void ShowMaxLevelPopup()
 	{
-		if (maxLevelPopup == null)
+		if ((UnityEngine.Object)maxLevelPopup == (UnityEngine.Object)null)
 		{
 			maxLevelPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_MAX_LEVEL), false);
 		}
-		if (!(maxLevelPopup == null))
+		if (!((UnityEngine.Object)maxLevelPopup == (UnityEngine.Object)null))
 		{
 			bool[] array = new bool[enemyLevelNames.Count];
 			for (int i = 0; i < array.Length; i++)
@@ -549,10 +545,17 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 		MonoBehaviourSingleton<PartyManager>.I.SetSearchRequest(searchRequest);
 	}
 
-	protected unsafe override void SendSearch()
+	protected override void SendSearch()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<PartyManager>.I.SendSearch(new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), true);
+		MonoBehaviourSingleton<PartyManager>.I.SendSearch(delegate(bool is_success, Error err)
+		{
+			if (!is_success && err == Error.WRN_PARTY_SEARCH_NOT_FOUND_QUEST)
+			{
+				OnNotFoundQuest();
+			}
+			GameSection.ResumeEvent(true, null);
+		}, true);
 	}
 
 	protected override void OnQuery_MATCHING()
@@ -572,25 +575,30 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 		}
 	}
 
-	protected unsafe override void SendRandomMatching()
+	protected override void SendRandomMatching()
 	{
 		GameSection.SetEventData(new object[1]
 		{
 			false
 		});
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<PartyManager>.I.SendSearchRandomMatching(new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<PartyManager>.I.SendSearchRandomMatching(delegate(bool is_success, Error err)
+		{
+			if (!is_success)
+			{
+				OnNotFoundMatchingParty();
+			}
+			GameSection.ResumeEvent(true, null);
+		});
 	}
 
 	protected void FixBit()
 	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
 		int num = 0;
 		for (int i = 0; i < rarityButton.Length; i++)
 		{
 			int num2 = i;
-			if ((searchRequest.rarityBit & (1 << num2)) != 0 && GetCtrl(rarityButton[i]).get_gameObject().get_activeInHierarchy())
+			if ((searchRequest.rarityBit & (1 << num2)) != 0 && GetCtrl(rarityButton[i]).gameObject.activeInHierarchy)
 			{
 				num |= 1 << (num2 & 0x1F);
 			}
@@ -600,7 +608,7 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 		for (int j = 0; j < elementButton.Length; j++)
 		{
 			int num4 = j;
-			if ((searchRequest.elementBit & (1 << num4)) != 0 && GetCtrl(elementButton[j]).get_gameObject().get_activeInHierarchy())
+			if ((searchRequest.elementBit & (1 << num4)) != 0 && GetCtrl(elementButton[j]).gameObject.activeInHierarchy)
 			{
 				num3 |= 1 << (num4 & 0x1F);
 			}
@@ -608,7 +616,7 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 		searchRequest.elementBit = num3;
 	}
 
-	protected unsafe virtual void OnQuery_SPECIES_SEARCH_REQUEST()
+	protected virtual void OnQuery_SPECIES_SEARCH_REQUEST()
 	{
 		int num = (int)GameSection.GetEventData();
 		SearchRequestParam searchRequestParam = new SearchRequestParam();
@@ -629,6 +637,13 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 		searchRequestParam.order = 1;
 		MonoBehaviourSingleton<PartyManager>.I.SetSearchRequestTemp(searchRequestParam);
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<PartyManager>.I.SendSearch(new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
+		MonoBehaviourSingleton<PartyManager>.I.SendSearch(delegate(bool is_success, Error err)
+		{
+			if (!is_success && err == Error.WRN_PARTY_SEARCH_NOT_FOUND_QUEST)
+			{
+				OnNotFoundQuest();
+			}
+			GameSection.ResumeEvent(true, null);
+		}, false);
 	}
 }

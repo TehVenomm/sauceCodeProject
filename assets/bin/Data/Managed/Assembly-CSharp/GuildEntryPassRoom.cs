@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 
 public class GuildEntryPassRoom : QuestEntryPassRoom
@@ -16,10 +15,14 @@ public class GuildEntryPassRoom : QuestEntryPassRoom
 
 	private GuildStatisticInfo _info;
 
-	private unsafe IEnumerator GetClanStatistic(int clanID)
+	private IEnumerator GetClanStatistic(int clanID)
 	{
 		bool finish_get_statistic = false;
-		MonoBehaviourSingleton<GuildManager>.I.SendRequestStatistic(clanID, new Action<bool, GuildStatisticInfo>((object)/*Error near IL_0033: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<GuildManager>.I.SendRequestStatistic(clanID, delegate(bool success, GuildStatisticInfo info)
+		{
+			((_003CGetClanStatistic_003Ec__Iterator57)/*Error near IL_0033: stateMachine*/)._003Cfinish_get_statistic_003E__0 = true;
+			((_003CGetClanStatistic_003Ec__Iterator57)/*Error near IL_0033: stateMachine*/)._003C_003Ef__this._info = info;
+		});
 		while (!finish_get_statistic)
 		{
 			yield return (object)null;
@@ -27,19 +30,16 @@ public class GuildEntryPassRoom : QuestEntryPassRoom
 		HandleEvent(clanID);
 	}
 
-	private unsafe void OnQuery_FIND()
+	private void OnQuery_FIND()
 	{
 		GameSection.StayEvent();
 		try
 		{
-			int num = int.Parse(string.Join(string.Empty, passCode));
-			GuildManager i = MonoBehaviourSingleton<GuildManager>.I;
-			int clanId = num;
-			if (_003C_003Ef__am_0024cache1 == null)
+			int clanId = int.Parse(string.Join(string.Empty, passCode));
+			MonoBehaviourSingleton<GuildManager>.I.SendSearchWithID(clanId, delegate(bool is_success, Error err)
 			{
-				_003C_003Ef__am_0024cache1 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			i.SendSearchWithID(clanId, _003C_003Ef__am_0024cache1);
+				GameSection.ResumeEvent(is_success, null);
+			});
 		}
 		catch
 		{
@@ -47,22 +47,26 @@ public class GuildEntryPassRoom : QuestEntryPassRoom
 		}
 	}
 
-	private unsafe void HandleEvent(int clanId)
+	private void HandleEvent(int clanId)
 	{
 		if (_info != null)
 		{
 			if (_info.privacy == 0)
 			{
-				GuildManager i = MonoBehaviourSingleton<GuildManager>.I;
-				if (_003C_003Ef__am_0024cache2 == null)
+				MonoBehaviourSingleton<GuildManager>.I.SendRequestJoin(clanId, -1, delegate
 				{
-					_003C_003Ef__am_0024cache2 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-				}
-				i.SendRequestJoin(clanId, -1, _003C_003Ef__am_0024cache2);
+					MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Guild", null, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
+				});
 			}
 			else if (_info.privacy == 1)
 			{
-				MonoBehaviourSingleton<GuildManager>.I.SendRequestRequest(clanId, -1, new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				MonoBehaviourSingleton<GuildManager>.I.SendRequestRequest(clanId, -1, delegate(bool isSuccess, Error error)
+				{
+					if (isSuccess)
+					{
+						OpenDialog();
+					}
+				});
 			}
 			GameSection.ResumeEvent(true, null);
 		}

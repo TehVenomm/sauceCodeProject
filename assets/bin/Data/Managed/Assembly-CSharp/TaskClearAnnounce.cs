@@ -18,17 +18,14 @@ public class TaskClearAnnounce : UIBehaviour
 
 	private void StoreAudioClip()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		string sE = ResourceName.GetSE(40000158);
 		if (!string.IsNullOrEmpty(sE))
 		{
-			Transform val = this.get_transform().GetChild(0);
-			if (!(val == null))
+			Transform child = base.transform.GetChild(0);
+			if (!((UnityEngine.Object)child == (UnityEngine.Object)null))
 			{
-				ResourceLink component = val.GetComponent<ResourceLink>();
-				if (!(component == null))
+				ResourceLink component = child.GetComponent<ResourceLink>();
+				if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
 				{
 					m_AudioClip = component.Get<AudioClip>(sE);
 				}
@@ -38,7 +35,7 @@ public class TaskClearAnnounce : UIBehaviour
 
 	private void PlayAudio()
 	{
-		if (m_AudioClip != null)
+		if ((UnityEngine.Object)m_AudioClip != (UnityEngine.Object)null)
 		{
 			SoundManager.PlayOneshotJingle(m_AudioClip, 40000158, null, null);
 		}
@@ -46,24 +43,23 @@ public class TaskClearAnnounce : UIBehaviour
 
 	private void Start()
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_EFFECT);
-		if (ctrl != null)
+		if ((UnityEngine.Object)ctrl != (UnityEngine.Object)null)
 		{
-			ctrl.set_localScale(Vector3.get_zero());
+			ctrl.localScale = Vector3.zero;
 		}
 		StoreAudioClip();
 	}
 
 	public void Play(string announce, string reward, Action onComplete)
 	{
-		UIWidget component = base.GetComponent<UIWidget>((Enum)UI.WGT_ANCHOR_POINT);
-		UITweenCtrl component2 = base.GetComponent<UITweenCtrl>((Enum)UI.OBJ_TWEENCTRL);
-		if (component == null || component2 == null)
+		UIWidget component = GetComponent<UIWidget>(UI.WGT_ANCHOR_POINT);
+		UITweenCtrl component2 = GetComponent<UITweenCtrl>(UI.OBJ_TWEENCTRL);
+		if ((UnityEngine.Object)component == (UnityEngine.Object)null || (UnityEngine.Object)component2 == (UnityEngine.Object)null)
 		{
 			if (onComplete != null)
 			{
-				onComplete.Invoke();
+				onComplete();
 			}
 		}
 		else
@@ -73,14 +69,14 @@ public class TaskClearAnnounce : UIBehaviour
 			component.bottomAnchor.Set(1f, -130f);
 			component.topAnchor.Set(1f, -105f);
 			component.UpdateAnchors();
-			SetLabelText((Enum)UI.LBL_ANNOUNCE, announce);
-			SetLabelText((Enum)UI.LBL_REWARD, reward);
+			SetLabelText(UI.LBL_ANNOUNCE, announce);
+			SetLabelText(UI.LBL_REWARD, reward);
 			component2.Reset();
 			component2.Play(true, delegate
 			{
 				if (onComplete != null)
 				{
-					onComplete.Invoke();
+					onComplete();
 				}
 			});
 			PlayAudio();

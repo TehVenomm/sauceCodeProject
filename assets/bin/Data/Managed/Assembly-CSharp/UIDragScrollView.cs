@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Drag Scroll View")]
-public class UIDragScrollView
+public class UIDragScrollView : MonoBehaviour
 {
 	public UIScrollView scrollView;
 
@@ -17,22 +17,15 @@ public class UIDragScrollView
 
 	private bool mStarted;
 
-	public UIDragScrollView()
-		: this()
-	{
-	}
-
 	private void OnEnable()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		mTrans = this.get_transform();
-		if (scrollView == null && draggablePanel != null)
+		mTrans = base.transform;
+		if ((Object)scrollView == (Object)null && (Object)draggablePanel != (Object)null)
 		{
 			scrollView = draggablePanel;
 			draggablePanel = null;
 		}
-		if (mStarted && (mAutoFind || mScroll == null))
+		if (mStarted && (mAutoFind || (Object)mScroll == (Object)null))
 		{
 			FindScrollView();
 		}
@@ -48,12 +41,12 @@ public class UIDragScrollView
 	private void FindScrollView()
 	{
 		UIScrollView uIScrollView = NGUITools.FindInParents<UIScrollView>(mTrans);
-		if (scrollView == null || (mAutoFind && uIScrollView != scrollView))
+		if ((Object)scrollView == (Object)null || (mAutoFind && (Object)uIScrollView != (Object)scrollView))
 		{
 			scrollView = uIScrollView;
 			mAutoFind = true;
 		}
-		else if (scrollView == uIScrollView)
+		else if ((Object)scrollView == (Object)uIScrollView)
 		{
 			mAutoFind = true;
 		}
@@ -62,25 +55,22 @@ public class UIDragScrollView
 
 	private void AttachUIButtonEffect()
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		UIButton component = this.GetComponent<UIButton>();
-		if (component != null && this.GetComponent<UINoAuto>() == null && component.GetComponent<UIButtonEffect>() == null)
+		UIButton component = GetComponent<UIButton>();
+		if ((Object)component != (Object)null && (Object)GetComponent<UINoAuto>() == (Object)null && (Object)component.GetComponent<UIButtonEffect>() == (Object)null)
 		{
-			UIButtonEffect uIButtonEffect = component.get_gameObject().AddComponent<UIButtonEffect>();
+			UIButtonEffect uIButtonEffect = component.gameObject.AddComponent<UIButtonEffect>();
 			uIButtonEffect.isSimple = true;
 		}
 	}
 
 	private void OnPress(bool pressed)
 	{
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Expected O, but got Unknown
-		if (mAutoFind && mScroll != scrollView)
+		if (mAutoFind && (Object)mScroll != (Object)scrollView)
 		{
 			mScroll = scrollView;
 			mAutoFind = false;
 		}
-		if (Object.op_Implicit(scrollView) && this.get_enabled() && NGUITools.GetActive(this.get_gameObject()))
+		if ((bool)scrollView && base.enabled && NGUITools.GetActive(base.gameObject))
 		{
 			scrollView.Press(pressed);
 			if (!pressed && mAutoFind)
@@ -93,7 +83,7 @@ public class UIDragScrollView
 
 	private void OnDrag(Vector2 delta)
 	{
-		if (Object.op_Implicit(scrollView) && NGUITools.GetActive(this))
+		if ((bool)scrollView && NGUITools.GetActive(this))
 		{
 			scrollView.Drag();
 		}
@@ -101,7 +91,7 @@ public class UIDragScrollView
 
 	private void OnScroll(float delta)
 	{
-		if (Object.op_Implicit(scrollView) && NGUITools.GetActive(this))
+		if ((bool)scrollView && NGUITools.GetActive(this))
 		{
 			scrollView.Scroll(delta);
 		}
@@ -109,8 +99,7 @@ public class UIDragScrollView
 
 	public void OnPan(Vector2 delta)
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		if (Object.op_Implicit(scrollView) && NGUITools.GetActive(this))
+		if ((bool)scrollView && NGUITools.GetActive(this))
 		{
 			scrollView.OnPan(delta);
 		}

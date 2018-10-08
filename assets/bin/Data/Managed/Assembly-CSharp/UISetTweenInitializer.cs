@@ -1,35 +1,24 @@
 using UnityEngine;
 
 [RequireComponent(typeof(UIWidget))]
-public class UISetTweenInitializer
+public class UISetTweenInitializer : MonoBehaviour
 {
-	public UISetTweenInitializer()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		if (Application.get_isPlaying())
+		if (Application.isPlaying)
 		{
-			Transform val = this.get_transform();
-			UIWidget component = this.GetComponent<UIWidget>();
-			if (!(component == null))
+			Transform transform = base.transform;
+			UIWidget component = GetComponent<UIWidget>();
+			if (!((Object)component == (Object)null))
 			{
-				UITweener[] components = this.GetComponents<UITweener>();
+				UITweener[] components = GetComponents<UITweener>();
 				if (components != null && components.Length > 0)
 				{
 					int num = components.Length;
 					for (int i = 0; i < num; i++)
 					{
 						UITweener uITweener = components[i];
-						if (uITweener != null)
+						if ((Object)uITweener != (Object)null)
 						{
 							if (uITweener is TweenAlpha)
 							{
@@ -44,17 +33,17 @@ public class UISetTweenInitializer
 							else if (uITweener is TweenPosition)
 							{
 								TweenPosition tweenPosition = uITweener as TweenPosition;
-								val.set_localPosition(tweenPosition.from);
+								transform.localPosition = tweenPosition.from;
 							}
 							else if (uITweener is TweenRotation)
 							{
 								TweenRotation tweenRotation = uITweener as TweenRotation;
-								val.set_localEulerAngles(tweenRotation.from);
+								transform.localEulerAngles = tweenRotation.from;
 							}
 							else if (uITweener is TweenScale)
 							{
 								TweenScale tweenScale = uITweener as TweenScale;
-								val.set_localScale(tweenScale.from);
+								transform.localScale = tweenScale.from;
 							}
 							else if (uITweener is TweenWidth)
 							{

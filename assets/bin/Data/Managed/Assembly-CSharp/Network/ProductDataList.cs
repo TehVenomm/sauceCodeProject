@@ -17,34 +17,25 @@ namespace Network
 
 		public List<ProductData> shopList = new List<ProductData>();
 
-		public unsafe List<ProductData> GetGemList()
+		public List<ProductData> GetGemList()
 		{
-			List<ProductData> source = shopList;
-			if (_003C_003Ef__am_0024cache5 == null)
-			{
-				_003C_003Ef__am_0024cache5 = new Func<ProductData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			return source.Where(_003C_003Ef__am_0024cache5).ToList();
+			return (from o in shopList
+			where !o.isSpecial
+			select o).ToList();
 		}
 
-		public unsafe List<ProductData> GetBundleList()
+		public List<ProductData> GetBundleList()
 		{
-			List<ProductData> source = shopList;
-			if (_003C_003Ef__am_0024cache6 == null)
-			{
-				_003C_003Ef__am_0024cache6 = new Func<ProductData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			return source.Where(_003C_003Ef__am_0024cache6).ToList();
+			return (from o in shopList
+			where MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.HasPack(o.productId)
+			select o).ToList();
 		}
 
-		public unsafe bool HasPurchasedBundle()
+		public bool HasPurchasedBundle()
 		{
-			List<ProductData> source = shopList;
-			if (_003C_003Ef__am_0024cache7 == null)
-			{
-				_003C_003Ef__am_0024cache7 = new Func<ProductData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			List<ProductData> list = source.Where(_003C_003Ef__am_0024cache7).ToList();
+			List<ProductData> list = (from o in shopList
+			where MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.HasPack(o.productId)
+			select o).ToList();
 			return list != null && list.Count < MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.TotalPack();
 		}
 	}

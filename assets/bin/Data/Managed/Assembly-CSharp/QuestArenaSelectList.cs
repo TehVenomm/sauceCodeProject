@@ -88,7 +88,7 @@ public class QuestArenaSelectList : QuestEventSelectList
 			bool is_recv_delivery = false;
 			MonoBehaviourSingleton<QuestManager>.I.SendGetEventList(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator10C)/*Error near IL_003b: stateMachine*/)._003Cis_recv_delivery_003E__0 = true;
+				((_003CDoInitialize_003Ec__Iterator10E)/*Error near IL_003b: stateMachine*/)._003Cis_recv_delivery_003E__0 = true;
 			});
 			while (!is_recv_delivery)
 			{
@@ -99,7 +99,7 @@ public class QuestArenaSelectList : QuestEventSelectList
 		}
 		if (eventData == null)
 		{
-			this.StartCoroutine(LoadDisableBanner());
+			StartCoroutine(LoadDisableBanner());
 		}
 		else
 		{
@@ -110,9 +110,9 @@ public class QuestArenaSelectList : QuestEventSelectList
 			}
 			if (MonoBehaviourSingleton<UserInfoManager>.I.isJoinedArenaRanking)
 			{
-				yield return (object)this.StartCoroutine(SendGetMyRcord());
+				yield return (object)StartCoroutine(SendGetMyRcord());
 			}
-			this.StartCoroutine(base.DoInitialize());
+			StartCoroutine(base.DoInitialize());
 		}
 	}
 
@@ -120,11 +120,11 @@ public class QuestArenaSelectList : QuestEventSelectList
 	{
 		string resourceName = ResourceName.GetEventBG(10012200);
 		Hash128 hash = default(Hash128);
-		if (MonoBehaviourSingleton<ResourceManager>.I.manifest != null)
+		if ((UnityEngine.Object)MonoBehaviourSingleton<ResourceManager>.I.manifest != (UnityEngine.Object)null)
 		{
 			hash = MonoBehaviourSingleton<ResourceManager>.I.manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(resourceName));
 		}
-		if (MonoBehaviourSingleton<ResourceManager>.I.manifest == null || hash.get_isValid())
+		if ((UnityEngine.Object)MonoBehaviourSingleton<ResourceManager>.I.manifest == (UnityEngine.Object)null || hash.isValid)
 		{
 			LoadingQueue load_queue = new LoadingQueue(this);
 			LoadObject lo_bg = load_queue.Load(RESOURCE_CATEGORY.EVENT_BG, resourceName, false);
@@ -141,8 +141,8 @@ public class QuestArenaSelectList : QuestEventSelectList
 	{
 		if (eventData == null)
 		{
-			SetActive((Enum)UI.BTN_INFO, false);
-			SetActive((Enum)UI.LBL_SUB_TITLE, false);
+			SetActive(UI.BTN_INFO, false);
+			SetActive(UI.LBL_SUB_TITLE, false);
 			UpdateTitle();
 			UpdateNoArenaTable();
 		}
@@ -204,16 +204,24 @@ public class QuestArenaSelectList : QuestEventSelectList
 		MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
 	}
 
-	private unsafe void OnQuery_AUTO_PROLOGUE()
+	private void OnQuery_AUTO_PROLOGUE()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<QuestManager>.I.SendQuestReadEventStory(eventData.eventId, new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<QuestManager>.I.SendQuestReadEventStory(eventData.eventId, delegate(bool success, Error error)
+		{
+			eventData.readPrologueStory = true;
+			GameSection.ResumeEvent(success, null);
+		});
 	}
 
-	private unsafe IEnumerator SendGetMyRcord()
+	private IEnumerator SendGetMyRcord()
 	{
 		bool isFinishGetRecord = false;
-		MonoBehaviourSingleton<QuestManager>.I.SendGetArenaUserRecord(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, eventData.eventId, new Action<bool, ArenaUserRecordModel.Param>((object)/*Error near IL_004c: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<QuestManager>.I.SendGetArenaUserRecord(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, eventData.eventId, delegate(bool b, ArenaUserRecordModel.Param result)
+		{
+			((_003CSendGetMyRcord_003Ec__Iterator110)/*Error near IL_004c: stateMachine*/)._003CisFinishGetRecord_003E__0 = true;
+			((_003CSendGetMyRcord_003Ec__Iterator110)/*Error near IL_004c: stateMachine*/)._003C_003Ef__this.record = result;
+		});
 		while (!isFinishGetRecord)
 		{
 			yield return (object)null;
@@ -222,21 +230,19 @@ public class QuestArenaSelectList : QuestEventSelectList
 
 	private void UpdateSubTitle()
 	{
-		SetLabelText((Enum)UI.LBL_SUB_TITLE, eventData.name);
+		SetActive(UI.LBL_SUB_TITLE, false);
+		SetLabelText(UI.LBL_SUB_TITLE, eventData.name);
 	}
 
 	private void UpdateTitle()
 	{
 		string text = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 27u);
-		SetLabelText((Enum)UI.LBL_LOCATION_NAME, text);
-		SetLabelText((Enum)UI.LBL_LOCATION_NAME_EFFECT, text);
+		SetLabelText(UI.LBL_LOCATION_NAME, text);
+		SetLabelText(UI.LBL_LOCATION_NAME_EFFECT, text);
 	}
 
-	protected unsafe override void UpdateTable()
+	protected override void UpdateTable()
 	{
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0171: Expected O, but got Unknown
-		//IL_017d: Unknown result type (might be due to invalid IL or missing references)
 		int num = 0;
 		int count = stories.Count;
 		if (count > 0)
@@ -252,15 +258,15 @@ public class QuestArenaSelectList : QuestEventSelectList
 		}
 		if (notClearDevliveries == null || num2 == 0)
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, true);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
-			SetActive((Enum)UI.TBL_DELIVERY_QUEST, false);
+			SetActive(UI.STR_DELIVERY_NON_LIST, true);
+			SetActive(UI.GRD_DELIVERY_QUEST, false);
+			SetActive(UI.TBL_DELIVERY_QUEST, false);
 		}
 		else
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, false);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
-			SetActive((Enum)UI.TBL_DELIVERY_QUEST, true);
+			SetActive(UI.STR_DELIVERY_NON_LIST, false);
+			SetActive(UI.GRD_DELIVERY_QUEST, false);
+			SetActive(UI.TBL_DELIVERY_QUEST, true);
 			int questStartIndex = 0;
 			questStartIndex++;
 			int completedStartIndex = notClearDevliveries.Count + questStartIndex;
@@ -271,31 +277,100 @@ public class QuestArenaSelectList : QuestEventSelectList
 				storyStartIndex++;
 			}
 			Transform ctrl = GetCtrl(UI.TBL_DELIVERY_QUEST);
-			if (Object.op_Implicit(ctrl))
+			if ((bool)ctrl)
 			{
-				int i = 0;
-				for (int childCount = ctrl.get_childCount(); i < childCount; i++)
+				int j = 0;
+				for (int childCount = ctrl.childCount; j < childCount; j++)
 				{
-					Transform val = ctrl.GetChild(0);
-					val.set_parent(null);
-					Object.Destroy(val.get_gameObject());
+					Transform child = ctrl.GetChild(0);
+					child.parent = null;
+					UnityEngine.Object.Destroy(child.gameObject);
 				}
 			}
 			bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-			_003CUpdateTable_003Ec__AnonStorey3E1 _003CUpdateTable_003Ec__AnonStorey3E;
-			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-			component.set_enabled(true);
+			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, false, delegate(int i, Transform parent)
+			{
+				Transform result = null;
+				if (i >= storyStartIndex)
+				{
+					if (!HasChapterStory() || i == storyStartIndex || !isRenewalFlag)
+					{
+						return Realizes("QuestEventStoryItem", parent, true);
+					}
+					return null;
+				}
+				if (i >= borderIndex)
+				{
+					result = Realizes("QuestEventBorderItem", parent, true);
+				}
+				else if (i >= questStartIndex)
+				{
+					result = Realizes("QuestRequestItemArena", parent, true);
+				}
+				else if (i == 0)
+				{
+					result = Realizes("QuestArenaRequestItemToRanking", parent, true);
+				}
+				return result;
+			}, delegate(int i, Transform t, bool is_recycle)
+			{
+				if (!((UnityEngine.Object)t == (UnityEngine.Object)null))
+				{
+					SetActive(t, true);
+					if (i >= storyStartIndex)
+					{
+						int index = i - storyStartIndex;
+						InitStory(index, t);
+					}
+					else if (i < borderIndex)
+					{
+						if (i >= completedStartIndex)
+						{
+							int completedIndex = i - completedStartIndex;
+							InitCompletedDelivery(completedIndex, t);
+						}
+						else if (i >= questStartIndex)
+						{
+							InitNormalDelivery(i - questStartIndex, t);
+						}
+						else if (i == 0)
+						{
+							InitGoToRankingButton(t);
+						}
+					}
+					if (i < storyStartIndex && i != 0)
+					{
+						SetSprite(t, UI.SPR_FRAME, "RequestPlate_Arena");
+					}
+				}
+			});
+			UIScrollView component = GetComponent<UIScrollView>(UI.SCR_DELIVERY_QUEST);
+			component.enabled = true;
 			RepositionTable();
 		}
 	}
 
-	protected unsafe void UpdateNoArenaTable()
+	protected void UpdateNoArenaTable()
 	{
 		int item_num = 1;
-		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, item_num, false, new Func<int, Transform, Transform>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-		component.set_enabled(false);
+		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, item_num, false, delegate(int i, Transform parent)
+		{
+			Transform result = null;
+			if (i == 0)
+			{
+				result = Realizes("QuestArenaRequestItemToRanking", parent, true);
+			}
+			return result;
+		}, delegate(int i, Transform t, bool is_recycle)
+		{
+			SetActive(t, true);
+			if (i == 0)
+			{
+				InitGoToRankingButton(t);
+			}
+		});
+		UIScrollView component = GetComponent<UIScrollView>(UI.SCR_DELIVERY_QUEST);
+		component.enabled = false;
 		RepositionTable();
 	}
 
@@ -308,7 +383,7 @@ public class QuestArenaSelectList : QuestEventSelectList
 			ArenaTable.ArenaData arenaData = deliveryTableData.GetArenaData();
 			if (arenaData == null)
 			{
-				Debug.LogError((object)(this.get_name() + " " + deliveryTableData.name + " : arenaDataが見つかりません"));
+				Debug.LogError(base.name + " " + deliveryTableData.name + " : arenaDataが見つかりません");
 			}
 			else
 			{
@@ -405,11 +480,10 @@ public class QuestArenaSelectList : QuestEventSelectList
 
 	private void SetUpArenaListItem(Transform t, DeliveryTable.DeliveryData info)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		QuestRequestItemArena questRequestItemArena = t.GetComponent<QuestRequestItemArena>();
-		if (questRequestItemArena == null)
+		if ((UnityEngine.Object)questRequestItemArena == (UnityEngine.Object)null)
 		{
-			questRequestItemArena = t.get_gameObject().AddComponent<QuestRequestItemArena>();
+			questRequestItemArena = t.gameObject.AddComponent<QuestRequestItemArena>();
 		}
 		questRequestItemArena.InitUI();
 		questRequestItemArena.Setup(t, info);
@@ -417,11 +491,10 @@ public class QuestArenaSelectList : QuestEventSelectList
 
 	private void SetUpArenaListItemRankUp(Transform t, DeliveryTable.DeliveryData info)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		QuestRequestItemArenaRankUp questRequestItemArenaRankUp = t.GetComponent<QuestRequestItemArenaRankUp>();
-		if (questRequestItemArenaRankUp == null)
+		if ((UnityEngine.Object)questRequestItemArenaRankUp == (UnityEngine.Object)null)
 		{
-			questRequestItemArenaRankUp = t.get_gameObject().AddComponent<QuestRequestItemArenaRankUp>();
+			questRequestItemArenaRankUp = t.gameObject.AddComponent<QuestRequestItemArenaRankUp>();
 		}
 		questRequestItemArenaRankUp.InitUI();
 		questRequestItemArenaRankUp.Setup(t, info);
@@ -429,11 +502,10 @@ public class QuestArenaSelectList : QuestEventSelectList
 
 	private void SetUpCompletedArenaListItem(Transform t, DeliveryTable.DeliveryData info)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		QuestRequestItemArena questRequestItemArena = t.GetComponent<QuestRequestItemArena>();
-		if (questRequestItemArena == null)
+		if ((UnityEngine.Object)questRequestItemArena == (UnityEngine.Object)null)
 		{
-			questRequestItemArena = t.get_gameObject().AddComponent<QuestRequestItemArena>();
+			questRequestItemArena = t.gameObject.AddComponent<QuestRequestItemArena>();
 		}
 		questRequestItemArena.InitUI();
 		questRequestItemArena.SetupComplete(t, info, record);
@@ -455,7 +527,7 @@ public class QuestArenaSelectList : QuestEventSelectList
 		SetCompletedHaveCount(t, deliveryData);
 	}
 
-	private unsafe void OnQuery_SELECT_RUSH()
+	private void OnQuery_SELECT_RUSH()
 	{
 		int index = (int)GameSection.GetEventData();
 		DeliveryTable.DeliveryData dd = notClearDevliveries[index];
@@ -467,8 +539,39 @@ public class QuestArenaSelectList : QuestEventSelectList
 			bool enable_clear_event = dd.clearEventID != 0;
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-			_003COnQuery_SELECT_RUSH_003Ec__AnonStorey3E3 _003COnQuery_SELECT_RUSH_003Ec__AnonStorey3E;
-			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(notClearDelivery.uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003COnQuery_SELECT_RUSH_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(notClearDelivery.uId, enable_clear_event, delegate(bool is_success, DeliveryRewardList recv_reward)
+			{
+				if (is_success)
+				{
+					if (is_tutorial)
+					{
+						TutorialStep.isSendFirstRewardComplete = true;
+					}
+					if (!enable_clear_event)
+					{
+						MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
+						GameSection.ChangeStayEvent("RUSH_REWARD", new object[2]
+						{
+							(int)dd.id,
+							recv_reward
+						});
+					}
+					else
+					{
+						GameSection.ChangeStayEvent("CLEAR_EVENT", new object[3]
+						{
+							(int)dd.clearEventID,
+							(int)dd.id,
+							recv_reward
+						});
+					}
+				}
+				else
+				{
+					changeToDeliveryClearEvent = false;
+				}
+				GameSection.ResumeEvent(is_success, null);
+			});
 		}
 		else if (dd.GetConditionType(0u) == DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
 		{

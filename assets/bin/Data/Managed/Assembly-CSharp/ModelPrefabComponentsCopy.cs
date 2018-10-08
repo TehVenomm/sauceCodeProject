@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ModelPrefabComponentsCopy
+public class ModelPrefabComponentsCopy : MonoBehaviour
 {
 	public enum TOOL_MODE
 	{
@@ -19,7 +19,7 @@ public class ModelPrefabComponentsCopy
 
 	public GameObject workPrefab;
 
-	public GameObject[] changePrefabList = (GameObject[])new GameObject[10];
+	public GameObject[] changePrefabList = new GameObject[10];
 
 	public int numDstPrefab = 1;
 
@@ -40,9 +40,4 @@ public class ModelPrefabComponentsCopy
 	public GameObject dstObject;
 
 	public bool enableComponentLog;
-
-	public ModelPrefabComponentsCopy()
-		: this()
-	{
-	}
 }

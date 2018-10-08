@@ -28,7 +28,7 @@ public class ScreenOrientationManager : MonoBehaviourSingleton<ScreenOrientation
 	{
 		if (MonoBehaviourSingleton<GameSceneManager>.IsValid())
 		{
-			timer += Time.get_deltaTime();
+			timer += Time.deltaTime;
 			if (timer >= 2f)
 			{
 				timer = 0f;
@@ -46,7 +46,7 @@ public class ScreenOrientationManager : MonoBehaviourSingleton<ScreenOrientation
 
 	protected bool CheckIsPortrait()
 	{
-		return Screen.get_width() < Screen.get_height();
+		return Screen.width < Screen.height;
 	}
 
 	public void EventScreenRotate(bool is_portrait)

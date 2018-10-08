@@ -1,4 +1,6 @@
-public class AnimEventTools
+using UnityEngine;
+
+public class AnimEventTools : MonoBehaviour
 {
 	public enum TOOL_MODE
 	{
@@ -13,9 +15,4 @@ public class AnimEventTools
 	public AnimEventData animEventData;
 
 	public AnimEventFormat.ID eventID;
-
-	public AnimEventTools()
-		: this()
-	{
-	}
 }

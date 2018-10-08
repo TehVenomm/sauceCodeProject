@@ -97,14 +97,27 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 		base.Initialize();
 	}
 
-	protected unsafe override void DrawIcon()
+	protected override void DrawIcon()
 	{
 		base.DrawIcon();
 		NeedMaterial[] reward_ary = CreateNeedMaterialAry();
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		_003CDrawIcon_003Ec__AnonStorey3C4 _003CDrawIcon_003Ec__AnonStorey3C;
-		SetGrid(UI.GRD_REWARD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey3C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-		SetActive((Enum)UI.STR_NON_REWARD, reward_ary.Length == 0);
+		SetGrid(UI.GRD_REWARD_ICON, null, sELL_SELECT_MAX, false, delegate(int i, Transform t, bool is_recycle)
+		{
+			if (i < reward_ary.Length)
+			{
+				NeedMaterial needMaterial = reward_ary[i];
+				ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.ITEM, needMaterial.itemID, t, needMaterial.num, "NONE", 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
+				itemIcon.SetRewardBG(true);
+				Transform ctrl = GetCtrl(UI.GRD_REWARD_ICON);
+				SetMaterialInfo(itemIcon.transform, REWARD_TYPE.ITEM, needMaterial.itemID, ctrl);
+			}
+			else
+			{
+				SetActive(t, false);
+			}
+		});
+		SetActive(UI.STR_NON_REWARD, reward_ary.Length == 0);
 	}
 
 	protected virtual NeedMaterial[] CreateNeedMaterialAry()

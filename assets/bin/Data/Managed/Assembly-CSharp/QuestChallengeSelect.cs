@@ -88,11 +88,10 @@ public class QuestChallengeSelect : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
-	private unsafe IEnumerator DoInitialize()
+	private IEnumerator DoInitialize()
 	{
 		bool is_recv_quest = false;
 		LoadingQueue load_queue = new LoadingQueue(this);
@@ -101,12 +100,15 @@ public class QuestChallengeSelect : GameSection
 		InitSearchParam();
 		QuestAcceptChallengeRoomCondition.ChallengeSearchRequestParam sendParam = new QuestAcceptChallengeRoomCondition.ChallengeSearchRequestParam();
 		int userLevel = sendParam.enemyLevel = GetEnemyLevelFromUserLevel();
-		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeList(sendParam, new Action<bool, Error>((object)/*Error near IL_00a4: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
+		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeList(sendParam, delegate
+		{
+			((_003CDoInitialize_003Ec__Iterator7B)/*Error near IL_00a4: stateMachine*/)._003Cis_recv_quest_003E__0 = true;
+		}, false);
 		while (!is_recv_quest)
 		{
 			yield return (object)null;
 		}
-		this.StartCoroutine(CheckLimitQuestItem());
+		StartCoroutine(CheckLimitQuestItem());
 		if (load_queue.IsLoading())
 		{
 			yield return (object)load_queue.Wait();
@@ -127,51 +129,50 @@ public class QuestChallengeSelect : GameSection
 		isResetUI = false;
 	}
 
-	protected unsafe void ShowChallenge()
+	protected void ShowChallenge()
 	{
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
 		List<QuestData> challengeList = MonoBehaviourSingleton<QuestManager>.I.challengeList;
 		if (MonoBehaviourSingleton<PartyManager>.I.challengeInfo.oldShadowCount != null)
 		{
-			SetActive((Enum)UI.STR_CHALLENGE_BONUS_MESSAGE, true);
-			SetActive((Enum)UI.BTN_DETAIL, true);
+			SetActive(UI.STR_CHALLENGE_BONUS_MESSAGE, true);
+			SetActive(UI.BTN_DETAIL, true);
 			UIPanel component = GetCtrl(UI.SCR_ORDER_QUEST).GetComponent<UIPanel>();
 			component.baseClipRegion = new Vector4(0f, -110f, 440f, 549f);
-			SetLabelText((Enum)UI.STR_CHALLENGE_BONUS_MESSAGE, StringTable.Format(STRING_CATEGORY.SHADOW_COUNT, 3u, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.oldShadowCount.num));
-			base.GetComponent<UILabel>((Enum)UI.STR_CHALLENGE_BONUS_MESSAGE).supportEncoding = true;
+			SetLabelText(UI.STR_CHALLENGE_BONUS_MESSAGE, StringTable.Format(STRING_CATEGORY.SHADOW_COUNT, 3u, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.oldShadowCount.num));
+			GetComponent<UILabel>(UI.STR_CHALLENGE_BONUS_MESSAGE).supportEncoding = true;
 		}
 		else
 		{
-			SetActive((Enum)UI.STR_CHALLENGE_BONUS_MESSAGE, false);
-			SetActive((Enum)UI.BTN_DETAIL, false);
+			SetActive(UI.STR_CHALLENGE_BONUS_MESSAGE, false);
+			SetActive(UI.BTN_DETAIL, false);
 		}
-		SetLabelText((Enum)UI.STR_CHALLENGE_MESSAGE, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.message);
+		SetLabelText(UI.STR_CHALLENGE_MESSAGE, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.message);
 		SetSupportEncoding(UI.STR_CHALLENGE_MESSAGE, true);
 		if (challengeList == null || challengeList.Count == 0)
 		{
-			SetActive((Enum)UI.GRD_ORDER_QUEST, false);
-			SetActive((Enum)UI.STR_ORDER_NON_LIST, true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, true);
-			SetLabelText((Enum)UI.LBL_MAX, "0");
-			SetLabelText((Enum)UI.LBL_NOW, "0");
+			SetActive(UI.GRD_ORDER_QUEST, false);
+			SetActive(UI.STR_ORDER_NON_LIST, true);
+			SetActive(UI.OBJ_ACTIVE_ROOT, false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, true);
+			SetLabelText(UI.LBL_MAX, "0");
+			SetLabelText(UI.LBL_NOW, "0");
 			UIScrollView component2 = GetCtrl(UI.SCR_ORDER_QUEST).GetComponent<UIScrollView>();
-			if (component2 != null)
+			if ((UnityEngine.Object)component2 != (UnityEngine.Object)null)
 			{
-				component2.set_enabled(false);
+				component2.enabled = false;
 				component2.verticalScrollBar.alpha = 0f;
 			}
 		}
 		else
 		{
-			SetActive((Enum)UI.GRD_ORDER_QUEST, true);
-			SetActive((Enum)UI.STR_ORDER_NON_LIST, false);
+			SetActive(UI.GRD_ORDER_QUEST, true);
+			SetActive(UI.STR_ORDER_NON_LIST, false);
 			pageMax = 1 + (challengeList.Count - 1) / 10;
 			bool flag = pageMax > 1;
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
-			SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
-			SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
+			SetActive(UI.OBJ_ACTIVE_ROOT, flag);
+			SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
+			SetLabelText(UI.LBL_MAX, pageMax.ToString());
+			SetLabelText(UI.LBL_NOW, nowPage.ToString());
 			UITweener[] transitions = GetCtrl(UI.OBJ_FRAME).GetComponents<UITweener>();
 			int finishCount = 0;
 			UITweener[] array = transitions;
@@ -192,8 +193,76 @@ public class QuestChallengeSelect : GameSection
 			Array.Copy(challengeList.ToArray(), num, challengeData, 0, num2);
 			bool isGuildRequest = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "GuildRequestChallengeCounter";
 			UIScrollView scrollView = GetCtrl(UI.SCR_ORDER_QUEST).GetComponent<UIScrollView>();
-			_003CShowChallenge_003Ec__AnonStorey346 _003CShowChallenge_003Ec__AnonStorey;
-			SetGrid(UI.GRD_ORDER_QUEST, "QuestListChallengeItem", challengeData.Length, isResetUI, new Func<int, Transform, Transform>((object)_003CShowChallenge_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CShowChallenge_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetGrid(UI.GRD_ORDER_QUEST, "QuestListChallengeItem", challengeData.Length, isResetUI, (int i, Transform t) => Realizes("QuestListChallengeItem", t, true), delegate(int i, Transform t, bool is_recycle)
+			{
+				SetActive(t, true);
+				SetEvent(t, "SELECT_ORDER", i);
+				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)challengeData[i].questId);
+				if (isGuildRequest)
+				{
+					SetActive(t, UI.TWN_DIFFICULT_STAR, false);
+					SetActive(t, UI.TXT_NEED_POINT, true);
+					string text = string.Format(StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 6u), MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedPoint(questData.rarity), MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedTimeWithFormat(questData.rarity));
+					SetLabelText(t, UI.TXT_NEED_POINT, text);
+				}
+				else
+				{
+					SetActive(t, UI.TWN_DIFFICULT_STAR, false);
+					SetActive(t, UI.TXT_NEED_POINT, false);
+				}
+				EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
+				ITEM_ICON_TYPE itemIconType = ItemIcon.GetItemIconType(questData.questType);
+				ItemIcon icon = ItemIcon.Create(itemIconType, enemyData.iconId, questData.rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY, ELEMENT_TYPE.MAX);
+				icon.SetEnableCollider(false);
+				SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
+				SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData.element);
+				SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
+				SetActive(t, UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
+				SetLabelText(t, UI.LBL_QUEST_NAME, questData.questText);
+				int num3 = 1;
+				ClearStatusQuestEnemySpecies clearStatusQuestEnemySpecies = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestEnemySpecies(questData.questID);
+				if (clearStatusQuestEnemySpecies != null)
+				{
+					num3 = clearStatusQuestEnemySpecies.questStatus;
+				}
+				int value = i + 100;
+				SetToggleGroup(t, UI.OBJ_ICON_NEW, value);
+				CLEAR_STATUS cLEAR_STATUS = (CLEAR_STATUS)num3;
+				if (cLEAR_STATUS != CLEAR_STATUS.NEW)
+				{
+					SetToggle(t, UI.OBJ_ICON_NEW, false);
+					SetActive(t, UI.OBJ_ICON_ROOT, false);
+				}
+				else
+				{
+					SetActive(t, UI.OBJ_ICON_ROOT, true);
+					SetToggle(t, UI.OBJ_ICON_NEW, true);
+					SetVisibleWidgetEffect(UI.SCR_ORDER_QUEST, t, UI.SPR_ICON_NEW, "ef_ui_questselect_new");
+				}
+				Transform transform = FindCtrl(t, UI.OBJ_FRAME);
+				if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
+				{
+					UIPanel uiPanel = transform.gameObject.GetComponent<UIPanel>();
+					if ((UnityEngine.Object)uiPanel == (UnityEngine.Object)null)
+					{
+						uiPanel = transform.gameObject.AddComponent<UIPanel>();
+						uiPanel.depth = scrollView.panel.depth + 1;
+					}
+					uiPanel.widgetsAreStatic = false;
+					if (isScrollViewReady)
+					{
+						PanelToStatic(icon, uiPanel);
+					}
+					else
+					{
+						QuestChallengeSelect questChallengeSelect = this;
+						questChallengeSelect.onScrollViewReady = (Action)Delegate.Combine(questChallengeSelect.onScrollViewReady, (Action)delegate
+						{
+							PanelToStatic(icon, uiPanel);
+						});
+					}
+				}
+			});
 		}
 	}
 
@@ -202,29 +271,33 @@ public class QuestChallengeSelect : GameSection
 		if (base.isOpen && isTransitionFinished && onScrollViewReady != null)
 		{
 			isScrollViewReady = true;
-			onScrollViewReady.Invoke();
+			onScrollViewReady();
 			onScrollViewReady = null;
 		}
 	}
 
-	private unsafe void PanelToStatic(ItemIcon icon, UIPanel uiPanel)
+	private void PanelToStatic(ItemIcon icon, UIPanel uiPanel)
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Expected O, but got Unknown
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Expected O, but got Unknown
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Expected O, but got Unknown
-		_003CPanelToStatic_003Ec__AnonStorey349 _003CPanelToStatic_003Ec__AnonStorey;
 		if (icon.isIconLoaded)
 		{
 			uiPanel.widgetsAreStatic = false;
 			AppMain i = MonoBehaviourSingleton<AppMain>.I;
-			i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003CPanelToStatic_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+			{
+				uiPanel.widgetsAreStatic = true;
+			});
 		}
 		else
 		{
-			icon.onIconLoaded = new Action((object)_003CPanelToStatic_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			icon.onIconLoaded = delegate
+			{
+				uiPanel.widgetsAreStatic = false;
+				AppMain i2 = MonoBehaviourSingleton<AppMain>.I;
+				i2.onDelayCall = (Action)Delegate.Combine(i2.onDelayCall, (Action)delegate
+				{
+					uiPanel.widgetsAreStatic = true;
+				});
+			};
 		}
 	}
 
@@ -266,10 +339,8 @@ public class QuestChallengeSelect : GameSection
 		return NOTIFY_FLAG.UPDATE_QUEST_ITEM_INVENTORY;
 	}
 
-	private unsafe void Update()
+	private void Update()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
 		if (!isScrollViewReady)
 		{
 			TryScrollViewToReady();
@@ -277,7 +348,13 @@ public class QuestChallengeSelect : GameSection
 		if (isQuestItemDirty)
 		{
 			RefreshUI();
-			Protocol.Force(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			Protocol.Force(delegate
+			{
+				MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeList(param, delegate
+				{
+					StartCoroutine(CheckLimitQuestItem());
+				}, true);
+			});
 			isQuestItemDirty = false;
 		}
 	}
@@ -295,11 +372,11 @@ public class QuestChallengeSelect : GameSection
 				{
 					for (int i = 0; i < challengeQuest.remainTimes.Count; i++)
 					{
-						((_003CCheckLimitQuestItem_003Ec__Iterator7A)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 = challengeQuest.remainTimes[i];
-						if (!(((_003CCheckLimitQuestItem_003Ec__Iterator7A)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 <= 0f) && ((_003CCheckLimitQuestItem_003Ec__Iterator7A)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 > ((_003CCheckLimitQuestItem_003Ec__Iterator7A)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3)
+						((_003CCheckLimitQuestItem_003Ec__Iterator7C)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 = challengeQuest.remainTimes[i];
+						if (!(((_003CCheckLimitQuestItem_003Ec__Iterator7C)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 <= 0f) && ((_003CCheckLimitQuestItem_003Ec__Iterator7C)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 > ((_003CCheckLimitQuestItem_003Ec__Iterator7C)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3)
 						{
-							((_003CCheckLimitQuestItem_003Ec__Iterator7A)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 = ((_003CCheckLimitQuestItem_003Ec__Iterator7A)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3;
-							((_003CCheckLimitQuestItem_003Ec__Iterator7A)/*Error near IL_007f: stateMachine*/)._003CquestData_003E__2 = challengeQuest;
+							((_003CCheckLimitQuestItem_003Ec__Iterator7C)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 = ((_003CCheckLimitQuestItem_003Ec__Iterator7C)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3;
+							((_003CCheckLimitQuestItem_003Ec__Iterator7C)/*Error near IL_007f: stateMachine*/)._003CquestData_003E__2 = challengeQuest;
 						}
 					}
 				});

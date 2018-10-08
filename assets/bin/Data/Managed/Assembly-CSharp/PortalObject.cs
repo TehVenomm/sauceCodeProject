@@ -1,7 +1,7 @@
 using Network;
 using UnityEngine;
 
-public class PortalObject
+public class PortalObject : MonoBehaviour
 {
 	public enum VIEW_TYPE
 	{
@@ -111,15 +111,8 @@ public class PortalObject
 		set;
 	}
 
-	public PortalObject()
-		: this()
-	{
-	}
-
 	public static PortalObject Create(FieldMapPortalInfo portal_info, Transform parent)
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		if (portal_info == null)
 		{
 			return null;
@@ -128,10 +121,10 @@ public class PortalObject
 		{
 			return null;
 		}
-		Transform val = Utility.CreateGameObject("PortalObject", parent, 19);
-		val.set_position(new Vector3(portal_info.portalData.srcX, 0f, portal_info.portalData.srcZ));
-		PortalObject portalObject = val.get_gameObject().AddComponent<PortalObject>();
-		if (portalObject == null)
+		Transform transform = Utility.CreateGameObject("PortalObject", parent, 19);
+		transform.position = new Vector3(portal_info.portalData.srcX, 0f, portal_info.portalData.srcZ);
+		PortalObject portalObject = transform.gameObject.AddComponent<PortalObject>();
+		if ((Object)portalObject == (Object)null)
 		{
 			return null;
 		}
@@ -141,16 +134,12 @@ public class PortalObject
 
 	protected virtual void Awake()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Expected O, but got Unknown
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		parameter = MonoBehaviourSingleton<InGameSettingsManager>.I.portal;
-		_transform = this.get_transform();
-		SphereCollider val = this.get_gameObject().AddComponent<SphereCollider>();
-		val.set_center(new Vector3(0f, 0f, 0f));
-		val.set_radius(1f);
-		val.set_isTrigger(true);
+		_transform = base.transform;
+		SphereCollider sphereCollider = base.gameObject.AddComponent<SphereCollider>();
+		sphereCollider.center = new Vector3(0f, 0f, 0f);
+		sphereCollider.radius = 1f;
+		sphereCollider.isTrigger = true;
 		if (MonoBehaviourSingleton<UIStatusGizmoManager>.IsValid())
 		{
 			MonoBehaviourSingleton<UIStatusGizmoManager>.I.Create(this);
@@ -223,10 +212,9 @@ public class PortalObject
 
 	private void CreateView()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (viewObject != null)
+		if ((Object)viewObject != (Object)null)
 		{
-			Object.Destroy(viewObject.get_gameObject());
+			Object.Destroy(viewObject.gameObject);
 			viewObject = null;
 		}
 		if (viewType == VIEW_TYPE.NOT_TRAVELED && !isFull)
@@ -235,12 +223,12 @@ public class PortalObject
 			{
 				viewObject = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesField>.I.portalIncomplete, _transform, -1);
 			}
-			if (viewObject != null)
+			if ((Object)viewObject != (Object)null)
 			{
 				viewAnimator = viewObject.GetComponent<Animator>();
-				if (viewAnimator != null)
+				if ((Object)viewAnimator != (Object)null)
 				{
-					viewAnimator.set_speed(0f);
+					viewAnimator.speed = 0f;
 				}
 				viewParticles = viewObject.GetComponentsInChildren<ParticleSystem>();
 			}
@@ -271,12 +259,12 @@ public class PortalObject
 			{
 				num = 0f;
 			}
-			if (viewAnimator != null)
+			if ((Object)viewAnimator != (Object)null)
 			{
-				viewAnimator.set_speed(1f);
+				viewAnimator.speed = 1f;
 				viewAnimator.Play("ef_btl_warp_unuse_01", 0, num);
 				viewAnimator.Update(0f);
-				viewAnimator.set_speed(0f);
+				viewAnimator.speed = 0f;
 			}
 			if (viewParticles != null)
 			{
@@ -289,16 +277,16 @@ public class PortalObject
 				int i = 0;
 				for (int num2 = viewParticles.Length; i < num2; i++)
 				{
-					if (viewParticles[i] != null)
+					if ((Object)viewParticles[i] != (Object)null)
 					{
 						if (flag)
 						{
-							if (viewParticles[i].get_isStopped())
+							if (viewParticles[i].isStopped)
 							{
 								viewParticles[i].Play();
 							}
 						}
-						else if (!viewParticles[i].get_isStopped())
+						else if (!viewParticles[i].isStopped)
 						{
 							viewParticles[i].Stop();
 						}
@@ -310,22 +298,7 @@ public class PortalObject
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ec: Expected O, but got Unknown
-		//IL_023e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0274: Expected O, but got Unknown
-		//IL_0298: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a5: Expected O, but got Unknown
-		//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030a: Expected O, but got Unknown
-		//IL_0349: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0356: Expected O, but got Unknown
-		//IL_0386: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0393: Expected O, but got Unknown
-		//IL_03f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0400: Expected O, but got Unknown
-		if (collider.get_gameObject().GetComponent<Self>() == null)
+		if ((Object)collider.gameObject.GetComponent<Self>() == (Object)null)
 		{
 			return;
 		}
@@ -341,7 +314,7 @@ public class PortalObject
 		{
 			return;
 		}
-		if (MonoBehaviourSingleton<StageObjectManager>.I.self == null)
+		if ((Object)MonoBehaviourSingleton<StageObjectManager>.I.self == (Object)null)
 		{
 			return;
 		}
@@ -358,7 +331,7 @@ public class PortalObject
 				{
 					if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 					{
-						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NOT_FULL", new object[2]
+						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_NOT_FULL", new object[2]
 						{
 							nowPoint.ToString(),
 							maxPoint.ToString()
@@ -367,7 +340,7 @@ public class PortalObject
 				}
 				else if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NOT_ACTIVE", null, null, true);
+					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_NOT_ACTIVE", null, null, true);
 				}
 			}
 			else
@@ -379,19 +352,19 @@ public class PortalObject
 					{
 						if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portalData, true, true))
 						{
-							MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_QUEST_LOCK", null, null, true);
+							MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_QUEST_LOCK", null, null, true);
 						}
 					}
 					else if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(portalData.dstQuestID, true))
 					{
-						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_QUEST", null, null, true);
+						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_QUEST", null, null, true);
 					}
 				}
 				else if (viewType == VIEW_TYPE.TO_HOME)
 				{
 					if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 					{
-						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_HOME", null, null, true);
+						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_HOME", null, null, true);
 					}
 				}
 				else if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
@@ -402,7 +375,7 @@ public class PortalObject
 					}
 					if (MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portalData, false, true))
 					{
-						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NEXT", null, null, true);
+						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_NEXT", null, null, true);
 					}
 				}
 			}
@@ -431,7 +404,7 @@ public class PortalObject
 		}
 		if (!string.IsNullOrEmpty(text) && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NOT_APPEAR", new object[1]
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_NOT_APPEAR", new object[1]
 			{
 				text
 			}, null, true);
@@ -440,9 +413,7 @@ public class PortalObject
 
 	public void OnGetPortalPoint(int add_point)
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		EffectManager.OneShot(parameter.pointGetEffectName, _transform.get_position(), _transform.get_rotation(), false);
+		EffectManager.OneShot(parameter.pointGetEffectName, _transform.position, _transform.rotation, false);
 		nowPoint += add_point;
 		if (nowPoint >= maxPoint)
 		{
@@ -486,7 +457,7 @@ public class PortalObject
 			UpdateView();
 			SoundManager.PlayOneShotUISE(40000068);
 		}
-		if (uiGizmo != null)
+		if ((Object)uiGizmo != (Object)null)
 		{
 			uiGizmo.OnGetPortalPoint();
 		}

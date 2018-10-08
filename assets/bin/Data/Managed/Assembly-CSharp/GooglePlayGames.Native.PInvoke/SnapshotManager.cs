@@ -94,9 +94,9 @@ namespace GooglePlayGames.Native.PInvoke
 				return ResponseStatus() > (CommonErrorStatus.ResponseStatus)0;
 			}
 
-			internal unsafe IEnumerable<NativeSnapshotMetadata> Data()
+			internal IEnumerable<NativeSnapshotMetadata> Data()
 			{
-				return PInvokeUtilities.ToEnumerable<NativeSnapshotMetadata>(GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_FetchAllResponse_GetData_Length(SelfPtr()), new Func<UIntPtr, NativeSnapshotMetadata>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				return PInvokeUtilities.ToEnumerable(GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_FetchAllResponse_GetData_Length(SelfPtr()), (UIntPtr index) => new NativeSnapshotMetadata(GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_FetchAllResponse_GetData_GetElement(SelfPtr(), index)));
 			}
 
 			protected override void CallDispose(HandleRef selfPointer)
@@ -244,9 +244,9 @@ namespace GooglePlayGames.Native.PInvoke
 			mServices = Misc.CheckNotNull(services);
 		}
 
-		internal unsafe void FetchAll(Types.DataSource source, Action<FetchAllResponse> callback)
+		internal void FetchAll(Types.DataSource source, Action<FetchAllResponse> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_FetchAll(mServices.AsHandle(), source, InternalFetchAllCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, FetchAllResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_FetchAll(mServices.AsHandle(), source, InternalFetchAllCallback, Callbacks.ToIntPtr(callback, FetchAllResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.SnapshotManager.FetchAllCallback))]
@@ -255,9 +255,9 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("SnapshotManager#FetchAllCallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal unsafe void SnapshotSelectUI(bool allowCreate, bool allowDelete, uint maxSnapshots, string uiTitle, Action<SnapshotSelectUIResponse> callback)
+		internal void SnapshotSelectUI(bool allowCreate, bool allowDelete, uint maxSnapshots, string uiTitle, Action<SnapshotSelectUIResponse> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_ShowSelectUIOperation(mServices.AsHandle(), allowCreate, allowDelete, maxSnapshots, uiTitle, InternalSnapshotSelectUICallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, SnapshotSelectUIResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_ShowSelectUIOperation(mServices.AsHandle(), allowCreate, allowDelete, maxSnapshots, uiTitle, InternalSnapshotSelectUICallback, Callbacks.ToIntPtr(callback, SnapshotSelectUIResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotSelectUICallback))]
@@ -266,11 +266,11 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("SnapshotManager#SnapshotSelectUICallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal unsafe void Open(string fileName, Types.DataSource source, Types.SnapshotConflictPolicy conflictPolicy, Action<OpenResponse> callback)
+		internal void Open(string fileName, Types.DataSource source, Types.SnapshotConflictPolicy conflictPolicy, Action<OpenResponse> callback)
 		{
 			Misc.CheckNotNull(fileName);
 			Misc.CheckNotNull(callback);
-			GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_Open(mServices.AsHandle(), source, fileName, conflictPolicy, InternalOpenCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, OpenResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_Open(mServices.AsHandle(), source, fileName, conflictPolicy, InternalOpenCallback, Callbacks.ToIntPtr(callback, OpenResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.SnapshotManager.OpenCallback))]
@@ -279,19 +279,19 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("SnapshotManager#OpenCallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal unsafe void Commit(NativeSnapshotMetadata metadata, NativeSnapshotMetadataChange metadataChange, byte[] updatedData, Action<CommitResponse> callback)
+		internal void Commit(NativeSnapshotMetadata metadata, NativeSnapshotMetadataChange metadataChange, byte[] updatedData, Action<CommitResponse> callback)
 		{
 			Misc.CheckNotNull(metadata);
 			Misc.CheckNotNull(metadataChange);
-			GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_Commit(mServices.AsHandle(), metadata.AsPointer(), metadataChange.AsPointer(), updatedData, new UIntPtr((ulong)updatedData.Length), InternalCommitCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, CommitResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_Commit(mServices.AsHandle(), metadata.AsPointer(), metadataChange.AsPointer(), updatedData, new UIntPtr((ulong)updatedData.Length), InternalCommitCallback, Callbacks.ToIntPtr(callback, CommitResponse.FromPointer));
 		}
 
-		internal unsafe void Resolve(NativeSnapshotMetadata metadata, NativeSnapshotMetadataChange metadataChange, string conflictId, Action<CommitResponse> callback)
+		internal void Resolve(NativeSnapshotMetadata metadata, NativeSnapshotMetadataChange metadataChange, string conflictId, Action<CommitResponse> callback)
 		{
 			Misc.CheckNotNull(metadata);
 			Misc.CheckNotNull(metadataChange);
 			Misc.CheckNotNull(conflictId);
-			GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_ResolveConflict(mServices.AsHandle(), metadata.AsPointer(), metadataChange.AsPointer(), conflictId, InternalCommitCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, CommitResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_ResolveConflict(mServices.AsHandle(), metadata.AsPointer(), metadataChange.AsPointer(), conflictId, InternalCommitCallback, Callbacks.ToIntPtr(callback, CommitResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.SnapshotManager.CommitCallback))]
@@ -306,11 +306,11 @@ namespace GooglePlayGames.Native.PInvoke
 			GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_Delete(mServices.AsHandle(), metadata.AsPointer());
 		}
 
-		internal unsafe void Read(NativeSnapshotMetadata metadata, Action<ReadResponse> callback)
+		internal void Read(NativeSnapshotMetadata metadata, Action<ReadResponse> callback)
 		{
 			Misc.CheckNotNull(metadata);
 			Misc.CheckNotNull(callback);
-			GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_Read(mServices.AsHandle(), metadata.AsPointer(), InternalReadCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, ReadResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			GooglePlayGames.Native.Cwrapper.SnapshotManager.SnapshotManager_Read(mServices.AsHandle(), metadata.AsPointer(), InternalReadCallback, Callbacks.ToIntPtr(callback, ReadResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.SnapshotManager.ReadCallback))]

@@ -58,40 +58,55 @@ public class LoungeQuestBoard : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		SetLabelText((Enum)UI.LBL_TITLE, base.sectionData.GetText("TITLE"));
-		SetLabelText((Enum)UI.LBL_TITLE_SHADOW, base.sectionData.GetText("TITLE"));
-		SetLabelText((Enum)UI.STR_NON_LIST, base.sectionData.GetText("NON_QUEST"));
-		SetActive((Enum)UI.SCR_QUEST, true);
-		this.StartCoroutine(DoInitialize());
+		SetLabelText(UI.LBL_TITLE, base.sectionData.GetText("TITLE"));
+		SetLabelText(UI.LBL_TITLE_SHADOW, base.sectionData.GetText("TITLE"));
+		SetLabelText(UI.STR_NON_LIST, base.sectionData.GetText("NON_QUEST"));
+		SetActive(UI.SCR_QUEST, true);
+		StartCoroutine(DoInitialize());
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.SPR_CONDITION_DIFFICULTY, false);
-		SetActive((Enum)UI.STR_NO_CONDITION, true);
+		SetActive(UI.SPR_CONDITION_DIFFICULTY, false);
+		SetActive(UI.STR_NO_CONDITION, true);
 		SetNpcInfo();
 		if (parties.Count <= 0)
 		{
-			SetActive((Enum)UI.GRD_QUEST, false);
-			SetActive((Enum)UI.STR_NON_LIST, true);
+			SetActive(UI.GRD_QUEST, false);
+			SetActive(UI.STR_NON_LIST, true);
 		}
 		else
 		{
-			SetActive((Enum)UI.GRD_QUEST, true);
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			SetGrid(UI.GRD_QUEST, "QuestSearchListSelectItem", parties.Count, false, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetActive(UI.GRD_QUEST, true);
+			SetActive(UI.STR_NON_LIST, false);
+			SetGrid(UI.GRD_QUEST, "QuestSearchListSelectItem", parties.Count, false, delegate(int i, Transform t, bool is_recycle)
+			{
+				QuestTable.QuestTableData questTableData = null;
+				questTableData = ((parties[i].quest.explore == null) ? Singleton<QuestTable>.I.GetQuestData((uint)parties[i].quest.questId) : Singleton<QuestTable>.I.GetQuestData((uint)parties[i].quest.explore.mainQuestId));
+				if (questTableData == null)
+				{
+					SetActive(t, false);
+				}
+				else
+				{
+					SetEvent(t, "SELECT_ROOM", i);
+					SetQuestData(questTableData, t);
+					SetPartyData(parties[i], t, questTableData.questType);
+					SetStatusIconInfo(parties[i], t);
+					SetMemberIcon(t, questTableData);
+				}
+			});
 		}
 	}
 
 	protected void SetStatusIconInfo(PartyModel.Party _partyParam, Transform _targetObject)
 	{
-		if (!(_targetObject == null) && _partyParam != null)
+		if (!((UnityEngine.Object)_targetObject == (UnityEngine.Object)null) && _partyParam != null)
 		{
 			QuestUserStatusIconController componentInChildren = _targetObject.GetComponentInChildren<QuestUserStatusIconController>();
-			if (componentInChildren != null)
+			if ((UnityEngine.Object)componentInChildren != (UnityEngine.Object)null)
 			{
-				Debug.Log((object)("ID:" + _partyParam.quest.questId + ", Bit:" + _partyParam.iconBit));
+				Debug.Log("ID:" + _partyParam.quest.questId + ", Bit:" + _partyParam.iconBit);
 				componentInChildren.Initialize(new QuestUserStatusIconController.InitParam
 				{
 					StatusBit = _partyParam.iconBit
@@ -102,13 +117,24 @@ public class LoungeQuestBoard : GameSection
 
 	private IEnumerator DoInitialize()
 	{
-		yield return (object)this.StartCoroutine(Reload(null));
+		yield return (object)StartCoroutine(Reload(null));
 	}
 
-	private unsafe IEnumerator Reload(Action<bool> cb = null)
+	private IEnumerator Reload(Action<bool> cb = null)
 	{
 		bool isRecv = false;
-		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendRoomParty(new Action<bool, List<PartyModel.Party>>((object)/*Error near IL_002d: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendRoomParty(delegate(bool isSuccess, List<PartyModel.Party> parties)
+		{
+			if (isSuccess)
+			{
+				((_003CReload_003Ec__IteratorE2)/*Error near IL_002d: stateMachine*/)._003C_003Ef__this.parties = parties;
+				((_003CReload_003Ec__IteratorE2)/*Error near IL_002d: stateMachine*/)._003CisRecv_003E__0 = true;
+			}
+			if (((_003CReload_003Ec__IteratorE2)/*Error near IL_002d: stateMachine*/).cb != null)
+			{
+				((_003CReload_003Ec__IteratorE2)/*Error near IL_002d: stateMachine*/).cb(isSuccess);
+			}
+		});
 		while (!isRecv)
 		{
 			yield return (object)null;
@@ -158,12 +184,6 @@ public class LoungeQuestBoard : GameSection
 
 	private void SetQuestData(QuestTable.QuestTableData questData, Transform t)
 	{
-		//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0265: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0300: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031a: Unknown result type (might be due to invalid IL or missing references)
 		UI[] array = new UI[10]
 		{
 			UI.OBJ_DIFFICULT_STAR_1,
@@ -204,22 +224,22 @@ public class LoungeQuestBoard : GameSection
 			SetElementSprite(t, UI.SPR_WEAK_ELEMENT, 6);
 			SetActive(t, UI.STR_NON_WEAK_ELEMENT, true);
 		}
-		Transform val = FindCtrl(t, UI.SPR_ICON_DOUBLE);
-		Transform val2 = FindCtrl(t, UI.SPR_ICON_DEFENSE_BATTLE);
-		Transform val3 = FindCtrl(t, UI.LBL_RECRUTING_MEMBERS);
-		Transform val4 = FindCtrl(t, UI.SPR_WINDOW_BASE);
-		if (val4 != null)
+		Transform transform = FindCtrl(t, UI.SPR_ICON_DOUBLE);
+		Transform transform2 = FindCtrl(t, UI.SPR_ICON_DEFENSE_BATTLE);
+		Transform transform3 = FindCtrl(t, UI.LBL_RECRUTING_MEMBERS);
+		Transform transform4 = FindCtrl(t, UI.SPR_WINDOW_BASE);
+		if ((UnityEngine.Object)transform4 != (UnityEngine.Object)null)
 		{
-			UISprite component = val4.GetComponent<UISprite>();
-			Transform val5 = FindCtrl(t, UI.OBJ_SEARCH_INFO_ROOT);
-			UISprite component2 = val5.GetComponent<UISprite>();
+			UISprite component = transform4.GetComponent<UISprite>();
+			Transform transform5 = FindCtrl(t, UI.OBJ_SEARCH_INFO_ROOT);
+			UISprite component2 = transform5.GetComponent<UISprite>();
 			if (questData.questType == QUEST_TYPE.GATE || questData.questType == QUEST_TYPE.DEFENSE)
 			{
 				component.spriteName = "QuestListPlateO";
 				component2.spriteName = "SearchAdWindowO";
-				val.get_gameObject().SetActive(true);
-				val2.get_gameObject().SetActive(questData.questType == QUEST_TYPE.DEFENSE);
-				val3.get_gameObject().SetActive(questData.questType == QUEST_TYPE.DEFENSE);
+				transform.gameObject.SetActive(true);
+				transform2.gameObject.SetActive(questData.questType == QUEST_TYPE.DEFENSE);
+				transform3.gameObject.SetActive(questData.questType == QUEST_TYPE.DEFENSE);
 				string format = StringTable.Get(STRING_CATEGORY.GATE_QUEST_NAME, 0u);
 				string text = string.Empty;
 				if (enemyData != null)
@@ -233,9 +253,9 @@ public class LoungeQuestBoard : GameSection
 			{
 				component.spriteName = "QuestListPlateN";
 				component2.spriteName = "SearchAdWindow";
-				val.get_gameObject().SetActive(false);
-				val2.get_gameObject().SetActive(false);
-				val3.get_gameObject().SetActive(false);
+				transform.gameObject.SetActive(false);
+				transform2.gameObject.SetActive(false);
+				transform3.gameObject.SetActive(false);
 				SetLabelText(t, UI.LBL_QUEST_NAME, questData.questText);
 				SetLabelText(t, UI.LBL_QUEST_NUM, string.Format(base.sectionData.GetText("QUEST_NUMBER"), questData.locationNumber, questData.questNumber));
 			}
@@ -249,11 +269,9 @@ public class LoungeQuestBoard : GameSection
 
 	private void SetNpcInfo()
 	{
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 		string text = (parties.Count <= 0) ? base.sectionData.GetText("NON_LIST_MSG") : base.sectionData.GetText("EXIST_LIST_MSG");
-		SetRenderNPCModel((Enum)UI.TEX_NPCMODEL, 7, MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.boardCenterNPCPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.boardCenterNPCRot, MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.boardCenterNPCFOV, (Action<NPCLoader>)null);
-		SetLabelText((Enum)UI.LBL_MESSAGE, text);
+		SetRenderNPCModel(UI.TEX_NPCMODEL, 7, MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.boardCenterNPCPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.boardCenterNPCRot, MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.boardCenterNPCFOV, null);
+		SetLabelText(UI.LBL_MESSAGE, text);
 	}
 
 	private void OnQuery_SELECT_ROOM()
@@ -279,9 +297,8 @@ public class LoungeQuestBoard : GameSection
 
 	private void OnQuery_RELOAD()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		GameSection.StayEvent();
-		this.StartCoroutine(Reload(delegate(bool b)
+		StartCoroutine(Reload(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b, null);
 		}));

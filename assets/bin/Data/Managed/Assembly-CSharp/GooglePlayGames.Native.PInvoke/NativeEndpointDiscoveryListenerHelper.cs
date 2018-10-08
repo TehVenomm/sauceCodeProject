@@ -18,9 +18,9 @@ namespace GooglePlayGames.Native.PInvoke
 			EndpointDiscoveryListenerHelper.EndpointDiscoveryListenerHelper_Dispose(selfPointer);
 		}
 
-		internal unsafe void SetOnEndpointFound(Action<long, NativeEndpointDetails> callback)
+		internal void SetOnEndpointFound(Action<long, NativeEndpointDetails> callback)
 		{
-			EndpointDiscoveryListenerHelper.EndpointDiscoveryListenerHelper_SetOnEndpointFoundCallback(SelfPtr(), InternalOnEndpointFoundCallback, Callbacks.ToIntPtr<long, NativeEndpointDetails>(callback, new Func<IntPtr, NativeEndpointDetails>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			EndpointDiscoveryListenerHelper.EndpointDiscoveryListenerHelper_SetOnEndpointFoundCallback(SelfPtr(), InternalOnEndpointFoundCallback, Callbacks.ToIntPtr(callback, NativeEndpointDetails.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(EndpointDiscoveryListenerHelper.OnEndpointFoundCallback))]
@@ -31,18 +31,18 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal void SetOnEndpointLostCallback(Action<long, string> callback)
 		{
-			EndpointDiscoveryListenerHelper.EndpointDiscoveryListenerHelper_SetOnEndpointLostCallback(SelfPtr(), InternalOnEndpointLostCallback, Callbacks.ToIntPtr((Delegate)callback));
+			EndpointDiscoveryListenerHelper.EndpointDiscoveryListenerHelper_SetOnEndpointLostCallback(SelfPtr(), InternalOnEndpointLostCallback, Callbacks.ToIntPtr(callback));
 		}
 
 		[MonoPInvokeCallback(typeof(EndpointDiscoveryListenerHelper.OnEndpointLostCallback))]
 		private static void InternalOnEndpointLostCallback(long id, string lostEndpointId, IntPtr userData)
 		{
-			Action<long, string> val = Callbacks.IntPtrToPermanentCallback<Action<long, string>>(userData);
-			if (val != null)
+			Action<long, string> action = Callbacks.IntPtrToPermanentCallback<Action<long, string>>(userData);
+			if (action != null)
 			{
 				try
 				{
-					val.Invoke(id, lostEndpointId);
+					action(id, lostEndpointId);
 				}
 				catch (Exception arg)
 				{

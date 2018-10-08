@@ -15,14 +15,13 @@ public class SmithPerformanceBase : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
 		{
 			MonoBehaviourSingleton<StatusStageManager>.I.SetUITextureActive(false);
 		}
 		object obj = resultData = GameSection.GetEventData();
-		SetToggle((Enum)UI.TGL_DIRECTION, true);
-		this.StartCoroutine(DoInitialize());
+		SetToggle(UI.TGL_DIRECTION, true);
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -35,7 +34,7 @@ public class SmithPerformanceBase : GameSection
 		GameObject npcRoot4 = new GameObject("NPC");
 		npcData4.LoadModel(npcRoot4, false, true, delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator157)/*Error near IL_0093: stateMachine*/)._003Cwait_003E__2--;
+			((_003CDoInitialize_003Ec__Iterator159)/*Error near IL_0093: stateMachine*/)._003Cwait_003E__2--;
 		}, false);
 		GameObject npcRoot3 = null;
 		if (this is SmithAbilityChangePerformance || this is SmithAbilityItemPerformance)
@@ -45,7 +44,7 @@ public class SmithPerformanceBase : GameSection
 			npcRoot3 = new GameObject("NPC003");
 			npcData3.LoadModel(npcRoot3, false, true, delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator157)/*Error near IL_011c: stateMachine*/)._003Cwait_003E__2--;
+				((_003CDoInitialize_003Ec__Iterator159)/*Error near IL_011c: stateMachine*/)._003Cwait_003E__2--;
 			}, false);
 		}
 		int[] seIds2 = (int[])Enum.GetValues(typeof(SmithEquipDirector.AUDIO));
@@ -65,7 +64,7 @@ public class SmithPerformanceBase : GameSection
 		{
 			yield return (object)null;
 		}
-		Object directionObject = lo_direction.loadedObject;
+		UnityEngine.Object directionObject = lo_direction.loadedObject;
 		Transform directionTransform = ResourceUtility.Realizes(directionObject, MonoBehaviourSingleton<StageManager>.I.stageObject, -1);
 		director = directionTransform.GetComponent<SmithEquipDirector>();
 		director.SetNPC004(npcRoot4);
@@ -98,13 +97,12 @@ public class SmithPerformanceBase : GameSection
 
 	protected virtual void OnEndDirection()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoEnd());
+		StartCoroutine(DoEnd());
 	}
 
 	protected void EndDirectionUI()
 	{
-		SetToggle((Enum)UI.TGL_DIRECTION, false);
+		SetToggle(UI.TGL_DIRECTION, false);
 	}
 
 	private IEnumerator DoEnd()
@@ -116,20 +114,19 @@ public class SmithPerformanceBase : GameSection
 		}
 		EndDirectionUI();
 		DispatchEvent("SKIP", null);
-		if (Object.op_Implicit(director))
+		if ((bool)director)
 		{
 			director.Reset();
-			Object.Destroy(director.get_gameObject());
+			UnityEngine.Object.Destroy(director.gameObject);
 		}
 	}
 
 	protected override void OnDestroy()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		if (Object.op_Implicit(director))
+		if ((bool)director)
 		{
 			director.Reset();
-			Object.Destroy(director.get_gameObject());
+			UnityEngine.Object.Destroy(director.gameObject);
 		}
 		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
 		{

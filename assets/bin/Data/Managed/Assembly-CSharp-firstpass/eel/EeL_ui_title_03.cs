@@ -1,15 +1,11 @@
+using rhyme;
 using UnityEngine;
 
 namespace eel
 {
 	[AddComponentMenu("EeL/EeL_ui_title_03")]
-	public class EeL_ui_title_03
+	public class EeL_ui_title_03 : rymFXBinary
 	{
-		public EeL_ui_title_03()
-			: this()
-		{
-		}
-
 		public override string GetName()
 		{
 			return "EeL_ui_title_03";

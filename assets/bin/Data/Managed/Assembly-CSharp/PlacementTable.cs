@@ -73,9 +73,9 @@ public class PlacementTable : Singleton<PlacementTable>
 
 	public void CreateTable(TextAsset placeableObjectTextAsset, TextAsset placeableMapTextAsset)
 	{
-		objectTable = TableUtility.CreateUIntKeyTable<PlaceableObjectData>(placeableObjectTextAsset.get_text(), PlaceableObjectData.cb, PlaceableObjectData.NT, null);
+		objectTable = TableUtility.CreateUIntKeyTable<PlaceableObjectData>(placeableObjectTextAsset.text, PlaceableObjectData.cb, PlaceableObjectData.NT, null);
 		objectTable.TrimExcess();
-		mapTable = TableUtility.CreateUIntKeyTable<PlaceableMapData>(placeableMapTextAsset.get_text(), PlaceableMapData.cb, PlaceableMapData.NT, null);
+		mapTable = TableUtility.CreateUIntKeyTable<PlaceableMapData>(placeableMapTextAsset.text, PlaceableMapData.cb, PlaceableMapData.NT, null);
 		mapTable.TrimExcess();
 	}
 

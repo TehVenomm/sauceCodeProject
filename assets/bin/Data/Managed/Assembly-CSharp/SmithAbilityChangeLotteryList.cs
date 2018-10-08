@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -36,11 +35,10 @@ public class SmithAbilityChangeLotteryList : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
-	protected unsafe virtual IEnumerator DoInitialize()
+	protected virtual IEnumerator DoInitialize()
 	{
 		object[] datas = GameSection.GetEventData() as object[];
 		EquipItemInfo info = datas[0] as EquipItemInfo;
@@ -49,12 +47,20 @@ public class SmithAbilityChangeLotteryList : GameSection
 		switch (smithType)
 		{
 		case SmithEquipBase.SmithType.ABILITY_CHANGE:
-			MonoBehaviourSingleton<SmithManager>.I.SendGetAbilityList(info.uniqueID, new Action<Error, List<SmithGetAbilityList.Param>>((object)/*Error near IL_0087: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			MonoBehaviourSingleton<SmithManager>.I.SendGetAbilityList(info.uniqueID, delegate(Error error, List<SmithGetAbilityList.Param> list)
+			{
+				((_003CDoInitialize_003Ec__IteratorD7)/*Error near IL_0087: stateMachine*/)._003Cwait_003E__3 = false;
+				((_003CDoInitialize_003Ec__IteratorD7)/*Error near IL_0087: stateMachine*/)._003C_003Ef__this.SetAbilities(list);
+			});
 			break;
 		case SmithEquipBase.SmithType.GENERATE:
 		{
 			SmithManager.SmithCreateData createdata = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>();
-			MonoBehaviourSingleton<SmithManager>.I.SendGetAbilityListPreGenerate(createdata.createEquipItemTable.id, new Action<Error, List<SmithGetAbilityListForCreateModel.Param>>((object)/*Error near IL_00c2: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			MonoBehaviourSingleton<SmithManager>.I.SendGetAbilityListPreGenerate(createdata.createEquipItemTable.id, delegate(Error error, List<SmithGetAbilityListForCreateModel.Param> list)
+			{
+				((_003CDoInitialize_003Ec__IteratorD7)/*Error near IL_00c2: stateMachine*/)._003Cwait_003E__3 = false;
+				((_003CDoInitialize_003Ec__IteratorD7)/*Error near IL_00c2: stateMachine*/)._003C_003Ef__this.SetAbilities(list);
+			});
 			break;
 		}
 		}
@@ -104,10 +110,18 @@ public class SmithAbilityChangeLotteryList : GameSection
 		minMaxAps = new List<MinMaxAp>();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
-		SetDynamicList((Enum)UI.GRD_ABILITY, "SmithAbilityChangeLotteryListItem", abilities.Count, false, null, null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetLabelText(UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
+		SetDynamicList(UI.GRD_ABILITY, "SmithAbilityChangeLotteryListItem", abilities.Count, false, null, null, delegate(int index, Transform t, bool reset)
+		{
+			EquipItemAbility equipItemAbility = abilities[index];
+			MinMaxAp minMaxAp = minMaxAps[index];
+			GetAbilityDetail(equipItemAbility, minMaxAp.minAp, minMaxAp.maxAp, out string ap, out string description);
+			SetLabelText(t, UI.LBL_ABILITY_DETAIL_NAME, equipItemAbility.GetName());
+			SetLabelText(t, UI.LBL_ABILITY_DETAIL_POINT, ap);
+			SetLabelText(t, UI.LBL_ABILITY_DETAIL_DESC, description);
+		});
 	}
 
 	public override void OnNotify(NOTIFY_FLAG flags)

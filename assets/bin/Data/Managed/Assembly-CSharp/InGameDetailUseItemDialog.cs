@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class InGameDetailUseItemDialog : ItemDetailUseItemDialog
 {
 	private bool isInActiveRotate;
@@ -40,15 +42,13 @@ public class InGameDetailUseItemDialog : ItemDetailUseItemDialog
 
 	private void OnScreenRotate(bool isPortrait)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		if (base.transferUI != null)
+		if ((Object)base.transferUI != (Object)null)
 		{
-			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
 		}
 		else
 		{
-			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
 		}
 		if (!isInActiveRotate)
 		{

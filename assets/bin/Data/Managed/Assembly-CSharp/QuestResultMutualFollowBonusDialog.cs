@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -40,7 +39,7 @@ public class QuestResultMutualFollowBonusDialog : ItemSellConfirm
 		GameSection.BackSection();
 	}
 
-	protected unsafe override void DrawIcon()
+	protected override void DrawIcon()
 	{
 		SortCompareData[] itemData = sellData.ToArray();
 		int reward_num = itemData.Length;
@@ -54,8 +53,65 @@ public class QuestResultMutualFollowBonusDialog : ItemSellConfirm
 		}
 		bool shouldAddGold = totalGold > 0;
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		_003CDrawIcon_003Ec__AnonStorey417 _003CDrawIcon_003Ec__AnonStorey;
-		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, delegate(int i, Transform t, bool is_recycle)
+		{
+			if (i < reward_num)
+			{
+				if (i < itemData.Length)
+				{
+					int enemy_icon_id = 0;
+					int enemy_icon_id2 = 0;
+					object itemData2 = itemData[i].GetItemData();
+					if (itemData2 is ItemSortData)
+					{
+						ItemSortData itemSortData = itemData2 as ItemSortData;
+						enemy_icon_id = itemSortData.itemData.tableData.enemyIconID;
+						enemy_icon_id2 = itemSortData.itemData.tableData.enemyIconID2;
+					}
+					ItemIcon itemIcon = null;
+					if (itemData[i].GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
+					{
+						itemIcon = ItemIcon.Create(new ItemIcon.ItemIconCreateParam
+						{
+							icon_type = itemData[i].GetIconType(),
+							icon_id = itemData[i].GetIconID(),
+							rarity = new RARITY_TYPE?(itemData[i].GetRarity()),
+							parent = t,
+							element = itemData[i].GetIconElement(),
+							magi_enable_equip_type = itemData[i].GetIconMagiEnableType(),
+							num = itemData[i].GetNum(),
+							enemy_icon_id = enemy_icon_id,
+							enemy_icon_id2 = enemy_icon_id2,
+							questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST
+						});
+					}
+					else
+					{
+						GET_TYPE getType = itemData[i].GetGetType();
+						itemIcon = ItemIcon.Create(itemData[i].GetIconType(), itemData[i].GetIconID(), itemData[i].GetRarity(), t, itemData[i].GetIconElement(), itemData[i].GetIconMagiEnableType(), itemData[i].GetNum(), null, 0, false, -1, false, null, false, enemy_icon_id, enemy_icon_id2, false, getType, ELEMENT_TYPE.MAX);
+					}
+					itemIcon.SetRewardBG(true);
+					SetMaterialInfo(itemIcon.transform, itemData[i].GetMaterialType(), itemData[i].GetTableID(), null);
+				}
+				else if (shouldAddGold)
+				{
+					ItemIcon itemIcon2 = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.MONEY, 1u, t, totalGold, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
+					itemIcon2.SetRewardBG(true);
+					SetMaterialInfo(itemIcon2.transform, REWARD_TYPE.MONEY, 0u, null);
+					shouldAddGold = false;
+				}
+				else
+				{
+					ItemIcon itemIcon3 = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.CRYSTAL, 1u, t, crystalNum, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
+					itemIcon3.SetRewardBG(true);
+					SetMaterialInfo(itemIcon3.transform, REWARD_TYPE.CRYSTAL, 0u, null);
+				}
+			}
+			else
+			{
+				SetActive(t, false);
+			}
+		});
 	}
 
 	protected override int GetSellGold()

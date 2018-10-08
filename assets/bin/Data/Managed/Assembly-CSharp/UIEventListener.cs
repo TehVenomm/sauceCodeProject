@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Internal/Event Listener")]
-public class UIEventListener
+public class UIEventListener : MonoBehaviour
 {
 	public delegate void VoidDelegate(GameObject go);
 
@@ -51,177 +51,140 @@ public class UIEventListener
 	{
 		get
 		{
-			Collider component = this.GetComponent<Collider>();
-			if (component != null)
+			Collider component = GetComponent<Collider>();
+			if ((Object)component != (Object)null)
 			{
-				return component.get_enabled();
+				return component.enabled;
 			}
-			Collider2D component2 = this.GetComponent<Collider2D>();
-			return component2 != null && component2.get_enabled();
+			Collider2D component2 = GetComponent<Collider2D>();
+			return (Object)component2 != (Object)null && component2.enabled;
 		}
-	}
-
-	public UIEventListener()
-		: this()
-	{
 	}
 
 	private void OnSubmit()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (isColliderEnabled && onSubmit != null)
 		{
-			onSubmit(this.get_gameObject());
+			onSubmit(base.gameObject);
 		}
 	}
 
 	private void OnClick()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (isColliderEnabled && onClick != null)
 		{
-			onClick(this.get_gameObject());
+			onClick(base.gameObject);
 		}
 	}
 
 	private void OnDoubleClick()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (isColliderEnabled && onDoubleClick != null)
 		{
-			onDoubleClick(this.get_gameObject());
+			onDoubleClick(base.gameObject);
 		}
 	}
 
 	private void OnHover(bool isOver)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (isColliderEnabled && onHover != null)
 		{
-			onHover(this.get_gameObject(), isOver);
+			onHover(base.gameObject, isOver);
 		}
 	}
 
 	private void OnPress(bool isPressed)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (isColliderEnabled && onPress != null)
 		{
-			onPress(this.get_gameObject(), isPressed);
+			onPress(base.gameObject, isPressed);
 		}
 	}
 
 	private void OnSelect(bool selected)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (isColliderEnabled && onSelect != null)
 		{
-			onSelect(this.get_gameObject(), selected);
+			onSelect(base.gameObject, selected);
 		}
 	}
 
 	private void OnScroll(float delta)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (isColliderEnabled && onScroll != null)
 		{
-			onScroll(this.get_gameObject(), delta);
+			onScroll(base.gameObject, delta);
 		}
 	}
 
 	private void OnDragStart()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Expected O, but got Unknown
 		if (onDragStart != null)
 		{
-			onDragStart(this.get_gameObject());
+			onDragStart(base.gameObject);
 		}
 	}
 
 	private void OnDrag(Vector2 delta)
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
 		if (onDrag != null)
 		{
-			onDrag(this.get_gameObject(), delta);
+			onDrag(base.gameObject, delta);
 		}
 	}
 
 	private void OnDragOver()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (isColliderEnabled && onDragOver != null)
 		{
-			onDragOver(this.get_gameObject());
+			onDragOver(base.gameObject);
 		}
 	}
 
 	private void OnDragOut()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (isColliderEnabled && onDragOut != null)
 		{
-			onDragOut(this.get_gameObject());
+			onDragOut(base.gameObject);
 		}
 	}
 
 	private void OnDragEnd()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Expected O, but got Unknown
 		if (onDragEnd != null)
 		{
-			onDragEnd(this.get_gameObject());
+			onDragEnd(base.gameObject);
 		}
 	}
 
 	private void OnDrop(GameObject go)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (isColliderEnabled && onDrop != null)
 		{
-			onDrop(this.get_gameObject(), go);
+			onDrop(base.gameObject, go);
 		}
 	}
 
 	private void OnKey(KeyCode key)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (isColliderEnabled && onKey != null)
 		{
-			onKey(this.get_gameObject(), key);
+			onKey(base.gameObject, key);
 		}
 	}
 
 	private void OnTooltip(bool show)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (isColliderEnabled && onTooltip != null)
 		{
-			onTooltip(this.get_gameObject(), show);
+			onTooltip(base.gameObject, show);
 		}
 	}
 
 	public static UIEventListener Get(GameObject go)
 	{
 		UIEventListener uIEventListener = go.GetComponent<UIEventListener>();
-		if (uIEventListener == null)
+		if ((Object)uIEventListener == (Object)null)
 		{
 			uIEventListener = go.AddComponent<UIEventListener>();
 		}

@@ -19,64 +19,30 @@ public class TweenTransform : UITweener
 
 	protected override void OnUpdate(float factor, bool isFinished)
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Expected O, but got Unknown
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-		if (to != null)
+		if ((Object)to != (Object)null)
 		{
-			if (mTrans == null)
+			if ((Object)mTrans == (Object)null)
 			{
-				mTrans = this.get_transform();
-				mPos = mTrans.get_position();
-				mRot = mTrans.get_rotation();
-				mScale = mTrans.get_localScale();
+				mTrans = base.transform;
+				mPos = mTrans.position;
+				mRot = mTrans.rotation;
+				mScale = mTrans.localScale;
 			}
-			if (from != null)
+			if ((Object)from != (Object)null)
 			{
-				mTrans.set_position(from.get_position() * (1f - factor) + to.get_position() * factor);
-				mTrans.set_localScale(from.get_localScale() * (1f - factor) + to.get_localScale() * factor);
-				mTrans.set_rotation(Quaternion.Slerp(from.get_rotation(), to.get_rotation(), factor));
+				mTrans.position = from.position * (1f - factor) + to.position * factor;
+				mTrans.localScale = from.localScale * (1f - factor) + to.localScale * factor;
+				mTrans.rotation = Quaternion.Slerp(from.rotation, to.rotation, factor);
 			}
 			else
 			{
-				mTrans.set_position(mPos * (1f - factor) + to.get_position() * factor);
-				mTrans.set_localScale(mScale * (1f - factor) + to.get_localScale() * factor);
-				mTrans.set_rotation(Quaternion.Slerp(mRot, to.get_rotation(), factor));
+				mTrans.position = mPos * (1f - factor) + to.position * factor;
+				mTrans.localScale = mScale * (1f - factor) + to.localScale * factor;
+				mTrans.rotation = Quaternion.Slerp(mRot, to.rotation, factor);
 			}
 			if (parentWhenFinished && isFinished)
 			{
-				mTrans.set_parent(to);
+				mTrans.parent = to;
 			}
 		}
 	}
@@ -94,7 +60,7 @@ public class TweenTransform : UITweener
 		if (duration <= 0f)
 		{
 			tweenTransform.Sample(1f, true);
-			tweenTransform.set_enabled(false);
+			tweenTransform.enabled = false;
 		}
 		return tweenTransform;
 	}

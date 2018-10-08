@@ -10,7 +10,7 @@ public class UIInGameSelfAnnounceManager : MonoBehaviourSingleton<UIInGameSelfAn
 
 	public void PlayRegionBreak()
 	{
-		if (!(regionBreak == null))
+		if (!((Object)regionBreak == (Object)null))
 		{
 			regionBreak.Play(null);
 		}
@@ -18,7 +18,7 @@ public class UIInGameSelfAnnounceManager : MonoBehaviourSingleton<UIInGameSelfAn
 
 	public void PlayDragonArmorBreak()
 	{
-		if (!(regionDragonArmor == null))
+		if (!((Object)regionDragonArmor == (Object)null))
 		{
 			regionDragonArmor.Play(null);
 		}

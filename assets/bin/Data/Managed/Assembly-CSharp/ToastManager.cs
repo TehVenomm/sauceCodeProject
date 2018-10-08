@@ -66,12 +66,10 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 
 	protected override void Awake()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
 		base.Awake();
-		if (!(window == null))
+		if (!((UnityEngine.Object)window == (UnityEngine.Object)null))
 		{
-			windowTransform = window.get_transform();
+			windowTransform = window.transform;
 			transitions = window.GetComponentsInChildren<UITransition>();
 			window.SetActive(false);
 			isOpenDialog = false;
@@ -80,10 +78,9 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 
 	private void Update()
 	{
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		if (!(window == null) && !MonoBehaviourSingleton<TransitionManager>.I.isTransing && !isOpenDialog && openInfoList.Count > 0)
+		if (!((UnityEngine.Object)window == (UnityEngine.Object)null) && !MonoBehaviourSingleton<TransitionManager>.I.isTransing && !isOpenDialog && openInfoList.Count > 0)
 		{
-			this.StartCoroutine(DoShowDialog(openInfoList[0]));
+			StartCoroutine(DoShowDialog(openInfoList[0]));
 			openInfoList.RemoveAt(0);
 		}
 	}
@@ -98,8 +95,8 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 		isOpenDialog = true;
 		window.SetActive(true);
 		tweenCtrl.Reset();
-		windowTransform.set_parent(dialogInfo.link);
-		windowTransform.set_localPosition(Vector3.get_zero());
+		windowTransform.parent = dialogInfo.link;
+		windowTransform.localPosition = Vector3.zero;
 		int n = 0;
 		for (int m = sprites.Length; n < m; n++)
 		{
@@ -119,7 +116,7 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 		bool play_tween = true;
 		tweenCtrl.Play(true, delegate
 		{
-			((_003CDoShowDialog_003Ec__Iterator28A)/*Error near IL_01c0: stateMachine*/)._003Cplay_tween_003E__4 = false;
+			((_003CDoShowDialog_003Ec__Iterator28C)/*Error near IL_01c0: stateMachine*/)._003Cplay_tween_003E__4 = false;
 		});
 		yield return (object)new WaitForSeconds(desc.showTime);
 		while (play_tween)
@@ -135,7 +132,7 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 				transitions[j].Close(null);
 			}
 		}
-		yield return (object)this.StartCoroutine(DoWaitTransitions());
+		yield return (object)StartCoroutine(DoWaitTransitions());
 		isOpenDialog = false;
 	}
 

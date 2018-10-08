@@ -119,7 +119,7 @@ public class StatusAccessory : SkillInfoBase
 
 	private Vector3 originScale = default(Vector3);
 
-	private Quaternion originRot = Quaternion.get_identity();
+	private Quaternion originRot = Quaternion.identity;
 
 	private Dictionary<ulong, Transform> iconDic = new Dictionary<ulong, Transform>();
 
@@ -137,7 +137,7 @@ public class StatusAccessory : SkillInfoBase
 		InitSort();
 		InitLocalInventory();
 		Transform ctrl = GetCtrl(UI.ACCESSORY_ROOT);
-		if (ctrl != null)
+		if ((UnityEngine.Object)ctrl != (UnityEngine.Object)null)
 		{
 			tweenCtrl = ctrl.GetComponent<UITweenCtrl>();
 		}
@@ -146,31 +146,26 @@ public class StatusAccessory : SkillInfoBase
 
 	private new void Finalize()
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		if (Object.op_Implicit(selectModelTrans))
+		if ((bool)selectModelTrans)
 		{
-			if (originParent != null)
+			if ((UnityEngine.Object)originParent != (UnityEngine.Object)null)
 			{
 				selectModelTrans.SetParent(originParent);
-				selectModelTrans.set_localPosition(originPos);
-				selectModelTrans.set_localScale(originScale);
-				selectModelTrans.set_localRotation(originRot);
+				selectModelTrans.localPosition = originPos;
+				selectModelTrans.localScale = originScale;
+				selectModelTrans.localRotation = originRot;
 			}
 			else
 			{
-				playerLoader.DeleteAccessoryModel(selectModelTrans.get_name());
+				playerLoader.DeleteAccessoryModel(selectModelTrans.name);
 			}
 		}
 		selectModelTrans = null;
 		originParent = null;
-		if (Object.op_Implicit(selectIconTrans))
+		if ((bool)selectIconTrans)
 		{
-			selectIconTrans.SetParent(this.get_transform());
-			selectIconTrans.get_gameObject().SetActive(false);
+			selectIconTrans.SetParent(base.transform);
+			selectIconTrans.gameObject.SetActive(false);
 		}
 		selectIconTrans = null;
 		selectItem = null;
@@ -195,7 +190,7 @@ public class StatusAccessory : SkillInfoBase
 		localInventory = sortSettings.CreateSortAry<AccessoryInfo, AccessorySortData>(target_ary);
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
 		if (dispState != eDispState.Part)
 		{
@@ -203,8 +198,8 @@ public class StatusAccessory : SkillInfoBase
 			{
 				InitLocalInventory();
 			}
-			SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
-			SetToggle((Enum)UI.TGL_ICON_ASC, sortSettings.orderTypeAsc);
+			SetLabelText(UI.LBL_SORT, sortSettings.GetSortLabel());
+			SetToggle(UI.TGL_ICON_ASC, sortSettings.orderTypeAsc);
 			m_generatedIconList.Clear();
 			ResetIcon();
 			UpdateNewIconInfo();
@@ -215,12 +210,69 @@ public class StatusAccessory : SkillInfoBase
 			{
 				num++;
 			}
-			SetActive((Enum)UI.LBL_NON_LIST, num <= 0);
-			_003CUpdateUI_003Ec__AnonStorey46B _003CUpdateUI_003Ec__AnonStorey46B;
-			SetDynamicList((Enum)UI.GRD_INVENTORY, (string)null, num, false, new Func<int, bool>((object)_003CUpdateUI_003Ec__AnonStorey46B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey46B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetActive(UI.LBL_NON_LIST, num <= 0);
+			SetDynamicList(UI.GRD_INVENTORY, null, num, false, delegate(int i)
+			{
+				if (isRemoveBtn && i == 0)
+				{
+					return true;
+				}
+				int num3 = (!isRemoveBtn) ? i : (i - 1);
+				SortCompareData sortCompareData = localInventory[num3];
+				if (sortCompareData == null || !sortCompareData.IsPriority(sortSettings.orderTypeAsc))
+				{
+					return false;
+				}
+				return true;
+			}, null, delegate(int i, Transform t, bool is_recycle)
+			{
+				if (isRemoveBtn && i == 0)
+				{
+					ItemIconDetail.CreateRemoveButton(t, "TRY_ON", -1, 100, false, "外す");
+				}
+				else
+				{
+					int num2 = (!isRemoveBtn) ? i : (i - 1);
+					if (num2 >= localInventory.Length)
+					{
+						SetActive(t, false);
+					}
+					else
+					{
+						AccessorySortData accessorySortData = localInventory[num2] as AccessorySortData;
+						if (accessorySortData == null || accessorySortData.GetTableID() == 0)
+						{
+							SetActive(t, false);
+						}
+						else
+						{
+							SetActive(t, true);
+							bool isNew = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(ITEM_ICON_TYPE.ACCESSORY, accessorySortData.GetUniqID());
+							bool isEquipping = false;
+							int j = 0;
+							for (int count = equipSet.acc.ids.Count; j < count; j++)
+							{
+								string text = equipSet.acc.ids[j];
+								if (text.Equals(accessorySortData.GetUniqID().ToString()))
+								{
+									isEquipping = true;
+									break;
+								}
+							}
+							ItemIcon itemIcon = ItemIconDetail.CreateAccessoryIcon(accessorySortData.itemData.tableData, t, "TRY_ON", num2, isNew, isEquipping);
+							itemIcon.SetInitData(accessorySortData);
+							SetLongTouch(itemIcon.transform, "DETAIL", accessorySortData);
+							if (!m_generatedIconList.Contains(itemIcon))
+							{
+								m_generatedIconList.Add(itemIcon);
+							}
+						}
+					}
+				}
+			});
 			base.UpdateUI();
-			SetActive((Enum)UI.LIST_ROOT, true);
-			SetActive((Enum)UI.ACCESSORY_ROOT, false);
+			SetActive(UI.LIST_ROOT, true);
+			SetActive(UI.ACCESSORY_ROOT, false);
 		}
 	}
 
@@ -244,22 +296,22 @@ public class StatusAccessory : SkillInfoBase
 		if (dispState != state)
 		{
 			dispState = state;
-			SetActive((Enum)UI.LIST_ROOT, dispState == eDispState.List);
-			SetActive((Enum)UI.ACCESSORY_ROOT, dispState == eDispState.Part);
+			SetActive(UI.LIST_ROOT, dispState == eDispState.List);
+			SetActive(UI.ACCESSORY_ROOT, dispState == eDispState.Part);
 		}
 	}
 
 	private void ChangeMode(ePutMode mode)
 	{
 		putMode = mode;
-		SetActive((Enum)UI.LBL_ON, putMode == ePutMode.On);
-		SetActive((Enum)UI.LBL_OFF, putMode == ePutMode.Off);
-		SetActive((Enum)UI.LBL_LIMIT, putMode == ePutMode.Limit);
+		SetActive(UI.LBL_ON, putMode == ePutMode.On);
+		SetActive(UI.LBL_OFF, putMode == ePutMode.Off);
+		SetActive(UI.LBL_LIMIT, putMode == ePutMode.Limit);
 	}
 
 	private Transform CreateIcon(ulong _uuid)
 	{
-		Transform val = null;
+		Transform transform = null;
 		if (!iconDic.ContainsKey(_uuid))
 		{
 			int i = 0;
@@ -268,32 +320,30 @@ public class StatusAccessory : SkillInfoBase
 				AccessorySortData accessorySortData = localInventory[i] as AccessorySortData;
 				if (accessorySortData.GetUniqID() == _uuid)
 				{
-					val = AccessoryIcon.Create(accessorySortData.itemData.tableData.accessoryId, accessorySortData.itemData.tableData.rarity, accessorySortData.itemData.tableData.getType);
+					transform = AccessoryIcon.Create(accessorySortData.itemData.tableData.accessoryId, accessorySortData.itemData.tableData.rarity, accessorySortData.itemData.tableData.getType);
 					break;
 				}
 			}
-			if (val != null)
+			if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 			{
-				iconDic.Add(_uuid, val);
+				iconDic.Add(_uuid, transform);
 			}
 		}
 		else
 		{
-			val = iconDic[_uuid];
+			transform = iconDic[_uuid];
 		}
-		return val;
+		return transform;
 	}
 
 	private void ResetIcon()
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 		foreach (KeyValuePair<ulong, Transform> item in iconDic)
 		{
-			if (!(item.Value == null))
+			if (!((UnityEngine.Object)item.Value == (UnityEngine.Object)null))
 			{
-				item.Value.SetParent(this.get_transform());
-				item.Value.get_gameObject().SetActive(false);
+				item.Value.SetParent(base.transform);
+				item.Value.gameObject.SetActive(false);
 			}
 		}
 		iconDic.Clear();
@@ -301,36 +351,29 @@ public class StatusAccessory : SkillInfoBase
 
 	private void SetIconParent(int part, Transform iconTrans)
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		iconTrans.SetParent(GetCtrl(partParent[part]));
-		iconTrans.set_localPosition(Vector3.get_zero());
-		iconTrans.set_localRotation(Quaternion.get_identity());
-		iconTrans.set_localScale(Vector3.get_one());
-		iconTrans.get_gameObject().SetActive(true);
+		iconTrans.localPosition = Vector3.zero;
+		iconTrans.localRotation = Quaternion.identity;
+		iconTrans.localScale = Vector3.one;
+		iconTrans.gameObject.SetActive(true);
 	}
 
 	private void RemoveIconParent(int part)
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Expected O, but got Unknown
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(partParent[part]);
-		if (ctrl.get_childCount() > 0)
+		if (ctrl.childCount > 0)
 		{
-			Transform val = ctrl.GetChild(0);
-			if (!(val == null))
+			Transform child = ctrl.GetChild(0);
+			if (!((UnityEngine.Object)child == (UnityEngine.Object)null))
 			{
-				val.get_gameObject().SetActive(false);
+				child.gameObject.SetActive(false);
 			}
 		}
 	}
 
 	private void SetupIcon(int index)
 	{
-		if (tweenCtrl != null)
+		if ((UnityEngine.Object)tweenCtrl != (UnityEngine.Object)null)
 		{
 			tweenCtrl.Reset();
 			tweenCtrl.Play(true, null);
@@ -343,14 +386,14 @@ public class StatusAccessory : SkillInfoBase
 		{
 			_SetupIconOn(index);
 		}
-		SetActive((Enum)UI.BTN_DECIDE, false);
+		SetActive(UI.BTN_DECIDE, false);
 	}
 
 	private void _SetupIconOff()
 	{
 		for (int i = 0; i <= 9; i++)
 		{
-			SetActive((Enum)partButton[i], false);
+			SetActive(partButton[i], false);
 		}
 		EquipSetInfo currentLocalEquipSet = MonoBehaviourSingleton<StatusManager>.I.GetCurrentLocalEquipSet();
 		int j = 0;
@@ -359,7 +402,7 @@ public class StatusAccessory : SkillInfoBase
 			int part = currentLocalEquipSet.acc.GetPart(j);
 			if (part >= 0)
 			{
-				SetActive((Enum)partButton[part], true);
+				SetActive(partButton[part], true);
 				SetIconParent(part, CreateIcon(currentLocalEquipSet.acc.GetId(j)));
 			}
 		}
@@ -368,21 +411,11 @@ public class StatusAccessory : SkillInfoBase
 
 	private void _SetupIconOn(int index)
 	{
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Expected O, but got Unknown
-		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
 		AccessorySortData accessorySortData = localInventory[index] as AccessorySortData;
 		selectItem = accessorySortData.itemData;
 		selectUUID = accessorySortData.itemData.uniqueID.ToString();
 		selectIconTrans = CreateIcon(selectItem.uniqueID);
-		selectIconTrans.get_gameObject().SetActive(false);
+		selectIconTrans.gameObject.SetActive(false);
 		bool flag = false;
 		EquipSetInfo currentLocalEquipSet = MonoBehaviourSingleton<StatusManager>.I.GetCurrentLocalEquipSet();
 		int i = 0;
@@ -395,12 +428,12 @@ public class StatusAccessory : SkillInfoBase
 				if (info != null)
 				{
 					selectModelTrans = playerLoader.GetAccessoryModel(ResourceName.GetPlayerAccessory(info.accessoryId));
-					originParent = selectModelTrans.get_parent();
-					originPos = selectModelTrans.get_localPosition();
-					originScale = selectModelTrans.get_localScale();
-					originRot = selectModelTrans.get_localRotation();
+					originParent = selectModelTrans.parent;
+					originPos = selectModelTrans.localPosition;
+					originScale = selectModelTrans.localScale;
+					originRot = selectModelTrans.localRotation;
 					SetIconParent(currentLocalEquipSet.acc.GetPart(i), selectIconTrans);
-					selectIconTrans.get_gameObject().SetActive(true);
+					selectIconTrans.gameObject.SetActive(true);
 					flag = true;
 					break;
 				}
@@ -410,7 +443,7 @@ public class StatusAccessory : SkillInfoBase
 		{
 			for (int j = 0; j <= 9; j++)
 			{
-				SetActive((Enum)partButton[j], false);
+				SetActive(partButton[j], false);
 			}
 			int k = 0;
 			for (int count2 = currentLocalEquipSet.acc.ids.Count; k < count2; k++)
@@ -418,7 +451,7 @@ public class StatusAccessory : SkillInfoBase
 				int part = currentLocalEquipSet.acc.GetPart(k);
 				if (part >= 0)
 				{
-					SetActive((Enum)partButton[part], true);
+					SetActive(partButton[part], true);
 					SetIconParent(part, CreateIcon(currentLocalEquipSet.acc.GetId(k)));
 				}
 			}
@@ -428,7 +461,7 @@ public class StatusAccessory : SkillInfoBase
 		{
 			for (int l = 0; l <= 9; l++)
 			{
-				SetActive((Enum)partButton[l], (selectItem.tableData.attachPlaceBit & (1 << l)) != 0);
+				SetActive(partButton[l], (selectItem.tableData.attachPlaceBit & (1 << l)) != 0);
 			}
 			ChangeMode(ePutMode.On);
 		}
@@ -617,7 +650,6 @@ public class StatusAccessory : SkillInfoBase
 
 	private void PutOn(ACCESSORY_PART part)
 	{
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
 		if (!isLoading && selectItem != null)
 		{
 			AccessoryTable.AccessoryInfoData info = selectItem.GetInfo(part);
@@ -626,13 +658,13 @@ public class StatusAccessory : SkillInfoBase
 				putUID = info.id;
 				putPart = part;
 				SetIconParent((int)part, selectIconTrans);
-				if (selectModelTrans != null)
+				if ((UnityEngine.Object)selectModelTrans != (UnityEngine.Object)null)
 				{
 					SetupModel(info);
 				}
 				else
 				{
-					this.StartCoroutine(_Load(info.accessoryId, delegate(Transform t)
+					StartCoroutine(_Load(info.accessoryId, delegate(Transform t)
 					{
 						selectModelTrans = t;
 						playerLoader.AddAccessoryModel(t);
@@ -645,10 +677,7 @@ public class StatusAccessory : SkillInfoBase
 
 	private void SetupModel(AccessoryTable.AccessoryInfoData info)
 	{
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		if (!(selectModelTrans == null))
+		if (!((UnityEngine.Object)selectModelTrans == (UnityEngine.Object)null))
 		{
 			PlayerLoader.SetLightProbes(selectModelTrans, false);
 			if (renderLayer != -1)
@@ -656,10 +685,10 @@ public class StatusAccessory : SkillInfoBase
 				PlayerLoader.SetLayerWithChildren_SecondaryNoChange(selectModelTrans, renderLayer);
 			}
 			selectModelTrans.SetParent(playerLoader.GetNodeTrans(info.node));
-			selectModelTrans.set_localPosition(info.offset);
-			selectModelTrans.set_localRotation(info.rotation);
-			selectModelTrans.set_localScale(info.scale);
-			SetActive((Enum)UI.BTN_DECIDE, true);
+			selectModelTrans.localPosition = info.offset;
+			selectModelTrans.localRotation = info.rotation;
+			selectModelTrans.localScale = info.scale;
+			SetActive(UI.BTN_DECIDE, true);
 		}
 	}
 
@@ -674,14 +703,14 @@ public class StatusAccessory : SkillInfoBase
 		}
 		if (lo == null)
 		{
-			Debug.LogWarning((object)("StatusAccessory::_Load() cant load [" + ResourceName.GetPlayerAccessory(id) + "]"));
+			Debug.LogWarning("StatusAccessory::_Load() cant load [" + ResourceName.GetPlayerAccessory(id) + "]");
 		}
 		else
 		{
 			Transform trans = lo.Realizes(null, -1);
-			if (trans == null)
+			if ((UnityEngine.Object)trans == (UnityEngine.Object)null)
 			{
-				Debug.LogWarning((object)("StatusAccessory::_Load() cant realizes [" + ResourceName.GetPlayerAccessory(id) + "]"));
+				Debug.LogWarning("StatusAccessory::_Load() cant realizes [" + ResourceName.GetPlayerAccessory(id) + "]");
 			}
 			else
 			{
@@ -727,7 +756,7 @@ public class StatusAccessory : SkillInfoBase
 			isRefresh = true;
 			for (int k = 0; k <= 9; k++)
 			{
-				SetActive((Enum)partButton[k], (selectItem.tableData.attachPlaceBit & (1 << k)) != 0);
+				SetActive(partButton[k], (selectItem.tableData.attachPlaceBit & (1 << k)) != 0);
 			}
 			ChangeMode(ePutMode.On);
 		}

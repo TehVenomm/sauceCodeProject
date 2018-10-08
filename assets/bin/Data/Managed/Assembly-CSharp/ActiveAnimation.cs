@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Internal/Active Animation")]
-public class ActiveAnimation
+public class ActiveAnimation : MonoBehaviour
 {
 	public static ActiveAnimation current;
 
@@ -27,26 +27,15 @@ public class ActiveAnimation
 
 	private string mClip = string.Empty;
 
-	private float playbackTime
-	{
-		get
-		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			AnimatorStateInfo currentAnimatorStateInfo = mAnimator.GetCurrentAnimatorStateInfo(0);
-			return Mathf.Clamp01(currentAnimatorStateInfo.get_normalizedTime());
-		}
-	}
+	private float playbackTime => Mathf.Clamp01(mAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime);
 
 	public bool isPlaying
 	{
 		get
 		{
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Expected O, but got Unknown
-			if (mAnim == null)
+			if ((Object)mAnim == (Object)null)
 			{
-				if (mAnimator != null)
+				if ((Object)mAnimator != (Object)null)
 				{
 					if (mLastDirection == Direction.Reverse)
 					{
@@ -65,12 +54,11 @@ public class ActiveAnimation
 			}
 			foreach (AnimationState item in mAnim)
 			{
-				AnimationState val = item;
-				if (mAnim.IsPlaying(val.get_name()))
+				if (mAnim.IsPlaying(item.name))
 				{
 					if (mLastDirection == Direction.Forward)
 					{
-						if (val.get_time() < val.get_length())
+						if (item.time < item.length)
 						{
 							return true;
 						}
@@ -81,7 +69,7 @@ public class ActiveAnimation
 						{
 							return true;
 						}
-						if (val.get_time() > 0f)
+						if (item.time > 0f)
 						{
 							return true;
 						}
@@ -92,32 +80,24 @@ public class ActiveAnimation
 		}
 	}
 
-	public ActiveAnimation()
-		: this()
-	{
-	}
-
 	public void Finish()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
-		if (mAnim != null)
+		if ((Object)mAnim != (Object)null)
 		{
 			foreach (AnimationState item in mAnim)
 			{
-				AnimationState val = item;
 				if (mLastDirection == Direction.Forward)
 				{
-					val.set_time(val.get_length());
+					item.time = item.length;
 				}
 				else if (mLastDirection == Direction.Reverse)
 				{
-					val.set_time(0f);
+					item.time = 0f;
 				}
 			}
 			mAnim.Sample();
 		}
-		else if (mAnimator != null)
+		else if ((Object)mAnimator != (Object)null)
 		{
 			mAnimator.Play(mClip, 0, (mLastDirection != Direction.Forward) ? 0f : 1f);
 		}
@@ -125,24 +105,21 @@ public class ActiveAnimation
 
 	public void Reset()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
-		if (mAnim != null)
+		if ((Object)mAnim != (Object)null)
 		{
 			foreach (AnimationState item in mAnim)
 			{
-				AnimationState val = item;
 				if (mLastDirection == Direction.Reverse)
 				{
-					val.set_time(val.get_length());
+					item.time = item.length;
 				}
 				else if (mLastDirection == Direction.Forward)
 				{
-					val.set_time(0f);
+					item.time = 0f;
 				}
 			}
 		}
-		else if (mAnimator != null)
+		else if ((Object)mAnimator != (Object)null)
 		{
 			mAnimator.Play(mClip, 0, (mLastDirection != Direction.Reverse) ? 0f : 1f);
 		}
@@ -150,7 +127,7 @@ public class ActiveAnimation
 
 	private void Start()
 	{
-		if (eventReceiver != null && EventDelegate.IsValid(onFinished))
+		if ((Object)eventReceiver != (Object)null && EventDelegate.IsValid(onFinished))
 		{
 			eventReceiver = null;
 			callWhenFinished = null;
@@ -159,57 +136,51 @@ public class ActiveAnimation
 
 	private void Update()
 	{
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Expected O, but got Unknown
-		//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fb: Expected O, but got Unknown
 		float deltaTime = RealTime.deltaTime;
 		if (deltaTime != 0f)
 		{
-			if (mAnimator != null)
+			if ((Object)mAnimator != (Object)null)
 			{
 				mAnimator.Update((mLastDirection != Direction.Reverse) ? deltaTime : (0f - deltaTime));
 				if (isPlaying)
 				{
 					return;
 				}
-				mAnimator.set_enabled(false);
-				this.set_enabled(false);
+				mAnimator.enabled = false;
+				base.enabled = false;
 			}
 			else
 			{
-				if (!(mAnim != null))
+				if (!((Object)mAnim != (Object)null))
 				{
-					this.set_enabled(false);
+					base.enabled = false;
 					return;
 				}
 				bool flag = false;
 				foreach (AnimationState item in mAnim)
 				{
-					AnimationState val = item;
-					if (mAnim.IsPlaying(val.get_name()))
+					if (mAnim.IsPlaying(item.name))
 					{
-						float num = val.get_speed() * deltaTime;
-						AnimationState obj = val;
-						obj.set_time(obj.get_time() + num);
+						float num = item.speed * deltaTime;
+						item.time += num;
 						if (num < 0f)
 						{
-							if (val.get_time() > 0f)
+							if (item.time > 0f)
 							{
 								flag = true;
 							}
 							else
 							{
-								val.set_time(0f);
+								item.time = 0f;
 							}
 						}
-						else if (val.get_time() < val.get_length())
+						else if (item.time < item.length)
 						{
 							flag = true;
 						}
 						else
 						{
-							val.set_time(val.get_length());
+							item.time = item.length;
 						}
 					}
 				}
@@ -218,24 +189,24 @@ public class ActiveAnimation
 				{
 					return;
 				}
-				this.set_enabled(false);
+				base.enabled = false;
 			}
 			if (mNotify)
 			{
 				mNotify = false;
-				if (current == null)
+				if ((Object)current == (Object)null)
 				{
 					current = this;
 					EventDelegate.Execute(onFinished);
-					if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
+					if ((Object)eventReceiver != (Object)null && !string.IsNullOrEmpty(callWhenFinished))
 					{
-						eventReceiver.SendMessage(callWhenFinished, 1);
+						eventReceiver.SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
 					}
 					current = null;
 				}
 				if (mDisableDirection != 0 && mLastDirection == mDisableDirection)
 				{
-					NGUITools.SetActive(this.get_gameObject(), false);
+					NGUITools.SetActive(base.gameObject, false);
 				}
 			}
 		}
@@ -243,19 +214,17 @@ public class ActiveAnimation
 
 	private void Play(string clipName, Direction playDirection)
 	{
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Expected O, but got Unknown
 		if (playDirection == Direction.Toggle)
 		{
 			playDirection = ((mLastDirection != Direction.Forward) ? Direction.Forward : Direction.Reverse);
 		}
-		if (mAnim != null)
+		if ((Object)mAnim != (Object)null)
 		{
-			this.set_enabled(true);
-			mAnim.set_enabled(false);
+			base.enabled = true;
+			mAnim.enabled = false;
 			if (string.IsNullOrEmpty(clipName))
 			{
-				if (!mAnim.get_isPlaying())
+				if (!mAnim.isPlaying)
 				{
 					mAnim.Play();
 				}
@@ -266,18 +235,17 @@ public class ActiveAnimation
 			}
 			foreach (AnimationState item in mAnim)
 			{
-				AnimationState val = item;
-				if (string.IsNullOrEmpty(clipName) || val.get_name() == clipName)
+				if (string.IsNullOrEmpty(clipName) || item.name == clipName)
 				{
-					float num = Mathf.Abs(val.get_speed());
-					val.set_speed(num * (float)playDirection);
-					if (playDirection == Direction.Reverse && val.get_time() == 0f)
+					float num = Mathf.Abs(item.speed);
+					item.speed = num * (float)playDirection;
+					if (playDirection == Direction.Reverse && item.time == 0f)
 					{
-						val.set_time(val.get_length());
+						item.time = item.length;
 					}
-					else if (playDirection == Direction.Forward && val.get_time() == val.get_length())
+					else if (playDirection == Direction.Forward && item.time == item.length)
 					{
-						val.set_time(0f);
+						item.time = 0f;
 					}
 				}
 			}
@@ -285,15 +253,15 @@ public class ActiveAnimation
 			mNotify = true;
 			mAnim.Sample();
 		}
-		else if (mAnimator != null)
+		else if ((Object)mAnimator != (Object)null)
 		{
-			if (this.get_enabled() && isPlaying && mClip == clipName)
+			if (base.enabled && isPlaying && mClip == clipName)
 			{
 				mLastDirection = playDirection;
 			}
 			else
 			{
-				this.set_enabled(true);
+				base.enabled = true;
 				mNotify = true;
 				mLastDirection = playDirection;
 				mClip = clipName;
@@ -304,20 +272,14 @@ public class ActiveAnimation
 
 	public static ActiveAnimation Play(Animation anim, string clipName, Direction playDirection, EnableCondition enableBeforePlay, DisableCondition disableCondition)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Expected O, but got Unknown
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		if (!NGUITools.GetActive(anim.get_gameObject()))
+		if (!NGUITools.GetActive(anim.gameObject))
 		{
 			if (enableBeforePlay != EnableCondition.EnableThenPlay)
 			{
 				return null;
 			}
-			NGUITools.SetActive(anim.get_gameObject(), true);
-			UIPanel[] componentsInChildren = anim.get_gameObject().GetComponentsInChildren<UIPanel>();
+			NGUITools.SetActive(anim.gameObject, true);
+			UIPanel[] componentsInChildren = anim.gameObject.GetComponentsInChildren<UIPanel>();
 			int i = 0;
 			for (int num = componentsInChildren.Length; i < num; i++)
 			{
@@ -325,19 +287,19 @@ public class ActiveAnimation
 			}
 		}
 		ActiveAnimation activeAnimation = anim.GetComponent<ActiveAnimation>();
-		if (activeAnimation == null)
+		if ((Object)activeAnimation == (Object)null)
 		{
-			activeAnimation = anim.get_gameObject().AddComponent<ActiveAnimation>();
+			activeAnimation = anim.gameObject.AddComponent<ActiveAnimation>();
 		}
 		activeAnimation.mAnim = anim;
 		activeAnimation.mDisableDirection = (Direction)disableCondition;
 		activeAnimation.onFinished.Clear();
 		activeAnimation.Play(clipName, playDirection);
-		if (activeAnimation.mAnim != null)
+		if ((Object)activeAnimation.mAnim != (Object)null)
 		{
 			activeAnimation.mAnim.Sample();
 		}
-		else if (activeAnimation.mAnimator != null)
+		else if ((Object)activeAnimation.mAnimator != (Object)null)
 		{
 			activeAnimation.mAnimator.Update(0f);
 		}
@@ -356,20 +318,14 @@ public class ActiveAnimation
 
 	public static ActiveAnimation Play(Animator anim, string clipName, Direction playDirection, EnableCondition enableBeforePlay, DisableCondition disableCondition)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Expected O, but got Unknown
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Expected O, but got Unknown
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		if (enableBeforePlay != EnableCondition.IgnoreDisabledState && !NGUITools.GetActive(anim.get_gameObject()))
+		if (enableBeforePlay != EnableCondition.IgnoreDisabledState && !NGUITools.GetActive(anim.gameObject))
 		{
 			if (enableBeforePlay != EnableCondition.EnableThenPlay)
 			{
 				return null;
 			}
-			NGUITools.SetActive(anim.get_gameObject(), true);
-			UIPanel[] componentsInChildren = anim.get_gameObject().GetComponentsInChildren<UIPanel>();
+			NGUITools.SetActive(anim.gameObject, true);
+			UIPanel[] componentsInChildren = anim.gameObject.GetComponentsInChildren<UIPanel>();
 			int i = 0;
 			for (int num = componentsInChildren.Length; i < num; i++)
 			{
@@ -377,19 +333,19 @@ public class ActiveAnimation
 			}
 		}
 		ActiveAnimation activeAnimation = anim.GetComponent<ActiveAnimation>();
-		if (activeAnimation == null)
+		if ((Object)activeAnimation == (Object)null)
 		{
-			activeAnimation = anim.get_gameObject().AddComponent<ActiveAnimation>();
+			activeAnimation = anim.gameObject.AddComponent<ActiveAnimation>();
 		}
 		activeAnimation.mAnimator = anim;
 		activeAnimation.mDisableDirection = (Direction)disableCondition;
 		activeAnimation.onFinished.Clear();
 		activeAnimation.Play(clipName, playDirection);
-		if (activeAnimation.mAnim != null)
+		if ((Object)activeAnimation.mAnim != (Object)null)
 		{
 			activeAnimation.mAnim.Sample();
 		}
-		else if (activeAnimation.mAnimator != null)
+		else if ((Object)activeAnimation.mAnimator != (Object)null)
 		{
 			activeAnimation.mAnimator.Update(0f);
 		}

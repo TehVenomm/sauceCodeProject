@@ -128,17 +128,12 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 		MonoBehaviourSingleton<NetworkManager>.I.tokenTemp = empty;
 	}
 
-	public unsafe void SendCheckRegister(string ntc_data, Action<bool> call_back)
+	public void SendCheckRegister(string ntc_data, Action<bool> call_back)
 	{
 		CheckRegisterModel.RequestSendForm requestSendForm = new CheckRegisterModel.RequestSendForm();
 		requestSendForm.data = ntc_data;
-		_003CSendCheckRegister_003Ec__AnonStorey543 _003CSendCheckRegister_003Ec__AnonStorey;
 		Protocol.Send(CheckRegisterModel.URL, requestSendForm, delegate(CheckRegisterModel ret)
 		{
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Expected O, but got Unknown
-			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0124: Expected O, but got Unknown
 			switch (ret.Error)
 			{
 			case Error.None:
@@ -148,7 +143,10 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				sendAsset = ret.result.sendAsset;
 				if (ret.result.recommendUpdate)
 				{
-					RecommendUpdateCheck(new Action((object)_003CSendCheckRegister_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					RecommendUpdateCheck(delegate
+					{
+						call_back(true);
+					});
 				}
 				else if (call_back != null)
 				{
@@ -160,7 +158,10 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				{
 					if (ret.result.recommendUpdate)
 					{
-						RecommendUpdateCheck(new Action((object)_003CSendCheckRegister_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+						RecommendUpdateCheck(delegate
+						{
+							call_back(false);
+						});
 					}
 					else if (call_back != null)
 					{
@@ -289,7 +290,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			{
 				Native.launchMyselfMarket();
 			}
-			call_back.Invoke();
+			call_back();
 		}, true, 0);
 	}
 
@@ -528,7 +529,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				is_success = true;
 				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result, 0);
 			}
-			call_back.Invoke(is_success, ret);
+			call_back(is_success, ret);
 		}, string.Empty);
 	}
 
@@ -587,7 +588,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			{
 				is_success = true;
 			}
-			call_back.Invoke(is_success, ret);
+			call_back(is_success, ret);
 		}, string.Empty);
 	}
 

@@ -25,8 +25,8 @@ class FabricKitsFinder implements Callable<Map<String, KitInfo>> {
     }
 
     private KitInfo loadKitInfo(ZipEntry zipEntry, ZipFile zipFile) {
-        Closeable inputStream;
         Throwable e;
+        Closeable inputStream;
         try {
             inputStream = zipFile.getInputStream(zipEntry);
             try {

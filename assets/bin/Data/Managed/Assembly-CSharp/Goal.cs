@@ -78,7 +78,7 @@ public abstract class Goal : Poolable
 
 	public void SetGiveupTime(float time)
 	{
-		giveupTime = Time.get_time() + time;
+		giveupTime = Time.time + time;
 	}
 
 	public bool IsGiveupTime()
@@ -87,7 +87,7 @@ public abstract class Goal : Poolable
 		{
 			return false;
 		}
-		return Time.get_time() > giveupTime;
+		return Time.time > giveupTime;
 	}
 
 	protected abstract void Activate(Brain brain);
@@ -127,7 +127,7 @@ public abstract class Goal : Poolable
 
 	public virtual string ToStringGoal()
 	{
-		string arg = (!(giveupTime > 0f)) ? string.Empty : (" " + (giveupTime - Time.get_time()).ToString("F2"));
+		string arg = (!(giveupTime > 0f)) ? string.Empty : (" " + (giveupTime - Time.time).ToString("F2"));
 		return $"Goal[ {goalType} ]: status={status}{arg}.";
 	}
 

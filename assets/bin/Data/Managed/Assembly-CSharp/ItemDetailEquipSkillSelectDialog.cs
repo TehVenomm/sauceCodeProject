@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class ItemDetailEquipSkillSelectDialog : ItemDetailEquipSkillSelect
@@ -11,11 +10,9 @@ public class ItemDetailEquipSkillSelectDialog : ItemDetailEquipSkillSelect
 		base.Initialize();
 	}
 
-	protected unsafe override bool CheckApplicationVersion()
+	protected override bool CheckApplicationVersion()
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Expected O, but got Unknown
-		if (selectSkillItem != null && !MonoBehaviourSingleton<GameSceneManager>.I.CheckSkillItemAndOpenUpdateAppDialog(selectSkillItem.tableData, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+		if (selectSkillItem != null && !MonoBehaviourSingleton<GameSceneManager>.I.CheckSkillItemAndOpenUpdateAppDialog(selectSkillItem.tableData, OnCancelSelect))
 		{
 			return false;
 		}
@@ -41,7 +38,7 @@ public class ItemDetailEquipSkillSelectDialog : ItemDetailEquipSkillSelect
 
 	private void OnQuery_DETAIL()
 	{
-		Debug.LogWarning((object)"OnQuery_DETAIL");
+		Debug.LogWarning("OnQuery_DETAIL");
 		selectIndex = (int)GameSection.GetEventData();
 		ItemDetailSkillSimpleDialog.InitParam eventData = new ItemDetailSkillSimpleDialog.InitParam(CreateDetailEventData(selectIndex), initData);
 		GameSection.SetEventData(eventData);

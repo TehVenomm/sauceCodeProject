@@ -1,18 +1,13 @@
 using UnityEngine;
 
 [RequireComponent(typeof(UIGameSceneEventSender))]
-public class UIGameSceneEventSenderVersionRestriction
+public class UIGameSceneEventSenderVersionRestriction : MonoBehaviour
 {
 	public uint major;
 
 	public uint minor;
 
 	public uint revision;
-
-	public UIGameSceneEventSenderVersionRestriction()
-		: this()
-	{
-	}
 
 	public string GetCheckApplicationVersionText()
 	{

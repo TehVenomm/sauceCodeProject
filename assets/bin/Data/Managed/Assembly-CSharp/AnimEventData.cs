@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AnimEventData
+public class AnimEventData : ScriptableObject
 {
 	[Serializable]
 	public class EventData
@@ -106,10 +106,6 @@ public class AnimEventData
 
 		public void Copy(ResidentEffectData srcInfo)
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 			effectName = srcInfo.effectName;
 			linkNodeName = srcInfo.linkNodeName;
 			offsetPos = srcInfo.offsetPos;
@@ -136,11 +132,6 @@ public class AnimEventData
 	public static int[] ids;
 
 	public ResidentEffectData[] residentEffectDataList;
-
-	public AnimEventData()
-		: this()
-	{
-	}
 
 	static AnimEventData()
 	{
@@ -233,10 +224,6 @@ public class AnimEventData
 
 	public ResidentEffectData AddResidentEffectData()
 	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 		List<ResidentEffectData> list = new List<ResidentEffectData>();
 		if (residentEffectDataList != null && residentEffectDataList.Length > 0)
 		{
@@ -245,8 +232,8 @@ public class AnimEventData
 		ResidentEffectData residentEffectData = new ResidentEffectData();
 		residentEffectData.effectName = string.Empty;
 		residentEffectData.linkNodeName = string.Empty;
-		residentEffectData.offsetPos = Vector3.get_zero();
-		residentEffectData.offsetRot = Vector3.get_zero();
+		residentEffectData.offsetPos = Vector3.zero;
+		residentEffectData.offsetRot = Vector3.zero;
 		residentEffectData.groupID = 0;
 		residentEffectData.handle = 0;
 		residentEffectData.scale = 1f;

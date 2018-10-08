@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIZOffset
+public class UIZOffset : MonoBehaviour
 {
 	private Material _mat;
 
@@ -9,21 +9,13 @@ public class UIZOffset
 
 	private int sourceQueue;
 
-	public UIZOffset()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
-		MeshRenderer component = this.GetComponent<MeshRenderer>();
-		_mat = new Material(component.get_sharedMaterial());
-		sourceQueue = _mat.get_renderQueue();
-		_mat.set_renderQueue(sourceQueue + zOffset);
-		component.set_material(_mat);
+		MeshRenderer component = GetComponent<MeshRenderer>();
+		_mat = new Material(component.sharedMaterial);
+		sourceQueue = _mat.renderQueue;
+		_mat.renderQueue = sourceQueue + zOffset;
+		component.material = _mat;
 	}
 
 	private void Update()
@@ -32,7 +24,7 @@ public class UIZOffset
 
 	private void OnDestroy()
 	{
-		if (_mat != null)
+		if ((Object)_mat != (Object)null)
 		{
 			Object.Destroy(_mat);
 		}

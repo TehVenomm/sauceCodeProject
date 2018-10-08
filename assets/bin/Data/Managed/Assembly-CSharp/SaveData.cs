@@ -35,7 +35,7 @@ public static class SaveData
 
 	public static void SetData<T>(Key key, T data)
 	{
-		string val = JsonUtility.ToJson((object)data);
+		string val = JsonUtility.ToJson(data);
 		SetString(key, val);
 	}
 

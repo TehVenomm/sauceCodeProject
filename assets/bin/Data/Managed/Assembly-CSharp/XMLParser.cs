@@ -40,12 +40,12 @@ public class XMLParser
 					string text2 = text.Substring(2, text.Length - 3);
 					if (currentElement == null)
 					{
-						Debug.LogError((object)("Got close tag '" + text2 + "' without open tag."));
+						Debug.LogError("Got close tag '" + text2 + "' without open tag.");
 						return null;
 					}
 					if (text2 != currentElement.tag)
 					{
-						Debug.LogError((object)("Expected close tag for '" + currentElement.tag + "' but got '" + text2 + "'."));
+						Debug.LogError("Expected close tag for '" + currentElement.tag + "' but got '" + text2 + "'.");
 						return null;
 					}
 					if (elements.Count == 0)
@@ -98,7 +98,7 @@ public class XMLParser
 						num = text.IndexOf("=");
 						if (num < 0)
 						{
-							Debug.LogError((object)("Invalid attribute for tag '" + text2 + "'."));
+							Debug.LogError("Invalid attribute for tag '" + text2 + "'.");
 							return null;
 						}
 						string key = text.Substring(0, num);
@@ -127,7 +127,7 @@ public class XMLParser
 						}
 						if (num < 0)
 						{
-							Debug.LogError((object)("Invalid attribute for tag '" + text2 + "'."));
+							Debug.LogError("Invalid attribute for tag '" + text2 + "'.");
 							return null;
 						}
 						string value = (!flag2) ? text.Substring(0, num - 1) : text.Substring(1, num - 1);
@@ -215,7 +215,7 @@ public class XMLParser
 			}
 			SkipProlog();
 		}
-		Debug.LogError((object)("Expected '<' but got '" + num + "'."));
+		Debug.LogError("Expected '<' but got '" + num + "'.");
 	}
 
 	private string ReadTag(bool startingBracket)
@@ -225,7 +225,7 @@ public class XMLParser
 		char c = (char)reader.Peek();
 		if (startingBracket && c != '<')
 		{
-			Debug.LogError((object)("Expected < but got " + c));
+			Debug.LogError("Expected < but got " + c);
 			return null;
 		}
 		if (!startingBracket)

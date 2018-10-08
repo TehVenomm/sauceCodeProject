@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class MissionCheckDead : MissionCheckBase
 {
 	private bool isDead;
@@ -14,13 +16,13 @@ public class MissionCheckDead : MissionCheckBase
 			switch (missionRequire)
 			{
 			case MISSION_REQUIRE.SELF:
-				if (!(to_obj as Self == null))
+				if (!((Object)(to_obj as Self) == (Object)null))
 				{
 					isDead = true;
 				}
 				break;
 			case MISSION_REQUIRE.ALL:
-				if (!(to_obj as Player == null) && !MonoBehaviourSingleton<StageObjectManager>.I.nonplayerList.Contains(to_obj))
+				if (!((Object)(to_obj as Player) == (Object)null) && !MonoBehaviourSingleton<StageObjectManager>.I.nonplayerList.Contains(to_obj))
 				{
 					isDead = true;
 				}

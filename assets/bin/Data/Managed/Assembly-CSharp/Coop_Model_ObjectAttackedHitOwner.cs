@@ -10,9 +10,9 @@ public class Coop_Model_ObjectAttackedHitOwner : Coop_Model_ObjectBase
 
 	public int fromType;
 
-	public Vector3 fromPos = Vector3.get_zero();
+	public Vector3 fromPos = Vector3.zero;
 
-	public Vector3 hitPos = Vector3.get_zero();
+	public Vector3 hitPos = Vector3.zero;
 
 	public int fromClientID;
 
@@ -50,19 +50,11 @@ public class Coop_Model_ObjectAttackedHitOwner : Coop_Model_ObjectBase
 
 	public Coop_Model_ObjectAttackedHitOwner()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 		base.packetType = PACKET_TYPE.OBJECT_ATTACKED_HIT_OWNER;
 	}
 
 	public void SetAttackedHitStatus(AttackedHitStatusOwner status)
 	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		attackInfoName = status.attackInfo.name;
 		attackInfoRate = status.attackInfo.rateInfoRate;
 		fromObjectID = status.fromObjectID;
@@ -93,14 +85,10 @@ public class Coop_Model_ObjectAttackedHitOwner : Coop_Model_ObjectBase
 
 	public void CopyAttackedHitStatus(out AttackedHitStatusOwner status)
 	{
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
 		AttackedHitStatus attackedHitStatus = new AttackedHitStatus();
 		attackedHitStatus.fromObjectID = fromObjectID;
 		attackedHitStatus.fromObject = MonoBehaviourSingleton<StageObjectManager>.I.FindCharacter(fromObjectID);
-		if (attackedHitStatus.fromObject != null)
+		if ((Object)attackedHitStatus.fromObject != (Object)null)
 		{
 			attackedHitStatus.attackInfo = (attackedHitStatus.fromObject.FindAttackInfoExternal(attackInfoName, true, attackInfoRate) as AttackHitInfo);
 		}
@@ -112,7 +100,7 @@ public class Coop_Model_ObjectAttackedHitOwner : Coop_Model_ObjectBase
 		attackedHitStatus.fromPos = fromPos;
 		attackedHitStatus.hitPos = hitPos;
 		attackedHitStatus.fromClientID = fromClientID;
-		if (attackedHitStatus.fromObject != null)
+		if ((Object)attackedHitStatus.fromObject != (Object)null)
 		{
 			attackedHitStatus.skillParam = attackedHitStatus.fromObject.GetSkillParam(skillIndex);
 		}

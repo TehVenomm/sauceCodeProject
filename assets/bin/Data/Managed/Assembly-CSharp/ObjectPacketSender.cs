@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectPacketSender
+public class ObjectPacketSender : MonoBehaviour
 {
 	public class ActionHistoryData
 	{
 		public float startTime = -1f;
 
-		public Vector3 startPos = Vector3.get_zero();
+		public Vector3 startPos = Vector3.zero;
 
 		public float startDir;
 	}
@@ -36,7 +36,6 @@ public class ObjectPacketSender
 	}
 
 	public ObjectPacketSender()
-		: this()
 	{
 		needWaitSyncTime = 0f;
 		enableSend = true;
@@ -44,28 +43,24 @@ public class ObjectPacketSender
 
 	public static ObjectPacketSender SetupComponent(StageObject set_object)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		if (set_object is Enemy)
 		{
-			return set_object.get_gameObject().AddComponent<EnemyPacketSender>();
+			return set_object.gameObject.AddComponent<EnemyPacketSender>();
 		}
 		if (set_object is Player)
 		{
-			return set_object.get_gameObject().AddComponent<PlayerPacketSender>();
+			return set_object.gameObject.AddComponent<PlayerPacketSender>();
 		}
 		if (set_object is Character)
 		{
-			return set_object.get_gameObject().AddComponent<CharacterPacketSender>();
+			return set_object.gameObject.AddComponent<CharacterPacketSender>();
 		}
-		return set_object.get_gameObject().AddComponent<ObjectPacketSender>();
+		return set_object.gameObject.AddComponent<ObjectPacketSender>();
 	}
 
 	protected virtual void Awake()
 	{
-		owner = this.GetComponent<StageObject>();
+		owner = GetComponent<StageObject>();
 	}
 
 	protected int SendTo<T>(int to_client_id, T model, bool promise = false, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null) where T : Coop_Model_Base
@@ -126,12 +121,6 @@ public class ObjectPacketSender
 
 	protected virtual void StackActionHistory(Coop_Model_ObjectBase stack_model, bool is_act_model)
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
 		if (is_act_model)
 		{
 			ClearActionHistory();
@@ -143,11 +132,10 @@ public class ObjectPacketSender
 		if (actionHistoryList.Count <= 0)
 		{
 			actionHistoryData = new ActionHistoryData();
-			actionHistoryData.startTime = Time.get_time();
+			actionHistoryData.startTime = Time.time;
 			actionHistoryData.startPos = owner._position;
 			ActionHistoryData obj = actionHistoryData;
-			Quaternion rotation = owner._rotation;
-			Vector3 eulerAngles = rotation.get_eulerAngles();
+			Vector3 eulerAngles = owner._rotation.eulerAngles;
 			obj.startDir = eulerAngles.y;
 		}
 		actionHistoryList.Add(stack_model);
@@ -175,7 +163,7 @@ public class ObjectPacketSender
 		float num = 0f;
 		if (actionHistoryData != null && actionHistoryData.startTime >= 0f)
 		{
-			num = Time.get_time() - actionHistoryData.startTime;
+			num = Time.time - actionHistoryData.startTime;
 		}
 		if (num > needWaitSyncTime)
 		{
@@ -220,7 +208,7 @@ public class ObjectPacketSender
 		}
 	}
 
-	public unsafe virtual void OnAttackedHitFix(AttackedHitStatusFix status)
+	public virtual void OnAttackedHitFix(AttackedHitStatusFix status)
 	{
 		if (enableSend && owner.IsOriginal())
 		{
@@ -238,7 +226,34 @@ public class ObjectPacketSender
 			coop_Model_ObjectAttackedHitFix.SetAttackedHitStatus(status);
 			if (flag)
 			{
-				SendBroadcast(coop_Model_ObjectAttackedHitFix, true, null, new Func<Coop_Model_Base, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				SendBroadcast(coop_Model_ObjectAttackedHitFix, true, null, delegate(Coop_Model_Base send_model)
+				{
+					if ((UnityEngine.Object)owner == (UnityEngine.Object)null)
+					{
+						return false;
+					}
+					Coop_Model_ObjectAttackedHitFix coop_Model_ObjectAttackedHitFix2 = send_model as Coop_Model_ObjectAttackedHitFix;
+					Character character = owner as Character;
+					if ((UnityEngine.Object)character != (UnityEngine.Object)null)
+					{
+						coop_Model_ObjectAttackedHitFix2.afterHP = character.hp;
+						Player player = owner as Player;
+						if ((UnityEngine.Object)player != (UnityEngine.Object)null)
+						{
+							coop_Model_ObjectAttackedHitFix2.afterHealHp = player.healHp;
+						}
+						if (coop_Model_ObjectAttackedHitFix2.afterHP > 0 && coop_Model_ObjectAttackedHitFix2.reactionType == 8)
+						{
+							coop_Model_ObjectAttackedHitFix2.reactionType = 0;
+						}
+					}
+					BarrierBulletObject barrierBulletObject = owner as BarrierBulletObject;
+					if ((UnityEngine.Object)barrierBulletObject != (UnityEngine.Object)null)
+					{
+						coop_Model_ObjectAttackedHitFix2.afterHP = barrierBulletObject.GetHp();
+					}
+					return true;
+				});
 			}
 			else
 			{
@@ -293,8 +308,6 @@ public class ObjectPacketSender
 
 	public void OnShotGimmickGenerator(Vector3 pos)
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		if (enableSend && owner.IsOriginal())
 		{
 			Coop_Model_ObjectShotGimmickGenerator coop_Model_ObjectShotGimmickGenerator = new Coop_Model_ObjectShotGimmickGenerator();

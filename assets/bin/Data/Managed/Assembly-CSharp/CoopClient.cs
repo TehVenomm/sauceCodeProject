@@ -2,7 +2,7 @@ using Network;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CoopClient
+public class CoopClient : MonoBehaviour
 {
 	public enum CLIENT_STATUS
 	{
@@ -165,7 +165,6 @@ public class CoopClient
 	}
 
 	public CoopClient()
-		: this()
 	{
 		status = CLIENT_STATUS.NONE;
 		slotIndex = -1;
@@ -174,8 +173,7 @@ public class CoopClient
 
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		packetReceiver = this.get_gameObject().AddComponent<CoopClientPacketReceiver>();
+		packetReceiver = base.gameObject.AddComponent<CoopClientPacketReceiver>();
 	}
 
 	protected virtual void Update()
@@ -301,7 +299,7 @@ public class CoopClient
 	public virtual string GetPlayerName()
 	{
 		Player player = GetPlayer();
-		if (player != null)
+		if ((Object)player != (Object)null)
 		{
 			return player.charaName;
 		}
@@ -419,31 +417,23 @@ public class CoopClient
 
 	public void PopCachePlayer(StageObject.COOP_MODE_TYPE coop_mode = StageObject.COOP_MODE_TYPE.NONE)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			int num = 0;
-			Vector3 appearPosGuest = Vector3.get_zero();
-			if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
+			Vector3 appearPosGuest = Vector3.zero;
+			if ((Object)MonoBehaviourSingleton<StageObjectManager>.I.boss != (Object)null)
 			{
-				appearPosGuest = MonoBehaviourSingleton<StageObjectManager>.I.boss._transform.get_position();
+				appearPosGuest = MonoBehaviourSingleton<StageObjectManager>.I.boss._transform.position;
 			}
 			if (cachePlayerID != 0 && !IsPlayerPop())
 			{
 				num = cachePlayerID;
 				cachePlayerID = 0;
 				Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindCache(num) as Player;
-				if (player != null)
+				if ((Object)player != (Object)null)
 				{
 					MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(player);
-					player.get_gameObject().SetActive(true);
+					player.gameObject.SetActive(true);
 					SetPlayerID(num);
 					player.SetAppearPosGuest(appearPosGuest);
 					if (coop_mode != 0)
@@ -457,10 +447,10 @@ public class CoopClient
 			{
 				num = cacheSubPlayerIDs[i];
 				Player player2 = MonoBehaviourSingleton<StageObjectManager>.I.FindCache(num) as Player;
-				if (player2 != null)
+				if ((Object)player2 != (Object)null)
 				{
 					MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(player2);
-					player2.get_gameObject().SetActive(true);
+					player2.gameObject.SetActive(true);
 					player2.SetAppearPosGuest(appearPosGuest);
 					if (coop_mode != 0)
 					{
@@ -498,7 +488,6 @@ public class CoopClient
 
 	public virtual bool OnRecvClientStatus(Coop_Model_ClientStatus model, CoopPacket packet)
 	{
-		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
 		if (isLeave)
 		{
 			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.WelcomeClient(clientId);
@@ -518,10 +507,10 @@ public class CoopClient
 				for (int count = list.Count; i < count; i++)
 				{
 					Player player = list[i] as Player;
-					if (!(player == null) && player.coopClientId == clientId && player.isWaitBattleStart)
+					if (!((Object)player == (Object)null) && player.coopClientId == clientId && player.isWaitBattleStart)
 					{
 						MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(player);
-						player.get_gameObject().SetActive(true);
+						player.gameObject.SetActive(true);
 						player.ActBattleStart(false);
 					}
 				}

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class ConfigTouch : GameSection
@@ -22,13 +21,13 @@ public class ConfigTouch : GameSection
 
 	public override void UpdateUI()
 	{
-		SetProgressInt((Enum)UI.SLD_TOUCH_FLICK, Mathf.RoundToInt(GameSaveData.instance.touchInGameFlick * 100f), 0, 100, (EventDelegate.Callback)OnChangeTouchFlick);
-		SetProgressInt((Enum)UI.SLD_TOUCH_LONG, Mathf.RoundToInt(GameSaveData.instance.touchInGameLong * 100f), 0, 100, (EventDelegate.Callback)OnChangeTouchLong);
+		SetProgressInt(UI.SLD_TOUCH_FLICK, Mathf.RoundToInt(GameSaveData.instance.touchInGameFlick * 100f), 0, 100, OnChangeTouchFlick);
+		SetProgressInt(UI.SLD_TOUCH_LONG, Mathf.RoundToInt(GameSaveData.instance.touchInGameLong * 100f), 0, 100, OnChangeTouchLong);
 	}
 
 	private void OnChangeTouchFlick()
 	{
-		GameSaveData.instance.touchInGameFlick = (float)GetProgressInt((Enum)UI.SLD_TOUCH_FLICK) * 0.01f;
+		GameSaveData.instance.touchInGameFlick = (float)GetProgressInt(UI.SLD_TOUCH_FLICK) * 0.01f;
 		if (MonoBehaviourSingleton<InputManager>.IsValid())
 		{
 			MonoBehaviourSingleton<InputManager>.I.UpdateConfigInput();
@@ -37,6 +36,6 @@ public class ConfigTouch : GameSection
 
 	private void OnChangeTouchLong()
 	{
-		GameSaveData.instance.touchInGameLong = (float)GetProgressInt((Enum)UI.SLD_TOUCH_LONG) * 0.01f;
+		GameSaveData.instance.touchInGameLong = (float)GetProgressInt(UI.SLD_TOUCH_LONG) * 0.01f;
 	}
 }

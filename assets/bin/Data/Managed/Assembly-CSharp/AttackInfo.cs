@@ -69,7 +69,7 @@ public class AttackInfo
 		attackInfo.nextBulletInfoName = nextBulletInfoName;
 		attackInfo.isSkillReference = isSkillReference;
 		attackInfo.skillElementIndex = skillElementIndex;
-		if (bulletData != null)
+		if ((UnityEngine.Object)bulletData != (UnityEngine.Object)null)
 		{
 			attackInfo.bulletData = bulletData.GetRateBulletData(rate_info.bulletData, rate);
 		}
@@ -127,12 +127,6 @@ public class AttackInfo
 
 	public static Vector3 GetRateValue(Vector3 val_a, Vector3 val_b, float rate)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		return val_a + (val_b - val_a) * rate;
 	}
 }

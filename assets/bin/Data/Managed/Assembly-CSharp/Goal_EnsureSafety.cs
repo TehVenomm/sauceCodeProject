@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class Goal_EnsureSafety : GoalComposite
 {
 	private const float GUARD_GIVEUP_TIME = 5f;
@@ -9,12 +11,9 @@ public class Goal_EnsureSafety : GoalComposite
 
 	protected override void Activate(Brain brain)
 	{
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
 		SetStatus(STATUS.ACTIVE);
 		RemoveAllSubGoals(brain);
-		if (brain.dangerRader != null && brain.dangerRader.AskDanger(0.2f))
+		if ((Object)brain.dangerRader != (Object)null && brain.dangerRader.AskDanger(0.2f))
 		{
 			if (brain.dangerRader.AskWillBulletHit(0.2f))
 			{
@@ -78,7 +77,7 @@ public class Goal_EnsureSafety : GoalComposite
 	{
 		STATUS status = UpdateSubGoals(brain);
 		SetStatus(status);
-		if (brain.dangerRader != null && !brain.dangerRader.AskDanger(1f))
+		if ((Object)brain.dangerRader != (Object)null && !brain.dangerRader.AskDanger(1f))
 		{
 			SetStatus(STATUS.COMPLETED);
 		}

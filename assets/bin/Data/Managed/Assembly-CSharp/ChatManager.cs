@@ -1,7 +1,7 @@
 using Network;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using UnityEngine;
 
 public class ChatManager : MonoBehaviourSingleton<ChatManager>
 {
@@ -61,23 +61,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 		private set;
 	}
 
-	public event Action OnCreateRoomChat
-	{
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		add
-		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Expected O, but got Unknown
-			this.OnCreateRoomChat = Delegate.Combine((Delegate)this.OnCreateRoomChat, (Delegate)value);
-		}
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		remove
-		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Expected O, but got Unknown
-			this.OnCreateRoomChat = Delegate.Remove((Delegate)this.OnCreateRoomChat, (Delegate)value);
-		}
-	}
+	public event Action OnCreateRoomChat;
 
 	public event Action<ChatRoom> OnDestroyRoomChat;
 
@@ -140,20 +124,40 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 		return invalidChannel.channel;
 	}
 
-	public unsafe void SelectChannel(int channel)
+	public void SelectChannel(int channel)
 	{
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Expected O, but got Unknown
 		if (channel > 0 && (currentChannel == null || currentChannel.channel != channel || !homeChat.HasConnect))
 		{
-			_003CSelectChannel_003Ec__AnonStorey52E _003CSelectChannel_003Ec__AnonStorey52E;
-			Protocol.Force(new Action((object)_003CSelectChannel_003Ec__AnonStorey52E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			Protocol.Force(delegate
+			{
+				SendChannelEnter(channel, delegate(ChatChannel chatChannel)
+				{
+					if (chatChannel != null)
+					{
+						if (homeChat != null && homeChat.connection != null)
+						{
+							homeChat.Disconnect(delegate
+							{
+								ChatWebSocketConnection chatWebSocketConnection = homeChat.connection as ChatWebSocketConnection;
+								if ((bool)chatWebSocketConnection)
+								{
+									UnityEngine.Object.Destroy(chatWebSocketConnection);
+								}
+								ConnectHomeChat(chatChannel);
+							});
+						}
+						else
+						{
+							ConnectHomeChat(chatChannel);
+						}
+					}
+				});
+			});
 		}
 	}
 
 	private void ConnectHomeChat(ChatChannel channel)
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		currentChannel = channel;
 		if (channel == invalidChannel || channel == offlineChannel)
 		{
@@ -161,7 +165,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 		}
 		else
 		{
-			ChatWebSocketConnection chatWebSocketConnection = this.get_gameObject().AddComponent<ChatWebSocketConnection>();
+			ChatWebSocketConnection chatWebSocketConnection = base.gameObject.AddComponent<ChatWebSocketConnection>();
 			chatWebSocketConnection.Setup(channel.host, channel.port, channel.path, true);
 			homeChat.SetConnection(chatWebSocketConnection);
 			int roomNo = 1;
@@ -220,15 +224,21 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 		SwitchRoomChatConnection(connection);
 	}
 
-	private unsafe void SwitchRoomChatConnection(IChatConnection connection)
+	private void SwitchRoomChatConnection(IChatConnection connection)
 	{
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Expected O, but got Unknown
 		if (roomChat != null)
 		{
 			IChatConnection conn = roomChat.connection;
-			_003CSwitchRoomChatConnection_003Ec__AnonStorey530 _003CSwitchRoomChatConnection_003Ec__AnonStorey;
-			roomChat.Disconnect(new Action((object)_003CSwitchRoomChatConnection_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			roomChat.Disconnect(delegate
+			{
+				ChatWebSocketConnection chatWebSocketConnection = conn as ChatWebSocketConnection;
+				if ((UnityEngine.Object)chatWebSocketConnection != (UnityEngine.Object)null)
+				{
+					UnityEngine.Object.Destroy(chatWebSocketConnection);
+				}
+				roomChat.SetConnection(connection);
+				roomChat.JoinRoom(0);
+			});
 		}
 	}
 
@@ -247,19 +257,23 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 		roomChat.SetConnection(conn);
 		if (this.OnCreateRoomChat != null)
 		{
-			this.OnCreateRoomChat.Invoke();
+			this.OnCreateRoomChat();
 		}
 	}
 
-	public unsafe void DestroyRoomChat()
+	public void DestroyRoomChat()
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Expected O, but got Unknown
 		if (roomChat != null)
 		{
 			IChatConnection conn = roomChat.connection;
-			_003CDestroyRoomChat_003Ec__AnonStorey531 _003CDestroyRoomChat_003Ec__AnonStorey;
-			roomChat.Disconnect(new Action((object)_003CDestroyRoomChat_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			roomChat.Disconnect(delegate
+			{
+				ChatWebSocketConnection chatWebSocketConnection = conn as ChatWebSocketConnection;
+				if ((UnityEngine.Object)chatWebSocketConnection != (UnityEngine.Object)null)
+				{
+					UnityEngine.Object.Destroy(chatWebSocketConnection);
+				}
+			});
 			if (this.OnDestroyRoomChat != null)
 			{
 				this.OnDestroyRoomChat(roomChat);
@@ -301,10 +315,8 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 		}
 	}
 
-	public unsafe void CreateClanChat(ChatChannelInfo info, int clanId, Action<bool> callback = null)
+	public void CreateClanChat(ChatChannelInfo info, int clanId, Action<bool> callback = null)
 	{
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f6: Expected O, but got Unknown
 		if (info == null)
 		{
 			Log.Error(LOG.NETWORK, "clanChat info is null!!");
@@ -333,8 +345,42 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 		else
 		{
 			clanChat = new ClanChatRoom();
-			_003CCreateClanChat_003Ec__AnonStorey532 _003CCreateClanChat_003Ec__AnonStorey;
-			Protocol.Force(new Action((object)_003CCreateClanChat_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			Protocol.Force(delegate
+			{
+				SendClanChannelEnter(info.recommend, delegate(ChatChannel chatChannel)
+				{
+					if (chatChannel == null)
+					{
+						Log.Error(LOG.NETWORK, "Clan Chat channel is null");
+						clanChat.LeaveRoom(clanId);
+						if (callback != null)
+						{
+							callback(false);
+						}
+					}
+					else if (chatChannel == invalidChannel || chatChannel == offlineChannel)
+					{
+						clanChat.SetConnection(new ClanChatOfflineConnection());
+						Log.Error(LOG.NETWORK, "Use Clan chat Offline Connection");
+						if (callback != null)
+						{
+							callback(true);
+						}
+					}
+					else
+					{
+						ClanChatWebSocketConnection clanChatWebSocketConnection = base.gameObject.AddComponent<ClanChatWebSocketConnection>();
+						clanChatWebSocketConnection.Setup(chatChannel.host, chatChannel.port, chatChannel.path, true);
+						clanChat.SetConnection(clanChatWebSocketConnection);
+						clanChat.JoinRoom(clanId);
+						Log.Error(LOG.NETWORK, "Create Clan Chat Successful !");
+						if (callback != null)
+						{
+							callback(true);
+						}
+					}
+				});
+			});
 		}
 	}
 

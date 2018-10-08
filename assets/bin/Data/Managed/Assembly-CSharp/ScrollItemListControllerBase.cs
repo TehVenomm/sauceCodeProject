@@ -89,7 +89,7 @@ public abstract class ScrollItemListControllerBase
 		return InvokeRequestNextPageInfo(nextPageNum);
 	}
 
-	private unsafe bool InvokeRequestNextPageInfo(int _nextPageNum)
+	private bool InvokeRequestNextPageInfo(int _nextPageNum)
 	{
 		if (MaxPageNum <= 0 || m_coroutineExecutor == null)
 		{
@@ -101,7 +101,7 @@ public abstract class ScrollItemListControllerBase
 		}
 		StartRequest();
 		ResetLoadCompleteCount();
-		m_coroutineExecutor.InvokeCoroutine(RequestNextPageInfo(_nextPageNum, new Action<bool, int>((object)this, (IntPtr)(void*)/*OpCode not supported: LdVirtFtn*/)));
+		m_coroutineExecutor.InvokeCoroutine(RequestNextPageInfo(_nextPageNum, OnCallbackRequestPageInfo));
 		return true;
 	}
 

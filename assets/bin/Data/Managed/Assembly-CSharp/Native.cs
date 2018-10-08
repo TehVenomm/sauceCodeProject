@@ -17,20 +17,18 @@ public static class Native
 
 	public static int GetPurchaseType()
 	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Expected O, but got Unknown
 		if (m_purchaseType != -1)
 		{
 			return m_purchaseType;
 		}
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			m_purchaseType = val.CallStatic<int>("getPurchaseType", new object[0]);
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			m_purchaseType = androidJavaClass.CallStatic<int>("getPurchaseType", new object[0]);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 		return m_purchaseType;
 	}
@@ -45,239 +43,190 @@ public static class Native
 
 	public static bool getScreenLockMode()
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
 		bool result = true;
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			string text = val.CallStatic<string>("getScreenLockMode", new object[0]);
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			string text = androidJavaClass.CallStatic<string>("getScreenLockMode", new object[0]);
 			result = text.Equals("true");
 			return result;
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 			return result;
 		}
 	}
 
 	public static void setScreenLockMode(bool flag)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			val.CallStatic("setScreenLockMode", new object[1]
-			{
-				(!flag) ? "false" : "true"
-			});
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			androidJavaClass.CallStatic("setScreenLockMode", (!flag) ? "false" : "true");
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static bool IsAdsRemoved()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			int num = val.CallStatic<int>("isAdsRemoved", new object[0]);
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			int num = androidJavaClass.CallStatic<int>("isAdsRemoved", new object[0]);
 			return num == 1;
 			IL_0031:;
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 		return false;
 	}
 
 	public static void SetShopMenuButton(bool flag)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			val.CallStatic("setShopMode", new object[1]
-			{
-				flag
-			});
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			androidJavaClass.CallStatic("setShopMode", flag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static void applicationQuit()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			val.CallStatic("quit", new object[0]);
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			androidJavaClass.CallStatic("quit");
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static void ProcessKillCommit()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			val.CallStatic("ProcessKillCommit", new object[0]);
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			androidJavaClass.CallStatic("ProcessKillCommit");
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static void launchMyselfMarket()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			if (val != null && GetPurchaseType() == 0)
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			if (androidJavaClass != null && GetPurchaseType() == 0)
 			{
-				val.CallStatic("GoGooglePlayMyself", new object[0]);
+				androidJavaClass.CallStatic("GoGooglePlayMyself");
 			}
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static void LaunchMailerInvitation(string titleText, string descriptionText, string message)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			val.CallStatic("ShowInvitationCodeView", new object[3]
-			{
-				titleText,
-				descriptionText,
-				message
-			});
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			androidJavaClass.CallStatic("ShowInvitationCodeView", titleText, descriptionText, message);
 		}
-		catch (Exception ex)
+		catch (Exception message2)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message2);
 		}
 	}
 
 	public static void OpenURL(string url)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			val.CallStatic("OpenURL", new object[1]
-			{
-				url
-			});
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			androidJavaClass.CallStatic("OpenURL", url);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static bool CheckInstallPackage(string pacakg_name)
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
 		int num = 0;
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			num = val.CallStatic<int>("checkInstallPackage", new object[1]
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			num = androidJavaClass.CallStatic<int>("checkInstallPackage", new object[1]
 			{
 				pacakg_name
 			});
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 		return num == 1;
 	}
 
 	public static void ResetPackagePreferences()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			val.CallStatic("resetPackagePreferences", new object[0]);
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			androidJavaClass.CallStatic("resetPackagePreferences");
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static void SendIdfaOrAdidWithUid(string userId, bool debugFlg)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			val.CallStatic("sendAdidWithUid", new object[2]
-			{
-				userId,
-				debugFlg
-			});
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			androidJavaClass.CallStatic("sendAdidWithUid", userId, debugFlg);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static void TrackPageView(string page)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AnalyticsHelper");
-			val.CallStatic("trackPageView", new object[1]
-			{
-				page
-			});
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AnalyticsHelper");
+			androidJavaClass.CallStatic("trackPageView", page);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static void RequestPurchase(string productId, string userId, string userIdHash)
 	{
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Expected O, but got Unknown
 		string text = MonoBehaviourSingleton<AccountManager>.I.account.token;
 		int num = text.IndexOf('=');
 		if (num >= 0)
@@ -293,78 +242,56 @@ public static class Native
 		NetworkNative.setHost(text2);
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
-			val.CallStatic("requestMarket", new object[3]
-			{
-				productId,
-				userId,
-				userIdHash
-			});
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
+			androidJavaClass.CallStatic("requestMarket", productId, userId, userIdHash);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static void GetProductDatas(string productIds)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
-			val.CallStatic("getProductDatas", new object[1]
-			{
-				productIds
-			});
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
+			androidJavaClass.CallStatic("getProductDatas", productIds);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static void SetProductNameData(string datas)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
-			val.CallStatic("setProductNameData", new object[1]
-			{
-				datas
-			});
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
+			androidJavaClass.CallStatic("setProductNameData", datas);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static void SetProductIdData(string datas)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
-			val.CallStatic("setProductIdData", new object[1]
-			{
-				datas
-			});
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
+			androidJavaClass.CallStatic("setProductIdData", datas);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static void checkAndGivePromotionItems(string productIds)
 	{
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Expected O, but got Unknown
 		string text = MonoBehaviourSingleton<AccountManager>.I.account.token;
 		int num = text.IndexOf('=');
 		if (num >= 0)
@@ -380,104 +307,79 @@ public static class Native
 		NetworkNative.setHost(text2);
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
-			val.CallStatic("checkAndGivePromotionitems", new object[1]
-			{
-				productIds
-			});
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
+			androidJavaClass.CallStatic("checkAndGivePromotionitems", productIds);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static void RestorePurchasedItem(bool showErrorDialog)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
-			val.CallStatic("restorePurchasedItem", new object[1]
-			{
-				showErrorDialog
-			});
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
+			androidJavaClass.CallStatic("restorePurchasedItem", showErrorDialog);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static void TrackUserRegEventAppsFlyer(string userId)
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
-		Debug.Log((object)("TrackUserRegEventAppsFlyer: userId=" + userId));
+		Debug.Log("TrackUserRegEventAppsFlyer: userId=" + userId);
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			val.CallStatic("trackUserRegEventAppsFlyer", new object[1]
-			{
-				userId
-			});
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			androidJavaClass.CallStatic("trackUserRegEventAppsFlyer", userId);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 
 	public static void RegisterLocalNotification(int id, string title, string body, int afterSeconds)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Expected O, but got Unknown
 		if (0 < afterSeconds)
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".LocalNotificationHelper");
-			if (val != null)
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".LocalNotificationHelper");
+			if (androidJavaClass != null)
 			{
-				val.CallStatic("Register", new object[4]
-				{
-					id,
-					title,
-					body,
-					afterSeconds
-				});
+				androidJavaClass.CallStatic("Register", id, title, body, afterSeconds);
 			}
 			else
 			{
-				Debug.Log((object)("not to be found:" + Property.BundleIdentifier + ".LocalNotificationHelper"));
+				Debug.Log("not to be found:" + Property.BundleIdentifier + ".LocalNotificationHelper");
 			}
 		}
 	}
 
 	public static void CancelAllLocalNotification()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
-		AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".LocalNotificationHelper");
-		if (val != null)
+		AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".LocalNotificationHelper");
+		if (androidJavaClass != null)
 		{
-			val.CallStatic("CancelAll", new object[0]);
+			androidJavaClass.CallStatic("CancelAll");
 		}
 		else
 		{
-			Debug.Log((object)("not to be found:" + Property.BundleIdentifier + ".LocalNotificationHelper"));
+			Debug.Log("not to be found:" + Property.BundleIdentifier + ".LocalNotificationHelper");
 		}
 	}
 
 	public static UserFromAttributeData GetInstallReferrer()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
 			UserFromAttributeData userFromAttributeData = new UserFromAttributeData();
-			string text = val.CallStatic<string>("GetInstallReferrerAtInstall", new object[0]);
-			Debug.Log((object)("Selected Referrer:" + text));
+			string text = androidJavaClass.CallStatic<string>("GetInstallReferrerAtInstall", new object[0]);
+			Debug.Log("Selected Referrer:" + text);
 			if (text.Contains("&"))
 			{
 				string[] array = text.Split('&');
@@ -486,7 +388,7 @@ public static class Native
 				{
 					if (text2.Contains("="))
 					{
-						Debug.LogError((object)text2);
+						Debug.LogError(text2);
 						string[] array3 = text2.Split('=');
 						if (array3.Length == 2)
 						{
@@ -509,34 +411,30 @@ public static class Native
 			return userFromAttributeData;
 			IL_0117:;
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 		return null;
 	}
 
 	public static bool CheckReferrerSendToAppBrowser()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		try
 		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
-			return val.CallStatic<bool>("CheckReferrerSendToAppBrowser", new object[0]);
+			AndroidJavaClass androidJavaClass = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
+			return androidJavaClass.CallStatic<bool>("CheckReferrerSendToAppBrowser", new object[0]);
 			IL_002c:;
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 		return false;
 	}
 
 	public static bool GetDeviceAutoRotateSetting()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
 		try
 		{
 			if (apphelper == null)
@@ -546,17 +444,15 @@ public static class Native
 			return apphelper.CallStatic<int>("GetDeviceAutoRotateSetting", new object[0]) == 1;
 			IL_0041:;
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 		return false;
 	}
 
 	public static void getList()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
 		try
 		{
 			if (apphelper == null)
@@ -568,9 +464,9 @@ public static class Native
 				"other"
 			});
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 	}
 }

@@ -7,7 +7,7 @@ public class WeatherController
 	[Serializable]
 	private class ShaderSettings
 	{
-		public Color fogColor = Color.get_white();
+		public Color fogColor = Color.white;
 
 		public float linearFogStart;
 
@@ -52,7 +52,7 @@ public class WeatherController
 	{
 		get
 		{
-			if (_skyDome == null && MonoBehaviourSingleton<StageManager>.IsValid() && MonoBehaviourSingleton<StageManager>.I.skyObject != null)
+			if ((UnityEngine.Object)_skyDome == (UnityEngine.Object)null && MonoBehaviourSingleton<StageManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageManager>.I.skyObject != (UnityEngine.Object)null)
 			{
 				_skyDome = MonoBehaviourSingleton<StageManager>.I.skyObject.GetComponent<SkyDomeWeatherController>();
 			}
@@ -62,16 +62,6 @@ public class WeatherController
 
 	public void Init()
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
 		LIGHTMAPBLEND_PARAMTER_KEY = Shader.PropertyToID("_LightMapBlend");
 		if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
 		{
@@ -86,7 +76,7 @@ public class WeatherController
 			originalSettings.lightProbePeak = MonoBehaviourSingleton<SceneSettingsManager>.I.lightProbePeak;
 			originalSettings.npcAmbientColor = MonoBehaviourSingleton<SceneSettingsManager>.I.npcAmbientColor;
 		}
-		if (Application.get_isPlaying())
+		if (Application.isPlaying)
 		{
 			Update(0f);
 			if (enableObjects != null)
@@ -101,21 +91,6 @@ public class WeatherController
 
 	public void Update(float rate)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
 		rate = Mathf.Clamp01(rate);
 		ShaderGlobal.fogColor = Color.Lerp(originalSettings.fogColor, afterShaderSettings.fogColor, rate);
 		ShaderGlobal.fogNear = Mathf.Lerp(originalSettings.linearFogStart, afterShaderSettings.linearFogStart, rate);
@@ -131,20 +106,20 @@ public class WeatherController
 		{
 			for (int i = 0; i < blendLightMapRenderer.Length; i++)
 			{
-				if (!(blendLightMapRenderer[i] == null))
+				if (!((UnityEngine.Object)blendLightMapRenderer[i] == (UnityEngine.Object)null))
 				{
-					Material[] sharedMaterials = blendLightMapRenderer[i].get_sharedMaterials();
-					foreach (Material val in sharedMaterials)
+					Material[] sharedMaterials = blendLightMapRenderer[i].sharedMaterials;
+					foreach (Material material in sharedMaterials)
 					{
-						if (!(val == null) && val.HasProperty(LIGHTMAPBLEND_PARAMTER_KEY))
+						if (!((UnityEngine.Object)material == (UnityEngine.Object)null) && material.HasProperty(LIGHTMAPBLEND_PARAMTER_KEY))
 						{
-							val.SetFloat(LIGHTMAPBLEND_PARAMTER_KEY, rate);
+							material.SetFloat(LIGHTMAPBLEND_PARAMTER_KEY, rate);
 						}
 					}
 				}
 			}
 		}
-		if (skyDome != null)
+		if ((UnityEngine.Object)skyDome != (UnityEngine.Object)null)
 		{
 			skyDome.UpdateRenderers(rate);
 		}
@@ -152,17 +127,15 @@ public class WeatherController
 
 	public void OnStartWeatherChange()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageManager>.IsValid())
 		{
-			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect != null)
+			if ((UnityEngine.Object)MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect != (UnityEngine.Object)null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect.get_gameObject().SetActive(!cameraLinkEffectEnable);
+				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect.gameObject.SetActive(!cameraLinkEffectEnable);
 			}
-			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0 != null)
+			if ((UnityEngine.Object)MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0 != (UnityEngine.Object)null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0.get_gameObject().SetActive(!cameraLinkEffectY0Enable);
+				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0.gameObject.SetActive(!cameraLinkEffectY0Enable);
 			}
 		}
 		if (disableObjects != null)
@@ -176,17 +149,15 @@ public class WeatherController
 
 	public void OnFinishedWeatherChange()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageManager>.IsValid())
 		{
-			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect != null)
+			if ((UnityEngine.Object)MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect != (UnityEngine.Object)null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect.get_gameObject().SetActive(cameraLinkEffectEnable);
+				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect.gameObject.SetActive(cameraLinkEffectEnable);
 			}
-			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0 != null)
+			if ((UnityEngine.Object)MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0 != (UnityEngine.Object)null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0.get_gameObject().SetActive(cameraLinkEffectY0Enable);
+				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0.gameObject.SetActive(cameraLinkEffectY0Enable);
 			}
 		}
 		if (enableObjects != null)
@@ -200,17 +171,15 @@ public class WeatherController
 
 	public void OnStartReturnToOriginal()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageManager>.IsValid())
 		{
-			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect != null)
+			if ((UnityEngine.Object)MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect != (UnityEngine.Object)null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect.get_gameObject().SetActive(!cameraLinkEffectEnable);
+				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect.gameObject.SetActive(!cameraLinkEffectEnable);
 			}
-			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0 != null)
+			if ((UnityEngine.Object)MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0 != (UnityEngine.Object)null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0.get_gameObject().SetActive(!cameraLinkEffectY0Enable);
+				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0.gameObject.SetActive(!cameraLinkEffectY0Enable);
 			}
 		}
 		if (enableObjects != null)

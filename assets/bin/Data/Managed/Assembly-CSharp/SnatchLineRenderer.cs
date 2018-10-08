@@ -1,57 +1,50 @@
 using UnityEngine;
 
-public class SnatchLineRenderer
+public class SnatchLineRenderer : MonoBehaviour
 {
 	private LineRenderer lineRenderer;
 
-	public SnatchLineRenderer()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
-		Transform val = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.snatchLine, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-		if (!(val == null))
+		Transform transform = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.snatchLine, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
+		if (!((Object)transform == (Object)null))
 		{
-			lineRenderer = val.GetComponent<LineRenderer>();
-			if (lineRenderer != null)
+			lineRenderer = transform.GetComponent<LineRenderer>();
+			if ((Object)lineRenderer != (Object)null)
 			{
-				lineRenderer.set_enabled(false);
+				lineRenderer.enabled = false;
 			}
 		}
 	}
 
 	private void OnDestroy()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (lineRenderer != null)
+		if ((Object)lineRenderer != (Object)null)
 		{
-			Object.Destroy(lineRenderer.get_gameObject());
+			Object.Destroy(lineRenderer.gameObject);
 			lineRenderer = null;
 		}
 	}
 
 	public void SetVisible()
 	{
-		if (lineRenderer != null)
+		if ((Object)lineRenderer != (Object)null)
 		{
-			lineRenderer.set_enabled(true);
+			lineRenderer.enabled = true;
 		}
 	}
 
 	public void SetInvisible()
 	{
-		if (lineRenderer != null)
+		if ((Object)lineRenderer != (Object)null)
 		{
-			lineRenderer.set_enabled(false);
+			lineRenderer.enabled = false;
 		}
 	}
 
 	public void SetPositonStart(Vector3 pos)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		if (lineRenderer != null)
+		if ((Object)lineRenderer != (Object)null)
 		{
 			lineRenderer.SetPosition(0, pos);
 		}
@@ -59,8 +52,7 @@ public class SnatchLineRenderer
 
 	public void SetPositionEnd(Vector3 pos)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		if (lineRenderer != null)
+		if ((Object)lineRenderer != (Object)null)
 		{
 			lineRenderer.SetPosition(1, pos);
 		}

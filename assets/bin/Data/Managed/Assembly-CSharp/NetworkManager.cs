@@ -73,19 +73,17 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 
 	public void Request<T>(string path, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(RequestCoroutine(path, call_back, get_param, token));
+		StartCoroutine(RequestCoroutine(path, call_back, get_param, token));
 	}
 
 	public IEnumerator RequestCoroutine<T>(string path, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		yield return (object)this.StartCoroutine(this.RequestFormCoroutine<T>(path, null, call_back, get_param, token));
+		yield return (object)StartCoroutine(this.RequestFormCoroutine<T>(path, (WWWForm)null, call_back, get_param, token));
 	}
 
 	public void Request<T1, T2>(string path, T1 postData, Action<T2> call_back, string get_param = "", string token = "") where T2 : BaseModel, new()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(RequestCoroutine(path, postData, call_back, get_param, token));
+		StartCoroutine(RequestCoroutine(path, postData, call_back, get_param, token));
 	}
 
 	public IEnumerator RequestCoroutine<T1, T2>(string path, T1 postData, Action<T2> call_back, string get_param = "", string token = "") where T2 : BaseModel, new()
@@ -97,22 +95,19 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 		string encrypt_data = Cipher.EncryptRJ128(key, "yCNBH$$rCNGvC+#f", data);
 		string data_to_send = string.IsNullOrEmpty(encrypt_data) ? string.Empty : encrypt_data;
 		form.AddField("data", data_to_send);
-		yield return (object)this.StartCoroutine(this.RequestFormCoroutine<T2>(path, form, call_back, get_param, token));
+		yield return (object)StartCoroutine(this.RequestFormCoroutine<T2>(path, form, call_back, get_param, token));
 	}
 
 	public void RequestForm<T>(string path, WWWForm form, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(RequestFormCoroutine(path, form, call_back, get_param, token));
+		StartCoroutine(RequestFormCoroutine(path, form, call_back, get_param, token));
 	}
 
-	public unsafe IEnumerator RequestFormCoroutine<T>(string path, WWWForm form, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
+	public IEnumerator RequestFormCoroutine<T>(string path, WWWForm form, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		if (_003CRequestFormCoroutine_003Ec__Iterator21A<T>._003C_003Ef__am_0024cacheD == null)
+		yield return (object)StartCoroutine(this.Request_Impl<T>(path, form, call_back, (Action)delegate
 		{
-			_003CRequestFormCoroutine_003Ec__Iterator21A<T>._003C_003Ef__am_0024cacheD = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		yield return (object)this.StartCoroutine(this.Request_Impl<T>(path, form, call_back, _003CRequestFormCoroutine_003Ec__Iterator21A<T>._003C_003Ef__am_0024cacheD, get_param, token));
+		}, get_param, token));
 	}
 
 	private string GetUrl(string path, string get_param)
@@ -127,9 +122,9 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 	private Dictionary<string, string> GetHeader(WWWForm form)
 	{
 		Dictionary<string, string> dictionary = new Dictionary<string, string>();
-		foreach (string key in form.get_headers().Keys)
+		foreach (string key in form.headers.Keys)
 		{
-			dictionary.Add(key, form.get_headers()[key].ToString());
+			dictionary.Add(key, form.headers[key].ToString());
 		}
 		AccountManager.Account account = MonoBehaviourSingleton<AccountManager>.I.account;
 		dictionary["Cookie"] = (account.token ?? string.Empty);
@@ -178,13 +173,12 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 		string url = GetUrl(path, get_param);
 		CrashlyticsReporter.SetAPIRequest(url);
 		CrashlyticsReporter.SetAPIRequestStatus(true);
-		byte[] data = form.get_data();
+		byte[] data = form.data;
 		Dictionary<string, string> headers = GetHeader(form);
 		string msg = GenerateErrorMsg(Error.Unknown);
 		AccountManager.Account account = MonoBehaviourSingleton<AccountManager>.I.account;
-		lastRequestTime = Time.get_time();
-		WWW www = new WWW(url, data, headers);
-		try
+		lastRequestTime = Time.time;
+		using (WWW www = new WWW(url, data, headers))
 		{
 			WWWInfo wwwinfo = new WWWInfo(www, false, false);
 			wwwInfos.Add(wwwinfo);
@@ -197,18 +191,18 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 					msg = GenerateErrorMsg(Error.TimeOut);
 					break;
 				}
-				if (!string.IsNullOrEmpty(www.get_error()))
+				if (!string.IsNullOrEmpty(www.error))
 				{
-					string txt = www.get_error();
+					string txt = www.error;
 					int httpError = 0;
 					msg = ((!int.TryParse(txt.Substring(0, 3), out httpError)) ? GenerateErrorMsg(Error.DetectHttpError) : GenerateErrorMsg((Error)(200000 + httpError)));
 					break;
 				}
-				if (www.get_isDone())
+				if (www.isDone)
 				{
-					www.get_text();
+					string text = www.text;
 					string signature = null;
-					foreach (KeyValuePair<string, string> responseHeader in www.get_responseHeaders())
+					foreach (KeyValuePair<string, string> responseHeader in www.responseHeaders)
 					{
 						string headerName = responseHeader.Key.ToLower();
 						if (string.IsNullOrEmpty(tokenTemp) && headerName == "set-cookie")
@@ -239,7 +233,7 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 					try
 					{
 						string key = (!string.IsNullOrEmpty(account.userHash)) ? account.userHash : "ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,";
-						gzippedResponse = Cipher.DecryptRJ128Byte(key, "yCNBH$$rCNGvC+#f", www.get_text());
+						gzippedResponse = Cipher.DecryptRJ128Byte(key, "yCNBH$$rCNGvC+#f", www.text);
 					}
 					catch (Exception exc4)
 					{
@@ -257,7 +251,7 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 						isDecryptSuccess2 = true;
 						try
 						{
-							gzippedResponse = Cipher.DecryptRJ128Byte("ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,", "yCNBH$$rCNGvC+#f", www.get_text());
+							gzippedResponse = Cipher.DecryptRJ128Byte("ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,", "yCNBH$$rCNGvC+#f", www.text);
 						}
 						catch (Exception exc3)
 						{
@@ -339,10 +333,6 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 			}
 			wwwInfos.Remove(wwwinfo);
 		}
-		finally
-		{
-			((IDisposable)www)?.Dispose();
-		}
 		yield return (object)new WaitForEndOfFrame();
 		yield return (object)new WaitForEndOfFrame();
 		yield return (object)new WaitForEndOfFrame();
@@ -364,7 +354,7 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 				}
 				finally
 				{
-					((_003CRequest_Impl_003Ec__Iterator21B<T>)/*Error near IL_0853: stateMachine*/)._003C_003E__Finally0();
+					((_003CRequest_Impl_003Ec__Iterator21D<T>)/*Error near IL_0853: stateMachine*/)._003C_003E__Finally0();
 				}
 			}
 		}
@@ -372,7 +362,7 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 		{
 			Debug.LogException(exp);
 			CrashlyticsReporter.SetAPIRequestStatus(false);
-			call_fatal.Invoke();
+			call_fatal();
 		}
 	}
 

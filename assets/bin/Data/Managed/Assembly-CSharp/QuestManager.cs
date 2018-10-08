@@ -605,7 +605,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		}
 	}
 
-	private unsafe void UpdatePortalPointForExplore(int portalId, int point, int x, int z)
+	private void UpdatePortalPointForExplore(int portalId, int point, int x, int z)
 	{
 		ExplorePortalPoint portal = explore.GetPortalData(portalId);
 		if (portal != null)
@@ -639,8 +639,27 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 					if (fieldPortal == null || fieldPortal.point < portalPoint)
 					{
 						SetExplorePortalPoint(portalId, point);
-						_003CUpdatePortalPointForExplore_003Ec__AnonStorey665 _003CUpdatePortalPointForExplore_003Ec__AnonStorey;
-						MonoBehaviourSingleton<FieldManager>.I.SendFieldQuestOpenPortal(portalId, new Action<bool, Error>((object)_003CUpdatePortalPointForExplore_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+						MonoBehaviourSingleton<FieldManager>.I.SendFieldQuestOpenPortal(portalId, delegate(bool succeeded, Error error)
+						{
+							if (succeeded)
+							{
+								if (!PlayPortalPointEffect(portalInfo, point - prevPoint, x, z) && ShouldShowPortalOpenNotification())
+								{
+									string text3 = string.Empty;
+									FieldMapTable.FieldMapTableData fieldMapData2 = Singleton<FieldMapTable>.I.GetFieldMapData(portal.portalData.dstMapID);
+									if (fieldMapData2 != null)
+									{
+										text3 = fieldMapData2.mapName;
+									}
+									string text4 = StringTable.Format(STRING_CATEGORY.IN_GAME, 6002u, text3);
+									UIInGamePopupDialog.PushOpen(text4, false, 1.8f);
+								}
+							}
+							else
+							{
+								RollbackExplorePortalPoint(portalId, prevPoint);
+							}
+						});
 					}
 					else
 					{
@@ -976,7 +995,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		{
 			ExplorePlayerStatus explorePlayerStatus = enabledPlayerStatusList[i];
 			CoopClient coopClient = explorePlayerStatus.coopClient;
-			if (!(null == coopClient))
+			if (!((UnityEngine.Object)null == (UnityEngine.Object)coopClient))
 			{
 				int num = coopClient.slotIndex;
 				if (flag)
@@ -1009,7 +1028,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			return -1;
 		}
 		CoopClient coopClient = enabledPlayerStatusList[statusIndex].coopClient;
-		if (null == coopClient)
+		if ((UnityEngine.Object)null == (UnityEngine.Object)coopClient)
 		{
 			return -1;
 		}
@@ -1342,7 +1361,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 
 	public bool IsTutorialCurrentQuest()
 	{
-		if (!IsValidInGame() || !MonoBehaviourSingleton<UserInfoManager>.IsValid() || !MonoBehaviourSingleton<CoopManager>.IsValid() || MonoBehaviourSingleton<CoopManager>.I.coopMyClient == null)
+		if (!IsValidInGame() || !MonoBehaviourSingleton<UserInfoManager>.IsValid() || !MonoBehaviourSingleton<CoopManager>.IsValid() || (UnityEngine.Object)MonoBehaviourSingleton<CoopManager>.I.coopMyClient == (UnityEngine.Object)null)
 		{
 			return false;
 		}
@@ -1488,7 +1507,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		int questId = (int)tableData.questID;
 		if (questId != questData.questId)
 		{
-			Debug.LogWarning((object)("Network.QuestDataとQuestTableDataのクエストIDが一致していません questData = " + questData.questId + " tableData = " + questId));
+			Debug.LogWarning("Network.QuestDataとQuestTableDataのクエストIDが一致していません questData = " + questData.questId + " tableData = " + questId);
 		}
 		ClearStatusQuest clearStatusQuest = this.clearStatusQuest.Find((ClearStatusQuest data) => data.questId == questId);
 		if (clearStatusQuest != null && clearStatusQuest.questStatus > 0)
@@ -1653,7 +1672,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		return bingoEventList;
 	}
 
-	public unsafe List<Network.EventData> GetValidBingoDataListInSection()
+	public List<Network.EventData> GetValidBingoDataListInSection()
 	{
 		if (!MonoBehaviourSingleton<GameSceneManager>.IsValid())
 		{
@@ -1668,8 +1687,9 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		{
 			excludeLocationType = EVENT_DISPLAY_LOCATION_TYPE.FIELD;
 		}
-		_003CGetValidBingoDataListInSection_003Ec__AnonStorey673 _003CGetValidBingoDataListInSection_003Ec__AnonStorey;
-		return bingoEventList.Where(new Func<Network.EventData, bool>((object)_003CGetValidBingoDataListInSection_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList();
+		return (from e in bingoEventList
+		where e.displayLocationType != (int)excludeLocationType
+		select e).ToList();
 	}
 
 	public bool IsBingoPlayableEventExist()
@@ -1708,16 +1728,12 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		return GenerateQuestToken(DateTime.Now.GetHashCode());
 	}
 
-	public unsafe static string GenerateQuestToken(int key)
+	public static string GenerateQuestToken(int key)
 	{
 		byte[] bytes = Encoding.UTF8.GetBytes(key.ToString());
-		byte[] array = MD5.Create().ComputeHash(bytes);
-		byte[] source = array;
-		if (_003C_003Ef__am_0024cache1E == null)
-		{
-			_003C_003Ef__am_0024cache1E = new Func<byte, string>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		return string.Concat(source.Select<byte, string>(_003C_003Ef__am_0024cache1E).ToArray());
+		byte[] source = MD5.Create().ComputeHash(bytes);
+		return string.Concat((from i in source
+		select i.ToString("x2")).ToArray());
 	}
 
 	public void SendQuestStart(int questId, int equip_set_no, bool free_join, Action<bool> call_back)
@@ -1757,7 +1773,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			case Error.None:
 				obj = true;
 				startData = ret.result;
-				startTime = Time.get_time();
+				startTime = Time.time;
 				MonoBehaviourSingleton<GoWrapManager>.I.trackQuestStart(currentQuestID);
 				break;
 			}
@@ -1772,7 +1788,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		{
 			num = (float)MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.QUEST_LOCK_SEC;
 		}
-		float num2 = Time.get_time() - startTime;
+		float num2 = Time.time - startTime;
 		if (num2 < num)
 		{
 			return false;
@@ -1851,7 +1867,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	{
 		if (startData == null)
 		{
-			call_back.Invoke(false, Error.Unknown);
+			call_back(false, Error.Unknown);
 		}
 		else
 		{
@@ -1864,12 +1880,12 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			}
 			Protocol.Send(QuestCompleteTrialModel.URL, requestSendForm, delegate(QuestCompleteTrialModel ret)
 			{
-				bool flag = false;
+				bool arg = false;
 				if (ret.Error == Error.None)
 				{
-					flag = true;
+					arg = true;
 				}
-				call_back.Invoke(flag, ret.Error);
+				call_back(arg, ret.Error);
 			}, string.Empty);
 		}
 	}
@@ -1878,7 +1894,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	{
 		if (startData == null)
 		{
-			call_back.Invoke(false, Error.Unknown);
+			call_back(false, Error.Unknown);
 		}
 		else
 		{
@@ -1926,7 +1942,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				requestSendForm.logs = logs;
 				requestSendForm.enemyHp = MonoBehaviourSingleton<InGameRecorder>.I.GetTotalEnemyHP();
 			}
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null)
 			{
 				requestSendForm.actioncount = MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.GetTaskCount();
 				MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.Clear();
@@ -1963,7 +1979,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			}
 			Protocol.Send(QuestCompleteModel.URL, requestSendForm, delegate(QuestCompleteModel ret)
 			{
-				bool flag = false;
+				bool arg = false;
 				if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
 				{
 					MonoBehaviourSingleton<UIPlayerStatus>.I.SetHGPBoostUpdatePermitFlag(true);
@@ -1975,7 +1991,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				switch (ret.Error)
 				{
 				case Error.None:
-					flag = true;
+					arg = true;
 					SetReciveCompleteData(ret.result, mClear, mission_clear_status);
 					resultUserCollection.SetPartyFollowInfo(ret.result.friend);
 					if (MonoBehaviourSingleton<PartyManager>.IsValid())
@@ -2001,7 +2017,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 					MonoBehaviourSingleton<GoWrapManager>.I.trackQuestEnd(currentQuestID, true);
 					break;
 				}
-				call_back.Invoke(flag, ret.Error);
+				call_back(arg, ret.Error);
 			}, string.Empty);
 		}
 	}
@@ -2025,7 +2041,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			requestSendForm.logs = logs;
 			requestSendForm.enemyHp = MonoBehaviourSingleton<InGameRecorder>.I.GetTotalEnemyHP();
 		}
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null)
 		{
 			if (!IsValidTrial())
 			{
@@ -2068,12 +2084,12 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		requestSendForm.crystalCL = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.Crystal;
 		Protocol.Send(QuestContinueModel.URL, requestSendForm, delegate(QuestContinueModel ret)
 		{
-			bool flag = false;
+			bool arg = false;
 			if (ret.Error == Error.None)
 			{
-				flag = true;
+				arg = true;
 			}
-			call_back.Invoke(flag, ret.Error);
+			call_back(arg, ret.Error);
 		}, string.Empty);
 	}
 
@@ -2083,12 +2099,12 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		requestSendForm.eventId = eventId;
 		Protocol.Send(QuestReadEventStoryModel.URL, requestSendForm, delegate(QuestReadEventStoryModel ret)
 		{
-			bool flag = false;
+			bool arg = false;
 			if (ret.Error == Error.None)
 			{
-				flag = true;
+				arg = true;
 			}
-			call_back.Invoke(flag, ret.Error);
+			call_back(arg, ret.Error);
 		}, string.Empty);
 	}
 
@@ -2096,7 +2112,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	{
 		if (startData == null)
 		{
-			call_back.Invoke(false, Error.Unknown);
+			call_back(false, Error.Unknown);
 		}
 		else
 		{
@@ -2127,7 +2143,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				requestSendForm.logs = logs;
 				requestSendForm.enemyHp = MonoBehaviourSingleton<InGameRecorder>.I.GetTotalEnemyHP();
 			}
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null)
 			{
 				requestSendForm.actioncount = MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.GetTaskCount();
 				MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.Clear();
@@ -2140,18 +2156,18 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			List<int> mission_clear_status = GetMissionClearStatus();
 			Protocol.Send(QuestRushProgressModel.URL, requestSendForm, delegate(QuestRushProgressModel ret)
 			{
-				bool flag = false;
+				bool arg = false;
 				switch (ret.Error)
 				{
 				case Error.None:
-					flag = true;
+					arg = true;
 					MonoBehaviourSingleton<InGameManager>.I.AddWaveResult(ret.result.reward, ret.result.pointEvent, ret.result.pointShop);
 					MonoBehaviourSingleton<InGameProgress>.I.SetRushRemainTime(ret.result.remainSec);
 					MonoBehaviourSingleton<InGameProgress>.I.SetRushTimeBonus(ret.result.plusSec);
 					SetReciveCompleteData(null, mClear, mission_clear_status);
 					break;
 				}
-				call_back.Invoke(flag, ret.Error);
+				call_back(arg, ret.Error);
 			}, string.Empty);
 		}
 	}
@@ -2167,7 +2183,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			{
 				obj = true;
 				startData = ret.result;
-				startTime = Time.get_time();
+				startTime = Time.time;
 			}
 			callBack(obj);
 		}, string.Empty);
@@ -2177,22 +2193,22 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	{
 		if (startData == null)
 		{
-			callback.Invoke(false, Error.Unknown);
+			callback(false, Error.Unknown);
 		}
 		else
 		{
 			requestData.qt = startData.qt;
 			Protocol.Send(ArenaProgressModel.URL, requestData, delegate(ArenaProgressModel ret)
 			{
-				bool flag = false;
+				bool arg = false;
 				if (ret.Error == Error.None)
 				{
-					flag = true;
+					arg = true;
 					MonoBehaviourSingleton<InGameManager>.I.AddArenaWaveResult(ret.result.reward, ret.result.pointShop);
 					MonoBehaviourSingleton<InGameProgress>.I.SetArenaRemainTime(ret.result.remainMilliSec);
 					MonoBehaviourSingleton<InGameProgress>.I.SetArenaTimeBonus(ret.result.plusSec);
 				}
-				callback.Invoke(flag, ret.Error);
+				callback(arg, ret.Error);
 			}, string.Empty);
 		}
 	}
@@ -2201,11 +2217,11 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	{
 		if (startData == null)
 		{
-			callBack.Invoke(false, Error.Unknown);
+			callBack(false, Error.Unknown);
 		}
 		else if (!MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
-			callBack.Invoke(false, Error.Unknown);
+			callBack(false, Error.Unknown);
 		}
 		else
 		{
@@ -2218,13 +2234,13 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			}
 			Protocol.Send(ArenaCompleteModel.URL, requestSendForm, delegate(ArenaCompleteModel ret)
 			{
-				bool flag = false;
+				bool arg = false;
 				if (ret.Error == Error.None)
 				{
-					flag = true;
+					arg = true;
 					arenaCompData = ret.result;
 				}
-				callBack.Invoke(flag, ret.Error);
+				callBack(arg, ret.Error);
 			}, string.Empty);
 		}
 	}
@@ -2257,12 +2273,12 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		requestSendForm.eventId = eventId;
 		Protocol.Send(ArenaUserRecordModel.URL, requestSendForm, delegate(ArenaUserRecordModel ret)
 		{
-			bool flag = false;
+			bool arg = false;
 			if (ret.Error == Error.None)
 			{
-				flag = true;
+				arg = true;
 			}
-			callBack.Invoke(flag, ret.result);
+			callBack(arg, ret.result);
 		}, string.Empty);
 	}
 
@@ -2352,13 +2368,13 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		}
 		Protocol.Send(QuestChallengeListModel.URL, send, delegate(QuestChallengeListModel ret)
 		{
-			bool flag = false;
+			bool arg = false;
 			if (ret.Error == Error.None)
 			{
-				flag = true;
+				arg = true;
 				UpdateChallengeList(ret.result.shadow);
 			}
-			call_back.Invoke(flag, ret.Error);
+			call_back(arg, ret.Error);
 		}, string.Empty);
 	}
 
@@ -2398,12 +2414,12 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		requestSendForm.enemyId = enemyId;
 		Protocol.Send(QuestChallengeEnemyModel.URL, requestSendForm, delegate(QuestChallengeEnemyModel ret)
 		{
-			bool flag = false;
+			bool arg = false;
 			if (ret.Error == Error.None)
 			{
-				flag = true;
+				arg = true;
 			}
-			call_back.Invoke(flag, ret.result);
+			call_back(arg, ret.result);
 		}, string.Empty);
 	}
 
@@ -2421,7 +2437,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			sendForm.rarityBit = PlayerPrefs.GetInt("CHALLENGE_SEARCH_RAIRTY_KEY", 8388607);
 			sendForm.elementBit = PlayerPrefs.GetInt("CHALLENGE_SEARCH_ELEMENT_KEY", 8388607);
 			sendForm.enemyLevel = PlayerPrefs.GetInt("CHALLENGE_SEARCH_ENEMY_LEVEL_KEY", userLevel);
-			sendForm.targetEnemySpeciesName = PlayerPrefs.GetString("CHALLENGE_SEARCH_SPECIES_KEY", (string)null);
+			sendForm.targetEnemySpeciesName = PlayerPrefs.GetString("CHALLENGE_SEARCH_SPECIES_KEY", null);
 		}
 	}
 

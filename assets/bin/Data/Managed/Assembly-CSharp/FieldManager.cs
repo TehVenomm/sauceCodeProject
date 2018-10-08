@@ -43,13 +43,13 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 
 	private CurrentFieldData current = new CurrentFieldData();
 
-	private Vector3 cameraOffsetPortraitPos = Vector3.get_zero();
+	private Vector3 cameraOffsetPortraitPos = Vector3.zero;
 
-	private Quaternion cameraOffsetPortraitRot = Quaternion.get_identity();
+	private Quaternion cameraOffsetPortraitRot = Quaternion.identity;
 
-	private Vector3 cameraOffsetLandscapePos = Vector3.get_zero();
+	private Vector3 cameraOffsetLandscapePos = Vector3.zero;
 
-	private Quaternion cameraOffsetLandscapeRot = Quaternion.get_identity();
+	private Quaternion cameraOffsetLandscapeRot = Quaternion.identity;
 
 	public List<int> fieldGatherPointIdList = new List<int>();
 
@@ -99,8 +99,6 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 	{
 		get
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid() && !MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
 			{
 				return cameraOffsetLandscapePos;
@@ -113,8 +111,6 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 	{
 		get
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid() && !MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
 			{
 				return cameraOffsetLandscapeRot;
@@ -133,14 +129,6 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 
 	public FieldManager()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		fieldData = new FieldModel.Param();
 		noticeText = string.Empty;
 	}
@@ -279,28 +267,6 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 
 	public void SetCurrentFieldMapID(uint map_id, float map_x, float map_z, float map_dir)
 	{
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
 		current = new CurrentFieldData();
 		current.fieldTransitionInfo.portalID = 0u;
 		current.fieldTransitionInfo.mapID = map_id;
@@ -318,8 +284,8 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		else
 		{
 			current.mapData = null;
-			cameraOffsetPortraitPos = (cameraOffsetLandscapePos = Vector3.get_zero());
-			cameraOffsetPortraitRot = (cameraOffsetLandscapeRot = Quaternion.get_identity());
+			cameraOffsetPortraitPos = (cameraOffsetLandscapePos = Vector3.zero);
+			cameraOffsetPortraitRot = (cameraOffsetLandscapeRot = Quaternion.identity);
 		}
 		current.isValidBoss = false;
 		List<FieldMapTable.EnemyPopTableData> enemyPopList = Singleton<FieldMapTable>.I.GetEnemyPopList(currentMapID);
@@ -585,7 +551,7 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 				{
 					fieldGatherGrowthList = ret.result.growth;
 				}
-				if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.knockDownRaidBoss != null)
+				if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.knockDownRaidBoss != (UnityEngine.Object)null)
 				{
 					MonoBehaviourSingleton<UIManager>.I.knockDownRaidBoss.SetRaidBossHp(ret.result.raidBossHp);
 				}
@@ -705,7 +671,7 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 			FieldLeaveModel.RequestSendForm requestSendForm = new FieldLeaveModel.RequestSendForm();
 			requestSendForm.toHome = 0;
 			requestSendForm.retire = 0;
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null)
 			{
 				requestSendForm.actioncount = MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.GetTaskCount();
 				MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.Clear();
@@ -755,8 +721,8 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		requestSendForm.crystalCL = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.Crystal;
 		Protocol.Send(FieldContinueModel.URL, requestSendForm, delegate(FieldContinueModel ret)
 		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			call_back.Invoke(flag, ret.Error);
+			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
+			call_back(arg, ret.Error);
 		}, string.Empty);
 	}
 
@@ -764,8 +730,8 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 	{
 		Protocol.Send(FieldCharaListModel.URL, delegate(FieldCharaListModel ret)
 		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			call_back.Invoke(flag, ret.result);
+			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
+			call_back(arg, ret.result);
 		}, string.Empty);
 	}
 
@@ -775,8 +741,8 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		requestSendForm.pId = pointId;
 		Protocol.Send(FieldGatherModel.URL, requestSendForm, delegate(FieldGatherModel ret)
 		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			call_back.Invoke(flag, ret.result.reward);
+			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
+			call_back(arg, ret.result.reward);
 		}, string.Empty);
 	}
 
@@ -788,8 +754,8 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		requestSendForm.isPop = isPop;
 		Protocol.Send(FieldFishModel.URL, requestSendForm, delegate(FieldFishModel ret)
 		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			call_back.Invoke(flag, ret.result.reward);
+			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
+			call_back(arg, ret.result.reward);
 		}, string.Empty);
 	}
 
@@ -799,8 +765,8 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		requestSendForm.portalId = portalId;
 		Protocol.Send(FieldQuestOpenPortalModel.URL, requestSendForm, delegate(FieldQuestOpenPortalModel ret)
 		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			call_back.Invoke(flag, ret.Error);
+			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
+			call_back(arg, ret.Error);
 		}, string.Empty);
 	}
 
@@ -825,7 +791,7 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 					MonoBehaviourSingleton<InGameProgress>.I.CheckGatherPointList();
 				}
 			}
-			call_back.Invoke(flag, ret.Error);
+			call_back(flag, ret.Error);
 		}, string.Empty);
 	}
 

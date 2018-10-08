@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class NPCFacial
+public class NPCFacial : MonoBehaviour
 {
 	public enum TYPE
 	{
@@ -89,25 +89,20 @@ public class NPCFacial
 		set;
 	}
 
-	public NPCFacial()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		if (faceRenderer != null)
+		if ((UnityEngine.Object)faceRenderer != (UnityEngine.Object)null)
 		{
-			Material[] materials = faceRenderer.get_materials();
-			if (eyeMaterial != null)
+			Material[] materials = faceRenderer.materials;
+			if ((UnityEngine.Object)eyeMaterial != (UnityEngine.Object)null)
 			{
-				eyeMaterial = Array.Find(materials, (Material o) => o.get_name().StartsWith(eyeMaterial.get_name()));
+				eyeMaterial = Array.Find(materials, (Material o) => o.name.StartsWith(eyeMaterial.name));
 			}
-			if (mouthMaterial != null)
+			if ((UnityEngine.Object)mouthMaterial != (UnityEngine.Object)null)
 			{
-				mouthMaterial = Array.Find(materials, (Material o) => o.get_name().StartsWith(mouthMaterial.get_name()));
+				mouthMaterial = Array.Find(materials, (Material o) => o.name.StartsWith(mouthMaterial.name));
 			}
-			if (eyeMaterial != null && eyeTextures[1] != null)
+			if ((UnityEngine.Object)eyeMaterial != (UnityEngine.Object)null && (UnityEngine.Object)eyeTextures[1] != (UnityEngine.Object)null)
 			{
 				enableEyeBlick = true;
 				ResetEyeBlinkTime();
@@ -124,13 +119,9 @@ public class NPCFacial
 
 	private void UpdateAnim()
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-		if (!(animNode == null) && enableAnim)
+		if (!((UnityEngine.Object)animNode == (UnityEngine.Object)null) && enableAnim)
 		{
-			Vector3 localPosition = animNode.get_localPosition();
+			Vector3 localPosition = animNode.localPosition;
 			TYPE tYPE = (TYPE)(localPosition.y * 100f + 0.001f);
 			TYPE tYPE2 = (TYPE)(localPosition.z * 100f + 0.001f);
 			if (lastAnimEyeType != tYPE && Mathf.Abs(lastAnimValue.y - localPosition.y) < 0.0001f)
@@ -163,16 +154,15 @@ public class NPCFacial
 
 	private void UpdateEyeBlink()
 	{
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		if (!(faceRenderer == null) && enableEyeBlick && eyeType == TYPE.NORMAL)
+		if (!((UnityEngine.Object)faceRenderer == (UnityEngine.Object)null) && enableEyeBlick && eyeType == TYPE.NORMAL)
 		{
-			eyeBlinkTime -= Time.get_deltaTime();
+			eyeBlinkTime -= Time.deltaTime;
 			if (eyeBlinkTime <= 0f)
 			{
-				if (eyeMaterial.get_mainTexture() != eyeTextures[1])
+				if ((UnityEngine.Object)eyeMaterial.mainTexture != (UnityEngine.Object)eyeTextures[1])
 				{
 					SetTexture(eyeMaterial, eyeTextures, TYPE.CLOSE);
-					eyeBlinkTime = Random.Range(0.1f, 0.3f);
+					eyeBlinkTime = UnityEngine.Random.Range(0.1f, 0.3f);
 				}
 				else
 				{
@@ -188,20 +178,20 @@ public class NPCFacial
 		if (textures != null && textures.Length != 0)
 		{
 			int num = (int)type;
-			if (num < 0 || num >= textures.Length || textures[num] == null)
+			if (num < 0 || num >= textures.Length || (UnityEngine.Object)textures[num] == (UnityEngine.Object)null)
 			{
 				num = 0;
 			}
-			Texture val = textures[num];
-			if (!(val == null))
+			Texture texture = textures[num];
+			if (!((UnityEngine.Object)texture == (UnityEngine.Object)null))
 			{
-				material.set_mainTexture(val);
+				material.mainTexture = texture;
 			}
 		}
 	}
 
 	private void ResetEyeBlinkTime()
 	{
-		eyeBlinkTime = Random.Range(3f, 6f);
+		eyeBlinkTime = UnityEngine.Random.Range(3f, 6f);
 	}
 }

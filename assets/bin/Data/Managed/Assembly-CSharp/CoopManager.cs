@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class CoopManager : MonoBehaviourSingleton<CoopManager>
 {
 	public const int ID_ERROR = -1;
@@ -76,14 +78,10 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 
 	protected override void Awake()
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Expected O, but got Unknown
 		base.Awake();
-		coopRoom = this.get_gameObject().AddComponent<CoopRoom>();
-		coopStage = this.get_gameObject().AddComponent<CoopStage>();
-		coopMyClient = (CoopMyClient)Utility.CreateGameObjectAndComponent("CoopMyClient", this.get_transform(), -1);
+		coopRoom = base.gameObject.AddComponent<CoopRoom>();
+		coopStage = base.gameObject.AddComponent<CoopStage>();
+		coopMyClient = (CoopMyClient)Utility.CreateGameObjectAndComponent("CoopMyClient", base.transform, -1);
 	}
 
 	private void Start()
@@ -115,11 +113,11 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 
 	public void OnStageChangeInterval()
 	{
-		if (coopRoom != null)
+		if ((Object)coopRoom != (Object)null)
 		{
 			coopRoom.OnStageChangeInterval();
 		}
-		if (coopStage != null)
+		if ((Object)coopStage != (Object)null)
 		{
 			coopStage.OnStageChangeInterval();
 		}
@@ -131,11 +129,11 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 
 	public void OnQuestSeriesInterval()
 	{
-		if (coopRoom != null)
+		if ((Object)coopRoom != (Object)null)
 		{
 			coopRoom.OnQuestSeriesInterval();
 		}
-		if (coopStage != null)
+		if ((Object)coopStage != (Object)null)
 		{
 			coopStage.OnQuestSeriesInterval();
 		}
@@ -178,7 +176,7 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 
 	public int GetPartyOwnerPlayerID()
 	{
-		if (coopRoom == null || coopRoom.clients == null)
+		if ((Object)coopRoom == (Object)null || coopRoom.clients == null)
 		{
 			return -1;
 		}
@@ -187,7 +185,7 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 			return -1;
 		}
 		CoopClient coopClient = coopRoom.clients.FindPartyOwner();
-		if (coopClient == null)
+		if ((Object)coopClient == (Object)null)
 		{
 			return -1;
 		}
@@ -203,7 +201,7 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 			nonplayerIDCount = 0;
 		}
 		nonplayerIDCount++;
-		if (MonoBehaviourSingleton<StageObjectManager>.I.FindNonPlayer(num) != null)
+		if ((Object)MonoBehaviourSingleton<StageObjectManager>.I.FindNonPlayer(num) != (Object)null)
 		{
 			return CreateUniqueNonPlayerID();
 		}
@@ -227,7 +225,7 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 		if (packet.destObjectId == 1003)
 		{
 			CoopClient coopClient = coopRoom.clients.FindByClientId(packet.fromClientId);
-			if (coopClient != null)
+			if ((Object)coopClient != (Object)null)
 			{
 				return coopClient.packetReceiver;
 			}
@@ -235,11 +233,11 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.FindObject(packet.destObjectId);
-			if (stageObject == null)
+			if ((Object)stageObject == (Object)null)
 			{
 				stageObject = MonoBehaviourSingleton<StageObjectManager>.I.FindCache(packet.destObjectId);
 			}
-			if (stageObject != null)
+			if ((Object)stageObject != (Object)null)
 			{
 				return stageObject.packetReceiver;
 			}
@@ -250,7 +248,7 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 	public bool PacketRelay(CoopPacket packet)
 	{
 		PacketReceiver packetReceiver = GetPacketReceiver(packet);
-		if (packetReceiver != null)
+		if ((Object)packetReceiver != (Object)null)
 		{
 			packetReceiver.Set(packet);
 			return true;
@@ -261,7 +259,7 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 	public void ForcePacketProcess(CoopPacket packet)
 	{
 		PacketReceiver packetReceiver = GetPacketReceiver(packet);
-		if (packetReceiver != null)
+		if ((Object)packetReceiver != (Object)null)
 		{
 			packetReceiver.ForcePacketProcess(packet);
 		}

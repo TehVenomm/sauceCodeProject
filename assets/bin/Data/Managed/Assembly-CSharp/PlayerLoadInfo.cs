@@ -204,14 +204,12 @@ public class PlayerLoadInfo
 
 	public void SetFace(int sex, int face_type_id, int skin_color_id)
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		faceModelID = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetFaceModelID(sex, face_type_id);
 		skinColor = NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetSkinColor(skin_color_id));
 	}
 
 	public void SetHair(int sex, int hair_style_id, int hair_color_id)
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		hairModelID = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetHairModelID(sex, hair_style_id);
 		hairColor = NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetHairColor(hair_color_id));
 	}

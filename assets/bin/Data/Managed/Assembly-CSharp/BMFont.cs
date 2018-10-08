@@ -17,8 +17,8 @@ public class BMFont
 	[HideInInspector]
 	private int mWidth;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private int mHeight;
 
 	[SerializeField]

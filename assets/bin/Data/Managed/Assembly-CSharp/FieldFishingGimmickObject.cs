@@ -36,23 +36,14 @@ public class FieldFishingGimmickObject : FieldGatherGimmickObject
 
 	public override bool StartAction(Player player, bool isSend)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 		if (!base.StartAction(player, isSend))
 		{
 			return false;
 		}
-		Vector3 val = player._transform.get_position() - m_transform.get_position();
-		if (val.get_sqrMagnitude() < sqlRadius)
+		Vector3 vector = player._transform.position - m_transform.position;
+		if (vector.sqrMagnitude < sqlRadius)
 		{
-			player._transform.set_position(m_transform.get_position() + val.get_normalized() * radius * 0.9f);
+			player._transform.position = m_transform.position + vector.normalized * radius * 0.9f;
 		}
 		return true;
 	}

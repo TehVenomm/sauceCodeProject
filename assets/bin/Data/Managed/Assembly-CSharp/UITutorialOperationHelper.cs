@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class UITutorialOperationHelper
+public class UITutorialOperationHelper : MonoBehaviour
 {
 	[Serializable]
 	public class TutorialCommon
@@ -66,24 +66,20 @@ public class UITutorialOperationHelper
 
 		public void ShowTapIcon(int index = 0)
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			tapIconSprite.get_gameObject().SetActive(true);
-			tapIconSprite.set_enabled(true);
-			tapCharacters[index].get_gameObject().SetActive(true);
-			tapCharacters[index].set_enabled(true);
+			tapIconSprite.gameObject.SetActive(true);
+			tapIconSprite.enabled = true;
+			tapCharacters[index].gameObject.SetActive(true);
+			tapCharacters[index].enabled = true;
 		}
 
 		public void HideTapIcon()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			tapIconSprite.get_gameObject().SetActive(false);
-			tapIconSprite.set_enabled(false);
+			tapIconSprite.gameObject.SetActive(false);
+			tapIconSprite.enabled = false;
 			for (int i = 0; i < tapCharacters.Length; i++)
 			{
-				tapCharacters[i].get_gameObject().SetActive(false);
-				tapCharacters[i].set_enabled(false);
+				tapCharacters[i].gameObject.SetActive(false);
+				tapCharacters[i].enabled = false;
 			}
 		}
 
@@ -111,8 +107,7 @@ public class UITutorialOperationHelper
 
 		public void ShowComplete()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			complete.get_gameObject().SetActive(true);
+			complete.gameObject.SetActive(true);
 			complete.Reset();
 			SoundManager.PlayOneShotUISE(SE_ID_COMPLETE);
 			complete.Play(true, null);
@@ -120,14 +115,12 @@ public class UITutorialOperationHelper
 
 		public void HideComplete()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			complete.get_gameObject().SetActive(false);
+			complete.gameObject.SetActive(false);
 		}
 
 		public void ShowGoodJob()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			good_job.get_gameObject().SetActive(true);
+			good_job.gameObject.SetActive(true);
 			good_job.Reset();
 			SoundManager.PlayOneShotUISE(SE_ID_COMPLETE);
 			good_job.Play(true, null);
@@ -135,14 +128,12 @@ public class UITutorialOperationHelper
 
 		public void HideGoodJob()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			good_job.get_gameObject().SetActive(false);
+			good_job.gameObject.SetActive(false);
 		}
 
 		public void ShowExcellent()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			excellent.get_gameObject().SetActive(true);
+			excellent.gameObject.SetActive(true);
 			excellent.Reset();
 			SoundManager.PlayOneShotUISE(SE_ID_COMPLETE);
 			excellent.Play(true, null);
@@ -150,14 +141,12 @@ public class UITutorialOperationHelper
 
 		public void HideExcellent()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			excellent.get_gameObject().SetActive(false);
+			excellent.gameObject.SetActive(false);
 		}
 
 		public void ShowSplendid()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			splendid.get_gameObject().SetActive(true);
+			splendid.gameObject.SetActive(true);
 			splendid.Reset();
 			SoundManager.PlayOneShotUISE(SE_ID_COMPLETE);
 			splendid.Play(true, null);
@@ -165,37 +154,31 @@ public class UITutorialOperationHelper
 
 		public void HideSplendid()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			splendid.get_gameObject().SetActive(false);
+			splendid.gameObject.SetActive(false);
 		}
 
 		public void ShowEnemyCount(int count)
 		{
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
 			CurrentEnemyShow = ((count <= CurrentEnemyShow) ? CurrentEnemyShow : count);
 			if (!OnShowEnemyCount)
 			{
 				if (count == 0)
 				{
-					enemy_counts[count].get_gameObject().SetActive(true);
+					enemy_counts[count].gameObject.SetActive(true);
 				}
 				else
 				{
-					if (enemy_counts[0].get_gameObject().get_activeInHierarchy())
+					if (enemy_counts[0].gameObject.activeInHierarchy)
 					{
-						enemy_counts[0].get_gameObject().SetActive(true);
+						enemy_counts[0].gameObject.SetActive(true);
 					}
 					OnShowEnemyCount = true;
-					enemy_counts[count].get_gameObject().SetActive(true);
+					enemy_counts[count].gameObject.SetActive(true);
 					enemy_counts[count].Reset();
 					enemy_counts[count].Play(true, delegate
 					{
-						//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 						OnShowEnemyCount = false;
-						enemy_counts[count].get_gameObject().SetActive(false);
+						enemy_counts[count].gameObject.SetActive(false);
 						if (CurrentEnemyShow > count)
 						{
 							ShowEnemyCount(count + 1);
@@ -207,10 +190,9 @@ public class UITutorialOperationHelper
 
 		public void HideEnemyCount()
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			for (int i = 0; i < enemy_counts.Length; i++)
 			{
-				enemy_counts[i].get_gameObject().SetActive(false);
+				enemy_counts[i].gameObject.SetActive(false);
 			}
 		}
 	}
@@ -374,7 +356,7 @@ public class UITutorialOperationHelper
 		private UISprite helpPicture3;
 
 		[SerializeField]
-		private Object logoAnimationPrefab;
+		private UnityEngine.Object logoAnimationPrefab;
 
 		private GameObject logoAnimationGameObject;
 
@@ -420,14 +402,12 @@ public class UITutorialOperationHelper
 
 		public void PlayLogoAnimation()
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Expected O, but got Unknown
-			logoAnimationGameObject = ResourceUtility.Realizes(logoAnimationPrefab, MonoBehaviourSingleton<AppMain>.I.mainCameraTransform, -1).get_gameObject();
+			logoAnimationGameObject = ResourceUtility.Realizes(logoAnimationPrefab, MonoBehaviourSingleton<AppMain>.I.mainCameraTransform, -1).gameObject;
 		}
 
 		public void StopLogoAnimation()
 		{
-			Object.Destroy(logoAnimationGameObject);
+			UnityEngine.Object.Destroy(logoAnimationGameObject);
 		}
 	}
 
@@ -508,36 +488,25 @@ public class UITutorialOperationHelper
 
 	public Transform fingerAttack => _fingerAttack;
 
-	public UITutorialOperationHelper()
-		: this()
-	{
-	}
-
 	public static void ShowTutorialWidget(UIWidget widget, float duration = 0.3f)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
-		widget.get_gameObject().SetActive(true);
+		widget.gameObject.SetActive(true);
 		widget.alpha = 0f;
-		TweenAlpha.Begin(widget.get_gameObject(), duration, 1f);
+		TweenAlpha.Begin(widget.gameObject, duration, 1f);
 	}
 
 	public static void HideTutorialWidget(UIWidget widget, Action onHided)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Expected O, but got Unknown
-		TweenAlpha ta = TweenAlpha.Begin(widget.get_gameObject(), 0.2f, 0f);
+		TweenAlpha ta = TweenAlpha.Begin(widget.gameObject, 0.2f, 0f);
 		ta.onFinished.Clear();
 		ta.AddOnFinished(delegate
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			widget.get_gameObject().SetActive(false);
+			widget.gameObject.SetActive(false);
 			if (onHided != null)
 			{
-				onHided.Invoke();
+				onHided();
 			}
-			Object.Destroy(ta);
+			UnityEngine.Object.Destroy(ta);
 		});
 	}
 }

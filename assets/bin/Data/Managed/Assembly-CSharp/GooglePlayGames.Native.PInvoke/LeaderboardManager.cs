@@ -36,14 +36,14 @@ namespace GooglePlayGames.Native.PInvoke
 			GooglePlayGames.Native.Cwrapper.LeaderboardManager.LeaderboardManager_ShowUI(mServices.AsHandle(), leaderboardId, (Types.LeaderboardTimeSpan)span, Callbacks.InternalShowUICallback, Callbacks.ToIntPtr(callback));
 		}
 
-		public unsafe void LoadLeaderboardData(string leaderboardId, LeaderboardStart start, int rowCount, LeaderboardCollection collection, LeaderboardTimeSpan timeSpan, string playerId, Action<LeaderboardScoreData> callback)
+		public void LoadLeaderboardData(string leaderboardId, LeaderboardStart start, int rowCount, LeaderboardCollection collection, LeaderboardTimeSpan timeSpan, string playerId, Action<LeaderboardScoreData> callback)
 		{
 			NativeScorePageToken internalObject = new NativeScorePageToken(GooglePlayGames.Native.Cwrapper.LeaderboardManager.LeaderboardManager_ScorePageToken(mServices.AsHandle(), leaderboardId, (Types.LeaderboardStart)start, (Types.LeaderboardTimeSpan)timeSpan, (Types.LeaderboardCollection)collection));
 			ScorePageToken token = new ScorePageToken(internalObject, leaderboardId, collection, timeSpan);
 			GooglePlayGames.Native.Cwrapper.LeaderboardManager.LeaderboardManager_Fetch(mServices.AsHandle(), Types.DataSource.CACHE_OR_NETWORK, leaderboardId, InternalFetchCallback, Callbacks.ToIntPtr(delegate(FetchResponse rsp)
 			{
 				HandleFetch(token, rsp, playerId, rowCount, callback);
-			}, new Func<IntPtr, FetchResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			}, FetchResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.LeaderboardManager.FetchCallback))]
@@ -52,7 +52,7 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("LeaderboardManager#InternalFetchCallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal unsafe void HandleFetch(ScorePageToken token, FetchResponse response, string selfPlayerId, int maxResults, Action<LeaderboardScoreData> callback)
+		internal void HandleFetch(ScorePageToken token, FetchResponse response, string selfPlayerId, int maxResults, Action<LeaderboardScoreData> callback)
 		{
 			LeaderboardScoreData data = new LeaderboardScoreData(token.LeaderboardId, (ResponseStatus)response.GetStatus());
 			if (response.GetStatus() != CommonErrorStatus.ResponseStatus.VALID && response.GetStatus() != CommonErrorStatus.ResponseStatus.VALID_BUT_STALE)
@@ -67,7 +67,7 @@ namespace GooglePlayGames.Native.PInvoke
 				GooglePlayGames.Native.Cwrapper.LeaderboardManager.LeaderboardManager_FetchScoreSummary(mServices.AsHandle(), Types.DataSource.CACHE_OR_NETWORK, token.LeaderboardId, (Types.LeaderboardTimeSpan)token.TimeSpan, (Types.LeaderboardCollection)token.Collection, InternalFetchSummaryCallback, Callbacks.ToIntPtr(delegate(FetchScoreSummaryResponse rsp)
 				{
 					HandleFetchScoreSummary(data, rsp, selfPlayerId, maxResults, token, callback);
-				}, new Func<IntPtr, FetchScoreSummaryResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+				}, FetchScoreSummaryResponse.FromPointer));
 			}
 		}
 
@@ -101,7 +101,7 @@ namespace GooglePlayGames.Native.PInvoke
 			}
 		}
 
-		public unsafe void LoadScorePage(LeaderboardScoreData data, int maxResults, ScorePageToken token, Action<LeaderboardScoreData> callback)
+		public void LoadScorePage(LeaderboardScoreData data, int maxResults, ScorePageToken token, Action<LeaderboardScoreData> callback)
 		{
 			if (data == null)
 			{
@@ -111,7 +111,7 @@ namespace GooglePlayGames.Native.PInvoke
 			GooglePlayGames.Native.Cwrapper.LeaderboardManager.LeaderboardManager_FetchScorePage(mServices.AsHandle(), Types.DataSource.CACHE_OR_NETWORK, nativeScorePageToken.AsPointer(), (uint)maxResults, InternalFetchScorePage, Callbacks.ToIntPtr(delegate(FetchScorePageResponse rsp)
 			{
 				HandleFetchScorePage(data, token, rsp, callback);
-			}, new Func<IntPtr, FetchScorePageResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			}, FetchScorePageResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.LeaderboardManager.FetchScorePageCallback))]

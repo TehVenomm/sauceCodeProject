@@ -83,12 +83,10 @@ public class UIInGamePopupDialog : MonoBehaviourSingleton<UIInGamePopupDialog>
 
 	protected override void Awake()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
 		base.Awake();
-		if (!(window == null))
+		if (!((UnityEngine.Object)window == (UnityEngine.Object)null))
 		{
-			windowTransform = window.get_transform();
+			windowTransform = window.transform;
 			transitions = window.GetComponentsInChildren<UITransition>();
 			window.SetActive(false);
 			isOpenDialog = false;
@@ -98,10 +96,9 @@ public class UIInGamePopupDialog : MonoBehaviourSingleton<UIInGamePopupDialog>
 
 	private void Update()
 	{
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		if (!(window == null) && enableDialog && !MonoBehaviourSingleton<TransitionManager>.I.isTransing && !isOpenDialog && openInfoList.Count > 0)
+		if (!((UnityEngine.Object)window == (UnityEngine.Object)null) && enableDialog && !MonoBehaviourSingleton<TransitionManager>.I.isTransing && !isOpenDialog && openInfoList.Count > 0)
 		{
-			this.StartCoroutine(DoShowDialog(openInfoList[0]));
+			StartCoroutine(DoShowDialog(openInfoList[0]));
 			openInfoList.RemoveAt(0);
 		}
 	}
@@ -137,8 +134,8 @@ public class UIInGamePopupDialog : MonoBehaviourSingleton<UIInGamePopupDialog>
 		tweenCtrl.Reset();
 		if (dialogInfo.Length > desc.type)
 		{
-			windowTransform.set_parent(dialogInfo[desc.type].link);
-			windowTransform.set_localPosition(Vector3.get_zero());
+			windowTransform.parent = dialogInfo[desc.type].link;
+			windowTransform.localPosition = Vector3.zero;
 			int n = 0;
 			for (int m = sprites.Length; n < m; n++)
 			{
@@ -159,7 +156,7 @@ public class UIInGamePopupDialog : MonoBehaviourSingleton<UIInGamePopupDialog>
 		bool play_tween = true;
 		tweenCtrl.Play(true, delegate
 		{
-			((_003CDoShowDialog_003Ec__Iterator1FB)/*Error near IL_0201: stateMachine*/)._003Cplay_tween_003E__4 = false;
+			((_003CDoShowDialog_003Ec__Iterator1FD)/*Error near IL_0201: stateMachine*/)._003Cplay_tween_003E__4 = false;
 		});
 		yield return (object)new WaitForSeconds(desc.showTime);
 		while (play_tween)
@@ -175,7 +172,7 @@ public class UIInGamePopupDialog : MonoBehaviourSingleton<UIInGamePopupDialog>
 				transitions[j].Close(null);
 			}
 		}
-		yield return (object)this.StartCoroutine(DoWaitTransitions());
+		yield return (object)StartCoroutine(DoWaitTransitions());
 		isOpenDialog = false;
 	}
 

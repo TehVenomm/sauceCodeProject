@@ -73,7 +73,7 @@ public class LoungeSearchSettings : LoungeConditionSettings
 		{
 			labelIndex = (int)searchRequest.label;
 		}
-		SetActive((Enum)UI.LBL_DEFAULT, string.IsNullOrEmpty(searchRequest.loungeName));
+		SetActive(UI.LBL_DEFAULT, string.IsNullOrEmpty(searchRequest.loungeName));
 		SetInput((Enum)UI.IPT_NAME, searchRequest.loungeName, 16, (EventDelegate.Callback)((LoungeConditionSettings)this).OnChangeLoungeName);
 		GameSection.SetEventData(false);
 		InitializeBase();
@@ -98,24 +98,22 @@ public class LoungeSearchSettings : LoungeConditionSettings
 
 	protected override void OnChangeLoungeName()
 	{
-		string inputValue = GetInputValue((Enum)UI.IPT_NAME);
+		string inputValue = GetInputValue(UI.IPT_NAME);
 		inputValue = inputValue.Replace(" ", string.Empty);
 		inputValue = inputValue.Replace("\u3000", string.Empty);
-		SetActive((Enum)UI.LBL_DEFAULT, string.IsNullOrEmpty(inputValue));
+		SetActive(UI.LBL_DEFAULT, string.IsNullOrEmpty(inputValue));
 		searchRequest.SetLoungeName(inputValue);
 	}
 
-	private unsafe void OnQuery_SEARCH()
+	private void OnQuery_SEARCH()
 	{
 		searchRequest.order = 1;
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SetSearchRequest(searchRequest);
 		GameSection.StayEvent();
-		LoungeMatchingManager i = MonoBehaviourSingleton<LoungeMatchingManager>.I;
-		if (_003C_003Ef__am_0024cache1 == null)
+		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendSearch(delegate(bool is_success, Error err)
 		{
-			_003C_003Ef__am_0024cache1 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		i.SendSearch(_003C_003Ef__am_0024cache1, true);
+			GameSection.ResumeEvent(is_success, null);
+		}, true);
 	}
 
 	private void OnQuery_MATCHING()
@@ -130,14 +128,16 @@ public class LoungeSearchSettings : LoungeConditionSettings
 		RequestRandomMatching();
 	}
 
-	private unsafe void RequestRandomMatching()
+	private void RequestRandomMatching()
 	{
 		GameSection.StayEvent();
-		LoungeMatchingManager i = MonoBehaviourSingleton<LoungeMatchingManager>.I;
-		if (_003C_003Ef__am_0024cache2 == null)
+		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendSearchRandomMatching(delegate(bool is_success, Error err)
 		{
-			_003C_003Ef__am_0024cache2 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		i.SendSearchRandomMatching(_003C_003Ef__am_0024cache2);
+			if (!is_success)
+			{
+				GameSection.ChangeStayEvent("NOT_FOUND_MATCHING_LOUNGE", null);
+			}
+			GameSection.ResumeEvent(true, null);
+		});
 	}
 }

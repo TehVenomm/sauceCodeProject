@@ -20,9 +20,9 @@ public class DefaultMessageStateManager implements MessageStateManager {
     }
 
     public List<MessageState> getMessageStates(String str, long j) {
+        Cursor query;
         List<MessageState> arrayList = new ArrayList();
         SQLiteDatabase readableDatabase = this.dbHelper.getReadableDatabase();
-        Cursor query;
         try {
             query = readableDatabase.query(TABLE_NAME, TABLE_COLUMNS, String.format(Locale.ENGLISH, "(message_type = ?) AND (message_timestamp >= %d)", new Object[]{Long.valueOf(j)}), new String[]{str}, null, null, null);
             query.moveToFirst();

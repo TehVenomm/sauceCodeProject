@@ -21,10 +21,10 @@ public class UIButtonRepeater : UILongTouch
 
 	public static void SetRepeatButton(GameObject button, string event_name, object event_data = null)
 	{
-		if (!(button.GetComponent<UIButton>() == null))
+		if (!((Object)button.GetComponent<UIButton>() == (Object)null))
 		{
 			UIButtonRepeater uIButtonRepeater = button.GetComponent<UIButtonRepeater>();
-			if (uIButtonRepeater == null)
+			if ((Object)uIButtonRepeater == (Object)null)
 			{
 				uIButtonRepeater = button.AddComponent<UIButtonRepeater>();
 			}
@@ -40,11 +40,9 @@ public class UIButtonRepeater : UILongTouch
 
 	protected override void _SendEvent()
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (CheckSendTime())
 		{
-			UIGameSceneEventSender.SendEvent("UIButtonRepeater", this.get_gameObject(), eventName, eventData, null);
+			UIGameSceneEventSender.SendEvent("UIButtonRepeater", base.gameObject, eventName, eventData, null);
 		}
 	}
 
@@ -65,7 +63,7 @@ public class UIButtonRepeater : UILongTouch
 			return false;
 		}
 		time = 0.001f;
-		repeatTime -= Time.get_deltaTime();
+		repeatTime -= Time.deltaTime;
 		if (repeatTime > 0f)
 		{
 			return false;
@@ -76,7 +74,7 @@ public class UIButtonRepeater : UILongTouch
 
 	private float GetIntervalTime()
 	{
-		pushTime -= Time.get_deltaTime();
+		pushTime -= Time.deltaTime;
 		float result;
 		if (isFirstWait)
 		{

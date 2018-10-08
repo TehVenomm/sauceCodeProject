@@ -1,12 +1,8 @@
 using System;
+using UnityEngine;
 
-public class FlashCompatibleConvert
+public class FlashCompatibleConvert : MonoBehaviour
 {
-	public FlashCompatibleConvert()
-		: this()
-	{
-	}
-
 	public static int ToInt32(string s)
 	{
 		if (s == null)

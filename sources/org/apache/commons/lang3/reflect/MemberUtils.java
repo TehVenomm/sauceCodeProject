@@ -56,8 +56,8 @@ abstract class MemberUtils {
         if (cls2.isPrimitive()) {
             return getPrimitivePromotionCost(cls, cls2);
         }
-        Class superclass;
         float f = 0.0f;
+        Class superclass;
         while (superclass != null && !cls2.equals(superclass)) {
             if (cls2.isInterface() && ClassUtils.isAssignable(superclass, (Class) cls2)) {
                 f += 0.25f;

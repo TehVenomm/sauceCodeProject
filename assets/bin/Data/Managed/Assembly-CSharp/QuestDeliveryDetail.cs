@@ -227,12 +227,12 @@ public class QuestDeliveryDetail : GameSection
 
 	protected virtual void SetBaseFrame()
 	{
-		baseRoot = SetPrefab((Enum)UI.OBJ_BASE_ROOT, "QuestRequestCheckBase");
+		baseRoot = SetPrefab(UI.OBJ_BASE_ROOT, "QuestRequestCheckBase");
 	}
 
 	protected virtual void SetTargetFrame()
 	{
-		targetFrame = SetPrefab((Enum)UI.OBJ_NEED_ITEM_ROOT, "QuestRequestCheckItem");
+		targetFrame = SetPrefab(UI.OBJ_NEED_ITEM_ROOT, "QuestRequestCheckItem");
 	}
 
 	protected virtual void SetSubmissionFrame()
@@ -244,12 +244,12 @@ public class QuestDeliveryDetail : GameSection
 		uint questId = info.needs[0].questId;
 		if (questId == 0)
 		{
-			SetActive((Enum)UI.BTN_SUBMISSION, false);
+			SetActive(UI.BTN_SUBMISSION, false);
 		}
 		else
 		{
 			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(questId);
-			SetActive((Enum)UI.BTN_SUBMISSION, questData.IsMissionExist());
+			SetActive(UI.BTN_SUBMISSION, questData.IsMissionExist());
 		}
 	}
 
@@ -293,14 +293,14 @@ public class QuestDeliveryDetail : GameSection
 				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(questId);
 				if (!questData.IsMissionExist())
 				{
-					SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, false);
+					SetActive(UI.OBJ_SUBMISSION_ROOT, false);
 				}
 				else
 				{
 					ClearStatusQuest clearStatusQuestData = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(questId);
 					if (clearStatusQuestData == null)
 					{
-						SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, true);
+						SetActive(UI.OBJ_SUBMISSION_ROOT, true);
 						int i = 0;
 						for (int num = questData.missionID.Length; i < num; i++)
 						{
@@ -319,7 +319,7 @@ public class QuestDeliveryDetail : GameSection
 					}
 					else
 					{
-						SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, true);
+						SetActive(UI.OBJ_SUBMISSION_ROOT, true);
 						int j = 0;
 						for (int count = clearStatusQuestData.missionStatus.Count; j < count; j++)
 						{
@@ -350,36 +350,27 @@ public class QuestDeliveryDetail : GameSection
 		}
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e4: Expected O, but got Unknown
-		//IL_0614: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0631: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0812: Unknown result type (might be due to invalid IL or missing references)
-		//IL_081f: Unknown result type (might be due to invalid IL or missing references)
 		OpenTutorial();
 		UpdateTitle();
 		SetSprite(baseRoot, UI.SPR_WINDOW, SPR_WINDOW_TYPE[info.DeliveryTypeIndex()]);
 		SetSprite(baseRoot, UI.SPR_MESSAGE_BG, SPR_MESSAGE_BG_TYPE[info.DeliveryTypeIndex()]);
 		bool flag = false;
-		if (Object.op_Implicit(submissionFrame))
+		if ((bool)submissionFrame)
 		{
 			UpdateSubMissionButton();
 			UpdateSubMission();
-			flag = submissionFrame.get_gameObject().get_activeSelf();
-			SetActive((Enum)UI.STR_BTN_SUBMISSION, !flag);
-			SetActive((Enum)UI.STR_BTN_SUBMISSION_BACK, flag);
+			flag = submissionFrame.gameObject.activeSelf;
+			SetActive(UI.STR_BTN_SUBMISSION, !flag);
+			SetActive(UI.STR_BTN_SUBMISSION_BACK, flag);
 		}
 		Transform root = targetFrame;
 		MonoBehaviourSingleton<DeliveryManager>.I.GetTargetEnemyData(deliveryID, out targetQuestID, out targetMapID, out string map_name, out string enemy_name, out DIFFICULTY_TYPE? difficulty, out targetPortalID);
 		SetLabelText(root, UI.LBL_PLACE_NAME, map_name);
 		MonoBehaviourSingleton<DeliveryManager>.I.GetAllProgressDelivery(deliveryID, out int have, out int need);
 		SetLabelText(root, UI.LBL_HAVE, (!isComplete) ? have.ToString() : need.ToString());
-		SetColor(root, UI.LBL_HAVE, (!isComplete) ? Color.get_red() : Color.get_white());
+		SetColor(root, UI.LBL_HAVE, (!isComplete) ? Color.red : Color.white);
 		SetLabelText(root, UI.LBL_NEED, need.ToString());
 		SetLabelText(root, UI.LBL_NEED_ITEM_NAME, MonoBehaviourSingleton<DeliveryManager>.I.GetTargetItemName(deliveryID, 0u));
 		if (info.IsDefeatCondition(0u))
@@ -387,13 +378,13 @@ public class QuestDeliveryDetail : GameSection
 			if (targetQuestID != 0)
 			{
 				isQuestEnemy = true;
-				Transform val = FindCtrl(root, UI.OBJ_DIFFICULTY_ROOT);
+				Transform transform = FindCtrl(root, UI.OBJ_DIFFICULTY_ROOT);
 				int value = (int)difficulty.Value;
-				int i = 0;
-				for (int childCount = val.get_childCount(); i < childCount; i++)
+				int j = 0;
+				for (int childCount = transform.childCount; j < childCount; j++)
 				{
-					Transform t = val.GetChild(i);
-					SetActive(t, i <= value);
+					Transform child = transform.GetChild(j);
+					SetActive(child, j <= value);
 				}
 				SetLabelText(root, UI.LBL_GET_PLACE, base.sectionData.GetText("GET_QUEST"));
 			}
@@ -415,10 +406,10 @@ public class QuestDeliveryDetail : GameSection
 		UpdateNPC(map_name, enemy_name);
 		if ((isComplete || isNotice) && !isCompletedEventDelivery)
 		{
-			SetActive((Enum)UI.OBJ_BACK, false);
-			SetActive((Enum)UI.BTN_CREATE, false);
-			SetActive((Enum)UI.BTN_JOIN, false);
-			SetActive((Enum)UI.BTN_MATCHING, false);
+			SetActive(UI.OBJ_BACK, false);
+			SetActive(UI.BTN_CREATE, false);
+			SetActive(UI.BTN_JOIN, false);
+			SetActive(UI.BTN_MATCHING, false);
 			if (isNotice)
 			{
 				UpdateUIJumpButton(JumpButtonType.Complete);
@@ -426,7 +417,7 @@ public class QuestDeliveryDetail : GameSection
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_BACK, true);
+			SetActive(UI.OBJ_BACK, true);
 			bool flag2 = true;
 			bool flag3 = false;
 			if (info == null || info.IsDefeatCondition(0u) || targetMapID != 0)
@@ -524,19 +515,38 @@ public class QuestDeliveryDetail : GameSection
 			}
 			if (flag3 && MonoBehaviourSingleton<FieldManager>.I.currentMapID != targetMapID)
 			{
-				SetColor(baseRoot, UI.LBL_PLACE_NAME, Color.get_red());
+				SetColor(baseRoot, UI.LBL_PLACE_NAME, Color.red);
 			}
 			else
 			{
-				SetColor(baseRoot, UI.LBL_PLACE_NAME, Color.get_white());
+				SetColor(baseRoot, UI.LBL_PLACE_NAME, Color.white);
 			}
 		}
 		int money = 0;
 		int exp = 0;
 		if (rewardData != null)
 		{
-			_003CUpdateUI_003Ec__AnonStorey36A _003CUpdateUI_003Ec__AnonStorey36A;
-			SetGrid(baseRoot, UI.GRD_REWARD, string.Empty, rewardData.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey36A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetGrid(baseRoot, UI.GRD_REWARD, string.Empty, rewardData.Length, false, delegate(int i, Transform t, bool is_recycle)
+			{
+				DeliveryRewardTable.DeliveryRewardData.Reward reward = rewardData[i].reward;
+				bool is_visible = false;
+				if (reward.type == REWARD_TYPE.MONEY)
+				{
+					money += reward.num;
+				}
+				else if (reward.type == REWARD_TYPE.EXP)
+				{
+					exp += reward.num;
+				}
+				else
+				{
+					is_visible = true;
+					ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(reward.type, reward.item_id, t, reward.num, string.Empty, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_DETAIL);
+					SetMaterialInfo(itemIcon.transform, reward.type, reward.item_id, null);
+					itemIcon.SetRewardBG(true);
+				}
+				SetActive(t, is_visible);
+			});
 		}
 		SetLabelText(baseRoot, UI.LBL_MONEY, money.ToString());
 		SetLabelText(baseRoot, UI.LBL_EXP, exp.ToString());
@@ -576,10 +586,10 @@ public class QuestDeliveryDetail : GameSection
 			}
 			else
 			{
-				this.StartCoroutine(StartTweenCoroutine(flag5));
+				StartCoroutine(StartTweenCoroutine(flag5));
 			}
 		}
-		this.StartCoroutine(SetPointShopGetPointUI());
+		StartCoroutine(SetPointShopGetPointUI());
 	}
 
 	private IEnumerator StartTweenCoroutine(bool is_unlock_portal)
@@ -598,7 +608,7 @@ public class QuestDeliveryDetail : GameSection
 		}
 		PlayCompleteTween(delegate
 		{
-			((_003CStartTweenCoroutine_003Ec__Iterator94)/*Error near IL_00c1: stateMachine*/)._003C_003Ef__this.OnEndCompletetween(((_003CStartTweenCoroutine_003Ec__Iterator94)/*Error near IL_00c1: stateMachine*/).is_unlock_portal, ((_003CStartTweenCoroutine_003Ec__Iterator94)/*Error near IL_00c1: stateMachine*/)._003CeffectName_003E__0);
+			((_003CStartTweenCoroutine_003Ec__Iterator96)/*Error near IL_00c1: stateMachine*/)._003C_003Ef__this.OnEndCompletetween(((_003CStartTweenCoroutine_003Ec__Iterator96)/*Error near IL_00c1: stateMachine*/).is_unlock_portal, ((_003CStartTweenCoroutine_003Ec__Iterator96)/*Error near IL_00c1: stateMachine*/)._003CeffectName_003E__0);
 		});
 		CompleteTutorial();
 	}
@@ -613,14 +623,16 @@ public class QuestDeliveryDetail : GameSection
 		}, false, 0);
 	}
 
-	protected unsafe virtual void OnEndCompletetween(bool is_unlock_portal, string effectName)
+	protected virtual void OnEndCompletetween(bool is_unlock_portal, string effectName)
 	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Expected O, but got Unknown
 		completeJumpButton = true;
 		if (is_unlock_portal)
 		{
-			PlayUnlockPortalTween(effectName, new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			PlayUnlockPortalTween(effectName, delegate
+			{
+				UpdateUIJumpButton(JumpButtonType.Complete);
+				DispMessageEventOpen();
+			});
 		}
 		else
 		{
@@ -632,13 +644,13 @@ public class QuestDeliveryDetail : GameSection
 	protected void PlayUnlockPortalTween(string effectName, Action callback)
 	{
 		Transform ctrl = GetCtrl(UI.OBJ_UNLOCK_PORTAL_ROOT);
-		if (ctrl != null)
+		if ((UnityEngine.Object)ctrl != (UnityEngine.Object)null)
 		{
 			Transform uIEffect = EffectManager.GetUIEffect(effectName, ctrl, -0.2f, 0, null);
-			if (uIEffect != null)
+			if ((UnityEngine.Object)uIEffect != (UnityEngine.Object)null)
 			{
 				rymFX component = uIEffect.GetComponent<rymFX>();
-				if (component != null)
+				if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 				{
 					component.ChangeRenderQueue = 3999;
 				}
@@ -647,22 +659,23 @@ public class QuestDeliveryDetail : GameSection
 		PlayTween(baseRoot, UI.OBJ_UNLOCK_PORTAL_ROOT, true, delegate
 		{
 			PlayAudio(AUDIO.UNLOCKE_PORTAL, 1f, true);
-			callback.Invoke();
+			callback();
 		}, false, 0);
 	}
 
-	protected unsafe void DispMessageEventOpen()
+	protected void DispMessageEventOpen()
 	{
 		if (MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds != null && MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds.Count != 0)
 		{
 			hasDispedMessage = true;
 			int releasedEventId = MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds[0];
 			MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds.RemoveAt(0);
-			_003CDispMessageEventOpen_003Ec__AnonStorey36D _003CDispMessageEventOpen_003Ec__AnonStorey36D;
-			Network.EventData eventData = MonoBehaviourSingleton<QuestManager>.I.eventList.Where(new Func<Network.EventData, bool>((object)_003CDispMessageEventOpen_003Ec__AnonStorey36D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
+			Network.EventData eventData = (from e in MonoBehaviourSingleton<QuestManager>.I.eventList
+			where e.eventId == releasedEventId
+			select e).First();
 			if (eventData == null)
 			{
-				Debug.LogError((object)"イベント開放に関して、指定されたIDのイベントが存在しません");
+				Debug.LogError("イベント開放に関して、指定されたIDのイベントが存在しません");
 				DispMessageEventOpen();
 			}
 			else
@@ -875,8 +888,8 @@ public class QuestDeliveryDetail : GameSection
 			{
 				yield return (object)queue.Wait();
 			}
-			SetActive((Enum)UI.OBJ_NORMAL_ROOT, true);
-			SetLabelText((Enum)UI.LBL_POINT_NORMAL, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopGetPointData[0].basePoint));
+			SetActive(UI.OBJ_NORMAL_ROOT, true);
+			SetLabelText(UI.LBL_POINT_NORMAL, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopGetPointData[0].basePoint));
 			UITexture normalTex = GetCtrl(UI.TEX_NORMAL_ICON).GetComponent<UITexture>();
 			ResourceLoad.LoadPointIconImageTexture(normalTex, pointShopGetPointData[0].pointShopId);
 			if (pointShopGetPointData.Count >= 2)
@@ -886,8 +899,8 @@ public class QuestDeliveryDetail : GameSection
 				{
 					yield return (object)queue.Wait();
 				}
-				SetActive((Enum)UI.OBJ_EVENT_ROOT, true);
-				SetLabelText((Enum)UI.LBL_POINT_EVENT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopGetPointData[1].basePoint));
+				SetActive(UI.OBJ_EVENT_ROOT, true);
+				SetLabelText(UI.LBL_POINT_EVENT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopGetPointData[1].basePoint));
 				UITexture eventTex = GetCtrl(UI.TEX_EVENT_ICON).GetComponent<UITexture>();
 				ResourceLoad.LoadPointIconImageTexture(eventTex, pointShopGetPointData[1].pointShopId);
 			}
@@ -930,7 +943,7 @@ public class QuestDeliveryDetail : GameSection
 		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.needs[0].questId, true);
 	}
 
-	protected unsafe void WaveMatchAuto()
+	protected void WaveMatchAuto()
 	{
 		GameSection.SetEventData(new object[1]
 		{
@@ -939,14 +952,60 @@ public class QuestDeliveryDetail : GameSection
 		GameSection.StayEvent();
 		int retryCount = 0;
 		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 0);
-		_003CWaveMatchAuto_003Ec__AnonStorey36E _003CWaveMatchAuto_003Ec__AnonStorey36E;
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.GetQuestData().questID, retryCount, false, new Action<bool, int, bool, float>((object)_003CWaveMatchAuto_003Ec__AnonStorey36E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.GetQuestData().questID, retryCount, false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
+		{
+			if (!is_success)
+			{
+				GameSection.ResumeEvent(false, null);
+			}
+			else if (maxRetryCount > 0)
+			{
+				retryCount++;
+				StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
+			}
+			else if (!isJoined)
+			{
+				WaveMatchCreate();
+			}
+			else
+			{
+				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
+				GameSection.ResumeEvent(true, null);
+			}
+		});
 	}
 
-	private unsafe IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
+	private IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
 	{
 		yield return (object)new WaitForSeconds(time);
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, false, new Action<bool, int, bool, float>((object)/*Error near IL_0061: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
+		{
+			if (!is_success)
+			{
+				GameSection.ResumeEvent(false, null);
+			}
+			else if (maxRetryCount > 0)
+			{
+				if (((_003CMatchAtRandom_003Ec__Iterator98)/*Error near IL_0061: stateMachine*/).retryCount >= maxRetryCount)
+				{
+					((_003CMatchAtRandom_003Ec__Iterator98)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.WaveMatchCreate();
+				}
+				else
+				{
+					((_003CMatchAtRandom_003Ec__Iterator98)/*Error near IL_0061: stateMachine*/).retryCount++;
+					((_003CMatchAtRandom_003Ec__Iterator98)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.StartCoroutine(((_003CMatchAtRandom_003Ec__Iterator98)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.MatchAtRandom(((_003CMatchAtRandom_003Ec__Iterator98)/*Error near IL_0061: stateMachine*/).setting, ((_003CMatchAtRandom_003Ec__Iterator98)/*Error near IL_0061: stateMachine*/).retryCount, waitTime));
+				}
+			}
+			else if (!isJoined)
+			{
+				((_003CMatchAtRandom_003Ec__Iterator98)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.WaveMatchCreate();
+			}
+			else
+			{
+				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(((_003CMatchAtRandom_003Ec__Iterator98)/*Error near IL_0061: stateMachine*/).setting);
+				GameSection.ResumeEvent(true, null);
+			}
+		});
 	}
 
 	protected void WaveMatchCreate()

@@ -26,12 +26,10 @@ public class BinaryTableReader
 
 	public BinaryTableReader(byte[] bytes)
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Expected O, but got Unknown
 		MemoryStream memoryStream = new MemoryStream(bytes);
 		memoryStream.Seek(256L, SeekOrigin.Begin);
-		ZlibStream input = new ZlibStream((Stream)memoryStream, 1);
-		reader = new BinaryReader((Stream)input);
+		ZlibStream input = new ZlibStream(memoryStream, CompressionMode.Decompress);
+		reader = new BinaryReader(input);
 		allDataSize = bytes.Length - 256;
 	}
 

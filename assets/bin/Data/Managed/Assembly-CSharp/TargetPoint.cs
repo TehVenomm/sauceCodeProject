@@ -1,16 +1,16 @@
 using UnityEngine;
 
-public class TargetPoint
+public class TargetPoint : MonoBehaviour
 {
 	public class Param
 	{
 		public bool isShowRange;
 
-		public Vector3 markerPos = Vector3.get_zero();
+		public Vector3 markerPos = Vector3.zero;
 
-		public Quaternion markerRot = Quaternion.get_identity();
+		public Quaternion markerRot = Quaternion.identity;
 
-		public Vector3 targetPos = Vector3.get_zero();
+		public Vector3 targetPos = Vector3.zero;
 
 		public float vecSqrMagnitude;
 
@@ -52,10 +52,10 @@ public class TargetPoint
 	public bool isDispArrowSpWeak;
 
 	[Tooltip("継続ダメ\u30fcジエフェクトオフセット")]
-	public Vector3 bleedOffsetPos = Vector3.get_zero();
+	public Vector3 bleedOffsetPos = Vector3.zero;
 
 	[Tooltip("継続ダメ\u30fcジエフェクト回転オフセット")]
-	public Vector3 bleedOffsetRot = Vector3.get_zero();
+	public Vector3 bleedOffsetRot = Vector3.zero;
 
 	[Tooltip("狙いマ\u30fcカ\u30fcのポイントサイズ")]
 	public float aimMarkerPointRate = 1f;
@@ -113,14 +113,7 @@ public class TargetPoint
 	}
 
 	public TargetPoint()
-		: this()
 	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 		param = new Param();
 		owner = null;
 		subRegionRoot = null;
@@ -133,9 +126,7 @@ public class TargetPoint
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		_transform = this.get_transform();
+		_transform = base.transform;
 	}
 
 	private void Start()
@@ -145,21 +136,16 @@ public class TargetPoint
 
 	public void scaledCalc()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		scaledOffset = offset.Mul(_transform.get_lossyScale());
+		scaledOffset = offset.Mul(_transform.lossyScale);
 		float num = markerZShift;
-		Vector3 lossyScale = _transform.get_lossyScale();
+		Vector3 lossyScale = _transform.lossyScale;
 		scaledMarkerZShift = num * lossyScale.z;
 	}
 
 	public bool IsEneble()
 	{
 		Enemy enemy = owner as Enemy;
-		if (enemy == null || enemy.isDead || !enemy.enableTargetPoint)
+		if ((Object)enemy == (Object)null || enemy.isDead || !enemy.enableTargetPoint)
 		{
 			return false;
 		}
@@ -168,31 +154,19 @@ public class TargetPoint
 
 	public Vector3 GetTargetPoint()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		return _transform.get_position() + _transform.get_rotation() * scaledOffset;
+		return _transform.position + _transform.rotation * scaledOffset;
 	}
 
 	public Transform PlayArrowBleedEffect(string effect_name, int show_index)
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 		Transform effect = EffectManager.GetEffect(effect_name, _transform);
-		if (effect != null)
+		if ((Object)effect != (Object)null)
 		{
-			effect.set_localScale(Vector3.get_one().Div(_transform.get_lossyScale()));
-			effect.set_localPosition(GetArrowBleedLocalPosition());
-			effect.set_localRotation(GetArrowBleedLocalRotation(show_index));
+			effect.localScale = Vector3.one.Div(_transform.lossyScale);
+			effect.localPosition = GetArrowBleedLocalPosition();
+			effect.localRotation = GetArrowBleedLocalRotation(show_index);
 			effectTransform = effect;
-			effectOrgLossyScele = effectTransform.get_lossyScale();
+			effectOrgLossyScele = effectTransform.lossyScale;
 			effectShowIndex = show_index;
 		}
 		return effect;
@@ -200,106 +174,66 @@ public class TargetPoint
 
 	public Transform PlayArrowBurstEffect(string effect_name, Transform trs)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 		Transform effect = EffectManager.GetEffect(effect_name, null);
-		if (effect != null)
+		if ((Object)effect != (Object)null)
 		{
-			effect.set_localScale(Vector3.get_one().Div(_transform.get_lossyScale()));
-			if (null != trs)
+			effect.localScale = Vector3.one.Div(_transform.lossyScale);
+			if ((Object)null != (Object)trs)
 			{
-				effect.set_position(trs.get_position());
+				effect.position = trs.position;
 			}
 			else
 			{
-				effect.set_position(_transform.get_position());
+				effect.position = _transform.position;
 			}
-			effect.set_rotation(Quaternion.get_identity());
+			effect.rotation = Quaternion.identity;
 		}
 		return effect;
 	}
 
 	public Vector3 GetArrowBleedLocalPosition()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		return bleedOffsetPos;
 	}
 
 	public Quaternion GetArrowBleedLocalRotation(int show_index = 0)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		Quaternion val = Quaternion.get_identity();
-		if (offset != Vector3.get_zero())
+		Quaternion lhs = Quaternion.identity;
+		if (offset != Vector3.zero)
 		{
-			val = Quaternion.LookRotation(-offset);
+			lhs = Quaternion.LookRotation(-offset);
 		}
-		val *= Quaternion.Euler(bleedOffsetRot.x, bleedOffsetRot.y, bleedOffsetRot.z);
+		lhs *= Quaternion.Euler(bleedOffsetRot.x, bleedOffsetRot.y, bleedOffsetRot.z);
 		if (show_index > 0 && MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
 		{
 			InGameSettingsManager.Player.SpecialActionInfo.ArrowBleedOther arrowBleedOther = MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedOther;
 			if (arrowBleedOther != null)
 			{
-				Quaternion val2 = Quaternion.AngleAxis((float)(show_index - 1) * 120f + arrowBleedOther.axisRandomAngle * Random.get_value() - arrowBleedOther.axisRandomAngle * 0.5f, Vector3.get_forward());
-				Quaternion val3 = Quaternion.Euler(arrowBleedOther.openFixAngle + arrowBleedOther.openRandomAngle * Random.get_value(), 0f, 0f);
-				val = val * val2 * val3;
+				Quaternion rhs = Quaternion.AngleAxis((float)(show_index - 1) * 120f + arrowBleedOther.axisRandomAngle * Random.value - arrowBleedOther.axisRandomAngle * 0.5f, Vector3.forward);
+				Quaternion rhs2 = Quaternion.Euler(arrowBleedOther.openFixAngle + arrowBleedOther.openRandomAngle * Random.value, 0f, 0f);
+				lhs = lhs * rhs * rhs2;
 			}
 		}
-		return val;
+		return lhs;
 	}
 
 	public void ArrowBleedEffectUpdate(bool isPostion, bool isRotation, bool isOrgScele)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		if (!(effectTransform == null))
+		if (!((Object)effectTransform == (Object)null))
 		{
 			if (isOrgScele)
 			{
-				Vector3 lossyScale = effectTransform.get_lossyScale();
-				Vector3 localScale = effectTransform.get_localScale();
-				effectTransform.set_localScale(new Vector3(localScale.x / lossyScale.x * effectOrgLossyScele.x, localScale.y / lossyScale.y * effectOrgLossyScele.y, localScale.z / lossyScale.z * effectOrgLossyScele.z));
+				Vector3 lossyScale = effectTransform.lossyScale;
+				Vector3 localScale = effectTransform.localScale;
+				effectTransform.localScale = new Vector3(localScale.x / lossyScale.x * effectOrgLossyScele.x, localScale.y / lossyScale.y * effectOrgLossyScele.y, localScale.z / lossyScale.z * effectOrgLossyScele.z);
 			}
 			if (isPostion)
 			{
-				effectTransform.set_localPosition(GetArrowBleedLocalPosition());
+				effectTransform.localPosition = GetArrowBleedLocalPosition();
 			}
 			if (isRotation)
 			{
-				effectTransform.set_localRotation(GetArrowBleedLocalRotation(effectShowIndex));
+				effectTransform.localRotation = GetArrowBleedLocalRotation(effectShowIndex);
 			}
 		}
 	}

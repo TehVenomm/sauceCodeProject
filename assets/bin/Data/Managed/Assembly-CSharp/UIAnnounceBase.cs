@@ -39,24 +39,24 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 		int i = 0;
 		for (int num = starAnim.Length; i < num; i++)
 		{
-			starAnim[i].set_enabled(false);
+			starAnim[i].enabled = false;
 			starAnim[i].ResetToBeginning();
 		}
 		int j = 0;
 		for (int num2 = effAnim.Length; j < num2; j++)
 		{
-			effAnim[j].set_enabled(false);
+			effAnim[j].enabled = false;
 			effAnim[j].Sample(1f, true);
 		}
 		int k = 0;
 		for (int num3 = loopAnim.Length; k < num3; k++)
 		{
-			loopAnim[k].set_enabled(false);
+			loopAnim[k].enabled = false;
 		}
 		int l = 0;
 		for (int num4 = endAnim.Length; l < num4; l++)
 		{
-			endAnim[l].set_enabled(false);
+			endAnim[l].enabled = false;
 		}
 	}
 
@@ -65,7 +65,7 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 		base.OnDisable();
 		if (routineWork != null)
 		{
-			if (panelChange != null)
+			if ((Object)panelChange != (Object)null)
 			{
 				panelChange.Lock();
 			}
@@ -76,7 +76,7 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 
 	protected bool AnnounceStart(Player player)
 	{
-		if (player == null)
+		if ((Object)player == (Object)null)
 		{
 			return false;
 		}
@@ -89,22 +89,20 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 
 	protected bool AnnounceStart()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		if (!this.get_gameObject().get_activeInHierarchy())
+		if (!base.gameObject.activeInHierarchy)
 		{
 			return false;
 		}
 		if (routineWork != null)
 		{
-			this.StopCoroutine(routineWork);
+			StopCoroutine(routineWork);
 		}
-		else if (panelChange != null)
+		else if ((Object)panelChange != (Object)null)
 		{
 			panelChange.UnLock();
 		}
 		routineWork = Direction();
-		this.StartCoroutine(routineWork);
+		StartCoroutine(routineWork);
 		return true;
 	}
 
@@ -113,7 +111,7 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 		int i4 = 0;
 		for (int n4 = this.endAnim.Length; i4 < n4; i4++)
 		{
-			this.endAnim[i4].set_enabled(false);
+			this.endAnim[i4].enabled = false;
 		}
 		int i3 = 0;
 		for (int n3 = this.starAnim.Length; i3 < n3; i3++)
@@ -143,12 +141,12 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 		int j = 0;
 		for (int i = this.endAnim.Length; j < i; j++)
 		{
-			while (this.endAnim[j].get_enabled())
+			while (this.endAnim[j].enabled)
 			{
 				yield return (object)null;
 			}
 		}
-		if (this.panelChange != null)
+		if ((Object)this.panelChange != (Object)null)
 		{
 			this.panelChange.Lock();
 		}

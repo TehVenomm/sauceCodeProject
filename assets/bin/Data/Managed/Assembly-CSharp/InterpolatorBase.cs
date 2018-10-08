@@ -142,7 +142,7 @@ public abstract class InterpolatorBase<T> : Interpolator
 
 	public T Update()
 	{
-		Update(Time.get_deltaTime());
+		Update(Time.deltaTime);
 		return Get();
 	}
 

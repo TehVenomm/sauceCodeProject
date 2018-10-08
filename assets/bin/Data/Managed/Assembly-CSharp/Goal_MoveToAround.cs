@@ -19,7 +19,6 @@ public class Goal_MoveToAround : GoalComposite
 
 	public Goal_MoveToAround SetParam(PLACE place, Vector3 pos, float len)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		this.place = place;
 		targetPos = pos;
 		moveLen = len;
@@ -28,8 +27,6 @@ public class Goal_MoveToAround : GoalComposite
 
 	protected override void Activate(Brain brain)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		SetStatus(STATUS.ACTIVE);
 		AddSubGoal<Goal_Move>().SetStick(place.GetVector2(), targetPos).SetGiveupTime(moveLen * 0.7f);
 	}
@@ -47,8 +44,7 @@ public class Goal_MoveToAround : GoalComposite
 
 	public override string ToStringGoal()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		string str = $"targetPos={(object)targetPos}, moveLen={(object)moveLen}";
+		string str = $"targetPos={targetPos}, moveLen={moveLen}";
 		return base.ToStringGoal() + str;
 	}
 }

@@ -116,7 +116,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 	private void LateUpdate()
 	{
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		if (self == null)
+		if ((Object)self == (Object)null)
 		{
 			Clear();
 		}
@@ -124,7 +124,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 		{
 			Function func = m_func;
 			Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-			func = ((!self.IsOnCannonMode() || !(boss != null) || !boss.IsValidShield()) ? Function.Basis : Function.Cannon);
+			func = ((!self.IsOnCannonMode() || !((Object)boss != (Object)null) || !boss.IsValidShield()) ? Function.Basis : Function.Cannon);
 			if (func != m_func)
 			{
 				OnChangeFunction(func);
@@ -163,69 +163,8 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 
 	private void FuncBasisMode()
 	{
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0287: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_046f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_060e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0613: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0615: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0617: Unknown result type (might be due to invalid IL or missing references)
-		//IL_061c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_061e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0620: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0622: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0627: Unknown result type (might be due to invalid IL or missing references)
-		//IL_062b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_062d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_062f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0634: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0638: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0644: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0649: Unknown result type (might be due to invalid IL or missing references)
-		//IL_064b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0650: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0657: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0659: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0660: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0662: Unknown result type (might be due to invalid IL or missing references)
-		//IL_075b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_075d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_075f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0764: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0766: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0768: Unknown result type (might be due to invalid IL or missing references)
-		//IL_076f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0896: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0897: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0899: Unknown result type (might be due to invalid IL or missing references)
-		//IL_089e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b43: Unknown result type (might be due to invalid IL or missing references)
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
+		if ((Object)MonoBehaviourSingleton<StageObjectManager>.I.boss != (Object)null)
 		{
 			parameter = MonoBehaviourSingleton<InGameSettingsManager>.I.targetMarker;
 		}
@@ -235,7 +174,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 		}
 		if (changeLockFlag)
 		{
-			changeLockTime -= Time.get_deltaTime();
+			changeLockTime -= Time.deltaTime;
 			if (changeLockTime <= 0f)
 			{
 				changeLockTime = 0f;
@@ -244,7 +183,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 			}
 		}
 		bool flag = false;
-		Vector3 val = self._position;
+		Vector3 vector = self._position;
 		if (self.isArrowAimLesserMode)
 		{
 			if (self.isArrowAimEnd)
@@ -254,7 +193,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 			else
 			{
 				parameter = MonoBehaviourSingleton<InGameSettingsManager>.I.targetMarkerArrowAimLesser;
-				val += self.arrowAimLesserCursorPos;
+				vector += self.arrowAimLesserCursorPos;
 			}
 		}
 		float num = parameter.targetDistance;
@@ -284,14 +223,14 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 				for (int k = 0; k < bulletObservableList.Count; k++)
 				{
 					AnimEventShot animEventShot = bulletObservableList[k] as AnimEventShot;
-					if (animEventShot != null && animEventShot.targetPoint != null)
+					if ((Object)animEventShot != (Object)null && (Object)animEventShot.targetPoint != (Object)null)
 					{
 						RegisterTargetInfo(animEventShot.targetPoint, null);
 					}
 					else
 					{
 						AttackFunnelBit attackFunnelBit = bulletObservableList[k] as AttackFunnelBit;
-						if (attackFunnelBit != null && attackFunnelBit.targetPoint != null)
+						if ((Object)attackFunnelBit != (Object)null && (Object)attackFunnelBit.targetPoint != (Object)null)
 						{
 							RegisterTargetInfo(attackFunnelBit.targetPoint, null);
 						}
@@ -302,7 +241,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 		for (int l = 0; l < MonoBehaviourSingleton<InGameManager>.I.dropItemList.Count; l++)
 		{
 			FieldDropObject fieldDropObject = MonoBehaviourSingleton<InGameManager>.I.dropItemList[l];
-			if (fieldDropObject.targetPoint != null && fieldDropObject.get_gameObject().get_activeInHierarchy())
+			if ((Object)fieldDropObject.targetPoint != (Object)null && fieldDropObject.gameObject.activeInHierarchy)
 			{
 				RegisterTargetInfo(fieldDropObject.targetPoint, null);
 			}
@@ -311,10 +250,10 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 		for (int m = 0; m < count2; m++)
 		{
 			Player player = MonoBehaviourSingleton<StageObjectManager>.I.playerList[m] as Player;
-			if (!(player == null) && !player.isDead)
+			if (!((Object)player == (Object)null) && !player.isDead)
 			{
 				TargetPoint restraintTargetPoint = player.RestraintTargetPoint;
-				if (restraintTargetPoint != null)
+				if ((Object)restraintTargetPoint != (Object)null)
 				{
 					RegisterTargetInfo(restraintTargetPoint, null);
 				}
@@ -337,15 +276,14 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 			float num8 = 3.40282347E+38f;
 			TargetPoint targetPoint3 = null;
 			float num9 = 3.40282347E+38f;
-			Vector2 val2 = val.ToVector2XZ();
-			Vector2 forwardXZ = self.forwardXZ;
-			forwardXZ.Normalize();
+			Vector2 b = vector.ToVector2XZ();
+			self.forwardXZ.Normalize();
 			Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-			Quaternion rotation = cameraTransform.get_rotation();
-			Vector3 position = cameraTransform.get_position();
-			Vector2 val3 = position.ToVector2XZ();
-			Vector3 val4 = Vector2.op_Implicit(cameraTransform.get_forward().ToVector2XZ());
-			val4.Normalize();
+			Quaternion rotation = cameraTransform.rotation;
+			Vector3 position = cameraTransform.position;
+			Vector2 b2 = position.ToVector2XZ();
+			Vector3 v = cameraTransform.forward.ToVector2XZ();
+			v.Normalize();
 			bool isAutoMode = self.isAutoMode;
 			for (int n = 0; n < numTargetInfo; n++)
 			{
@@ -356,7 +294,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 				param.isTargetEnable = false;
 				param.weakState = Enemy.WEAK_STATE.NONE;
 				param.weakSubParam = -1;
-				if (targetPoint4.get_enabled() && targetPoint4.get_gameObject().get_activeInHierarchy())
+				if (targetPoint4.enabled && targetPoint4.gameObject.activeInHierarchy)
 				{
 					if (self.isArrowAimBossMode)
 					{
@@ -369,7 +307,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 					{
 						continue;
 					}
-					if (enemy2 != null && targetPoint4.regionID >= 0 && targetPoint4.regionID < enemy2.regionWorks.Length)
+					if ((Object)enemy2 != (Object)null && targetPoint4.regionID >= 0 && targetPoint4.regionID < enemy2.regionWorks.Length)
 					{
 						EnemyRegionWork enemyRegionWork = enemy2.regionWorks[targetPoint4.regionID];
 						if (!enemyRegionWork.enabled)
@@ -392,11 +330,9 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 					{
 						param.isTargetEnable = true;
 						Vector3 targetPoint5 = targetPoint4.GetTargetPoint();
-						Vector2 val5 = targetPoint5.ToVector2XZ();
-						Vector2 val6 = val5 - val2;
-						TargetPoint.Param param2 = param;
-						Vector3 val7 = position - targetPoint5;
-						param2.markerPos = val7.get_normalized() * targetPoint4.scaledMarkerZShift + targetPoint5;
+						Vector2 a = targetPoint5.ToVector2XZ();
+						Vector2 vector2 = a - b;
+						param.markerPos = (position - targetPoint5).normalized * targetPoint4.scaledMarkerZShift + targetPoint5;
 						param.markerRot = rotation;
 						param.targetPos = targetPoint5;
 						bool flag2 = false;
@@ -404,21 +340,21 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 						{
 							flag2 = true;
 						}
-						float sqrMagnitude = val6.get_sqrMagnitude();
+						float sqrMagnitude = vector2.sqrMagnitude;
 						param.isShowRange = (sqrMagnitude < num5 || flag2);
 						param.vecSqrMagnitude = sqrMagnitude;
 						if (!isTargetDisable)
 						{
 							if (isAutoMode && !(targetPoint4.owner is Player))
 							{
-								if (targetPoint3 == null)
+								if ((Object)targetPoint3 == (Object)null)
 								{
 									targetPoint3 = targetPoint4;
 									num9 = sqrMagnitude;
 								}
-								else if (targetPoint4.owner == null)
+								else if ((Object)targetPoint4.owner == (Object)null)
 								{
-									if (targetPoint3.owner == null)
+									if ((Object)targetPoint3.owner == (Object)null)
 									{
 										if (sqrMagnitude < num9)
 										{
@@ -440,16 +376,16 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 							}
 							if (flag2 || !(sqrMagnitude > num4))
 							{
-								Vector2 val8 = val5 - val3;
-								float num10 = Mathf.Acos(Vector2.Dot(Vector2.op_Implicit(val4), val8.get_normalized()));
+								Vector2 vector3 = a - b2;
+								float num10 = Mathf.Acos(Vector2.Dot(v, vector3.normalized));
 								if (!(num10 > num3))
 								{
 									bool flag3 = false;
 									if (parameter.enableCameraCulling && !flag)
 									{
 										float cameraCullingMargin = parameter.cameraCullingMargin;
-										Vector3 val9 = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToViewportPoint(targetPoint5);
-										if (val9.x < 0f - cameraCullingMargin || val9.x > 1f + cameraCullingMargin || val9.y < 0f - cameraCullingMargin || val9.y > 1f + cameraCullingMargin || val9.z < 0f)
+										Vector3 vector4 = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToViewportPoint(targetPoint5);
+										if (vector4.x < 0f - cameraCullingMargin || vector4.x > 1f + cameraCullingMargin || vector4.y < 0f - cameraCullingMargin || vector4.y > 1f + cameraCullingMargin || vector4.z < 0f)
 										{
 											flag3 = true;
 										}
@@ -466,17 +402,16 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 											sqrMagnitude = num11 * num11;
 											num10 = 0f;
 										}
-										Vector3 val10 = val - targetPoint5;
-										sqrMagnitude = val10.get_magnitude();
+										sqrMagnitude = (vector - targetPoint5).magnitude;
 										sqrMagnitude += targetPoint4.weight;
 										if (targetPoint5.y >= 0f && targetPoint5.y < self.GetIgnoreTargetHeight())
 										{
-											if (targetPoint2 == null || sqrMagnitude < num8)
+											if ((Object)targetPoint2 == (Object)null || sqrMagnitude < num8)
 											{
 												targetPoint2 = targetPoint4;
 												num8 = sqrMagnitude;
 											}
-											if (num10 <= num6 && (targetPoint == null || sqrMagnitude < num7))
+											if (num10 <= num6 && ((Object)targetPoint == (Object)null || sqrMagnitude < num7))
 											{
 												targetPoint = targetPoint4;
 												num7 = sqrMagnitude;
@@ -489,7 +424,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 					}
 				}
 			}
-			if (targetPoint == null && targetPoint2 != null)
+			if ((Object)targetPoint == (Object)null && (Object)targetPoint2 != (Object)null)
 			{
 				targetPoint = targetPoint2;
 			}
@@ -506,20 +441,20 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 			else
 			{
 				TargetPoint targetPoint6 = DecideFinalTargetPoint(targetPoint, targetingPoint, self.attackMode);
-				if (targetPoint6 != null)
+				if ((Object)targetPoint6 != (Object)null)
 				{
 					self.targetingPointList.Add(targetPoint6);
 					self.SetActionTarget(targetPoint6.owner, true);
 					if (isAutoMode)
 					{
 						AutoSelfController autoSelfController2 = self.controller as AutoSelfController;
-						if (targetPoint6 != null)
+						if ((Object)targetPoint6 != (Object)null)
 						{
-							if (targetPoint6.owner == null)
+							if ((Object)targetPoint6.owner == (Object)null)
 							{
 								autoSelfController2.actionTargetPoint = targetPoint6;
 							}
-							else if (targetPoint3.owner == null)
+							else if ((Object)targetPoint3.owner == (Object)null)
 							{
 								targetPoint6 = (autoSelfController2.actionTargetPoint = DecideFinalTargetPoint(targetPoint3, targetPoint6, self.attackMode));
 								self.targetingPointList.Add(targetPoint6);
@@ -552,15 +487,15 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 			{
 				Enemy enemy3 = targetInfoList[num13].enemy;
 				TargetPoint targetPoint7 = targetInfoList[num13].targetPoint;
-				if (targetPoint7 != targetPoint)
+				if ((Object)targetPoint7 != (Object)targetPoint)
 				{
-					targetPoint7.param.targetSelectCounter -= Time.get_deltaTime();
+					targetPoint7.param.targetSelectCounter -= Time.deltaTime;
 					if (targetPoint7.param.targetSelectCounter < 0f)
 					{
 						targetPoint7.param.targetSelectCounter = 0f;
 					}
 				}
-				if (targetPoint7.get_enabled() && targetPoint7.get_gameObject().get_activeInHierarchy() && showMarker)
+				if (targetPoint7.enabled && targetPoint7.gameObject.activeInHierarchy && showMarker)
 				{
 					Enemy.WEAK_STATE weakState = targetPoint7.param.weakState;
 					bool flag5 = false;
@@ -575,7 +510,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 					}
 					bool playSign = false;
 					float markerScale = 1f;
-					if (enemy3 != null && targetPoint7.regionID >= 0 && targetPoint7.regionID < enemy3.regionWorks.Length)
+					if ((Object)enemy3 != (Object)null && targetPoint7.regionID >= 0 && targetPoint7.regionID < enemy3.regionWorks.Length)
 					{
 						if (flag5 && !flag6)
 						{
@@ -623,7 +558,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 						targetMarker = null;
 						for (int num14 = 0; num14 < markersTemp.Count; num14++)
 						{
-							if (markersTemp[num14].point == updateParam.targetPoint)
+							if ((Object)markersTemp[num14].point == (Object)updateParam.targetPoint)
 							{
 								targetMarker = markersTemp[num14];
 								markersTemp.RemoveAt(num14);
@@ -637,7 +572,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 						else if (!flag4)
 						{
 							flag4 = targetMarker.UpdateMarker(updateParam);
-							if (self.isArrowAimLesserMode && self.spAttackType == SP_ATTACK_TYPE.SOUL && targetMarker.point == self.targetingPoint)
+							if (self.isArrowAimLesserMode && self.spAttackType == SP_ATTACK_TYPE.SOUL && (Object)targetMarker.point == (Object)self.targetingPoint)
 							{
 								MultiLockMarker multiLockMarker = null;
 								if (fieldMultiLockDic.ContainsKey(targetPoint7))
@@ -688,7 +623,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 				targetInfoList[num17].targetPoint = null;
 			}
 			numTargetInfo = 0;
-			if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null && updateShadowSealingFlag)
+			if ((Object)MonoBehaviourSingleton<StageObjectManager>.I.boss != (Object)null && updateShadowSealingFlag)
 			{
 				MonoBehaviourSingleton<StageObjectManager>.I.boss.CountShadowSealingTarget();
 				updateShadowSealingFlag = false;
@@ -705,14 +640,14 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 			EnemyRegionWork enemyRegionWork = boss.SearchShieldCriticalRegionWork();
 			if (enemyRegionWork == null)
 			{
-				Debug.LogWarning((object)"Not found RegionWork.");
+				Debug.LogWarning("Not found RegionWork.");
 			}
 			else
 			{
 				TargetPoint targetPoint = boss.SearchTargetPoint(enemyRegionWork.regionId);
-				if (targetPoint == null)
+				if ((Object)targetPoint == (Object)null)
 				{
-					Debug.LogWarning((object)"Not found TargetPoint.");
+					Debug.LogWarning("Not found TargetPoint.");
 				}
 				else
 				{
@@ -733,7 +668,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 	private void UpdateGrabMarker()
 	{
 		Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-		if (!(boss == null) && !boss.isDead)
+		if (!((Object)boss == (Object)null) && !boss.isDead)
 		{
 			EnemyRegionWork enemyRegionWork = null;
 			EnemyRegionWork[] regionWorks = boss.regionWorks;
@@ -754,9 +689,9 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 				else
 				{
 					TargetPoint targetPoint = boss.SearchTargetPoint(enemyRegionWork.regionId);
-					if (targetPoint == null)
+					if ((Object)targetPoint == (Object)null)
 					{
-						Debug.LogWarning((object)"Not found TargetPoint.");
+						Debug.LogWarning("Not found TargetPoint.");
 					}
 					else
 					{
@@ -765,7 +700,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 							m_grabMarker = new TargetMarker(base._transform);
 						}
 						m_grabMarker.UpdateByTargetPoint(targetPoint, "ef_btl_target_cannon_03");
-						if (uiGrabStatusGizmo == null)
+						if ((Object)uiGrabStatusGizmo == (Object)null)
 						{
 							uiGrabStatusGizmo = MonoBehaviourSingleton<UIStatusGizmoManager>.I.CreateGrab();
 						}
@@ -784,7 +719,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 			m_grabMarker.UnableMarker();
 			m_grabMarker = null;
 		}
-		if (uiGrabStatusGizmo != null)
+		if ((Object)uiGrabStatusGizmo != (Object)null)
 		{
 			uiGrabStatusGizmo.targetEnemy = null;
 			uiGrabStatusGizmo.targetPoint = null;
@@ -795,25 +730,25 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 	private void MakeTargetPointListForArrowAimBossMode(List<TargetPoint> targetList)
 	{
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		if (!(self == null))
+		if (!((Object)self == (Object)null))
 		{
 			for (int i = 0; i < numTargetInfo; i++)
 			{
 				TargetPoint targetPoint = targetInfoList[i].targetPoint;
-				if (targetPoint.param.isTargetEnable && !(targetPoint.subRegionRoot == null))
+				if (targetPoint.param.isTargetEnable && !((Object)targetPoint.subRegionRoot == (Object)null))
 				{
 					Enemy enemy = targetInfoList[i].enemy;
-					if (!(enemy == null))
+					if (!((Object)enemy == (Object)null))
 					{
 						for (int j = i + 1; j < numTargetInfo; j++)
 						{
 							TargetPoint targetPoint2 = targetInfoList[j].targetPoint;
 							Enemy enemy2 = targetInfoList[j].enemy;
-							if (enemy2 != enemy)
+							if ((Object)enemy2 != (Object)enemy)
 							{
 								break;
 							}
-							if (targetPoint2.param.isTargetEnable && !(targetPoint2.subRegionRoot == null) && targetPoint.subRegionRoot == targetPoint2.subRegionRoot)
+							if (targetPoint2.param.isTargetEnable && !((Object)targetPoint2.subRegionRoot == (Object)null) && (Object)targetPoint.subRegionRoot == (Object)targetPoint2.subRegionRoot)
 							{
 								if (targetPoint.param.vecSqrMagnitude > targetPoint2.param.vecSqrMagnitude)
 								{
@@ -831,7 +766,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 			for (int k = 0; k < numTargetInfo; k++)
 			{
 				Enemy enemy3 = targetInfoList[k].enemy;
-				if (enemy3 == null)
+				if ((Object)enemy3 == (Object)null)
 				{
 					if (self.spAttackType == SP_ATTACK_TYPE.SOUL)
 					{
@@ -864,16 +799,16 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 	private TargetPoint DecideFinalTargetPoint(TargetPoint nextTargetPoint, TargetPoint nowTargetPoint, Player.ATTACK_MODE attackMode)
 	{
 		bool flag = false;
-		if (targetingTime == 0f || Time.get_time() - targetingTime >= parameter.changeAbleTime)
+		if (targetingTime == 0f || Time.time - targetingTime >= parameter.changeAbleTime)
 		{
 			flag = true;
 		}
 		bool flag2 = true;
 		bool flag3 = false;
-		if (nextTargetPoint != null)
+		if ((Object)nextTargetPoint != (Object)null)
 		{
 			TargetPoint.Param param = nextTargetPoint.param;
-			param.targetSelectCounter += Time.get_deltaTime();
+			param.targetSelectCounter += Time.deltaTime;
 			if (param.targetSelectCounter < parameter.selectAbleTime)
 			{
 				flag2 = false;
@@ -899,7 +834,7 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 			flag4 = true;
 		}
 		flag3 = false;
-		if (nowTargetPoint != null)
+		if ((Object)nowTargetPoint != (Object)null)
 		{
 			switch (nowTargetPoint.param.weakState)
 			{
@@ -922,9 +857,9 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 			flag5 = true;
 			if (targetingWeakTime <= 0f)
 			{
-				targetingWeakTime = Time.get_time();
+				targetingWeakTime = Time.time;
 			}
-			if (Time.get_time() - targetingWeakTime >= parameter.changeWeakTime)
+			if (Time.time - targetingWeakTime >= parameter.changeWeakTime)
 			{
 				flag5 = false;
 			}
@@ -934,27 +869,27 @@ public class TargetMarkerManager : MonoBehaviourSingleton<TargetMarkerManager>
 			targetingWeakTime = 0f;
 		}
 		bool flag6 = false;
-		if (((flag && flag2) || flag4 || nowTargetPoint == null) && !flag5)
+		if (((flag && flag2) || flag4 || (Object)nowTargetPoint == (Object)null) && !flag5)
 		{
 			flag6 = true;
 		}
 		bool flag7 = false;
-		if (nowTargetPoint != null)
+		if ((Object)nowTargetPoint != (Object)null)
 		{
 			Enemy enemy = nowTargetPoint.owner as Enemy;
-			if (enemy != null && !enemy.isDead && enemy.enableTargetPoint)
+			if ((Object)enemy != (Object)null && !enemy.isDead && enemy.enableTargetPoint)
 			{
 				flag7 = true;
 			}
 		}
 		if ((!isTargetLock && flag6) || !flag7 || isTargetDisable)
 		{
-			if (nextTargetPoint != null)
+			if ((Object)nextTargetPoint != (Object)null)
 			{
-				if (nowTargetPoint != nextTargetPoint)
+				if ((Object)nowTargetPoint != (Object)nextTargetPoint)
 				{
 					nowTargetPoint = nextTargetPoint;
-					targetingTime = Time.get_time();
+					targetingTime = Time.time;
 					targetingWeakTime = 0f;
 				}
 				nextTargetPoint.param.targetSelectCounter = 0f;

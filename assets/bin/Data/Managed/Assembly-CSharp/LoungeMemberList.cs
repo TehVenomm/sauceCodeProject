@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,10 +38,9 @@ public class LoungeMemberList : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 		members = new List<LoungeModel.SlotInfo>(8);
-		SetLabelText((Enum)UI.STR_LIST_NUM, base.sectionData.GetText("MEMBER_NUMBER"));
-		this.StartCoroutine(DoInitialize());
+		SetLabelText(UI.STR_LIST_NUM, base.sectionData.GetText("MEMBER_NUMBER"));
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -50,7 +48,7 @@ public class LoungeMemberList : GameSection
 		bool isWait = true;
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.GetRallyList(delegate
 		{
-			((_003CDoInitialize_003Ec__IteratorDE)/*Error near IL_002d: stateMachine*/)._003CisWait_003E__0 = false;
+			((_003CDoInitialize_003Ec__IteratorE0)/*Error near IL_002d: stateMachine*/)._003CisWait_003E__0 = false;
 		});
 		while (isWait)
 		{
@@ -68,9 +66,9 @@ public class LoungeMemberList : GameSection
 	{
 		SetMembers();
 		UpdateListUI();
-		SetActive((Enum)UI.LBL_NON_LIST, members.Count <= 0);
-		SetLabelText((Enum)UI.LBL_MEMBER_NUMBER_NOW, MonoBehaviourSingleton<LoungeMatchingManager>.I.GetMemberCount().ToString());
-		SetLabelText((Enum)UI.LBL_MEMBER_NUMBER_MAX, (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData.num + 1).ToString());
+		SetActive(UI.LBL_NON_LIST, members.Count <= 0);
+		SetLabelText(UI.LBL_MEMBER_NUMBER_NOW, MonoBehaviourSingleton<LoungeMatchingManager>.I.GetMemberCount().ToString());
+		SetLabelText(UI.LBL_MEMBER_NUMBER_MAX, (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData.num + 1).ToString());
 	}
 
 	private void SetMembers()
@@ -86,9 +84,12 @@ public class LoungeMemberList : GameSection
 		}
 	}
 
-	private unsafe void UpdateListUI()
+	private void UpdateListUI()
 	{
-		SetDynamicList((Enum)UI.GRD_LIST, "LoungeMemberListItem", members.Count, false, null, null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetDynamicList(UI.GRD_LIST, "LoungeMemberListItem", members.Count, false, null, null, delegate(int i, Transform t, bool is_recycle)
+		{
+			SetupListItem(members[i], i, t, is_recycle);
+		});
 	}
 
 	private void SetupListItem(LoungeModel.SlotInfo data, int i, Transform t, bool is_recycle)
@@ -99,8 +100,6 @@ public class LoungeMemberList : GameSection
 
 	private void SetMemberInfo(LoungeModel.SlotInfo data, int i, Transform t)
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 		CharaInfo userInfo = data.userInfo;
 		FollowLoungeMember followLoungeMember = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetFollowLoungeMember(userInfo.userId);
 		EquipSetCalculator otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(i + 4);
@@ -119,7 +118,7 @@ public class LoungeMemberList : GameSection
 		});
 		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsRallyUser(userInfo.userId))
 		{
-			SetBadge(t, -1, 1, 10, 0, true);
+			SetBadge(t, -1, SpriteAlignment.TopLeft, 10, 0, true);
 		}
 	}
 

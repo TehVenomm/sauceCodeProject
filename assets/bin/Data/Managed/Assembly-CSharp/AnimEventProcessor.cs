@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -55,20 +54,11 @@ public class AnimEventProcessor
 
 	public void Update()
 	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Expected O, but got Unknown
-		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019f: Expected O, but got Unknown
-		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
-		if (!(animator == null))
+		if (!((Object)animator == (Object)null))
 		{
 			bool flag = animator.IsInTransition(0);
 			AnimatorStateInfo info = (!flag) ? animator.GetCurrentAnimatorStateInfo(0) : animator.GetNextAnimatorStateInfo(0);
-			if ((curHash != info.get_fullPathHash() && !waitChange) || (curHash == info.get_fullPathHash() && waitChange))
+			if ((curHash != info.fullPathHash && !waitChange) || (curHash == info.fullPathHash && waitChange))
 			{
 				if (waitChange)
 				{
@@ -78,10 +68,10 @@ public class AnimEventProcessor
 				{
 					if (curDatas != null && lastSpeed > 0f)
 					{
-						float num = Time.get_deltaTime() * lastSpeed + lastNormalizedTime;
+						float num = Time.deltaTime * lastSpeed + lastNormalizedTime;
 						Forward(num - beginTime + curMargin);
 					}
-					OnChangeAnim(info.get_fullPathHash(), false);
+					OnChangeAnim(info.fullPathHash, false);
 				}
 				if (curDatas == null)
 				{
@@ -100,7 +90,7 @@ public class AnimEventProcessor
 					changeTransition = true;
 					return;
 				}
-				ChangeAnimClip(ref info, nextAnimatorClipInfo[0].get_clip());
+				ChangeAnimClip(ref info, nextAnimatorClipInfo[0].clip);
 			}
 			else if (changeDelay)
 			{
@@ -109,14 +99,14 @@ public class AnimEventProcessor
 				{
 					return;
 				}
-				ChangeAnimClip(ref info, array[0].get_clip());
+				ChangeAnimClip(ref info, array[0].clip);
 			}
-			if (!waitChange && curDatas != null && (!flag || !((ValueType)animator.GetCurrentAnimatorStateInfo(0)).Equals((object)animator.GetNextAnimatorStateInfo(0))))
+			if (!waitChange && curDatas != null && (!flag || !animator.GetCurrentAnimatorStateInfo(0).Equals(animator.GetNextAnimatorStateInfo(0))))
 			{
-				float num2 = info.get_normalizedTime() * curTimeScale;
-				if (animator.get_speed() >= 0f)
+				float num2 = info.normalizedTime * curTimeScale;
+				if (animator.speed >= 0f)
 				{
-					if (num2 >= lastTime && info.get_loop())
+					if (num2 >= lastTime && info.loop)
 					{
 						Forward(curLength);
 						beginTime = lastTime;
@@ -133,7 +123,7 @@ public class AnimEventProcessor
 						curIndex = 0;
 					}
 					lastNormalizedTime = num2;
-					lastSpeed = animator.get_speed();
+					lastSpeed = animator.speed;
 					Forward(num2 - beginTime + curMargin);
 				}
 			}
@@ -160,9 +150,9 @@ public class AnimEventProcessor
 
 	private void ChangeAnimClip(ref AnimatorStateInfo info, AnimationClip clip)
 	{
-		curLength = clip.get_length();
+		curLength = clip.length;
 		curTimeScale = curLength;
-		curMargin = 0.005f * (clip.get_length() / info.get_length());
+		curMargin = 0.005f * (clip.length / info.length);
 		beginTime = 0f;
 		lastTime = curLength;
 		lastNormalizedTime = 0f;
@@ -270,7 +260,7 @@ public class AnimEventProcessor
 
 	public void ChangeAnimCtrl(RuntimeAnimatorController anim_ctrl, AnimEventData anim_event)
 	{
-		if (!(anim_ctrl == null) && !(anim_event == null))
+		if (!((Object)anim_ctrl == (Object)null) && !((Object)anim_event == (Object)null))
 		{
 			ExecuteLastEvent(true);
 			curHash = 0;
@@ -278,7 +268,7 @@ public class AnimEventProcessor
 			curTime = 0f;
 			curIndex = 0;
 			ignoreEventFlag = false;
-			animator.set_runtimeAnimatorController(anim_ctrl);
+			animator.runtimeAnimatorController = anim_ctrl;
 			animator.Rebind();
 			animEventData = anim_event;
 		}

@@ -35,7 +35,7 @@ public class EnemyFieldDropItemTable : Singleton<EnemyFieldDropItemTable>
 
 	private object tableLock = new object();
 
-	public unsafe void Add(uint enemyId, uint itemId, uint fieldId, List<int> partIds)
+	public void Add(uint enemyId, uint itemId, uint fieldId, List<int> partIds)
 	{
 		lock (tableLock)
 		{
@@ -44,8 +44,7 @@ public class EnemyFieldDropItemTable : Singleton<EnemyFieldDropItemTable>
 				value = new List<EnemyFieldDropItemData>();
 				enemyToItemTable[enemyId] = value;
 			}
-			_003CAdd_003Ec__AnonStorey732 _003CAdd_003Ec__AnonStorey;
-			if (!value.Any(new Func<EnemyFieldDropItemData, bool>((object)_003CAdd_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+			if (!value.Any((EnemyFieldDropItemData x) => x.itemId == itemId && x.fieldId == fieldId))
 			{
 				EnemyFieldDropItemData item = new EnemyFieldDropItemData(enemyId, itemId, fieldId, partIds);
 				value.Add(item);

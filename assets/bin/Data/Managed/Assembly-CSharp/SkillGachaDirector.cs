@@ -47,17 +47,12 @@ public class SkillGachaDirector : AnimationDirector
 		GOLD
 	}
 
-	public class MagiBall
+	public class MagiBall : MonoBehaviour
 	{
 		public FLASH_TYPE FlashType
 		{
 			get;
 			set;
-		}
-
-		public MagiBall()
-			: this()
-		{
 		}
 	}
 
@@ -159,46 +154,42 @@ public class SkillGachaDirector : AnimationDirector
 
 	private bool m_isFinishLoad;
 
-	private Texture2D[] basketModelTextureList = (Texture2D[])new Texture2D[3];
+	private Texture2D[] basketModelTextureList = new Texture2D[3];
 
 	private Texture backupBasketModelTexture;
 
-	private Color backupBasketSpeColor = Color.get_white();
+	private Color backupBasketSpeColor = Color.white;
 
 	private bool IsSingleGacha => !isReam;
 
 	protected override void Awake()
 	{
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Expected O, but got Unknown
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		commandReceiver = this;
 		if (balls.Length > 0)
 		{
 			for (int i = 0; i < balls.Length; i++)
 			{
-				if (balls[i] != null)
+				if ((UnityEngine.Object)balls[i] != (UnityEngine.Object)null)
 				{
 					balls[i].SetActive(false);
 				}
 			}
 		}
 		SetActiveRenBalls(false);
-		if (ballSocket != null)
+		if ((UnityEngine.Object)ballSocket != (UnityEngine.Object)null)
 		{
 			basketColliders = ballSocket.GetComponentsInChildren<Collider>(true);
 			SetActivateBasketCollider(false);
 		}
-		if (line != null)
+		if ((UnityEngine.Object)line != (UnityEngine.Object)null)
 		{
-			line.set_enabled(false);
+			line.enabled = false;
 		}
 		Material material = GetMaterial(basket);
-		if (material != null)
+		if ((UnityEngine.Object)material != (UnityEngine.Object)null)
 		{
-			backupBasketModelTexture = material.get_mainTexture();
+			backupBasketModelTexture = material.mainTexture;
 			backupBasketSpeColor = material.GetColor("_SpeLightColor");
 		}
 	}
@@ -222,26 +213,25 @@ public class SkillGachaDirector : AnimationDirector
 
 	public void StartDirection(ISectionCommand command_receiver)
 	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		if (coroutine != null)
 		{
-			this.StopCoroutine(coroutine);
+			StopCoroutine(coroutine);
 			coroutine = null;
 		}
 		if (command_receiver != null)
 		{
 			sectionCommandReceiver = command_receiver;
-			this.StartCoroutine(coroutine = DoSkillGacha());
+			StartCoroutine(coroutine = DoSkillGacha());
 		}
 	}
 
 	private IEnumerator DoSkillGacha()
 	{
-		Transform _transform = this.get_transform();
+		Transform _transform = base.transform;
 		Reset();
-		if (line != null)
+		if ((UnityEngine.Object)line != (UnityEngine.Object)null)
 		{
-			line.set_enabled(true);
+			line.enabled = true;
 		}
 		isReam = false;
 		if (MonoBehaviourSingleton<GachaManager>.IsValid() && MonoBehaviourSingleton<GachaManager>.I.IsReam())
@@ -249,10 +239,10 @@ public class SkillGachaDirector : AnimationDirector
 			isReam = true;
 		}
 		SetActivateBasketCollider(true);
-		Vector3 basket_pos = basket.get_position();
+		Vector3 basket_pos = basket.position;
 		for (int l = 0; l < 20; l++)
 		{
-			CreateBall(_transform, 0, basket_pos + Quaternion.AngleAxis((float)(l * 45), Vector3.get_right()) * new Vector3(0.04f * (float)(l - 10), 0.08f, 0f), false);
+			CreateBall(_transform, 0, basket_pos + Quaternion.AngleAxis((float)(l * 45), Vector3.right) * new Vector3(0.04f * (float)(l - 10), 0.08f, 0f), false);
 		}
 		LoadingQueue load_queue = new LoadingQueue(this);
 		if (isReam)
@@ -283,7 +273,7 @@ public class SkillGachaDirector : AnimationDirector
 							MeshRenderer mr = ballsRen[i].GetComponent<MeshRenderer>();
 							int index = skill_item_data2.rarity.ToRarityExpressionID();
 							MeshRenderer rareBall = balls[index].GetComponent<MeshRenderer>();
-							mr.set_sharedMaterial(rareBall.get_sharedMaterial());
+							mr.sharedMaterial = rareBall.sharedMaterial;
 						}
 					}
 				}
@@ -303,21 +293,21 @@ public class SkillGachaDirector : AnimationDirector
 			{
 				yield return (object)loadQueue.Wait();
 			}
-			basketModelTextureList[tx] = loadObj.loadedObject;
+			basketModelTextureList[tx] = (Texture2D)loadObj.loadedObject;
 		}
-		if (backupBasketModelTexture != null)
+		if ((UnityEngine.Object)backupBasketModelTexture != (UnityEngine.Object)null)
 		{
 			Material mat = GetMaterial(basket);
-			if (mat != null)
+			if ((UnityEngine.Object)mat != (UnityEngine.Object)null)
 			{
-				mat.set_mainTexture(backupBasketModelTexture);
+				mat.mainTexture = backupBasketModelTexture;
 				mat.SetColor("_SpeLightColor", backupBasketSpeColor);
 			}
 		}
 		yield return (object)new WaitForSeconds(1f);
-		npcModel = Utility.CreateGameObject("NPC", this.get_transform().get_parent(), -1);
-		managedObjects.Add(npcModel.get_gameObject());
-		NPCLoader npc_loader = npcModel.get_gameObject().AddComponent<NPCLoader>();
+		npcModel = Utility.CreateGameObject("NPC", base.transform.parent, -1);
+		managedObjects.Add(npcModel.gameObject);
+		NPCLoader npc_loader = npcModel.gameObject.AddComponent<NPCLoader>();
 		npc_loader.Load(Singleton<NPCTable>.I.GetNPCData(1).npcModelID, 0, false, true, SHADER_TYPE.NORMAL, null);
 		while (npc_loader.isLoading)
 		{
@@ -330,11 +320,11 @@ public class SkillGachaDirector : AnimationDirector
 		npcAnimator = npc_loader.animator;
 		yield return (object)null;
 		m_isFinishLoad = true;
-		npcAnimator.set_cullingMode(0);
+		npcAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 		npcAnimator.Rebind();
-		npcAnimator.set_cullingMode(0);
+		npcAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 		gachaAnimator.Rebind();
-		cameraAnimator.set_cullingMode(0);
+		cameraAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 		cameraAnimator.Rebind();
 		string anim_name = (!IsSingleGacha) ? "SKILL_GACHA_REAM" : "SKILL_GACHA_SINGLE";
 		dropCount = 0;
@@ -350,21 +340,21 @@ public class SkillGachaDirector : AnimationDirector
 					{
 						yield return (object)null;
 					}
-					Time.set_timeScale(1f);
+					Time.timeScale = 1f;
 					skip = false;
 					yield return (object)MonoBehaviourSingleton<TransitionManager>.I.In();
 				}
 				yield return (object)null;
 			}
 		}
-		while (mainBall.get_gameObject().get_activeSelf())
+		while (mainBall.gameObject.activeSelf)
 		{
 			yield return (object)null;
 		}
 		if (skip)
 		{
 			yield return (object)MonoBehaviourSingleton<TransitionManager>.I.In();
-			Time.set_timeScale(1f);
+			Time.timeScale = 1f;
 		}
 		yield return (object)null;
 		sectionCommandReceiver.OnEnd();
@@ -377,16 +367,13 @@ public class SkillGachaDirector : AnimationDirector
 
 	private void Drop()
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
 		sectionCommandReceiver.OnHideRarity();
 		int i = 0;
 		for (int count = managedEffects.Count; i < count; i++)
 		{
-			if (managedEffects[i] != null)
+			if ((UnityEngine.Object)managedEffects[i] != (UnityEngine.Object)null)
 			{
-				Object.Destroy(managedEffects[i].get_gameObject());
+				UnityEngine.Object.Destroy(managedEffects[i].gameObject);
 			}
 		}
 		managedEffects.Clear();
@@ -406,11 +393,11 @@ public class SkillGachaDirector : AnimationDirector
 			reward = new GachaResult.GachaReward();
 		}
 		rarityIndex = rarity.ToRarityExpressionID();
-		if (mainBall != null)
+		if ((UnityEngine.Object)mainBall != (UnityEngine.Object)null)
 		{
-			Object.Destroy(mainBall.get_gameObject());
+			UnityEngine.Object.Destroy(mainBall.gameObject);
 		}
-		mainBall = CreateBall(ballSocket, rarityIndex, Vector3.get_zero(), true);
+		mainBall = CreateBall(ballSocket, rarityIndex, Vector3.zero, true);
 		string text;
 		if (dropCount != 0)
 		{
@@ -428,45 +415,38 @@ public class SkillGachaDirector : AnimationDirector
 
 	private Transform CreateBall(Transform parent, int rarityType, Vector3 pos, bool is_main)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		GameObject val = ResourceUtility.Instantiate<GameObject>(balls[rarityType]);
-		Transform val2 = val.get_transform();
-		val2.set_parent(parent);
-		val2.set_localPosition(pos);
-		val2.set_localScale(Vector3.get_one());
+		GameObject gameObject = ResourceUtility.Instantiate(balls[rarityType]);
+		Transform transform = gameObject.transform;
+		transform.parent = parent;
+		transform.localPosition = pos;
+		transform.localScale = Vector3.one;
 		if (is_main)
 		{
-			Object.Destroy(val.GetComponent<Rigidbody>());
-			Object.Destroy(val.GetComponent<Collider>());
+			UnityEngine.Object.Destroy(gameObject.GetComponent<Rigidbody>());
+			UnityEngine.Object.Destroy(gameObject.GetComponent<Collider>());
 		}
 		else
 		{
-			MagiBall magiBall = val.AddComponent<MagiBall>();
-			if (magiBall != null)
+			MagiBall magiBall = gameObject.AddComponent<MagiBall>();
+			if ((UnityEngine.Object)magiBall != (UnityEngine.Object)null)
 			{
 				magiBall.FlashType = (FLASH_TYPE)rarityType;
 			}
-			ballObjects.Add(val);
+			ballObjects.Add(gameObject);
 		}
-		val.SetActive(true);
-		return val2;
+		gameObject.SetActive(true);
+		return transform;
 	}
 
 	protected override void LateUpdate()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		if (useCamera != null)
+		if ((UnityEngine.Object)useCamera != (UnityEngine.Object)null)
 		{
-			Vector3 localScale = cameraAnimator.get_transform().get_localScale();
+			Vector3 localScale = cameraAnimator.transform.localScale;
 			float x = localScale.x;
 			if (x > 0f)
 			{
-				useCamera.set_fieldOfView(Utility.HorizontalToVerticalFOV(x));
+				useCamera.fieldOfView = Utility.HorizontalToVerticalFOV(x);
 			}
 		}
 		base.LateUpdate();
@@ -474,11 +454,10 @@ public class SkillGachaDirector : AnimationDirector
 
 	private void Delete()
 	{
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int count = managedObjects.Count; i < count; i++)
 		{
-			Object.DestroyImmediate(managedObjects[i]);
+			UnityEngine.Object.DestroyImmediate(managedObjects[i]);
 			managedObjects[i] = null;
 		}
 		managedObjects.Clear();
@@ -487,7 +466,7 @@ public class SkillGachaDirector : AnimationDirector
 			int count2 = flashEffectList.Count;
 			for (int j = 0; j < count2; j++)
 			{
-				Object.DestroyImmediate(flashEffectList[j].get_gameObject());
+				UnityEngine.Object.DestroyImmediate(flashEffectList[j].gameObject);
 				flashEffectList[j] = null;
 			}
 		}
@@ -498,13 +477,13 @@ public class SkillGachaDirector : AnimationDirector
 		int count3 = ballObjects.Count;
 		for (int k = 0; k < count3; k++)
 		{
-			Object.DestroyImmediate(ballObjects[k]);
+			UnityEngine.Object.DestroyImmediate(ballObjects[k]);
 			ballObjects[k] = null;
 		}
 		ballObjects.Clear();
-		if (line != null)
+		if ((UnityEngine.Object)line != (UnityEngine.Object)null)
 		{
-			line.set_enabled(false);
+			line.enabled = false;
 		}
 		Play("INIT", null, 0f);
 	}
@@ -523,20 +502,19 @@ public class SkillGachaDirector : AnimationDirector
 
 	public override void Skip()
 	{
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		if (!skip && !IsFinishDrop10() && !m_isAlreadySkipped)
 		{
 			m_isAlreadySkipped = true;
 			AudioObjectPool.StopAllLentObjects();
 			base.Skip();
-			this.StartCoroutine(DoSkip());
+			StartCoroutine(DoSkip());
 		}
 	}
 
 	private IEnumerator DoSkip()
 	{
 		yield return (object)MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.BLACK);
-		Time.set_timeScale(100f);
+		Time.timeScale = 100f;
 		while (!m_isFinishLoad)
 		{
 			yield return (object)null;
@@ -554,22 +532,21 @@ public class SkillGachaDirector : AnimationDirector
 
 	private void OnDirectionCommand(string cmd)
 	{
-		//IL_021a: Unknown result type (might be due to invalid IL or missing references)
 		bool flag = !MonoBehaviourSingleton<TransitionManager>.I.isChanging && MonoBehaviourSingleton<TransitionManager>.I.isTransing;
 		if (cmd == "NPC_EFFECT")
 		{
-			if (npcModel != null)
+			if ((UnityEngine.Object)npcModel != (UnityEngine.Object)null)
 			{
-				Transform val = Utility.Find(npcModel, "Head");
-				if (val != null)
+				Transform transform = Utility.Find(npcModel, "Head");
+				if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 				{
-					val = ResourceUtility.Realizes(npcEffect, val, -1);
+					transform = ResourceUtility.Realizes(npcEffect, transform, -1);
 				}
 			}
 		}
 		else if (cmd == "DROP_EFFECT")
 		{
-			if (!flag && dropBallEffect != null && dropBallEffectPosition != null)
+			if (!flag && (UnityEngine.Object)dropBallEffect != (UnityEngine.Object)null && (UnityEngine.Object)dropBallEffectPosition != (UnityEngine.Object)null)
 			{
 				managedEffects.Add(ResourceUtility.Realizes(dropBallEffect, dropBallEffectPosition, -1));
 			}
@@ -579,7 +556,7 @@ public class SkillGachaDirector : AnimationDirector
 			if (!flag)
 			{
 				PlayAUDIO(AUDIO.BALL_POP);
-				if (jumpBallEffect != null && jumpBallEffectPosition != null)
+				if ((UnityEngine.Object)jumpBallEffect != (UnityEngine.Object)null && (UnityEngine.Object)jumpBallEffectPosition != (UnityEngine.Object)null)
 				{
 					managedEffects.Add(ResourceUtility.Realizes(jumpBallEffect, jumpBallEffectPosition, -1));
 				}
@@ -617,9 +594,9 @@ public class SkillGachaDirector : AnimationDirector
 		}
 		else if (cmd == "HIDE_BALL")
 		{
-			if (mainBall != null)
+			if ((UnityEngine.Object)mainBall != (UnityEngine.Object)null)
 			{
-				mainBall.get_gameObject().SetActive(false);
+				mainBall.gameObject.SetActive(false);
 			}
 			if (isReam && sectionCommandReceiver != null && reward != null)
 			{
@@ -669,17 +646,17 @@ public class SkillGachaDirector : AnimationDirector
 				UpdateGachaModelEffectReam(flashCount);
 			}
 		}
-		else if (!(flashEffectPrefab == null) && flashEffectRarityPrefabs != null)
+		else if (!((UnityEngine.Object)flashEffectPrefab == (UnityEngine.Object)null) && flashEffectRarityPrefabs != null)
 		{
 			ApplyRandomVectorForBalls();
 			flashCount++;
-			GameObject val = flashEffectPrefab;
+			GameObject gameObject = flashEffectPrefab;
 			if (isReam)
 			{
 				if (flashCount >= 4)
 				{
 					FLASH_TYPE flashTypeAtLast = GetFlashTypeAtLast();
-					val = flashEffectRarityPrefabs[(int)flashTypeAtLast];
+					gameObject = flashEffectRarityPrefabs[(int)flashTypeAtLast];
 					SwitchBasketModelTexture(flashTypeAtLast);
 					SwitchBasketBallColor(flashTypeAtLast);
 					PlayAUDIOFlash(flashTypeAtLast);
@@ -687,20 +664,20 @@ public class SkillGachaDirector : AnimationDirector
 				else
 				{
 					FLASH_TYPE fLASH_TYPE = UpdateGachaModelEffectReam(flashCount);
-					val = flashEffectRarityPrefabs[(int)fLASH_TYPE];
+					gameObject = flashEffectRarityPrefabs[(int)fLASH_TYPE];
 				}
 			}
 			else
 			{
 				FLASH_TYPE fLASH_TYPE2 = UpdateGachaModelEffectSingle(flashCount);
-				val = flashEffectRarityPrefabs[(int)fLASH_TYPE2];
+				gameObject = flashEffectRarityPrefabs[(int)fLASH_TYPE2];
 			}
-			if (val != null && flashEffectPosition != null)
+			if ((UnityEngine.Object)gameObject != (UnityEngine.Object)null && (UnityEngine.Object)flashEffectPosition != (UnityEngine.Object)null)
 			{
-				Transform val2 = ResourceUtility.Realizes(val, flashEffectPosition, -1);
-				if (val2 != null)
+				Transform transform = ResourceUtility.Realizes(gameObject, flashEffectPosition, -1);
+				if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 				{
-					flashEffectList.Add(val2);
+					flashEffectList.Add(transform);
 				}
 			}
 		}
@@ -716,7 +693,7 @@ public class SkillGachaDirector : AnimationDirector
 				fLASH_TYPE = FLASH_TYPE.GOLD;
 				if (targetFlashCount < 3)
 				{
-					fLASH_TYPE = ((Random.Range(0, 100) <= 50) ? FLASH_TYPE.SILVER : FLASH_TYPE.GREEN);
+					fLASH_TYPE = ((UnityEngine.Random.Range(0, 100) <= 50) ? FLASH_TYPE.SILVER : FLASH_TYPE.GREEN);
 				}
 			}
 			else if (CalcNumRarityData(RARITY_TYPE.A, false, false) > 0)
@@ -724,7 +701,7 @@ public class SkillGachaDirector : AnimationDirector
 				fLASH_TYPE = FLASH_TYPE.SILVER;
 				if (targetFlashCount < 3)
 				{
-					fLASH_TYPE = ((Random.Range(0, 100) <= 50) ? FLASH_TYPE.SILVER : FLASH_TYPE.GREEN);
+					fLASH_TYPE = ((UnityEngine.Random.Range(0, 100) <= 50) ? FLASH_TYPE.SILVER : FLASH_TYPE.GREEN);
 				}
 			}
 		}
@@ -736,25 +713,19 @@ public class SkillGachaDirector : AnimationDirector
 
 	private void SwitchBasketBallColor(FLASH_TYPE targetFlashType)
 	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Expected O, but got Unknown
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Expected O, but got Unknown
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 		foreach (GameObject ballObject in ballObjects)
 		{
 			MeshRenderer component = ballObject.GetComponent<MeshRenderer>();
-			if (!(component == null))
+			if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
 			{
-				Material val = component.get_material();
-				if (!(val == null))
+				Material material = component.material;
+				if (!((UnityEngine.Object)material == (UnityEngine.Object)null))
 				{
 					MeshRenderer component2 = balls[(int)targetFlashType].GetComponent<MeshRenderer>();
-					Material val2 = component2.get_material();
-					val.set_mainTexture(val2.get_mainTexture());
-					val.SetColor("_SpeLightColor", val2.GetColor("_SpeLightColor"));
-					val.SetFloat("_SpeWidth", val2.GetFloat("_SpeWidth"));
+					Material material2 = component2.material;
+					material.mainTexture = material2.mainTexture;
+					material.SetColor("_SpeLightColor", material2.GetColor("_SpeLightColor"));
+					material.SetFloat("_SpeWidth", material2.GetFloat("_SpeWidth"));
 				}
 			}
 		}
@@ -762,12 +733,6 @@ public class SkillGachaDirector : AnimationDirector
 
 	private void SwitchBasketBallColorReam(FLASH_TYPE targetFlashType, int numChange)
 	{
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Expected O, but got Unknown
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Expected O, but got Unknown
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
 		int num = 0;
 		foreach (GameObject ballObject in ballObjects)
 		{
@@ -776,19 +741,19 @@ public class SkillGachaDirector : AnimationDirector
 				break;
 			}
 			MagiBall component = ballObject.GetComponent<MagiBall>();
-			if (!(component == null) && component.FlashType == FLASH_TYPE.GREEN)
+			if (!((UnityEngine.Object)component == (UnityEngine.Object)null) && component.FlashType == FLASH_TYPE.GREEN)
 			{
 				MeshRenderer component2 = ballObject.GetComponent<MeshRenderer>();
-				if (!(component2 == null))
+				if (!((UnityEngine.Object)component2 == (UnityEngine.Object)null))
 				{
-					Material val = component2.get_material();
-					if (!(val == null))
+					Material material = component2.material;
+					if (!((UnityEngine.Object)material == (UnityEngine.Object)null))
 					{
 						MeshRenderer component3 = balls[(int)targetFlashType].GetComponent<MeshRenderer>();
-						Material val2 = component3.get_material();
-						val.set_mainTexture(val2.get_mainTexture());
-						val.SetColor("_SpeLightColor", val2.GetColor("_SpeLightColor"));
-						val.SetFloat("_SpeWidth", val2.GetFloat("_SpeWidth"));
+						Material material2 = component3.material;
+						material.mainTexture = material2.mainTexture;
+						material.SetColor("_SpeLightColor", material2.GetColor("_SpeLightColor"));
+						material.SetFloat("_SpeWidth", material2.GetFloat("_SpeWidth"));
 						component.FlashType = targetFlashType;
 						num++;
 					}
@@ -832,25 +797,24 @@ public class SkillGachaDirector : AnimationDirector
 
 	private void SwitchBasketModelTexture(FLASH_TYPE targetRarityType)
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 		if (basketModelTextureList == null)
 		{
 			Log.Error("Not found downloaded texture!!");
 		}
 		else
 		{
-			Texture2D val = basketModelTextureList[(int)targetRarityType];
-			if (val == null)
+			Texture2D texture2D = basketModelTextureList[(int)targetRarityType];
+			if ((UnityEngine.Object)texture2D == (UnityEngine.Object)null)
 			{
 				Log.Error("Not found texture for basket model!!");
 			}
 			else
 			{
 				Material material = GetMaterial(basket);
-				if (material != null)
+				if ((UnityEngine.Object)material != (UnityEngine.Object)null)
 				{
-					material.set_mainTexture(val);
-					material.SetColor("_SpeLightColor", Color.get_white());
+					material.mainTexture = texture2D;
+					material.SetColor("_SpeLightColor", Color.white);
 				}
 			}
 		}
@@ -859,12 +823,12 @@ public class SkillGachaDirector : AnimationDirector
 	private Material GetMaterial(Transform targetTrans)
 	{
 		MeshRenderer component = targetTrans.GetComponent<MeshRenderer>();
-		if (component == null)
+		if ((UnityEngine.Object)component == (UnityEngine.Object)null)
 		{
 			Log.Error("Not found MeshRender!!");
 			return null;
 		}
-		Material[] materials = component.get_materials();
+		Material[] materials = component.materials;
 		if (materials == null)
 		{
 			Log.Error("material list is null!!");
@@ -875,16 +839,14 @@ public class SkillGachaDirector : AnimationDirector
 
 	private void ApplyRandomVectorForBalls()
 	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		foreach (GameObject ballObject in ballObjects)
 		{
-			if (!(ballObject == null))
+			if (!((UnityEngine.Object)ballObject == (UnityEngine.Object)null))
 			{
 				Rigidbody component = ballObject.GetComponent<Rigidbody>();
-				if (!(component == null))
+				if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
 				{
-					component.AddForce(Vector3.get_up() * 120f);
+					component.AddForce(Vector3.up * 120f);
 				}
 			}
 		}
@@ -970,19 +932,18 @@ public class SkillGachaDirector : AnimationDirector
 
 	public void PlayUIRarityEffect(RARITY_TYPE rarity, Transform effect_parent_ui, Transform effect_target_ui)
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		GameObject val = null;
+		GameObject gameObject = null;
 		int num = rarity.ToRarityExpressionID2();
 		if (num > 0)
 		{
-			val = uiRarityEffectPrefabs[num - 1];
+			gameObject = uiRarityEffectPrefabs[num - 1];
 		}
-		if (!(val == null))
+		if (!((UnityEngine.Object)gameObject == (UnityEngine.Object)null))
 		{
 			UIWidget componentInChildren = effect_target_ui.GetComponentInChildren<UIWidget>();
-			Transform val2 = ResourceUtility.Realizes(val, effect_parent_ui, 5);
-			val2.set_position(effect_parent_ui.get_position());
-			EffectManager.SetUIEffectDepth(val2, effect_parent_ui, -0.001f, 10, componentInChildren);
+			Transform transform = ResourceUtility.Realizes(gameObject, effect_parent_ui, 5);
+			transform.position = effect_parent_ui.position;
+			EffectManager.SetUIEffectDepth(transform, effect_parent_ui, -0.001f, 10, componentInChildren);
 			PlayRarityAudio(rarity);
 		}
 	}
@@ -1013,7 +974,7 @@ public class SkillGachaDirector : AnimationDirector
 				int count = MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().reward.Count;
 				for (int num = Mathf.Min(ballsRen.Length, count); i < num; i++)
 				{
-					if (ballsRen[i] != null)
+					if ((UnityEngine.Object)ballsRen[i] != (UnityEngine.Object)null)
 					{
 						ballsRen[i].SetActive(isActive);
 					}
@@ -1021,7 +982,7 @@ public class SkillGachaDirector : AnimationDirector
 			}
 			for (; i < ballsRen.Length; i++)
 			{
-				if (ballsRen[i] != null)
+				if ((UnityEngine.Object)ballsRen[i] != (UnityEngine.Object)null)
 				{
 					ballsRen[i].SetActive(false);
 				}
@@ -1040,7 +1001,7 @@ public class SkillGachaDirector : AnimationDirector
 			int i = 0;
 			for (int num = basketColliders.Length; i < num; i++)
 			{
-				basketColliders[i].set_enabled(isActivate);
+				basketColliders[i].enabled = isActivate;
 			}
 		}
 	}

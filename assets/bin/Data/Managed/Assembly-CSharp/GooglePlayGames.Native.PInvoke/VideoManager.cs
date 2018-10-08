@@ -18,9 +18,9 @@ namespace GooglePlayGames.Native.PInvoke
 			mServices = Misc.CheckNotNull(services);
 		}
 
-		internal unsafe void GetCaptureCapabilities(Action<GetCaptureCapabilitiesResponse> callback)
+		internal void GetCaptureCapabilities(Action<GetCaptureCapabilitiesResponse> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.VideoManager.VideoManager_GetCaptureCapabilities(mServices.AsHandle(), InternalCaptureCapabilitiesCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, GetCaptureCapabilitiesResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			GooglePlayGames.Native.Cwrapper.VideoManager.VideoManager_GetCaptureCapabilities(mServices.AsHandle(), InternalCaptureCapabilitiesCallback, Callbacks.ToIntPtr(callback, GetCaptureCapabilitiesResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.VideoManager.CaptureCapabilitiesCallback))]
@@ -34,9 +34,9 @@ namespace GooglePlayGames.Native.PInvoke
 			GooglePlayGames.Native.Cwrapper.VideoManager.VideoManager_ShowCaptureOverlay(mServices.AsHandle());
 		}
 
-		internal unsafe void GetCaptureState(Action<GetCaptureStateResponse> callback)
+		internal void GetCaptureState(Action<GetCaptureStateResponse> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.VideoManager.VideoManager_GetCaptureState(mServices.AsHandle(), InternalCaptureStateCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, GetCaptureStateResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			GooglePlayGames.Native.Cwrapper.VideoManager.VideoManager_GetCaptureState(mServices.AsHandle(), InternalCaptureStateCallback, Callbacks.ToIntPtr(callback, GetCaptureStateResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.VideoManager.CaptureStateCallback))]
@@ -45,9 +45,9 @@ namespace GooglePlayGames.Native.PInvoke
 			Callbacks.PerformInternalCallback("VideoManager#CaptureStateCallback", Callbacks.Type.Temporary, response, data);
 		}
 
-		internal unsafe void IsCaptureAvailable(Types.VideoCaptureMode captureMode, Action<IsCaptureAvailableResponse> callback)
+		internal void IsCaptureAvailable(Types.VideoCaptureMode captureMode, Action<IsCaptureAvailableResponse> callback)
 		{
-			GooglePlayGames.Native.Cwrapper.VideoManager.VideoManager_IsCaptureAvailable(mServices.AsHandle(), captureMode, InternalIsCaptureAvailableCallback, Callbacks.ToIntPtr(callback, new Func<IntPtr, IsCaptureAvailableResponse>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			GooglePlayGames.Native.Cwrapper.VideoManager.VideoManager_IsCaptureAvailable(mServices.AsHandle(), captureMode, InternalIsCaptureAvailableCallback, Callbacks.ToIntPtr(callback, IsCaptureAvailableResponse.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(GooglePlayGames.Native.Cwrapper.VideoManager.IsCaptureAvailableCallback))]

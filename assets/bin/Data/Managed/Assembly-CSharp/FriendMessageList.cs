@@ -68,32 +68,32 @@ public class FriendMessageList : FollowListBase
 
 	public override void ListUI()
 	{
-		SetLabelText((Enum)UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText((Enum)UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText((Enum)UI.LBL_SORT, StringTable.Get(STRING_CATEGORY.USER_SORT, (uint)m_currentSortType));
+		SetLabelText(UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.LBL_SORT, StringTable.Get(STRING_CATEGORY.USER_SORT, (uint)m_currentSortType));
 		FriendMessageUserListModel.MessageUserInfo[] array = recvdata.ToArray();
 		if (array == null || array.Length == 0)
 		{
-			SetActive((Enum)UI.STR_NON_LIST, true);
-			SetActive((Enum)UI.GRD_LIST, false);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, true);
-			SetLabelText((Enum)UI.LBL_NOW, "0");
-			SetLabelText((Enum)UI.LBL_MAX, "0");
+			SetActive(UI.STR_NON_LIST, true);
+			SetActive(UI.GRD_LIST, false);
+			SetActive(UI.OBJ_ACTIVE_ROOT, false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, true);
+			SetLabelText(UI.LBL_NOW, "0");
+			SetLabelText(UI.LBL_MAX, "0");
 		}
 		else
 		{
-			SetPageNumText((Enum)UI.LBL_NOW, nowPage + 1);
-			SetPageNumText((Enum)UI.LBL_MAX, pageNumMax);
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			SetActive((Enum)UI.GRD_LIST, true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
+			SetPageNumText(UI.LBL_NOW, nowPage + 1);
+			SetPageNumText(UI.LBL_MAX, pageNumMax);
+			SetActive(UI.STR_NON_LIST, false);
+			SetActive(UI.GRD_LIST, true);
+			SetActive(UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
+			SetActive(UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
 			UpdateDynamicList();
 		}
 	}
 
-	protected unsafe override void UpdateDynamicList()
+	protected override void UpdateDynamicList()
 	{
 		FriendMessageUserListModel.MessageUserInfo[] array = recvdata.ToArray();
 		int pageItemLength = GetPageItemLength(nowPage);
@@ -101,17 +101,22 @@ public class FriendMessageList : FollowListBase
 		if (pageItemLength >= 1 && array.Length >= 1 && array.Length >= num + pageItemLength)
 		{
 			FriendMessageUserListModel.MessageUserInfo[] info = new FriendMessageUserListModel.MessageUserInfo[pageItemLength];
-			for (int i = 0; i < pageItemLength; i++)
+			for (int j = 0; j < pageItemLength; j++)
 			{
-				info[i] = array[num + i];
+				info[j] = array[num + j];
 			}
 			if (GameDefine.ACTIVE_DEGREE)
 			{
 				base.ScrollGrid.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 			}
 			CleanItemList();
-			_003CUpdateDynamicList_003Ec__AnonStorey2FC _003CUpdateDynamicList_003Ec__AnonStorey2FC;
-			SetDynamicList((Enum)UI.GRD_LIST, "FollowListBaseItem", pageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey2FC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetDynamicList(UI.GRD_LIST, "FollowListBaseItem", pageItemLength, false, null, null, delegate(int i, Transform t, bool is_recycle)
+			{
+				FriendMessageUserListModel.MessageUserInfo messageUserInfo = info[i];
+				SetFollowStatus(t, messageUserInfo.userId, true, true);
+				SetCharaInfo(messageUserInfo, i, t, is_recycle, 0 == messageUserInfo.userId);
+				SetBadge(t, messageUserInfo.noReadNum, SpriteAlignment.TopRight, -10, -6, false);
+			});
 		}
 	}
 
@@ -120,10 +125,22 @@ public class FriendMessageList : FollowListBase
 		return (currentPage + 1 < pageNumMax || recvdata.Count % 10 <= 0) ? 10 : (recvdata.Count % 10);
 	}
 
-	protected unsafe override void SendGetList(int page, Action<bool> callback = null)
+	protected override void SendGetList(int page, Action<bool> callback = null)
 	{
-		_003CSendGetList_003Ec__AnonStorey2FD _003CSendGetList_003Ec__AnonStorey2FD;
-		MonoBehaviourSingleton<FriendManager>.I.SendGetMessageUserList(page, new Action<bool, FriendMessageUserListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey2FD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<FriendManager>.I.SendGetMessageUserList(page, delegate(bool is_success, FriendMessageUserListModel.Param recv_data)
+		{
+			if (is_success)
+			{
+				recvdata = recv_data.messageUser;
+				nowPage = page;
+				pageNumMax = Mathf.CeilToInt((float)recvdata.Count / 10f);
+				Sort(recvdata);
+			}
+			if (callback != null)
+			{
+				callback(is_success);
+			}
+		});
 	}
 
 	public override void OnQuery_FOLLOW_INFO()
@@ -190,7 +207,7 @@ public class FriendMessageList : FollowListBase
 		return false;
 	}
 
-	protected unsafe override void OnQuery_JOIN_FRIEND()
+	protected override void OnQuery_JOIN_FRIEND()
 	{
 		int num = (int)GameSection.GetEventData();
 		if (recvdata != null && recvdata.Count > num && num >= 0)
@@ -204,13 +221,14 @@ public class FriendMessageList : FollowListBase
 				case 3:
 					if (MonoBehaviourSingleton<PartyManager>.IsValid())
 					{
-						PartyManager i = MonoBehaviourSingleton<PartyManager>.I;
-						string conditionParam = joinStatus.conditionParam;
-						if (_003C_003Ef__am_0024cache2 == null)
+						MonoBehaviourSingleton<PartyManager>.I.SendApply(joinStatus.conditionParam, delegate(bool isSucceed, Error error)
 						{
-							_003C_003Ef__am_0024cache2 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-						}
-						i.SendApply(conditionParam, _003C_003Ef__am_0024cache2, joinStatus.targetParam);
+							if (isSucceed)
+							{
+								MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("QuestAccept", "QuestAcceptRoom", UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
+							}
+							GameSection.ResumeEvent(true, null);
+						}, joinStatus.targetParam);
 					}
 					break;
 				case 2:
@@ -218,14 +236,26 @@ public class FriendMessageList : FollowListBase
 					break;
 				case 4:
 				{
-					int num2 = int.Parse(joinStatus.conditionParam);
-					int targetParam = joinStatus.targetParam;
-					int toUserId = num2;
-					if (_003C_003Ef__am_0024cache3 == null)
+					int toUserId = int.Parse(joinStatus.conditionParam);
+					JoinField(joinStatus.targetParam, toUserId, delegate(bool is_matching, bool is_connect, bool is_regist)
 					{
-						_003C_003Ef__am_0024cache3 = new Action<bool, bool, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-					}
-					JoinField(targetParam, toUserId, _003C_003Ef__am_0024cache3);
+						if (!is_matching)
+						{
+							GameSection.StopEvent();
+						}
+						else if (!is_connect)
+						{
+							GameSection.StopEvent();
+						}
+						else
+						{
+							GameSection.ResumeEvent(is_regist, null);
+							if (is_regist)
+							{
+								MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("InGame", null, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
+							}
+						}
+					});
 					break;
 				}
 				default:

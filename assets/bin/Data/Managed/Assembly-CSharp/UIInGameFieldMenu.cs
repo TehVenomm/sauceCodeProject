@@ -31,16 +31,13 @@ public class UIInGameFieldMenu : UIInGamePopBase
 
 	public static bool IsValid()
 	{
-		return instance != null;
+		return (Object)instance != (Object)null;
 	}
 
 	protected override void Awake()
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Expected O, but got Unknown
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		instance = this;
-		_transform = this.get_transform();
+		_transform = base.transform;
 		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 		{
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
@@ -49,7 +46,7 @@ public class UIInGameFieldMenu : UIInGamePopBase
 		base.Awake();
 		if (!FieldManager.IsValidInGameNoQuest())
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(false);
 		}
 		bool flag = LoungeMatchingManager.IsValidInLounge();
 		SetVisibleButton("BTN_HOME", flag);
@@ -64,7 +61,7 @@ public class UIInGameFieldMenu : UIInGamePopBase
 		{
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= OnScreenRotate;
 		}
-		if (instance == this)
+		if ((Object)instance == (Object)this)
 		{
 			instance = null;
 		}
@@ -72,8 +69,6 @@ public class UIInGameFieldMenu : UIInGamePopBase
 
 	public void OnClickReturn()
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 		{
 			string event_name = "RETURN";
@@ -81,7 +76,7 @@ public class UIInGameFieldMenu : UIInGamePopBase
 			{
 				event_name = "RETURN_LOUNGE";
 			}
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameFieldMenu.OnClickReturn", this.get_gameObject(), event_name, null, null, true);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameFieldMenu.OnClickReturn", base.gameObject, event_name, null, null, true);
 		}
 	}
 
@@ -104,7 +99,7 @@ public class UIInGameFieldMenu : UIInGamePopBase
 			int i = 0;
 			for (int num = menuBtns.Length; i < num; i++)
 			{
-				if (menuBtns[i] != null && menuBtns[i].get_name() == "BTN_EVENT")
+				if ((Object)menuBtns[i] != (Object)null && menuBtns[i].name == "BTN_EVENT")
 				{
 					menuBtns[i].isEnabled = !disable;
 				}
@@ -119,7 +114,7 @@ public class UIInGameFieldMenu : UIInGamePopBase
 			int i = 0;
 			for (int num = menuBtns.Length; i < num; i++)
 			{
-				if (menuBtns[i] != null && menuBtns[i].get_name() == "BTN_MAP")
+				if ((Object)menuBtns[i] != (Object)null && menuBtns[i].name == "BTN_MAP")
 				{
 					menuBtns[i].isEnabled = !disable;
 				}
@@ -134,7 +129,7 @@ public class UIInGameFieldMenu : UIInGamePopBase
 			int i = 0;
 			for (int num = menuBtns.Length; i < num; i++)
 			{
-				if (menuBtns[i] != null)
+				if ((Object)menuBtns[i] != (Object)null)
 				{
 					menuBtns[i].isEnabled = !disable;
 				}
@@ -149,7 +144,7 @@ public class UIInGameFieldMenu : UIInGamePopBase
 			int i = 0;
 			for (int num = menuBtns.Length; i < num; i++)
 			{
-				if (menuBtns[i] != null && menuBtns[i].get_name() == btn_name)
+				if ((Object)menuBtns[i] != (Object)null && menuBtns[i].name == btn_name)
 				{
 					menuBtns[i].isEnabled = is_enable;
 				}
@@ -159,14 +154,13 @@ public class UIInGameFieldMenu : UIInGamePopBase
 
 	private void SetVisibleButton(string btn_name, bool isVisible)
 	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		if (menuBtns != null)
 		{
 			for (int i = 0; i < menuBtns.Length; i++)
 			{
-				if (menuBtns[i] != null && menuBtns[i].get_name() == btn_name)
+				if ((Object)menuBtns[i] != (Object)null && menuBtns[i].name == btn_name)
 				{
-					menuBtns[i].get_gameObject().SetActive(!isVisible);
+					menuBtns[i].gameObject.SetActive(!isVisible);
 				}
 			}
 		}
@@ -177,7 +171,7 @@ public class UIInGameFieldMenu : UIInGamePopBase
 		UIButton[] array = menuBtns;
 		foreach (UIButton uIButton in array)
 		{
-			uIButton.set_enabled(false);
+			uIButton.enabled = false;
 		}
 	}
 

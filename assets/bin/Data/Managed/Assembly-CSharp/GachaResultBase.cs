@@ -109,15 +109,15 @@ public abstract class GachaResultBase : GameSection
 
 	protected virtual IEnumerator LoadMultiResultUI(LoadingQueue loadQueue)
 	{
-		SetActive((Enum)UI.FOOTER_ROOT, false);
-		SetActive((Enum)UI.FOOTER_GUARANTEE_ROOT, false);
-		SetActive((Enum)UI.FOOTER_MULTI_RESULT_ROOT, true);
+		SetActive(UI.FOOTER_ROOT, false);
+		SetActive(UI.FOOTER_GUARANTEE_ROOT, false);
+		SetActive(UI.FOOTER_MULTI_RESULT_ROOT, true);
 		footerRoot = GetCtrl(UI.FOOTER_MULTI_RESULT_ROOT);
 		yield return (object)LoadGachaButton(buttonName: CreateButtonName(), loadQueue: loadQueue, parent: FindCtrl(footerRoot, UI.BTN_NEXT));
 		SetEvent(FindCtrl(footerRoot, UI.BTN_NEXT).GetChild(0), "NEXT_PERFORMANCE", -1);
 		yield return (object)LoadGachaGuaranteeCounter(loadQueue, nextGuachaGuarantee, delegate(LoadObject lo_guarantee)
 		{
-			((_003CLoadMultiResultUI_003Ec__Iterator44)/*Error near IL_011e: stateMachine*/)._003C_003Ef__this.SetTexture(((_003CLoadMultiResultUI_003Ec__Iterator44)/*Error near IL_011e: stateMachine*/)._003C_003Ef__this.footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN, lo_guarantee.loadedObject as Texture);
+			((_003CLoadMultiResultUI_003Ec__Iterator46)/*Error near IL_011e: stateMachine*/)._003C_003Ef__this.SetTexture(((_003CLoadMultiResultUI_003Ec__Iterator46)/*Error near IL_011e: stateMachine*/)._003C_003Ef__this.footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN, lo_guarantee.loadedObject as Texture);
 		});
 	}
 
@@ -134,11 +134,11 @@ public abstract class GachaResultBase : GameSection
 		{
 			yield return (object)loadQueue.Wait();
 		}
-		buttonObj = (Object.Instantiate(lo_button.loadedObject) as GameObject);
-		buttonObj.get_transform().set_parent(parent);
-		buttonObj.get_transform().set_name(parent.get_name());
-		buttonObj.get_transform().set_localScale(new Vector3(1f, 1f, 1f));
-		buttonObj.get_transform().set_localPosition(new Vector3(0f, 0f, 0f));
+		buttonObj = (UnityEngine.Object.Instantiate(lo_button.loadedObject) as GameObject);
+		buttonObj.transform.parent = parent;
+		buttonObj.transform.name = parent.name;
+		buttonObj.transform.localScale = new Vector3(1f, 1f, 1f);
+		buttonObj.transform.localPosition = new Vector3(0f, 0f, 0f);
 	}
 
 	protected IEnumerator LoadGachaGuaranteeCounter(LoadingQueue loadQueue, GachaGuaranteeCampaignInfo guarantee, Action<LoadObject> callback)
@@ -267,22 +267,14 @@ public abstract class GachaResultBase : GameSection
 
 	protected void SetGachaButtonActive(bool enableRetry)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Expected O, but got Unknown
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Expected O, but got Unknown
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Expected O, but got Unknown
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Expected O, but got Unknown
-		Transform root = FindCtrl(buttonObj.get_transform(), (!enableRetry) ? UI.OBJ_GACHA_DISABLE_ROOT : UI.OBJ_GACHA_ENABLE_ROOT);
-		SetActive(buttonObj.get_transform(), UI.OBJ_GACHA_ENABLE_ROOT, enableRetry);
-		SetActive(buttonObj.get_transform(), UI.OBJ_GACHA_DISABLE_ROOT, !enableRetry);
+		Transform root = FindCtrl(buttonObj.transform, (!enableRetry) ? UI.OBJ_GACHA_DISABLE_ROOT : UI.OBJ_GACHA_ENABLE_ROOT);
+		SetActive(buttonObj.transform, UI.OBJ_GACHA_ENABLE_ROOT, enableRetry);
+		SetActive(buttonObj.transform, UI.OBJ_GACHA_DISABLE_ROOT, !enableRetry);
 		int num = (MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId <= 0) ? GetCrystalNum() : MonoBehaviourSingleton<GachaManager>.I.selectGacha.needItemNum;
 		SetLabelText(root, UI.LBL_PRICE, num.ToString());
 		if (!enableRetry)
 		{
-			SetButtonEnabled(buttonObj.get_transform(), false);
+			SetButtonEnabled(buttonObj.transform, false);
 		}
 	}
 }

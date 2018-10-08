@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,12 +34,8 @@ public class SmithAbilityChangeSelect : SmithEquipSelectBase
 
 	public override void UpdateUI()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Expected O, but got Unknown
-		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).get_parent(), false);
-		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).get_parent(), false);
+		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).parent, false);
+		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).parent, false);
 		base.UpdateUI();
 	}
 
@@ -69,15 +64,52 @@ public class SmithAbilityChangeSelect : SmithEquipSelectBase
 		localInventoryEquipData = sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortData>(list.ToArray());
 	}
 
-	protected unsafe override void LocalInventory()
+	protected override void LocalInventory()
 	{
 		SetupEnableInventoryUI();
 		if (localInventoryEquipData != null)
 		{
-			SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
+			SetLabelText(UI.LBL_SORT, sortSettings.GetSortLabel());
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
-			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length, false, new Func<int, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetDynamicList(InventoryUI, null, localInventoryEquipData.Length, false, delegate(int i)
+			{
+				SortCompareData sortCompareData = localInventoryEquipData[i];
+				if (sortCompareData == null || !sortCompareData.IsPriority(sortSettings.orderTypeAsc))
+				{
+					return false;
+				}
+				return true;
+			}, null, delegate(int i, Transform t, bool is_recycle)
+			{
+				uint tableID = localInventoryEquipData[i].GetTableID();
+				if (tableID == 0)
+				{
+					SetActive(t, false);
+				}
+				else
+				{
+					SetActive(t, true);
+					EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(tableID);
+					EquipItemSortData equipItemSortData = localInventoryEquipData[i] as EquipItemSortData;
+					EquipItemInfo equip = equipItemSortData.GetItemData() as EquipItemInfo;
+					ITEM_ICON_TYPE iconType = equipItemSortData.GetIconType();
+					bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, equipItemSortData.GetUniqID());
+					SkillSlotUIData[] skillSlotData = GetSkillSlotData(equip);
+					ItemIcon itemIcon = CreateEquipAbilityIconDetail(getType: equipItemSortData.GetGetType(), icon_type: iconType, icon_id: equipItemData.GetIconID(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex), rarity: equipItemData.rarity, item_data: equipItemSortData, skill_slot_data: skillSlotData, is_show_main_status: base.IsShowMainStatus, parent: t, event_name: "TRY_ON", event_data: i, icon_status: equipItemSortData.GetIconStatus(), is_new: is_new, toggle_group: -1, is_select: false, equip_index: -1);
+					itemIcon.SetItemID(equipItemSortData.GetTableID());
+					itemIcon.SetButtonColor(localInventoryEquipData[i].IsPriority(sortSettings.orderTypeAsc), true);
+					SetLongTouch(itemIcon.transform, "DETAIL", i);
+					if ((Object)itemIcon != (Object)null && equipItemSortData != null)
+					{
+						itemIcon.SetInitData(equipItemSortData);
+					}
+					if ((Object)itemIcon != (Object)null && !m_generatedIconList.Contains(itemIcon))
+					{
+						m_generatedIconList.Add(itemIcon);
+					}
+				}
+			});
 		}
 	}
 

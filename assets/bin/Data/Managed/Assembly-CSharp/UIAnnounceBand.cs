@@ -41,19 +41,18 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 
 	private void InitAnim()
 	{
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int num = animStart.Length; i < num; i++)
 		{
-			animStart[i].set_enabled(false);
+			animStart[i].enabled = false;
 			animStart[i].Sample(1f, true);
 		}
 		int j = 0;
 		for (int num2 = animEnd.Length; j < num2; j++)
 		{
-			animEnd[j].set_enabled(false);
+			animEnd[j].enabled = false;
 		}
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(false);
 		animRoot.SetActive(false);
 	}
 
@@ -79,20 +78,16 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 
 	public void SetAnnounce(string messeage, string conditionTitle)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(true);
 		announceQueue.Add(messeage);
 		announceQueue.Add(conditionTitle);
 	}
 
 	private bool PlayAnnounce()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		if (!this.get_gameObject().get_activeInHierarchy())
+		if (!base.gameObject.activeInHierarchy)
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(false);
 			return false;
 		}
 		if (announceQueue.Count > 0)
@@ -104,7 +99,7 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 			announceQueue.RemoveAt(0);
 			isDone = true;
 			panelChange.UnLock();
-			this.StartCoroutine(Direction());
+			StartCoroutine(Direction());
 			return true;
 		}
 		return false;
@@ -112,11 +107,10 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 
 	private void FinishAnnounce()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		if (!PlayAnnounce())
 		{
 			animRoot.SetActive(false);
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(false);
 			panelChange.Lock();
 			isDone = false;
 		}
@@ -138,7 +132,7 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 		int n = 0;
 		for (int m = animStart.Length; n < m; n++)
 		{
-			while (animStart[n].get_enabled())
+			while (animStart[n].enabled)
 			{
 				yield return (object)null;
 			}
@@ -152,7 +146,7 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 		int j = 0;
 		for (int i = animEnd.Length; j < i; j++)
 		{
-			while (animEnd[j].get_enabled())
+			while (animEnd[j].enabled)
 			{
 				yield return (object)null;
 			}

@@ -15,9 +15,9 @@ public class TweenOrthoSize : UITweener
 	{
 		get
 		{
-			if (mCam == null)
+			if ((UnityEngine.Object)mCam == (UnityEngine.Object)null)
 			{
-				mCam = this.GetComponent<Camera>();
+				mCam = GetComponent<Camera>();
 			}
 			return mCam;
 		}
@@ -40,11 +40,11 @@ public class TweenOrthoSize : UITweener
 	{
 		get
 		{
-			return cachedCamera.get_orthographicSize();
+			return cachedCamera.orthographicSize;
 		}
 		set
 		{
-			cachedCamera.set_orthographicSize(value);
+			cachedCamera.orthographicSize = value;
 		}
 	}
 
@@ -61,7 +61,7 @@ public class TweenOrthoSize : UITweener
 		if (duration <= 0f)
 		{
 			tweenOrthoSize.Sample(1f, true);
-			tweenOrthoSize.set_enabled(false);
+			tweenOrthoSize.enabled = false;
 		}
 		return tweenOrthoSize;
 	}

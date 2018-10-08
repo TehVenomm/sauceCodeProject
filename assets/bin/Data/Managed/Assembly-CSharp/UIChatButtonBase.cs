@@ -40,7 +40,6 @@ public class UIChatButtonBase : MonoBehaviourSingleton<UIChatButtonBase>
 
 	private void OnPress(bool pressed)
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		if (!pressed)
 		{
 			chat(chatID);
@@ -50,7 +49,7 @@ public class UIChatButtonBase : MonoBehaviourSingleton<UIChatButtonBase>
 		int i = 0;
 		for (int num = chatItem.Length; i < num; i++)
 		{
-			chatItem[i].get_gameObject().SetActive(pressed);
+			chatItem[i].gameObject.SetActive(pressed);
 		}
 	}
 

@@ -46,18 +46,18 @@ public class PropertyReference
 		}
 	}
 
-	public bool isValid => mTarget != null && !string.IsNullOrEmpty(mName);
+	public bool isValid => (UnityEngine.Object)mTarget != (UnityEngine.Object)null && !string.IsNullOrEmpty(mName);
 
 	public bool isEnabled
 	{
 		get
 		{
-			if (mTarget == null)
+			if ((UnityEngine.Object)mTarget == (UnityEngine.Object)null)
 			{
 				return false;
 			}
-			MonoBehaviour val = mTarget as MonoBehaviour;
-			return val == null || val.get_enabled();
+			MonoBehaviour monoBehaviour = mTarget as MonoBehaviour;
+			return (UnityEngine.Object)monoBehaviour == (UnityEngine.Object)null || monoBehaviour.enabled;
 		}
 	}
 
@@ -97,7 +97,7 @@ public class PropertyReference
 		if (obj is PropertyReference)
 		{
 			PropertyReference propertyReference = obj as PropertyReference;
-			return mTarget == propertyReference.mTarget && string.Equals(mName, propertyReference.mName);
+			return (UnityEngine.Object)mTarget == (UnityEngine.Object)propertyReference.mTarget && string.Equals(mName, propertyReference.mName);
 		}
 		return false;
 	}
@@ -132,9 +132,9 @@ public class PropertyReference
 
 	public static string ToString(Component comp, string property)
 	{
-		if (comp != null)
+		if ((UnityEngine.Object)comp != (UnityEngine.Object)null)
 		{
-			string text = ((object)comp).GetType().ToString();
+			string text = comp.GetType().ToString();
 			int num = text.LastIndexOf('.');
 			if (num > 0)
 			{
@@ -206,9 +206,9 @@ public class PropertyReference
 		}
 		if (!Convert(ref value))
 		{
-			if (Application.get_isPlaying())
+			if (Application.isPlaying)
 			{
-				Debug.LogError((object)("Unable to convert " + value.GetType() + " to " + GetPropertyType()));
+				UnityEngine.Debug.LogError("Unable to convert " + value.GetType() + " to " + GetPropertyType());
 			}
 		}
 		else
@@ -231,9 +231,9 @@ public class PropertyReference
 	[DebuggerStepThrough]
 	private bool Cache()
 	{
-		if (mTarget != null && !string.IsNullOrEmpty(mName))
+		if ((UnityEngine.Object)mTarget != (UnityEngine.Object)null && !string.IsNullOrEmpty(mName))
 		{
-			Type type = ((object)mTarget).GetType();
+			Type type = mTarget.GetType();
 			mField = type.GetField(mName);
 			mProperty = type.GetProperty(mName);
 		}
@@ -247,7 +247,7 @@ public class PropertyReference
 
 	private bool Convert(ref object value)
 	{
-		if (mTarget == null)
+		if ((UnityEngine.Object)mTarget == (UnityEngine.Object)null)
 		{
 			return false;
 		}

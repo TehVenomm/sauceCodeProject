@@ -1,4 +1,6 @@
-public class EnemyEffectObject
+using UnityEngine;
+
+public class EnemyEffectObject : MonoBehaviour
 {
 	public enum DELETE_CONDITION
 	{
@@ -20,11 +22,6 @@ public class EnemyEffectObject
 
 	public string UniqueName => m_uniqueName;
 
-	public EnemyEffectObject()
-		: this()
-	{
-	}
-
 	public void Initialize(Enemy enemy, EnemyRegionWork regionWork, int deleteCondition, string uniqueName)
 	{
 		m_targetEnemy = enemy;
@@ -35,14 +32,12 @@ public class EnemyEffectObject
 
 	private void SelfDestroy()
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Expected O, but got Unknown
-		if (m_targetEnemy != null)
+		if ((Object)m_targetEnemy != (Object)null)
 		{
 			m_targetEnemy.OnNotifyDeleteEnemyEffect(this);
 			m_targetEnemy = null;
 		}
-		EffectManager.ReleaseEffect(this.get_gameObject(), true, false);
+		EffectManager.ReleaseEffect(base.gameObject, true, false);
 		m_isDeleted = true;
 	}
 
@@ -50,7 +45,7 @@ public class EnemyEffectObject
 	{
 		if (!m_isDeleted)
 		{
-			if (m_targetEnemy == null || m_targetEnemy.isDead)
+			if ((Object)m_targetEnemy == (Object)null || m_targetEnemy.isDead)
 			{
 				SelfDestroy();
 			}

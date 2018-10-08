@@ -1,4 +1,4 @@
-using System;
+using Network;
 using System.Collections;
 using UnityEngine;
 
@@ -14,8 +14,7 @@ public class MutualFollowFBConnectDialog : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(LoadTopBanner());
+		StartCoroutine(LoadTopBanner());
 		base.Initialize();
 	}
 
@@ -27,7 +26,7 @@ public class MutualFollowFBConnectDialog : GameSection
 		{
 			yield return (object)loadQueue.Wait();
 		}
-		if (lo_image.loadedObject == null)
+		if (lo_image.loadedObject == (Object)null)
 		{
 			yield return (object)null;
 		}
@@ -37,7 +36,7 @@ public class MutualFollowFBConnectDialog : GameSection
 		uiTexture.mainTexture = bannerImg;
 	}
 
-	private unsafe void OnQuery_CONNECT()
+	private void OnQuery_CONNECT()
 	{
 		GameSection.StayEvent();
 		if (MonoBehaviourSingleton<FBManager>.I.isLoggedIn)
@@ -46,18 +45,37 @@ public class MutualFollowFBConnectDialog : GameSection
 		}
 		else
 		{
-			MonoBehaviourSingleton<FBManager>.I.LoginWithReadPermission(new Action<bool, string>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			MonoBehaviourSingleton<FBManager>.I.LoginWithReadPermission(delegate(bool success, string s)
+			{
+				if (success)
+				{
+					_SendRegistLinkFacebook();
+				}
+				else
+				{
+					GameSection.ResumeEvent(success, null);
+				}
+			});
 		}
 	}
 
-	private unsafe void _SendRegistLinkFacebook()
+	private void _SendRegistLinkFacebook()
 	{
-		AccountManager i = MonoBehaviourSingleton<AccountManager>.I;
-		string accessToken = MonoBehaviourSingleton<FBManager>.I.accessToken;
-		if (_003C_003Ef__am_0024cache0 == null)
+		MonoBehaviourSingleton<AccountManager>.I.SendRegistLinkFacebook(MonoBehaviourSingleton<FBManager>.I.accessToken, delegate(bool success, RegistLinkFacebookModel ret)
 		{
-			_003C_003Ef__am_0024cache0 = new Action<bool, RegistLinkFacebookModel>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		i.SendRegistLinkFacebook(accessToken, _003C_003Ef__am_0024cache0);
+			if (success)
+			{
+				GameSection.ResumeEvent(success, null);
+			}
+			else
+			{
+				if (ret.Error == Error.WRN_REGISTER_FACEBOOK_ACCOUNT_LINKED)
+				{
+					GameSection.ChangeStayEvent("ACCOUNT_CONFLICT", ret.existInfo);
+					success = true;
+				}
+				GameSection.ResumeEvent(success, null);
+			}
+		});
 	}
 }

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class QuestAcceptShadowCountDetail : GameSection
@@ -20,43 +19,38 @@ public class QuestAcceptShadowCountDetail : GameSection
 
 	public override void UpdateUI()
 	{
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Expected O, but got Unknown
-		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
 		string text = StringTable.Format(STRING_CATEGORY.SHADOW_COUNT, 0u, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.currentShadowCount.startDate);
-		SetLabelText((Enum)UI.LBL_FIRST_SENTENSE, text);
+		SetLabelText(UI.LBL_FIRST_SENTENSE, text);
 		if (MonoBehaviourSingleton<PartyManager>.I.challengeInfo.IsRankingEvent())
 		{
-			SetActive((Enum)UI.LBL_SECOND_SENTENSE, true);
-			SetActive((Enum)UI.PADDING_2, true);
-			SetLabelText((Enum)UI.LBL_SECOND_SENTENSE, StringTable.Get(STRING_CATEGORY.SHADOW_COUNT, 1u));
+			SetActive(UI.LBL_SECOND_SENTENSE, true);
+			SetActive(UI.PADDING_2, true);
+			SetLabelText(UI.LBL_SECOND_SENTENSE, StringTable.Get(STRING_CATEGORY.SHADOW_COUNT, 1u));
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_SECOND_SENTENSE, false);
-			SetActive((Enum)UI.PADDING_2, false);
+			SetActive(UI.LBL_SECOND_SENTENSE, false);
+			SetActive(UI.PADDING_2, false);
 		}
-		SetLabelText((Enum)UI.LBL_DESCRIPTION, StringTable.Get(STRING_CATEGORY.SHADOW_COUNT, 2u));
-		SetLabelText((Enum)UI.LBL_BONUS_NUM, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.currentShadowCount.num.ToString());
-		base.GetComponent<UITable>((Enum)UI.TBL_CONTENTS).Reposition();
+		SetLabelText(UI.LBL_DESCRIPTION, StringTable.Get(STRING_CATEGORY.SHADOW_COUNT, 2u));
+		SetLabelText(UI.LBL_BONUS_NUM, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.currentShadowCount.num.ToString());
+		GetComponent<UITable>(UI.TBL_CONTENTS).Reposition();
 		Transform ctrl = GetCtrl(UI.SPR_FRAME);
 		int num = 0;
-		int childCount = GetCtrl(UI.TBL_CONTENTS).get_childCount();
+		int childCount = GetCtrl(UI.TBL_CONTENTS).childCount;
 		for (int i = 0; i < childCount; i++)
 		{
-			Transform val = GetCtrl(UI.TBL_CONTENTS).GetChild(i);
-			if (val.get_gameObject().get_activeSelf())
+			Transform child = GetCtrl(UI.TBL_CONTENTS).GetChild(i);
+			if (child.gameObject.activeSelf)
 			{
-				num += val.GetComponent<UIWidget>().height;
+				num += child.GetComponent<UIWidget>().height;
 			}
 		}
 		num = Mathf.Max(num, 0);
 		float num2 = (float)(123 + num);
-		Vector3 localScale = ctrl.get_localScale();
+		Vector3 localScale = ctrl.localScale;
 		int height = (int)(num2 / localScale.y);
-		SetHeight((Enum)UI.SPR_FRAME, height);
+		SetHeight(UI.SPR_FRAME, height);
 		UpdateAnchors();
 		base.UpdateUI();
 	}

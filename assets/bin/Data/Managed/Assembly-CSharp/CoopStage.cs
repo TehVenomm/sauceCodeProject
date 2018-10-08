@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class CoopStage
+public class CoopStage : MonoBehaviour
 {
 	public enum STAGE_REQUEST_ERROR
 	{
@@ -154,7 +154,6 @@ public class CoopStage
 	}
 
 	public CoopStage()
-		: this()
 	{
 		isStageRequested = false;
 		isRecvStageInfo = false;
@@ -187,10 +186,8 @@ public class CoopStage
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		packetSender = this.get_gameObject().AddComponent<CoopStagePacketSender>();
-		packetReceiver = this.get_gameObject().AddComponent<CoopStagePacketReceiver>();
+		packetSender = base.gameObject.AddComponent<CoopStagePacketSender>();
+		packetReceiver = base.gameObject.AddComponent<CoopStagePacketReceiver>();
 	}
 
 	private void Update()
@@ -203,7 +200,7 @@ public class CoopStage
 		}
 		if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart() && MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			checkCharacterSyncTimer -= Time.get_deltaTime();
+			checkCharacterSyncTimer -= Time.deltaTime;
 			if (checkCharacterSyncTimer <= 0f)
 			{
 				CheckCharacterSync();
@@ -223,12 +220,12 @@ public class CoopStage
 				{
 					if (c.IsPlayerPop())
 					{
-						Player player2 = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(c.playerId) as Player;
-						if (player2 == null)
+						Player x = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(c.playerId) as Player;
+						if ((UnityEngine.Object)x == (UnityEngine.Object)null)
 						{
-							player2 = (MonoBehaviourSingleton<StageObjectManager>.I.FindCache(c.playerId) as Player);
+							x = (MonoBehaviourSingleton<StageObjectManager>.I.FindCache(c.playerId) as Player);
 						}
-						if (player2 != null)
+						if ((UnityEngine.Object)x != (UnityEngine.Object)null)
 						{
 							return;
 						}
@@ -240,7 +237,7 @@ public class CoopStage
 			for (int count = MonoBehaviourSingleton<StageObjectManager>.I.cacheList.Count; i < count; i++)
 			{
 				Player player = MonoBehaviourSingleton<StageObjectManager>.I.cacheList[i] as Player;
-				if (player != null && player.IsPuppet() && player.playerSender != null)
+				if ((UnityEngine.Object)player != (UnityEngine.Object)null && player.IsPuppet() && (UnityEngine.Object)player.playerSender != (UnityEngine.Object)null)
 				{
 					player.playerSender.OnLoadComplete(false);
 				}
@@ -371,7 +368,7 @@ public class CoopStage
 	public void OnLeaveClient(CoopClient client, int host_client_id)
 	{
 		Logd("OnLeaveClient: client={0}.", client);
-		if (chatConnection != null && QuestManager.IsValidInGame() && !(client is CoopMyClient) && client.GetPlayer() != null)
+		if (chatConnection != null && QuestManager.IsValidInGame() && !(client is CoopMyClient) && (UnityEngine.Object)client.GetPlayer() != (UnityEngine.Object)null)
 		{
 			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.CHAT, 6u, client.GetPlayerName()));
 		}
@@ -384,7 +381,7 @@ public class CoopStage
 		if (FieldManager.IsValidInGameNoBoss() || (MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsDefenseBattle()))
 		{
 			Player player = client.GetPlayer();
-			if (player != null && !(player is Self))
+			if ((UnityEngine.Object)player != (UnityEngine.Object)null && !(player is Self))
 			{
 				player.DestroyObject();
 			}
@@ -461,7 +458,7 @@ public class CoopStage
 								{
 									player.ActBattleStart(false);
 								}
-								else if (player.controller != null)
+								else if ((UnityEngine.Object)player.controller != (UnityEngine.Object)null)
 								{
 									player.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.BATTLE_START);
 								}
@@ -507,11 +504,11 @@ public class CoopStage
 				CoopClient coopClient2 = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(host_client_id);
 				Logd("SetHostClient: SwitchHost: old host={0}", coopClient);
 				Logd("SetHostClient: SwitchHost: new host={0}", coopClient2);
-				if (coopClient2 != null && coopClient2 is CoopMyClient)
+				if ((UnityEngine.Object)coopClient2 != (UnityEngine.Object)null && coopClient2 is CoopMyClient)
 				{
 					ReSendStageInfo();
 					MonoBehaviourSingleton<CoopManager>.I.coopStage.OnSwitchHost();
-					if (!coopClient2.IsBattleStart() && coopClient != null && coopClient.IsBattleStart() && QuestManager.IsValidInGame())
+					if (!coopClient2.IsBattleStart() && (UnityEngine.Object)coopClient != (UnityEngine.Object)null && coopClient.IsBattleStart() && QuestManager.IsValidInGame())
 					{
 						if (MonoBehaviourSingleton<InGameManager>.I.IsRush())
 						{
@@ -533,11 +530,11 @@ public class CoopStage
 						}
 					}
 				}
-				if (coopClient != null && coopClient.stageId == stageId)
+				if ((UnityEngine.Object)coopClient != (UnityEngine.Object)null && coopClient.stageId == stageId)
 				{
 					coopClient.SetStageHost(false);
 				}
-				if (coopClient2 != null && coopClient2.stageId == stageId)
+				if ((UnityEngine.Object)coopClient2 != (UnityEngine.Object)null && coopClient2.stageId == stageId)
 				{
 					coopClient2.SetStageHost(true);
 				}
@@ -549,20 +546,20 @@ public class CoopStage
 
 	private bool IsWait(Func<bool> cb)
 	{
-		return isAsyncLoop || !cb.Invoke();
+		return isAsyncLoop || !cb();
 	}
 
 	private bool IsAsyncWait(Func<bool> cb)
 	{
-		return isAsyncLoop || ((MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen() || CoopOfflineManager.IsValidActivate()) && !cb.Invoke());
+		return isAsyncLoop || ((MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen() || CoopOfflineManager.IsValidActivate()) && !cb());
 	}
 
 	private bool IsGuestAsyncWait(Func<bool> cb)
 	{
-		return isAsyncLoop || (MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen() && !MonoBehaviourSingleton<CoopManager>.I.isStageHost && !cb.Invoke());
+		return isAsyncLoop || (MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen() && !MonoBehaviourSingleton<CoopManager>.I.isStageHost && !cb());
 	}
 
-	public unsafe IEnumerator DoActivate()
+	public IEnumerator DoActivate()
 	{
 		isActivateStart = true;
 		if (MonoBehaviourSingleton<CoopOfflineManager>.IsValid())
@@ -573,7 +570,7 @@ public class CoopStage
 		{
 			InitBossBreakIdList();
 		}
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null)
 		{
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 			self.id = MonoBehaviourSingleton<CoopManager>.I.GetSelfID();
@@ -587,7 +584,7 @@ public class CoopStage
 		forceNextWave = false;
 		MonoBehaviourSingleton<CoopManager>.I.coopMyClient.StageRequest();
 		MonoBehaviourSingleton<CoopNetworkManager>.I.RoomStageRequest();
-		while (IsAsyncWait(new Func<bool>((object)/*Error near IL_0149: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+		while (IsAsyncWait(() => ((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_0149: stateMachine*/)._003C_003Ef__this.isStageRequested))
 		{
 			yield return (object)null;
 		}
@@ -600,7 +597,7 @@ public class CoopStage
 			if (MonoBehaviourSingleton<InGameManager>.I.isValidGimmickObject)
 			{
 				Logd("Activate: Gimmick wait...");
-				while (IsGuestAsyncWait(new Func<bool>((object)/*Error near IL_01e2: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+				while (IsGuestAsyncWait(() => ((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_01e2: stateMachine*/)._003C_003Ef__this.isRecvStageInfo))
 				{
 					if (IsOtherClientProgressed())
 					{
@@ -612,7 +609,7 @@ public class CoopStage
 			}
 			if (QuestManager.IsValidInGameExplore())
 			{
-				while (IsGuestAsyncWait(new Func<bool>((object)/*Error near IL_0220: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+				while (IsGuestAsyncWait(() => ((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_0220: stateMachine*/)._003C_003Ef__this.isRecvStageInfo))
 				{
 					yield return (object)null;
 				}
@@ -621,8 +618,40 @@ public class CoopStage
 			if (MonoBehaviourSingleton<InGameManager>.I.IsNeedInitBoss())
 			{
 				Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-				Time.get_time();
-				while (IsWait(new Func<bool>((object)/*Error near IL_02a5: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+				float time = Time.time;
+				while (IsWait(delegate
+				{
+					((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_02a5: stateMachine*/)._003Cboss_003E__2 = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+					if ((UnityEngine.Object)((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_02a5: stateMachine*/)._003Cboss_003E__2 == (UnityEngine.Object)null)
+					{
+						if (QuestManager.IsValidInGameExplore() && MonoBehaviourSingleton<QuestManager>.I.IsExploreBossDead())
+						{
+							return true;
+						}
+						float num = Time.time - ((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_02a5: stateMachine*/)._003CwaitStart_003E__3;
+						if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && (num > 15f || !MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen()))
+						{
+							((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_02a5: stateMachine*/)._003C_003Ef__this.Logd("Give up Boss wait.");
+							((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_02a5: stateMachine*/)._003CrushTryReentry_003E__1 = true;
+							return true;
+						}
+						if (QuestManager.IsValidInGameSeries() && (num > 15f || !MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen()))
+						{
+							((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_02a5: stateMachine*/)._003CrushTryReentry_003E__1 = true;
+							return true;
+						}
+						if (QuestManager.IsValidInGameWaveMatch(false))
+						{
+							return true;
+						}
+						return false;
+					}
+					if (((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_02a5: stateMachine*/)._003Cboss_003E__2.IsOriginal() || ((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_02a5: stateMachine*/)._003Cboss_003E__2.IsCoopNone())
+					{
+						return ((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_02a5: stateMachine*/)._003Cboss_003E__2.isInitialized;
+					}
+					return ((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_02a5: stateMachine*/)._003Cboss_003E__2.isCoopInitialized;
+				}))
 				{
 					if (IsOtherClientProgressed())
 					{
@@ -631,7 +660,7 @@ public class CoopStage
 					}
 					yield return (object)null;
 				}
-				if (boss != null)
+				if ((UnityEngine.Object)boss != (UnityEngine.Object)null)
 				{
 					if (boss.IsOriginal() || boss.IsCoopNone())
 					{
@@ -651,15 +680,33 @@ public class CoopStage
 					}
 				}
 			}
-			if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null && bossBreakIDLists != null)
+			if ((UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.boss != (UnityEngine.Object)null && bossBreakIDLists != null)
 			{
 				int series = (int)MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex;
 				bossBreakIDLists[series] = MonoBehaviourSingleton<StageObjectManager>.I.boss.GetBreakRegionIDList();
 			}
-			if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+			if ((UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null)
 			{
 				Logd("Activate: Self poss wait...");
-				while (IsWait(new Func<bool>((object)/*Error near IL_0456: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+				while (IsWait(delegate
+				{
+					if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && (MonoBehaviourSingleton<InGameProgress>.I.progressEndType == InGameProgress.PROGRESS_END_TYPE.FIELD_REENTRY || !MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen()))
+					{
+						((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_0456: stateMachine*/)._003CrushTryReentry_003E__1 = true;
+						return true;
+					}
+					if (QuestManager.IsValidInGameSeries() && (MonoBehaviourSingleton<InGameProgress>.I.progressEndType == InGameProgress.PROGRESS_END_TYPE.FIELD_REENTRY || !MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen()))
+					{
+						((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_0456: stateMachine*/)._003CrushTryReentry_003E__1 = true;
+						return true;
+					}
+					if (QuestManager.IsValidInGameWaveMatch(false) && (MonoBehaviourSingleton<InGameProgress>.I.progressEndType == InGameProgress.PROGRESS_END_TYPE.FIELD_REENTRY || !MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen()))
+					{
+						((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_0456: stateMachine*/)._003CrushTryReentry_003E__1 = true;
+						return true;
+					}
+					return MonoBehaviourSingleton<StageObjectManager>.I.self.isSetAppearPos;
+				}))
 				{
 					if (IsOtherClientProgressed())
 					{
@@ -678,7 +725,9 @@ public class CoopStage
 			int eventId = Utility.GetCurrentEventID();
 			if (eventId > 0)
 			{
-				Network.EventData eventData = MonoBehaviourSingleton<QuestManager>.I.eventList.Where(new Func<Network.EventData, bool>((object)/*Error near IL_04c6: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).FirstOrDefault();
+				Network.EventData eventData = (from e in MonoBehaviourSingleton<QuestManager>.I.eventList
+				where e.eventId == ((_003CDoActivate_003Ec__Iterator1A2)/*Error near IL_04c6: stateMachine*/)._003CeventId_003E__5
+				select e).FirstOrDefault();
 				if (eventData != null && eventData.eventTypeEnum == EVENT_TYPE.PRESENT_QUEST)
 				{
 					isPresentQuest = true;
@@ -713,7 +762,7 @@ public class CoopStage
 		}
 	}
 
-	private unsafe void StartBattle()
+	private void StartBattle()
 	{
 		if (!MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart())
 		{
@@ -742,13 +791,9 @@ public class CoopStage
 			fieldRewardPool.SetMapId(num);
 			if (QuestManager.IsValidInGameExplore() && Singleton<QuestTable>.IsValid() && Singleton<EnemyTable>.IsValid())
 			{
-				FieldManager i = MonoBehaviourSingleton<FieldManager>.I;
-				int mapId = num;
-				if (_003C_003Ef__am_0024cache29 == null)
+				MonoBehaviourSingleton<FieldManager>.I.SendFieldQuestMapChange(num, delegate
 				{
-					_003C_003Ef__am_0024cache29 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-				}
-				i.SendFieldQuestMapChange(mapId, _003C_003Ef__am_0024cache29);
+				});
 				CheckBossTrace(num);
 			}
 			if (FieldManager.IsValidInGameNoQuest())
@@ -762,18 +807,14 @@ public class CoopStage
 
 	private void SetSpecialEnemyAnounceIfNeed(int mapId)
 	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Expected O, but got Unknown
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Expected O, but got Unknown
 		ClearAllSpecialEnemyAnnounce();
 		if (Singleton<FieldMapEnemyPopTimeZoneTable>.I.TryGetEnableLastEndTime(mapId, out FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData resultTimeZone, out ENEMY_POP_TYPE resultType))
 		{
 			currentAnnounceType = resultType;
-			specialEnemyAnnounceGone = this.StartCoroutine(AnnounceSpecialEnemyGone(resultType, resultTimeZone));
+			specialEnemyAnnounceGone = StartCoroutine(AnnounceSpecialEnemyGone(resultType, resultTimeZone));
 			if (!ExistSpecialEnemyOnField())
 			{
-				specialEnemyAnnounceExist = this.StartCoroutine(AnnounceSpecialEnemyExist(resultType, resultTimeZone));
+				specialEnemyAnnounceExist = StartCoroutine(AnnounceSpecialEnemyExist(resultType, resultTimeZone));
 			}
 		}
 	}
@@ -792,7 +833,7 @@ public class CoopStage
 			ClearSpecialEnemyExistAnnounce(type);
 			if (specialEnemyAnnounceGone != null)
 			{
-				this.StopCoroutine(specialEnemyAnnounceGone);
+				StopCoroutine(specialEnemyAnnounceGone);
 				specialEnemyAnnounceGone = null;
 			}
 		}
@@ -802,7 +843,7 @@ public class CoopStage
 	{
 		if (currentAnnounceType == type && specialEnemyAnnounceExist != null)
 		{
-			this.StopCoroutine(specialEnemyAnnounceExist);
+			StopCoroutine(specialEnemyAnnounceExist);
 			specialEnemyAnnounceExist = null;
 		}
 	}
@@ -1037,7 +1078,7 @@ public class CoopStage
 			MonoBehaviourSingleton<StageObjectManager>.I.playerList.ForEach(delegate(StageObject o)
 			{
 				Player player = o as Player;
-				if (player != null && (player.IsOriginal() || player.IsCoopNone()))
+				if ((UnityEngine.Object)player != (UnityEngine.Object)null && (player.IsOriginal() || player.IsCoopNone()))
 				{
 					packetSender.SendStagePlayerPop(player, to_client_id);
 					if (player is Self)
@@ -1049,7 +1090,7 @@ public class CoopStage
 						Logd("StageRequest response PlayerPop({0}). to={1}", player.id, to_client_id);
 					}
 				}
-				else if (player == null)
+				else if ((UnityEngine.Object)player == (UnityEngine.Object)null)
 				{
 					Log.Warning(LOG.COOP, "SendOriginalObjectPop, player is null. to_client_id:{0}", to_client_id);
 				}
@@ -1062,7 +1103,7 @@ public class CoopStage
 					int i = 0;
 					for (int count = allCoopObjectList.Count; i < count; i++)
 					{
-						if (!(allCoopObjectList[i] == null))
+						if (!((UnityEngine.Object)allCoopObjectList[i] == (UnityEngine.Object)null))
 						{
 							allCoopObjectList[i].SetCoopMode(StageObject.COOP_MODE_TYPE.ORIGINAL, 0);
 							packetSender.SendObjectInfo(allCoopObjectList[i], StageObject.COOP_MODE_TYPE.MIRROR, to_client_id);
@@ -1075,9 +1116,6 @@ public class CoopStage
 
 	public bool OnRecvStagePlayerPop(Coop_Model_StagePlayerPop model, CoopPacket packet)
 	{
-		//IL_0327: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0477: Unknown result type (might be due to invalid IL or missing references)
 		if (!isActivateStart)
 		{
 			return false;
@@ -1087,7 +1125,7 @@ public class CoopStage
 			return true;
 		}
 		CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(packet.fromClientId);
-		if (coopClient == null)
+		if ((UnityEngine.Object)coopClient == (UnityEngine.Object)null)
 		{
 			return true;
 		}
@@ -1103,14 +1141,14 @@ public class CoopStage
 				Predicate<StageObject> match = delegate(StageObject o)
 				{
 					Player player2 = o as Player;
-					return player2 != null && !player2.isDestroyWaitFlag && player2.id != model.sid && player2.createInfo != null && player2.createInfo.charaInfo != null && model.charaInfo != null && player2.createInfo.charaInfo.userId != 0 && player2.createInfo.charaInfo.userId == model.charaInfo.userId;
+					return (UnityEngine.Object)player2 != (UnityEngine.Object)null && !player2.isDestroyWaitFlag && player2.id != model.sid && player2.createInfo != null && player2.createInfo.charaInfo != null && model.charaInfo != null && player2.createInfo.charaInfo.userId != 0 && player2.createInfo.charaInfo.userId == model.charaInfo.userId;
 				};
 				StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Find(match);
-				if (stageObject == null)
+				if ((UnityEngine.Object)stageObject == (UnityEngine.Object)null)
 				{
 					stageObject = MonoBehaviourSingleton<StageObjectManager>.I.cacheList.Find(match);
 				}
-				if (stageObject != null)
+				if ((UnityEngine.Object)stageObject != (UnityEngine.Object)null)
 				{
 					Logd("OnRecvStagePlayerPop last leaved player({0}) destroy. to={1}", stageObject.id, coopClient.userId);
 					stageObject.DestroyObject();
@@ -1123,13 +1161,13 @@ public class CoopStage
 			}
 		}
 		Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(model.sid) as Player;
-		if (player == null)
+		if ((UnityEngine.Object)player == (UnityEngine.Object)null)
 		{
 			player = (MonoBehaviourSingleton<StageObjectManager>.I.FindCache(model.sid) as Player);
 		}
-		if (player != null)
+		if ((UnityEngine.Object)player != (UnityEngine.Object)null)
 		{
-			if (player == MonoBehaviourSingleton<StageObjectManager>.I.self)
+			if ((UnityEngine.Object)player == (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self)
 			{
 				Logd("myself player pop!");
 				return true;
@@ -1139,7 +1177,7 @@ public class CoopStage
 				return false;
 			}
 		}
-		if (player == null)
+		if ((UnityEngine.Object)player == (UnityEngine.Object)null)
 		{
 			PlayerLoader.OnCompleteLoad callback = delegate
 			{
@@ -1148,7 +1186,7 @@ public class CoopStage
 			if (model.extentionInfo != null && model.extentionInfo.npcDataID != 0)
 			{
 				Logd("CreateNonPlayer. sid={0},npcDataID={1},npcLv={2},npcLvIndex={3}", model.sid, model.extentionInfo.npcDataID, model.extentionInfo.npcLv, model.extentionInfo.npcLvIndex);
-				player = MonoBehaviourSingleton<StageObjectManager>.I.CreateNonPlayer(model.sid, model.extentionInfo, Vector3.get_zero(), 0f, model.transferInfo, callback);
+				player = MonoBehaviourSingleton<StageObjectManager>.I.CreateNonPlayer(model.sid, model.extentionInfo, Vector3.zero, 0f, model.transferInfo, callback);
 			}
 			else
 			{
@@ -1156,13 +1194,13 @@ public class CoopStage
 				createPlayerInfo.charaInfo = model.charaInfo;
 				Logd("CreatePlayer. sid={0},userId={1}", model.sid, createPlayerInfo.charaInfo.userId);
 				createPlayerInfo.extentionInfo = model.extentionInfo;
-				player = MonoBehaviourSingleton<StageObjectManager>.I.CreatePlayer(model.sid, createPlayerInfo, false, Vector3.get_zero(), 0f, model.transferInfo, callback);
+				player = MonoBehaviourSingleton<StageObjectManager>.I.CreatePlayer(model.sid, createPlayerInfo, false, Vector3.zero, 0f, model.transferInfo, callback);
 				if (QuestManager.IsValidInGame())
 				{
 					MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.AddPlayer(createPlayerInfo.charaInfo);
 				}
 			}
-			if (player != null)
+			if ((UnityEngine.Object)player != (UnityEngine.Object)null)
 			{
 				player.SetCoopMode(StageObject.COOP_MODE_TYPE.PUPPET, packet.fromClientId);
 			}
@@ -1171,7 +1209,7 @@ public class CoopStage
 		{
 			Logd("already player pop! sid={0}", model.sid);
 			MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(player);
-			player.get_gameObject().SetActive(true);
+			player.gameObject.SetActive(true);
 			player.SafeActIdle();
 			player.SetCoopMode(StageObject.COOP_MODE_TYPE.PUPPET, packet.fromClientId);
 			if (!player.isLoading)
@@ -1184,7 +1222,6 @@ public class CoopStage
 
 	protected void OnPopPlayerLoadComplete(Player player, int client_id)
 	{
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected())
 		{
 			if (player.IsOriginal() || player.IsCoopNone())
@@ -1206,7 +1243,7 @@ public class CoopStage
 				else
 				{
 					Logd("PlayerLoadComplete. player={0},client={1}", player.id, client_id);
-					player.get_gameObject().SetActive(false);
+					player.gameObject.SetActive(false);
 					MonoBehaviourSingleton<StageObjectManager>.I.AddCacheObject(player);
 					player.packetReceiver.SetFilterMode(ObjectPacketReceiver.FILTER_MODE.WAIT_INITIALIZE);
 					player.playerSender.OnLoadComplete(true);
@@ -1232,10 +1269,6 @@ public class CoopStage
 
 	private bool PopEnemy(Coop_Model_EnemyPop model, out Enemy outEnmey)
 	{
-		//IL_0262: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_042a: Unknown result type (might be due to invalid IL or missing references)
 		outEnmey = null;
 		if (!isActivateStart)
 		{
@@ -1251,11 +1284,11 @@ public class CoopStage
 		}
 		Logd("OnRecvEnemyPop. sid={0},ownerClientId={1},popIndex={2}", model.sid, model.ownerClientId, model.popIndex);
 		Enemy enemy = MonoBehaviourSingleton<StageObjectManager>.I.FindEnemy(model.sid) as Enemy;
-		if (enemy == null)
+		if ((UnityEngine.Object)enemy == (UnityEngine.Object)null)
 		{
 			enemy = (MonoBehaviourSingleton<StageObjectManager>.I.FindCache(model.sid) as Enemy);
 		}
-		if (enemy != null && enemy.isLoading)
+		if ((UnityEngine.Object)enemy != (UnityEngine.Object)null && enemy.isLoading)
 		{
 			Logd("OnRecvEnemyPop. enemy is loading...");
 			return false;
@@ -1284,7 +1317,7 @@ public class CoopStage
 		}
 		if (model.ownerClientId == MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId)
 		{
-			if (enemy == null)
+			if ((UnityEngine.Object)enemy == (UnityEngine.Object)null)
 			{
 				QUEST_TYPE qUEST_TYPE2 = qUEST_TYPE;
 				if (qUEST_TYPE2 == QUEST_TYPE.DEFENSE)
@@ -1294,7 +1327,7 @@ public class CoopStage
 				else
 				{
 					QUEST_STYLE qUEST_STYLE2 = qUEST_STYLE;
-					enemy = ((qUEST_STYLE2 != QUEST_STYLE.DEFENSE) ? MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(model.sid, Vector3.get_zero(), 0f, num, num2, enemyPopData.bossFlag, enemyPopData.bigMonsterFlag, true, false, delegate(Enemy target)
+					enemy = ((qUEST_STYLE2 != QUEST_STYLE.DEFENSE) ? MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(model.sid, Vector3.zero, 0f, num, num2, enemyPopData.bossFlag, enemyPopData.bigMonsterFlag, true, false, delegate(Enemy target)
 					{
 						if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
 						{
@@ -1310,7 +1343,7 @@ public class CoopStage
 			else
 			{
 				MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(enemy);
-				enemy.get_gameObject().SetActive(true);
+				enemy.gameObject.SetActive(true);
 			}
 			if (IsSolo())
 			{
@@ -1320,11 +1353,11 @@ public class CoopStage
 			{
 				enemy.SetCoopMode(StageObject.COOP_MODE_TYPE.ORIGINAL, 0);
 			}
-			if (enemy.controller == null)
+			if ((UnityEngine.Object)enemy.controller == (UnityEngine.Object)null)
 			{
 				enemy.AddController<EnemyController>();
 			}
-			if (enemy.isBoss && enemy.controller != null && !MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart())
+			if (enemy.isBoss && (UnityEngine.Object)enemy.controller != (UnityEngine.Object)null && !MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart())
 			{
 				enemy.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.BATTLE_START);
 			}
@@ -1346,9 +1379,9 @@ public class CoopStage
 		}
 		else
 		{
-			if (enemy == null)
+			if ((UnityEngine.Object)enemy == (UnityEngine.Object)null)
 			{
-				enemy = MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(model.sid, Vector3.get_zero(), 0f, num, num2, enemyPopData.bossFlag, enemyPopData.bigMonsterFlag, false, false, delegate(Enemy target)
+				enemy = MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(model.sid, Vector3.zero, 0f, num, num2, enemyPopData.bossFlag, enemyPopData.bigMonsterFlag, false, false, delegate(Enemy target)
 				{
 					OnPopEnemyLoadComplete(target, model.ownerClientId, true);
 				});
@@ -1388,11 +1421,10 @@ public class CoopStage
 
 	private bool PopEnemyForSeries(Coop_Model_EnemyPop model, Enemy enemy)
 	{
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
 		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestSeriesIndex((uint)model.seriesIdx);
 		if (model.ownerClientId != MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId)
 		{
-			if (enemy != null)
+			if ((UnityEngine.Object)enemy != (UnityEngine.Object)null)
 			{
 				enemy.SetCoopMode(StageObject.COOP_MODE_TYPE.MIRROR, model.ownerClientId);
 				enemy.isCoopInitialized = false;
@@ -1406,7 +1438,6 @@ public class CoopStage
 			}
 			enemy = MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyForSeries(model.sid, model.seriesIdx, delegate(Enemy target)
 			{
-				//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 				if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
 				{
 					MonoBehaviourSingleton<InGameRecorder>.I.RecordEnemyHP(target.id, target.hpMax);
@@ -1414,16 +1445,16 @@ public class CoopStage
 				OnPopEnemyLoadComplete(target, model.ownerClientId, true);
 				if (model.seriesIdx > 0)
 				{
-					this.StartCoroutine(MonoBehaviourSingleton<StageObjectManager>.I.CreateNextEnemyForSeriesOfBattles(target));
+					StartCoroutine(MonoBehaviourSingleton<StageObjectManager>.I.CreateNextEnemyForSeriesOfBattles(target));
 				}
 			});
 			enemy.SetCoopMode(StageObject.COOP_MODE_TYPE.MIRROR, model.ownerClientId);
 			return true;
 		}
-		if (enemy != null)
+		if ((UnityEngine.Object)enemy != (UnityEngine.Object)null)
 		{
 			MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(enemy);
-			enemy.get_gameObject().SetActive(true);
+			enemy.gameObject.SetActive(true);
 			if (MonoBehaviourSingleton<SoundManager>.IsValid())
 			{
 				SoundManager.RequestBGM(MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestBGMID(), true);
@@ -1433,16 +1464,14 @@ public class CoopStage
 		{
 			enemy = MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyForSeries(model.sid, model.seriesIdx, delegate(Enemy target)
 			{
-				//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 				if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
 				{
 					MonoBehaviourSingleton<InGameRecorder>.I.RecordEnemyHP(target.id, target.hpMax);
 				}
 				if (model.seriesIdx > 0)
 				{
-					target.get_gameObject().SetActive(false);
-					this.StartCoroutine(MonoBehaviourSingleton<StageObjectManager>.I.CreateNextEnemyForSeriesOfBattles(enemy));
+					target.gameObject.SetActive(false);
+					StartCoroutine(MonoBehaviourSingleton<StageObjectManager>.I.CreateNextEnemyForSeriesOfBattles(enemy));
 				}
 			});
 		}
@@ -1454,11 +1483,11 @@ public class CoopStage
 		{
 			enemy.SetCoopMode(StageObject.COOP_MODE_TYPE.ORIGINAL, 0);
 		}
-		if (enemy.controller == null)
+		if ((UnityEngine.Object)enemy.controller == (UnityEngine.Object)null)
 		{
 			enemy.AddController<EnemyController>();
 		}
-		if (enemy.isBoss && enemy.controller != null && !MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart())
+		if (enemy.isBoss && (UnityEngine.Object)enemy.controller != (UnityEngine.Object)null && !MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart())
 		{
 			enemy.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.BATTLE_START);
 		}
@@ -1473,29 +1502,26 @@ public class CoopStage
 
 	public bool OnRecvEnemyBossPop(Coop_Model_EnemyBossPop model)
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		if (!PopEnemy(model, out Enemy outEnmey))
 		{
 			fieldEnemyBossEntering = false;
 			return false;
 		}
-		if (outEnmey == null)
+		if ((UnityEngine.Object)outEnmey == (UnityEngine.Object)null)
 		{
 			fieldEnemyBossEntering = false;
 			return false;
 		}
-		if (outEnmey.get_gameObject() != null)
+		if ((UnityEngine.Object)outEnmey.gameObject != (UnityEngine.Object)null)
 		{
-			outEnmey.get_gameObject().SetActive(false);
+			outEnmey.gameObject.SetActive(false);
 		}
 		ClearSpecialEnemyExistAnnounce(ENEMY_POP_TYPE.FIELD_BOSS);
-		this.StartCoroutine(StartEnemyBoss(model, outEnmey));
+		StartCoroutine(StartEnemyBoss(model, outEnmey));
 		return true;
 	}
 
-	public unsafe IEnumerator StartEnemyBoss(Coop_Model_EnemyBossPop model, Enemy enemy)
+	public IEnumerator StartEnemyBoss(Coop_Model_EnemyBossPop model, Enemy enemy)
 	{
 		requestedEnemyBossAlive = false;
 		if (!readyToPlay)
@@ -1511,7 +1537,7 @@ public class CoopStage
 					enemy.DestroyObject();
 					yield break;
 				}
-				requestTimer += Time.get_deltaTime();
+				requestTimer += Time.deltaTime;
 				yield return (object)null;
 			}
 			requestedEnemyBossAlive = false;
@@ -1524,14 +1550,14 @@ public class CoopStage
 			{
 				yield return (object)null;
 			}
-			if (enemy == null)
+			if ((UnityEngine.Object)enemy == (UnityEngine.Object)null)
 			{
 				fieldEnemyBossEntering = false;
 			}
 			else if (isInFieldEnemyBossBattle)
 			{
 				fieldEnemyBossEntering = false;
-				enemy.get_gameObject().SetActive(true);
+				enemy.gameObject.SetActive(true);
 			}
 			else
 			{
@@ -1556,7 +1582,7 @@ public class CoopStage
 				{
 					fieldEnemyBossEntering = false;
 					isEnterFieldEnemyBossBattle = false;
-					enemy.get_gameObject().SetActive(true);
+					enemy.gameObject.SetActive(true);
 				}
 				else
 				{
@@ -1569,15 +1595,24 @@ public class CoopStage
 					{
 						MonoBehaviourSingleton<InGameProgress>.I.ResetStartTimer((float)escapeTime, 0f);
 					}
-					yield return (object)this.StartCoroutine(LoadFieldEnemyEntryExitEffect());
+					yield return (object)StartCoroutine(LoadFieldEnemyEntryExitEffect());
 					Transform effectTrans = EffectManager.GetEffect("ef_btl_enemy_entry_01", null);
-					Vector3 effectPos = enemy._transform.get_localPosition();
-					effectPos.y = StageManager.GetHeight(enemy._transform.get_position());
-					effectTrans.set_localPosition(effectPos);
-					enemy.get_gameObject().SetActive(true);
+					Vector3 effectPos = enemy._transform.localPosition;
+					effectPos.y = StageManager.GetHeight(enemy._transform.position);
+					effectTrans.localPosition = effectPos;
+					enemy.gameObject.SetActive(true);
 					enemy.hitOffFlag |= StageObject.HIT_OFF_FLAG.FORCE;
-					GoUpCharacterFromUnderGround(enemy, new Action((object)/*Error near IL_0386: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-					this.StartCoroutine(LoadFieldTimesUpVictoryeffect());
+					GoUpCharacterFromUnderGround(enemy, delegate
+					{
+						EffectManager.ReleaseEffect(((_003CStartEnemyBoss_003Ec__Iterator1A5)/*Error near IL_0386: stateMachine*/)._003CeffectTrans_003E__4.gameObject, true, false);
+						if (!((_003CStartEnemyBoss_003Ec__Iterator1A5)/*Error near IL_0386: stateMachine*/)._003CisGimmickPop_003E__1)
+						{
+							((_003CStartEnemyBoss_003Ec__Iterator1A5)/*Error near IL_0386: stateMachine*/).enemy.ActMadMode();
+						}
+						((_003CStartEnemyBoss_003Ec__Iterator1A5)/*Error near IL_0386: stateMachine*/).enemy.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.FORCE;
+						((_003CStartEnemyBoss_003Ec__Iterator1A5)/*Error near IL_0386: stateMachine*/)._003C_003Ef__this.fieldEnemyBossEntering = false;
+					});
+					StartCoroutine(LoadFieldTimesUpVictoryeffect());
 				}
 			}
 		}
@@ -1601,12 +1636,15 @@ public class CoopStage
 		}
 	}
 
-	private unsafe IEnumerator LoadFieldTimesUpVictoryeffect()
+	private IEnumerator LoadFieldTimesUpVictoryeffect()
 	{
 		if (!MonoBehaviourSingleton<InGameLinkResourcesFieldEnemyBoss>.IsValid() && MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
 			bool loadedEffectUI = false;
-			MonoBehaviourSingleton<InGameProgress>.I.RealizesLinkResourcesFieldEnemyBoss(new Action((object)/*Error near IL_004b: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			MonoBehaviourSingleton<InGameProgress>.I.RealizesLinkResourcesFieldEnemyBoss(delegate
+			{
+				((_003CLoadFieldTimesUpVictoryeffect_003Ec__Iterator1A7)/*Error near IL_004b: stateMachine*/)._003CloadedEffectUI_003E__0 = true;
+			});
 			int count = 100;
 			while (loadedEffectUI && count > 0)
 			{
@@ -1618,7 +1656,7 @@ public class CoopStage
 
 	private IEnumerator LoadAndPlayVictoryEffect()
 	{
-		yield return (object)this.StartCoroutine(LoadFieldTimesUpVictoryeffect());
+		yield return (object)StartCoroutine(LoadFieldTimesUpVictoryeffect());
 		while (!readyToPlay)
 		{
 			yield return (object)null;
@@ -1650,8 +1688,7 @@ public class CoopStage
 
 	public bool OnRecvEnemyBossEscape(Coop_Model_EnemyBossEscape model)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(EscapeEnemyBoss(model.sid));
+		StartCoroutine(EscapeEnemyBoss(model.sid));
 		return true;
 	}
 
@@ -1670,8 +1707,7 @@ public class CoopStage
 
 	public void EscapeHostEnmeyBoss()
 	{
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<StageObjectManager>.I.fieldEnemyBoss == null)
+		if ((UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.fieldEnemyBoss == (UnityEngine.Object)null)
 		{
 			isInFieldEnemyBossBattle = false;
 			isInFieldFishingEnemyBattle = false;
@@ -1680,11 +1716,11 @@ public class CoopStage
 		{
 			int id = MonoBehaviourSingleton<StageObjectManager>.I.fieldEnemyBoss.id;
 			packetSender.SendEnemyBossEscape(id, true);
-			this.StartCoroutine(EscapeEnemyBoss(id));
+			StartCoroutine(EscapeEnemyBoss(id));
 		}
 	}
 
-	private unsafe IEnumerator EscapeEnemyBoss(int sid)
+	private IEnumerator EscapeEnemyBoss(int sid)
 	{
 		if (isInFieldEnemyBossBattle)
 		{
@@ -1694,7 +1730,7 @@ public class CoopStage
 			{
 				yield return (object)null;
 			}
-			yield return (object)this.StartCoroutine(LoadFieldEnemyEntryExitEffect());
+			yield return (object)StartCoroutine(LoadFieldEnemyEntryExitEffect());
 			while (fieldEnemyBossEntering)
 			{
 				yield return (object)null;
@@ -1704,18 +1740,22 @@ public class CoopStage
 			{
 				enemy = (MonoBehaviourSingleton<StageObjectManager>.I.FindEnemy(sid) as Enemy);
 			}
-			if (enemy != null)
+			if ((UnityEngine.Object)enemy != (UnityEngine.Object)null)
 			{
 				enemy.PrepareVanishLocal();
 			}
-			if (enemy != null)
+			if ((UnityEngine.Object)enemy != (UnityEngine.Object)null)
 			{
 				Transform effectTrans = EffectManager.GetEffect("ef_btl_enemy_entry_01", null);
-				Vector3 effectPos = enemy._transform.get_localPosition();
-				effectPos.y = StageManager.GetHeight(enemy._transform.get_position());
-				effectTrans.set_localPosition(effectPos);
-				GoDownCharacterToUnderGround(enemy, new Action((object)/*Error near IL_018f: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-				yield return (object)this.StartCoroutine(LoadFieldTimesUpVictoryeffect());
+				Vector3 effectPos = enemy._transform.localPosition;
+				effectPos.y = StageManager.GetHeight(enemy._transform.position);
+				effectTrans.localPosition = effectPos;
+				GoDownCharacterToUnderGround(enemy, delegate
+				{
+					EffectManager.ReleaseEffect(((_003CEscapeEnemyBoss_003Ec__Iterator1A9)/*Error near IL_018f: stateMachine*/)._003CeffectTrans_003E__1.gameObject, true, false);
+					((_003CEscapeEnemyBoss_003Ec__Iterator1A9)/*Error near IL_018f: stateMachine*/)._003C_003Ef__this.ResetBGM();
+				});
+				yield return (object)StartCoroutine(LoadFieldTimesUpVictoryeffect());
 				MonoBehaviourSingleton<InGameProgress>.I.PlayFieldEnemyBossTimesUpEffect();
 				enemy.OnEndEscape();
 			}
@@ -1741,7 +1781,7 @@ public class CoopStage
 	{
 		if (firstWaveMatchInfo != null)
 		{
-			firstWaveMatchPopSec -= Time.get_deltaTime();
+			firstWaveMatchPopSec -= Time.deltaTime;
 			if (firstWaveMatchPopSec <= 0f)
 			{
 				firstWaveMatchInfo = null;
@@ -1763,13 +1803,9 @@ public class CoopStage
 		}
 	}
 
-	public unsafe void GoUpCharacterFromUnderGround(Enemy enemy, Action OnEndAction)
+	public void GoUpCharacterFromUnderGround(Enemy enemy, Action OnEndAction)
 	{
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Expected O, but got Unknown
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		if (enemy.controller != null)
+		if ((UnityEngine.Object)enemy.controller != (UnityEngine.Object)null)
 		{
 			enemy.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.DEFAULT);
 		}
@@ -1778,47 +1814,51 @@ public class CoopStage
 		{
 			time = MonoBehaviourSingleton<InGameSettingsManager>.I.fishingParam.hitEnemyMoveSec;
 		}
-		_003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4C6 _003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4C;
-		this.StartCoroutine(SimpleMoveCharacterY(enemy, -10f, StageManager.GetHeight(enemy._transform.get_position()), time, new Action((object)_003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+		StartCoroutine(SimpleMoveCharacterY(enemy, -10f, StageManager.GetHeight(enemy._transform.position), time, delegate
+		{
+			OnEndAction.SafeInvoke();
+			if ((UnityEngine.Object)enemy.controller != (UnityEngine.Object)null)
+			{
+				enemy.controller.SetEnableControll(true, ControllerBase.DISABLE_FLAG.DEFAULT);
+			}
+		}));
 	}
 
-	public unsafe void GoDownCharacterToUnderGround(Enemy enemy, Action OnEndAction)
+	public void GoDownCharacterToUnderGround(Enemy enemy, Action OnEndAction)
 	{
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Expected O, but got Unknown
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		if (enemy.controller != null)
+		if ((UnityEngine.Object)enemy.controller != (UnityEngine.Object)null)
 		{
 			enemy.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.DEFAULT);
 		}
 		enemy.PrepareVanishLocal();
 		enemy.ActIdle(false, -1f);
 		Enemy enemy2 = enemy;
-		Vector3 position = enemy._transform.get_position();
-		_003CGoDownCharacterToUnderGround_003Ec__AnonStorey4C7 _003CGoDownCharacterToUnderGround_003Ec__AnonStorey4C;
-		this.StartCoroutine(SimpleMoveCharacterY(enemy2, position.y, -10f, 3f, new Action((object)_003CGoDownCharacterToUnderGround_003Ec__AnonStorey4C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+		Vector3 position = enemy._transform.position;
+		StartCoroutine(SimpleMoveCharacterY(enemy2, position.y, -10f, 3f, delegate
+		{
+			enemy.VanishLocal();
+			OnEndAction.SafeInvoke();
+		}));
 	}
 
 	public IEnumerator SimpleMoveCharacterY(Character enemy, float from, float to, float time, Action OnEndAction)
 	{
 		enemy.onTheGround = false;
-		Vector3 startPos = enemy._transform.get_position();
+		Vector3 startPos = enemy._transform.position;
 		startPos.y = from;
-		enemy._transform.set_position(startPos);
+		enemy._transform.position = startPos;
 		float speed = (to - from) / time;
 		float elapsedTime = 0f;
 		while (true)
 		{
-			if (enemy == null || enemy._transform == null)
+			if ((UnityEngine.Object)enemy == (UnityEngine.Object)null || (UnityEngine.Object)enemy._transform == (UnityEngine.Object)null)
 			{
 				yield break;
 			}
-			Vector3 pos = enemy._transform.get_position();
-			pos.y += speed * Time.get_deltaTime();
-			enemy._transform.set_position(pos);
-			elapsedTime += Time.get_deltaTime();
+			Vector3 pos = enemy._transform.position;
+			pos.y += speed * Time.deltaTime;
+			enemy._transform.position = pos;
+			elapsedTime += Time.deltaTime;
 			if (elapsedTime > time)
 			{
 				break;
@@ -1831,10 +1871,9 @@ public class CoopStage
 
 	public void OnDefeatFieldEnemyBoss()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid() && isInFieldEnemyBossBattle)
 		{
-			this.StartCoroutine(LoadAndPlayVictoryEffect());
+			StartCoroutine(LoadAndPlayVictoryEffect());
 			isInFieldEnemyBossBattle = false;
 			isInFieldFishingEnemyBattle = false;
 			MonoBehaviourSingleton<InGameProgress>.I.StopTimer();
@@ -1849,7 +1888,6 @@ public class CoopStage
 
 	protected void OnPopEnemyLoadComplete(Enemy enemy, int client_id, bool init = true)
 	{
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
 		{
 			MonoBehaviourSingleton<InGameRecorder>.I.RecordEnemyHP(enemy.id, enemy.hpMax);
@@ -1872,7 +1910,7 @@ public class CoopStage
 					Logd("EnemyLoadComplete. enemy={0},client={1}", enemy.id, client_id);
 					if (init)
 					{
-						enemy.get_gameObject().SetActive(false);
+						enemy.gameObject.SetActive(false);
 						MonoBehaviourSingleton<StageObjectManager>.I.AddCacheObject(enemy);
 					}
 					enemy.packetReceiver.SetFilterMode(ObjectPacketReceiver.FILTER_MODE.WAIT_INITIALIZE);
@@ -1884,7 +1922,6 @@ public class CoopStage
 
 	public bool OnRecvStageInfo(Coop_Model_StageInfo model, CoopPacket packet)
 	{
-		//IL_0271: Unknown result type (might be due to invalid IL or missing references)
 		if (!isActivateStart)
 		{
 			return false;
@@ -1894,7 +1931,7 @@ public class CoopStage
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
 			CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(packet.fromClientId);
-			if (coopClient != null && coopClient.IsBattleStart())
+			if ((UnityEngine.Object)coopClient != (UnityEngine.Object)null && coopClient.IsBattleStart())
 			{
 				if ((MonoBehaviourSingleton<InGameManager>.I.IsRush() || QuestManager.IsValidInGameWaveMatch(false)) && model.rushLimitTime >= 0f)
 				{
@@ -1916,11 +1953,10 @@ public class CoopStage
 		{
 			model.gimmicks.ForEach(delegate(Coop_Model_StageInfo.GimmickInfo gimmick)
 			{
-				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 				StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.FindGimmick(gimmick.id);
-				if (stageObject != null)
+				if ((UnityEngine.Object)stageObject != (UnityEngine.Object)null)
 				{
-					stageObject.get_gameObject().SetActive(gimmick.enable);
+					stageObject.gameObject.SetActive(gimmick.enable);
 					stageObject.SetCoopMode(StageObject.COOP_MODE_TYPE.MIRROR, packet.fromClientId);
 				}
 			});
@@ -1929,7 +1965,7 @@ public class CoopStage
 				for (int i = 0; i < MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList.Count; i++)
 				{
 					FieldWaveTargetObject fieldWaveTargetObject = MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList[i] as FieldWaveTargetObject;
-					if (!(fieldWaveTargetObject == null))
+					if (!((UnityEngine.Object)fieldWaveTargetObject == (UnityEngine.Object)null))
 					{
 						bool flag = false;
 						for (int j = 0; j < model.waveTargets.Count; j++)
@@ -1950,7 +1986,7 @@ public class CoopStage
 				}
 			}
 		}
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null && !MonoBehaviourSingleton<StageObjectManager>.I.self.isSetAppearPos)
+		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.self != (UnityEngine.Object)null && !MonoBehaviourSingleton<StageObjectManager>.I.self.isSetAppearPos)
 		{
 			MonoBehaviourSingleton<StageObjectManager>.I.self.SetAppearPosGuest(model.enemyPos);
 		}
@@ -1960,7 +1996,7 @@ public class CoopStage
 	public virtual bool OnRecvStageResponseEnd(Coop_Model_StageResponseEnd model, CoopPacket packet)
 	{
 		CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(packet.fromClientId);
-		if (!(coopClient == null))
+		if (!((UnityEngine.Object)coopClient == (UnityEngine.Object)null))
 		{
 			if (coopClient.isStageHost)
 			{
@@ -2022,7 +2058,7 @@ public class CoopStage
 		if (model.isSelf && model.isPlayer)
 		{
 			Player self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if (self != null && (self.IsOriginal() || self.IsCoopNone()))
+			if ((UnityEngine.Object)self != (UnityEngine.Object)null && (self.IsOriginal() || self.IsCoopNone()))
 			{
 				packetSender.SendStagePlayerPop(self, packet.fromClientId);
 				Logd("StageRequest response SelfPop({0}). to={1}", self.id, packet.fromClientId);
@@ -2040,7 +2076,7 @@ public class CoopStage
 			{
 				num = 10;
 			}
-			if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart() && MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.boss != null && MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
+			if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart() && MonoBehaviourSingleton<StageObjectManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.boss != (UnityEngine.Object)null && MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
 			{
 				Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
 				int num2 = (int)((float)boss.hpMax * MonoBehaviourSingleton<InGameSettingsManager>.I.room.entryCloseEnemyHpRate);
@@ -2082,7 +2118,7 @@ public class CoopStage
 		for (int i = 0; i < 8; i++)
 		{
 			CoopClient at = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.GetAt(i);
-			if (Object.op_Implicit(at) && !(at is CoopMyClient) && !at.isBattleRetire)
+			if ((bool)at && !(at is CoopMyClient) && !at.isBattleRetire)
 			{
 				return;
 			}
@@ -2142,7 +2178,7 @@ public class CoopStage
 			return false;
 		}
 		Character character = MonoBehaviourSingleton<StageObjectManager>.I.FindCharacter(model.chara_id) as Character;
-		if (character != null)
+		if ((UnityEngine.Object)character != (UnityEngine.Object)null)
 		{
 			character.ChatSay(model.chat_id);
 		}
@@ -2165,14 +2201,14 @@ public class CoopStage
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			character = (MonoBehaviourSingleton<StageObjectManager>.I.FindCharacter(model.chara_id) as Character);
-			if (character != null)
+			if ((UnityEngine.Object)character != (UnityEngine.Object)null)
 			{
 				character.ChatSay(model.text);
 			}
 			else if (QuestManager.IsValidInGameExplore())
 			{
 				ExplorePlayerStatus explorePlayerStatus = MonoBehaviourSingleton<QuestManager>.I.GetExplorePlayerStatus(model.user_id);
-				if (MonoBehaviourSingleton<UIInGameMessageBar>.IsValid() && MonoBehaviourSingleton<UIInGameMessageBar>.I.get_isActiveAndEnabled() && explorePlayerStatus != null)
+				if (MonoBehaviourSingleton<UIInGameMessageBar>.IsValid() && MonoBehaviourSingleton<UIInGameMessageBar>.I.isActiveAndEnabled && explorePlayerStatus != null)
 				{
 					MonoBehaviourSingleton<UIInGameMessageBar>.I.Announce(explorePlayerStatus.userName, model.text);
 				}
@@ -2181,11 +2217,11 @@ public class CoopStage
 		if (chatConnection != null)
 		{
 			CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(fromClientId);
-			if (coopClient != null)
+			if ((UnityEngine.Object)coopClient != (UnityEngine.Object)null)
 			{
 				chatConnection.OnReceiveMessage(model.user_id, coopClient.GetPlayerName(), model.text);
 			}
-			else if (character != null)
+			else if ((UnityEngine.Object)character != (UnityEngine.Object)null)
 			{
 				chatConnection.OnReceiveMessage(model.user_id, character.charaName, model.text);
 			}
@@ -2199,7 +2235,7 @@ public class CoopStage
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			character = (MonoBehaviourSingleton<StageObjectManager>.I.FindCharacter(model.chara_id) as Character);
-			if (character != null)
+			if ((UnityEngine.Object)character != (UnityEngine.Object)null)
 			{
 				character.ChatSayStamp(model.stamp_id);
 			}
@@ -2207,11 +2243,11 @@ public class CoopStage
 		if (chatConnection != null)
 		{
 			CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByPlayerId(model.chara_id);
-			if (coopClient != null)
+			if ((UnityEngine.Object)coopClient != (UnityEngine.Object)null)
 			{
 				chatConnection.OnReceiveStamp(model.user_id, coopClient.GetPlayerName(), model.stamp_id);
 			}
-			else if (character != null)
+			else if ((UnityEngine.Object)character != (UnityEngine.Object)null)
 			{
 				chatConnection.OnReceiveStamp(model.user_id, character.charaName, model.stamp_id);
 			}
@@ -2221,11 +2257,6 @@ public class CoopStage
 
 	public bool OnRecvEnemyDefeat(Coop_Model_EnemyDefeat model)
 	{
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0371: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0381: Unknown result type (might be due to invalid IL or missing references)
 		if (!isActivateStart)
 		{
 			return false;
@@ -2233,7 +2264,7 @@ public class CoopStage
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			Enemy enemy = MonoBehaviourSingleton<StageObjectManager>.I.FindEnemy(model.sid) as Enemy;
-			if (enemy != null)
+			if ((UnityEngine.Object)enemy != (UnityEngine.Object)null)
 			{
 				enemy.StopForceEnemyOut();
 				Vector3 position = enemy._position;
@@ -2317,9 +2348,8 @@ public class CoopStage
 		}
 		if (model.money > 0)
 		{
-			Vector3 pos = default(Vector3);
-			pos._002Ector((float)model.x, 0f, (float)model.z);
-			EffectManager.OneShot("ef_btl_drop_coin_01", pos, Quaternion.get_identity(), false);
+			Vector3 pos = new Vector3((float)model.x, 0f, (float)model.z);
+			EffectManager.OneShot("ef_btl_drop_coin_01", pos, Quaternion.identity, false);
 			SoundManager.PlayOneShotSE(10000065, pos);
 		}
 		return true;
@@ -2404,7 +2434,6 @@ public class CoopStage
 
 	public bool OnRecvEventHappenQuest(Coop_Model_EventHappenQuest model)
 	{
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
 			return true;
@@ -2422,10 +2451,10 @@ public class CoopStage
 		}
 		if (MonoBehaviourSingleton<InGameManager>.IsValid())
 		{
-			PortalUnlockEvent component = MonoBehaviourSingleton<InGameManager>.I.get_gameObject().GetComponent<PortalUnlockEvent>();
-			if (component != null)
+			PortalUnlockEvent component = MonoBehaviourSingleton<InGameManager>.I.gameObject.GetComponent<PortalUnlockEvent>();
+			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 			{
-				Object.Destroy(component);
+				UnityEngine.Object.Destroy(component);
 			}
 			MonoBehaviourSingleton<InGameManager>.I.OpenAllDropObject();
 		}
@@ -2435,10 +2464,9 @@ public class CoopStage
 
 	public void OnRecvSyncTimeRequest(Coop_Model_StageSyncTimeRequest model, int toClientId)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
-			this.StartCoroutine(DoStageSyncTime(model, toClientId));
+			StartCoroutine(DoStageSyncTime(model, toClientId));
 		}
 	}
 
@@ -2465,7 +2493,7 @@ public class CoopStage
 		}
 	}
 
-	public unsafe void SendSyncPlayerRecord(int toClientId, bool promise = true)
+	public void SendSyncPlayerRecord(int toClientId, bool promise = true)
 	{
 		if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
 		{
@@ -2473,14 +2501,21 @@ public class CoopStage
 			int i = 0;
 			for (int count = list.Count; i < count; i++)
 			{
-				InGameRecorder.PlayerRecordSyncHost playerRecordSyncHost = list[i];
-				CoopStagePacketSender packetSender = this.packetSender;
-				InGameRecorder.PlayerRecordSyncHost record = playerRecordSyncHost;
-				if (_003C_003Ef__am_0024cache2D == null)
+				InGameRecorder.PlayerRecordSyncHost record = list[i];
+				packetSender.SendSyncPlayerRecord(record, toClientId, promise, delegate(Coop_Model_Base resend_model)
 				{
-					_003C_003Ef__am_0024cache2D = new Func<Coop_Model_Base, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-				}
-				packetSender.SendSyncPlayerRecord(record, toClientId, promise, _003C_003Ef__am_0024cache2D);
+					Coop_Model_StageSyncPlayerRecord coop_Model_StageSyncPlayerRecord = resend_model as Coop_Model_StageSyncPlayerRecord;
+					if (MonoBehaviourSingleton<InGameRecorder>.IsValid() && coop_Model_StageSyncPlayerRecord != null && coop_Model_StageSyncPlayerRecord.rec.charaInfo != null)
+					{
+						InGameRecorder.PlayerRecordSyncHost playerRecordSyncHost = MonoBehaviourSingleton<InGameRecorder>.I.CreateSyncHostData(coop_Model_StageSyncPlayerRecord.rec.charaInfo.userId);
+						if (playerRecordSyncHost != null)
+						{
+							coop_Model_StageSyncPlayerRecord.rec = playerRecordSyncHost;
+							return true;
+						}
+					}
+					return false;
+				});
 			}
 		}
 	}
@@ -2503,9 +2538,8 @@ public class CoopStage
 
 	private void ForceProgressNextWave()
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		Logd("ForceProgressNextWave current:{0}, other:{1}", MonoBehaviourSingleton<InGameManager>.I.GetRushIndex(), GetOtherRushIndex());
-		this.StartCoroutine(_ForceProgressNextWave());
+		StartCoroutine(_ForceProgressNextWave());
 	}
 
 	private IEnumerator _ForceProgressNextWave()
@@ -2513,11 +2547,11 @@ public class CoopStage
 		forceNextWave = true;
 		isRecvRushRequested = false;
 		MonoBehaviourSingleton<CoopManager>.I.coopRoom.SendRushRequest();
-		float time = Time.get_time();
+		float time = Time.time;
 		while (!isRecvRushRequested)
 		{
 			yield return (object)null;
-			if (Time.get_time() - time > 5f)
+			if (Time.time - time > 5f)
 			{
 				Logd("Timeout RushRequest");
 				bossBreakIDLists[0].Add(0);
@@ -2557,13 +2591,13 @@ public class CoopStage
 			return true;
 		}
 		CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(packet.fromClientId);
-		if (coopClient == null)
+		if ((UnityEngine.Object)coopClient == (UnityEngine.Object)null)
 		{
 			return true;
 		}
 		Logd("Responsed StageObjectInfo from {0}. sid={1}, CoopMode:{2}, userid={3}", packet.fromClientId, model.StageObjectID, model.CoopModeType, coopClient.userId);
 		StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.FindObject(model.StageObjectID);
-		if (stageObject == null)
+		if ((UnityEngine.Object)stageObject == (UnityEngine.Object)null)
 		{
 			return false;
 		}

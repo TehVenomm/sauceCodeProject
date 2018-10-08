@@ -17,9 +17,9 @@ namespace GooglePlayGames.Native.PInvoke
 			return PInvokeUtilities.OutParamsToString((byte[] out_string, UIntPtr size) => GooglePlayGames.Native.Cwrapper.TurnBasedMatchConfig.TurnBasedMatchConfig_PlayerIdsToInvite_GetElement(SelfPtr(), index, out_string, size));
 		}
 
-		internal unsafe IEnumerator<string> PlayerIdsToInvite()
+		internal IEnumerator<string> PlayerIdsToInvite()
 		{
-			return PInvokeUtilities.ToEnumerator<string>(GooglePlayGames.Native.Cwrapper.TurnBasedMatchConfig.TurnBasedMatchConfig_PlayerIdsToInvite_Length(SelfPtr()), new Func<UIntPtr, string>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			return PInvokeUtilities.ToEnumerator(GooglePlayGames.Native.Cwrapper.TurnBasedMatchConfig.TurnBasedMatchConfig_PlayerIdsToInvite_Length(SelfPtr()), PlayerIdAtIndex);
 		}
 
 		internal uint Variant()

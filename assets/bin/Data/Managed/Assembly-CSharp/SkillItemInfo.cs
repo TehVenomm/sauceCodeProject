@@ -543,7 +543,6 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 
 	public static string GetExceedExplanationText(int exceedCnt)
 	{
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 		string text = StringTable.Format(STRING_CATEGORY.SMITH, 11u, StringTable.Format(STRING_CATEGORY.SMITH, 9u, exceedCnt), StringTable.Format(STRING_CATEGORY.SMITH, 8u, GetDecreaseUseGaugePercent(exceedCnt)));
 		return UIUtility.GetColorText(text, ExceedSkillItemTable.color);
 	}

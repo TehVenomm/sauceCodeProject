@@ -30,15 +30,18 @@ public class GuildInfoDialog : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		_clanId = (int)GameSection.GetEventData();
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
-	private unsafe IEnumerator DoInitialize()
+	private IEnumerator DoInitialize()
 	{
 		bool finish_get_statistic = false;
-		MonoBehaviourSingleton<GuildManager>.I.SendRequestStatistic(_clanId, new Action<bool, GuildStatisticInfo>((object)/*Error near IL_0038: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<GuildManager>.I.SendRequestStatistic(_clanId, delegate(bool success, GuildStatisticInfo info)
+		{
+			((_003CDoInitialize_003Ec__Iterator59)/*Error near IL_0038: stateMachine*/)._003Cfinish_get_statistic_003E__0 = true;
+			((_003CDoInitialize_003Ec__Iterator59)/*Error near IL_0038: stateMachine*/)._003C_003Ef__this._info = info;
+		});
 		while (!finish_get_statistic)
 		{
 			yield return (object)null;
@@ -48,39 +51,50 @@ public class GuildInfoDialog : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.LBL_GUILD_NAME, _info.clanName);
+		SetLabelText(UI.LBL_GUILD_NAME, _info.clanName);
 		if (_info.emblem != null && _info.emblem.Length >= 3)
 		{
-			SetSprite((Enum)UI.SPR_EMBLEM_LAYER_1, GuildItemManager.I.GetItemSprite(_info.emblem[0]));
-			SetSprite((Enum)UI.SPR_EMBLEM_LAYER_2, GuildItemManager.I.GetItemSprite(_info.emblem[1]));
-			SetSprite((Enum)UI.SPR_EMBLEM_LAYER_3, GuildItemManager.I.GetItemSprite(_info.emblem[2]));
+			SetSprite(UI.SPR_EMBLEM_LAYER_1, GuildItemManager.I.GetItemSprite(_info.emblem[0]));
+			SetSprite(UI.SPR_EMBLEM_LAYER_2, GuildItemManager.I.GetItemSprite(_info.emblem[1]));
+			SetSprite(UI.SPR_EMBLEM_LAYER_3, GuildItemManager.I.GetItemSprite(_info.emblem[2]));
 		}
 		else
 		{
-			SetSprite((Enum)UI.SPR_EMBLEM_LAYER_1, string.Empty);
-			SetSprite((Enum)UI.SPR_EMBLEM_LAYER_2, string.Empty);
-			SetSprite((Enum)UI.SPR_EMBLEM_LAYER_3, string.Empty);
+			SetSprite(UI.SPR_EMBLEM_LAYER_1, string.Empty);
+			SetSprite(UI.SPR_EMBLEM_LAYER_2, string.Empty);
+			SetSprite(UI.SPR_EMBLEM_LAYER_3, string.Empty);
 		}
-		SetLabelText((Enum)UI.LBL_TAG, _info.tag);
-		SetLabelText((Enum)UI.LBL_LEVEL, string.Format(base.sectionData.GetText("TEXT_LEVEL"), _info.level));
-		SetLabelText((Enum)UI.LBL_MEM, $"{_info.currentMem}/{_info.memCap}");
-		SetLabelText((Enum)UI.LBL_DESC, _info.description);
+		SetLabelText(UI.LBL_TAG, _info.tag);
+		SetLabelText(UI.LBL_LEVEL, string.Format(base.sectionData.GetText("TEXT_LEVEL"), _info.level));
+		SetLabelText(UI.LBL_MEM, $"{_info.currentMem}/{_info.memCap}");
+		SetLabelText(UI.LBL_DESC, _info.description);
 		TimeSpan timeSpan = DateTime.UtcNow - DateTime.Parse(_info.createAt);
 		SetLabelText(UI.LBL_DAYS, timeSpan.Days);
 		SetLabelText(UI.LBL_DONATE, _info.donate);
-		SetLabelText((Enum)UI.LBL_GUILD_ID, $"{_clanId:D5}");
-		SetLabelText((Enum)UI.LBL_HUNTER_NUM, $"{_info.currentMem}/{_info.memCap}");
-		SetActive((Enum)UI.BTN_JOIN, _info.privacy == 0);
-		SetActive((Enum)UI.BTN_REQUEST, _info.privacy == 1);
-		SetButtonEnabled((Enum)UI.BTN_JOIN, _info.canJoin, true);
-		SetButtonEnabled((Enum)UI.BTN_REQUEST, _info.canJoin, true);
+		SetLabelText(UI.LBL_GUILD_ID, $"{_clanId:D5}");
+		SetLabelText(UI.LBL_HUNTER_NUM, $"{_info.currentMem}/{_info.memCap}");
+		SetActive(UI.BTN_JOIN, _info.privacy == 0);
+		SetActive(UI.BTN_REQUEST, _info.privacy == 1);
+		SetButtonEnabled(UI.BTN_JOIN, _info.canJoin, true);
+		SetButtonEnabled(UI.BTN_REQUEST, _info.canJoin, true);
 	}
 
-	private unsafe void OnQuery_JOIN()
+	private void OnQuery_JOIN()
 	{
 		GameSection.SetEventData($"Welcome to {_info.clanName}!");
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildManager>.I.SendRequestJoin(_clanId, -1, new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<GuildManager>.I.SendRequestJoin(_clanId, -1, delegate(bool isSuccess, Error error)
+		{
+			GuildInfoDialog guildInfoDialog = this;
+			DoWaitProtocolBusyFinish(delegate
+			{
+				if (!GuildManager.IsValidInGuild())
+				{
+					GameSection.ChangeStayEvent("REQUEST", null);
+				}
+				GameSection.ResumeEvent(isSuccess, null);
+			});
+		});
 	}
 
 	private void OnQuery_DETAIL()
@@ -92,10 +106,25 @@ public class GuildInfoDialog : GameSection
 		});
 	}
 
-	private unsafe void OnQuery_REQUEST()
+	private void OnQuery_REQUEST()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildManager>.I.SendRequestJoin(_clanId, -1, new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<GuildManager>.I.SendRequestJoin(_clanId, -1, delegate(bool isSuccess, Error error)
+		{
+			GuildInfoDialog guildInfoDialog = this;
+			DoWaitProtocolBusyFinish(delegate
+			{
+				if (isSuccess)
+				{
+					guildInfoDialog.SetButtonEnabled(UI.BTN_REQUEST, false, true);
+				}
+				if (GuildManager.IsValidInGuild())
+				{
+					GameSection.ChangeStayEvent("JOIN", null);
+				}
+				GameSection.ResumeEvent(true, null);
+			});
+		});
 	}
 
 	private void OnQuery_MORE()

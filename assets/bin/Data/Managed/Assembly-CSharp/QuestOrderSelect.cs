@@ -155,8 +155,7 @@ public class QuestOrderSelect : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -170,14 +169,14 @@ public class QuestOrderSelect : GameSection
 			MonoBehaviourSingleton<QuestManager>.I.SendGetQuestList(delegate
 			{
 				MonoBehaviourSingleton<QuestManager>.I.needRequestOrderQuestList = false;
-				((_003CDoInitialize_003Ec__Iterator7D)/*Error near IL_0075: stateMachine*/)._003Cis_recv_quest_003E__0 = true;
+				((_003CDoInitialize_003Ec__Iterator7F)/*Error near IL_0075: stateMachine*/)._003Cis_recv_quest_003E__0 = true;
 			});
 			while (!is_recv_quest)
 			{
 				yield return (object)null;
 			}
 		}
-		this.StartCoroutine(CheckLimitQuestItem());
+		StartCoroutine(CheckLimitQuestItem());
 		sortSettings = SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.QUEST, SortSettings.SETTINGS_TYPE.ORDER_QUEST);
 		SHOW_QUEST_REMAIN_LIMIT_SECOND = (float)TimeSpan.FromDays(5.0).TotalSeconds;
 		sortSettings.indivComparison = Compare;
@@ -197,24 +196,22 @@ public class QuestOrderSelect : GameSection
 
 	public override void UpdateUI()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		npcText = Singleton<NPCMessageTable>.I.GetNPCMessageBySectionData(base.sectionData);
-		SetRenderNPCModel((Enum)UI.TEX_NPCMODEL, 2, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCRot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCFOV, (Action<NPCLoader>)null);
-		SetLabelText((Enum)UI.LBL_NPC_MESSAGE, npcText);
+		SetRenderNPCModel(UI.TEX_NPCMODEL, 2, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCRot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCFOV, null);
+		SetLabelText(UI.LBL_NPC_MESSAGE, npcText);
 		if (MonoBehaviourSingleton<PartyManager>.IsValid() && MonoBehaviourSingleton<PartyManager>.I.challengeInfo != null && MonoBehaviourSingleton<PartyManager>.I.challengeInfo.currentShadowCount != null)
 		{
-			SetActive((Enum)UI.BTN_SHADOW_COUNT, true);
+			SetActive(UI.BTN_SHADOW_COUNT, true);
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_SHADOW_COUNT, false);
+			SetActive(UI.BTN_SHADOW_COUNT, false);
 		}
 		ShowOrder();
 		isResetUI = false;
 	}
 
-	protected unsafe void ShowOrder()
+	protected void ShowOrder()
 	{
 		if (MonoBehaviourSingleton<InventoryManager>.I.questItemInventory.GetCount() > 0)
 		{
@@ -263,8 +260,9 @@ public class QuestOrderSelect : GameSection
 					int num3 = 0;
 					if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 					{
-						_003CShowOrder_003Ec__AnonStorey352 _003CShowOrder_003Ec__AnonStorey;
-						num3 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CShowOrder_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
+						num3 = (from g in MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList
+						where g.questId == (int)info.questData.tableData.questID
+						select g).Count();
 					}
 					int num4 = num2 - num3;
 					if (num4 > 0)
@@ -277,16 +275,16 @@ public class QuestOrderSelect : GameSection
 		questGridDatas = list2.ToArray();
 		if (questGridDatas == null || questGridDatas.Length == 0)
 		{
-			SetActive((Enum)UI.GRD_ORDER_QUEST, false);
-			SetActive((Enum)UI.STR_ORDER_NON_LIST, true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, true);
-			SetLabelText((Enum)UI.LBL_MAX, "0");
-			SetLabelText((Enum)UI.LBL_NOW, "0");
+			SetActive(UI.GRD_ORDER_QUEST, false);
+			SetActive(UI.STR_ORDER_NON_LIST, true);
+			SetActive(UI.OBJ_ACTIVE_ROOT, false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, true);
+			SetLabelText(UI.LBL_MAX, "0");
+			SetLabelText(UI.LBL_NOW, "0");
 			UIScrollView component = GetCtrl(UI.SCR_ORDER_QUEST).GetComponent<UIScrollView>();
-			if (component != null)
+			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 			{
-				component.set_enabled(false);
+				component.enabled = false;
 				component.verticalScrollBar.alpha = 0f;
 			}
 		}
@@ -294,21 +292,21 @@ public class QuestOrderSelect : GameSection
 		{
 			if (questGridDatas.Length == 1 && questGridDatas[0].orderQuestType == QuestGridData.ORDER_QUEST_TYPE.Challenge)
 			{
-				SetActive((Enum)UI.STR_ORDER_NON_LIST, true);
+				SetActive(UI.STR_ORDER_NON_LIST, true);
 			}
 			else
 			{
-				SetActive((Enum)UI.STR_ORDER_NON_LIST, false);
+				SetActive(UI.STR_ORDER_NON_LIST, false);
 			}
-			SetActive((Enum)UI.GRD_ORDER_QUEST, true);
-			SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
-			SetToggle((Enum)UI.TGL_ICON_ASC, sortSettings.orderTypeAsc);
+			SetActive(UI.GRD_ORDER_QUEST, true);
+			SetLabelText(UI.LBL_SORT, sortSettings.GetSortLabel());
+			SetToggle(UI.TGL_ICON_ASC, sortSettings.orderTypeAsc);
 			pageMax = 1 + (questGridDatas.Length - 1) / 10;
 			bool flag = pageMax > 1;
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
-			SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
-			SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
+			SetActive(UI.OBJ_ACTIVE_ROOT, flag);
+			SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
+			SetLabelText(UI.LBL_MAX, pageMax.ToString());
+			SetLabelText(UI.LBL_NOW, nowPage.ToString());
 			UITweener[] transitions = GetCtrl(UI.OBJ_FRAME).GetComponents<UITweener>();
 			int finishCount = 0;
 			UITweener[] array2 = transitions;
@@ -329,7 +327,7 @@ public class QuestOrderSelect : GameSection
 			Array.Copy(questGridDatas, num5, destinationArray, 0, num6);
 			questGridDatas = destinationArray;
 			SetGrid(UI.GRD_ORDER_QUEST, string.Empty, 0, true, null, null);
-			SetGrid(UI.GRD_ORDER_QUEST, "QuestListOrderItem", questGridDatas.Length, true, new Func<int, Transform, Transform>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			SetGrid(UI.GRD_ORDER_QUEST, "QuestListOrderItem", questGridDatas.Length, true, CreateGridListItem, UpdateGridListItem);
 		}
 	}
 
@@ -363,21 +361,10 @@ public class QuestOrderSelect : GameSection
 		}
 	}
 
-	private unsafe void UpdateGirdListItemQuest(int i, Transform t, bool is_recycle)
+	private void UpdateGirdListItemQuest(int i, Transform t, bool is_recycle)
 	{
-		//IL_0428: Unknown result type (might be due to invalid IL or missing references)
-		//IL_044d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ba: Expected O, but got Unknown
-		//IL_04bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c4: Expected O, but got Unknown
 		List<GameSectionHistory.HistoryData> historyList = MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList();
-		List<GameSectionHistory.HistoryData> source = historyList;
-		if (_003C_003Ef__am_0024cache10 == null)
-		{
-			_003C_003Ef__am_0024cache10 = new Func<GameSectionHistory.HistoryData, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		bool flag = source.Any(_003C_003Ef__am_0024cache10);
+		bool flag = historyList.Any((GameSectionHistory.HistoryData h) => h.sectionName.StartsWith("GuildRequest"));
 		SetActive(t, true);
 		SetEvent(t, "SELECT_ORDER", i);
 		QuestSortData questSortData = questGridDatas[i].questSortData;
@@ -435,8 +422,9 @@ public class QuestOrderSelect : GameSection
 		int num3 = 0;
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
-			_003CUpdateGirdListItemQuest_003Ec__AnonStorey354 _003CUpdateGirdListItemQuest_003Ec__AnonStorey;
-			num3 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CUpdateGirdListItemQuest_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
+			num3 = (from g in MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList
+			where g.questId == (int)info.questData.tableData.questID
+			select g).Count();
 		}
 		int num4 = num2 - num3;
 		SetLabelText(t, UI.LBL_ORDER_NUM, num4.ToString());
@@ -444,13 +432,13 @@ public class QuestOrderSelect : GameSection
 		{
 			t.GetComponent<UIButton>().isEnabled = false;
 		}
-		Transform val = FindCtrl(t, UI.OBJ_FRAME);
-		if (val != null)
+		Transform transform = FindCtrl(t, UI.OBJ_FRAME);
+		if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 		{
-			UIPanel uiPanel = val.get_gameObject().GetComponent<UIPanel>();
-			if (uiPanel == null)
+			UIPanel uiPanel = transform.gameObject.GetComponent<UIPanel>();
+			if ((UnityEngine.Object)uiPanel == (UnityEngine.Object)null)
 			{
-				uiPanel = val.get_gameObject().AddComponent<UIPanel>();
+				uiPanel = transform.gameObject.AddComponent<UIPanel>();
 				uiPanel.depth = component.panel.depth + 1;
 			}
 			uiPanel.widgetsAreStatic = false;
@@ -460,8 +448,10 @@ public class QuestOrderSelect : GameSection
 			}
 			else
 			{
-				_003CUpdateGirdListItemQuest_003Ec__AnonStorey355 _003CUpdateGirdListItemQuest_003Ec__AnonStorey2;
-				onScrollViewReady = Delegate.Combine((Delegate)onScrollViewReady, (Delegate)new Action((object)_003CUpdateGirdListItemQuest_003Ec__AnonStorey2, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				onScrollViewReady = (Action)Delegate.Combine(onScrollViewReady, (Action)delegate
+				{
+					PanelToStatic(icon, uiPanel);
+				});
 			}
 		}
 		QuestItemInfo itemData = questSortData.itemData;
@@ -496,29 +486,33 @@ public class QuestOrderSelect : GameSection
 		if (base.isOpen && isTransitionFinished && onScrollViewReady != null)
 		{
 			isScrollViewReady = true;
-			onScrollViewReady.Invoke();
+			onScrollViewReady();
 			onScrollViewReady = null;
 		}
 	}
 
-	private unsafe void PanelToStatic(ItemIcon icon, UIPanel uiPanel)
+	private void PanelToStatic(ItemIcon icon, UIPanel uiPanel)
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Expected O, but got Unknown
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Expected O, but got Unknown
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Expected O, but got Unknown
-		_003CPanelToStatic_003Ec__AnonStorey356 _003CPanelToStatic_003Ec__AnonStorey;
 		if (icon.isIconLoaded)
 		{
 			uiPanel.widgetsAreStatic = false;
 			AppMain i = MonoBehaviourSingleton<AppMain>.I;
-			i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003CPanelToStatic_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+			{
+				uiPanel.widgetsAreStatic = true;
+			});
 		}
 		else
 		{
-			icon.onIconLoaded = new Action((object)_003CPanelToStatic_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			icon.onIconLoaded = delegate
+			{
+				uiPanel.widgetsAreStatic = false;
+				AppMain i2 = MonoBehaviourSingleton<AppMain>.I;
+				i2.onDelayCall = (Action)Delegate.Combine(i2.onDelayCall, (Action)delegate
+				{
+					uiPanel.widgetsAreStatic = true;
+				});
+			};
 		}
 	}
 
@@ -644,10 +638,8 @@ public class QuestOrderSelect : GameSection
 		return base.CheckAutoEvent(event_name, event_data);
 	}
 
-	private unsafe void Update()
+	private void Update()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
 		if (!isScrollViewReady)
 		{
 			TryScrollViewToReady();
@@ -655,7 +647,13 @@ public class QuestOrderSelect : GameSection
 		if (isQuestItemDirty)
 		{
 			RefreshUI();
-			Protocol.Force(new Action((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			Protocol.Force(delegate
+			{
+				MonoBehaviourSingleton<QuestManager>.I.SendGetQuestList(delegate
+				{
+					StartCoroutine(CheckLimitQuestItem());
+				});
+			});
 			isQuestItemDirty = false;
 		}
 	}
@@ -711,11 +709,11 @@ public class QuestOrderSelect : GameSection
 				{
 					for (int i = 0; i < orderQuest.remainTimes.Count; i++)
 					{
-						((_003CCheckLimitQuestItem_003Ec__Iterator7E)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 = orderQuest.remainTimes[i];
-						if (!(((_003CCheckLimitQuestItem_003Ec__Iterator7E)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 <= 0f) && ((_003CCheckLimitQuestItem_003Ec__Iterator7E)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 > ((_003CCheckLimitQuestItem_003Ec__Iterator7E)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3)
+						((_003CCheckLimitQuestItem_003Ec__Iterator80)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 = orderQuest.remainTimes[i];
+						if (!(((_003CCheckLimitQuestItem_003Ec__Iterator80)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3 <= 0f) && ((_003CCheckLimitQuestItem_003Ec__Iterator80)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 > ((_003CCheckLimitQuestItem_003Ec__Iterator80)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3)
 						{
-							((_003CCheckLimitQuestItem_003Ec__Iterator7E)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 = ((_003CCheckLimitQuestItem_003Ec__Iterator7E)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3;
-							((_003CCheckLimitQuestItem_003Ec__Iterator7E)/*Error near IL_007f: stateMachine*/)._003CquestData_003E__2 = orderQuest;
+							((_003CCheckLimitQuestItem_003Ec__Iterator80)/*Error near IL_007f: stateMachine*/)._003CminRemainingSec_003E__1 = ((_003CCheckLimitQuestItem_003Ec__Iterator80)/*Error near IL_007f: stateMachine*/)._003CparseRemainingSec_003E__3;
+							((_003CCheckLimitQuestItem_003Ec__Iterator80)/*Error near IL_007f: stateMachine*/)._003CquestData_003E__2 = orderQuest;
 						}
 					}
 				});
@@ -748,13 +746,16 @@ public class QuestOrderSelect : GameSection
 		GameSection.SetEventData(param);
 	}
 
-	private unsafe void Search(ref List<QuestItemInfo> list)
+	private void Search(ref List<QuestItemInfo> list)
 	{
 		if (param != null && param.order != 0)
 		{
-			list = list.Where(new Func<QuestItemInfo, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Where(new Func<QuestItemInfo, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Where(new Func<QuestItemInfo, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/))
-				.Where(new Func<QuestItemInfo, bool>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/))
-				.ToList();
+			list = (from item in list
+			where param.IsMatchRarity(item)
+			where param.IsMatchLevel(item)
+			where param.IsMatchElement(item)
+			where param.IsMatchEnemySpecies(item)
+			select item).ToList();
 		}
 	}
 

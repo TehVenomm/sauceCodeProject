@@ -15,17 +15,14 @@ public class ItemDetailEquipDialog : ItemDetailEquip
 
 	private void StoreAudioClip()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		string sE = ResourceName.GetSE(40000021);
 		if (!string.IsNullOrEmpty(sE))
 		{
-			Transform val = this.get_transform().GetChild(0);
-			if (!(val == null))
+			Transform child = base.transform.GetChild(0);
+			if (!((Object)child == (Object)null))
 			{
-				ResourceLink component = val.GetComponent<ResourceLink>();
-				if (!(component == null))
+				ResourceLink component = child.GetComponent<ResourceLink>();
+				if (!((Object)component == (Object)null))
 				{
 					m_AudioClip = component.Get<AudioClip>(sE);
 				}
@@ -35,7 +32,7 @@ public class ItemDetailEquipDialog : ItemDetailEquip
 
 	private void PlayAudio()
 	{
-		if (m_AudioClip != null)
+		if ((Object)m_AudioClip != (Object)null)
 		{
 			SoundManager.PlayOneshotJingle(m_AudioClip, 40000021, null, null);
 		}

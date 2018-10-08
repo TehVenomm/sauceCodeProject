@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Toggle")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/Interaction/Toggle")]
 public class UIToggle : UIWidgetContainer
 {
 	public delegate bool Validate(bool choice);
@@ -31,8 +31,8 @@ public class UIToggle : UIWidgetContainer
 
 	public Validate validator;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UISprite checkSprite;
 
 	[HideInInspector]
@@ -43,12 +43,12 @@ public class UIToggle : UIWidgetContainer
 	[SerializeField]
 	private GameObject eventReceiver;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private string functionName = "OnActivate";
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private bool startsChecked;
 
 	private bool mIsActive = true;
@@ -78,13 +78,13 @@ public class UIToggle : UIWidgetContainer
 	{
 		get
 		{
-			Collider component = this.GetComponent<Collider>();
-			if (component != null)
+			Collider component = GetComponent<Collider>();
+			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 			{
-				return component.get_enabled();
+				return component.enabled;
 			}
-			Collider2D component2 = this.GetComponent<Collider2D>();
-			return component2 != null && component2.get_enabled();
+			Collider2D component2 = GetComponent<Collider2D>();
+			return (UnityEngine.Object)component2 != (UnityEngine.Object)null && component2.enabled;
 		}
 	}
 
@@ -106,7 +106,7 @@ public class UIToggle : UIWidgetContainer
 		for (int i = 0; i < list.size; i++)
 		{
 			UIToggle uIToggle = list[i];
-			if (uIToggle != null && uIToggle.group == group && uIToggle.mIsActive)
+			if ((UnityEngine.Object)uIToggle != (UnityEngine.Object)null && uIToggle.group == group && uIToggle.mIsActive)
 			{
 				return uIToggle;
 			}
@@ -131,19 +131,19 @@ public class UIToggle : UIWidgetContainer
 			startsChecked = false;
 			startsActive = true;
 		}
-		if (!Application.get_isPlaying())
+		if (!Application.isPlaying)
 		{
-			if (checkSprite != null && activeSprite == null)
+			if ((UnityEngine.Object)checkSprite != (UnityEngine.Object)null && (UnityEngine.Object)activeSprite == (UnityEngine.Object)null)
 			{
 				activeSprite = checkSprite;
 				checkSprite = null;
 			}
-			if (checkAnimation != null && activeAnimation == null)
+			if ((UnityEngine.Object)checkAnimation != (UnityEngine.Object)null && (UnityEngine.Object)activeAnimation == (UnityEngine.Object)null)
 			{
 				activeAnimation = checkAnimation;
 				checkAnimation = null;
 			}
-			if (Application.get_isPlaying() && activeSprite != null)
+			if (Application.isPlaying && (UnityEngine.Object)activeSprite != (UnityEngine.Object)null)
 			{
 				activeSprite.alpha = ((!startsActive) ? 0f : 1f);
 			}
@@ -166,7 +166,7 @@ public class UIToggle : UIWidgetContainer
 
 	private void OnClick()
 	{
-		if (this.get_enabled() && isColliderEnabled && UICamera.currentTouchID != -2)
+		if (base.enabled && isColliderEnabled && UICamera.currentTouchID != -2)
 		{
 			value = !value;
 		}
@@ -174,15 +174,13 @@ public class UIToggle : UIWidgetContainer
 
 	public void Set(bool state)
 	{
-		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017a: Expected O, but got Unknown
 		if (validator == null || validator(state))
 		{
 			if (!mStarted)
 			{
 				mIsActive = state;
 				startsActive = state;
-				if (activeSprite != null)
+				if ((UnityEngine.Object)activeSprite != (UnityEngine.Object)null)
 				{
 					activeSprite.alpha = ((!state) ? 0f : 1f);
 				}
@@ -196,7 +194,7 @@ public class UIToggle : UIWidgetContainer
 					while (num < size)
 					{
 						UIToggle uIToggle = list[num];
-						if (uIToggle != this && uIToggle.group == group)
+						if ((UnityEngine.Object)uIToggle != (UnityEngine.Object)this && uIToggle.group == group)
 						{
 							uIToggle.Set(false);
 						}
@@ -212,7 +210,7 @@ public class UIToggle : UIWidgetContainer
 					}
 				}
 				mIsActive = state;
-				if (activeSprite != null)
+				if ((UnityEngine.Object)activeSprite != (UnityEngine.Object)null)
 				{
 					if (instantTween || !NGUITools.GetActive(this))
 					{
@@ -220,10 +218,10 @@ public class UIToggle : UIWidgetContainer
 					}
 					else
 					{
-						TweenAlpha.Begin(activeSprite.get_gameObject(), 0.15f, (!mIsActive) ? 0f : 1f);
+						TweenAlpha.Begin(activeSprite.gameObject, 0.15f, (!mIsActive) ? 0f : 1f);
 					}
 				}
-				if (current == null)
+				if ((UnityEngine.Object)current == (UnityEngine.Object)null)
 				{
 					UIToggle uIToggle2 = current;
 					current = this;
@@ -231,24 +229,24 @@ public class UIToggle : UIWidgetContainer
 					{
 						EventDelegate.Execute(onChange);
 					}
-					else if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+					else if ((UnityEngine.Object)eventReceiver != (UnityEngine.Object)null && !string.IsNullOrEmpty(functionName))
 					{
-						eventReceiver.SendMessage(functionName, (object)mIsActive, 1);
+						eventReceiver.SendMessage(functionName, mIsActive, SendMessageOptions.DontRequireReceiver);
 					}
 					current = uIToggle2;
 				}
-				if (animator != null)
+				if ((UnityEngine.Object)animator != (UnityEngine.Object)null)
 				{
 					ActiveAnimation activeAnimation = ActiveAnimation.Play(animator, null, state ? Direction.Forward : Direction.Reverse, EnableCondition.IgnoreDisabledState, DisableCondition.DoNotDisable);
-					if (activeAnimation != null && (instantTween || !NGUITools.GetActive(this)))
+					if ((UnityEngine.Object)activeAnimation != (UnityEngine.Object)null && (instantTween || !NGUITools.GetActive(this)))
 					{
 						activeAnimation.Finish();
 					}
 				}
-				else if (this.activeAnimation != null)
+				else if ((UnityEngine.Object)this.activeAnimation != (UnityEngine.Object)null)
 				{
 					ActiveAnimation activeAnimation2 = ActiveAnimation.Play(this.activeAnimation, null, state ? Direction.Forward : Direction.Reverse, EnableCondition.IgnoreDisabledState, DisableCondition.DoNotDisable);
-					if (activeAnimation2 != null && (instantTween || !NGUITools.GetActive(this)))
+					if ((UnityEngine.Object)activeAnimation2 != (UnityEngine.Object)null && (instantTween || !NGUITools.GetActive(this)))
 					{
 						activeAnimation2.Finish();
 					}

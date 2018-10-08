@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,7 +31,6 @@ public class TheaterStory : GameSection
 
 	public override void Initialize()
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		object[] array = GameSection.GetEventData() as object[];
 		m_canViewStoryList = (array[0] as List<TheaterModeTable.TheaterModeData>);
 		m_chapterName = (array[1] as string);
@@ -53,7 +51,7 @@ public class TheaterStory : GameSection
 			return (int)(a.story_id - b.story_id);
 		});
 		SetPaging();
-		this.StartCoroutine("DoInitialize");
+		StartCoroutine("DoInitialize");
 	}
 
 	private IEnumerator DoInitialize()
@@ -62,20 +60,8 @@ public class TheaterStory : GameSection
 		base.Initialize();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Expected O, but got Unknown
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Expected O, but got Unknown
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Expected O, but got Unknown
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Expected O, but got Unknown
 		string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
 		EventData[] events = new EventData[4]
 		{
@@ -90,32 +76,42 @@ public class TheaterStory : GameSection
 		};
 		if (m_canViewStoryList.Count > 0)
 		{
-			SetActive(this.get_gameObject().get_transform(), UI.STR_STORY_NON_LIST, false);
+			SetActive(base.gameObject.transform, UI.STR_STORY_NON_LIST, false);
 		}
 		else
 		{
-			SetActive(this.get_gameObject().get_transform(), UI.STR_STORY_NON_LIST, true);
+			SetActive(base.gameObject.transform, UI.STR_STORY_NON_LIST, true);
 		}
-		SetActive(this.get_gameObject().get_transform(), UI.LBL_CHAPTER_NAME, true);
-		SetLabelText(this.get_gameObject().get_transform(), UI.LBL_CHAPTER_NAME, m_chapterName);
-		SetLabelText((Enum)UI.LBL_MAX, m_pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, m_nowPage.ToString());
+		SetActive(base.gameObject.transform, UI.LBL_CHAPTER_NAME, true);
+		SetLabelText(base.gameObject.transform, UI.LBL_CHAPTER_NAME, m_chapterName);
+		SetLabelText(UI.LBL_MAX, m_pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, m_nowPage.ToString());
 		List<TheaterModeTable.TheaterModeData> dispList = m_canViewStoryList;
 		if (m_pageMax > 1)
 		{
 			List<TheaterModeTable.TheaterModeData> list = new List<TheaterModeTable.TheaterModeData>();
-			int i = 0;
-			for (int count = dispList.Count; i < count; i++)
+			int j = 0;
+			for (int count = dispList.Count; j < count; j++)
 			{
-				if (i >= (m_nowPage - 1) * 10 && i < m_nowPage * 10)
+				if (j >= (m_nowPage - 1) * 10 && j < m_nowPage * 10)
 				{
-					list.Add(dispList[i]);
+					list.Add(dispList[j]);
 				}
 			}
 			dispList = list;
 		}
-		_003CUpdateUI_003Ec__AnonStorey3D9 _003CUpdateUI_003Ec__AnonStorey3D;
-		SetDynamicList((Enum)UI.GRD_LIST, "TheaterStoryListItem", dispList.Count, true, null, null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetDynamicList(UI.GRD_LIST, "TheaterStoryListItem", dispList.Count, true, null, null, delegate(int i, Transform t, bool is_recycle)
+		{
+			SetActive(t, UI.LBL_STORY_TITLE, true);
+			SetLabelText(t, UI.LBL_STORY_TITLE, dispList[i].title);
+			SetEvent(t, "PLAY_STORY", new object[4]
+			{
+				dispList[i].script_id,
+				0,
+				0,
+				events
+			});
+		});
 	}
 
 	private void OnApplicationPause(bool pause)
@@ -148,17 +144,17 @@ public class TheaterStory : GameSection
 		List<TheaterModeTable.TheaterModeData> canViewStoryList = m_canViewStoryList;
 		if (canViewStoryList.Count <= 10)
 		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, true);
+			SetActive(UI.OBJ_ACTIVE_ROOT, false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, true);
 			m_pageMax = 1;
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, true);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, false);
+			SetActive(UI.OBJ_ACTIVE_ROOT, true);
+			SetActive(UI.OBJ_INACTIVE_ROOT, false);
 			m_pageMax = canViewStoryList.Count / 10 + 1;
 		}
-		SetLabelText((Enum)UI.LBL_MAX, m_pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, m_nowPage.ToString());
+		SetLabelText(UI.LBL_MAX, m_pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, m_nowPage.ToString());
 	}
 }

@@ -15,9 +15,9 @@ public class TweenFOV : UITweener
 	{
 		get
 		{
-			if (mCam == null)
+			if ((UnityEngine.Object)mCam == (UnityEngine.Object)null)
 			{
-				mCam = this.GetComponent<Camera>();
+				mCam = GetComponent<Camera>();
 			}
 			return mCam;
 		}
@@ -40,11 +40,11 @@ public class TweenFOV : UITweener
 	{
 		get
 		{
-			return cachedCamera.get_fieldOfView();
+			return cachedCamera.fieldOfView;
 		}
 		set
 		{
-			cachedCamera.set_fieldOfView(value);
+			cachedCamera.fieldOfView = value;
 		}
 	}
 
@@ -61,7 +61,7 @@ public class TweenFOV : UITweener
 		if (duration <= 0f)
 		{
 			tweenFOV.Sample(1f, true);
-			tweenFOV.set_enabled(false);
+			tweenFOV.enabled = false;
 		}
 		return tweenFOV;
 	}

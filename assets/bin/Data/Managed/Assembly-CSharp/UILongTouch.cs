@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UILongTouch
+public class UILongTouch : MonoBehaviour
 {
 	private const float TOUCH_TIME = 0.75f;
 
@@ -10,17 +10,12 @@ public class UILongTouch
 
 	protected float time;
 
-	public UILongTouch()
-		: this()
-	{
-	}
-
 	public static void Set(GameObject button, string event_name, object event_data = null)
 	{
-		if (!(button.GetComponent<UIButton>() == null))
+		if (!((Object)button.GetComponent<UIButton>() == (Object)null))
 		{
 			UILongTouch uILongTouch = button.GetComponent<UILongTouch>();
-			if (uILongTouch == null)
+			if ((Object)uILongTouch == (Object)null)
 			{
 				uILongTouch = button.AddComponent<UILongTouch>();
 			}
@@ -39,9 +34,7 @@ public class UILongTouch
 
 	protected virtual void OnPress(bool isPressed)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		if (TutorialMessage.IsActiveButton(this.get_gameObject()))
+		if (TutorialMessage.IsActiveButton(base.gameObject))
 		{
 			if (isPressed)
 			{
@@ -63,11 +56,11 @@ public class UILongTouch
 	{
 		if (!(time <= 0f))
 		{
-			time -= Time.get_deltaTime();
+			time -= Time.deltaTime;
 			if (time <= 0f)
 			{
-				UIScrollView componentInParent = this.GetComponentInParent<UIScrollView>();
-				if ((componentInParent == null || (componentInParent != null && !componentInParent.isDragging)) && TutorialStep.HasAllTutorialCompleted() && !MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && !MonoBehaviourSingleton<GameSceneManager>.I.isCallingOnQuery)
+				UIScrollView componentInParent = GetComponentInParent<UIScrollView>();
+				if (((Object)componentInParent == (Object)null || ((Object)componentInParent != (Object)null && !componentInParent.isDragging)) && TutorialStep.HasAllTutorialCompleted() && !MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && !MonoBehaviourSingleton<GameSceneManager>.I.isCallingOnQuery)
 				{
 					_SendEvent();
 				}
@@ -82,8 +75,6 @@ public class UILongTouch
 
 	protected virtual void _SendEvent()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
-		UIGameSceneEventSender.SendEvent("UILongTouch", this.get_gameObject(), eventName, eventData, null);
+		UIGameSceneEventSender.SendEvent("UILongTouch", base.gameObject, eventName, eventData, null);
 	}
 }

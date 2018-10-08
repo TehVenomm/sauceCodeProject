@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class MenuTop : GameSection
 {
@@ -22,9 +23,9 @@ public class MenuTop : GameSection
 
 	public override void UpdateUI()
 	{
-		SetBadge((Enum)UI.INFO, GameSaveData.instance.IsShowNewsNotification() ? 1 : 0, 3, -4, -4, false);
-		SetBadge((Enum)UI.PRESENT_BTN, MonoBehaviourSingleton<PresentManager>.I.presentNum, 3, -4, -4, false);
-		SetBadge((Enum)UI.FRIEND, MonoBehaviourSingleton<FriendManager>.I.noReadMessageNum, 3, -4, -4, false);
+		SetBadge(UI.INFO, GameSaveData.instance.IsShowNewsNotification() ? 1 : 0, SpriteAlignment.TopRight, -4, -4, false);
+		SetBadge(UI.PRESENT_BTN, MonoBehaviourSingleton<PresentManager>.I.presentNum, SpriteAlignment.TopRight, -4, -4, false);
+		SetBadge(UI.FRIEND, MonoBehaviourSingleton<FriendManager>.I.noReadMessageNum, SpriteAlignment.TopRight, -4, -4, false);
 	}
 
 	public void OnQuery_FRIEND()

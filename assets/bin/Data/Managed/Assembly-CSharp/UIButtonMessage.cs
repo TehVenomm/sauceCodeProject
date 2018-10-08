@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Button Message (Legacy)")]
-public class UIButtonMessage
+public class UIButtonMessage : MonoBehaviour
 {
 	public enum Trigger
 	{
@@ -23,11 +23,6 @@ public class UIButtonMessage
 
 	private bool mStarted;
 
-	public UIButtonMessage()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
 		mStarted = true;
@@ -35,17 +30,15 @@ public class UIButtonMessage
 
 	private void OnEnable()
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
 		if (mStarted)
 		{
-			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
+			OnHover(UICamera.IsHighlighted(base.gameObject));
 		}
 	}
 
 	private void OnHover(bool isOver)
 	{
-		if (this.get_enabled() && ((isOver && trigger == Trigger.OnMouseOver) || (!isOver && trigger == Trigger.OnMouseOut)))
+		if (base.enabled && ((isOver && trigger == Trigger.OnMouseOver) || (!isOver && trigger == Trigger.OnMouseOut)))
 		{
 			Send();
 		}
@@ -53,7 +46,7 @@ public class UIButtonMessage
 
 	private void OnPress(bool isPressed)
 	{
-		if (this.get_enabled() && ((isPressed && trigger == Trigger.OnPress) || (!isPressed && trigger == Trigger.OnRelease)))
+		if (base.enabled && ((isPressed && trigger == Trigger.OnPress) || (!isPressed && trigger == Trigger.OnRelease)))
 		{
 			Send();
 		}
@@ -61,7 +54,7 @@ public class UIButtonMessage
 
 	private void OnSelect(bool isSelected)
 	{
-		if (this.get_enabled() && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
+		if (base.enabled && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
 		{
 			OnHover(isSelected);
 		}
@@ -69,7 +62,7 @@ public class UIButtonMessage
 
 	private void OnClick()
 	{
-		if (this.get_enabled() && trigger == Trigger.OnClick)
+		if (base.enabled && trigger == Trigger.OnClick)
 		{
 			Send();
 		}
@@ -77,7 +70,7 @@ public class UIButtonMessage
 
 	private void OnDoubleClick()
 	{
-		if (this.get_enabled() && trigger == Trigger.OnDoubleClick)
+		if (base.enabled && trigger == Trigger.OnDoubleClick)
 		{
 			Send();
 		}
@@ -85,18 +78,11 @@ public class UIButtonMessage
 
 	private void Send()
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Expected O, but got Unknown
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Expected O, but got Unknown
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Expected O, but got Unknown
 		if (!string.IsNullOrEmpty(functionName))
 		{
-			if (target == null)
+			if ((Object)target == (Object)null)
 			{
-				target = this.get_gameObject();
+				target = base.gameObject;
 			}
 			if (includeChildren)
 			{
@@ -104,13 +90,13 @@ public class UIButtonMessage
 				int i = 0;
 				for (int num = componentsInChildren.Length; i < num; i++)
 				{
-					Transform val = componentsInChildren[i];
-					val.get_gameObject().SendMessage(functionName, (object)this.get_gameObject(), 1);
+					Transform transform = componentsInChildren[i];
+					transform.gameObject.SendMessage(functionName, base.gameObject, SendMessageOptions.DontRequireReceiver);
 				}
 			}
 			else
 			{
-				target.SendMessage(functionName, (object)this.get_gameObject(), 1);
+				target.SendMessage(functionName, base.gameObject, SendMessageOptions.DontRequireReceiver);
 			}
 		}
 	}

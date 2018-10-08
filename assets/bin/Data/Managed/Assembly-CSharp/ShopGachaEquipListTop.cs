@@ -28,7 +28,7 @@ public class ShopGachaEquipListTop : GameSection
 		{
 			if (c != null)
 			{
-				this.StopCoroutine(c);
+				StopCoroutine(c);
 			}
 		});
 		coroutineList.Clear();
@@ -39,21 +39,47 @@ public class ShopGachaEquipListTop : GameSection
 		base.Initialize();
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
 		base.UpdateUI();
 		object[] array = (object[])GameSection.GetEventData();
 		uint materialID = (uint)array[0];
 		CreateEquipItemTable.CreateEquipItemData[] equipItems = Singleton<CreateEquipItemTable>.I.GetSortedCreateEquipItemsByPart(materialID);
-		_003CUpdateUI_003Ec__AnonStorey434 _003CUpdateUI_003Ec__AnonStorey;
-		SetTable(UI.TBL_LIST, "GachaEquipItem", equipItems.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetTable(UI.TBL_LIST, "GachaEquipItem", equipItems.Length, false, delegate(int i, Transform t, bool b)
+		{
+			CreateEquipItemTable.CreateEquipItemData createEquipItemData = equipItems[i];
+			uint equipItemID = createEquipItemData.equipItemID;
+			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(equipItemID);
+			SetLabelText(t, UI.LBL_NAME, equipItemData.name);
+			SetEquipmentTypeIcon(t, UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, equipItemData);
+			NeedMaterial[] needMaterial = createEquipItemData.needMaterial;
+			NeedMaterial needMaterial2 = (needMaterial.Length < 1) ? null : needMaterial[0];
+			if (needMaterial2 != null)
+			{
+				SetItemIcon(needMaterial2.itemID, t, UI.ITEM_ICON_1);
+			}
+			NeedMaterial needMaterial3 = (needMaterial.Length < 2) ? null : needMaterial[1];
+			if (needMaterial3 != null)
+			{
+				SetItemIcon(needMaterial3.itemID, t, UI.ITEM_ICON_2);
+			}
+			Coroutine item = StartCoroutine(LoadEquipModel(t, UI.TEX_EQUIP_MODEL, equipItemData.id));
+			coroutineList.Add(item);
+			Transform t2 = FindCtrl(t, UI.BTN_EQUIP_MODEL);
+			SetEvent(t2, "DETAIL_MAX_PARAM", new object[3]
+			{
+				ItemDetailEquip.CURRENT_SECTION.GACHA_EQUIP_PREVIEW,
+				equipItemData,
+				materialID
+			});
+		});
 	}
 
 	private void SetItemIcon(uint itemID, Transform trans, UI target)
 	{
 		ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(itemID);
 		ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.ITEM, itemData.iconID, itemData.rarity, FindCtrl(trans, target), ELEMENT_TYPE.MAX, null, -1, null, 0, false, -1, false, null, false, itemData.enemyIconID, itemData.enemyIconID2, false, GET_TYPE.PAY, ELEMENT_TYPE.MAX);
-		if (itemIcon != null)
+		if ((UnityEngine.Object)itemIcon != (UnityEngine.Object)null)
 		{
 			SetMaterialInfo(itemIcon.transform, REWARD_TYPE.ITEM, itemData.id, GetCtrl(UI.PNL_MATERIAL_INFO));
 		}

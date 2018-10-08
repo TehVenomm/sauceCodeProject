@@ -86,17 +86,17 @@ public class ItemStorageTop : SkillInfoBase
 
 	public class MaterialInventory : InventoryBase
 	{
-		public unsafe MaterialInventory(bool include_material, bool include_lithograph, bool include_lapis, GET_TYPE? get_type = default(GET_TYPE?))
+		public MaterialInventory(bool include_material, bool include_lithograph, bool include_lapis, GET_TYPE? get_type = default(GET_TYPE?))
 		{
 			List<ItemInfo> item_inventory = new List<ItemInfo>();
 			if (!include_lapis)
 			{
-				base.sortSettings = SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.MATERIAL, SortSettings.SETTINGS_TYPE.MATERIAL);
+				sortSettings = SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.MATERIAL, SortSettings.SETTINGS_TYPE.MATERIAL);
 			}
 			else
 			{
-				base.sortSettings = new SortSettings();
-				base.sortSettings.requirement = SortBase.SORT_REQUIREMENT.NUM;
+				sortSettings = new SortSettings();
+				sortSettings.requirement = SortBase.SORT_REQUIREMENT.NUM;
 			}
 			MonoBehaviourSingleton<InventoryManager>.I.ForAllItemInventory(delegate(ItemInfo item_data)
 			{
@@ -137,22 +137,18 @@ public class ItemStorageTop : SkillInfoBase
 					}
 				}
 			}
-			datas = base.sortSettings.CreateSortAry<ItemInfo, ItemSortData>(item_inventory.ToArray());
+			datas = sortSettings.CreateSortAry<ItemInfo, ItemSortData>(item_inventory.ToArray());
 			if (!include_lapis)
 			{
-				SortSettings sortSettings = base.sortSettings;
-				List<AbilityItemInfo> all = MonoBehaviourSingleton<InventoryManager>.I.abilityItemInventory.GetAll();
-				if (_003C_003Ef__am_0024cache0 == null)
-				{
-					_003C_003Ef__am_0024cache0 = new Func<AbilityItemInfo, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-				}
-				AbilityItemSortData[] array = sortSettings.CreateSortAry<AbilityItemInfo, AbilityItemSortData>(all.Where(_003C_003Ef__am_0024cache0).ToArray());
+				AbilityItemSortData[] array = sortSettings.CreateSortAry<AbilityItemInfo, AbilityItemSortData>((from x in MonoBehaviourSingleton<InventoryManager>.I.abilityItemInventory.GetAll()
+				where x.equipUniqueId == 0
+				select x).ToArray());
 				if (array.Length > 0)
 				{
 					int destinationIndex = datas.Length;
 					Array.Resize(ref datas, datas.Length + array.Length);
 					Array.Copy(array, 0, datas, destinationIndex, array.Length);
-					base.sortSettings.Sort(datas);
+					sortSettings.Sort(datas);
 				}
 			}
 		}
@@ -384,15 +380,12 @@ public class ItemStorageTop : SkillInfoBase
 
 	public class AbilityItemInventory : InventoryBase
 	{
-		public unsafe AbilityItemInventory()
+		public AbilityItemInventory()
 		{
 			sortSettings = SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.ABILITY_ITEM, SortSettings.SETTINGS_TYPE.STORAGE_ABILITY_ITEM);
-			List<AbilityItemInfo> all = MonoBehaviourSingleton<InventoryManager>.I.abilityItemInventory.GetAll();
-			if (_003C_003Ef__am_0024cache0 == null)
-			{
-				_003C_003Ef__am_0024cache0 = new Func<AbilityItemInfo, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			AbilityItemInfo[] target_ary = all.Where(_003C_003Ef__am_0024cache0).ToArray();
+			AbilityItemInfo[] target_ary = (from x in MonoBehaviourSingleton<InventoryManager>.I.abilityItemInventory.GetAll()
+			where x.equipUniqueId == 0
+			select x).ToArray();
 			datas = sortSettings.CreateSortAry<AbilityItemInfo, AbilityItemSortData>(target_ary);
 		}
 
@@ -476,13 +469,13 @@ public class ItemStorageTop : SkillInfoBase
 
 	protected ItemStorageSellConfirm.GO_BACK confirmTo;
 
-	private Vector3 m_currentScrollTopPos = Vector3.get_zero();
+	private Vector3 m_currentScrollTopPos = Vector3.zero;
 
 	protected bool m_isEnableUpdateScrollTopPos = true;
 
-	protected Vector3 m_lastScrollPosition = Vector3.get_up() * -9999.9f;
+	protected Vector3 m_lastScrollPosition = Vector3.up * -9999.9f;
 
-	protected Vector3 m_scrollTopPosition = Vector3.get_zero();
+	protected Vector3 m_scrollTopPosition = Vector3.zero;
 
 	protected float m_maxScrollableValue;
 
@@ -508,8 +501,6 @@ public class ItemStorageTop : SkillInfoBase
 
 	protected void UpdateCurrentScrollTopPos(Vector3 _newPos)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		if (m_isEnableUpdateScrollTopPos)
 		{
 			m_isEnableUpdateScrollTopPos = false;
@@ -522,8 +513,8 @@ public class ItemStorageTop : SkillInfoBase
 		int i = 0;
 		for (int num = uiTab.Length; i < num; i++)
 		{
-			UIToggle component = base.GetComponent<UIToggle>((Enum)uiTab[i]);
-			if (component != null)
+			UIToggle component = GetComponent<UIToggle>(uiTab[i]);
+			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 			{
 				component.onChange.Clear();
 			}
@@ -576,26 +567,26 @@ public class ItemStorageTop : SkillInfoBase
 		base.OnNotify(flags);
 	}
 
-	public unsafe override void UpdateUI()
+	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		int i = 0;
-		for (int num = uiTab.Length; i < num; i++)
+		int j = 0;
+		for (int num = uiTab.Length; j < num; j++)
 		{
-			UIToggle component = base.GetComponent<UIToggle>((Enum)uiTab[i]);
-			if (component != null)
+			UIToggle component = GetComponent<UIToggle>(uiTab[j]);
+			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 			{
-				component.value = (i == (int)tab);
+				component.value = (j == (int)tab);
 			}
-			UIToggledComponents component2 = base.GetComponent<UIToggledComponents>((Enum)uiTab[i]);
-			if (component2 != null)
+			UIToggledComponents component2 = GetComponent<UIToggledComponents>(uiTab[j]);
+			if ((UnityEngine.Object)component2 != (UnityEngine.Object)null)
 			{
 				UIToggle.current = component;
 				component2.Toggle();
 			}
 		}
 		UIToggle.current = null;
-		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, true);
+		SetToggle(UI.TGL_CHANGE_INVENTORY, true);
 		InventoryBase inventory = inventories[(int)tab];
 		if (inventory == null)
 		{
@@ -624,20 +615,20 @@ public class ItemStorageTop : SkillInfoBase
 				List<SortCompareData> find_data = new List<SortCompareData>();
 				sellItemData.ForEach(delegate(SortCompareData sort_data)
 				{
-					int k = 0;
-					for (int num4 = inventories[(int)tab].datas.Length; k < num4; k++)
+					int l = 0;
+					for (int num4 = inventories[(int)tab].datas.Length; l < num4; l++)
 					{
-						if (sort_data.GetUniqID() == inventories[(int)tab].datas[k].GetUniqID())
+						if (sort_data.GetUniqID() == inventories[(int)tab].datas[l].GetUniqID())
 						{
 							return;
 						}
 					}
 					find_data.Add(sort_data);
 				});
-				int j = 0;
-				for (int num2 = inventories[(int)tab].datas.Length; j < num2; j++)
+				int k = 0;
+				for (int num2 = inventories[(int)tab].datas.Length; k < num2; k++)
 				{
-					SortCompareData sortCompareData = inventories[(int)tab].datas[j];
+					SortCompareData sortCompareData = inventories[(int)tab].datas[k];
 					if (sortCompareData.IsFavorite() && find_data.IndexOf(sortCompareData) == -1)
 					{
 						find_data.Add(sortCompareData);
@@ -653,39 +644,69 @@ public class ItemStorageTop : SkillInfoBase
 				}
 			}
 		}
-		SetActive((Enum)UI.BTN_SORT, true);
-		SetLabelText((Enum)UI.LBL_SORT, inventory.sortSettings.GetSortLabel());
-		SetToggle((Enum)UI.TGL_ICON_ASC, inventory.sortSettings.orderTypeAsc);
+		SetActive(UI.BTN_SORT, true);
+		SetLabelText(UI.LBL_SORT, inventory.sortSettings.GetSortLabel());
+		SetToggle(UI.TGL_ICON_ASC, inventory.sortSettings.orderTypeAsc);
 		bool flag = tab != TAB_MODE.USE_ITEM && tab != TAB_MODE.LAPIS;
-		SetActive((Enum)UI.BTN_SORT, tab != TAB_MODE.ACCESSORY && flag);
-		SetActive((Enum)UI.SPR_INVALID_SORT, tab != TAB_MODE.ACCESSORY && !flag);
-		SetLabelText((Enum)UI.LBL_INVALID_SORT, inventory.sortSettings.GetSortLabel());
+		SetActive(UI.BTN_SORT, tab != TAB_MODE.ACCESSORY && flag);
+		SetActive(UI.SPR_INVALID_SORT, tab != TAB_MODE.ACCESSORY && !flag);
+		SetLabelText(UI.LBL_INVALID_SORT, inventory.sortSettings.GetSortLabel());
 		m_generatedIconList.Clear();
 		UpdateNewIconInfo();
 		bool flag2 = tab != TAB_MODE.SKILL && tab != TAB_MODE.ACCESSORY;
-		SetActive((Enum)UI.BTN_CHANGE, flag2);
-		SetActive((Enum)UI.SPR_INVALID_CHANGE, !flag2);
+		SetActive(UI.BTN_CHANGE, flag2);
+		SetActive(UI.SPR_INVALID_CHANGE, !flag2);
 		int sortedItemCount = 0;
-		_003CUpdateUI_003Ec__AnonStorey37D _003CUpdateUI_003Ec__AnonStorey37D;
-		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, false, new Func<int, bool>((object)_003CUpdateUI_003Ec__AnonStorey37D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey37D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetDynamicList(inventoryUI, null, inventory.datas.Length, false, delegate(int i)
+		{
+			SortCompareData sortCompareData3 = inventory.datas[i];
+			if (sortCompareData3 == null || !sortCompareData3.IsPriority(inventory.sortSettings.orderTypeAsc))
+			{
+				return false;
+			}
+			sortedItemCount++;
+			return true;
+		}, null, delegate(int i, Transform t, bool is_recycre)
+		{
+			SortCompareData sortCompareData2 = inventory.datas[i];
+			ItemIcon itemIcon = inventory.CreateIcon(new object[4]
+			{
+				sortCompareData2,
+				t,
+				i,
+				this
+			});
+			if ((UnityEngine.Object)itemIcon != (UnityEngine.Object)null)
+			{
+				itemIcon.toggleSelectFrame.onChange.Clear();
+				itemIcon.toggleSelectFrame.onChange.Add(new EventDelegate(this, "IconToggleChange"));
+				SetLongTouch(itemIcon.transform, "DETAIL", i);
+				itemIcon.SetGrayout(IsRequiredIconGrayOut(sortCompareData2));
+				itemIcon.SetInitData(sortCompareData2);
+				if (!m_generatedIconList.Contains(itemIcon))
+				{
+					m_generatedIconList.Add(itemIcon);
+				}
+			}
+		});
 		if (tab == TAB_MODE.EQUIP || tab == TAB_MODE.SKILL)
 		{
 			if (isSellMode)
 			{
 				UpdateSellGoldAndExp();
-				SetActive((Enum)UI.OBJ_SELL_MODE_ROOT, true);
-				SetActive((Enum)UI.OBJ_BTN_SELL_MODE, false);
+				SetActive(UI.OBJ_SELL_MODE_ROOT, true);
+				SetActive(UI.OBJ_BTN_SELL_MODE, false);
 			}
 			else
 			{
-				SetActive((Enum)UI.OBJ_BTN_SELL_MODE, MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
-				SetActive((Enum)UI.OBJ_SELL_MODE_ROOT, false);
+				SetActive(UI.OBJ_BTN_SELL_MODE, MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
+				SetActive(UI.OBJ_SELL_MODE_ROOT, false);
 			}
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_BTN_SELL_MODE, false);
-			SetActive((Enum)UI.OBJ_SELL_MODE_ROOT, false);
+			SetActive(UI.OBJ_BTN_SELL_MODE, false);
+			SetActive(UI.OBJ_SELL_MODE_ROOT, false);
 		}
 		int num3 = 0;
 		int now_num = 0;
@@ -712,8 +733,8 @@ public class ItemStorageTop : SkillInfoBase
 			});
 			break;
 		}
-		SetLabelText((Enum)UI.LBL_MAX_HAVE_NUM, num3.ToString());
-		SetLabelText((Enum)UI.LBL_NOW_HAVE_NUM, now_num.ToString());
+		SetLabelText(UI.LBL_MAX_HAVE_NUM, num3.ToString());
+		SetLabelText(UI.LBL_NOW_HAVE_NUM, now_num.ToString());
 		m_maxScrollableValue = CalcMaxScrollableValue(sortedItemCount);
 		UpdateScrollSettings();
 		UpdateAnchors();
@@ -753,9 +774,9 @@ public class ItemStorageTop : SkillInfoBase
 				total_gold += sort_data.GetSalePrice();
 			});
 		}
-		SetLabelText((Enum)UI.LBL_SELECT_NUM, num.ToString());
-		SetLabelText((Enum)UI.LBL_MAX_SELECT_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX.ToString());
-		SetLabelText((Enum)UI.LBL_TOTAL, total_gold.ToString());
+		SetLabelText(UI.LBL_SELECT_NUM, num.ToString());
+		SetLabelText(UI.LBL_MAX_SELECT_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX.ToString());
+		SetLabelText(UI.LBL_TOTAL, total_gold.ToString());
 	}
 
 	public override EventData CheckAutoEvent(string event_name, object event_data)
@@ -779,9 +800,6 @@ public class ItemStorageTop : SkillInfoBase
 
 	protected void ChangeTab(TAB_MODE t)
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
 		if (isSellMode && sellItemData.Count > 0 && tab != t)
 		{
 			tmpTab = t;
@@ -795,7 +813,7 @@ public class ItemStorageTop : SkillInfoBase
 				sellItemData.Clear();
 				isSellMode = false;
 				SetNextTab(t);
-				m_lastScrollPosition = Vector3.get_up() * -9999.9f;
+				m_lastScrollPosition = Vector3.up * -9999.9f;
 				m_isEnableUpdateScrollTopPos = true;
 				inventoryUI = SelectListTarget(tab, showInventoryMode);
 				SetDirty(inventoryUI);
@@ -1011,8 +1029,6 @@ public class ItemStorageTop : SkillInfoBase
 			int select_index = (!reset) ? 1 : (-1);
 			sellItemData.ForEach(delegate(SortCompareData material)
 			{
-				//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0098: Expected O, but got Unknown
 				int num = -1;
 				if (inventories[(int)tab] != null)
 				{
@@ -1028,9 +1044,9 @@ public class ItemStorageTop : SkillInfoBase
 				}
 				if (num != -1)
 				{
-					Transform val = ui.GetChild(num);
-					ItemIconDetail componentInChildren = val.GetComponentInChildren<ItemIconDetail>();
-					if (componentInChildren != null)
+					Transform child = ui.GetChild(num);
+					ItemIconDetail componentInChildren = child.GetComponentInChildren<ItemIconDetail>();
+					if ((UnityEngine.Object)componentInChildren != (UnityEngine.Object)null)
 					{
 						if (tab == TAB_MODE.EQUIP)
 						{
@@ -1105,7 +1121,7 @@ public class ItemStorageTop : SkillInfoBase
 	{
 		if (toggleIndex != -1)
 		{
-			Transform child = GetChild((Enum)inventoryUI, toggleIndex);
+			Transform child = GetChild(inventoryUI, toggleIndex);
 			child.GetComponentInChildren<UIToggle>().value = false;
 			toggleIndex = -1;
 		}
@@ -1144,14 +1160,14 @@ public class ItemStorageTop : SkillInfoBase
 
 	private UI SelectListTarget(TAB_MODE tab, SHOW_INVENTORY_MODE show_detail_icon)
 	{
-		SetActive((Enum)UI.SCR_INVENTORY, false);
-		SetActive((Enum)UI.SCR_INVENTORY_EQUIP, false);
-		SetActive((Enum)UI.GRD_INVENTORY, false);
-		SetActive((Enum)UI.GRD_INVENTORY_SMALL, false);
-		SetActive((Enum)UI.GRD_INVENTORY_EQUIP, false);
-		SetActive((Enum)UI.GRD_INVENTORY_EQUIP_SMALL, false);
-		SetActive((Enum)UI.SPR_SCR_BAR, false);
-		SetActive((Enum)UI.SPR_EQUIP_SCR_BAR, false);
+		SetActive(UI.SCR_INVENTORY, false);
+		SetActive(UI.SCR_INVENTORY_EQUIP, false);
+		SetActive(UI.GRD_INVENTORY, false);
+		SetActive(UI.GRD_INVENTORY_SMALL, false);
+		SetActive(UI.GRD_INVENTORY_EQUIP, false);
+		SetActive(UI.GRD_INVENTORY_EQUIP_SMALL, false);
+		SetActive(UI.SPR_SCR_BAR, false);
+		SetActive(UI.SPR_EQUIP_SCR_BAR, false);
 		bool flag = false;
 		if (MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene() && (tab == TAB_MODE.EQUIP || tab == TAB_MODE.SKILL))
 		{
@@ -1159,25 +1175,24 @@ public class ItemStorageTop : SkillInfoBase
 		}
 		if (flag)
 		{
-			SetActive((Enum)UI.SCR_INVENTORY_EQUIP, true);
-			SetActive((Enum)UI.SPR_EQUIP_SCR_BAR, true);
-			SetActive((Enum)UI.GRD_INVENTORY_EQUIP, true);
+			SetActive(UI.SCR_INVENTORY_EQUIP, true);
+			SetActive(UI.SPR_EQUIP_SCR_BAR, true);
+			SetActive(UI.GRD_INVENTORY_EQUIP, true);
 			return UI.GRD_INVENTORY_EQUIP;
 		}
-		SetActive((Enum)UI.SCR_INVENTORY, true);
-		SetActive((Enum)UI.SPR_SCR_BAR, true);
-		SetActive((Enum)UI.GRD_INVENTORY, true);
+		SetActive(UI.SCR_INVENTORY, true);
+		SetActive(UI.SPR_SCR_BAR, true);
+		SetActive(UI.GRD_INVENTORY, true);
 		return UI.GRD_INVENTORY;
 	}
 
 	private void InitializeCaption()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
-		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
-		if (component != null)
+		UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
+		if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 		{
 			component.Reset();
 			int i = 0;
@@ -1191,20 +1206,17 @@ public class ItemStorageTop : SkillInfoBase
 
 	protected float CalcMaxScrollableValue(int allItemCount)
 	{
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
 		if (allItemCount < 1)
 		{
 			return 0f;
 		}
 		Transform scrollViewController = GetScrollViewController(tab);
-		if (scrollViewController == null)
+		if ((UnityEngine.Object)scrollViewController == (UnityEngine.Object)null)
 		{
 			return 0f;
 		}
 		UIPanel component = scrollViewController.GetComponent<UIPanel>();
-		if (component == null)
+		if ((UnityEngine.Object)component == (UnityEngine.Object)null)
 		{
 			return 0f;
 		}
@@ -1213,7 +1225,7 @@ public class ItemStorageTop : SkillInfoBase
 		UIGrid[] componentsInChildren = scrollViewController.GetComponentsInChildren<UIGrid>(true);
 		for (int i = 0; i < componentsInChildren.Length; i++)
 		{
-			if (componentsInChildren[i].get_gameObject().get_activeInHierarchy())
+			if (componentsInChildren[i].gameObject.activeInHierarchy)
 			{
 				num = componentsInChildren[i].cellHeight;
 				num2 = componentsInChildren[i].maxPerLine;
@@ -1236,19 +1248,10 @@ public class ItemStorageTop : SkillInfoBase
 
 	protected void UpdateScrollSettings()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 		Transform scrollViewController = GetScrollViewController(tab);
-		if (!(scrollViewController == null))
+		if (!((UnityEngine.Object)scrollViewController == (UnityEngine.Object)null))
 		{
-			UpdateCurrentScrollTopPos(scrollViewController.get_localPosition());
+			UpdateCurrentScrollTopPos(scrollViewController.localPosition);
 			float y = m_lastScrollPosition.y;
 			Vector3 currentScrollTopPos = CurrentScrollTopPos;
 			if (y > currentScrollTopPos.y)
@@ -1256,7 +1259,7 @@ public class ItemStorageTop : SkillInfoBase
 				float maxScrollableValue = m_maxScrollableValue;
 				Vector3 currentScrollTopPos2 = CurrentScrollTopPos;
 				float num = maxScrollableValue + currentScrollTopPos2.y;
-				Vector3 localPosition = scrollViewController.get_localPosition();
+				Vector3 localPosition = scrollViewController.localPosition;
 				float y2 = localPosition.y;
 				UI scrollViewUI = GetScrollViewUI(tab);
 				float num2 = m_lastScrollPosition.y - y2;
@@ -1268,7 +1271,7 @@ public class ItemStorageTop : SkillInfoBase
 				{
 					num2 = num - y2;
 				}
-				MoveRelativeScrollView((Enum)scrollViewUI, Vector3.get_up() * num2);
+				MoveRelativeScrollView(scrollViewUI, Vector3.up * num2);
 			}
 		}
 	}
@@ -1311,22 +1314,16 @@ public class ItemStorageTop : SkillInfoBase
 
 	protected void SaveCurrentScrollPosition()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 		Transform scrollViewController = GetScrollViewController(tab);
-		if (!(scrollViewController == null))
+		if (!((UnityEngine.Object)scrollViewController == (UnityEngine.Object)null))
 		{
-			m_lastScrollPosition = scrollViewController.get_localPosition();
+			m_lastScrollPosition = scrollViewController.localPosition;
 		}
 	}
 
 	protected void SetCurrentScrollPositionOnTop()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		if (!(CurrentScrollTopPos == Vector3.get_zero()))
+		if (!(CurrentScrollTopPos == Vector3.zero))
 		{
 			m_lastScrollPosition = CurrentScrollTopPos;
 		}

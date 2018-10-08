@@ -148,7 +148,6 @@ public class GuildMemberInfo : SkillInfoBase
 
 	public override void Initialize()
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		FriendCharaInfo friendCharaInfo = friendData = (GameSection.GetEventData() as FriendCharaInfo);
 		data = (GameSection.GetEventData() as CharaInfo);
 		if (friendCharaInfo != null)
@@ -157,7 +156,7 @@ public class GuildMemberInfo : SkillInfoBase
 			dataFollowing = friendCharaInfo.following;
 		}
 		nowSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-		isFollowerList = Object.op_Implicit(Object.FindObjectOfType(typeof(FriendFollowerList)));
+		isFollowerList = UnityEngine.Object.FindObjectOfType(typeof(FriendFollowerList));
 		InitializeBase();
 	}
 
@@ -194,17 +193,15 @@ public class GuildMemberInfo : SkillInfoBase
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		if (!(loader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == nowSectionName)
+		if (!((UnityEngine.Object)loader == (UnityEngine.Object)null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == nowSectionName)
 		{
-			loader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
+			loader.transform.Rotate(GameDefine.GetCharaRotateVector(touch_info));
 		}
 	}
 
 	public override void UpdateUI()
 	{
-		transRoot = SetPrefab((Enum)UI.OBJ_EQUIP_SET_ROOT, GetCreatePrefabName());
+		transRoot = SetPrefab(UI.OBJ_EQUIP_SET_ROOT, GetCreatePrefabName());
 		UpdateUserIDLabel();
 		UpdateHeader();
 		LoadModel();
@@ -250,11 +247,9 @@ public class GuildMemberInfo : SkillInfoBase
 
 	protected virtual void LoadModel()
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		SetRenderPlayerModel(transRoot, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data, true, true, true, isVisualMode), PLAYER_ANIM_TYPE.GetStatus(data.sex), new Vector3(0f, -0.75f, 14f), new Vector3(0f, 180f, 0f), isVisualMode, delegate(PlayerLoader player_loader)
 		{
-			if (player_loader != null)
+			if ((UnityEngine.Object)player_loader != (UnityEngine.Object)null)
 			{
 				loader = player_loader;
 			}
@@ -298,11 +293,11 @@ public class GuildMemberInfo : SkillInfoBase
 						return;
 					}
 				}
-				Transform val = null;
+				Transform transform = null;
 				int num2 = -1;
 				if (equipItemData.IsWeapon())
 				{
-					val = FindCtrl(transRoot, icons[weapon_cnt]);
+					transform = FindCtrl(transRoot, icons[weapon_cnt]);
 					num2 = weapon_cnt;
 					weapon_cnt++;
 				}
@@ -333,19 +328,19 @@ public class GuildMemberInfo : SkillInfoBase
 					}
 					if (num2 != -1)
 					{
-						val = FindCtrl(transRoot, icons[num2]);
+						transform = FindCtrl(transRoot, icons[num2]);
 					}
 				}
-				if (!(val == null))
+				if (!((UnityEngine.Object)transform == (UnityEngine.Object)null))
 				{
 					SetActive(FindCtrl(transRoot, icons[num2]), true);
 					string event_name = (!isVisualMode) ? "DETAIL" : "VISUAL_DETAIL";
-					ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(equipItemData.type), equipItemData.GetIconID(GetCharaSex()), equipItemData.rarity, val, equipItemData.GetTargetElementPriorityToTable(), null, -1, event_name, num2, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY, ELEMENT_TYPE.MAX);
+					ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(equipItemData.type), equipItemData.GetIconID(GetCharaSex()), equipItemData.rarity, transform, equipItemData.GetTargetElementPriorityToTable(), null, -1, event_name, num2, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY, ELEMENT_TYPE.MAX);
 					SetLongTouch(itemIcon.transform, event_name, num2);
 					SetEvent(FindCtrl(transRoot, icons_btn[num2]), event_name, num2);
 					SetLongTouch(FindCtrl(transRoot, icons_btn[num2]), event_name, num2);
 					EquipItemInfo info = new EquipItemInfo(equip_data);
-					itemIcon.SetEquipExtInvertedColor(info, base.GetComponent<UILabel>((Enum)icons_level[num2]));
+					itemIcon.SetEquipExtInvertedColor(info, GetComponent<UILabel>(icons_level[num2]));
 					SetActive(FindCtrl(transRoot, icons_level[num2]), !isVisualMode);
 					if (equip_data != null)
 					{
@@ -391,21 +386,20 @@ public class GuildMemberInfo : SkillInfoBase
 
 	protected void SetVisualModeIcon(int index, int table_id, EQUIPMENT_TYPE e_type, CharaInfo chara_info)
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		string event_name = "VISUAL_DETAIL";
-		Transform val = FindCtrl(transRoot, icons[index]);
+		Transform transform = FindCtrl(transRoot, icons[index]);
 		EquipItemTable.EquipItemData visualModeTargetTable = GetVisualModeTargetTable((uint)table_id, e_type, chara_info);
 		if (visualModeTargetTable != null)
 		{
-			val.GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
+			transform.GetComponentsInChildren(true, Temporary.itemIconList);
 			int i = 0;
 			for (int count = Temporary.itemIconList.Count; i < count; i++)
 			{
-				Temporary.itemIconList[i].get_gameObject().SetActive(true);
+				Temporary.itemIconList[i].gameObject.SetActive(true);
 			}
 			Temporary.itemIconList.Clear();
 			SetActive(FindCtrl(transRoot, icons[index]), true);
-			ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(visualModeTargetTable.type), visualModeTargetTable.GetIconID(GetCharaSex()), visualModeTargetTable.rarity, val, visualModeTargetTable.GetTargetElementPriorityToTable(), null, -1, event_name, index, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY, ELEMENT_TYPE.MAX);
+			ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(visualModeTargetTable.type), visualModeTargetTable.GetIconID(GetCharaSex()), visualModeTargetTable.rarity, transform, visualModeTargetTable.GetTargetElementPriorityToTable(), null, -1, event_name, index, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY, ELEMENT_TYPE.MAX);
 			SetLongTouch(itemIcon.transform, event_name, index);
 			SetEvent(FindCtrl(transRoot, icons_btn[index]), event_name, index);
 			SetLongTouch(FindCtrl(transRoot, icons_btn[index]), event_name, index);
@@ -415,14 +409,6 @@ public class GuildMemberInfo : SkillInfoBase
 
 	protected void UpdateBottomButton()
 	{
-		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(transRoot, UI.OBJ_FRIEND_INFO_ROOT, IsFriendInfo);
 		SetActive(transRoot, UI.OBJ_CHANGE_EQUIP_INFO_ROOT, !IsFriendInfo);
 		SetActive(transRoot, UI.BTN_MAGI, showMagiButton);
@@ -451,15 +437,15 @@ public class GuildMemberInfo : SkillInfoBase
 				SetActive(transRoot, UI.BTN_FOLLOW, true);
 				if (!isFollowerListChengeTrans)
 				{
-					Transform val = FindCtrl(transRoot, UI.BTN_FOLLOW);
-					Transform obj = val;
-					Vector3 localPosition = val.get_localPosition();
-					float num = localPosition.x - 167f;
-					Vector3 localPosition2 = val.get_localPosition();
-					float num2 = localPosition2.y - 502f;
-					Vector3 localPosition3 = val.get_localPosition();
-					obj.set_localPosition(new Vector3(num, num2, localPosition3.z));
-					val.set_localScale(new Vector3(1f, 1f, 1f));
+					Transform transform = FindCtrl(transRoot, UI.BTN_FOLLOW);
+					Transform transform2 = transform;
+					Vector3 localPosition = transform.localPosition;
+					float x = localPosition.x - 167f;
+					Vector3 localPosition2 = transform.localPosition;
+					float y = localPosition2.y - 502f;
+					Vector3 localPosition3 = transform.localPosition;
+					transform2.localPosition = new Vector3(x, y, localPosition3.z);
+					transform.localScale = new Vector3(1f, 1f, 1f);
 					isFollowerListChengeTrans = true;
 				}
 			}
@@ -595,11 +581,18 @@ public class GuildMemberInfo : SkillInfoBase
 		});
 	}
 
-	protected unsafe void SendFollow(List<int> send_follow_list, Action<bool> callback = null)
+	protected void SendFollow(List<int> send_follow_list, Action<bool> callback = null)
 	{
 		GameSection.StayEvent();
-		_003CSendFollow_003Ec__AnonStorey324 _003CSendFollow_003Ec__AnonStorey;
-		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(send_follow_list, new Action<Error, List<int>>((object)_003CSendFollow_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(send_follow_list, delegate(Error err, List<int> follow_list)
+		{
+			bool flag = err == Error.None && follow_list.Count > 0;
+			if (callback != null)
+			{
+				callback(flag);
+			}
+			GameSection.ResumeEvent(flag, null);
+		});
 	}
 
 	protected void SendUnFollow(int send_unfollow, Action<bool> callback = null)
@@ -752,33 +745,27 @@ public class GuildMemberInfo : SkillInfoBase
 		MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex = -1;
 	}
 
-	private unsafe void OnQuery_MEMBER_ACCEPT()
+	private void OnQuery_MEMBER_ACCEPT()
 	{
 		GameSection.StayEvent();
 		if (friendData != null)
 		{
-			GuildManager i = MonoBehaviourSingleton<GuildManager>.I;
-			int requestId = friendData.requestId;
-			if (_003C_003Ef__am_0024cache10 == null)
+			MonoBehaviourSingleton<GuildManager>.I.SendAdminJoin(friendData.requestId, 1, delegate(bool is_success, Error err)
 			{
-				_003C_003Ef__am_0024cache10 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			i.SendAdminJoin(requestId, 1, _003C_003Ef__am_0024cache10);
+				GameSection.ResumeEvent(is_success, null);
+			});
 		}
 	}
 
-	private unsafe void OnQuery_MEMBER_REJECT()
+	private void OnQuery_MEMBER_REJECT()
 	{
 		GameSection.StayEvent();
 		if (friendData != null)
 		{
-			GuildManager i = MonoBehaviourSingleton<GuildManager>.I;
-			int requestId = friendData.requestId;
-			if (_003C_003Ef__am_0024cache11 == null)
+			MonoBehaviourSingleton<GuildManager>.I.SendAdminJoin(friendData.requestId, 0, delegate(bool is_success, Error err)
 			{
-				_003C_003Ef__am_0024cache11 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			i.SendAdminJoin(requestId, 0, _003C_003Ef__am_0024cache11);
+				GameSection.ResumeEvent(is_success, null);
+			});
 		}
 	}
 

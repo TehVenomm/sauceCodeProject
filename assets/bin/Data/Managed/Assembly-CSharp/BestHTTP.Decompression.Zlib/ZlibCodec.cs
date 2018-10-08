@@ -3,8 +3,8 @@ using System.Runtime.InteropServices;
 
 namespace BestHTTP.Decompression.Zlib
 {
-	[Guid("ebc25cf6-9120-4283-b972-0e5520d0000D")]
 	[ComVisible(true)]
+	[Guid("ebc25cf6-9120-4283-b972-0e5520d0000D")]
 	[ClassInterface(ClassInterfaceType.AutoDispatch)]
 	internal sealed class ZlibCodec
 	{

@@ -1,17 +1,12 @@
 using System.Collections;
 using UnityEngine;
 
-public class EmptyScene
+public class EmptyScene : MonoBehaviour
 {
 	public static bool IsClearCache
 	{
 		get;
 		set;
-	}
-
-	public EmptyScene()
-		: this()
-	{
 	}
 
 	private IEnumerator Start()
@@ -23,11 +18,11 @@ public class EmptyScene
 		if (IsClearCache)
 		{
 			IsClearCache = false;
-			while (!Caching.get_enabled())
+			while (!Caching.enabled)
 			{
 				yield return (object)new WaitForEndOfFrame();
 			}
-			yield return (object)this.StartCoroutine(ResourceManager.ClearCache());
+			yield return (object)StartCoroutine(ResourceManager.ClearCache());
 			yield return (object)new WaitForEndOfFrame();
 			yield return (object)new WaitForEndOfFrame();
 			yield return (object)new WaitForEndOfFrame();

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Event Trigger")]
-public class UIEventTrigger
+public class UIEventTrigger : MonoBehaviour
 {
 	public static UIEventTrigger current;
 
@@ -36,24 +36,19 @@ public class UIEventTrigger
 	{
 		get
 		{
-			Collider component = this.GetComponent<Collider>();
-			if (component != null)
+			Collider component = GetComponent<Collider>();
+			if ((Object)component != (Object)null)
 			{
-				return component.get_enabled();
+				return component.enabled;
 			}
-			Collider2D component2 = this.GetComponent<Collider2D>();
-			return component2 != null && component2.get_enabled();
+			Collider2D component2 = GetComponent<Collider2D>();
+			return (Object)component2 != (Object)null && component2.enabled;
 		}
-	}
-
-	public UIEventTrigger()
-		: this()
-	{
 	}
 
 	private void OnHover(bool isOver)
 	{
-		if (!(current != null) && isColliderEnabled)
+		if (!((Object)current != (Object)null) && isColliderEnabled)
 		{
 			current = this;
 			if (isOver)
@@ -70,7 +65,7 @@ public class UIEventTrigger
 
 	private void OnPress(bool pressed)
 	{
-		if (!(current != null) && isColliderEnabled)
+		if (!((Object)current != (Object)null) && isColliderEnabled)
 		{
 			current = this;
 			if (pressed)
@@ -87,7 +82,7 @@ public class UIEventTrigger
 
 	private void OnSelect(bool selected)
 	{
-		if (!(current != null) && isColliderEnabled)
+		if (!((Object)current != (Object)null) && isColliderEnabled)
 		{
 			current = this;
 			if (selected)
@@ -104,7 +99,7 @@ public class UIEventTrigger
 
 	private void OnClick()
 	{
-		if (!(current != null) && isColliderEnabled)
+		if (!((Object)current != (Object)null) && isColliderEnabled)
 		{
 			current = this;
 			EventDelegate.Execute(onClick);
@@ -114,7 +109,7 @@ public class UIEventTrigger
 
 	private void OnDoubleClick()
 	{
-		if (!(current != null) && isColliderEnabled)
+		if (!((Object)current != (Object)null) && isColliderEnabled)
 		{
 			current = this;
 			EventDelegate.Execute(onDoubleClick);
@@ -124,7 +119,7 @@ public class UIEventTrigger
 
 	private void OnDragStart()
 	{
-		if (!(current != null))
+		if (!((Object)current != (Object)null))
 		{
 			current = this;
 			EventDelegate.Execute(onDragStart);
@@ -134,7 +129,7 @@ public class UIEventTrigger
 
 	private void OnDragEnd()
 	{
-		if (!(current != null))
+		if (!((Object)current != (Object)null))
 		{
 			current = this;
 			EventDelegate.Execute(onDragEnd);
@@ -144,7 +139,7 @@ public class UIEventTrigger
 
 	private void OnDragOver(GameObject go)
 	{
-		if (!(current != null) && isColliderEnabled)
+		if (!((Object)current != (Object)null) && isColliderEnabled)
 		{
 			current = this;
 			EventDelegate.Execute(onDragOver);
@@ -154,7 +149,7 @@ public class UIEventTrigger
 
 	private void OnDragOut(GameObject go)
 	{
-		if (!(current != null) && isColliderEnabled)
+		if (!((Object)current != (Object)null) && isColliderEnabled)
 		{
 			current = this;
 			EventDelegate.Execute(onDragOut);
@@ -164,7 +159,7 @@ public class UIEventTrigger
 
 	private void OnDrag(Vector2 delta)
 	{
-		if (!(current != null))
+		if (!((Object)current != (Object)null))
 		{
 			current = this;
 			EventDelegate.Execute(onDrag);

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIDynamicList
+public class UIDynamicList : MonoBehaviour
 {
 	private List<UIWidget> itemWidgets;
 
@@ -22,22 +22,16 @@ public class UIDynamicList
 
 	private Action<int, Transform, bool> initItemFunc;
 
-	public UIDynamicList()
-		: this()
-	{
-	}
-
 	public static UIDynamicList Set(UIScrollView scroll_view, int item_num, GameObject item_prefab, bool need_center_on_clickchild, Func<int, Transform, Transform> create_item_func, Action<int, Transform, bool> init_item_func)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		if (scroll_view == null || scroll_view.panel == null)
+		if ((UnityEngine.Object)scroll_view == (UnityEngine.Object)null || (UnityEngine.Object)scroll_view.panel == (UnityEngine.Object)null)
 		{
 			return null;
 		}
 		UIDynamicList uIDynamicList = scroll_view.GetComponent<UIDynamicList>();
-		if (uIDynamicList == null)
+		if ((UnityEngine.Object)uIDynamicList == (UnityEngine.Object)null)
 		{
-			uIDynamicList = scroll_view.get_gameObject().AddComponent<UIDynamicList>();
+			uIDynamicList = scroll_view.gameObject.AddComponent<UIDynamicList>();
 		}
 		uIDynamicList.itemWidgets = new List<UIWidget>(item_num);
 		uIDynamicList.showItems = new List<Transform>();
@@ -52,24 +46,18 @@ public class UIDynamicList
 
 	public void AddItemWidget(UIWidget w)
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Expected O, but got Unknown
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 		itemWidgets.Add(w);
-		if (w.cachedTransform.get_childCount() > 0)
+		if (w.cachedTransform.childCount > 0)
 		{
-			Transform val = w.cachedTransform.GetChild(0);
-			val.get_gameObject().SetActive(false);
-			hideItems.Add(val);
+			Transform child = w.cachedTransform.GetChild(0);
+			child.gameObject.SetActive(false);
+			hideItems.Add(child);
 		}
 	}
 
 	private void Update()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		if (scrollView.get_transform().get_localPosition() != scrollViewPos)
+		if (scrollView.transform.localPosition != scrollViewPos)
 		{
 			UpdateItems();
 		}
@@ -77,24 +65,7 @@ public class UIDynamicList
 
 	public void UpdateItems()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Expected O, but got Unknown
-		//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Expected O, but got Unknown
-		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a7: Expected O, but got Unknown
-		//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0230: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0235: Expected O, but got Unknown
-		//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027e: Expected O, but got Unknown
-		//IL_029d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a2: Expected O, but got Unknown
-		//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
-		scrollViewPos = scrollView.get_transform().get_localPosition();
+		scrollViewPos = scrollView.transform.localPosition;
 		UIPanel panel = scrollView.panel;
 		Transform cachedTransform = panel.cachedTransform;
 		int i = 0;
@@ -103,18 +74,18 @@ public class UIDynamicList
 			UIWidget uIWidget = itemWidgets[i];
 			if (panel.IsVisible(uIWidget))
 			{
-				int num = int.Parse(uIWidget.get_name());
-				Transform val;
-				bool flag;
-				if (uIWidget.cachedTransform.get_childCount() > 0)
+				int arg = int.Parse(uIWidget.name);
+				Transform transform;
+				bool arg2;
+				if (uIWidget.cachedTransform.childCount > 0)
 				{
-					val = uIWidget.cachedTransform.GetChild(0);
-					if (showItems.Contains(val))
+					transform = uIWidget.cachedTransform.GetChild(0);
+					if (showItems.Contains(transform))
 					{
 						continue;
 					}
-					flag = true;
-					hideItems.Remove(val);
+					arg2 = true;
+					hideItems.Remove(transform);
 				}
 				else
 				{
@@ -122,69 +93,69 @@ public class UIDynamicList
 					if (count2 > 0)
 					{
 						count2--;
-						val = hideItems[count2];
+						transform = hideItems[count2];
 						hideItems.RemoveAt(count2);
-						val.SetParent(uIWidget.cachedTransform, false);
-						flag = true;
+						transform.SetParent(uIWidget.cachedTransform, false);
+						arg2 = true;
 					}
 					else
 					{
-						val = ((createItemFunc != null) ? createItemFunc.Invoke(num, uIWidget.cachedTransform) : ((!(itemPrefab != null)) ? null : ResourceUtility.Realizes(itemPrefab, uIWidget.cachedTransform, 5)));
-						if (val != null)
+						transform = ((createItemFunc != null) ? createItemFunc(arg, uIWidget.cachedTransform) : ((!((UnityEngine.Object)itemPrefab != (UnityEngine.Object)null)) ? null : ResourceUtility.Realizes(itemPrefab, uIWidget.cachedTransform, 5)));
+						if ((UnityEngine.Object)transform != (UnityEngine.Object)null)
 						{
-							UIPanel componentInChildren = val.GetComponentInChildren<UIPanel>();
-							if (componentInChildren != null)
+							UIPanel componentInChildren = transform.GetComponentInChildren<UIPanel>();
+							if ((UnityEngine.Object)componentInChildren != (UnityEngine.Object)null)
 							{
 								componentInChildren.depth = panel.depth + 1;
 							}
 						}
 						else
 						{
-							GameObject val2 = new GameObject("item");
-							val2.set_layer(5);
-							val = val2.get_transform();
-							val.SetParent(uIWidget.cachedTransform, false);
-							val2.AddComponent<UIDragScrollView>().scrollView = scrollView;
+							GameObject gameObject = new GameObject("item");
+							gameObject.layer = 5;
+							transform = gameObject.transform;
+							transform.SetParent(uIWidget.cachedTransform, false);
+							gameObject.AddComponent<UIDragScrollView>().scrollView = scrollView;
 						}
 						if (needCenterOnClickChild)
 						{
-							UIUtility.AddCenterOnClickChild(val);
+							UIUtility.AddCenterOnClickChild(transform);
 						}
-						flag = false;
+						arg2 = false;
 					}
 				}
-				showItems.Add(val);
-				val.get_gameObject().SetActive(true);
-				initItemFunc.Invoke(num, val, flag);
-				UIUtility.UpdateAnchors(val);
+				showItems.Add(transform);
+				transform.gameObject.SetActive(true);
+				initItemFunc(arg, transform, arg2);
+				UIUtility.UpdateAnchors(transform);
 			}
-			else if (uIWidget.cachedTransform.get_childCount() > 0)
+			else if (uIWidget.cachedTransform.childCount > 0)
 			{
-				Transform val3 = uIWidget.cachedTransform.GetChild(0);
-				if (showItems.Contains(val3))
+				Transform transform2 = uIWidget.cachedTransform.GetChild(0);
+				if (showItems.Contains(transform2))
 				{
-					showItems.Remove(val3);
-					hideItems.Add(val3);
-					if (UICamera.selectedObject != null)
+					showItems.Remove(transform2);
+					hideItems.Add(transform2);
+					if ((UnityEngine.Object)UICamera.selectedObject != (UnityEngine.Object)null)
 					{
-						Transform val4 = UICamera.selectedObject.get_transform();
-						while (val4 != null)
+						Transform transform3 = UICamera.selectedObject.transform;
+						while ((UnityEngine.Object)transform3 != (UnityEngine.Object)null)
 						{
-							if (!(cachedTransform != val4))
+							if (!((UnityEngine.Object)cachedTransform != (UnityEngine.Object)transform3))
 							{
 								break;
 							}
-							if (val3 == val4)
+							if ((UnityEngine.Object)transform2 == (UnityEngine.Object)transform3)
 							{
-								val3 = null;
+								transform2 = null;
 								break;
 							}
-							val4 = val4.get_parent();
+							transform3 = transform3.parent;
 						}
 					}
-					if (val3 != null)
+					if ((UnityEngine.Object)transform2 != (UnityEngine.Object)null)
 					{
-						val3.get_gameObject().SetActive(false);
+						transform2.gameObject.SetActive(false);
 					}
 				}
 			}

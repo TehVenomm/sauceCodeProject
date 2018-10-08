@@ -34,16 +34,16 @@ public class DamageDistanceTable : Singleton<DamageDistanceTable>, IDataTable
 			}
 			float num = distance - (float)damagePoint.distance;
 			float num2 = (float)damagePoint2.distance - (float)damagePoint.distance;
-			float num3 = 1f;
+			float t = 1f;
 			if (distance <= 0f)
 			{
-				num3 = 0f;
+				t = 0f;
 			}
 			else if (num2 > 0f)
 			{
-				num3 = num / num2;
+				t = num / num2;
 			}
-			return Mathf.Lerp((float)damagePoint.rate, (float)damagePoint2.rate, num3);
+			return Mathf.Lerp(damagePoint.rate, damagePoint2.rate, t);
 		}
 
 		public void CalcMaxRate()
@@ -51,7 +51,7 @@ public class DamageDistanceTable : Singleton<DamageDistanceTable>, IDataTable
 			for (int i = 0; i < points.Length; i++)
 			{
 				DamagePoint damagePoint = points[i];
-				max = Mathf.Max(max, (float)damagePoint.rate);
+				max = Mathf.Max(max, damagePoint.rate);
 			}
 		}
 

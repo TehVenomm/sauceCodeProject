@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(UIGameSceneEventSender))]
 [AddComponentMenu("ProjectUI/UIButtonTweenEventCtrl")]
+[RequireComponent(typeof(UIGameSceneEventSender))]
 public class UIButtonTweenEventCtrl : UITweenCtrl
 {
 	public UITweener[] pushTweens;
@@ -15,10 +15,10 @@ public class UIButtonTweenEventCtrl : UITweenCtrl
 		{
 			Array.ForEach(tweens, delegate(UITweener t)
 			{
-				if (t != null)
+				if ((UnityEngine.Object)t != (UnityEngine.Object)null)
 				{
 					base._TweenReset(t);
-					t.set_enabled(false);
+					t.enabled = false;
 				}
 			});
 		}
@@ -26,10 +26,10 @@ public class UIButtonTweenEventCtrl : UITweenCtrl
 		{
 			Array.ForEach(pushTweens, delegate(UITweener t)
 			{
-				if (t != null)
+				if ((UnityEngine.Object)t != (UnityEngine.Object)null)
 				{
 					base._TweenReset(t);
-					t.set_enabled(false);
+					t.enabled = false;
 				}
 			});
 		}
@@ -42,12 +42,10 @@ public class UIButtonTweenEventCtrl : UITweenCtrl
 
 	private void Strat()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		UIGameSceneEventSender uIGameSceneEventSender = this.get_gameObject().GetComponent<UIGameSceneEventSender>();
-		if (uIGameSceneEventSender == null)
+		UIGameSceneEventSender uIGameSceneEventSender = base.gameObject.GetComponent<UIGameSceneEventSender>();
+		if ((UnityEngine.Object)uIGameSceneEventSender == (UnityEngine.Object)null)
 		{
-			uIGameSceneEventSender = this.get_gameObject().AddComponent<UIGameSceneEventSender>();
+			uIGameSceneEventSender = base.gameObject.AddComponent<UIGameSceneEventSender>();
 		}
 		if (string.IsNullOrEmpty(uIGameSceneEventSender.eventName))
 		{
@@ -105,7 +103,7 @@ public class UIButtonTweenEventCtrl : UITweenCtrl
 			int i = 0;
 			for (int num = target_tweens.Length; i < num; i++)
 			{
-				if (!(target_tweens[i] == null))
+				if (!((UnityEngine.Object)target_tweens[i] == (UnityEngine.Object)null))
 				{
 					UITweener.Style style = target_tweens[i].style;
 					target_tweens[i].style = UITweener.Style.Once;

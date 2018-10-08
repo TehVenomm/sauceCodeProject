@@ -61,7 +61,7 @@ public class EnemyHitMaterialTable : Singleton<EnemyHitMaterialTable>, IDataTabl
 
 	public void CreateTable(TextAsset stage_table_text_asset)
 	{
-		CreateTable(stage_table_text_asset.get_text());
+		CreateTable(stage_table_text_asset.text);
 	}
 
 	public void CreateTable(string csv)

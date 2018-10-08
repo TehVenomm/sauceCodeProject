@@ -58,7 +58,7 @@ public class GachaDecoManager : MonoBehaviourSingleton<GachaDecoManager>
 					float timer = (float)wait_time;
 					while (timer > 0f && IsVisible())
 					{
-						timer -= Time.get_deltaTime();
+						timer -= Time.deltaTime;
 						yield return (object)null;
 					}
 				}
@@ -81,7 +81,7 @@ public class GachaDecoManager : MonoBehaviourSingleton<GachaDecoManager>
 
 	private void UpdateGachaDeco(GachaDeco info)
 	{
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainMenu != null)
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && (UnityEngine.Object)MonoBehaviourSingleton<UIManager>.I.mainMenu != (UnityEngine.Object)null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.mainMenu.UpdateGachaDeco(info);
 		}

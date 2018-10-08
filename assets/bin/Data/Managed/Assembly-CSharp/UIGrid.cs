@@ -62,27 +62,21 @@ public class UIGrid : UIWidgetContainer
 			if (value)
 			{
 				mReposition = true;
-				this.set_enabled(true);
+				base.enabled = true;
 			}
 		}
 	}
 
 	public List<Transform> GetChildList()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Expected O, but got Unknown
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Expected O, but got Unknown
-		Transform val = this.get_transform();
+		Transform transform = base.transform;
 		List<Transform> list = new List<Transform>();
-		for (int i = 0; i < val.get_childCount(); i++)
+		for (int i = 0; i < transform.childCount; i++)
 		{
-			Transform val2 = val.GetChild(i);
-			if (!hideInactive || (Object.op_Implicit(val2) && NGUITools.GetActive(val2.get_gameObject())))
+			Transform child = transform.GetChild(i);
+			if (!hideInactive || ((bool)child && NGUITools.GetActive(child.gameObject)))
 			{
-				list.Add(val2);
+				list.Add(child);
 			}
 		}
 		if (sorting != 0 && arrangement != Arrangement.CellSnap)
@@ -129,10 +123,9 @@ public class UIGrid : UIWidgetContainer
 
 	public void AddChild(Transform trans, bool sort)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		if (trans != null)
+		if ((UnityEngine.Object)trans != (UnityEngine.Object)null)
 		{
-			trans.set_parent(this.get_transform());
+			trans.parent = base.transform;
 			ResetPosition(GetChildList());
 		}
 	}
@@ -150,10 +143,8 @@ public class UIGrid : UIWidgetContainer
 
 	protected virtual void Init()
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Expected O, but got Unknown
 		mInitDone = true;
-		mPanel = NGUITools.FindInParents<UIPanel>(this.get_gameObject());
+		mPanel = NGUITools.FindInParents<UIPanel>(base.gameObject);
 	}
 
 	protected virtual void Start()
@@ -166,18 +157,18 @@ public class UIGrid : UIWidgetContainer
 		animateSmoothly = false;
 		Reposition();
 		animateSmoothly = flag;
-		this.set_enabled(false);
+		base.enabled = false;
 	}
 
 	protected virtual void Update()
 	{
 		Reposition();
-		this.set_enabled(false);
+		base.enabled = false;
 	}
 
 	private void OnValidate()
 	{
-		if (!Application.get_isPlaying() && NGUITools.GetActive(this))
+		if (!Application.isPlaying && NGUITools.GetActive(this))
 		{
 			Reposition();
 		}
@@ -185,30 +176,22 @@ public class UIGrid : UIWidgetContainer
 
 	public static int SortByName(Transform a, Transform b)
 	{
-		return string.Compare(a.get_name(), b.get_name());
+		return string.Compare(a.name, b.name);
 	}
 
 	public static int SortHorizontal(Transform a, Transform b)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 localPosition = a.get_localPosition();
+		Vector3 localPosition = a.localPosition;
 		ref float x = ref localPosition.x;
-		Vector3 localPosition2 = b.get_localPosition();
+		Vector3 localPosition2 = b.localPosition;
 		return x.CompareTo(localPosition2.x);
 	}
 
 	public static int SortVertical(Transform a, Transform b)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 localPosition = b.get_localPosition();
+		Vector3 localPosition = b.localPosition;
 		ref float y = ref localPosition.y;
-		Vector3 localPosition2 = a.get_localPosition();
+		Vector3 localPosition2 = a.localPosition;
 		return y.CompareTo(localPosition2.y);
 	}
 
@@ -219,9 +202,7 @@ public class UIGrid : UIWidgetContainer
 	[ContextMenu("Execute")]
 	public virtual void Reposition()
 	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Expected O, but got Unknown
-		if (Application.get_isPlaying() && !mInitDone && NGUITools.GetActive(this.get_gameObject()))
+		if (Application.isPlaying && !mInitDone && NGUITools.GetActive(base.gameObject))
 		{
 			Init();
 		}
@@ -248,13 +229,11 @@ public class UIGrid : UIWidgetContainer
 
 	public void ConstrainWithinPanel()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
-		if (mPanel != null)
+		if ((UnityEngine.Object)mPanel != (UnityEngine.Object)null)
 		{
-			mPanel.ConstrainTargetToBounds(this.get_transform(), true);
+			mPanel.ConstrainTargetToBounds(base.transform, true);
 			UIScrollView component = mPanel.GetComponent<UIScrollView>();
-			if (component != null)
+			if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 			{
 				component.UpdateScrollbars(true);
 			}
@@ -263,60 +242,42 @@ public class UIGrid : UIWidgetContainer
 
 	protected virtual void ResetPosition(List<Transform> list)
 	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Expected O, but got Unknown
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011f: Expected O, but got Unknown
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0230: Expected O, but got Unknown
-		//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
 		mReposition = false;
 		int num = 0;
 		int num2 = 0;
 		int num3 = 0;
 		int num4 = 0;
-		Transform val = this.get_transform();
+		Transform transform = base.transform;
 		int i = 0;
 		for (int count = list.Count; i < count; i++)
 		{
-			Transform val2 = list[i];
-			Vector3 val3 = val2.get_localPosition();
-			float z = val3.z;
+			Transform transform2 = list[i];
+			Vector3 vector = transform2.localPosition;
+			float z = vector.z;
 			if (arrangement == Arrangement.CellSnap)
 			{
 				if (cellWidth > 0f)
 				{
-					val3.x = Mathf.Round(val3.x / cellWidth) * cellWidth;
+					vector.x = Mathf.Round(vector.x / cellWidth) * cellWidth;
 				}
 				if (cellHeight > 0f)
 				{
-					val3.y = Mathf.Round(val3.y / cellHeight) * cellHeight;
+					vector.y = Mathf.Round(vector.y / cellHeight) * cellHeight;
 				}
 			}
 			else
 			{
-				val3 = ((arrangement != 0) ? new Vector3(cellWidth * (float)num2, (0f - cellHeight) * (float)num, z) : new Vector3(cellWidth * (float)num, (0f - cellHeight) * (float)num2, z));
+				vector = ((arrangement != 0) ? new Vector3(cellWidth * (float)num2, (0f - cellHeight) * (float)num, z) : new Vector3(cellWidth * (float)num, (0f - cellHeight) * (float)num2, z));
 			}
-			if (animateSmoothly && Application.get_isPlaying())
+			if (animateSmoothly && Application.isPlaying)
 			{
-				SpringPosition springPosition = SpringPosition.Begin(val2.get_gameObject(), val3, 15f);
+				SpringPosition springPosition = SpringPosition.Begin(transform2.gameObject, vector, 15f);
 				springPosition.updateScrollView = true;
 				springPosition.ignoreTimeScale = true;
 			}
 			else
 			{
-				val2.set_localPosition(val3);
+				transform2.localPosition = vector;
 			}
 			num3 = Mathf.Max(num3, num);
 			num4 = Mathf.Max(num4, num2);
@@ -341,21 +302,21 @@ public class UIGrid : UIWidgetContainer
 				num5 = Mathf.Lerp(0f, (float)num4 * cellWidth, pivotOffset.x);
 				num6 = Mathf.Lerp((float)(-num3) * cellHeight, 0f, pivotOffset.y);
 			}
-			for (int j = 0; j < val.get_childCount(); j++)
+			for (int j = 0; j < transform.childCount; j++)
 			{
-				Transform val4 = val.GetChild(j);
-				SpringPosition component = val4.GetComponent<SpringPosition>();
-				if (component != null)
+				Transform child = transform.GetChild(j);
+				SpringPosition component = child.GetComponent<SpringPosition>();
+				if ((UnityEngine.Object)component != (UnityEngine.Object)null)
 				{
 					component.target.x -= num5;
 					component.target.y -= num6;
 				}
 				else
 				{
-					Vector3 localPosition = val4.get_localPosition();
+					Vector3 localPosition = child.localPosition;
 					localPosition.x -= num5;
 					localPosition.y -= num6;
-					val4.set_localPosition(localPosition);
+					child.localPosition = localPosition;
 				}
 			}
 		}

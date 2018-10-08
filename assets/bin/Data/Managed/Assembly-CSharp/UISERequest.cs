@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("ProjectUI/UI SE Request")]
-public class UISERequest
+public class UISERequest : MonoBehaviour
 {
 	private const float pitch = 1f;
 
@@ -9,9 +9,4 @@ public class UISERequest
 
 	[Range(0f, 1f)]
 	public float volume = 1f;
-
-	public UISERequest()
-		: this()
-	{
-	}
 }

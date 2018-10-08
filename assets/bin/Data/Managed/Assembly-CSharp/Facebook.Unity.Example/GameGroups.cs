@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,15 +13,15 @@ namespace Facebook.Unity.Example
 
 		private string gamerGroupCurrentGroup = string.Empty;
 
-		protected unsafe override void GetGui()
+		protected override void GetGui()
 		{
 			if (Button("Game Group Create - Closed"))
 			{
-				FB.GameGroupCreate("Test game group", "Test description", "CLOSED", new FacebookDelegate<IGroupCreateResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				FB.GameGroupCreate("Test game group", "Test description", "CLOSED", base.HandleResult);
 			}
 			if (Button("Game Group Create - Open"))
 			{
-				FB.GameGroupCreate("Test game group", "Test description", "OPEN", new FacebookDelegate<IGroupCreateResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				FB.GameGroupCreate("Test game group", "Test description", "OPEN", base.HandleResult);
 			}
 			LabelAndTextField("Group Name", ref gamerGroupName);
 			LabelAndTextField("Group Description", ref gamerGroupDesc);
@@ -32,13 +31,13 @@ namespace Facebook.Unity.Example
 				CallCreateGroupDialog();
 			}
 			LabelAndTextField("Group To Join", ref gamerGroupCurrentGroup);
-			bool enabled = GUI.get_enabled();
-			GUI.set_enabled(enabled && !string.IsNullOrEmpty(gamerGroupCurrentGroup));
+			bool enabled = GUI.enabled;
+			GUI.enabled = (enabled && !string.IsNullOrEmpty(gamerGroupCurrentGroup));
 			if (Button("Call Join Group Dialog"))
 			{
 				CallJoinGroupDialog();
 			}
-			GUI.set_enabled(enabled && FB.get_IsLoggedIn());
+			GUI.enabled = (enabled && FB.IsLoggedIn);
 			if (Button("Get All App Managed Groups"))
 			{
 				CallFbGetAllOwnedGroups();
@@ -51,24 +50,24 @@ namespace Facebook.Unity.Example
 			{
 				CallFbPostToGamerGroup();
 			}
-			GUI.set_enabled(enabled);
+			GUI.enabled = enabled;
 		}
 
 		private void GroupCreateCB(IGroupCreateResult result)
 		{
 			HandleResult(result);
-			if (result.get_GroupId() != null)
+			if (result.GroupId != null)
 			{
-				gamerGroupCurrentGroup = result.get_GroupId();
+				gamerGroupCurrentGroup = result.GroupId;
 			}
 		}
 
 		private void GetAllGroupsCB(IGraphResult result)
 		{
-			if (!string.IsNullOrEmpty(result.get_RawResult()))
+			if (!string.IsNullOrEmpty(result.RawResult))
 			{
-				base.LastResponse = result.get_RawResult();
-				IDictionary<string, object> resultDictionary = result.get_ResultDictionary();
+				base.LastResponse = result.RawResult;
+				IDictionary<string, object> resultDictionary = result.ResultDictionary;
 				if (resultDictionary.ContainsKey("data"))
 				{
 					List<object> list = (List<object>)resultDictionary["data"];
@@ -79,37 +78,37 @@ namespace Facebook.Unity.Example
 					}
 				}
 			}
-			if (!string.IsNullOrEmpty(result.get_Error()))
+			if (!string.IsNullOrEmpty(result.Error))
 			{
-				base.LastResponse = result.get_Error();
+				base.LastResponse = result.Error;
 			}
 		}
 
-		private unsafe void CallFbGetAllOwnedGroups()
+		private void CallFbGetAllOwnedGroups()
 		{
-			FB.API(FB.get_AppId() + "/groups", 0, new FacebookDelegate<IGraphResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), (IDictionary<string, string>)null);
+			FB.API(FB.AppId + "/groups", HttpMethod.GET, (FacebookDelegate<IGraphResult>)GetAllGroupsCB, (IDictionary<string, string>)null);
 		}
 
-		private unsafe void CallFbGetUserGroups()
+		private void CallFbGetUserGroups()
 		{
-			FB.API("/me/groups?parent=" + FB.get_AppId(), 0, new FacebookDelegate<IGraphResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), (IDictionary<string, string>)null);
+			FB.API("/me/groups?parent=" + FB.AppId, HttpMethod.GET, (FacebookDelegate<IGraphResult>)base.HandleResult, (IDictionary<string, string>)null);
 		}
 
-		private unsafe void CallCreateGroupDialog()
+		private void CallCreateGroupDialog()
 		{
-			FB.GameGroupCreate(gamerGroupName, gamerGroupDesc, gamerGroupPrivacy, new FacebookDelegate<IGroupCreateResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			FB.GameGroupCreate(gamerGroupName, gamerGroupDesc, gamerGroupPrivacy, GroupCreateCB);
 		}
 
-		private unsafe void CallJoinGroupDialog()
+		private void CallJoinGroupDialog()
 		{
-			FB.GameGroupJoin(gamerGroupCurrentGroup, new FacebookDelegate<IGroupJoinResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			FB.GameGroupJoin(gamerGroupCurrentGroup, base.HandleResult);
 		}
 
-		private unsafe void CallFbPostToGamerGroup()
+		private void CallFbPostToGamerGroup()
 		{
 			Dictionary<string, string> dictionary = new Dictionary<string, string>();
 			dictionary["message"] = "herp derp a post";
-			FB.API(gamerGroupCurrentGroup + "/feed", 1, new FacebookDelegate<IGraphResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), (IDictionary<string, string>)dictionary);
+			FB.API(gamerGroupCurrentGroup + "/feed", HttpMethod.POST, base.HandleResult, dictionary);
 		}
 	}
 }

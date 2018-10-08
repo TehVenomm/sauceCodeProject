@@ -1,4 +1,6 @@
-public class SoundID
+using UnityEngine;
+
+public class SoundID : MonoBehaviour
 {
 	public enum AudioSettinID
 	{
@@ -53,10 +55,5 @@ public class SoundID
 	public enum ConfigID
 	{
 		RESULT_COUNTER = 90000001
-	}
-
-	public SoundID()
-		: this()
-	{
 	}
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MaterialInfoButton
+public class MaterialInfoButton : MonoBehaviour
 {
 	private Transform parentButton;
 
@@ -14,25 +14,17 @@ public class MaterialInfoButton
 
 	private bool touched;
 
-	public MaterialInfoButton()
-		: this()
-	{
-	}
-
 	public static void Set(Transform icon, Transform material_info, REWARD_TYPE reward_type, uint id, string section_name, Transform parentScroll)
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Expected O, but got Unknown
 		UIButton componentInChildren = icon.GetComponentInChildren<UIButton>();
-		if (!(componentInChildren == null))
+		if (!((Object)componentInChildren == (Object)null))
 		{
 			MaterialInfoButton materialInfoButton = icon.GetComponent<MaterialInfoButton>();
-			if (materialInfoButton == null)
+			if ((Object)materialInfoButton == (Object)null)
 			{
-				materialInfoButton = icon.get_gameObject().AddComponent<MaterialInfoButton>();
+				materialInfoButton = icon.gameObject.AddComponent<MaterialInfoButton>();
 			}
-			materialInfoButton.parentButton = componentInChildren.get_transform();
+			materialInfoButton.parentButton = componentInChildren.transform;
 			materialInfoButton.itemName = Utility.GetRewardName(reward_type, id);
 			materialInfoButton.parentScroll = parentScroll;
 			MaterialInfo component = material_info.GetComponent<MaterialInfo>();
@@ -67,7 +59,7 @@ public class MaterialInfoButton
 		if (touched != is_touch)
 		{
 			touched = is_touch;
-			if (materialInfo != null)
+			if ((Object)materialInfo != (Object)null)
 			{
 				materialInfo.Send(is_touch, parentButton, itemName, parentScroll);
 			}

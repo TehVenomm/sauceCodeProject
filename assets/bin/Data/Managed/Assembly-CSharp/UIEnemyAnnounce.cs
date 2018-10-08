@@ -34,8 +34,6 @@ public class UIEnemyAnnounce : UIAnnounceBase<UIEnemyAnnounce>
 
 	public void EndBuff(string enemy_name, BuffParam.BUFFTYPE type)
 	{
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 		if (IsAnnounce(type) && AnnounceStart())
 		{
 			stateNameBuilder.Length = 0;
@@ -53,8 +51,6 @@ public class UIEnemyAnnounce : UIAnnounceBase<UIEnemyAnnounce>
 
 	private void SetupAnnounceInfo(string enemyName, STRING_CATEGORY category, uint stringID)
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 		stateNameBuilder.Length = 0;
 		stateNameBuilder.Append(enemyName);
 		stateNameBuilder.Append(" ");
@@ -77,8 +73,6 @@ public class UIEnemyAnnounce : UIAnnounceBase<UIEnemyAnnounce>
 
 	public void RequestFieldBuffAnnounce()
 	{
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 		uint currentFieldBuffId = MonoBehaviourSingleton<FieldManager>.I.currentFieldBuffId;
 		if (currentFieldBuffId != 0)
 		{
@@ -97,8 +91,6 @@ public class UIEnemyAnnounce : UIAnnounceBase<UIEnemyAnnounce>
 
 	public void RequestTextAnnounce(string text)
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		if (AnnounceStart())
 		{
 			announce.text = text;

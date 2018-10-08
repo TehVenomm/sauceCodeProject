@@ -9,15 +9,6 @@ public class Goal_AttackTarget : GoalComposite
 
 	protected override void Activate(Brain brain)
 	{
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 		SetStatus(STATUS.ACTIVE);
 		if (!brain.targetCtrl.IsAliveTarget())
 		{
@@ -30,7 +21,7 @@ public class Goal_AttackTarget : GoalComposite
 		else
 		{
 			Player player = brain.owner as Player;
-			if (player != null && player.isLongAttackMode)
+			if ((Object)player != (Object)null && player.isLongAttackMode)
 			{
 				Vector3 targetPosition = brain.targetCtrl.GetTargetPosition();
 				float distance = brain.targetCtrl.GetDistance();
@@ -38,8 +29,7 @@ public class Goal_AttackTarget : GoalComposite
 				{
 					float len = 3f;
 					PLACE place = Utility.Coin() ? PLACE.RIGHT : PLACE.LEFT;
-					RaycastHit seekHit = brain.moveCtrl.seekHit;
-					Vector3 position = seekHit.get_transform().get_position();
+					Vector3 position = brain.moveCtrl.seekHit.transform.position;
 					AddSubGoal<Goal_MoveToAround>().SetParam(place, position, len);
 					return;
 				}
@@ -71,7 +61,7 @@ public class Goal_AttackTarget : GoalComposite
 				brain.canAvoidAttack = false;
 				brain.weaponCtrl.AvoidAttackOn();
 			}
-			if (player != null)
+			if ((Object)player != (Object)null)
 			{
 				if (player.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.HEAT))
 				{

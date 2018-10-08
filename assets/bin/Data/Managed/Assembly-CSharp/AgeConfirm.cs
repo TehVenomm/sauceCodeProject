@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 public class AgeConfirm : GameSection
@@ -16,14 +15,14 @@ public class AgeConfirm : GameSection
 
 	public override void UpdateUI()
 	{
-		SetInput((Enum)UI.IPT_AD, string.Empty, 4, (EventDelegate.Callback)null);
-		SetInput((Enum)UI.IPT_MONTH, string.Empty, 2, (EventDelegate.Callback)null);
+		SetInput(UI.IPT_AD, string.Empty, 4, null);
+		SetInput(UI.IPT_MONTH, string.Empty, 2, null);
 	}
 
 	private void OnQuery_OK()
 	{
-		string inputValue = GetInputValue((Enum)UI.IPT_AD);
-		string inputValue2 = GetInputValue((Enum)UI.IPT_MONTH);
+		string inputValue = GetInputValue(UI.IPT_AD);
+		string inputValue2 = GetInputValue(UI.IPT_MONTH);
 		int result2;
 		int result;
 		if (inputValue.Length == 4 && inputValue2.Length >= 1 && int.TryParse(inputValue, out result) && int.TryParse(inputValue2, out result2) && result > 1800 && result2 >= 1 && result2 <= 12)

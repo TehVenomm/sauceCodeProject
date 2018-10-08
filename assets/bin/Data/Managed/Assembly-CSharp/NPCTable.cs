@@ -111,15 +111,13 @@ public class NPCTable : Singleton<NPCTable>, IDataTable
 			info.lId = leg;
 		}
 
-		public unsafe ModelLoaderBase LoadModel(GameObject go, bool need_shadow, bool enable_light_probe, Action<Animator> on_complete, bool useSpecialModel)
+		public ModelLoaderBase LoadModel(GameObject go, bool need_shadow, bool enable_light_probe, Action<Animator> on_complete, bool useSpecialModel)
 		{
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Expected O, but got Unknown
 			if (IsUsePlayerModel())
 			{
 				PlayerLoader loader = go.AddComponent<PlayerLoader>();
 				PlayerLoadInfo player_load_info = CreatePlayerLoadInfo();
-				loader.StartLoad(player_load_info, go.get_layer(), 99, false, false, need_shadow, enable_light_probe, false, false, FieldManager.IsValidInField(), true, (!enable_light_probe) ? SHADER_TYPE.UI : ShaderGlobal.GetCharacterShaderType(), delegate
+				loader.StartLoad(player_load_info, go.layer, 99, false, false, need_shadow, enable_light_probe, false, false, FieldManager.IsValidInField(), true, (!enable_light_probe) ? SHADER_TYPE.UI : ShaderGlobal.GetCharacterShaderType(), delegate
 				{
 					if (on_complete != null)
 					{
@@ -133,8 +131,13 @@ public class NPCTable : Singleton<NPCTable>, IDataTable
 			int num = Singleton<HomeThemeTable>.I.GetNpcModelID(homeThemeData, id);
 			int num2 = (num <= 0) ? specialModelID : num;
 			int npc_model_id = (!useSpecialModel || num2 <= 0) ? npcModelID : num2;
-			_003CLoadModel_003Ec__AnonStorey76A _003CLoadModel_003Ec__AnonStorey76A;
-			loader2.Load(npc_model_id, go.get_layer(), need_shadow, enable_light_probe, (!enable_light_probe) ? SHADER_TYPE.UI : ShaderGlobal.GetCharacterShaderType(), new Action((object)_003CLoadModel_003Ec__AnonStorey76A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			loader2.Load(npc_model_id, go.layer, need_shadow, enable_light_probe, (!enable_light_probe) ? SHADER_TYPE.UI : ShaderGlobal.GetCharacterShaderType(), delegate
+			{
+				if (on_complete != null)
+				{
+					on_complete(loader2.animator);
+				}
+			});
 			return loader2;
 		}
 
@@ -200,7 +203,7 @@ public class NPCTable : Singleton<NPCTable>, IDataTable
 		{
 			range = npcTypeOnNpcIdList[(int)npc_type].GetRange(0, npcTypeOnNpcIdList[(int)npc_type].Count);
 		}
-		int index = (int)(Random.get_value() * (float)range.Count);
+		int index = (int)(UnityEngine.Random.value * (float)range.Count);
 		int key = range[index];
 		return npcDataTable.Get((uint)key);
 	}
@@ -238,7 +241,7 @@ public class NPCTable : Singleton<NPCTable>, IDataTable
 		}
 		if (list.Count > 0)
 		{
-			int index = (int)(Random.get_value() * (float)list.Count);
+			int index = (int)(UnityEngine.Random.value * (float)list.Count);
 			int key = list[index];
 			return npcDataTable.Get((uint)key);
 		}

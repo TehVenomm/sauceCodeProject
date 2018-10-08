@@ -53,7 +53,7 @@ public class DecoyBulletObject : StageObject
 
 	public override AttackInfo[] GetAttackInfos()
 	{
-		if (ownerPlayer == null)
+		if ((Object)ownerPlayer == (Object)null)
 		{
 			return null;
 		}
@@ -62,18 +62,6 @@ public class DecoyBulletObject : StageObject
 
 	public void Initialize(int playerId, int decoyId, BulletData bullet, Vector3 position, SkillInfo.SkillParam skill, bool isHit)
 	{
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Expected O, but got Unknown
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			Log.Error(LOG.INGAME, "StageObjectManager is invalid. Can't initialize DecoyBulletObject.");
@@ -94,26 +82,26 @@ public class DecoyBulletObject : StageObject
 			isHitExplode = (hitNum > 0f);
 			isEnableHateInterval = (bulletData.dataDecoy.hateInterval > 0f);
 			hateInterval = 0f;
-			cachedTransform = this.get_transform();
+			cachedTransform = base.transform;
 			cachedTransform.SetParent(MonoBehaviourSingleton<StageObjectManager>.I._transform);
-			cachedTransform.set_position(position);
-			cachedTransform.set_localScale(Vector3.get_one());
+			cachedTransform.position = position;
+			cachedTransform.localScale = Vector3.one;
 			if (MonoBehaviourSingleton<EffectManager>.IsValid())
 			{
 				cachedEffectTransform = EffectManager.GetEffect(bulletData.data.effectName, MonoBehaviourSingleton<EffectManager>.I._transform);
-				cachedEffectTransform.set_position(cachedTransform.get_position() + bulletData.data.dispOffset);
-				cachedEffectTransform.set_localRotation(Quaternion.Euler(bulletData.data.dispRotation));
+				cachedEffectTransform.position = cachedTransform.position + bulletData.data.dispOffset;
+				cachedEffectTransform.localRotation = Quaternion.Euler(bulletData.data.dispRotation);
 			}
 			id = decoyId;
-			this.get_gameObject().set_name(OBJ_NAME + decoyId);
-			this.get_gameObject().set_layer(12);
+			base.gameObject.name = OBJ_NAME + decoyId;
+			base.gameObject.layer = 12;
 			ignoreLayerMask |= -1073741824;
 			if (!object.ReferenceEquals(ownerPlayer, null) && isHit && skillParam != null)
 			{
-				cachedCollider = this.get_gameObject().AddComponent<SphereCollider>();
-				cachedCollider.set_radius(bulletData.data.radius);
-				cachedCollider.set_isTrigger(true);
-				cachedCollider.set_enabled(true);
+				cachedCollider = base.gameObject.AddComponent<SphereCollider>();
+				cachedCollider.radius = bulletData.data.radius;
+				cachedCollider.isTrigger = true;
+				cachedCollider.enabled = true;
 				if (!string.IsNullOrEmpty(skillParam.tableData.attackInfoNames[0]))
 				{
 					atkInfo = FindAttackInfo(skillParam.tableData.attackInfoNames[0], true, false);
@@ -133,20 +121,20 @@ public class DecoyBulletObject : StageObject
 	{
 		if (isInitialized)
 		{
-			dontHitSec -= Time.get_deltaTime();
+			dontHitSec -= Time.deltaTime;
 			if (hitInterval > 0f)
 			{
-				hitInterval -= Time.get_deltaTime();
+				hitInterval -= Time.deltaTime;
 			}
 			if (isEnableHateInterval)
 			{
-				hateInterval -= Time.get_deltaTime();
+				hateInterval -= Time.deltaTime;
 				if (hateInterval <= 0f)
 				{
 					HateCtrl();
 				}
 			}
-			lifeTime -= Time.get_deltaTime();
+			lifeTime -= Time.deltaTime;
 			if (lifeTime <= 0f)
 			{
 				OnDisappear(true);
@@ -156,41 +144,31 @@ public class DecoyBulletObject : StageObject
 
 	public void OnDisappear(bool isExplode)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Expected O, but got Unknown
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Expected O, but got Unknown
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		if (!object.ReferenceEquals(cachedEffectTransform, null) && !object.ReferenceEquals((object)cachedEffectTransform.get_gameObject(), null))
+		if (!object.ReferenceEquals(cachedEffectTransform, null) && !object.ReferenceEquals(cachedEffectTransform.gameObject, null))
 		{
-			EffectManager.ReleaseEffect(cachedEffectTransform.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(cachedEffectTransform.gameObject, true, false);
 		}
 		cachedEffectTransform = null;
 		if (isExplode && !object.ReferenceEquals(atkInfo, null))
 		{
 			AtkAttribute atkAttribute = exAtk;
 			SkillInfo.SkillParam exSkillParam = skillParam;
-			AnimEventShot.Create(ownerPlayer, atkInfo, cachedTransform.get_position(), Quaternion.get_identity(), null, true, null, null, atkAttribute, Player.ATTACK_MODE.NONE, null, exSkillParam);
+			AnimEventShot.Create(ownerPlayer, atkInfo, cachedTransform.position, Quaternion.identity, null, true, null, null, atkAttribute, Player.ATTACK_MODE.NONE, null, exSkillParam);
 		}
 		ownerPlayer = null;
 		atkInfo = null;
 		bulletData = null;
-		if (!object.ReferenceEquals((object)this.get_gameObject(), null))
+		if (!object.ReferenceEquals(base.gameObject, null))
 		{
-			Object.Destroy(this.get_gameObject());
+			Object.Destroy(base.gameObject);
 		}
 	}
 
 	private void OnTriggerStay(Collider collider)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		if (isHitExplode && !(dontHitSec > 0f))
 		{
-			int layer = collider.get_gameObject().get_layer();
+			int layer = collider.gameObject.layer;
 			if (((1 << layer) & ignoreLayerMask) <= 0 && !(hitInterval > 0f))
 			{
 				hitInterval = MonoBehaviourSingleton<InGameSettingsManager>.I.buff.decoyHitInterval;

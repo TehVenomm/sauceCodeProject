@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CutSceneData
+public class CutSceneData : ScriptableObject
 {
 	public enum ATTACHMENT_TYPE
 	{
@@ -112,9 +112,4 @@ public class CutSceneData
 	public string mixerName;
 
 	public int storyId;
-
-	public CutSceneData()
-		: this()
-	{
-	}
 }

@@ -1,4 +1,4 @@
-using System;
+using UnityEngine;
 
 public class QuestInvitationInGameButton : UIBehaviour
 {
@@ -9,14 +9,14 @@ public class QuestInvitationInGameButton : UIBehaviour
 
 	protected override void OnOpen()
 	{
-		PlayTween((Enum)UI.OBJ_TWEEN, true, (EventDelegate.Callback)null, false, 0);
+		PlayTween(UI.OBJ_TWEEN, true, null, false, 0);
 		base.OnOpen();
 	}
 
 	public void SetDisableButton(bool flag)
 	{
-		UIButton componentInChildren = this.GetComponentInChildren<UIButton>();
-		if (componentInChildren != null)
+		UIButton componentInChildren = GetComponentInChildren<UIButton>();
+		if ((Object)componentInChildren != (Object)null)
 		{
 			componentInChildren.isEnabled = !flag;
 		}

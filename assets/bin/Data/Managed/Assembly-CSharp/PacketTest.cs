@@ -3,16 +3,9 @@ using System;
 using System.IO;
 using UnityEngine;
 
-public class PacketTest
+public class PacketTest : MonoBehaviour
 {
-	private SerializationContext context = SerializationContext.get_Default();
-
-	public PacketTest()
-		: this()
-	{
-	}//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0006: Expected O, but got Unknown
-
+	private SerializationContext context = SerializationContext.Default;
 
 	private void Awake()
 	{
@@ -100,10 +93,6 @@ public class PacketTest
 
 	private void Test2()
 	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Expected O, but got Unknown
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
 		MemoryStream memoryStream = new MemoryStream();
 		Coop_Model_ObjectAttackedHitFix coop_Model_ObjectAttackedHitFix = new Coop_Model_ObjectAttackedHitFix();
 		coop_Model_ObjectAttackedHitFix.hitPos.x = 1f;
@@ -111,10 +100,10 @@ public class PacketTest
 		coop_Model_ObjectAttackedHitFix.hitPos.z = 3.45f;
 		Log("before pos=" + coop_Model_ObjectAttackedHitFix.hitPos);
 		Type typeFromHandle = typeof(Coop_Model_ObjectAttackedHitFix);
-		IMessagePackSingleObjectSerializer val = context.GetSerializer(typeFromHandle);
-		MessagePackSerializerExtensions.Pack(val, (Stream)memoryStream, (object)coop_Model_ObjectAttackedHitFix);
+		IMessagePackSingleObjectSerializer serializer = context.GetSerializer(typeFromHandle);
+		serializer.Pack(memoryStream, coop_Model_ObjectAttackedHitFix);
 		memoryStream.Position = 0L;
-		Coop_Model_ObjectAttackedHitFix coop_Model_ObjectAttackedHitFix2 = (Coop_Model_ObjectAttackedHitFix)MessagePackSerializerExtensions.Unpack(val, (Stream)memoryStream);
+		Coop_Model_ObjectAttackedHitFix coop_Model_ObjectAttackedHitFix2 = (Coop_Model_ObjectAttackedHitFix)serializer.Unpack(memoryStream);
 		Log("after pos=" + coop_Model_ObjectAttackedHitFix2.hitPos);
 		string str = JSONSerializer.Serialize(coop_Model_ObjectAttackedHitFix, typeFromHandle);
 		Log("json stream:" + str);
@@ -126,10 +115,6 @@ public class PacketTest
 
 	private void Test4()
 	{
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Expected O, but got Unknown
 		MemoryStream memoryStream = new MemoryStream();
 		Coop_Model_EnemyTargetShotEvent coop_Model_EnemyTargetShotEvent = new Coop_Model_EnemyTargetShotEvent();
 		int[] array = new int[3]
@@ -150,20 +135,18 @@ public class PacketTest
 		log = string.Empty;
 		coop_Model_EnemyTargetShotEvent.targets.ForEach(delegate(Enemy.RandomShotInfo.TargetInfo r)
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			string text2 = log;
 			log = text2 + "[" + r.rot + "," + r.targetId + "],";
 		});
 		Log("before target:" + log);
 		Type typeFromHandle = typeof(Coop_Model_EnemyTargetShotEvent);
-		IMessagePackSingleObjectSerializer val = context.GetSerializer(typeFromHandle);
-		MessagePackSerializerExtensions.Pack(val, (Stream)memoryStream, (object)coop_Model_EnemyTargetShotEvent);
+		IMessagePackSingleObjectSerializer serializer = context.GetSerializer(typeFromHandle);
+		serializer.Pack(memoryStream, coop_Model_EnemyTargetShotEvent);
 		memoryStream.Position = 0L;
-		Coop_Model_EnemyTargetShotEvent coop_Model_EnemyTargetShotEvent2 = (Coop_Model_EnemyTargetShotEvent)MessagePackSerializerExtensions.Unpack(val, (Stream)memoryStream);
+		Coop_Model_EnemyTargetShotEvent coop_Model_EnemyTargetShotEvent2 = (Coop_Model_EnemyTargetShotEvent)serializer.Unpack(memoryStream);
 		log = string.Empty;
 		coop_Model_EnemyTargetShotEvent2.targets.ForEach(delegate(Enemy.RandomShotInfo.TargetInfo r)
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			string text = log;
 			log = text + "[" + r.rot + "," + r.targetId + "],";
 		});
@@ -174,16 +157,14 @@ public class PacketTest
 
 	private void MsgPack(Type type)
 	{
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Expected O, but got Unknown
 		MemoryStream memoryStream = new MemoryStream();
 		object obj = Activator.CreateInstance(type);
 		Log($"MsgPack:     {obj.GetType().FullName}\nValue:    {obj.ToString()}\nHashCode: {obj.GetHashCode()}\n");
-		IMessagePackSingleObjectSerializer val = context.GetSerializer(type);
-		MessagePackSerializerExtensions.Pack(val, (Stream)memoryStream, obj);
+		IMessagePackSingleObjectSerializer serializer = context.GetSerializer(type);
+		serializer.Pack(memoryStream, obj);
 		Log($"MsgPacked:     {obj.GetType().FullName}\nValue:    {obj.ToString()}\nHashCode: {obj.GetHashCode()}\n");
 		memoryStream.Position = 0L;
-		object obj2 = MessagePackSerializerExtensions.Unpack(val, (Stream)memoryStream);
+		object obj2 = serializer.Unpack(memoryStream);
 		Log($"MsgUnpack:     {obj2.GetType().FullName}\nValue:    {obj2.ToString()}\nHashCode: {obj2.GetHashCode()}\n");
 	}
 

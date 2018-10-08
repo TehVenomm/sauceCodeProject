@@ -47,7 +47,7 @@ public class TwoHandSwordBurstController : IWeaponController
 	{
 		get
 		{
-			if (m_owner == null || m_currentRestBulletCount == null || m_owner.weaponIndex < 0 || m_owner.weaponIndex >= m_currentRestBulletCount.Length || m_currentRestBulletCount.Length < 0)
+			if ((Object)m_owner == (Object)null || m_currentRestBulletCount == null || m_owner.weaponIndex < 0 || m_owner.weaponIndex >= m_currentRestBulletCount.Length || m_currentRestBulletCount.Length < 0)
 			{
 				return 0;
 			}
@@ -59,7 +59,7 @@ public class TwoHandSwordBurstController : IWeaponController
 	{
 		get
 		{
-			if (m_owner == null || m_currentMaxBulletCount == null || m_owner.weaponIndex < 0 || m_owner.weaponIndex >= m_currentMaxBulletCount.Length || m_currentMaxBulletCount.Length < 0)
+			if ((Object)m_owner == (Object)null || m_currentMaxBulletCount == null || m_owner.weaponIndex < 0 || m_owner.weaponIndex >= m_currentMaxBulletCount.Length || m_currentMaxBulletCount.Length < 0)
 			{
 				return 0;
 			}
@@ -96,7 +96,7 @@ public class TwoHandSwordBurstController : IWeaponController
 
 	public void SetCurrentRestBulletCount(int value)
 	{
-		if (value >= 0 && !(m_owner == null) && m_currentRestBulletCount != null && m_owner.weaponIndex >= 0 && m_owner.weaponIndex < m_currentRestBulletCount.Length && m_currentRestBulletCount.Length >= 0)
+		if (value >= 0 && !((Object)m_owner == (Object)null) && m_currentRestBulletCount != null && m_owner.weaponIndex >= 0 && m_owner.weaponIndex < m_currentRestBulletCount.Length && m_currentRestBulletCount.Length >= 0)
 		{
 			m_currentRestBulletCount[m_owner.weaponIndex] = value;
 		}
@@ -144,7 +144,7 @@ public class TwoHandSwordBurstController : IWeaponController
 
 	public void Init(InitParam _param)
 	{
-		if (_param.Owner != null)
+		if ((Object)_param.Owner != (Object)null)
 		{
 			m_owner = _param.Owner;
 		}
@@ -291,7 +291,7 @@ public class TwoHandSwordBurstController : IWeaponController
 
 	public bool IsEnableChangeActionByLongTap()
 	{
-		if (m_owner == null)
+		if ((Object)m_owner == (Object)null)
 		{
 			return false;
 		}
@@ -348,7 +348,7 @@ public class TwoHandSwordBurstController : IWeaponController
 
 	public bool IsRequiredReloadAction()
 	{
-		if (m_owner == null || m_owner.spAttackType != SP_ATTACK_TYPE.BURST)
+		if ((Object)m_owner == (Object)null || m_owner.spAttackType != SP_ATTACK_TYPE.BURST)
 		{
 			return false;
 		}
@@ -357,7 +357,7 @@ public class TwoHandSwordBurstController : IWeaponController
 
 	public bool IsEnableReloadAction()
 	{
-		if (m_owner == null || m_owner.spAttackType != SP_ATTACK_TYPE.BURST)
+		if ((Object)m_owner == (Object)null || m_owner.spAttackType != SP_ATTACK_TYPE.BURST)
 		{
 			return false;
 		}
@@ -370,7 +370,7 @@ public class TwoHandSwordBurstController : IWeaponController
 
 	public bool IsEnableShootAction()
 	{
-		if (m_owner == null || m_owner.spAttackType != SP_ATTACK_TYPE.BURST)
+		if ((Object)m_owner == (Object)null || m_owner.spAttackType != SP_ATTACK_TYPE.BURST)
 		{
 			return false;
 		}
@@ -411,12 +411,12 @@ public class TwoHandSwordBurstController : IWeaponController
 
 	public bool TryFirstReloadAction()
 	{
-		if (m_owner == null)
+		if ((Object)m_owner == (Object)null)
 		{
 			return false;
 		}
 		SelfController selfController = m_owner.controller as SelfController;
-		if (selfController == null)
+		if ((Object)selfController == (Object)null)
 		{
 			return false;
 		}
@@ -472,14 +472,7 @@ public class TwoHandSwordBurstController : IWeaponController
 
 	public float GetAtkRate(Enemy _enemy, Player _player)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = _enemy.get_transform().get_position() - _player.get_transform().get_position();
-		float magnitude = val.get_magnitude();
+		float magnitude = (_enemy.transform.position - _player.transform.position).magnitude;
 		return m_burstActionInfo.GetDistanceAttenuationRatio(magnitude);
 	}
 }

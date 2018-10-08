@@ -35,24 +35,17 @@ public static class CoopStageObjectUtility
 
 	public static void SetOfflineForAll()
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			MonoBehaviourSingleton<StageObjectManager>.I.cacheList.ForEach(delegate(StageObject obj)
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				obj.get_gameObject().SetActive(true);
+				obj.gameObject.SetActive(true);
 			});
 			MonoBehaviourSingleton<StageObjectManager>.I.ClearCacheObject();
-			Vector3 val = Vector3.get_zero();
-			if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
+			Vector3 vector = Vector3.zero;
+			if ((UnityEngine.Object)MonoBehaviourSingleton<StageObjectManager>.I.boss != (UnityEngine.Object)null)
 			{
-				val = MonoBehaviourSingleton<StageObjectManager>.I.boss._transform.get_position();
+				vector = MonoBehaviourSingleton<StageObjectManager>.I.boss._transform.position;
 			}
 			int i = 0;
 			for (int count = MonoBehaviourSingleton<StageObjectManager>.I.objectList.Count; i < count; i++)
@@ -71,11 +64,11 @@ public static class CoopStageObjectUtility
 					{
 						if (player is Self)
 						{
-							player.SetAppearPosOwner(val);
+							player.SetAppearPosOwner(vector);
 						}
 						else
 						{
-							player.SetAppearPosGuest(val);
+							player.SetAppearPosGuest(vector);
 						}
 					}
 					if (player.isWaitBattleStart)
@@ -98,7 +91,6 @@ public static class CoopStageObjectUtility
 
 	public static void TransfarOwner(StageObject obj, int owner_client_id)
 	{
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId == owner_client_id)
 		{
 			if (!CanControll(obj))
@@ -109,7 +101,7 @@ public static class CoopStageObjectUtility
 			{
 				obj.SetCoopMode(StageObject.COOP_MODE_TYPE.ORIGINAL, 0);
 				Character character = obj as Character;
-				if (character != null)
+				if ((UnityEngine.Object)character != (UnityEngine.Object)null)
 				{
 					SetAI(character);
 					if (!character.isSetAppearPos)
@@ -132,7 +124,7 @@ public static class CoopStageObjectUtility
 			}
 			obj.isCoopInitialized = false;
 			Character character2 = obj as Character;
-			if (character2 != null)
+			if ((UnityEngine.Object)character2 != (UnityEngine.Object)null)
 			{
 				character2.RemoveController();
 				character2.SafeActIdle();
@@ -143,7 +135,6 @@ public static class CoopStageObjectUtility
 
 	public static void TransfarOwnerForClientObjects(int client_id, int owner_client_id)
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			if (!FieldManager.IsValidInGameNoQuest())
@@ -152,9 +143,9 @@ public static class CoopStageObjectUtility
 				while (num < MonoBehaviourSingleton<StageObjectManager>.I.cacheList.Count)
 				{
 					Player player = MonoBehaviourSingleton<StageObjectManager>.I.cacheList[num] as Player;
-					if (player != null)
+					if ((UnityEngine.Object)player != (UnityEngine.Object)null)
 					{
-						player.get_gameObject().SetActive(true);
+						player.gameObject.SetActive(true);
 						MonoBehaviourSingleton<StageObjectManager>.I.cacheList.RemoveAt(num);
 					}
 					else
@@ -238,7 +229,7 @@ public static class CoopStageObjectUtility
 				{
 					nonPlayer.ActBattleStart(false);
 				}
-				else if (nonPlayer.controller != null)
+				else if ((UnityEngine.Object)nonPlayer.controller != (UnityEngine.Object)null)
 				{
 					nonPlayer.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.BATTLE_START);
 				}
@@ -312,7 +303,7 @@ public static class CoopStageObjectUtility
 			Action<StageObject> action2 = delegate(StageObject o)
 			{
 				Player player = o as Player;
-				if (player != null && player.isNpc)
+				if ((UnityEngine.Object)player != (UnityEngine.Object)null && player.isNpc)
 				{
 					destroyList.Add(o);
 				}
