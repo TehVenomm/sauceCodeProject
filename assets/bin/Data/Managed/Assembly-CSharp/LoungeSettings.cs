@@ -31,7 +31,7 @@ public class LoungeSettings : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate(bool isSuccess)
 			{
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess, null, false);
 			}, false);
 		}
 	}
@@ -43,7 +43,7 @@ public class LoungeSettings : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendLeave(delegate(bool isSuccess)
 			{
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess, null, false);
 			});
 		}
 	}

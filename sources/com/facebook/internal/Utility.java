@@ -509,8 +509,8 @@ public final class Utility {
     }
 
     public static long getContentSize(Uri uri) {
-        Throwable th;
         Cursor query;
+        Throwable th;
         try {
             query = FacebookSdk.getApplicationContext().getContentResolver().query(uri, null, null, null, null);
             try {

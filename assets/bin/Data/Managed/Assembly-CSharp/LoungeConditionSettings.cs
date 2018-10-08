@@ -282,8 +282,8 @@ public class LoungeConditionSettings : GameSection
 					SetStampTextre(item.StampId);
 				}
 				ChatStampListItem chatStampListItem = item;
-				_003CInitStampItem_003Ec__AnonStorey3F6 _003CInitStampItem_003Ec__AnonStorey3F;
-				chatStampListItem.onButton = Delegate.Combine((Delegate)chatStampListItem.onButton, (Delegate)new Action((object)_003CInitStampItem_003Ec__AnonStorey3F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CInitStampItem_003Ec__AnonStorey3FC _003CInitStampItem_003Ec__AnonStorey3FC;
+				chatStampListItem.onButton = Delegate.Combine((Delegate)chatStampListItem.onButton, (Delegate)new Action((object)_003CInitStampItem_003Ec__AnonStorey3FC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}
@@ -586,7 +586,7 @@ public class LoungeConditionSettings : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendEdit(requestEdit, delegate
 		{
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(true, null, false);
 		});
 	}
 }

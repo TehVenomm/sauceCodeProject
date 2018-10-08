@@ -80,40 +80,40 @@ public class UIPlayerStatusGizmo : UIStatusGizmoBase
 	[SerializeField]
 	protected Color prayerGaugeColor3;
 
-	[SerializeField]
 	[Tooltip("自キャラ表示時間")]
+	[SerializeField]
 	protected float selfShowTime = 5f;
 
-	[Tooltip("矢印横表示時のXオフセット")]
 	[SerializeField]
+	[Tooltip("矢印横表示時のXオフセット")]
 	protected float arrowSideOffset = 25f;
 
-	[Tooltip("スクリ\u30fcン横オフセット")]
 	[SerializeField]
+	[Tooltip("スクリ\u30fcン横オフセット")]
 	protected float screenSideOffset = 36f;
 
-	[SerializeField]
 	[Tooltip("スクリ\u30fcン下オフセット")]
+	[SerializeField]
 	protected float screenBottomOffset = 107f;
 
-	[Tooltip("スクリ\u30fcン下オフセット、フィ\u30fcルド時")]
 	[SerializeField]
+	[Tooltip("スクリ\u30fcン下オフセット、フィ\u30fcルド時")]
 	protected float screenBottomFieldOffset = 107f;
 
 	[SerializeField]
 	[Tooltip("チャット横オフセット")]
 	protected float chatSideOffset = 60f;
 
-	[SerializeField]
 	[Tooltip("チャット上オフセット")]
+	[SerializeField]
 	protected float chatTopOffset = 120f;
 
 	[SerializeField]
 	[Tooltip("チャットスタンプ横オフセット")]
 	protected float chatStampSideOffset = 60f;
 
-	[SerializeField]
 	[Tooltip("チャットスタンプ上オフセット")]
+	[SerializeField]
 	protected float chatStampTopOffset = 120f;
 
 	[SerializeField]

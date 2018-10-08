@@ -82,7 +82,7 @@ public class ItemDetailUseItem : GameSection
 			{
 				MonoBehaviourSingleton<InventoryManager>.I.SendInventoryAutoItem(data.GetUniqID().ToString(), delegate(bool is_success)
 				{
-					GameSection.ResumeEvent(is_success, null);
+					GameSection.ResumeEvent(is_success, null, false);
 				});
 			}
 			else
@@ -93,7 +93,7 @@ public class ItemDetailUseItem : GameSection
 					{
 						MonoBehaviourSingleton<CoopNetworkManager>.I.UpdateBoost();
 					}
-					GameSection.ResumeEvent(is_success, null);
+					GameSection.ResumeEvent(is_success, null, false);
 				});
 			}
 		}

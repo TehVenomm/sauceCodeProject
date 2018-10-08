@@ -17,6 +17,9 @@ public class HomeTop : HomeBase
 		BTN_GIFTBOX,
 		BTN_CHAT,
 		OBJ_BALOON_ROOT,
+		OBJ_GIFT,
+		OBJ_GIFT_ON,
+		BTN_MENU_GG_ON,
 		OBJ_EXPLORE_BALLOON_POS,
 		BTN_CHAIR,
 		OBJ_NORMAL_NOTICE,
@@ -41,7 +44,6 @@ public class HomeTop : HomeBase
 		SPR_BADGE,
 		SPR_MENU_GG,
 		OBJ_MENU_GG,
-		BTN_MENU_GG_ON,
 		BTN_MENU_GG_OFF,
 		BTN_GOWRAP_GG,
 		BTN_CRYSTAL_SHOP_GG,
@@ -110,13 +112,13 @@ public class HomeTop : HomeBase
 		if (flag7)
 		{
 			CheckHighlightPurchase();
-			if (isHighlightPurchase || GameSaveData.instance.IsShowNewsNotification() || isHighlightPikeShop)
+			if (isHighlightPurchase || GameSaveData.instance.IsShowNewsNotification() || isHighlightPikeShop || ShouldEnableGiftIcon())
 			{
-				SetBadge((Enum)UI.BTN_MENU_GG_ON, -1, 3, 5, -25, false);
+				SetActive(GetCtrl(UI.BTN_MENU_GG_ON), UI.OBJ_GIFT_ON, true);
 			}
 			else
 			{
-				SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
+				SetActive(GetCtrl(UI.BTN_MENU_GG_ON), UI.OBJ_GIFT_ON, false);
 			}
 		}
 		base.UpdateUIOfTutorial();
@@ -373,13 +375,13 @@ public class HomeTop : HomeBase
 				SetBadge((Enum)UI.BTN_POINT_SHOP_GG, 0, 3, 0, -8, false);
 			}
 		}
-		else if (isHighlightPurchase || GameSaveData.instance.IsShowNewsNotification() || isHighlightPikeShop)
+		else if (isHighlightPurchase || GameSaveData.instance.IsShowNewsNotification() || isHighlightPikeShop || ShouldEnableGiftIcon())
 		{
-			SetBadge((Enum)UI.BTN_MENU_GG_ON, -1, 3, 5, -25, false);
+			SetActive(GetCtrl(UI.BTN_MENU_GG_ON), UI.OBJ_GIFT_ON, true);
 		}
 		else
 		{
-			SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
+			SetActive(GetCtrl(UI.BTN_MENU_GG_ON), UI.OBJ_GIFT_ON, false);
 		}
 	}
 
@@ -445,9 +447,9 @@ public class HomeTop : HomeBase
 				SetBadge((Enum)UI.BTN_GOWRAP_GG, 0, 3, 0, -8, false);
 			}
 		}
-		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification() && !isHighlightPikeShop)
+		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification() && !isHighlightPikeShop && !ShouldEnableGiftIcon())
 		{
-			SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
+			SetActive(GetCtrl(UI.BTN_MENU_GG_ON), UI.OBJ_GIFT_ON, false);
 		}
 	}
 
@@ -465,9 +467,9 @@ public class HomeTop : HomeBase
 				SetBadge((Enum)UI.BTN_CRYSTAL_SHOP_GG, 0, 3, 0, -8, false);
 			}
 		}
-		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification() && !isHighlightPikeShop)
+		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification() && !isHighlightPikeShop && !ShouldEnableGiftIcon())
 		{
-			SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
+			SetActive(GetCtrl(UI.BTN_MENU_GG_ON), UI.OBJ_GIFT_ON, false);
 		}
 	}
 
@@ -477,9 +479,9 @@ public class HomeTop : HomeBase
 		{
 			SetBadge((Enum)UI.BTN_POINT_SHOP_GG, 0, 3, 0, -8, false);
 		}
-		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification())
+		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification() && !ShouldEnableGiftIcon())
 		{
-			SetBadge((Enum)UI.BTN_MENU_GG_ON, 0, 3, 0, 0, false);
+			SetActive(GetCtrl(UI.BTN_MENU_GG_ON), UI.OBJ_GIFT_ON, false);
 		}
 		isHighlightPikeShop = false;
 	}

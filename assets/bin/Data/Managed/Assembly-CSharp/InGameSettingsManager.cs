@@ -607,28 +607,28 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 			[SerializeField]
 			private float MinAttenuationDistance = 10f;
 
-			[Tooltip("[Burst] 距離減衰の最大減衰距離")]
 			[SerializeField]
+			[Tooltip("[Burst] 距離減衰の最大減衰距離")]
 			private float MaxAttenuationDistance = 1000f;
 
-			[Tooltip("[Burst] 距離減衰の最小ダメ\u30fcジレ\u30fcト")]
 			[SerializeField]
+			[Tooltip("[Burst] 距離減衰の最小ダメ\u30fcジレ\u30fcト")]
 			private float MinAttenuationDmgRate = 0.01f;
 
-			[SerializeField]
 			[Tooltip("[Burst] 距離減衰の最大ダメ\u30fcジレ\u30fcト")]
+			[SerializeField]
 			private float MaxAttenuationDmgRate = 1f;
 
 			[Tooltip("[Burst] 距離減衰定義(X:正規化距離[0.0 1.0] Y:正規化ダメ\u30fcジ補正値[0.0 1.0]")]
 			[SerializeField]
 			private AnimationCurve AnimCurve = Curves.CreateEaseInCurve();
 
-			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			[SerializeField]
+			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			public float SingleShotBaseDmgRate = 1f;
 
-			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			[SerializeField]
+			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			public float SingleShotElementDmgRate = 2f;
 
 			[SerializeField]

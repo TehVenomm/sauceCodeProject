@@ -11,12 +11,12 @@ public class UIPortalStatusGizmo : UIStatusGizmoBase
 	[SerializeField]
 	protected Vector3 offset;
 
-	[Tooltip("スクリ\u30fcン横オフセット")]
 	[SerializeField]
+	[Tooltip("スクリ\u30fcン横オフセット")]
 	protected float screenSideOffset = 22f;
 
-	[SerializeField]
 	[Tooltip("スクリ\u30fcン下オフセット")]
+	[SerializeField]
 	protected float screenBottomOffset = 112f;
 
 	[SerializeField]

@@ -263,7 +263,7 @@ public class QuestResultFriend : GameSection
 						playerLoadInfo.armModelID = -1;
 						playerLoadInfo.weaponModelID = -1;
 						playerLoadInfo.legModelID = -1;
-						SetRenderPlayerModelOneShot(root, UI.TEX_MODEL, playerLoadInfo, 98, new Vector3(0f, -1.613f, 2.342f), new Vector3(0f, 154f, 0f), true, null);
+						SetRenderPlayerModel(root, UI.TEX_MODEL, playerLoadInfo, 98, new Vector3(0f, -1.613f, 2.342f), new Vector3(0f, 154f, 0f), true, null);
 						if (playerRecord2.charaInfo.selectedDegrees != null && playerRecord2.charaInfo.selectedDegrees.Count == GameDefine.DEGREE_PART_COUNT)
 						{
 							DegreePlate component = FindCtrl(root, UI.OBJ_DEGREE_PLATE).GetComponent<DegreePlate>();
@@ -398,8 +398,8 @@ public class QuestResultFriend : GameSection
 			GameSection.StayEvent();
 			List<int> list = new List<int>();
 			list.Add(record.charaInfo.userId);
-			_003COnQuery_FOLLOW_003Ec__AnonStorey43D _003COnQuery_FOLLOW_003Ec__AnonStorey43D;
-			MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(list, new Action<Error, List<int>>((object)_003COnQuery_FOLLOW_003Ec__AnonStorey43D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003COnQuery_FOLLOW_003Ec__AnonStorey443 _003COnQuery_FOLLOW_003Ec__AnonStorey;
+			MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(list, new Action<Error, List<int>>((object)_003COnQuery_FOLLOW_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -419,7 +419,7 @@ public class QuestResultFriend : GameSection
 				MonoBehaviourSingleton<InGameManager>.I.isTransitionQuestToField = true;
 				GameSection.ChangeStayEvent("QUEST_TO_FIELD", null);
 			}
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(true, null, false);
 		};
 		if (MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.isQuestResultFieldLeave)
 		{

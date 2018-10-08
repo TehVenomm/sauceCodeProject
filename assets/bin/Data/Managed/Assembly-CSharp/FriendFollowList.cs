@@ -40,8 +40,8 @@ public class FriendFollowList : FollowListBase
 				base.ScrollGrid.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 			}
 			CleanItemList();
-			_003CUpdateDynamicList_003Ec__AnonStorey31C _003CUpdateDynamicList_003Ec__AnonStorey31C;
-			SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, pageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey31C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateDynamicList_003Ec__AnonStorey321 _003CUpdateDynamicList_003Ec__AnonStorey;
+			SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, pageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -52,8 +52,8 @@ public class FriendFollowList : FollowListBase
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey31D _003CSendGetList_003Ec__AnonStorey31D;
-		MonoBehaviourSingleton<FriendManager>.I.SendGetFollowList(page, new Action<bool, FriendFollowListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey31D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendGetList_003Ec__AnonStorey322 _003CSendGetList_003Ec__AnonStorey;
+		MonoBehaviourSingleton<FriendManager>.I.SendGetFollowList(page, new Action<bool, FriendFollowListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void PostSendGetListByReopen(int page)

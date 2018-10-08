@@ -1633,7 +1633,7 @@ public class Player : Character
 		{
 			return false;
 		}
-		_003CIsBoostByType_003Ec__AnonStorey536 _003CIsBoostByType_003Ec__AnonStorey;
+		_003CIsBoostByType_003Ec__AnonStorey540 _003CIsBoostByType_003Ec__AnonStorey;
 		if (boostPrayedInfoList.Count(new Func<BoostPrayInfo, bool>((object)_003CIsBoostByType_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)) > 0)
 		{
 			return true;
@@ -5639,8 +5639,8 @@ public class Player : Character
 	private unsafe void DetachRootEffectTemporary()
 	{
 		Transform attachTrans = (!MonoBehaviourSingleton<EffectManager>.IsValid()) ? MonoBehaviourSingleton<StageObjectManager>.I._transform : MonoBehaviourSingleton<EffectManager>.I._transform;
-		_003CDetachRootEffectTemporary_003Ec__AnonStorey53C _003CDetachRootEffectTemporary_003Ec__AnonStorey53C;
-		effectTransTable.ForEachKeyAndValue(new Action<string, Transform>((object)_003CDetachRootEffectTemporary_003Ec__AnonStorey53C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CDetachRootEffectTemporary_003Ec__AnonStorey546 _003CDetachRootEffectTemporary_003Ec__AnonStorey;
+		effectTransTable.ForEachKeyAndValue(new Action<string, Transform>((object)_003CDetachRootEffectTemporary_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void ReAttachRootEffect()
@@ -11998,8 +11998,8 @@ public class Player : Character
 					}
 				}
 			}
-			_003CShotSoulArrow_003Ec__AnonStorey53E _003CShotSoulArrow_003Ec__AnonStorey53E;
-			this.StartCoroutine(_ShotSoulArrow(shotPos, bowRot, list, arrowActionInfo.soulShotInterval, new Action((object)_003CShotSoulArrow_003Ec__AnonStorey53E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			_003CShotSoulArrow_003Ec__AnonStorey548 _003CShotSoulArrow_003Ec__AnonStorey;
+			this.StartCoroutine(_ShotSoulArrow(shotPos, bowRot, list, arrowActionInfo.soulShotInterval, new Action((object)_003CShotSoulArrow_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 	}
 

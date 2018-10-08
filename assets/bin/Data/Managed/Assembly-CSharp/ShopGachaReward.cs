@@ -23,7 +23,7 @@ public class ShopGachaReward : GameSection
 	{
 		QuestItem.SellItem[] data_ary = sellItem.ToArray();
 		int item_num = data_ary.Length;
-		_003CUpdateUI_003Ec__AnonStorey45D _003CUpdateUI_003Ec__AnonStorey45D;
-		SetGrid(UI.GRD_ICON, null, item_num, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey45D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateUI_003Ec__AnonStorey463 _003CUpdateUI_003Ec__AnonStorey;
+		SetGrid(UI.GRD_ICON, null, item_num, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 }

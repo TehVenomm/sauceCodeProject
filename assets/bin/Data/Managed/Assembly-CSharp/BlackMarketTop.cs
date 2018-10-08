@@ -489,7 +489,7 @@ public class BlackMarketTop : GameSection
 		MonoBehaviourSingleton<ShopManager>.I.SendBuyDarkMarket(currentItemChoosed.id, delegate(Error error)
 		{
 			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 			switch (error)
 			{
 			case Error.None:
@@ -501,7 +501,7 @@ public class BlackMarketTop : GameSection
 			{
 				string errorMessage2 = StringTable.GetErrorMessage((uint)error);
 				GameSection.ChangeStayEvent("BUY_ERROR", errorMessage2);
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(true, null, false);
 				break;
 			}
 			case Error.ERR_BM_ITEM_UNAVAILABLE:
@@ -514,7 +514,7 @@ public class BlackMarketTop : GameSection
 				break;
 			}
 			default:
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(false, null, false);
 				break;
 			}
 		});
@@ -535,7 +535,7 @@ public class BlackMarketTop : GameSection
 		LoadDarkMarketUI(false);
 		isPurchase = false;
 		isRelloading = false;
-		GameSection.ResumeEvent(true, null);
+		GameSection.ResumeEvent(true, null, false);
 	}
 
 	private IEnumerator DoResetMarketData()
@@ -554,7 +554,7 @@ public class BlackMarketTop : GameSection
 		LoadDarkMarketUI(true);
 		isPurchase = false;
 		isReseting = false;
-		GameSection.ResumeEvent(true, null);
+		GameSection.ResumeEvent(true, null, false);
 	}
 
 	private void OnQuery_BUY_IAP()
@@ -573,10 +573,10 @@ public class BlackMarketTop : GameSection
 			{
 			case Error.WRN_GOLD_OVER_LIMITTER_OVERUSE:
 				GameSection.ChangeStayEvent("STOPPER", null);
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(true, null, false);
 				break;
 			default:
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(false, null, false);
 				break;
 			case Error.None:
 				DoPurchase();
@@ -606,7 +606,7 @@ public class BlackMarketTop : GameSection
 		}
 		if (isPurchase)
 		{
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(false, null, false);
 		}
 	}
 
@@ -621,7 +621,7 @@ public class BlackMarketTop : GameSection
 		}
 		if (isPurchase)
 		{
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(false, null, false);
 		}
 	}
 
@@ -636,7 +636,7 @@ public class BlackMarketTop : GameSection
 		}
 		if (isPurchase)
 		{
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(false, null, false);
 		}
 	}
 
@@ -652,8 +652,8 @@ public class BlackMarketTop : GameSection
 	{
 		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001a: Expected O, but got Unknown
-		_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2DF _003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2DF;
-		SendRequestCurrentCrystal(new Action((object)_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2DF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2E4 _003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2E;
+		SendRequestCurrentCrystal(new Action((object)_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey2E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void CheckCrystalNum(OnceStatusInfoModel ret, Action onFinish)

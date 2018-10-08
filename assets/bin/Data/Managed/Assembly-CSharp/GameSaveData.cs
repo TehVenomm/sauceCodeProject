@@ -77,6 +77,8 @@ public class GameSaveData
 
 	public int dayShowNewsNotification;
 
+	public bool isFinishTradingPostTutorial;
+
 	public List<LoginBonus> logInBonus;
 
 	public string showIAPAdsPop;

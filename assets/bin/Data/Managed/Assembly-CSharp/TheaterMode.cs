@@ -338,8 +338,8 @@ public class TheaterMode : GameSection
 		}
 		SetLabelText((Enum)UI.LBL_MAX, m_pageMax.ToString());
 		SetLabelText((Enum)UI.LBL_NOW, m_nowPage.ToString());
-		_003CUpdateUI_003Ec__AnonStorey3FE _003CUpdateUI_003Ec__AnonStorey3FE;
-		SetDynamicList((Enum)UI.GRD_EVENT_QUEST, "TheaterModeListItem", dispList.Count, true, null, null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3FE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateUI_003Ec__AnonStorey404 _003CUpdateUI_003Ec__AnonStorey;
+		SetDynamicList((Enum)UI.GRD_EVENT_QUEST, "TheaterModeListItem", dispList.Count, true, null, null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnApplicationPause(bool pause)

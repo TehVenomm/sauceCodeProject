@@ -55,7 +55,7 @@ public class QuestAcceptSearchListSelect : QuestSearchListSelect
 			}
 			else
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			}
 		});
 	}

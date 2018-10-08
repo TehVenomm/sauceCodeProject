@@ -511,7 +511,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 					List<GameSectionHierarchy.HierarchyData> exclusive_list2 = isOpenImportantDialog ? new List<GameSectionHierarchy.HierarchyData>() : hierarchy.GetExclusiveList(GAME_SECTION_TYPE.SCENE);
 					exclusive_list2.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
 					{
-						o.section.Close(((_003CDoChangeScene_003Ec__Iterator271)/*Error near IL_073a: stateMachine*/).close_type);
+						o.section.Close(((_003CDoChangeScene_003Ec__Iterator276)/*Error near IL_073a: stateMachine*/).close_type);
 					});
 					while (MonoBehaviourSingleton<UIManager>.I.IsTransitioning())
 					{
@@ -623,7 +623,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 						List<GameSectionHierarchy.HierarchyData> exclusive_list = isOpenImportantDialog ? new List<GameSectionHierarchy.HierarchyData>() : hierarchy.GetExclusiveList(new_section_data.type);
 						exclusive_list.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
 						{
-							o.section.Close(((_003CDoChangeScene_003Ec__Iterator271)/*Error near IL_0cf8: stateMachine*/).close_type);
+							o.section.Close(((_003CDoChangeScene_003Ec__Iterator276)/*Error near IL_0cf8: stateMachine*/).close_type);
 						});
 						MonoBehaviourSingleton<UIManager>.I.UpdateDialogBlocker(hierarchy, new_section_data);
 						while (MonoBehaviourSingleton<UIManager>.I.IsTransitioning())
@@ -659,7 +659,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 							{
 								if (o.data.type != GAME_SECTION_TYPE.PAGE)
 								{
-									((_003CDoChangeScene_003Ec__Iterator271)/*Error near IL_0e77: stateMachine*/)._003Clist_003E__41.Add(o);
+									((_003CDoChangeScene_003Ec__Iterator276)/*Error near IL_0e77: stateMachine*/)._003Clist_003E__41.Add(o);
 								}
 							});
 							exclusive_list = list2;
@@ -671,7 +671,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 							{
 								if (o.data.type != GAME_SECTION_TYPE.PAGE_DIALOG)
 								{
-									((_003CDoChangeScene_003Ec__Iterator271)/*Error near IL_0ebb: stateMachine*/)._003Clist_003E__42.Add(o);
+									((_003CDoChangeScene_003Ec__Iterator276)/*Error near IL_0ebb: stateMachine*/)._003Clist_003E__42.Add(o);
 								}
 							});
 							exclusive_list = list;
@@ -727,7 +727,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 						List<GameSectionHierarchy.HierarchyData> cut_list = isOpenImportantDialog ? new List<GameSectionHierarchy.HierarchyData>() : hierarchy.GetCutList(now_hierarchy_data);
 						cut_list.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
 						{
-							o.section.Close(((_003CDoChangeScene_003Ec__Iterator271)/*Error near IL_1154: stateMachine*/).close_type);
+							o.section.Close(((_003CDoChangeScene_003Ec__Iterator276)/*Error near IL_1154: stateMachine*/).close_type);
 						});
 						MonoBehaviourSingleton<UIManager>.I.UpdateDialogBlocker(hierarchy, new_section_data);
 						while (MonoBehaviourSingleton<UIManager>.I.IsTransitioning())
@@ -1342,15 +1342,15 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 						{
 							return false;
 						}
-						if (component.eventName != ((_003CDoAutoEvent_003Ec__Iterator273)/*Error near IL_0205: stateMachine*/)._003Cevent_data_003E__2.name)
+						if (component.eventName != ((_003CDoAutoEvent_003Ec__Iterator278)/*Error near IL_0205: stateMachine*/)._003Cevent_data_003E__2.name)
 						{
 							return false;
 						}
-						if (component.eventData != null && ((_003CDoAutoEvent_003Ec__Iterator273)/*Error near IL_0205: stateMachine*/)._003Cevent_data_003E__2.data != null && !component.eventData.Equals(((_003CDoAutoEvent_003Ec__Iterator273)/*Error near IL_0205: stateMachine*/)._003Cevent_data_003E__2.data))
+						if (component.eventData != null && ((_003CDoAutoEvent_003Ec__Iterator278)/*Error near IL_0205: stateMachine*/)._003Cevent_data_003E__2.data != null && !component.eventData.Equals(((_003CDoAutoEvent_003Ec__Iterator278)/*Error near IL_0205: stateMachine*/)._003Cevent_data_003E__2.data))
 						{
 							return false;
 						}
-						((_003CDoAutoEvent_003Ec__Iterator273)/*Error near IL_0205: stateMachine*/)._003Csender_003E__5 = component;
+						((_003CDoAutoEvent_003Ec__Iterator278)/*Error near IL_0205: stateMachine*/)._003Csender_003E__5 = component;
 						return true;
 					});
 					if (sender != null)
@@ -1379,7 +1379,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 									bool wait = true;
 									SpringPanel.OnFinished func = delegate
 									{
-										((_003CDoAutoEvent_003Ec__Iterator273)/*Error near IL_0362: stateMachine*/)._003Cwait_003E__11 = false;
+										((_003CDoAutoEvent_003Ec__Iterator278)/*Error near IL_0362: stateMachine*/)._003Cwait_003E__11 = false;
 									};
 									SpringPanel springPanel = sp;
 									springPanel.onFinished = (SpringPanel.OnFinished)Delegate.Combine(springPanel.onFinished, func);

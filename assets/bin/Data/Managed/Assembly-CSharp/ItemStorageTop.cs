@@ -625,7 +625,7 @@ public class ItemStorageTop : SkillInfoBase
 				sellItemData.ForEach(delegate(SortCompareData sort_data)
 				{
 					int k = 0;
-					for (int num4 = inventories[(int)tab].datas.Length; k < num4; k++)
+					for (int num3 = inventories[(int)tab].datas.Length; k < num3; k++)
 					{
 						if (sort_data.GetUniqID() == inventories[(int)tab].datas[k].GetUniqID())
 						{
@@ -666,8 +666,21 @@ public class ItemStorageTop : SkillInfoBase
 		SetActive((Enum)UI.BTN_CHANGE, flag2);
 		SetActive((Enum)UI.SPR_INVALID_CHANGE, !flag2);
 		int sortedItemCount = 0;
-		_003CUpdateUI_003Ec__AnonStorey3A5 _003CUpdateUI_003Ec__AnonStorey3A;
-		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, false, new Func<int, bool>((object)_003CUpdateUI_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateUI_003Ec__AnonStorey3AA _003CUpdateUI_003Ec__AnonStorey3AA;
+		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, false, new Func<int, bool>((object)_003CUpdateUI_003Ec__AnonStorey3AA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3AA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		InitSellObjectMode();
+		m_maxScrollableValue = CalcMaxScrollableValue(sortedItemCount);
+		UpdateScrollSettings();
+		UpdateAnchors();
+	}
+
+	protected virtual void InitListItemEvent(ItemIcon icon, int i, SortCompareData item)
+	{
+		SetLongTouch(icon.transform, "DETAIL", i);
+	}
+
+	protected virtual void InitSellObjectMode()
+	{
 		if (tab == TAB_MODE.EQUIP || tab == TAB_MODE.SKILL)
 		{
 			if (isSellMode)
@@ -687,12 +700,12 @@ public class ItemStorageTop : SkillInfoBase
 			SetActive((Enum)UI.OBJ_BTN_SELL_MODE, false);
 			SetActive((Enum)UI.OBJ_SELL_MODE_ROOT, false);
 		}
-		int num3 = 0;
+		int num = 0;
 		int now_num = 0;
 		switch (tab)
 		{
 		case TAB_MODE.EQUIP:
-			num3 = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxEquipItem;
+			num = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxEquipItem;
 			MonoBehaviourSingleton<InventoryManager>.I.ForAllEquipItemInventory(delegate(EquipItemInfo _equip)
 			{
 				if (_equip != null && _equip.uniqueID != 0L && _equip.tableID != 0)
@@ -702,7 +715,7 @@ public class ItemStorageTop : SkillInfoBase
 			});
 			break;
 		case TAB_MODE.SKILL:
-			num3 = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxSkillItem;
+			num = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxSkillItem;
 			MonoBehaviourSingleton<InventoryManager>.I.ForAllSkillItemInventory(delegate(SkillItemInfo _skill)
 			{
 				if (_skill != null && _skill.uniqueID != 0L && _skill.tableID != 0)
@@ -712,11 +725,8 @@ public class ItemStorageTop : SkillInfoBase
 			});
 			break;
 		}
-		SetLabelText((Enum)UI.LBL_MAX_HAVE_NUM, num3.ToString());
+		SetLabelText((Enum)UI.LBL_MAX_HAVE_NUM, num.ToString());
 		SetLabelText((Enum)UI.LBL_NOW_HAVE_NUM, now_num.ToString());
-		m_maxScrollableValue = CalcMaxScrollableValue(sortedItemCount);
-		UpdateScrollSettings();
-		UpdateAnchors();
 	}
 
 	private void Update()
@@ -1170,7 +1180,7 @@ public class ItemStorageTop : SkillInfoBase
 		return UI.GRD_INVENTORY;
 	}
 
-	private void InitializeCaption()
+	protected virtual void InitializeCaption()
 	{
 		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);

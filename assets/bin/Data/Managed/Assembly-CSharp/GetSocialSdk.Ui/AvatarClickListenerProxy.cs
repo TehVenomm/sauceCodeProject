@@ -20,8 +20,8 @@ namespace GetSocialSdk.Ui
 			//IL_0034: Expected O, but got Unknown
 			Debug.Log((object)">>>>>>> XXXX");
 			PublicUser publicUser = new PublicUser().ParseFromAJO(publicUserAjo);
-			_003ConAvatarClicked_003Ec__AnonStorey7F4 _003ConAvatarClicked_003Ec__AnonStorey7F;
-			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003ConAvatarClicked_003Ec__AnonStorey7F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003ConAvatarClicked_003Ec__AnonStorey807 _003ConAvatarClicked_003Ec__AnonStorey;
+			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003ConAvatarClicked_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 }

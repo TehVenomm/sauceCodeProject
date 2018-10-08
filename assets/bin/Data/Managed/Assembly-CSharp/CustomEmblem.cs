@@ -36,7 +36,7 @@ public class CustomEmblem : GameSection
 	public unsafe void UpdateList()
 	{
 		GuildItemInfoModel.EmblemInfo[] infos = GuildItemManager.I.GetEmblemLayer1Infos();
-		_003CUpdateList_003Ec__AnonStorey331 _003CUpdateList_003Ec__AnonStorey;
+		_003CUpdateList_003Ec__AnonStorey336 _003CUpdateList_003Ec__AnonStorey;
 		SetDynamicList((Enum)UI.GRD_LIST_1, "EmblemLayer1Item", infos.Length, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		infos = GuildItemManager.I.GetEmblemLayer2Infos();
 		SetDynamicList((Enum)UI.GRD_LIST_2, "EmblemLayer2Item", infos.Length, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));

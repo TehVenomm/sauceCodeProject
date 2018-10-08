@@ -3,8 +3,8 @@ using UnityEngine;
 
 public static class NGUIMath
 {
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static float Lerp(float from, float to, float factor)
 	{
 		return from * (1f - factor) + to * factor;
@@ -17,8 +17,8 @@ public static class NGUIMath
 		return (val >= 0) ? ((val >= max) ? (max - 1) : val) : 0;
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static int RepeatIndex(int val, int max)
 	{
 		if (max < 1)
@@ -36,8 +36,8 @@ public static class NGUIMath
 		return val;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static float WrapAngle(float angle)
 	{
 		while (angle > 180f)
@@ -107,8 +107,8 @@ public static class NGUIMath
 		}
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static char DecimalToHexChar(int num)
 	{
 		if (num > 15)
@@ -122,24 +122,24 @@ public static class NGUIMath
 		return (char)(65 + num - 10);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static string DecimalToHex8(int num)
 	{
 		num &= 0xFF;
 		return num.ToString("X2");
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static string DecimalToHex24(int num)
 	{
 		num &= 0xFFFFFF;
 		return num.ToString("X6");
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static string DecimalToHex32(int num)
 	{
 		return num.ToString("X8");
@@ -156,8 +156,8 @@ public static class NGUIMath
 		return num | Mathf.RoundToInt(c.a * 255f);
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static Color IntToColor(int val)
 	{
 		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
@@ -172,8 +172,8 @@ public static class NGUIMath
 		return black;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static string IntToBinary(int val, int bits)
 	{
 		string text = string.Empty;
@@ -189,8 +189,8 @@ public static class NGUIMath
 		return text;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static Color HexToColor(uint val)
 	{
 		//IL_0001: Unknown result type (might be due to invalid IL or missing references)

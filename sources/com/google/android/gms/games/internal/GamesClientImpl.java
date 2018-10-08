@@ -2127,10 +2127,10 @@ public final class GamesClientImpl extends com.google.android.gms.common.interna
     }
 
     public final Player zzapw() {
-        AbstractDataBuffer playerBuffer;
         zzaji();
         synchronized (this) {
             if (this.zzhea == null) {
+                AbstractDataBuffer playerBuffer;
                 try {
                     playerBuffer = new PlayerBuffer(((zzj) zzajj()).zzaqv());
                     if (playerBuffer.getCount() > 0) {

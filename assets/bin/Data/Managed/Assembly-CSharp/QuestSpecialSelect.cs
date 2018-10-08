@@ -617,8 +617,8 @@ public class QuestSpecialSelect : GameSection
 					areaInfos.Add(new AreaQuestInfo(data, areaBanners[i], cleared, flag));
 				}
 			}
-			_003CSetDeliveryList_003Ec__AnonStorey3B9 _003CSetDeliveryList_003Ec__AnonStorey3B;
-			SetDynamicList((Enum)UI.GRD_AREA, "QuestAreaListItem", areaInfos.Count, true, null, null, new Action<int, Transform, bool>((object)_003CSetDeliveryList_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSetDeliveryList_003Ec__AnonStorey3BF _003CSetDeliveryList_003Ec__AnonStorey3BF;
+			SetDynamicList((Enum)UI.GRD_AREA, "QuestAreaListItem", areaInfos.Count, true, null, null, new Action<int, Transform, bool>((object)_003CSetDeliveryList_003Ec__AnonStorey3BF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			isDeliveryGridReset = false;
 			RepositionAreaGrid();
 		}
@@ -629,8 +629,8 @@ public class QuestSpecialSelect : GameSection
 			SetActive((Enum)UI.GRD_DELIVERY, list.Length > 0);
 			SetActive((Enum)UI.LBL_DELIVERY_NON_LIST, list.Length == 0);
 			SetActive((Enum)UI.OBJ_DELIVERY_BAR, true);
-			_003CSetDeliveryList_003Ec__AnonStorey3BA _003CSetDeliveryList_003Ec__AnonStorey3BA;
-			SetDynamicList((Enum)UI.GRD_DELIVERY, "QuestRequestItem", list.Length, isDeliveryGridReset, null, null, new Action<int, Transform, bool>((object)_003CSetDeliveryList_003Ec__AnonStorey3BA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSetDeliveryList_003Ec__AnonStorey3C0 _003CSetDeliveryList_003Ec__AnonStorey3C;
+			SetDynamicList((Enum)UI.GRD_DELIVERY, "QuestRequestItem", list.Length, isDeliveryGridReset, null, null, new Action<int, Transform, bool>((object)_003CSetDeliveryList_003Ec__AnonStorey3C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			isDeliveryGridReset = false;
 			ShowNonDeliveryList();
 		}
@@ -983,8 +983,8 @@ public class QuestSpecialSelect : GameSection
 		changeToDeliveryClearEvent = true;
 		bool is_tutorial = !TutorialStep.HasFirstDeliveryCompleted();
 		bool enable_clear_event = table.clearEventID != 0;
-		_003CSendDeliveryComplete_003Ec__AnonStorey3BD _003CSendDeliveryComplete_003Ec__AnonStorey3BD;
-		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo[index].uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003CSendDeliveryComplete_003Ec__AnonStorey3BD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendDeliveryComplete_003Ec__AnonStorey3C3 _003CSendDeliveryComplete_003Ec__AnonStorey3C;
+		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo[index].uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003CSendDeliveryComplete_003Ec__AnonStorey3C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public void OnQuery_SELECT_QUEST()
@@ -1261,7 +1261,7 @@ public class QuestSpecialSelect : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<WorldMapManager>.I.SendRegionOpen(releaseRegionId, delegate(bool isSuccess)
 			{
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess, null, false);
 				if (isSuccess)
 				{
 					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(auto_event_data);

@@ -91,13 +91,13 @@ public class ChatStampAll
 			if (MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count > i)
 			{
 				int index2 = i;
-				_003CInitStampList_003Ec__AnonStorey2E2 _003CInitStampList_003Ec__AnonStorey2E;
+				_003CInitStampList_003Ec__AnonStorey2E7 _003CInitStampList_003Ec__AnonStorey2E;
 				InitStampItem(MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[index2], iTransform, new Action((object)_003CInitStampList_003Ec__AnonStorey2E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			else
 			{
 				int index = i - MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count;
-				_003CInitStampList_003Ec__AnonStorey2E3 _003CInitStampList_003Ec__AnonStorey2E2;
+				_003CInitStampList_003Ec__AnonStorey2E8 _003CInitStampList_003Ec__AnonStorey2E2;
 				InitStampItem((int)currentUnlockStamps[index].id, iTransform, new Action((object)_003CInitStampList_003Ec__AnonStorey2E2, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}

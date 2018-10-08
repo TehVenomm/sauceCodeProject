@@ -49,36 +49,36 @@ final class zzeea<FieldDescriptorType extends zzeec<FieldDescriptorType>> {
     private static void zza(zzefz zzefz, Object obj) {
         boolean z = false;
         zzeen.zzu(obj);
-        switch (zzefz.zzcdq()) {
-            case INT:
+        switch (zzeeb.zzmyp[zzefz.zzcdq().ordinal()]) {
+            case 1:
                 z = obj instanceof Integer;
                 break;
-            case LONG:
+            case 2:
                 z = obj instanceof Long;
                 break;
-            case FLOAT:
+            case 3:
                 z = obj instanceof Float;
                 break;
-            case DOUBLE:
+            case 4:
                 z = obj instanceof Double;
                 break;
-            case BOOLEAN:
+            case 5:
                 z = obj instanceof Boolean;
                 break;
-            case STRING:
+            case 6:
                 z = obj instanceof String;
                 break;
-            case BYTE_STRING:
+            case 7:
                 if ((obj instanceof zzedk) || (obj instanceof byte[])) {
                     z = true;
                     break;
                 }
-            case ENUM:
+            case 8:
                 if ((obj instanceof Integer) || (obj instanceof zzeeo)) {
                     z = true;
                     break;
                 }
-            case MESSAGE:
+            case 9:
                 if ((obj instanceof zzeey) || (obj instanceof zzeet)) {
                     z = true;
                     break;

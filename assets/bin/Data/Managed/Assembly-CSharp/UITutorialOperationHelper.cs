@@ -457,6 +457,12 @@ public class UITutorialOperationHelper
 
 		private Action OnCloseHelp;
 
+		[SerializeField]
+		private UITweenCtrl moveCtrl;
+
+		[SerializeField]
+		private UITweenCtrl attackCtrl;
+
 		public void SetLabel(int counter)
 		{
 			if (okLbl != null)
@@ -472,6 +478,8 @@ public class UITutorialOperationHelper
 
 		public void ShowHelpPicture(Action OnCloseHelp)
 		{
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
 			if (OnCloseHelp != null)
 			{
 				this.OnCloseHelp = OnCloseHelp;
@@ -487,15 +495,19 @@ public class UITutorialOperationHelper
 			{
 				helpUI.SetActive(true);
 			}
-			if (helpImage_1 != null && helpImage_2 != null)
+			helpImage_1.SetActive(false);
+			helpImage_2.SetActive(false);
+			helpImageIOS_1.SetActive(false);
+			helpImageIOS_2.SetActive(false);
+			if (moveCtrl != null)
 			{
-				helpImage_1.SetActive(true);
-				helpImage_2.SetActive(true);
+				moveCtrl.get_gameObject().SetActive(true);
+				moveCtrl.Play(true, null);
 			}
-			if (helpImageIOS_1 != null && helpImageIOS_2 != null)
+			if (attackCtrl != null)
 			{
-				helpImageIOS_1.SetActive(false);
-				helpImageIOS_2.SetActive(false);
+				attackCtrl.get_gameObject().SetActive(true);
+				attackCtrl.Play(true, null);
 			}
 		}
 

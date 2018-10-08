@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Toggle")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/Interaction/Toggle")]
 public class UIToggle : UIWidgetContainer
 {
 	public delegate bool Validate(bool choice);
@@ -31,24 +31,24 @@ public class UIToggle : UIWidgetContainer
 
 	public Validate validator;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private UISprite checkSprite;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Animation checkAnimation;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private GameObject eventReceiver;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private string functionName = "OnActivate";
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool startsChecked;
 
 	private bool mIsActive = true;

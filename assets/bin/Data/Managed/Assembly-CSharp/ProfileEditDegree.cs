@@ -362,7 +362,7 @@ public class ProfileEditDegree : GameSection
 		requestSendForm.degid3 = currentDegrees[3].ToString();
 		Protocol.Send(DegreeEquipModel.URL, requestSendForm, delegate(DegreeEquipModel x)
 		{
-			GameSection.ResumeEvent(x.Error == Error.None, null);
+			GameSection.ResumeEvent(x.Error == Error.None, null, false);
 			if (x.Error == Error.None)
 			{
 				RequestEvent("[BACK]", null);

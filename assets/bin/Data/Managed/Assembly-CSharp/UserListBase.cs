@@ -124,7 +124,7 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 		GameSection.StayEvent();
 		this.StartCoroutine(GetPrevPage(delegate(bool b)
 		{
-			GameSection.ResumeEvent(b, null);
+			GameSection.ResumeEvent(b, null, false);
 		}));
 	}
 
@@ -134,7 +134,7 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 		GameSection.StayEvent();
 		this.StartCoroutine(GetNextPage(delegate(bool b)
 		{
-			GameSection.ResumeEvent(b, null);
+			GameSection.ResumeEvent(b, null, false);
 		}));
 	}
 }

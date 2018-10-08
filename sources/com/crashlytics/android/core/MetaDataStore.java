@@ -68,12 +68,12 @@ class MetaDataStore {
     }
 
     public Map<String, String> readKeyData(String str) {
-        Closeable fileInputStream;
         Throwable e;
         File keysFileForSession = getKeysFileForSession(str);
         if (!keysFileForSession.exists()) {
             return Collections.emptyMap();
         }
+        Closeable fileInputStream;
         try {
             fileInputStream = new FileInputStream(keysFileForSession);
             try {
@@ -193,9 +193,9 @@ class MetaDataStore {
     }
 
     public void writeUserData(String str, UserMetaData userMetaData) {
+        Closeable bufferedWriter;
         Throwable e;
         File userDataFileForSession = getUserDataFileForSession(str);
-        Closeable bufferedWriter;
         try {
             String userDataToJson = userDataToJson(userMetaData);
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(userDataFileForSession), UTF_8));

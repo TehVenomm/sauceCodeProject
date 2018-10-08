@@ -272,7 +272,7 @@ public class LoungeQuestBoard : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<PartyManager>.I.SendEntry(MonoBehaviourSingleton<LoungeMatchingManager>.I.parties[index].id, true, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 	}
@@ -283,7 +283,7 @@ public class LoungeQuestBoard : GameSection
 		GameSection.StayEvent();
 		this.StartCoroutine(Reload(delegate(bool b)
 		{
-			GameSection.ResumeEvent(b, null);
+			GameSection.ResumeEvent(b, null, false);
 		}));
 	}
 
@@ -303,7 +303,7 @@ public class LoungeQuestBoard : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate(bool isSuccess)
 			{
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess, null, false);
 			}, false);
 		}
 	}

@@ -23,8 +23,8 @@ namespace GetSocialSdk.Core
 		{
 			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Expected O, but got Unknown
-			_003CpresentChannelInterface_003Ec__AnonStorey7F0 _003CpresentChannelInterface_003Ec__AnonStorey7F;
-			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003CpresentChannelInterface_003Ec__AnonStorey7F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CpresentChannelInterface_003Ec__AnonStorey803 _003CpresentChannelInterface_003Ec__AnonStorey;
+			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003CpresentChannelInterface_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 }

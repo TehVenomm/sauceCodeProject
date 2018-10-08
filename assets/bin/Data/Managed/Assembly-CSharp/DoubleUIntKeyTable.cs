@@ -22,7 +22,7 @@ public class DoubleUIntKeyTable<T> : UIntKeyTable<UIntKeyTable<T>>
 
 	public unsafe void ForEachDoubleKeyValue(Action<uint, uint, T> a)
 	{
-		_003CForEachDoubleKeyValue_003Ec__AnonStorey557 _003CForEachDoubleKeyValue_003Ec__AnonStorey;
+		_003CForEachDoubleKeyValue_003Ec__AnonStorey561 _003CForEachDoubleKeyValue_003Ec__AnonStorey;
 		ForEachKeyValue(new Action<uint, UIntKeyTable<uint>>((object)_003CForEachDoubleKeyValue_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -42,7 +42,7 @@ public class DoubleUIntKeyTable<T> : UIntKeyTable<UIntKeyTable<T>>
 			return false;
 		}
 		bool isEqual = true;
-		_003CEquals_003Ec__AnonStorey559 _003CEquals_003Ec__AnonStorey;
+		_003CEquals_003Ec__AnonStorey563 _003CEquals_003Ec__AnonStorey;
 		ForEachDoubleKeyValue(new Action<uint, uint, uint>((object)_003CEquals_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		return isEqual;
 	}

@@ -106,8 +106,13 @@ public class TutorialNameInputDialog : GameSection
 		string text = GetInputName().Replace(" ", string.Empty);
 		send_form.name = ((!(text == initName.Replace(" ", string.Empty))) ? text : "/colopl_rob");
 		send_form.crystalCL = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
-		_003CSendEditFigure_003Ec__AnonStorey4A5 _003CSendEditFigure_003Ec__AnonStorey4A;
-		Protocol.Force(new Action((object)_003CSendEditFigure_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendEditFigure_003Ec__AnonStorey4AF _003CSendEditFigure_003Ec__AnonStorey4AF;
+		Protocol.Force(new Action((object)_003CSendEditFigure_003Ec__AnonStorey4AF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		PlayerPrefs.SetString("Tut_Name", send_form.name);
+	}
+
+	private void OnQuery_CLOSE()
+	{
+		GameSection.BackSection();
 	}
 }

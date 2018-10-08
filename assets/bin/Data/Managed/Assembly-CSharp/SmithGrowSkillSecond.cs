@@ -141,8 +141,8 @@ public class SmithGrowSkillSecond : ItemDetailSkill
 			Object.Destroy(val.get_gameObject());
 		}
 		int material_num = (material != null) ? material.Length : 0;
-		_003CUpdateUI_003Ec__AnonStorey488 _003CUpdateUI_003Ec__AnonStorey;
-		SetGrid(UI.GRD_MATERIAL, null, MATERIAL_SELECT_MAX, false, new Func<int, Transform, Transform>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateUI_003Ec__AnonStorey48E _003CUpdateUI_003Ec__AnonStorey48E;
+		SetGrid(UI.GRD_MATERIAL, null, MATERIAL_SELECT_MAX, false, new Func<int, Transform, Transform>((object)_003CUpdateUI_003Ec__AnonStorey48E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey48E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		int exceedCnt = skillItem.exceedCnt;
 		SetActive((Enum)UI.OBJ_LV_EX, exceedCnt > 0);
 		if (exceedCnt > 0)

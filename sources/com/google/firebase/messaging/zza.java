@@ -410,7 +410,7 @@ final class zza {
                             zze = zzae(bundle);
                             if (TextUtils.isEmpty(zze)) {
                                 uri = null;
-                            } else if (!InternalConstants.DEFAULT_LOCALE.equals(zze) || this.mContext.getResources().getIdentifier(zze, "raw", this.mContext.getPackageName()) == 0) {
+                            } else if (!"default".equals(zze) || this.mContext.getResources().getIdentifier(zze, "raw", this.mContext.getPackageName()) == 0) {
                                 uri = RingtoneManager.getDefaultUri(2);
                             } else {
                                 String packageName = this.mContext.getPackageName();
@@ -478,7 +478,7 @@ final class zza {
                         if (TextUtils.isEmpty(zze)) {
                             uri = null;
                         } else {
-                            if (InternalConstants.DEFAULT_LOCALE.equals(zze)) {
+                            if ("default".equals(zze)) {
                             }
                             uri = RingtoneManager.getDefaultUri(2);
                         }
@@ -556,7 +556,7 @@ final class zza {
             if (TextUtils.isEmpty(zze)) {
                 uri = null;
             } else {
-                if (InternalConstants.DEFAULT_LOCALE.equals(zze)) {
+                if ("default".equals(zze)) {
                 }
                 uri = RingtoneManager.getDefaultUri(2);
             }
@@ -618,7 +618,7 @@ final class zza {
         zzqc = zzqc(zze(bundle, "gcm.n.color"));
         zze = zzae(bundle);
         if (TextUtils.isEmpty(zze)) {
-            if (InternalConstants.DEFAULT_LOCALE.equals(zze)) {
+            if ("default".equals(zze)) {
             }
             uri = RingtoneManager.getDefaultUri(2);
         } else {

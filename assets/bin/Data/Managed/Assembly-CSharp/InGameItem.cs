@@ -151,7 +151,7 @@ public class InGameItem : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<ShopManager>.I.SendGetShop(delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 }

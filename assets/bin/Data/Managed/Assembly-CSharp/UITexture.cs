@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/NGUI Texture")]
+[ExecuteInEditMode]
 public class UITexture : UIBasicSprite
 {
 	[SerializeField]
@@ -13,20 +13,20 @@ public class UITexture : UIBasicSprite
 	[SerializeField]
 	private Texture mTexture;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Material mMat;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Shader mShader;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Vector4 mBorder = Vector4.get_zero();
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private bool mFixedAspect;
 
 	[NonSerialized]

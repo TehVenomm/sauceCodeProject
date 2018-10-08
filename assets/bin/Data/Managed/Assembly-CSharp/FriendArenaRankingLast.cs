@@ -136,7 +136,7 @@ public class FriendArenaRankingLast : FriendArenaRankingBase
 			GameSection.StayEvent();
 			SendGetList(nowPage, delegate(bool b)
 			{
-				GameSection.ResumeEvent(b, null);
+				GameSection.ResumeEvent(b, null, false);
 				Refresh();
 				DragToOwn();
 			});
@@ -156,8 +156,8 @@ public class FriendArenaRankingLast : FriendArenaRankingBase
 	protected unsafe override void SendGetList(int nowPage, Action<bool> callback)
 	{
 		int isContaionSelf = isOwn ? 1 : 0;
-		_003CSendGetList_003Ec__AnonStorey318 _003CSendGetList_003Ec__AnonStorey;
-		MonoBehaviourSingleton<FriendManager>.I.SendGetLastRanking(-1, isContaionSelf, new Action<bool, ArenaLastRankingModel.Param>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendGetList_003Ec__AnonStorey31D _003CSendGetList_003Ec__AnonStorey31D;
+		MonoBehaviourSingleton<FriendManager>.I.SendGetLastRanking(-1, isContaionSelf, new Action<bool, ArenaLastRankingModel.Param>((object)_003CSendGetList_003Ec__AnonStorey31D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public override void OnQuery_FOLLOW_INFO()

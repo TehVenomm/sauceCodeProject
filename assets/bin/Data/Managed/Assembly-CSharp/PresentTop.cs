@@ -78,7 +78,7 @@ public class PresentTop : GameSection
 		{
 			if (is_on_query_event)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			}
 		});
 	}

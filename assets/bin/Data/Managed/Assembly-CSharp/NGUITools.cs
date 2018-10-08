@@ -1339,15 +1339,15 @@ public static class NGUITools
 		return Object.op_Implicit(mb) && mb.get_enabled() && mb.get_gameObject().get_activeInHierarchy();
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static bool GetActive(GameObject go)
 	{
 		return Object.op_Implicit(go) && go.get_activeInHierarchy();
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static void SetActiveSelf(GameObject go, bool state)
 	{
 		go.SetActive(state);

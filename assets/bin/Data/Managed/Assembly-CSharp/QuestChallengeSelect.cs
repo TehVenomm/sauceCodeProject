@@ -192,8 +192,8 @@ public class QuestChallengeSelect : GameSection
 			Array.Copy(challengeList.ToArray(), num, challengeData, 0, num2);
 			bool isGuildRequest = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName().Contains("GuildRequest");
 			UIScrollView scrollView = GetCtrl(UI.SCR_ORDER_QUEST).GetComponent<UIScrollView>();
-			_003CShowChallenge_003Ec__AnonStorey36E _003CShowChallenge_003Ec__AnonStorey36E;
-			SetGrid(UI.GRD_ORDER_QUEST, "QuestListChallengeItem", challengeData.Length, isResetUI, new Func<int, Transform, Transform>((object)_003CShowChallenge_003Ec__AnonStorey36E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CShowChallenge_003Ec__AnonStorey36E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CShowChallenge_003Ec__AnonStorey373 _003CShowChallenge_003Ec__AnonStorey;
+			SetGrid(UI.GRD_ORDER_QUEST, "QuestListChallengeItem", challengeData.Length, isResetUI, new Func<int, Transform, Transform>((object)_003CShowChallenge_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CShowChallenge_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -215,7 +215,7 @@ public class QuestChallengeSelect : GameSection
 		//IL_0045: Expected O, but got Unknown
 		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005c: Expected O, but got Unknown
-		_003CPanelToStatic_003Ec__AnonStorey371 _003CPanelToStatic_003Ec__AnonStorey;
+		_003CPanelToStatic_003Ec__AnonStorey376 _003CPanelToStatic_003Ec__AnonStorey;
 		if (icon.isIconLoaded)
 		{
 			uiPanel.widgetsAreStatic = false;

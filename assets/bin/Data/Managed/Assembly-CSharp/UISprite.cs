@@ -5,8 +5,8 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class UISprite : UIBasicSprite
 {
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UIAtlas mAtlas;
 
 	[SerializeField]

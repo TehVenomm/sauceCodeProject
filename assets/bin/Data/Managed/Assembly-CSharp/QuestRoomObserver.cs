@@ -90,7 +90,7 @@ public class QuestRoomObserver
 							{
 								if (isStayEvent)
 								{
-									GameSceneEvent.Resume(null);
+									GameSceneEvent.Resume(null, false);
 								}
 								checkInviteListDone = true;
 							}, false);

@@ -149,8 +149,8 @@ public class HomePointShop : GameSection
 		SetLabelText((Enum)UI.LBL_ARROW_NOW, (maxPage <= 0) ? "0" : currentPage.ToString());
 		SetLabelText((Enum)UI.LBL_ARROW_MAX, maxPage.ToString());
 		int item_num = Mathf.Min(GameDefine.POINT_SHOP_LIST_COUNT, currentPointShopItem.Count - (currentPage - 1) * GameDefine.POINT_SHOP_LIST_COUNT);
-		_003CViewNormalTab_003Ec__AnonStorey39A _003CViewNormalTab_003Ec__AnonStorey39A;
-		SetGrid(UI.GRD_NORMAL, "PointShopListItem", item_num, true, new Action<int, Transform, bool>((object)_003CViewNormalTab_003Ec__AnonStorey39A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CViewNormalTab_003Ec__AnonStorey39F _003CViewNormalTab_003Ec__AnonStorey39F;
+		SetGrid(UI.GRD_NORMAL, "PointShopListItem", item_num, true, new Action<int, Transform, bool>((object)_003CViewNormalTab_003Ec__AnonStorey39F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		List<PointShop> source2 = pointShop;
 		if (_003C_003Ef__am_0024cache8 == null)
 		{
@@ -174,8 +174,8 @@ public class HomePointShop : GameSection
 			_003C_003Ef__am_0024cache9 = new Func<PointShop, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 		List<PointShop> current = source.Where(_003C_003Ef__am_0024cache9).ToList();
-		_003CViewEventTab_003Ec__AnonStorey39B _003CViewEventTab_003Ec__AnonStorey39B;
-		SetGrid(UI.GRD_EVENT_LIST, "PointShopEventList", current.Count, true, new Action<int, Transform, bool>((object)_003CViewEventTab_003Ec__AnonStorey39B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CViewEventTab_003Ec__AnonStorey3A0 _003CViewEventTab_003Ec__AnonStorey3A;
+		SetGrid(UI.GRD_EVENT_LIST, "PointShopEventList", current.Count, true, new Action<int, Transform, bool>((object)_003CViewEventTab_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnQuery_CONFIRM_BUY()
@@ -211,15 +211,15 @@ public class HomePointShop : GameSection
 		string boughtMessage = PointShopManager.GetBoughtMessage(item, num);
 		GameSection.SetEventData(boughtMessage);
 		GameSection.StayEvent();
-		_003COnBuy_003Ec__AnonStorey39C _003COnBuy_003Ec__AnonStorey39C;
-		PointShop pointShop = this.pointShop.First(new Func<PointShop, bool>((object)_003COnBuy_003Ec__AnonStorey39C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003COnBuy_003Ec__AnonStorey3A1 _003COnBuy_003Ec__AnonStorey3A;
+		PointShop pointShop = this.pointShop.First(new Func<PointShop, bool>((object)_003COnBuy_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		MonoBehaviourSingleton<UserInfoManager>.I.PointShopManager.SendPointShopBuy(item, pointShop, num, delegate(bool isSuccess)
 		{
 			if (isSuccess)
 			{
 				UpdateTab();
 			}
-			GameSection.ResumeEvent(isSuccess, null);
+			GameSection.ResumeEvent(isSuccess, null, false);
 		});
 	}
 

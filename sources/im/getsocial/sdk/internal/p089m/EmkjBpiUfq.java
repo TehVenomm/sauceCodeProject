@@ -161,11 +161,11 @@ public class EmkjBpiUfq {
 
     /* renamed from: b */
     private static boolean m2105b(Context context, Bitmap bitmap) {
+        Closeable fileOutputStream;
         IOException e;
         Throwable th;
         File file = new File(context.getCacheDir(), "getsocial-smartinvite-tempimage.jpg");
         if (!file.exists() || file.delete()) {
-            Closeable fileOutputStream;
             try {
                 if (file.createNewFile()) {
                     fileOutputStream = new FileOutputStream(file);

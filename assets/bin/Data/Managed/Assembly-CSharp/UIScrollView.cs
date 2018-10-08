@@ -2,8 +2,8 @@ using System;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Scroll View")]
-[RequireComponent(typeof(UIPanel))]
 [ExecuteInEditMode]
+[RequireComponent(typeof(UIPanel))]
 public class UIScrollView
 {
 	public enum Movement
@@ -68,12 +68,14 @@ public class UIScrollView
 
 	public OnDragNotification onStoppedMoving;
 
-	[HideInInspector]
+	public OnDragNotification onReachBottom;
+
 	[SerializeField]
+	[HideInInspector]
 	private Vector3 scale = new Vector3(1f, 0f, 0f);
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Vector2 relativePositionOnReset = Vector2.get_zero();
 
 	protected Transform mTrans;
@@ -103,6 +105,8 @@ public class UIScrollView
 	protected Vector2 mDragStartOffset = Vector2.get_zero();
 
 	protected bool mDragStarted;
+
+	protected bool mReachBottom;
 
 	[NonSerialized]
 	private bool mStarted;
@@ -426,6 +430,10 @@ public class UIScrollView
 					mMomentum.z = 0f;
 				}
 				mScroll = 0f;
+			}
+			if (val.y < 0f)
+			{
+				mReachBottom = true;
 			}
 			return true;
 		}
@@ -1040,7 +1048,7 @@ public class UIScrollView
 		//IL_032b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_038b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0390: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0418: Unknown result type (might be due to invalid IL or missing references)
 		if (Application.get_isPlaying())
 		{
 			float deltaTime = RealTime.deltaTime;
@@ -1134,6 +1142,11 @@ public class UIScrollView
 							if (onStoppedMoving != null)
 							{
 								onStoppedMoving();
+							}
+							if (mReachBottom && onReachBottom != null)
+							{
+								onReachBottom();
+								mReachBottom = false;
 							}
 						}
 					}

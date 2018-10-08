@@ -5,6 +5,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
 import com.google.android.gms.drive.DriveFile;
 import com.unity3d.player.UnityPlayer;
 import java.util.Arrays;
@@ -41,18 +42,21 @@ public class LocalNotificationHelper {
 
     public static void Register(int i, String str, String str2, int i2) {
         final Activity activity = UnityPlayer.currentActivity;
+        Util.dLog("Unity", "Register " + i + " ; " + str + " ; " + str2 + " ; " + i2);
         final int i3 = i;
         final String str3 = str;
         final String str4 = str2;
         final int i4 = i2;
         activity.runOnUiThread(new Runnable() {
             public void run() {
-                Intent intent = new Intent(activity, LocalNotificationAlarmReceiver.class);
-                intent.putExtra("id", i3);
-                intent.putExtra("title", str3);
-                intent.putExtra(LocalNotificationAlarmReceiver.EXTRA_BODY, str4);
-                intent.putExtra(LocalNotificationAlarmReceiver.EXTRA_SMALLICON, activity.getResources().getIdentifier("push_icon", "drawable", activity.getPackageName()));
-                intent.putExtra(LocalNotificationAlarmReceiver.EXTRA_ACTIVITY, activity.getClass());
+                Intent intent = new Intent("android.media.action.DISPLAY_NOTIFICATION");
+                intent.addCategory("android.intent.category.DEFAULT");
+                Bundle bundle = new Bundle();
+                bundle.putInt("id", i3);
+                bundle.putString("title", str3);
+                bundle.putString(LocalNotificationAlarmReceiver.EXTRA_BODY, str4);
+                intent.putExtras(bundle);
+                intent.setClass(activity, LocalNotificationAlarmReceiver.class);
                 PendingIntent broadcast = PendingIntent.getBroadcast(activity, i3, intent, 134217728);
                 Calendar instance = Calendar.getInstance();
                 instance.setTimeInMillis(System.currentTimeMillis());
@@ -93,6 +97,7 @@ public class LocalNotificationHelper {
         JSONArray jSONArray = new JSONArray(list);
         Editor edit = UnityPlayer.currentActivity.getSharedPreferences(REGISTERED_NOTIFICATIONS_STORE, 0).edit();
         edit.putString(REGISTERED_NOTIFICATIONS_KEY, jSONArray.toString());
+        Util.dLog("Unity", "storeRegisteredNotifications " + jSONArray.toString());
         edit.commit();
     }
 }

@@ -33,7 +33,7 @@ public class ConfigPPON : GameSection
 					(int)ret
 				});
 			}
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(true, null, false);
 		});
 	}
 }

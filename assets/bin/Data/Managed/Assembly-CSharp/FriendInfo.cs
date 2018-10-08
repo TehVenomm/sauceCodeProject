@@ -619,8 +619,8 @@ public class FriendInfo : SkillInfoBase
 	protected unsafe void SendFollow(List<int> send_follow_list, Action<bool> callback = null)
 	{
 		GameSection.StayEvent();
-		_003CSendFollow_003Ec__AnonStorey315 _003CSendFollow_003Ec__AnonStorey;
-		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(send_follow_list, new Action<Error, List<int>>((object)_003CSendFollow_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendFollow_003Ec__AnonStorey31A _003CSendFollow_003Ec__AnonStorey31A;
+		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(send_follow_list, new Action<Error, List<int>>((object)_003CSendFollow_003Ec__AnonStorey31A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected void SendUnFollow(int send_unfollow, Action<bool> callback = null)
@@ -632,7 +632,7 @@ public class FriendInfo : SkillInfoBase
 			{
 				callback(is_success);
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -645,7 +645,7 @@ public class FriendInfo : SkillInfoBase
 			{
 				callback(is_success);
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -666,7 +666,7 @@ public class FriendInfo : SkillInfoBase
 					friendCharaInfo.following = false;
 				}
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -679,7 +679,7 @@ public class FriendInfo : SkillInfoBase
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<BlackListManager>.I.SendDelete(data.userId, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -799,7 +799,7 @@ public class FriendInfo : SkillInfoBase
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<FriendManager>.I.SendGetMessageDetailList(m_msgUserInfo.userId, 0, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 		MonoBehaviourSingleton<FriendManager>.I.SetNoReadMessageNum(MonoBehaviourSingleton<FriendManager>.I.noReadMessageNum - m_msgUserInfo.noReadNum);
 		m_msgUserInfo.noReadNum = 0;

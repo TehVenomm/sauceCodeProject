@@ -235,7 +235,7 @@ public class EquipSetDetailStatusAndAbilityTable : GameSection
 		string allAp = string.Empty;
 		string allAbilityDesc = string.Empty;
 		bool isEmpty = true;
-		_003CUpdateAbilityTable_003Ec__AnonStorey304 _003CUpdateAbilityTable_003Ec__AnonStorey;
+		_003CUpdateAbilityTable_003Ec__AnonStorey309 _003CUpdateAbilityTable_003Ec__AnonStorey;
 		SetGrid(UI.GRD_ABILITY, "EquipSetDetailAbilityTableItem", item_num, true, new Action<int, Transform, bool>((object)_003CUpdateAbilityTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		SetActive(base._transform, UI.OBJ_EMPTY, isEmpty);
 		SetLabelText(GetCtrl(UI.OBJ_EMPTY), UI.LBL_NO_ITEM, StringTable.Get(STRING_CATEGORY.COMMON, 19800u));

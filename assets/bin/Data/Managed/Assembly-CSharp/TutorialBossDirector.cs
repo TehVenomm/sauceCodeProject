@@ -209,7 +209,7 @@ public class TutorialBossDirector
 			new PlaySoundParam(11.3f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01, null),
 			new PlaySoundParam(11.93f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01, null),
 			new PlaySoundParam(13f, UITutorialOperationHelper.SE_ID_DRAGON_LANDING, null),
-			new PlaySoundParam(14.7f, UITutorialOperationHelper.SE_ID_DRAGON_CALL_01, () => ((_003CDoBattleStartDirection_003Ec__Iterator1FD)/*Error near IL_0169: stateMachine*/)._003C_003Ef__this.boss.head.get_position())
+			new PlaySoundParam(14.7f, UITutorialOperationHelper.SE_ID_DRAGON_CALL_01, () => ((_003CDoBattleStartDirection_003Ec__Iterator202)/*Error near IL_0169: stateMachine*/)._003C_003Ef__this.boss.head.get_position())
 		}));
 		this.StartCoroutine(WaitForTime(14.7f, new Action((object)/*Error near IL_01ad: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		while (cameraAnim.get_isPlaying())

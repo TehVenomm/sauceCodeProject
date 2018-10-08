@@ -196,8 +196,8 @@ public class QuestExploreSelectList : QuestEventSelectList
 				}
 			}
 			bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-			_003CUpdateTable_003Ec__AnonStorey417 _003CUpdateTable_003Ec__AnonStorey;
-			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateTable_003Ec__AnonStorey41D _003CUpdateTable_003Ec__AnonStorey41D;
+			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey41D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey41D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
 			component.set_enabled(true);
 			RepositionTable();
@@ -265,8 +265,8 @@ public class QuestExploreSelectList : QuestEventSelectList
 			bool enable_clear_event = table.clearEventID != 0;
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-			_003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey419 _003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey;
-			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo[num].uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey41F _003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey41F;
+			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo[num].uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey41F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		else
 		{

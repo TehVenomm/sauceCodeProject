@@ -119,7 +119,6 @@ public class ChatBotChatContext extends AbstractChatContext {
         }
 
         private void send(String str) {
-            InputStream bufferedInputStream;
             try {
                 HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(ChatBotChatContext.SERVICE_URL + ChatBotChatContext.this.chatBotConfig.getAppId()).openConnection();
                 try {
@@ -127,6 +126,7 @@ public class ChatBotChatContext extends AbstractChatContext {
                     httpURLConnection.setChunkedStreamingMode(0);
                     httpURLConnection.setRequestProperty(HttpRequest.HEADER_CONTENT_TYPE, "application/json");
                     OutputStream bufferedOutputStream = new BufferedOutputStream(httpURLConnection.getOutputStream());
+                    InputStream bufferedInputStream;
                     try {
                         JSONObject jSONObject = new JSONObject();
                         jSONObject.put(AccessToken.USER_ID_KEY, ChatBotChatContext.this.guid);

@@ -34,6 +34,18 @@ public class HomeInfoModel : BaseModel
 
 		public int pointShopBanner;
 
+		public int tradingDay;
+
+		public int tradingStatus;
+
+		public int tradingAccept;
+
+		public int tradingConditionDay;
+
+		public int tradingSellMinGem;
+
+		public int tradingSellMaxGem;
+
 		public bool isOneTimesOfferActive;
 
 		public ClanAdvisaryData advisory;

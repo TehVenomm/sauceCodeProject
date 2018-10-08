@@ -168,8 +168,8 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
 			bool initItem = false;
-			_003CLocalInventory_003Ec__AnonStorey479 _003CLocalInventory_003Ec__AnonStorey;
-			SetDynamicList((Enum)InventoryUI, string.Empty, localInventoryEquipData.Length, false, new Func<int, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CLocalInventory_003Ec__AnonStorey47F _003CLocalInventory_003Ec__AnonStorey47F;
+			SetDynamicList((Enum)InventoryUI, string.Empty, localInventoryEquipData.Length, false, new Func<int, bool>((object)_003CLocalInventory_003Ec__AnonStorey47F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CLocalInventory_003Ec__AnonStorey47F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			SetActive(GetCtrl(UI.OBJ_ROOT), UI.LBL_NO_ITEM, !initItem);
 			SetLabelText(GetCtrl(UI.OBJ_ROOT), UI.LBL_NO_ITEM, StringTable.Get(STRING_CATEGORY.COMMON, 19799u));
 		}

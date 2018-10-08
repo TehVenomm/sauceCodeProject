@@ -65,7 +65,7 @@ public class GuildDonateInvitationList : GameSection
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateInvitationList(delegate
 		{
 			_donateList = MonoBehaviourSingleton<GuildManager>.I.donateInviteList;
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(false, null, false);
 			RefreshUI();
 		}, false);
 	}

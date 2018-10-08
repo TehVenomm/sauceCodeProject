@@ -237,7 +237,7 @@ public class QuestOffLineChangeEquipSet : QuestChangeEquipSet
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<StatusManager>.I.CheckChangeEquipSet(selfCharaEquipSetNo, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 		MonoBehaviourSingleton<StatusManager>.I.SetLocalEquipSetNo(-1);
 		base.OnQuery_SECTION_BACK();
@@ -291,7 +291,7 @@ public class QuestOffLineChangeEquipSet : QuestChangeEquipSet
 				this.StartCoroutine(ReloadModelByLocalEquipSetCoroutine());
 				RefreshUI();
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 

@@ -22,22 +22,32 @@ class OpenIabHelper$17 implements Runnable {
     }
 
     public void run() {
+        Inventory queryInventory;
         IabResult iabResult;
-        Inventory inventory = null;
+        Throwable th;
         try {
-            inventory = this.this$0.queryInventory(this.val$querySkuDetails, this.val$moreItemSkus, this.val$moreSubsSkus);
-            iabResult = new IabResult(0, "Inventory refresh successful.");
-        } catch (Throwable e) {
-            Throwable th = e;
+            queryInventory = this.this$0.queryInventory(this.val$querySkuDetails, this.val$moreItemSkus, this.val$moreSubsSkus);
+            try {
+                iabResult = new IabResult(0, "Inventory refresh successful.");
+            } catch (Throwable e) {
+                th = e;
+                iabResult = th.getResult();
+                Logger.m4028e("queryInventoryAsync() Error : ", th);
+                OpenIabHelper.access$1800(this.this$0).post(new Runnable() {
+                    public void run() {
+                        if (OpenIabHelper.access$2100(OpenIabHelper$17.this.this$0) == 0) {
+                            OpenIabHelper$17.this.val$listener.onQueryInventoryFinished(iabResult, queryInventory);
+                        }
+                    }
+                });
+            }
+        } catch (Throwable e2) {
+            th = e2;
+            queryInventory = null;
             iabResult = th.getResult();
             Logger.m4028e("queryInventoryAsync() Error : ", th);
+            OpenIabHelper.access$1800(this.this$0).post(/* anonymous class already generated */);
         }
-        OpenIabHelper.access$1800(this.this$0).post(new Runnable() {
-            public void run() {
-                if (OpenIabHelper.access$2100(OpenIabHelper$17.this.this$0) == 0) {
-                    OpenIabHelper$17.this.val$listener.onQueryInventoryFinished(iabResult, inventory);
-                }
-            }
-        });
+        OpenIabHelper.access$1800(this.this$0).post(/* anonymous class already generated */);
     }
 }

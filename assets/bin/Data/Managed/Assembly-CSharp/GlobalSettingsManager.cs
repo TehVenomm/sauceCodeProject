@@ -656,6 +656,8 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 	public bool enableFortuneWheelBanner = true;
 
+	public bool enableTradingPostBanner = true;
+
 	public List<int> bossIdqQuest = new List<int>
 	{
 		994419202,
@@ -758,6 +760,40 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 		993218200,
 		300000522,
 		100000524
+	};
+
+	public List<ITEM_TYPE> itemMaterialType = new List<ITEM_TYPE>
+	{
+		ITEM_TYPE.MATERIAL_BONE,
+		ITEM_TYPE.MATERIAL_CLOTH,
+		ITEM_TYPE.MATERIAL_EQUIP,
+		ITEM_TYPE.MATERIAL_METAL,
+		ITEM_TYPE.MATERIAL_PELT,
+		ITEM_TYPE.MATERIAL_SCALE,
+		ITEM_TYPE.MATERIAL_WOOD,
+		ITEM_TYPE.UNIQUE_MATERIAL,
+		ITEM_TYPE.LITHOGRAPH
+	};
+
+	public List<ITEM_TYPE> itemItemType = new List<ITEM_TYPE>
+	{
+		ITEM_TYPE.ABILITY_ITEM,
+		ITEM_TYPE.USE_ITEM
+	};
+
+	public List<ITEM_TYPE> itemLapisType = new List<ITEM_TYPE>
+	{
+		ITEM_TYPE.LAPIS
+	};
+
+	public List<ITEM_TYPE> itemMagiType = new List<ITEM_TYPE>
+	{
+		ITEM_TYPE.MATERIAL_MAGI
+	};
+
+	public List<string> noBlurEffectForDeviceModel = new List<string>
+	{
+		"OnePlus"
 	};
 
 	private Quaternion initLightRot;

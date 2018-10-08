@@ -962,12 +962,12 @@ public class RegionMap : GameSection
 
 	private void OnQuery_SELECT_CHILD()
 	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		SpotEventData spotEventData = GameSection.GetEventData() as SpotEventData;
 		GameSection.StayEvent();
 		if (spotEventData == null)
 		{
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(false, null, false);
 		}
 		else
 		{
@@ -1038,7 +1038,7 @@ public class RegionMap : GameSection
 		SetFirstCameraPos();
 		isOpened = false;
 		OnOpen();
-		GameSection.ResumeEvent(true, null);
+		GameSection.ResumeEvent(true, null, false);
 		yield return (object)null;
 	}
 

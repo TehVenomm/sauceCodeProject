@@ -337,7 +337,7 @@ public class LoungeMemberInfo : FriendInfo
 			{
 				MonoBehaviourSingleton<LoungeManager>.I.HomePeople.DestroyLoungePlayer(data.userId);
 			}
-			GameSection.ResumeEvent(isSuccess, null);
+			GameSection.ResumeEvent(isSuccess, null, false);
 		}, data.userId);
 	}
 }

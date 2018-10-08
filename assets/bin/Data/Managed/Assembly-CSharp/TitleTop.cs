@@ -124,7 +124,7 @@ public class TitleTop : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			}, false);
 			tapEffect = ResourceUtility.Realizes(tapPrefab, -1);
 			if (null != tapEffect)
@@ -167,7 +167,7 @@ public class TitleTop : GameSection
 				{
 					GameSection.ChangeStayEvent("OPENING", null);
 				}
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 		else if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep > 0 && MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep <= 2)

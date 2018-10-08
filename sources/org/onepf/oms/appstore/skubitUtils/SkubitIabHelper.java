@@ -374,12 +374,12 @@ public class SkubitIabHelper implements AppstoreInAppBillingService {
     }
 
     public void processPurchaseSuccess(@NotNull Intent intent, @Nullable String str, @Nullable String str2) {
+        IabResult iabResult;
         Logger.m4025d("Successful resultcode from purchase activity.");
         Logger.m4026d("Purchase data: ", str);
         Logger.m4026d("Data signature: ", str2);
         Logger.m4026d("Extras: ", intent.getExtras());
         Logger.m4026d("Expected item type: ", this.mPurchasingItemType);
-        IabResult iabResult;
         if (str == null || str2 == null) {
             Logger.m4027e("In-app billing error: BUG: either purchaseData or dataSignature is null.");
             Logger.m4026d("Extras: ", intent.getExtras());
@@ -589,81 +589,80 @@ public class SkubitIabHelper implements AppstoreInAppBillingService {
         r4 = r1;
     L_0x00a9:
         r0 = r7.size();
-        if (r4 >= r0) goto L_0x0141;
+        if (r4 >= r0) goto L_0x0140;
     L_0x00af:
         r0 = r7.get(r4);
-        r2 = r0;
-        r2 = (java.lang.String) r2;
-        r0 = r8.get(r4);
         r0 = (java.lang.String) r0;
-        r1 = r6.get(r4);
+        r1 = r8.get(r4);
         r1 = (java.lang.String) r1;
+        r2 = r6.get(r4);
+        r2 = (java.lang.String) r2;
         r9 = r12.mSignatureBase64;
-        r9 = r12.isValidDataSignature(r9, r2, r0);
-        if (r9 == 0) goto L_0x011e;
-    L_0x00ca:
+        r9 = r12.isValidDataSignature(r9, r0, r1);
+        if (r9 == 0) goto L_0x011d;
+    L_0x00c9:
         r9 = 2;
         r9 = new java.lang.Object[r9];
         r10 = 0;
         r11 = "Sku is owned: ";
         r9[r10] = r11;
         r10 = 1;
-        r9[r10] = r1;
+        r9[r10] = r2;
         org.onepf.oms.util.Logger.m4026d(r9);
-        r1 = new org.onepf.oms.appstore.googleUtils.Purchase;
+        r2 = new org.onepf.oms.appstore.googleUtils.Purchase;
         r9 = r12.mAppstore;
         r9 = r9.getAppstoreName();
-        r1.<init>(r14, r2, r0, r9);
-        r0 = r1.getSku();
+        r2.<init>(r14, r0, r1, r9);
+        r1 = r2.getSku();
         r9 = org.onepf.oms.SkuManager.getInstance();
         r10 = r12.mAppstore;
         r10 = r10.getAppstoreName();
-        r0 = r9.getSku(r10, r0);
-        r1.setSku(r0);
-        r0 = r1.getToken();
-        r0 = android.text.TextUtils.isEmpty(r0);
-        if (r0 == 0) goto L_0x0115;
-    L_0x0102:
-        r0 = "In-app billing warning: BUG: empty/null token!";
-        org.onepf.oms.util.Logger.m4034w(r0);
-        r0 = 2;
-        r0 = new java.lang.Object[r0];
+        r1 = r9.getSku(r10, r1);
+        r2.setSku(r1);
+        r1 = r2.getToken();
+        r1 = android.text.TextUtils.isEmpty(r1);
+        if (r1 == 0) goto L_0x0114;
+    L_0x0101:
+        r1 = "In-app billing warning: BUG: empty/null token!";
+        org.onepf.oms.util.Logger.m4034w(r1);
+        r1 = 2;
+        r1 = new java.lang.Object[r1];
         r9 = 0;
         r10 = "Purchase data: ";
-        r0[r9] = r10;
+        r1[r9] = r10;
         r9 = 1;
-        r0[r9] = r2;
-        org.onepf.oms.util.Logger.m4026d(r0);
-    L_0x0115:
-        r13.addPurchase(r1);
+        r1[r9] = r0;
+        org.onepf.oms.util.Logger.m4026d(r1);
+    L_0x0114:
+        r13.addPurchase(r2);
         r0 = r3;
-    L_0x0119:
+    L_0x0118:
         r1 = r4 + 1;
         r3 = r0;
         r4 = r1;
         goto L_0x00a9;
-    L_0x011e:
-        r1 = "In-app billing warning: Purchase signature verification **FAILED**. Not adding item.";
-        org.onepf.oms.util.Logger.m4034w(r1);
-        r1 = 2;
-        r1 = new java.lang.Object[r1];
+    L_0x011d:
+        r2 = "In-app billing warning: Purchase signature verification **FAILED**. Not adding item.";
+        org.onepf.oms.util.Logger.m4034w(r2);
+        r2 = 2;
+        r2 = new java.lang.Object[r2];
         r3 = 0;
         r9 = "   Purchase data: ";
-        r1[r3] = r9;
+        r2[r3] = r9;
         r3 = 1;
-        r1[r3] = r2;
-        org.onepf.oms.util.Logger.m4026d(r1);
-        r1 = 2;
-        r1 = new java.lang.Object[r1];
+        r2[r3] = r0;
+        org.onepf.oms.util.Logger.m4026d(r2);
+        r0 = 2;
+        r0 = new java.lang.Object[r0];
         r2 = 0;
         r3 = "   Signature: ";
-        r1[r2] = r3;
+        r0[r2] = r3;
         r2 = 1;
-        r1[r2] = r0;
-        org.onepf.oms.util.Logger.m4026d(r1);
+        r0[r2] = r1;
+        org.onepf.oms.util.Logger.m4026d(r0);
         r0 = 1;
-        goto L_0x0119;
-    L_0x0141:
+        goto L_0x0118;
+    L_0x0140:
         r0 = "INAPP_CONTINUATION_TOKEN";
         r0 = r5.getString(r0);
         r1 = 2;
@@ -675,16 +674,16 @@ public class SkubitIabHelper implements AppstoreInAppBillingService {
         r1[r2] = r0;
         org.onepf.oms.util.Logger.m4026d(r1);
         r1 = android.text.TextUtils.isEmpty(r0);
-        if (r1 == 0) goto L_0x0164;
-    L_0x015b:
-        if (r3 == 0) goto L_0x0161;
-    L_0x015d:
+        if (r1 == 0) goto L_0x0163;
+    L_0x015a:
+        if (r3 == 0) goto L_0x0160;
+    L_0x015c:
         r0 = -1003; // 0xfffffffffffffc15 float:NaN double:NaN;
         goto L_0x003c;
-    L_0x0161:
+    L_0x0160:
         r0 = 0;
         goto L_0x003c;
-    L_0x0164:
+    L_0x0163:
         r1 = r0;
         r0 = r3;
         goto L_0x0024;

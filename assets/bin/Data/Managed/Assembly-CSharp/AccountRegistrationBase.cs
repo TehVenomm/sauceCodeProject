@@ -211,7 +211,7 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 				NetworkNative.GoogleAccount select_account = null;
 				if (googleAccountList == null || googleAccountList.googleAccounts.Count == 0)
 				{
-					GameSection.ResumeEvent(false, null);
+					GameSection.ResumeEvent(false, null, false);
 				}
 				else
 				{
@@ -224,7 +224,7 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 					});
 					MonoBehaviourSingleton<AccountManager>.I.SendRegistCreateGoogleAccount(select_account.name, select_account.key, inputText, inputText2, delegate(bool is_success)
 					{
-						GameSection.ResumeEvent(is_success, null);
+						GameSection.ResumeEvent(is_success, null, false);
 					});
 				}
 			}
@@ -232,7 +232,7 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 			{
 				MonoBehaviourSingleton<AccountManager>.I.SendRegistCreateRobAccount(mail_address, inputText, inputText2, secretQuestionIndex + 1, secretQuestionAnswer, delegate(bool is_success)
 				{
-					GameSection.ResumeEvent(is_success, null);
+					GameSection.ResumeEvent(is_success, null, false);
 				});
 			}
 		}

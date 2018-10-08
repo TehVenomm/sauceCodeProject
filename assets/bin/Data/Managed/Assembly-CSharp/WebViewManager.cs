@@ -68,6 +68,8 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 
 	public static string NewsWithLinkParamFormatFromInGame => "news/show?link={0}&at=1";
 
+	public static string TradingPost => "tradingpost/help";
+
 	public static string CreateNewsWithLinkParamUrl(string link_param)
 	{
 		return string.Format(NewsWithLinkParamFormat, link_param);

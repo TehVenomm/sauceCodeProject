@@ -21,6 +21,8 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 
 	public bool showFortuneWheel;
 
+	public bool showTradingPost;
+
 	public bool repeatPartyEnable;
 
 	public bool isWheelOfFortuneOn;
@@ -627,6 +629,10 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 				flag2 = ret.result.loginBonus;
 				oncePurchaseGachaProductId = ret.result.productId;
 				needShowOneTimesOfferSS = ret.result.isOneTimesOfferActive;
+				if (MonoBehaviourSingleton<TradingPostManager>.IsValid())
+				{
+					MonoBehaviourSingleton<TradingPostManager>.I.SetTradingPostInfo(ret.result);
+				}
 				partyInviteHome = ((!showJoinClanInGame) ? ret.result.party : PartyManager.IsValidNotEmptyList());
 				if (!partyInviteHome)
 				{

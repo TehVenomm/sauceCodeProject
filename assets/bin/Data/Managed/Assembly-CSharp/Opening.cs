@@ -321,7 +321,7 @@ public class Opening : GameSection
 					MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_login, "Tutorial", values);
 				}
 				isRegisted = is_success;
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 		else
@@ -369,7 +369,7 @@ public class Opening : GameSection
 					MonoBehaviourSingleton<NativeGameService>.I.SetOldUserLogin();
 				}
 			}
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success, null, false);
 		});
 	}
 

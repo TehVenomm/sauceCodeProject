@@ -29,7 +29,7 @@ public class QuestStartChangeEquipSet : QuestChangeEquipSet
 			{
 				selectSection.SuccessChangeEquipSet();
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 }

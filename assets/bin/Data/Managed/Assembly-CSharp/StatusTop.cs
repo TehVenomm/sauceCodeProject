@@ -608,7 +608,7 @@ public class StatusTop : SkillInfoBase
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<StatusManager>.I.CheckChangeEquip(equipSetNo, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 			base.OnQuery_MAIN_MENU_QUEST();
 		});
 	}
@@ -619,7 +619,7 @@ public class StatusTop : SkillInfoBase
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<StatusManager>.I.CheckChangeEquip(equipSetNo, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -782,7 +782,7 @@ public class StatusTop : SkillInfoBase
 				ResetEquipSetCopy();
 				DrawEquipSetCopyModeButton();
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 

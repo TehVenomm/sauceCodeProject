@@ -89,7 +89,7 @@ public class ItemStorageSell : ItemStorageTop
 		}
 	}
 
-	private void InitializeCaption()
+	private new void InitializeCaption()
 	{
 		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);

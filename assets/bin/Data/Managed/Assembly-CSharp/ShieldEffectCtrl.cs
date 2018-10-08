@@ -21,20 +21,20 @@ public class ShieldEffectCtrl
 	[Tooltip("LOOPを指定")]
 	private Transform targetRotateRoot;
 
-	[SerializeField]
 	[Tooltip("HITを指定")]
+	[SerializeField]
 	private Transform hitEffectRoot;
 
 	[SerializeField]
 	[Tooltip("エフェクトのク\u30fcルタイム")]
 	private float effectTime = 0.5f;
 
-	[SerializeField]
 	[Tooltip("1秒で回転する角度")]
+	[SerializeField]
 	private float rotateSpeed = 180f;
 
-	[SerializeField]
 	[Tooltip("シ\u30fcルドHPが0の時のScale")]
+	[SerializeField]
 	private Vector3 afterScale;
 
 	[SerializeField]

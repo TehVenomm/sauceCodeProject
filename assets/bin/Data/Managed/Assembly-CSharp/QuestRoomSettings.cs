@@ -101,7 +101,7 @@ public class QuestRoomSettings : GameSection
 				{
 					MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
 				}
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 		else
@@ -112,7 +112,7 @@ public class QuestRoomSettings : GameSection
 				{
 					MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
 				}
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 	}

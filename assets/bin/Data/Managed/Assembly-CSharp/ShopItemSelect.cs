@@ -63,14 +63,14 @@ public class ShopItemSelect : GameSection
 			{
 			case Error.None:
 				selectEventData[6] = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(true, null, false);
 				break;
 			case Error.ERR_CRYSTAL_NOT_ENOUGH:
 				GameSection.ChangeStayEvent("NOT_ENOUGTH", null);
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(true, null, false);
 				break;
 			default:
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(false, null, false);
 				break;
 			}
 		});

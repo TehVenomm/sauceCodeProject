@@ -63,8 +63,8 @@ public class MutualFollowFBInviteDialog : GameSection
 	{
 		List<FBManager.FriendData> friendList = invitable_friend_info.data;
 		int i = 0;
-		_003C_UpdateListFriend_003Ec__AnonStorey3FD _003C_UpdateListFriend_003Ec__AnonStorey3FD;
-		SetWrapContentFilter(UI.WRP_LIST, "MutualFollowFBInviteListItem", friendList.Count, false, new Action<int, Transform, bool>((object)_003C_UpdateListFriend_003Ec__AnonStorey3FD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<int, string, bool>((object)_003C_UpdateListFriend_003Ec__AnonStorey3FD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003C_UpdateListFriend_003Ec__AnonStorey403 _003C_UpdateListFriend_003Ec__AnonStorey;
+		SetWrapContentFilter(UI.WRP_LIST, "MutualFollowFBInviteListItem", friendList.Count, false, new Action<int, Transform, bool>((object)_003C_UpdateListFriend_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<int, string, bool>((object)_003C_UpdateListFriend_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void _UpdateSelected()

@@ -307,8 +307,8 @@ public class GuildSmithGrow : EquipMaterialBase
 				GameSection.SetEventData(result_data);
 				isNotifySelfUpdate = true;
 				GameSection.StayEvent();
-				_003CSend_003Ec__AnonStorey35C _003CSend_003Ec__AnonStorey35C;
-				MonoBehaviourSingleton<SmithManager>.I.SendGrowEquipItem(selectEquipData.uniqueID, aimLv, new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey35C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CSend_003Ec__AnonStorey361 _003CSend_003Ec__AnonStorey;
+				MonoBehaviourSingleton<SmithManager>.I.SendGrowEquipItem(selectEquipData.uniqueID, aimLv, new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}
@@ -433,7 +433,7 @@ public class GuildSmithGrow : EquipMaterialBase
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest(itemID, itemName, request, numRequest, delegate(bool success)
 		{
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success, null, false);
 			if (success)
 			{
 				((_003CCRSendDonateRequest_003Ec__Iterator6E)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;

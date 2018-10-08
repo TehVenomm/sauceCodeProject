@@ -94,6 +94,8 @@ public class CrystalShopTop : GameSection
 		SPR_ONETIMESOFFER
 	}
 
+	private const string TRADING_POST_LICENSE = "TradingPostLicense";
+
 	private List<ProductData> _purchaseGemList = new List<ProductData>();
 
 	private List<ProductData> _purchaseBundleList = new List<ProductData>();
@@ -270,8 +272,8 @@ public class CrystalShopTop : GameSection
 		SetActive(materialTab, false);
 		CheckOpenedGemTab();
 		int i = 0;
-		_003C_viewGemTab_003Ec__AnonStorey2F5 _003C_viewGemTab_003Ec__AnonStorey2F;
-		SetTable(gemTab, UI.TBL_LIST, "CrystalShopListItem", _purchaseGemList.Count, false, new Func<int, Transform, Transform>((object)_003C_viewGemTab_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003C_viewGemTab_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003C_viewGemTab_003Ec__AnonStorey2FA _003C_viewGemTab_003Ec__AnonStorey2FA;
+		SetTable(gemTab, UI.TBL_LIST, "CrystalShopListItem", _purchaseGemList.Count, false, new Func<int, Transform, Transform>((object)_003C_viewGemTab_003Ec__AnonStorey2FA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003C_viewGemTab_003Ec__AnonStorey2FA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void _viewBundleTab()
@@ -376,8 +378,8 @@ public class CrystalShopTop : GameSection
 		SetActive(materialTab, true);
 		CheckOpenedMaterialTab();
 		int i = 0;
-		_003C_viewMaterialTab_003Ec__AnonStorey2F9 _003C_viewMaterialTab_003Ec__AnonStorey2F;
-		SetTable(materialTab, UI.TBL_LIST, "CrystalShopListItemMaterial", _purchaseMaterialList.Count, false, new Action<int, Transform, bool>((object)_003C_viewMaterialTab_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003C_viewMaterialTab_003Ec__AnonStorey2FE _003C_viewMaterialTab_003Ec__AnonStorey2FE;
+		SetTable(materialTab, UI.TBL_LIST, "CrystalShopListItemMaterial", _purchaseMaterialList.Count, false, new Action<int, Transform, bool>((object)_003C_viewMaterialTab_003Ec__AnonStorey2FE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnGetProductDatas(StoreDataList list)
@@ -607,10 +609,10 @@ public class CrystalShopTop : GameSection
 			{
 			case Error.WRN_GOLD_OVER_LIMITTER_OVERUSE:
 				GameSection.ChangeStayEvent("STOPPER", null);
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(true, null, false);
 				break;
 			default:
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(false, null, false);
 				break;
 			case Error.None:
 				DoPurchase();
@@ -629,7 +631,7 @@ public class CrystalShopTop : GameSection
 	{
 		isPurchase = false;
 		GameSection.ChangeStayEvent("BILLING_UNAVAILABLE", null);
-		GameSection.ResumeEvent(true, null);
+		GameSection.ResumeEvent(true, null, false);
 	}
 
 	private void OnBuyItem(string productId)
@@ -655,7 +657,7 @@ public class CrystalShopTop : GameSection
 		if (isPurchase)
 		{
 			_enableChest();
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(false, null, false);
 		}
 	}
 
@@ -670,7 +672,7 @@ public class CrystalShopTop : GameSection
 		if (isPurchase)
 		{
 			_enableChest();
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(false, null, false);
 		}
 	}
 
@@ -688,13 +690,13 @@ public class CrystalShopTop : GameSection
 				{
 					_disableChest();
 					GameSection.ChangeStayEvent("SPECIAL_NOTICE", product_data);
-					GameSection.ResumeEvent(true, null);
+					GameSection.ResumeEvent(true, null, false);
 				});
 			}
 		}
 		if (isPurchase)
 		{
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(false, null, false);
 		}
 	}
 
@@ -714,7 +716,7 @@ public class CrystalShopTop : GameSection
 		}
 		if (isPurchase)
 		{
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(false, null, false);
 		}
 	}
 
@@ -722,23 +724,23 @@ public class CrystalShopTop : GameSection
 	{
 		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0027: Expected O, but got Unknown
-		_003CGetFinishAction_003Ec__AnonStorey2FE _003CGetFinishAction_003Ec__AnonStorey2FE;
-		return new Action((object)_003CGetFinishAction_003Ec__AnonStorey2FE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		_003CGetFinishAction_003Ec__AnonStorey303 _003CGetFinishAction_003Ec__AnonStorey;
+		return new Action((object)_003CGetFinishAction_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 	}
 
 	private unsafe Action GetFinishActionBundle(ShopReceiver.PaymentPurchaseData purchaseData)
 	{
 		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0020: Expected O, but got Unknown
-		_003CGetFinishActionBundle_003Ec__AnonStorey2FF _003CGetFinishActionBundle_003Ec__AnonStorey2FF;
-		return new Action((object)_003CGetFinishActionBundle_003Ec__AnonStorey2FF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		_003CGetFinishActionBundle_003Ec__AnonStorey304 _003CGetFinishActionBundle_003Ec__AnonStorey;
+		return new Action((object)_003CGetFinishActionBundle_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 	}
 
 	private unsafe Action GetFinishActionMaterial(ShopReceiver.PaymentPurchaseData purchaseData)
 	{
 		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0019: Expected O, but got Unknown
-		_003CGetFinishActionMaterial_003Ec__AnonStorey300 _003CGetFinishActionMaterial_003Ec__AnonStorey;
+		_003CGetFinishActionMaterial_003Ec__AnonStorey305 _003CGetFinishActionMaterial_003Ec__AnonStorey;
 		return new Action((object)_003CGetFinishActionMaterial_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 	}
 
@@ -754,7 +756,7 @@ public class CrystalShopTop : GameSection
 	{
 		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001a: Expected O, but got Unknown
-		_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey302 _003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey;
+		_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey307 _003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey;
 		SendRequestCurrentCrystal(new Action((object)_003CSendRequestCurrentPresentAndShopList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

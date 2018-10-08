@@ -15,8 +15,8 @@ public class AtkAttribute
 	[Tooltip("氷")]
 	public float water;
 
-	[FormerlySerializedAs("wind")]
 	[Tooltip("雷")]
+	[FormerlySerializedAs("wind")]
 	public float thunder;
 
 	[Tooltip("土")]

@@ -11,24 +11,24 @@ public class UIChatGimmickGizmo : UIStatusGizmoBase
 	[SerializeField]
 	protected TweenScale chatTween;
 
-	[SerializeField]
 	[Tooltip("スクリ\u30fcン横オフセット")]
+	[SerializeField]
 	protected float screenSideOffset = 36f;
 
 	[Tooltip("スクリ\u30fcン下オフセット")]
 	[SerializeField]
 	protected float screenBottomOffset = 107f;
 
-	[Tooltip("スクリ\u30fcン下オフセット、フィ\u30fcルド時")]
 	[SerializeField]
+	[Tooltip("スクリ\u30fcン下オフセット、フィ\u30fcルド時")]
 	protected float screenBottomFieldOffset = 107f;
 
 	[Tooltip("チャット横オフセット")]
 	[SerializeField]
 	protected float chatSideOffset = 60f;
 
-	[Tooltip("チャット上オフセット")]
 	[SerializeField]
+	[Tooltip("チャット上オフセット")]
 	protected float chatTopOffset = 120f;
 
 	private float sizeAdjust = 1f;

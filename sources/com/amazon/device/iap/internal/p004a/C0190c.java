@@ -280,6 +280,8 @@ public final class C0190c implements C0189c {
     /* renamed from: d */
     private ProductDataResponse m39d(Intent intent) {
         RequestId fromString;
+        ProductDataResponse.RequestStatus valueOf;
+        Map hashMap;
         RequestId requestId;
         Throwable th;
         Throwable e;
@@ -292,12 +294,10 @@ public final class C0190c implements C0189c {
         try {
             JSONObject jSONObject = new JSONObject(intent.getStringExtra("itemDataOutput"));
             fromString = RequestId.fromString(jSONObject.optString("requestId"));
-            ProductDataResponse.RequestStatus valueOf;
             try {
                 valueOf = ProductDataResponse.RequestStatus.valueOf(jSONObject.optString("status"));
                 try {
                     if (valueOf != ProductDataResponse.RequestStatus.FAILED) {
-                        Map hashMap;
                         Set linkedHashSet = new LinkedHashSet();
                         try {
                             hashMap = new HashMap();

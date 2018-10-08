@@ -82,7 +82,7 @@ public class AccountChangePasswordMail : AccountPopupAdjuster
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<AccountManager>.I.SendRegistChangePasswordRob(inputText, inputText2, inputText3, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 	}

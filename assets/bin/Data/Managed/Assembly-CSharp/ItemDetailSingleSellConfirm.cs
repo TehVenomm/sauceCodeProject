@@ -137,7 +137,7 @@ public class ItemDetailSingleSellConfirm : GameSection
 			GameSection.StayEvent();
 			SendItem(delegate(bool b)
 			{
-				GameSection.ResumeEvent(b, null);
+				GameSection.ResumeEvent(b, null, false);
 			});
 		}
 		else if (item is EquipItemSortData)
@@ -148,7 +148,7 @@ public class ItemDetailSingleSellConfirm : GameSection
 				if (!b)
 				{
 					Debug.LogWarning((object)"sellConfirm = false");
-					GameSection.ResumeEvent(false, null);
+					GameSection.ResumeEvent(false, null, false);
 				}
 				else
 				{
@@ -158,7 +158,7 @@ public class ItemDetailSingleSellConfirm : GameSection
 						item.GetUniqID().ToString()
 					}, delegate(bool is_success)
 					{
-						GameSection.ResumeEvent(is_success, null);
+						GameSection.ResumeEvent(is_success, null, false);
 					});
 				}
 			});
@@ -171,7 +171,7 @@ public class ItemDetailSingleSellConfirm : GameSection
 			GameSection.StayEvent();
 			SendSkill(list, delegate(bool b)
 			{
-				GameSection.ResumeEvent(b, null);
+				GameSection.ResumeEvent(b, null, false);
 			});
 		}
 		else if (item is AbilityItemSortData)
@@ -181,7 +181,7 @@ public class ItemDetailSingleSellConfirm : GameSection
 			list2.Add(item.GetUniqID().ToString());
 			SendAbilityItem(list2, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 	}
@@ -217,7 +217,7 @@ public class ItemDetailSingleSellConfirm : GameSection
 		if (is_exchange)
 		{
 			GameSection.StopEvent();
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(false, null, false);
 		}
 		else
 		{

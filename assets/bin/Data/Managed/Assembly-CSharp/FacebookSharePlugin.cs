@@ -19,8 +19,8 @@ public class FacebookSharePlugin : InviteChannelPlugin
 	private unsafe static void SendInvite(string referralDataUrl, Action completeCallback, Action cancelCallback, Action<GetSocialError> errorCallback)
 	{
 		Mobile.set_ShareDialogMode(2);
-		_003CSendInvite_003Ec__AnonStorey7EA _003CSendInvite_003Ec__AnonStorey7EA;
-		FacebookDelegate<IShareResult> val = new FacebookDelegate<IShareResult>((object)_003CSendInvite_003Ec__AnonStorey7EA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		_003CSendInvite_003Ec__AnonStorey7FD _003CSendInvite_003Ec__AnonStorey7FD;
+		FacebookDelegate<IShareResult> val = new FacebookDelegate<IShareResult>((object)_003CSendInvite_003Ec__AnonStorey7FD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		FB.ShareLink(new Uri(referralDataUrl), string.Empty, string.Empty, (Uri)null, val);
 	}
 }

@@ -39,13 +39,12 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
-	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -66,13 +65,12 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
-	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -114,13 +112,12 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
-	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -133,10 +130,9 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
                 public void setWhatsNewUrl(java.lang.String r1) {
                     /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables already executed
-	at jadx.core.dex.visitors.ssa.SSATransform.renameVariables(SSATransform.java:120)
-	at jadx.core.dex.visitors.ssa.SSATransform.process(SSATransform.java:52)
-	at jadx.core.dex.visitors.ssa.SSATransform.visit(SSATransform.java:42)
+Error: java.lang.NullPointerException
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
@@ -147,7 +143,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -168,13 +164,12 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
-	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -195,13 +190,12 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
-	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -222,13 +216,12 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
-	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -241,10 +234,9 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
                 public void setTwitterUrl(java.lang.String r1) {
                     /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables already executed
-	at jadx.core.dex.visitors.ssa.SSATransform.renameVariables(SSATransform.java:120)
-	at jadx.core.dex.visitors.ssa.SSATransform.process(SSATransform.java:52)
-	at jadx.core.dex.visitors.ssa.SSATransform.visit(SSATransform.java:42)
+Error: java.lang.NullPointerException
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
@@ -255,7 +247,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -276,13 +268,12 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
-	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -295,10 +286,9 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
                 public void setInstagramUrl(java.lang.String r1) {
                     /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables already executed
-	at jadx.core.dex.visitors.ssa.SSATransform.renameVariables(SSATransform.java:120)
-	at jadx.core.dex.visitors.ssa.SSATransform.process(SSATransform.java:52)
-	at jadx.core.dex.visitors.ssa.SSATransform.visit(SSATransform.java:42)
+Error: java.lang.NullPointerException
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
@@ -309,7 +299,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -330,13 +320,12 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
-	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -356,12 +345,13 @@ Error: java.lang.NullPointerException
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -382,13 +372,12 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
-	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -401,10 +390,9 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
                 public void setForumUrl(java.lang.String r1) {
                     /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables already executed
-	at jadx.core.dex.visitors.ssa.SSATransform.renameVariables(SSATransform.java:120)
-	at jadx.core.dex.visitors.ssa.SSATransform.process(SSATransform.java:52)
-	at jadx.core.dex.visitors.ssa.SSATransform.visit(SSATransform.java:42)
+Error: java.lang.NullPointerException
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
@@ -415,7 +403,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -436,13 +424,12 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
-	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r1 = this;
@@ -455,10 +442,9 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
                 public void setWikiUrl(java.lang.String r1) {
                     /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables already executed
-	at jadx.core.dex.visitors.ssa.SSATransform.renameVariables(SSATransform.java:120)
-	at jadx.core.dex.visitors.ssa.SSATransform.process(SSATransform.java:52)
-	at jadx.core.dex.visitors.ssa.SSATransform.visit(SSATransform.java:42)
+Error: java.lang.NullPointerException
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
@@ -469,7 +455,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                     /*
                     r0 = this;
@@ -491,12 +477,13 @@ Error: java.lang.NullPointerException
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                 /*
                 r0 = this;
@@ -509,19 +496,20 @@ Error: java.lang.NullPointerException
             public Core(org.json.JSONObject r7) throws org.json.JSONException {
                 /* JADX: method processing error */
 /*
-Error: java.lang.NullPointerException
-	at jadx.core.dex.visitors.ConstInlineVisitor.checkObjectInline(ConstInlineVisitor.java:80)
-	at jadx.core.dex.visitors.ConstInlineVisitor.checkInsn(ConstInlineVisitor.java:57)
-	at jadx.core.dex.visitors.ConstInlineVisitor.visit(ConstInlineVisitor.java:38)
+Error: java.util.ConcurrentModificationException
+	at java.util.ArrayList$Itr.checkForComodification(ArrayList.java:901)
+	at java.util.ArrayList$Itr.next(ArrayList.java:851)
+	at jadx.core.dex.visitors.typeinference.FinishTypeInference.visit(FinishTypeInference.java:21)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                 /*
                 r6 = this;
@@ -596,23 +584,17 @@ Error: java.lang.NullPointerException
 /*
 Error: java.lang.NullPointerException
 	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
-	at jadx.core.dex.visitors.regions.ProcessVariables.access$000(ProcessVariables.java:36)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processInsn(ProcessVariables.java:158)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processBlockTraced(ProcessVariables.java:135)
-	at jadx.core.dex.visitors.regions.TracedRegionVisitor.processBlock(TracedRegionVisitor.java:23)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:53)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverse(DepthRegionTraversal.java:18)
-	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:187)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                 /*
                 r1 = this;
@@ -627,23 +609,17 @@ Error: java.lang.NullPointerException
 /*
 Error: java.lang.NullPointerException
 	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
-	at jadx.core.dex.visitors.regions.ProcessVariables.access$000(ProcessVariables.java:36)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processInsn(ProcessVariables.java:169)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processBlockTraced(ProcessVariables.java:135)
-	at jadx.core.dex.visitors.regions.TracedRegionVisitor.processBlock(TracedRegionVisitor.java:23)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:53)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverse(DepthRegionTraversal.java:18)
-	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:187)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                 /*
                 r0 = this;
@@ -658,23 +634,17 @@ Error: java.lang.NullPointerException
 /*
 Error: java.lang.NullPointerException
 	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
-	at jadx.core.dex.visitors.regions.ProcessVariables.access$000(ProcessVariables.java:36)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processInsn(ProcessVariables.java:158)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processBlockTraced(ProcessVariables.java:135)
-	at jadx.core.dex.visitors.regions.TracedRegionVisitor.processBlock(TracedRegionVisitor.java:23)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:53)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverse(DepthRegionTraversal.java:18)
-	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:187)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                 /*
                 r1 = this;
@@ -689,23 +659,17 @@ Error: java.lang.NullPointerException
 /*
 Error: java.lang.NullPointerException
 	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
-	at jadx.core.dex.visitors.regions.ProcessVariables.access$000(ProcessVariables.java:36)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processInsn(ProcessVariables.java:169)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processBlockTraced(ProcessVariables.java:135)
-	at jadx.core.dex.visitors.regions.TracedRegionVisitor.processBlock(TracedRegionVisitor.java:23)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:53)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverse(DepthRegionTraversal.java:18)
-	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:187)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                 /*
                 r0 = this;
@@ -720,23 +684,17 @@ Error: java.lang.NullPointerException
 /*
 Error: java.lang.NullPointerException
 	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
-	at jadx.core.dex.visitors.regions.ProcessVariables.access$000(ProcessVariables.java:36)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processInsn(ProcessVariables.java:158)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processBlockTraced(ProcessVariables.java:135)
-	at jadx.core.dex.visitors.regions.TracedRegionVisitor.processBlock(TracedRegionVisitor.java:23)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:53)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverse(DepthRegionTraversal.java:18)
-	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:187)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                 /*
                 r1 = this;
@@ -750,24 +708,18 @@ Error: java.lang.NullPointerException
                 /* JADX: method processing error */
 /*
 Error: java.lang.NullPointerException
-	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:291)
-	at jadx.core.dex.visitors.regions.ProcessVariables.access$000(ProcessVariables.java:36)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processInsn(ProcessVariables.java:169)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processBlockTraced(ProcessVariables.java:135)
-	at jadx.core.dex.visitors.regions.TracedRegionVisitor.processBlock(TracedRegionVisitor.java:23)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:53)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverse(DepthRegionTraversal.java:18)
-	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:187)
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                 /*
                 r0 = this;
@@ -782,23 +734,17 @@ Error: java.lang.NullPointerException
 /*
 Error: java.lang.NullPointerException
 	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
-	at jadx.core.dex.visitors.regions.ProcessVariables.access$000(ProcessVariables.java:36)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processInsn(ProcessVariables.java:158)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processBlockTraced(ProcessVariables.java:135)
-	at jadx.core.dex.visitors.regions.TracedRegionVisitor.processBlock(TracedRegionVisitor.java:23)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:53)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverse(DepthRegionTraversal.java:18)
-	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:187)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                 /*
                 r1 = this;
@@ -812,24 +758,18 @@ Error: java.lang.NullPointerException
                 /* JADX: method processing error */
 /*
 Error: java.lang.NullPointerException
-	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:291)
-	at jadx.core.dex.visitors.regions.ProcessVariables.access$000(ProcessVariables.java:36)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processInsn(ProcessVariables.java:169)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processBlockTraced(ProcessVariables.java:135)
-	at jadx.core.dex.visitors.regions.TracedRegionVisitor.processBlock(TracedRegionVisitor.java:23)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:53)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverse(DepthRegionTraversal.java:18)
-	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:187)
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
                 /*
                 r0 = this;
@@ -850,12 +790,13 @@ Error: java.lang.NullPointerException
 	at jadx.core.dex.visitors.ModVisitor.visit(ModVisitor.java:68)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
             /*
             r0 = this;
@@ -877,23 +818,24 @@ Error: java.lang.NullPointerException
 	at jadx.core.dex.visitors.ModVisitor.visit(ModVisitor.java:68)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
             /*
             r2 = this;
             r2.<init>();
             r0 = "core";
             r0 = r3.has(r0);
-            if (r0 == 0) goto L_0x001a;
+            if (r0 == null) goto L_0x001a;
         L_0x000b:
             r0 = "core";
             r0 = r3.optJSONObject(r0);
-            if (r0 == 0) goto L_0x001a;
+            if (r0 == null) goto L_0x001a;
         L_0x0013:
             r1 = new net.gogame.gowrap.model.configuration.Configuration$Integrations$Core;
             r1.<init>(r0);
@@ -909,22 +851,16 @@ Error: java.lang.NullPointerException
 /*
 Error: java.lang.NullPointerException
 	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
-	at jadx.core.dex.visitors.regions.ProcessVariables.access$000(ProcessVariables.java:36)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processInsn(ProcessVariables.java:158)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processBlockTraced(ProcessVariables.java:135)
-	at jadx.core.dex.visitors.regions.TracedRegionVisitor.processBlock(TracedRegionVisitor.java:23)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:53)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverse(DepthRegionTraversal.java:18)
-	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:187)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
             /*
             r1 = this;
@@ -938,23 +874,17 @@ Error: java.lang.NullPointerException
             /* JADX: method processing error */
 /*
 Error: java.lang.NullPointerException
-	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:291)
-	at jadx.core.dex.visitors.regions.ProcessVariables.access$000(ProcessVariables.java:36)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processInsn(ProcessVariables.java:169)
-	at jadx.core.dex.visitors.regions.ProcessVariables$CollectUsageRegionVisitor.processBlockTraced(ProcessVariables.java:135)
-	at jadx.core.dex.visitors.regions.TracedRegionVisitor.processBlock(TracedRegionVisitor.java:23)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:53)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverse(DepthRegionTraversal.java:18)
-	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:187)
+	at jadx.core.dex.visitors.regions.ProcessVariables.addToUsageMap(ProcessVariables.java:284)
+	at jadx.core.dex.visitors.regions.ProcessVariables.visit(ProcessVariables.java:182)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
 	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
+	at jadx.core.ProcessClass.process(ProcessClass.java:39)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
+	at jadx.api.JadxDecompiler$$Lambda$8/1387620926.run(Unknown Source)
 */
             /*
             r0 = this;

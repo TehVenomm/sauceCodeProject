@@ -107,12 +107,12 @@ namespace App.Scripts.GoGame.Optimization
 
 		public unsafe bool IsSelfPlayerResourceCached(RESOURCE_CATEGORY resourceCategory, string packageName, string[] resourceNames)
 		{
-			_003CIsSelfPlayerResourceCached_003Ec__AnonStorey4C3 _003CIsSelfPlayerResourceCached_003Ec__AnonStorey4C;
+			_003CIsSelfPlayerResourceCached_003Ec__AnonStorey4CD _003CIsSelfPlayerResourceCached_003Ec__AnonStorey4CD;
 			if (packageName != null)
 			{
-				return resourceNames.Aggregate(true, new Func<bool, string, bool>((object)_003CIsSelfPlayerResourceCached_003Ec__AnonStorey4C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				return resourceNames.Aggregate(true, new Func<bool, string, bool>((object)_003CIsSelfPlayerResourceCached_003Ec__AnonStorey4CD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
-			return resourceNames.Aggregate(true, new Func<bool, string, bool>((object)_003CIsSelfPlayerResourceCached_003Ec__AnonStorey4C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			return resourceNames.Aggregate(true, new Func<bool, string, bool>((object)_003CIsSelfPlayerResourceCached_003Ec__AnonStorey4CD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
 		public Object GetSelfPlayerResourceCache(RESOURCE_CATEGORY resourceCategory, string resourceName)

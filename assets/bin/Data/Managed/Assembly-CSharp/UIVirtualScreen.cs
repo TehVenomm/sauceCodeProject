@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[RequireComponent(typeof(UIWidget))]
 [AddComponentMenu("ProjectUI/UIVirtualScreen")]
+[RequireComponent(typeof(UIWidget))]
 public class UIVirtualScreen
 {
 	public const float BASE_SCREEN_HEIGHT = 854f;

@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Internal/Property Binding")]
+[ExecuteInEditMode]
 public class PropertyBinding
 {
 	public enum UpdateCondition

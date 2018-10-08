@@ -12,75 +12,33 @@ class C0870i extends AsyncTask<String, Void, C0869h> {
     }
 
     /* renamed from: a */
-    private com.zopim.android.sdk.data.C0869h m699a(java.lang.String r5) {
-        /* JADX: method processing error */
-/*
-Error: java.util.ConcurrentModificationException
-	at java.util.ArrayList$Itr.checkForComodification(ArrayList.java:901)
-	at java.util.ArrayList$Itr.next(ArrayList.java:851)
-	at jadx.core.dex.visitors.ReSugarCode.getEnumMap(ReSugarCode.java:172)
-	at jadx.core.dex.visitors.ReSugarCode.processEnumSwitch(ReSugarCode.java:124)
-	at jadx.core.dex.visitors.ReSugarCode.process(ReSugarCode.java:68)
-	at jadx.core.dex.visitors.ReSugarCode.visit(ReSugarCode.java:52)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
-	at jadx.core.ProcessClass.process(ProcessClass.java:39)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/1659309731.run(Unknown Source)
-*/
-        /*
-        r4 = this;
-        r0 = r4.m701c(r5);
-        r1 = r4.m700b(r5);
-        r2 = com.zopim.android.sdk.data.C0871j.f869a;
-        r3 = r1.ordinal();
-        r2 = r2[r3];
-        switch(r2) {
-            case 1: goto L_0x0014;
-            case 2: goto L_0x001c;
-            case 3: goto L_0x0024;
-            case 4: goto L_0x002c;
-            case 5: goto L_0x0034;
-            case 6: goto L_0x003c;
-            case 7: goto L_0x0044;
-            default: goto L_0x0013;
-        };
-    L_0x0013:
-        return r1;
-    L_0x0014:
-        r2 = com.zopim.android.sdk.data.LivechatChatLogPath.getInstance();
-        r2.update(r0);
-        goto L_0x0013;
-    L_0x001c:
-        r2 = com.zopim.android.sdk.data.LivechatProfilePath.getInstance();
-        r2.update(r0);
-        goto L_0x0013;
-    L_0x0024:
-        r2 = com.zopim.android.sdk.data.LivechatAgentsPath.getInstance();
-        r2.update(r0);
-        goto L_0x0013;
-    L_0x002c:
-        r2 = com.zopim.android.sdk.data.LivechatDepartmentsPath.getInstance();
-        r2.update(r0);
-        goto L_0x0013;
-    L_0x0034:
-        r2 = com.zopim.android.sdk.data.LivechatAccountPath.getInstance();
-        r2.update(r0);
-        goto L_0x0013;
-    L_0x003c:
-        r2 = com.zopim.android.sdk.data.LivechatFormsPath.getInstance();
-        r2.update(r0);
-        goto L_0x0013;
-    L_0x0044:
-        r2 = com.zopim.android.sdk.data.ConnectionPath.getInstance();
-        r2.update(r0);
-        goto L_0x0013;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.zopim.android.sdk.data.i.a(java.lang.String):com.zopim.android.sdk.data.h");
+    private C0869h m699a(String str) {
+        String c = m701c(str);
+        C0869h b = m700b(str);
+        switch (C0871j.f869a[b.ordinal()]) {
+            case 1:
+                LivechatChatLogPath.getInstance().update(c);
+                break;
+            case 2:
+                LivechatProfilePath.getInstance().update(c);
+                break;
+            case 3:
+                LivechatAgentsPath.getInstance().update(c);
+                break;
+            case 4:
+                LivechatDepartmentsPath.getInstance().update(c);
+                break;
+            case 5:
+                LivechatAccountPath.getInstance().update(c);
+                break;
+            case 6:
+                LivechatFormsPath.getInstance().update(c);
+                break;
+            case 7:
+                ConnectionPath.getInstance().update(c);
+                break;
+        }
+        return b;
     }
 
     /* renamed from: b */

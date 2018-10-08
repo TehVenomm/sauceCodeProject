@@ -255,8 +255,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 				Object.Destroy(val.get_gameObject());
 			}
 		}
-		_003CUpdateTable_003Ec__AnonStorey3C8 _003CUpdateTable_003Ec__AnonStorey3C;
-		SetTable(UI.TBL_QUEST, string.Empty, item_num, true, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey3C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey3C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateTable_003Ec__AnonStorey3CE _003CUpdateTable_003Ec__AnonStorey3CE;
+		SetTable(UI.TBL_QUEST, string.Empty, item_num, true, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey3CE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey3CE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_QUEST);
 		component.set_enabled(true);
 		RepositionTable();
@@ -282,8 +282,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		SetLabelText(t, UI.LBL_LABEL, text);
 		SetStamp(t, lounge.stampId);
 		int num = lounge.num + 1;
-		_003CInitLounge_003Ec__AnonStorey3C9 _003CInitLounge_003Ec__AnonStorey3C;
-		int num2 = lounge.slotInfos.Count(new Func<LoungeModel.SlotInfo, bool>((object)_003CInitLounge_003Ec__AnonStorey3C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CInitLounge_003Ec__AnonStorey3CF _003CInitLounge_003Ec__AnonStorey3CF;
+		int num2 = lounge.slotInfos.Count(new Func<LoungeModel.SlotInfo, bool>((object)_003CInitLounge_003Ec__AnonStorey3CF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		for (int j = 0; j < 7; j++)
 		{
 			bool is_visible = j < num - 1;
@@ -740,7 +740,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendEntry(lounges[num].id, delegate(bool isSuccess)
 			{
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess, null, false);
 			});
 		}
 	}

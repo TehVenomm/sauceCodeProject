@@ -110,14 +110,14 @@ public class EventBannerView : UIBehaviour
 				loadingRoutines.Clear();
 				UIWidget refWidget = base._transform.GetComponentInChildren<UIWidget>();
 				bannerNum1 = ((MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count > 1) ? 1 : MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count);
-				_003CUpdateEventBannerAll_003Ec__AnonStorey2ED _003CUpdateEventBannerAll_003Ec__AnonStorey2ED;
-				SetWrapContent(UI.WRP_EVENT_BANNER1, "EventBanner", bannerNum1, true, new Action<int, Transform, bool>((object)_003CUpdateEventBannerAll_003Ec__AnonStorey2ED, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CUpdateEventBannerAll_003Ec__AnonStorey2F2 _003CUpdateEventBannerAll_003Ec__AnonStorey2F;
+				SetWrapContent(UI.WRP_EVENT_BANNER1, "EventBanner", bannerNum1, true, new Action<int, Transform, bool>((object)_003CUpdateEventBannerAll_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				bannerNum2 = MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count - bannerNum1;
 				if (bannerNum2 > 5)
 				{
 					bannerNum2 = 5;
 				}
-				SetWrapContent(UI.WRP_EVENT_BANNER2, "EventBanner", bannerNum2, true, new Action<int, Transform, bool>((object)_003CUpdateEventBannerAll_003Ec__AnonStorey2ED, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				SetWrapContent(UI.WRP_EVENT_BANNER2, "EventBanner", bannerNum2, true, new Action<int, Transform, bool>((object)_003CUpdateEventBannerAll_003Ec__AnonStorey2F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				mCenterIndex1 = 0;
 				mCenterIndex2 = 0;
 				timer1 = 0f;

@@ -113,7 +113,7 @@ public class HomePointShopEventDetail : GameSection
 				data.userPoint -= item.needPoint * num;
 				RefreshUI();
 			}
-			GameSection.ResumeEvent(result != null && result.Error == Error.None, null);
+			GameSection.ResumeEvent(result != null && result.Error == Error.None, null, false);
 		}, string.Empty);
 	}
 

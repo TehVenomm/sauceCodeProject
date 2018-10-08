@@ -2,20 +2,20 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/NGUI Font")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/NGUI Font")]
 public class UIFont
 {
 	[HideInInspector]
 	[SerializeField]
 	private Material mMat;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private BMFont mFont = new BMFont();
 
 	[SerializeField]
@@ -30,12 +30,12 @@ public class UIFont
 	[HideInInspector]
 	private List<BMSymbol> mSymbols = new List<BMSymbol>();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Font mDynamicFont;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private int mDynamicFontSize = 16;
 
 	[SerializeField]

@@ -411,8 +411,8 @@ public abstract class EquipMaterialBase : SmithEquipBase
 			num = needMaterial.Length;
 		}
 		int needItemSize = needEquipSize + num;
-		_003CNeededMaterial_003Ec__AnonStorey35B _003CNeededMaterial_003Ec__AnonStorey35B;
-		SetGrid(UI.GRD_NEED_MATERIAL, null, needItemSize, true, new Action<int, Transform, bool>((object)_003CNeededMaterial_003Ec__AnonStorey35B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CNeededMaterial_003Ec__AnonStorey360 _003CNeededMaterial_003Ec__AnonStorey;
+		SetGrid(UI.GRD_NEED_MATERIAL, null, needItemSize, true, new Action<int, Transform, bool>((object)_003CNeededMaterial_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		SetLabelText((Enum)UI.LBL_GOLD, needMoney.ToString("N0"));
 		Color color = Color.get_white();
 		if (needMaterial == null && needEquip == null)

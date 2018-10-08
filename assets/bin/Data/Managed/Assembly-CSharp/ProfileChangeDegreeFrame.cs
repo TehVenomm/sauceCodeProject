@@ -81,8 +81,8 @@ public class ProfileChangeDegreeFrame : GameSection
 			maxPage++;
 		}
 		int item_num = Mathf.Min(GameDefine.DEGREE_FRAME_CHANGE_LIST_COUNT, currentShow.Count - (currentPage - 1) * GameDefine.DEGREE_FRAME_CHANGE_LIST_COUNT);
-		_003CUpdateUI_003Ec__AnonStorey404 _003CUpdateUI_003Ec__AnonStorey;
-		SetGrid(UI.GRD_FRAME, "DegreePlate", item_num, true, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateUI_003Ec__AnonStorey40A _003CUpdateUI_003Ec__AnonStorey40A;
+		SetGrid(UI.GRD_FRAME, "DegreePlate", item_num, true, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey40A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		SetLabelText((Enum)UI.LBL_SORT, (!showAll) ? StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 21u) : StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 20u));
 		bool flag = maxPage > 1;
 		SetActive((Enum)UI.OBJ_ACTIVE_ARROW_ROOT, flag);

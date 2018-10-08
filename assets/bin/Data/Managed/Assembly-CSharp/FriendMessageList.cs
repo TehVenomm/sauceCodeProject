@@ -110,7 +110,7 @@ public class FriendMessageList : FollowListBase
 				base.ScrollGrid.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 			}
 			CleanItemList();
-			_003CUpdateDynamicList_003Ec__AnonStorey323 _003CUpdateDynamicList_003Ec__AnonStorey;
+			_003CUpdateDynamicList_003Ec__AnonStorey328 _003CUpdateDynamicList_003Ec__AnonStorey;
 			SetDynamicList((Enum)UI.GRD_LIST, "FollowListBaseItem", pageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
@@ -122,7 +122,7 @@ public class FriendMessageList : FollowListBase
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback = null)
 	{
-		_003CSendGetList_003Ec__AnonStorey324 _003CSendGetList_003Ec__AnonStorey;
+		_003CSendGetList_003Ec__AnonStorey329 _003CSendGetList_003Ec__AnonStorey;
 		MonoBehaviourSingleton<FriendManager>.I.SendGetMessageUserList(page, new Action<bool, FriendMessageUserListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -148,7 +148,7 @@ public class FriendMessageList : FollowListBase
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<FriendManager>.I.SendGetMessageDetailList(messageUserInfo.userId, 0, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 			MonoBehaviourSingleton<FriendManager>.I.SetNoReadMessageNum(MonoBehaviourSingleton<FriendManager>.I.noReadMessageNum - messageUserInfo.noReadNum);
 			messageUserInfo.noReadNum = 0;
@@ -234,7 +234,7 @@ public class FriendMessageList : FollowListBase
 					break;
 				}
 				default:
-					GameSection.ResumeEvent(true, null);
+					GameSection.ResumeEvent(true, null, false);
 					break;
 				}
 			}

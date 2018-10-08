@@ -93,7 +93,7 @@ public class InGamePlayerList : GameSection
 		ScrollViewResetPosition((Enum)UI.SCR_LIST);
 		UpdateAnchors();
 		AppMain i = MonoBehaviourSingleton<AppMain>.I;
-		_003COnScreenRotate_003Ec__AnonStorey3B2 _003COnScreenRotate_003Ec__AnonStorey3B;
+		_003COnScreenRotate_003Ec__AnonStorey3B8 _003COnScreenRotate_003Ec__AnonStorey3B;
 		i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003COnScreenRotate_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -136,7 +136,7 @@ public class InGamePlayerList : GameSection
 		List<int> list = new List<int>();
 		list.Add(infoList[index].userId);
 		GameSection.StayEvent();
-		_003COnQuery_FOLLOW_003Ec__AnonStorey3B3 _003COnQuery_FOLLOW_003Ec__AnonStorey3B;
+		_003COnQuery_FOLLOW_003Ec__AnonStorey3B9 _003COnQuery_FOLLOW_003Ec__AnonStorey3B;
 		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(list, new Action<Error, List<int>>((object)_003COnQuery_FOLLOW_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -154,7 +154,7 @@ public class InGamePlayerList : GameSection
 			{
 				infoList[index].following = !infoList[index].following;
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 			RefreshUI();
 		});
 	}
@@ -173,7 +173,7 @@ public class InGamePlayerList : GameSection
 			{
 				infoList[index].following = false;
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 			RefreshUI();
 		});
 	}
@@ -188,7 +188,7 @@ public class InGamePlayerList : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<BlackListManager>.I.SendDelete(infoList[index].userId, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 			RefreshUI();
 		});
 	}

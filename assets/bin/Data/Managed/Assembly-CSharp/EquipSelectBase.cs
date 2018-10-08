@@ -227,7 +227,7 @@ public abstract class EquipSelectBase : SmithEquipBase
 			if (item.ability != null && item.ability.Length > 0)
 			{
 				bool empty_ability = true;
-				_003CEquipParam_003Ec__AnonStorey360 _003CEquipParam_003Ec__AnonStorey;
+				_003CEquipParam_003Ec__AnonStorey365 _003CEquipParam_003Ec__AnonStorey;
 				SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", item.ability.Length, false, new Action<int, Transform, bool>((object)_003CEquipParam_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				if (empty_ability)
 				{
@@ -254,7 +254,7 @@ public abstract class EquipSelectBase : SmithEquipBase
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
 			bool initItem = false;
-			_003CLocalInventory_003Ec__AnonStorey361 _003CLocalInventory_003Ec__AnonStorey;
+			_003CLocalInventory_003Ec__AnonStorey366 _003CLocalInventory_003Ec__AnonStorey;
 			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length, false, new Func<int, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			SetActive(base._transform, UI.LBL_NO_ITEM, !initItem);
 			SetLabelText(base._transform, UI.LBL_NO_ITEM, StringTable.Get(STRING_CATEGORY.COMMON, 19799u));

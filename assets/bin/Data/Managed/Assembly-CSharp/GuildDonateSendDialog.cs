@@ -127,7 +127,7 @@ public class GuildDonateSendDialog : GameSection
 					}
 					MonoBehaviourSingleton<GuildManager>.I.SendDonateList(delegate(bool donate_success)
 					{
-						GameSection.ResumeEvent(donate_success, null);
+						GameSection.ResumeEvent(donate_success, null, false);
 						GameSection.BackSection();
 					});
 				});

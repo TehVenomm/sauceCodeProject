@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class TutorialGearSetTable : Singleton<TutorialGearSetTable>, IDataTable
 {
 	public class ItemData
@@ -45,7 +43,6 @@ public class TutorialGearSetTable : Singleton<TutorialGearSetTable>, IDataTable
 
 	public void CreateTable(string csv_text)
 	{
-		Debug.LogError((object)"INIT");
 		itemTable = TableUtility.CreateUIntKeyTable<ItemData>(csv_text, ItemData.cb, "setId,setName,difficulty,weaponId,helmId,armId,legId,armorId,skillId", null);
 		itemTable.TrimExcess();
 	}

@@ -46,8 +46,8 @@ public class GuildDonateMemberList : GuildMemberList
 
 	protected unsafe override void GetListItem(Action<bool, object> callback)
 	{
-		_003CGetListItem_003Ec__AnonStorey339 _003CGetListItem_003Ec__AnonStorey;
-		base.GetListItem(new Action<bool, object>((object)_003CGetListItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CGetListItem_003Ec__AnonStorey33E _003CGetListItem_003Ec__AnonStorey33E;
+		base.GetListItem(new Action<bool, object>((object)_003CGetListItem_003Ec__AnonStorey33E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void SetListItem(int i, Transform t, string event_name, FriendCharaInfo member)
@@ -85,7 +85,7 @@ public class GuildDonateMemberList : GuildMemberList
 				SetButtonEnabled(val, false);
 				_invitedList.Remove(member.userId);
 			}
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(false, null, false);
 		});
 	}
 

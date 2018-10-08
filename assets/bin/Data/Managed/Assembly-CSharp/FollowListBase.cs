@@ -149,7 +149,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 			ScrollGrid.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 		}
 		CleanItemList();
-		_003CUpdateDynamicList_003Ec__AnonStorey310 _003CUpdateDynamicList_003Ec__AnonStorey;
+		_003CUpdateDynamicList_003Ec__AnonStorey315 _003CUpdateDynamicList_003Ec__AnonStorey;
 		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
@@ -548,7 +548,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, StringTable.GetErrorCodeText(30301u), null, null, null, null), delegate
 			{
 				GameSceneEvent.PopStay();
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(false, null, false);
 			}, false, 0);
 			return false;
 		}
@@ -572,21 +572,21 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 	{
 		if (!MonoBehaviourSingleton<LoungeMatchingManager>.IsValid())
 		{
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(true, null, false);
 		}
 		else if (_joinData == null)
 		{
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(true, null, false);
 		}
 		else if (!LoungeMatchingManager.IsValidInLounge())
 		{
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(true, null, false);
 			GameSection.SetEventData(_joinData.conditionParam);
 			OnQuery_FORCE_MOVETO_LOUNGE();
 		}
 		else if (MonoBehaviourSingleton<LoungeMatchingManager>.I.GetLoungeNumber() == _joinData.conditionParam)
 		{
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(true, null, false);
 		}
 		else
 		{
@@ -596,7 +596,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 				new EventData("FORCE_MOVETO_LOUNGE", _joinData.conditionParam)
 			};
 			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(true, null, false);
 		}
 	}
 

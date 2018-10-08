@@ -134,7 +134,7 @@ public abstract class QuestSearchListSelectBase : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<PartyManager>.I.SendEntry(MonoBehaviourSingleton<PartyManager>.I.partys[index].id, false, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 	}
@@ -145,7 +145,7 @@ public abstract class QuestSearchListSelectBase : GameSection
 		GameSection.StayEvent();
 		this.StartCoroutine(Reload(delegate(bool b)
 		{
-			GameSection.ResumeEvent(b, null);
+			GameSection.ResumeEvent(b, null, false);
 		}));
 	}
 
@@ -163,14 +163,14 @@ public abstract class QuestSearchListSelectBase : GameSection
 		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(Reload(delegate(bool b)
 		{
-			GameSection.ResumeEvent(b, null);
+			GameSection.ResumeEvent(b, null, false);
 		}));
 	}
 
 	protected unsafe void SendGetChallengeInfo(Action onFinish, Action<bool> cb)
 	{
-		_003CSendGetChallengeInfo_003Ec__AnonStorey3C4 _003CSendGetChallengeInfo_003Ec__AnonStorey3C;
-		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(new Action<bool, Error>((object)_003CSendGetChallengeInfo_003Ec__AnonStorey3C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendGetChallengeInfo_003Ec__AnonStorey3CA _003CSendGetChallengeInfo_003Ec__AnonStorey3CA;
+		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(new Action<bool, Error>((object)_003CSendGetChallengeInfo_003Ec__AnonStorey3CA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected void SetMemberIcon(Transform t, QuestTable.QuestTableData table)

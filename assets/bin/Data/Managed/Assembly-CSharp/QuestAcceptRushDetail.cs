@@ -179,7 +179,7 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 			{
 				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -332,8 +332,8 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 		GameSection.StayEvent();
 		int retryCount = 0;
 		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 0);
-		_003COnQuery_AUTO_MATCHING_003Ec__AnonStorey42B _003COnQuery_AUTO_MATCHING_003Ec__AnonStorey42B;
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.GetQuestData().questID, retryCount, false, new Action<bool, int, bool, float>((object)_003COnQuery_AUTO_MATCHING_003Ec__AnonStorey42B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003COnQuery_AUTO_MATCHING_003Ec__AnonStorey431 _003COnQuery_AUTO_MATCHING_003Ec__AnonStorey;
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.GetQuestData().questID, retryCount, false, new Action<bool, int, bool, float>((object)_003COnQuery_AUTO_MATCHING_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private unsafe IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
@@ -359,7 +359,7 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 			{
 				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 

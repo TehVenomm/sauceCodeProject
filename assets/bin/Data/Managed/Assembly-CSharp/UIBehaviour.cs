@@ -3676,6 +3676,90 @@ public class UIBehaviour
 		}
 	}
 
+	protected void AddItemList(Transform item_list_transform, string item_prefab_name, int item_num, Func<int, bool> check_item_func, Func<int, Transform, Transform> create_item_func, Action<int, Transform, bool> init_item_func)
+	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0120: Expected O, but got Unknown
+		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0131: Expected O, but got Unknown
+		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+		UIGrid component = item_list_transform.get_gameObject().GetComponent<UIGrid>();
+		PrefabData prefabData = null;
+		if (!string.IsNullOrEmpty(item_prefab_name))
+		{
+			prefabData = GetPrefabData(item_prefab_name);
+			if (prefabData == null)
+			{
+				Log.Error(LOG.UI, "{0} not found.", item_prefab_name);
+				return;
+			}
+		}
+		UICenterOnChild component2 = item_list_transform.GetComponent<UICenterOnChild>();
+		UIScrollView component3 = item_list_transform.get_parent().get_gameObject().GetComponent<UIScrollView>();
+		UIPanel uIPanel = null;
+		if (component3 != null)
+		{
+			component3.set_enabled(true);
+			uIPanel = component3.GetComponent<UIPanel>();
+		}
+		for (int i = 0; i < item_num; i++)
+		{
+			if (check_item_func == null || check_item_func.Invoke(i))
+			{
+				Transform val;
+				if (prefabData != null || create_item_func != null)
+				{
+					val = null;
+					if (create_item_func != null)
+					{
+						val = create_item_func.Invoke(i, item_list_transform);
+					}
+					if (val == null && prefabData != null)
+					{
+						val = _Realizes(prefabData, item_list_transform, true);
+					}
+					if (val != null && uIPanel != null)
+					{
+						UIPanel componentInChildren = val.GetComponentInChildren<UIPanel>();
+						if (componentInChildren != null)
+						{
+							componentInChildren.depth = uIPanel.depth + 1;
+						}
+					}
+				}
+				else
+				{
+					GameObject val2 = new GameObject();
+					val2.set_layer(5);
+					val = val2.get_transform();
+					val.set_parent(item_list_transform);
+					val.set_localPosition(Vector3.get_zero());
+					val.set_localScale(Vector3.get_one());
+					if (component3 != null)
+					{
+						val2.AddComponent<UIDragScrollView>().scrollView = component3;
+					}
+				}
+				if (component2 != null)
+				{
+					UIUtility.AddCenterOnClickChild(val);
+				}
+				if (val == null)
+				{
+					return;
+				}
+				val.set_name(i.ToString());
+				init_item_func.Invoke(i, val, false);
+				UIUtility.UpdateAnchors(val);
+			}
+		}
+		component.Reposition();
+	}
+
 	private void SetItemList<T>(Transform item_list_transform, string item_prefab_name, int item_num, bool reset, Func<int, bool> check_item_func, Func<int, Transform, Transform> create_item_func, Action<int, Transform, bool> init_item_func, bool is_dynamic) where T : Component
 	{
 		//IL_000e: Unknown result type (might be due to invalid IL or missing references)

@@ -601,8 +601,8 @@ public class CharaMake : GameSection
 		Transform val2 = SetPrefab((Enum)ui, "CharaMakeList");
 		SetEvent(val2, UI.BTN_LIST_PREV, "LIST_PREV", (int)ui);
 		SetEvent(val2, UI.BTN_LIST_NEXT, "LIST_NEXT", (int)ui);
-		_003CSetList_003Ec__AnonStorey49E _003CSetList_003Ec__AnonStorey49E;
-		SetGrid(val2, UI.GRD_LIST, "CharaMakeListItem", item_num, false, new Action<int, Transform, bool>((object)_003CSetList_003Ec__AnonStorey49E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSetList_003Ec__AnonStorey4A4 _003CSetList_003Ec__AnonStorey4A;
+		SetGrid(val2, UI.GRD_LIST, "CharaMakeListItem", item_num, false, new Action<int, Transform, bool>((object)_003CSetList_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		SetCenterOnChildFunc(val2, UI.GRD_LIST, OnCenterListItem);
 		SetCenter(val2, UI.GRD_LIST, listInfo.index, false);
 		listInfo.tansform = val2.get_parent();
@@ -613,10 +613,10 @@ public class CharaMake : GameSection
 	{
 		GlobalSettingsManager.HasVisuals hasVisuals = MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals;
 		int item_num = (!IsWoman()) ? hasVisuals.hasManFaceIndexes.Length : hasVisuals.hasWomanFaceIndexes.Length;
-		_003CUpdateLists_003Ec__AnonStorey49F _003CUpdateLists_003Ec__AnonStorey49F;
-		SetList(LIST.FACETYPE, UI.OBJ_LIST_FACETYPE, item_num, new Action<int, Transform>((object)_003CUpdateLists_003Ec__AnonStorey49F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateLists_003Ec__AnonStorey4A5 _003CUpdateLists_003Ec__AnonStorey4A;
+		SetList(LIST.FACETYPE, UI.OBJ_LIST_FACETYPE, item_num, new Action<int, Transform>((object)_003CUpdateLists_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		int item_num2 = (!IsWoman()) ? hasVisuals.hasManHeadIndexes.Length : hasVisuals.hasWomanHeadIndexes.Length;
-		SetList(LIST.HAIRSTYLE, UI.OBJ_LIST_HAIRSTYLE, item_num2, new Action<int, Transform>((object)_003CUpdateLists_003Ec__AnonStorey49F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		SetList(LIST.HAIRSTYLE, UI.OBJ_LIST_HAIRSTYLE, item_num2, new Action<int, Transform>((object)_003CUpdateLists_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void UpdateVoiceNames()
@@ -924,8 +924,8 @@ public class CharaMake : GameSection
 		GameSection.StayEvent();
 		SendEditFigure(delegate(bool is_success)
 		{
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			GameSection.ResumeEvent(false, null);
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			GameSection.ResumeEvent(false, null, false);
 			if (is_success)
 			{
 				RequestEvent("BACK_TO_HOME", null);
@@ -1185,13 +1185,13 @@ public class CharaMake : GameSection
 		GameSection.StayEvent();
 		SendEditFigure(delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 			if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep != 2)
 			{
-				goto IL_001c;
+				goto IL_001d;
 			}
-			goto IL_001c;
-			IL_001c:
+			goto IL_001d;
+			IL_001d:
 			if (!nonFirstCharaMake)
 			{
 				int id = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
@@ -1218,7 +1218,7 @@ public class CharaMake : GameSection
 			Protocol.Send(OptionCheckUniqueNameModel.URL, requestSendForm, delegate(OptionEditFigureModel ret)
 			{
 				bool flag = ret.Error == Error.None;
-				GameSection.ResumeEvent(flag, null);
+				GameSection.ResumeEvent(flag, null, false);
 				if (flag)
 				{
 					MovePage(nextPage);

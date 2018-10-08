@@ -170,7 +170,7 @@ public class StatusEquipSetList : SkillInfoBase
 				ResetEquipSetCopy();
 				RefreshUI();
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 

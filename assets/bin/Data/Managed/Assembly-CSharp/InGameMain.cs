@@ -917,7 +917,7 @@ public class InGameMain : GameSection
 					Network.EventData firstEvent = validBingoDataListInSection[0];
 					List<DeliveryTable.DeliveryData> deliveryTableDataList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryTableDataList(false);
 					List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
-					_003COnQuery_BINGO_003Ec__AnonStorey3B0 _003COnQuery_BINGO_003Ec__AnonStorey3B;
+					_003COnQuery_BINGO_003Ec__AnonStorey3B6 _003COnQuery_BINGO_003Ec__AnonStorey3B;
 					int num = deliveryTableDataList.Where(new Func<DeliveryTable.DeliveryData, bool>((object)_003COnQuery_BINGO_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 					int num2 = 0;
 					for (int i = 0; i < clearStatusDelivery.Count; i++)
@@ -943,7 +943,7 @@ public class InGameMain : GameSection
 					GameSection.ChangeStayEvent("MINI_BINGO", null);
 				}
 			}
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(true, null, false);
 		});
 	}
 
@@ -956,7 +956,7 @@ public class InGameMain : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate(bool isSuccess)
 		{
-			GameSection.ResumeEvent(isSuccess, null);
+			GameSection.ResumeEvent(isSuccess, null, false);
 		}, false);
 	}
 
@@ -1371,7 +1371,7 @@ public class InGameMain : GameSection
 				component.bottomAnchor.Set(0f, num);
 				component.UpdateAnchors();
 				AppMain i = MonoBehaviourSingleton<AppMain>.I;
-				_003COnScreenRotate_003Ec__AnonStorey3B1 _003COnScreenRotate_003Ec__AnonStorey3B;
+				_003COnScreenRotate_003Ec__AnonStorey3B7 _003COnScreenRotate_003Ec__AnonStorey3B;
 				i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003COnScreenRotate_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}

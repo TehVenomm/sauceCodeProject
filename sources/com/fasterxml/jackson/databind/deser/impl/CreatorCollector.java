@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import net.gogame.gowrap.InternalConstants;
 
 public class CreatorCollector {
     protected static final int C_ARRAY_DELEGATE = 8;
@@ -35,7 +34,7 @@ public class CreatorCollector {
     protected static final int C_LONG = 3;
     protected static final int C_PROPS = 7;
     protected static final int C_STRING = 1;
-    protected static final String[] TYPE_DESCS = new String[]{InternalConstants.DEFAULT_LOCALE, "String", "int", "long", "double", "boolean", "delegate", "property-based"};
+    protected static final String[] TYPE_DESCS = new String[]{"default", "String", "int", "long", "double", "boolean", "delegate", "property-based"};
     protected SettableBeanProperty[] _arrayDelegateArgs;
     protected final BeanDescription _beanDesc;
     protected final boolean _canFixAccess;

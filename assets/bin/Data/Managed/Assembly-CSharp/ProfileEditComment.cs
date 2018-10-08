@@ -40,7 +40,7 @@ public class ProfileEditComment : ConfigName
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<UserInfoManager>.I.SendEditComment(text, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 }

@@ -35,7 +35,7 @@ public class AgeConfirm : GameSection
 				{
 					GameSection.ChangeStayEvent("ERROR", null);
 				}
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(true, null, false);
 			});
 		}
 		else

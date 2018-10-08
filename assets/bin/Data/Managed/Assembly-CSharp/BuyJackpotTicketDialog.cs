@@ -102,7 +102,7 @@ public class BuyJackpotTicketDialog : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<FortuneWheelManager>.I.BuyTicket(sliderNum, delegate(bool b)
 			{
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(true, null, false);
 				DispatchEvent("JACKPOT_BUY_MESSAGE", base.sectionData.GetText((!b) ? "STR_BUY_FAILED" : "STR_BUY_SUCCESS"));
 				MonoBehaviourSingleton<FortuneWheelManager>.I.RequestUpdateUI();
 			});

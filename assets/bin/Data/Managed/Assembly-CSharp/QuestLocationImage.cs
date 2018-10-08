@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
 [ExecuteInEditMode]
+[RequireComponent(typeof(Camera))]
 public class QuestLocationImage
 {
 	public const int WIDTH = 480;

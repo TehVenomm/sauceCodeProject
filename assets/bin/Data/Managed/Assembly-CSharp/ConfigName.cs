@@ -59,7 +59,7 @@ public class ConfigName : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<UserInfoManager>.I.SendChangeName(inputValue, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 }

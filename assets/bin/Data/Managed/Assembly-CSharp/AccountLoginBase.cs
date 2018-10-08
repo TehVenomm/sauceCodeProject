@@ -158,7 +158,7 @@ public class AccountLoginBase : AccountPopupAdjuster
 					NetworkNative.GoogleAccount select_account = null;
 					if (googleAccountList == null || googleAccountList.googleAccounts.Count == 0)
 					{
-						GameSection.ResumeEvent(false, null);
+						GameSection.ResumeEvent(false, null, false);
 						return;
 					}
 					googleAccountList.googleAccounts.ForEach(delegate(NetworkNative.GoogleAccount data)
@@ -182,7 +182,7 @@ public class AccountLoginBase : AccountPopupAdjuster
 					{
 						ToReset();
 					}
-					GameSection.ResumeEvent(is_success, null);
+					GameSection.ResumeEvent(is_success, null, false);
 				});
 			}
 			else
@@ -193,7 +193,7 @@ public class AccountLoginBase : AccountPopupAdjuster
 					{
 						ToReset();
 					}
-					GameSection.ResumeEvent(is_success, null);
+					GameSection.ResumeEvent(is_success, null, false);
 				});
 			}
 		}

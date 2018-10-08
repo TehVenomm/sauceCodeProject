@@ -633,7 +633,7 @@ public class QuestFriendDetailBase : FriendInfo
 				{
 					MonoBehaviourSingleton<FriendManager>.I.SetFollowToHomeCharaInfo(record.charaInfo.userId, true);
 				}
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 	}
@@ -667,7 +667,7 @@ public class QuestFriendDetailBase : FriendInfo
 				{
 					MonoBehaviourSingleton<FriendManager>.I.SetFollowToHomeCharaInfo(record.charaInfo.userId, false);
 				}
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 	}
@@ -681,7 +681,7 @@ public class QuestFriendDetailBase : FriendInfo
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<BlackListManager>.I.SendAdd(record.charaInfo.userId, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -694,7 +694,7 @@ public class QuestFriendDetailBase : FriendInfo
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<BlackListManager>.I.SendDelete(record.charaInfo.userId, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 

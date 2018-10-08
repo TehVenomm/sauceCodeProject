@@ -53,11 +53,11 @@ public class SerializationUtils {
     }
 
     public static <T extends Serializable> T clone(T t) {
+        ClassLoaderAwareObjectInputStream classLoaderAwareObjectInputStream;
         Throwable e;
         Throwable th;
         T t2 = null;
         if (t != null) {
-            ClassLoaderAwareObjectInputStream classLoaderAwareObjectInputStream;
             try {
                 classLoaderAwareObjectInputStream = new ClassLoaderAwareObjectInputStream(new ByteArrayInputStream(serialize(t)), t.getClass().getClassLoader());
                 try {
@@ -116,11 +116,11 @@ public class SerializationUtils {
     }
 
     public static void serialize(Serializable serializable, OutputStream outputStream) {
+        ObjectOutputStream objectOutputStream;
         Throwable e;
         if (outputStream == null) {
             throw new IllegalArgumentException("The OutputStream must not be null");
         }
-        ObjectOutputStream objectOutputStream;
         try {
             objectOutputStream = new ObjectOutputStream(outputStream);
             try {

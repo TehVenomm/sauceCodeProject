@@ -80,8 +80,8 @@ public class LoungeSearchFriend : FollowListBase
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey3F9 _003CSendGetList_003Ec__AnonStorey3F;
-		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendSearchFollowerRoom(new Action<bool, List<LoungeSearchFollowerRoomModel.LoungeFollowerModel>, List<int>>((object)_003CSendGetList_003Ec__AnonStorey3F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendGetList_003Ec__AnonStorey3FF _003CSendGetList_003Ec__AnonStorey3FF;
+		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendSearchFollowerRoom(new Action<bool, List<LoungeSearchFollowerRoomModel.LoungeFollowerModel>, List<int>>((object)_003CSendGetList_003Ec__AnonStorey3FF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private unsafe void UpdateListUI()
@@ -155,8 +155,8 @@ public class LoungeSearchFriend : FollowListBase
 		string text = StringTable.Get(STRING_CATEGORY.LOUNGE_LABEL, (uint)data.label);
 		SetLabelText(t, UI.LBL_LABEL, text);
 		int num = data.num + 1;
-		_003CSetLoungeInfo_003Ec__AnonStorey3FA _003CSetLoungeInfo_003Ec__AnonStorey3FA;
-		int num2 = data.slotInfos.Count(new Func<LoungeModel.SlotInfo, bool>((object)_003CSetLoungeInfo_003Ec__AnonStorey3FA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSetLoungeInfo_003Ec__AnonStorey400 _003CSetLoungeInfo_003Ec__AnonStorey;
+		int num2 = data.slotInfos.Count(new Func<LoungeModel.SlotInfo, bool>((object)_003CSetLoungeInfo_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		for (int i = 0; i < 7; i++)
 		{
 			bool is_visible = i < num - 1;
@@ -172,7 +172,7 @@ public class LoungeSearchFriend : FollowListBase
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendEntry(loungeFollowerModel.id, delegate(bool isSuccess)
 		{
-			GameSection.ResumeEvent(isSuccess, null);
+			GameSection.ResumeEvent(isSuccess, null, false);
 		});
 	}
 }

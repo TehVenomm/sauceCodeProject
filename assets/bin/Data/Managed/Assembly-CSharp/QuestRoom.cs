@@ -484,7 +484,7 @@ public class QuestRoom : GameSection
 		}
 		observer = questRoomObserver.Initialize(from_search_section, is_entry_pass, dispatch_callback, change_event_callback, _003C_003Ef__am_0024cache1A, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		}, true);
 		if (PartyManager.IsValidInParty())
 		{
@@ -955,7 +955,7 @@ public class QuestRoom : GameSection
 		{
 			SetActive((Enum)UI.BTN_CHANGE_PUBLIC, false);
 			SetActive((Enum)UI.BTN_CHANGE_PUBLIC_OFF, true);
-			GameSection.ResumeEvent(isSuccess, null);
+			GameSection.ResumeEvent(isSuccess, null, false);
 		});
 	}
 
@@ -969,7 +969,7 @@ public class QuestRoom : GameSection
 		}
 		MonoBehaviourSingleton<PartyManager>.I.SendIsEquip(true, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 			GameSection.SetEventData(new object[2]
 			{
 				observer.fromSearchSection,
@@ -1026,7 +1026,7 @@ public class QuestRoom : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<PartyManager>.I.SendReady(true, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 			break;
 		case PARTY_STATUS.PLAYING:
@@ -1034,7 +1034,7 @@ public class QuestRoom : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<PartyManager>.I.SendInvitedParty(delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 				DispatchEvent("QUEST_ROOM_IN_GAME", questData);
 			}, false);
 			break;
@@ -1049,7 +1049,7 @@ public class QuestRoom : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<PartyManager>.I.SendReady(false, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -1121,7 +1121,7 @@ public class QuestRoom : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate(bool b)
 			{
-				GameSection.ResumeEvent(b, null);
+				GameSection.ResumeEvent(b, null, false);
 				MonoBehaviourSingleton<CoopManager>.I.Clear();
 				QuestRoomObserver.OffObserve();
 				MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInLounge();
@@ -1477,7 +1477,7 @@ public class QuestRoom : GameSection
 				SetActive((Enum)UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
 				SetActive((Enum)UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
 				GameSaveData.instance.defaultRepeatPartyOn = MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest;
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 	}

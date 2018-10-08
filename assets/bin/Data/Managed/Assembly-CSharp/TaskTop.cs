@@ -179,8 +179,8 @@ public class TaskTop : GameSection
 		{
 			item_num = taskDataLists[(int)showType].Count - start;
 		}
-		_003CUpdateInventory_003Ec__AnonStorey49C _003CUpdateInventory_003Ec__AnonStorey49C;
-		SetDynamicList(gridTransform, LIST_ITEM_PREFAB_NAME, item_num, true, null, null, new Action<int, Transform, bool>((object)_003CUpdateInventory_003Ec__AnonStorey49C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateInventory_003Ec__AnonStorey4A2 _003CUpdateInventory_003Ec__AnonStorey4A;
+		SetDynamicList(gridTransform, LIST_ITEM_PREFAB_NAME, item_num, true, null, null, new Action<int, Transform, bool>((object)_003CUpdateInventory_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void InitListItem(TaskData data, Transform root)
@@ -285,7 +285,7 @@ public class TaskTop : GameSection
 			{
 				taskDataLists[0].Remove(data);
 				UpdateUI();
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(true, null, false);
 			}, string.Empty);
 		}
 	}

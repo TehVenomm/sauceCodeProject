@@ -4090,8 +4090,8 @@ public class Enemy : Character
 						{
 							if (delay > 0f)
 							{
-								_003COnPlayAttackedHitEffect_003Ec__AnonStorey525 _003COnPlayAttackedHitEffect_003Ec__AnonStorey;
-								AppMain.Delay(delay, new Action((object)_003COnPlayAttackedHitEffect_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+								_003COnPlayAttackedHitEffect_003Ec__AnonStorey52F _003COnPlayAttackedHitEffect_003Ec__AnonStorey52F;
+								AppMain.Delay(delay, new Action((object)_003COnPlayAttackedHitEffect_003Ec__AnonStorey52F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 							}
 							else
 							{
@@ -6871,33 +6871,45 @@ public class Enemy : Character
 		SetWarpToRandom(warpMax, warpMin);
 	}
 
-	private void EventRadialBlurStart(AnimEventData.EventData data)
+	private unsafe void EventRadialBlurStart(AnimEventData.EventData data)
 	{
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		float time = data.floatArgs[0];
-		float strength = data.floatArgs[1];
-		string text = data.stringArgs[0];
-		bool flag = (data.intArgs[0] != 0) ? true : false;
-		Transform val = FindNode(text);
-		if (val == null)
+		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+		List<string> noBlurEffectForDeviceModel = MonoBehaviourSingleton<GlobalSettingsManager>.I.noBlurEffectForDeviceModel;
+		if (_003C_003Ef__am_0024cacheA2 == null)
 		{
-			Log.Error("Not found node for RadialBlur!! " + text);
+			_003C_003Ef__am_0024cacheA2 = new Func<string, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		if (noBlurEffectForDeviceModel.Any(_003C_003Ef__am_0024cacheA2))
+		{
+			Log.Error("{0} is not allow to do blur effect", SystemInfo.get_deviceModel());
 		}
 		else
 		{
-			if (flag)
+			float time = data.floatArgs[0];
+			float strength = data.floatArgs[1];
+			string text = data.stringArgs[0];
+			bool flag = (data.intArgs[0] != 0) ? true : false;
+			Transform val = FindNode(text);
+			if (val == null)
 			{
-				if (MonoBehaviourSingleton<GlobalSettingsManager>.I.noBlurEffectBossId.Contains(enemyID) && MonoBehaviourSingleton<GlobalSettingsManager>.I.noBlurEffectEventId.Contains(Utility.GetCurrentEventID()))
-				{
-					return;
-				}
-				MonoBehaviourSingleton<InGameCameraManager>.I.StartRadialBlurFilter(time, strength, val);
+				Log.Error("Not found node for RadialBlur!! " + text);
 			}
 			else
 			{
-				MonoBehaviourSingleton<InGameCameraManager>.I.StartRadialBlurFilter(time, strength, val.get_position());
+				if (flag)
+				{
+					if (MonoBehaviourSingleton<GlobalSettingsManager>.I.noBlurEffectBossId.Contains(enemyID) && MonoBehaviourSingleton<GlobalSettingsManager>.I.noBlurEffectEventId.Contains(Utility.GetCurrentEventID()))
+					{
+						return;
+					}
+					MonoBehaviourSingleton<InGameCameraManager>.I.StartRadialBlurFilter(time, strength, val);
+				}
+				else
+				{
+					MonoBehaviourSingleton<InGameCameraManager>.I.StartRadialBlurFilter(time, strength, val.get_position());
+				}
+				radialBlurEnable = true;
 			}
-			radialBlurEnable = true;
 		}
 	}
 
@@ -8263,11 +8275,11 @@ public class Enemy : Character
 		{
 			bool flag = data.intArgs[0] == 1;
 			string[] source = data.stringArgs[0].Split(':');
-			if (_003C_003Ef__am_0024cacheA5 == null)
+			if (_003C_003Ef__am_0024cacheA6 == null)
 			{
-				_003C_003Ef__am_0024cacheA5 = new Func<string, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				_003C_003Ef__am_0024cacheA6 = new Func<string, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			}
-			int[] array = source.Select<string, int>(_003C_003Ef__am_0024cacheA5).ToArray();
+			int[] array = source.Select<string, int>(_003C_003Ef__am_0024cacheA6).ToArray();
 			int randomSelectedID = flag ? array[Random.Range(0, array.Length)] : 0;
 			ActivateRegionNode(array, flag, randomSelectedID);
 		}
@@ -8279,11 +8291,11 @@ public class Enemy : Character
 		if (data.stringArgs.Length > 0 && !string.IsNullOrEmpty(data.stringArgs[0]))
 		{
 			string[] source = data.stringArgs[0].Split(':');
-			if (_003C_003Ef__am_0024cacheA6 == null)
+			if (_003C_003Ef__am_0024cacheA7 == null)
 			{
-				_003C_003Ef__am_0024cacheA6 = new Func<string, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+				_003C_003Ef__am_0024cacheA7 = new Func<string, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			}
-			int[] array = source.Select<string, int>(_003C_003Ef__am_0024cacheA6).ToArray();
+			int[] array = source.Select<string, int>(_003C_003Ef__am_0024cacheA7).ToArray();
 			foreach (int num in array)
 			{
 				for (int j = 0; j < regionRoots.Length; j++)
@@ -8325,6 +8337,7 @@ public class Enemy : Character
 
 	public override void OnAnimEvent(AnimEventData.EventData data)
 	{
+		Debug.Log((object)("[Enemy OnAnimEvent] " + data.ToString()));
 		switch (data.id)
 		{
 		case AnimEventFormat.ID.DAMAGE_SHAKE_ON:
@@ -9876,7 +9889,7 @@ public class Enemy : Character
 				{
 					if (material.HasProperty("_MatCapPow"))
 					{
-						material.SetFloat("_MatCapPow", ((_003CSetShieldShaderParam_003Ec__Iterator1EE)/*Error near IL_009b: stateMachine*/)._003CmatCapPow_003E__1);
+						material.SetFloat("_MatCapPow", ((_003CSetShieldShaderParam_003Ec__Iterator1F3)/*Error near IL_009b: stateMachine*/)._003CmatCapPow_003E__1);
 					}
 				});
 				yield return (object)null;

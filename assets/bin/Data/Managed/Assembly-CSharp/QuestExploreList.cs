@@ -161,7 +161,7 @@ public class QuestExploreList : GameSection
 					if (!ev.readPrologueStory)
 					{
 						GameSection.StayEvent();
-						_003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey413 _003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey;
+						_003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey419 _003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey;
 						MonoBehaviourSingleton<QuestManager>.I.SendQuestReadEventStory(ev.eventId, new Action<bool, Error>((object)_003COnQuery_SELECT_EXPLORE_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					}
 					if (ev.eventType == 12)

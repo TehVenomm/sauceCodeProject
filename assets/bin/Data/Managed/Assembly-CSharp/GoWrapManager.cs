@@ -64,8 +64,8 @@ public class GoWrapManager : MonoBehaviourSingleton<GoWrapManager>, IGoWrapDeleg
 	{
 		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0028: Expected O, but got Unknown
-		_003CSendStatusTracking_003Ec__AnonStorey550 _003CSendStatusTracking_003Ec__AnonStorey;
-		Protocol.Force(new Action((object)_003CSendStatusTracking_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendStatusTracking_003Ec__AnonStorey55A _003CSendStatusTracking_003Ec__AnonStorey55A;
+		Protocol.Force(new Action((object)_003CSendStatusTracking_003Ec__AnonStorey55A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public void trackEvent(string name, string category)

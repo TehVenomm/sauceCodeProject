@@ -1713,7 +1713,7 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 			enemy.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.DEFAULT);
 		}
 		enemy.PlayMotion(124, -1f);
-		_003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey518 _003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey;
+		_003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey522 _003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey;
 		this.StartCoroutine(SimpleMoveCharacterY(enemy, (float)num, to, 1f, new Action((object)_003CShowEnemyFromUnderGroundForSeriesOfBattles_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 

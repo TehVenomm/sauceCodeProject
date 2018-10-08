@@ -408,8 +408,8 @@ public class FortuneWheelTop : GameSection
 				int count = userLogList.Count - 30;
 				userLogList.RemoveRange(0, count);
 			}
-			_003CReloadUserRewardLog_003Ec__AnonStorey30C _003CReloadUserRewardLog_003Ec__AnonStorey30C;
-			SetGrid(UI.GRD_REWARD_LOG, "FortuneWheelRewardLogItem", userLogList.Count, true, new Action<int, Transform, bool>((object)_003CReloadUserRewardLog_003Ec__AnonStorey30C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CReloadUserRewardLog_003Ec__AnonStorey311 _003CReloadUserRewardLog_003Ec__AnonStorey;
+			SetGrid(UI.GRD_REWARD_LOG, "FortuneWheelRewardLogItem", userLogList.Count, true, new Action<int, Transform, bool>((object)_003CReloadUserRewardLog_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			UIScrollView component = GetCtrl(UI.SCR_USER_REWARD).GetComponent<UIScrollView>();
 			if (component.CurrentFit())
 			{
@@ -539,8 +539,8 @@ public class FortuneWheelTop : GameSection
 		//IL_0032: Expected O, but got Unknown
 		if (!isSpinning)
 		{
-			_003CSpin_003Ec__AnonStorey30D _003CSpin_003Ec__AnonStorey30D;
-			Protocol.Force(new Action((object)_003CSpin_003Ec__AnonStorey30D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSpin_003Ec__AnonStorey312 _003CSpin_003Ec__AnonStorey;
+			Protocol.Force(new Action((object)_003CSpin_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -587,7 +587,7 @@ public class FortuneWheelTop : GameSection
 					this.StartCoroutine(IESpinMultiIMP(MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData));
 				}
 				UpdateAfterSpin();
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(true, null, false);
 			});
 		}
 	}

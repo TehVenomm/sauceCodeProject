@@ -1778,8 +1778,8 @@ public class CoopStage
 		{
 			time = MonoBehaviourSingleton<InGameSettingsManager>.I.fishingParam.hitEnemyMoveSec;
 		}
-		_003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4F1 _003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4F;
-		this.StartCoroutine(SimpleMoveCharacterY(enemy, -10f, StageManager.GetHeight(enemy._transform.get_position()), time, new Action((object)_003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+		_003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4FB _003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4FB;
+		this.StartCoroutine(SimpleMoveCharacterY(enemy, -10f, StageManager.GetHeight(enemy._transform.get_position()), time, new Action((object)_003CGoUpCharacterFromUnderGround_003Ec__AnonStorey4FB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 
 	public unsafe void GoDownCharacterToUnderGround(Enemy enemy, Action OnEndAction)
@@ -1797,8 +1797,8 @@ public class CoopStage
 		enemy.ActIdle(false, -1f);
 		Enemy enemy2 = enemy;
 		Vector3 position = enemy._transform.get_position();
-		_003CGoDownCharacterToUnderGround_003Ec__AnonStorey4F2 _003CGoDownCharacterToUnderGround_003Ec__AnonStorey4F;
-		this.StartCoroutine(SimpleMoveCharacterY(enemy2, position.y, -10f, 3f, new Action((object)_003CGoDownCharacterToUnderGround_003Ec__AnonStorey4F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+		_003CGoDownCharacterToUnderGround_003Ec__AnonStorey4FC _003CGoDownCharacterToUnderGround_003Ec__AnonStorey4FC;
+		this.StartCoroutine(SimpleMoveCharacterY(enemy2, position.y, -10f, 3f, new Action((object)_003CGoDownCharacterToUnderGround_003Ec__AnonStorey4FC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 	}
 
 	public IEnumerator SimpleMoveCharacterY(Character enemy, float from, float to, float time, Action OnEndAction)

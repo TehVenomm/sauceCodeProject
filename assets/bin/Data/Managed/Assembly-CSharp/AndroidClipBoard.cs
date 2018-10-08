@@ -11,10 +11,10 @@ public class AndroidClipBoard : iClipBoard
 		//IL_0048: Expected O, but got Unknown
 		AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
 		AndroidJavaObject activity = val.GetStatic<AndroidJavaObject>("currentActivity");
-		_003CSetClipBoard_003Ec__AnonStorey71A _003CSetClipBoard_003Ec__AnonStorey71A;
+		_003CSetClipBoard_003Ec__AnonStorey72D _003CSetClipBoard_003Ec__AnonStorey72D;
 		activity.Call("runOnUiThread", new object[1]
 		{
-			(object)new AndroidJavaRunnable((object)_003CSetClipBoard_003Ec__AnonStorey71A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)
+			(object)new AndroidJavaRunnable((object)_003CSetClipBoard_003Ec__AnonStorey72D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)
 		});
 	}
 }

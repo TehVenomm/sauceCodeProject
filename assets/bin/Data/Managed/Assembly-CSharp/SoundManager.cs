@@ -362,7 +362,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 					bool is_play_fadeout = true;
 					EventDelegate.Callback OnFinishedCallBack = delegate
 					{
-						((_003CStart_003Ec__Iterator295)/*Error near IL_00f3: stateMachine*/)._003Cis_play_fadeout_003E__1 = false;
+						((_003CStart_003Ec__Iterator29A)/*Error near IL_00f3: stateMachine*/)._003Cis_play_fadeout_003E__1 = false;
 					};
 					TweenVolume fadeout = TweenVolume.Begin(this.get_gameObject(), fadeOutTime, 0f);
 					EventDelegate.Add(fadeout.onFinished, OnFinishedCallBack);

@@ -119,7 +119,7 @@ public class ItemDetailEquipAttachSkill : SkillInfoBase
 		if (slotData != null)
 		{
 			Transform table_item = null;
-			_003CUpdateUI_003Ec__AnonStorey3E3 _003CUpdateUI_003Ec__AnonStorey3E;
+			_003CUpdateUI_003Ec__AnonStorey3E9 _003CUpdateUI_003Ec__AnonStorey3E;
 			SetTable(UI.TBL_SKILL_LIST, "EquipSetDetailTopItem", 1, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			Transform val = FindCtrl(table_item, UI.OBJ_SPACE_COLLISION);
 			Transform ctrl = GetCtrl(UI.OBJ_ANCHOR_BOTTOM);

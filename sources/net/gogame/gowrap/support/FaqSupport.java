@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import net.gogame.gowrap.Constants;
-import net.gogame.gowrap.InternalConstants;
 import net.gogame.gowrap.io.utils.IOUtils;
 import net.gogame.gowrap.model.faq.Category;
 
@@ -77,7 +76,7 @@ public final class FaqSupport {
                     jsonReader.skipValue();
                 } else if (StringUtils.isEquals(nextName, str)) {
                     category2 = new Category(jsonReader);
-                } else if (StringUtils.isEquals(nextName, InternalConstants.DEFAULT_LOCALE)) {
+                } else if (StringUtils.isEquals(nextName, "default")) {
                     category = new Category(jsonReader);
                 } else {
                     jsonReader.skipValue();

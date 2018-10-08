@@ -595,8 +595,8 @@ public class SmithEvolve : EquipGenerateBase
 		if (adapterAbilityList.Count > 0 || abilityItem != null)
 		{
 			bool empty_ability = true;
-			_003CEquipTableParam_003Ec__AnonStorey47A _003CEquipTableParam_003Ec__AnonStorey47A;
-			SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", adapterAbilityList.Count + ((abilityItem != null) ? 1 : 0), false, new Action<int, Transform, bool>((object)_003CEquipTableParam_003Ec__AnonStorey47A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CEquipTableParam_003Ec__AnonStorey480 _003CEquipTableParam_003Ec__AnonStorey;
+			SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", adapterAbilityList.Count + ((abilityItem != null) ? 1 : 0), false, new Action<int, Transform, bool>((object)_003CEquipTableParam_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			if (empty_ability)
 			{
 				SetActive((Enum)UI.STR_NON_ABILITY, true);
@@ -689,8 +689,8 @@ public class SmithEvolve : EquipGenerateBase
 			SmithManager.ResultData result_data = new SmithManager.ResultData();
 			GameSection.SetEventData(result_data);
 			GameSection.StayEvent();
-			_003CSend_003Ec__AnonStorey47C _003CSend_003Ec__AnonStorey47C;
-			MonoBehaviourSingleton<SmithManager>.I.SendEvolveEquipItem(data.evolveData.evolveBeforeEquipData.uniqueID, data.evolveData.GetEvolveTable().id, selectedUniqueIdList, new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey47C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSend_003Ec__AnonStorey482 _003CSend_003Ec__AnonStorey;
+			MonoBehaviourSingleton<SmithManager>.I.SendEvolveEquipItem(data.evolveData.evolveBeforeEquipData.uniqueID, data.evolveData.GetEvolveTable().id, selectedUniqueIdList, new Action<Error, EquipItemInfo>((object)_003CSend_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -831,8 +831,8 @@ public class SmithEvolve : EquipGenerateBase
 			}
 		}
 		loader = itemModels[i].get_gameObject().AddComponent<ItemLoader>();
-		_003CLoadItemModelData_003Ec__AnonStorey47D _003CLoadItemModelData_003Ec__AnonStorey47D;
-		loader.LoadEquip(smithData.evolveData.evolveEquipDataTable[i].id, GetRenderTextureModelTransform(UI.TEX_MODEL), GetRenderTextureLayer(UI.TEX_MODEL), -1, -1, new Action((object)_003CLoadItemModelData_003Ec__AnonStorey47D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CLoadItemModelData_003Ec__AnonStorey483 _003CLoadItemModelData_003Ec__AnonStorey;
+		loader.LoadEquip(smithData.evolveData.evolveEquipDataTable[i].id, GetRenderTextureModelTransform(UI.TEX_MODEL), GetRenderTextureLayer(UI.TEX_MODEL), -1, -1, new Action((object)_003CLoadItemModelData_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void OnOpen()

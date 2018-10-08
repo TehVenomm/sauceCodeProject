@@ -258,7 +258,7 @@ public class TutorialWeaponSelect : GameSection
 		equipSet = new EquipSetInfo[result.GetCount()];
 		result.ForEach(delegate(TutorialGearSetTable.ItemData o)
 		{
-			((_003CInit_003Ec__Iterator180)/*Error near IL_00ae: stateMachine*/)._003C_003Ef__this.equipSet[o.id - 1] = new EquipSetInfo(o);
+			((_003CInit_003Ec__Iterator185)/*Error near IL_00ae: stateMachine*/)._003C_003Ef__this.equipSet[o.id - 1] = new EquipSetInfo(o);
 		});
 		int len = equipSet.Length;
 		equipSetCalc = new EquipSetCalculator[len];
@@ -528,12 +528,12 @@ public class TutorialWeaponSelect : GameSection
 		loadedModel = false;
 		SetRenderPlayerModel(GetCtrl(UI.OBJ_MODEL_ROOT), UI.TEX_MODEL, load_player_info, PLAYER_ANIM_TYPE.GetStatus(sexId), new Vector3(0f, -0.75f, 14f), new Vector3(0f, 180f, 0f), true, delegate(PlayerLoader player_loader)
 		{
-			((_003CIERender_003Ec__Iterator184)/*Error near IL_00b3: stateMachine*/)._003C_003Ef__this.loadedModel = true;
+			((_003CIERender_003Ec__Iterator189)/*Error near IL_00b3: stateMachine*/)._003C_003Ef__this.loadedModel = true;
 			if (player_loader != null)
 			{
-				((_003CIERender_003Ec__Iterator184)/*Error near IL_00b3: stateMachine*/)._003C_003Ef__this.loader = player_loader;
+				((_003CIERender_003Ec__Iterator189)/*Error near IL_00b3: stateMachine*/)._003C_003Ef__this.loader = player_loader;
 			}
-			((_003CIERender_003Ec__Iterator184)/*Error near IL_00b3: stateMachine*/)._003C_003Ef__this.PlayVoice();
+			((_003CIERender_003Ec__Iterator189)/*Error near IL_00b3: stateMachine*/)._003C_003Ef__this.PlayVoice();
 		});
 	}
 

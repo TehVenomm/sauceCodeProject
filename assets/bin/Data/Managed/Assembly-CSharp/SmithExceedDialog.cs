@@ -57,6 +57,8 @@ public class SmithExceedDialog : GameSection
 
 	private int maxPageIndex;
 
+	private int need_select_index;
+
 	public override IEnumerable<string> requireDataTable
 	{
 		get
@@ -122,8 +124,8 @@ public class SmithExceedDialog : GameSection
 		UpdateBonusDetail(true);
 		bool is_only_lapis = true;
 		int item_num = exceedData.exceed.Length;
-		_003CUpdateUI_003Ec__AnonStorey3E9 _003CUpdateUI_003Ec__AnonStorey3E;
-		SetGrid(UI.GRD_LAPIS, "SmithExceedItem", item_num, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateUI_003Ec__AnonStorey3EF _003CUpdateUI_003Ec__AnonStorey3EF;
+		SetGrid(UI.GRD_LAPIS, "SmithExceedItem", item_num, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3EF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		bool flag = exceedCount < 4;
 		SetActive((Enum)UI.OBJ_VALID_EXCEED_ROOT, flag);
 		SetActive((Enum)UI.OBJ_INVALID_EXCEED_ROOT, !flag);
@@ -198,6 +200,7 @@ public class SmithExceedDialog : GameSection
 		}
 		else
 		{
+			need_select_index = (int)GameSection.GetEventData();
 			int num = (int)GameSection.GetEventData();
 			int exceed = smithData.selectEquipData.exceed;
 			int needNum = (int)exceedData.exceed[num].getNeedNum(exceed + 1);
@@ -220,6 +223,11 @@ public class SmithExceedDialog : GameSection
 				text
 			});
 		}
+	}
+
+	private void OnQuery_SmithExceedNeedMessage_YES()
+	{
+		MonoBehaviourSingleton<TradingPostManager>.I.SetTradingPostFindData((int)exceedData.exceed[need_select_index].itemId);
 	}
 
 	private unsafe void OnQuery_SmithExceedConfirm_YES()
@@ -257,8 +265,8 @@ public class SmithExceedDialog : GameSection
 				{
 					uint itemId = equipItemExceedDataIncludeLimited.exceed[selectIndex].itemId;
 					GameSection.StayEvent();
-					_003COnQuery_SmithExceedConfirm_YES_003Ec__AnonStorey3EA _003COnQuery_SmithExceedConfirm_YES_003Ec__AnonStorey3EA;
-					MonoBehaviourSingleton<SmithManager>.I.SendExceedEquipItem(selectEquipData.uniqueID, itemId, new Action<Error, EquipItemInfo>((object)_003COnQuery_SmithExceedConfirm_YES_003Ec__AnonStorey3EA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					_003COnQuery_SmithExceedConfirm_YES_003Ec__AnonStorey3F0 _003COnQuery_SmithExceedConfirm_YES_003Ec__AnonStorey3F;
+					MonoBehaviourSingleton<SmithManager>.I.SendExceedEquipItem(selectEquipData.uniqueID, itemId, new Action<Error, EquipItemInfo>((object)_003COnQuery_SmithExceedConfirm_YES_003Ec__AnonStorey3F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 			}
 		}

@@ -29,7 +29,7 @@ public class HomeOpinionBox : OpinionBox
 			}
 			else
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			}
 		});
 	}
@@ -52,7 +52,7 @@ public class HomeOpinionBox : OpinionBox
 	{
 		MonoBehaviourSingleton<UserInfoManager>.I.SendAppReviewInfo(starValue, replyAction, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 }

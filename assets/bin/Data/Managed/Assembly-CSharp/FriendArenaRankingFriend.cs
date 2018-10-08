@@ -87,7 +87,7 @@ public class FriendArenaRankingFriend : FriendArenaRanking
 
 	private unsafe void SendGetFriendRanking(int sendGroup, Action<bool> callback)
 	{
-		_003CSendGetFriendRanking_003Ec__AnonStorey313 _003CSendGetFriendRanking_003Ec__AnonStorey;
+		_003CSendGetFriendRanking_003Ec__AnonStorey318 _003CSendGetFriendRanking_003Ec__AnonStorey;
 		MonoBehaviourSingleton<FriendManager>.I.SendGetFriendRanking(sendGroup, 0, new Action<bool, List<ArenaRankingData>>((object)_003CSendGetFriendRanking_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

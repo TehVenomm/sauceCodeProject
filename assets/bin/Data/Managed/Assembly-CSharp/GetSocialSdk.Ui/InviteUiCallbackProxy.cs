@@ -25,8 +25,8 @@ namespace GetSocialSdk.Ui
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002a: Expected O, but got Unknown
 			Debug.Log((object)"Complete");
-			_003ConComplete_003Ec__AnonStorey7F5 _003ConComplete_003Ec__AnonStorey7F;
-			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003ConComplete_003Ec__AnonStorey7F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003ConComplete_003Ec__AnonStorey808 _003ConComplete_003Ec__AnonStorey;
+			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003ConComplete_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
 		private unsafe void onCancel(string channelId)
@@ -34,8 +34,8 @@ namespace GetSocialSdk.Ui
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002a: Expected O, but got Unknown
 			Debug.Log((object)"Cancel");
-			_003ConCancel_003Ec__AnonStorey7F6 _003ConCancel_003Ec__AnonStorey7F;
-			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003ConCancel_003Ec__AnonStorey7F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003ConCancel_003Ec__AnonStorey809 _003ConCancel_003Ec__AnonStorey;
+			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003ConCancel_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
 		private unsafe void onError(string channelId, AndroidJavaObject throwable)
@@ -43,8 +43,8 @@ namespace GetSocialSdk.Ui
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0031: Expected O, but got Unknown
 			Debug.Log((object)"Failure");
-			_003ConError_003Ec__AnonStorey7F7 _003ConError_003Ec__AnonStorey7F;
-			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003ConError_003Ec__AnonStorey7F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003ConError_003Ec__AnonStorey80A _003ConError_003Ec__AnonStorey80A;
+			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003ConError_003Ec__AnonStorey80A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 }

@@ -78,8 +78,8 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 		SetupEnableInventoryUI();
 		m_generatedIconList.Clear();
 		UpdateNewIconInfo();
-		_003CUpdateInventoryUI_003Ec__AnonStorey3E8 _003CUpdateInventoryUI_003Ec__AnonStorey3E;
-		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length + 2, false, new Func<int, bool>((object)_003CUpdateInventoryUI_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateInventoryUI_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateInventoryUI_003Ec__AnonStorey3EE _003CUpdateInventoryUI_003Ec__AnonStorey3EE;
+		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length + 2, false, new Func<int, bool>((object)_003CUpdateInventoryUI_003Ec__AnonStorey3EE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CUpdateInventoryUI_003Ec__AnonStorey3EE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override int GetInventoryFirstIndex()
@@ -276,7 +276,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 			{
 				isSelfSectionChange = false;
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -299,7 +299,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 			{
 				isSelfSectionChange = false;
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 

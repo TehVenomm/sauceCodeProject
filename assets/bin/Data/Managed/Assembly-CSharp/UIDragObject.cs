@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Drag Object")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/Interaction/Drag Object")]
 public class UIDragObject
 {
 	public enum DragEffect
@@ -28,8 +28,8 @@ public class UIDragObject
 	[SerializeField]
 	protected Vector3 scale = new Vector3(1f, 1f, 0f);
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private float scrollWheelFactor;
 
 	private Plane mPlane;

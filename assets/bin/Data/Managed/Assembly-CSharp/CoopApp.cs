@@ -34,22 +34,22 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 
 	public unsafe static void EnterQuestOffline(Action<bool, bool, bool, bool> call_back = null)
 	{
-		_003CEnterQuestOffline_003Ec__AnonStorey4C4 _003CEnterQuestOffline_003Ec__AnonStorey4C;
-		StartCoopOffline(new Action<bool, bool, bool>((object)_003CEnterQuestOffline_003Ec__AnonStorey4C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CEnterQuestOffline_003Ec__AnonStorey4CE _003CEnterQuestOffline_003Ec__AnonStorey4CE;
+		StartCoopOffline(new Action<bool, bool, bool>((object)_003CEnterQuestOffline_003Ec__AnonStorey4CE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public unsafe static void EnterQuestOfflineAssignedEquipment(AssignedEquipmentTable.AssignedEquipmentData assignedEquipmentData, CharaInfo charaInfo, Action<bool, bool, bool, bool> callBack = null)
 	{
-		_003CEnterQuestOfflineAssignedEquipment_003Ec__AnonStorey4C6 _003CEnterQuestOfflineAssignedEquipment_003Ec__AnonStorey4C;
-		StartCoopOffline(new Action<bool, bool, bool>((object)_003CEnterQuestOfflineAssignedEquipment_003Ec__AnonStorey4C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CEnterQuestOfflineAssignedEquipment_003Ec__AnonStorey4D0 _003CEnterQuestOfflineAssignedEquipment_003Ec__AnonStorey4D;
+		StartCoopOffline(new Action<bool, bool, bool>((object)_003CEnterQuestOfflineAssignedEquipment_003Ec__AnonStorey4D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public unsafe static void EnterArenaQuestOffline(Action<bool, bool, bool, bool> callBack = null)
 	{
 		QuestManager questMgr = MonoBehaviourSingleton<QuestManager>.I;
 		MonoBehaviourSingleton<InGameManager>.I.SetArenaInfo(questMgr.currentArenaId);
-		_003CEnterArenaQuestOffline_003Ec__AnonStorey4C8 _003CEnterArenaQuestOffline_003Ec__AnonStorey4C;
-		StartCoopOffline(new Action<bool, bool, bool>((object)_003CEnterArenaQuestOffline_003Ec__AnonStorey4C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CEnterArenaQuestOffline_003Ec__AnonStorey4D2 _003CEnterArenaQuestOffline_003Ec__AnonStorey4D;
+		StartCoopOffline(new Action<bool, bool, bool>((object)_003CEnterArenaQuestOffline_003Ec__AnonStorey4D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public static void EnterQuest(Action<bool, bool, bool, bool> call_back = null)
@@ -106,8 +106,8 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 			{
 				if (is_m)
 				{
-					_003CEnterPartyField_003Ec__AnonStorey4CC._003CEnterPartyField_003Ec__AnonStorey4CD _003CEnterPartyField_003Ec__AnonStorey4CD;
-					StartCoop(new Action<bool, bool>((object)_003CEnterPartyField_003Ec__AnonStorey4CD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), is_reentry);
+					_003CEnterPartyField_003Ec__AnonStorey4D6._003CEnterPartyField_003Ec__AnonStorey4D7 _003CEnterPartyField_003Ec__AnonStorey4D;
+					StartCoop(new Action<bool, bool>((object)_003CEnterPartyField_003Ec__AnonStorey4D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), is_reentry);
 				}
 				else if (call_back != null)
 				{
@@ -142,8 +142,8 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 			{
 				if (is_m)
 				{
-					_003CEnterField_003Ec__AnonStorey4CE._003CEnterField_003Ec__AnonStorey4CF _003CEnterField_003Ec__AnonStorey4CF;
-					StartCoop(new Action<bool, bool>((object)_003CEnterField_003Ec__AnonStorey4CF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
+					_003CEnterField_003Ec__AnonStorey4D8._003CEnterField_003Ec__AnonStorey4D9 _003CEnterField_003Ec__AnonStorey4D;
+					StartCoop(new Action<bool, bool>((object)_003CEnterField_003Ec__AnonStorey4D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
 				}
 				else if (call_back != null)
 				{
@@ -212,8 +212,8 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 	{
 		MonoBehaviourSingleton<CoopManager>.I.Clear();
 		CoopNetworkManager.ConnectData webSockConnectData = MonoBehaviourSingleton<FieldManager>.I.GetWebSockConnectData();
-		_003CStartCoop_003Ec__AnonStorey4D2 _003CStartCoop_003Ec__AnonStorey4D;
-		MonoBehaviourSingleton<CoopNetworkManager>.I.ConnectAndRegist(webSockConnectData, new Action<bool, bool>((object)_003CStartCoop_003Ec__AnonStorey4D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CStartCoop_003Ec__AnonStorey4DC _003CStartCoop_003Ec__AnonStorey4DC;
+		MonoBehaviourSingleton<CoopNetworkManager>.I.ConnectAndRegist(webSockConnectData, new Action<bool, bool>((object)_003CStartCoop_003Ec__AnonStorey4DC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private unsafe static void StartCoopAndQuestStart(bool is_m, bool isFromField, Action<bool, bool, bool, bool> call_back = null)
@@ -243,8 +243,8 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 			{
 				MonoBehaviourSingleton<InGameManager>.I.currentJoinType = CoopClient.CLIENT_JOIN_TYPE.FROM_QUEST_LIST;
 			}
-			_003CStartCoopAndQuestStart_003Ec__AnonStorey4D4 _003CStartCoopAndQuestStart_003Ec__AnonStorey4D;
-			StartCoop(new Action<bool, bool>((object)_003CStartCoopAndQuestStart_003Ec__AnonStorey4D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
+			_003CStartCoopAndQuestStart_003Ec__AnonStorey4DE _003CStartCoopAndQuestStart_003Ec__AnonStorey4DE;
+			StartCoop(new Action<bool, bool>((object)_003CStartCoopAndQuestStart_003Ec__AnonStorey4DE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), false);
 		}
 		else if (call_back != null)
 		{
@@ -281,8 +281,8 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 	private unsafe static void RandomMatchingQuestField(Action<bool> call_back = null)
 	{
 		int quest_id = (int)MonoBehaviourSingleton<QuestManager>.I.currentQuestID;
-		_003CRandomMatchingQuestField_003Ec__AnonStorey4D8 _003CRandomMatchingQuestField_003Ec__AnonStorey4D;
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching(quest_id, 0, false, new Action<bool, int, bool, float>((object)_003CRandomMatchingQuestField_003Ec__AnonStorey4D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CRandomMatchingQuestField_003Ec__AnonStorey4E2 _003CRandomMatchingQuestField_003Ec__AnonStorey4E;
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching(quest_id, 0, false, new Action<bool, int, bool, float>((object)_003CRandomMatchingQuestField_003Ec__AnonStorey4E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private static void MatchingPartyField(Action<bool> call_back = null, bool is_force_enter = false)
@@ -440,14 +440,14 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 			{
 				logs = MonoBehaviourSingleton<CoopManager>.I.coopStage.battleUserLog.list;
 			}
-			_003CQuestComplete_003Ec__AnonStorey4DD _003CQuestComplete_003Ec__AnonStorey4DD;
+			_003CQuestComplete_003Ec__AnonStorey4E7 _003CQuestComplete_003Ec__AnonStorey4E;
 			if (QuestManager.IsValidTrial())
 			{
-				MonoBehaviourSingleton<QuestManager>.I.SendQuestCompleteTrial(missionClearStatuses, new Action<bool, Error>((object)_003CQuestComplete_003Ec__AnonStorey4DD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				MonoBehaviourSingleton<QuestManager>.I.SendQuestCompleteTrial(missionClearStatuses, new Action<bool, Error>((object)_003CQuestComplete_003Ec__AnonStorey4E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			else
 			{
-				MonoBehaviourSingleton<QuestManager>.I.SendQuestComplete(list, missionClearStatuses, memIds, hpRate, logs, new Action<bool, Error>((object)_003CQuestComplete_003Ec__AnonStorey4DD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				MonoBehaviourSingleton<QuestManager>.I.SendQuestComplete(list, missionClearStatuses, memIds, hpRate, logs, new Action<bool, Error>((object)_003CQuestComplete_003Ec__AnonStorey4E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}
@@ -527,8 +527,8 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 			bool wait3 = true;
 			MonoBehaviourSingleton<FieldManager>.I.SendLeave(toHome, fieldRetire, delegate(bool is_leave)
 			{
-				((_003CLeaveCoroutine_003Ec__Iterator1AF)/*Error near IL_0059: stateMachine*/)._003Cwait_003E__2 = false;
-				((_003CLeaveCoroutine_003Ec__Iterator1AF)/*Error near IL_0059: stateMachine*/)._003Cis_leaved_003E__1 = is_leave;
+				((_003CLeaveCoroutine_003Ec__Iterator1B4)/*Error near IL_0059: stateMachine*/)._003Cwait_003E__2 = false;
+				((_003CLeaveCoroutine_003Ec__Iterator1B4)/*Error near IL_0059: stateMachine*/)._003Cis_leaved_003E__1 = is_leave;
 			});
 			while (wait3)
 			{
@@ -543,8 +543,8 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 			bool wait2 = true;
 			MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate(bool is_leave)
 			{
-				((_003CLeaveCoroutine_003Ec__Iterator1AF)/*Error near IL_00df: stateMachine*/)._003Cwait_003E__4 = false;
-				((_003CLeaveCoroutine_003Ec__Iterator1AF)/*Error near IL_00df: stateMachine*/)._003Cis_leaved_003E__3 = is_leave;
+				((_003CLeaveCoroutine_003Ec__Iterator1B4)/*Error near IL_00df: stateMachine*/)._003Cwait_003E__4 = false;
+				((_003CLeaveCoroutine_003Ec__Iterator1B4)/*Error near IL_00df: stateMachine*/)._003Cis_leaved_003E__3 = is_leave;
 			});
 			while (wait2)
 			{
@@ -583,11 +583,11 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 						MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave(true);
 						if (PartyManager.IsValidInParty() && !InGameManager.IsReentryNotLeaveParty())
 						{
-							if (_003COnApplicationPause_003Ec__Iterator1B0._003C_003Ef__am_0024cache7 == null)
+							if (_003COnApplicationPause_003Ec__Iterator1B5._003C_003Ef__am_0024cache7 == null)
 							{
-								_003COnApplicationPause_003Ec__Iterator1B0._003C_003Ef__am_0024cache7 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+								_003COnApplicationPause_003Ec__Iterator1B5._003C_003Ef__am_0024cache7 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 							}
-							Protocol.Force(_003COnApplicationPause_003Ec__Iterator1B0._003C_003Ef__am_0024cache7);
+							Protocol.Force(_003COnApplicationPause_003Ec__Iterator1B5._003C_003Ef__am_0024cache7);
 						}
 						MonoBehaviourSingleton<KtbWebSocket>.I.Close(1000, "Bye!");
 					}

@@ -67,8 +67,8 @@ public class GuildSearchFriend : FollowListBase
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey357 _003CSendGetList_003Ec__AnonStorey;
-		MonoBehaviourSingleton<GuildManager>.I.SendSearchFollowerRoom(new Action<bool, List<GuildSearchFollowerRoomModel.GuildFollowerModel>>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendGetList_003Ec__AnonStorey35C _003CSendGetList_003Ec__AnonStorey35C;
+		MonoBehaviourSingleton<GuildManager>.I.SendSearchFollowerRoom(new Action<bool, List<GuildSearchFollowerRoomModel.GuildFollowerModel>>((object)_003CSendGetList_003Ec__AnonStorey35C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private unsafe void UpdateListUI()

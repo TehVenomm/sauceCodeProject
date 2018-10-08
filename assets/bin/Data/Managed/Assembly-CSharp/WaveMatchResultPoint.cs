@@ -101,8 +101,8 @@ public class WaveMatchResultPoint : GameSection
 		SetLabelText((Enum)UI.LBL_GET_POINT, "0pt");
 		SetFontStyle((Enum)UI.LBL_TOTAL_POINT, 2);
 		SetLabelText((Enum)UI.LBL_TOTAL_POINT, d.userPoint.ToString("N0") + "pt");
-		_003CUpdateUI_003Ec__AnonStorey4A6 _003CUpdateUI_003Ec__AnonStorey4A;
-		SetGrid(UI.GRD_POINT_DETAIL, "WaveMatchResultPointDetailItem", d.bonusPoint.Count, true, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateUI_003Ec__AnonStorey4B0 _003CUpdateUI_003Ec__AnonStorey4B;
+		SetGrid(UI.GRD_POINT_DETAIL, "WaveMatchResultPointDetailItem", d.bonusPoint.Count, true, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey4B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (d.nextReward != null)
 		{
 			List<PointEventCurrentData.Reward> reward = d.nextReward.reward;
@@ -126,8 +126,8 @@ public class WaveMatchResultPoint : GameSection
 
 	private unsafe void SetAllRewardItem(UI targetGrid, List<PointEventCurrentData.Reward> rewardList)
 	{
-		_003CSetAllRewardItem_003Ec__AnonStorey4A7 _003CSetAllRewardItem_003Ec__AnonStorey4A;
-		SetGrid(targetGrid, "ItemIconReward", rewardList.Count, true, new Action<int, Transform, bool>((object)_003CSetAllRewardItem_003Ec__AnonStorey4A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSetAllRewardItem_003Ec__AnonStorey4B1 _003CSetAllRewardItem_003Ec__AnonStorey4B;
+		SetGrid(targetGrid, "ItemIconReward", rewardList.Count, true, new Action<int, Transform, bool>((object)_003CSetAllRewardItem_003Ec__AnonStorey4B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void SetPoint(UI parent, int point)
@@ -172,7 +172,7 @@ public class WaveMatchResultPoint : GameSection
 		PlayTween((Enum)UI.OBJ_WAVEMATCH_POINT, true, (EventDelegate.Callback)delegate
 		{
 			SoundManager.PlayOneShotUISE(40000228);
-			((_003CPlayAnimation_003Ec__Iterator186)/*Error near IL_0072: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			((_003CPlayAnimation_003Ec__Iterator18B)/*Error near IL_0072: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 		}, false, 0);
 		while (animState != 0 && !is_skip)
 		{
@@ -187,7 +187,7 @@ public class WaveMatchResultPoint : GameSection
 		animState = RESULT_ANIM_STATE.NEXT_REWARD;
 		PlayTween((Enum)UI.OBJ_NEXT_REWARD, true, (EventDelegate.Callback)delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator186)/*Error near IL_013e: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			((_003CPlayAnimation_003Ec__Iterator18B)/*Error near IL_013e: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 		}, false, 0);
 		SoundManager.PlayOneShotUISE(40000228);
 		if (pointEvents.pointRankingData.getReward.Count > 0)
@@ -195,7 +195,7 @@ public class WaveMatchResultPoint : GameSection
 			animState = RESULT_ANIM_STATE.REWARD;
 			PlayTween((Enum)UI.OBJ_GET_REWARD_ROOT, true, (EventDelegate.Callback)delegate
 			{
-				((_003CPlayAnimation_003Ec__Iterator186)/*Error near IL_0195: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+				((_003CPlayAnimation_003Ec__Iterator18B)/*Error near IL_0195: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
 			}, false, 0);
 		}
 		animState = RESULT_ANIM_STATE.END;

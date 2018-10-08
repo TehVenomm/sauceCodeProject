@@ -101,7 +101,7 @@ public class ConfigAnnounce : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<UserInfoManager>.I.SendPushNotificationDeviceEnable(pushEnable, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 				pushEnable = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.pushEnable;
 				autoClose = true;
 			});

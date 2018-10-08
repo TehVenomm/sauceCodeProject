@@ -403,16 +403,16 @@ public class TutorialMessage : UIBehaviour
 		{
 			if (msg == null)
 			{
-				((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_0052: stateMachine*/)._003Clist_003E__1.Add(null);
+				((_003C_LoadMessageImage_003Ec__Iterator2B0)/*Error near IL_0052: stateMachine*/)._003Clist_003E__1.Add(null);
 			}
 			else if (string.IsNullOrEmpty(msg.imageResourceName))
 			{
-				((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_0052: stateMachine*/)._003Clist_003E__1.Add(null);
+				((_003C_LoadMessageImage_003Ec__Iterator2B0)/*Error near IL_0052: stateMachine*/)._003Clist_003E__1.Add(null);
 			}
 			else
 			{
-				LoadObject item = ((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_0052: stateMachine*/)._003Clo_queue_003E__0.Load(RESOURCE_CATEGORY.UI, msg.imageResourceName, false);
-				((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_0052: stateMachine*/)._003Clist_003E__1.Add(item);
+				LoadObject item = ((_003C_LoadMessageImage_003Ec__Iterator2B0)/*Error near IL_0052: stateMachine*/)._003Clo_queue_003E__0.Load(RESOURCE_CATEGORY.UI, msg.imageResourceName, false);
+				((_003C_LoadMessageImage_003Ec__Iterator2B0)/*Error near IL_0052: stateMachine*/)._003Clist_003E__1.Add(item);
 			}
 		});
 		if (lo_queue.IsLoading())
@@ -421,14 +421,14 @@ public class TutorialMessage : UIBehaviour
 		}
 		list.ForEach(delegate(LoadObject data)
 		{
-			((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_009d: stateMachine*/)._003Cindex_003E__2++;
+			((_003C_LoadMessageImage_003Ec__Iterator2B0)/*Error near IL_009d: stateMachine*/)._003Cindex_003E__2++;
 			if (data != null)
 			{
-				Transform val = ResourceUtility.Realizes(data.loadedObject, ((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_009d: stateMachine*/)._003C_003Ef__this.GetCtrl(UI.OBJ_IMAGE_ROOT), 5);
+				Transform val = ResourceUtility.Realizes(data.loadedObject, ((_003C_LoadMessageImage_003Ec__Iterator2B0)/*Error near IL_009d: stateMachine*/)._003C_003Ef__this.GetCtrl(UI.OBJ_IMAGE_ROOT), 5);
 				if (val != null)
 				{
-					val.set_name(((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_009d: stateMachine*/)._003Cindex_003E__2.ToString());
-					((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_009d: stateMachine*/).tutorial_data.SetImage(((_003C_LoadMessageImage_003Ec__Iterator2AB)/*Error near IL_009d: stateMachine*/)._003Cindex_003E__2, val);
+					val.set_name(((_003C_LoadMessageImage_003Ec__Iterator2B0)/*Error near IL_009d: stateMachine*/)._003Cindex_003E__2.ToString());
+					((_003C_LoadMessageImage_003Ec__Iterator2B0)/*Error near IL_009d: stateMachine*/).tutorial_data.SetImage(((_003C_LoadMessageImage_003Ec__Iterator2B0)/*Error near IL_009d: stateMachine*/)._003Cindex_003E__2, val);
 				}
 			}
 		});

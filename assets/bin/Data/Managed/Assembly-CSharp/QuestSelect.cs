@@ -299,14 +299,14 @@ public class QuestSelect : GameSection
 			QuestItemInfo quest_item = MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem(info.questData.tableData.questID);
 			if (quest_item != null && quest_item.sellItems != null && quest_item.sellItems.Count > 0)
 			{
-				_003CUpdateUI_003Ec__AnonStorey369 _003CUpdateUI_003Ec__AnonStorey;
-				SetGrid(UI.GRD_REWARD_SELL, string.Empty, quest_item.sellItems.Count, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CUpdateUI_003Ec__AnonStorey36E _003CUpdateUI_003Ec__AnonStorey36E;
+				SetGrid(UI.GRD_REWARD_SELL, string.Empty, quest_item.sellItems.Count, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey36E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			SetActive((Enum)UI.OBJ_TOP_CROWN_ROOT, false);
 		}
 		SetActive((Enum)UI.OBJ_TREASURE, true);
-		_003CUpdateUI_003Ec__AnonStorey36A _003CUpdateUI_003Ec__AnonStorey36A;
-		SetGrid(UI.GRD_REWARD_QUEST, string.Empty, 5, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey36A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateUI_003Ec__AnonStorey36F _003CUpdateUI_003Ec__AnonStorey36F;
+		SetGrid(UI.GRD_REWARD_QUEST, string.Empty, 5, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey36F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)info.questData.tableData.GetMainEnemyID());
 		if (enemyData != null)
 		{
@@ -541,8 +541,8 @@ public class QuestSelect : GameSection
 	private unsafe void OnQuery_AUTO_MATCH()
 	{
 		GameSection.StayEvent();
-		_003COnQuery_AUTO_MATCH_003Ec__AnonStorey36B _003COnQuery_AUTO_MATCH_003Ec__AnonStorey36B;
-		Action<bool, bool, bool, bool> matching_end_action = new Action<bool, bool, bool, bool>((object)_003COnQuery_AUTO_MATCH_003Ec__AnonStorey36B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		_003COnQuery_AUTO_MATCH_003Ec__AnonStorey370 _003COnQuery_AUTO_MATCH_003Ec__AnonStorey;
+		Action<bool, bool, bool, bool> matching_end_action = new Action<bool, bool, bool, bool>((object)_003COnQuery_AUTO_MATCH_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		if (questInfo.questData.tableData.questType == QUEST_TYPE.ORDER)
 		{
 			int questID = (int)questInfo.questData.tableData.questID;
@@ -571,7 +571,7 @@ public class QuestSelect : GameSection
 		{
 			AnimBtnInvisible(false);
 		}
-		GameSection.ResumeEvent(is_success, null);
+		GameSection.ResumeEvent(is_success, null, false);
 	}
 
 	private IEnumerator GoToQuest(Action onComplete)

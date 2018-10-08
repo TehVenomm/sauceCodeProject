@@ -82,7 +82,7 @@ public class SmithRevertLithographDetail : ItemSellConfirm
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<SmithManager>.I.SendRevertLithograph(equipData.GetUniqID(), delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 	}

@@ -84,13 +84,13 @@ public class FriendSearch : FollowListBase
 		{
 			SetDirty(UI.GRD_LIST);
 			RefreshUI();
-			GameSection.ResumeEvent(b, null);
+			GameSection.ResumeEvent(b, null, false);
 		});
 	}
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey328 _003CSendGetList_003Ec__AnonStorey;
+		_003CSendGetList_003Ec__AnonStorey32D _003CSendGetList_003Ec__AnonStorey32D;
 		switch (searchType)
 		{
 		case SEARCH_TYPE.NAME:
@@ -100,7 +100,7 @@ public class FriendSearch : FollowListBase
 			}
 			else
 			{
-				MonoBehaviourSingleton<FriendManager>.I.SendSearchName(searchName, page, new Action<bool, FriendSearchResult>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				MonoBehaviourSingleton<FriendManager>.I.SendSearchName(searchName, page, new Action<bool, FriendSearchResult>((object)_003CSendGetList_003Ec__AnonStorey32D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			break;
 		case SEARCH_TYPE.ID:
@@ -110,11 +110,11 @@ public class FriendSearch : FollowListBase
 			}
 			else
 			{
-				MonoBehaviourSingleton<FriendManager>.I.SendSearchID(searchID, new Action<bool, FriendSearchResult>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				MonoBehaviourSingleton<FriendManager>.I.SendSearchID(searchID, new Action<bool, FriendSearchResult>((object)_003CSendGetList_003Ec__AnonStorey32D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			break;
 		case SEARCH_TYPE.AUTO:
-			MonoBehaviourSingleton<FriendManager>.I.SendSearchLevel(page, new Action<bool, FriendSearchResult>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			MonoBehaviourSingleton<FriendManager>.I.SendSearchLevel(page, new Action<bool, FriendSearchResult>((object)_003CSendGetList_003Ec__AnonStorey32D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			break;
 		}
 	}

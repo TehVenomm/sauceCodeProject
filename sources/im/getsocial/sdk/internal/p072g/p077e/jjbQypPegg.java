@@ -61,11 +61,11 @@ public class jjbQypPegg implements upgqDBbsrL {
 
             public void run() {
                 Closeable inputStream;
-                Closeable byteArrayOutputStream;
                 Throwable e;
                 OutOfMemoryError e2;
                 Closeable closeable = null;
                 try {
+                    Closeable byteArrayOutputStream;
                     HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(str2).openConnection();
                     httpURLConnection.setDoInput(true);
                     httpURLConnection.setUseCaches(true);

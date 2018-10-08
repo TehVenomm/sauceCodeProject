@@ -55,7 +55,9 @@ public class GameSection : UIBehaviour
 		UPDATE_RALLY_INVITE = 0x100000000000,
 		UPDATE_GUILD_LIST = 0x200000000000,
 		UPDATE_DARK_MARKET = 0x400000000000,
-		RESET_DARK_MARKET = 0x800000000000
+		RESET_DARK_MARKET = 0x800000000000,
+		UPDATE_TRADING_POST = 0x1000000000000,
+		UPDATE_TRADING_POST_ITEM_DETAIL = 0x2000000000000
 	}
 
 	private static object[] expandStorageEventData;
@@ -197,11 +199,11 @@ public class GameSection : UIBehaviour
 		GameSceneEvent.PopStay();
 	}
 
-	protected static void ResumeEvent(bool is_resume, object userData = null)
+	protected static void ResumeEvent(bool is_resume, object userData = null, bool is_send_query = false)
 	{
 		if (is_resume)
 		{
-			GameSceneEvent.Resume(userData);
+			GameSceneEvent.Resume(userData, is_send_query);
 		}
 		else
 		{
@@ -296,7 +298,7 @@ public class GameSection : UIBehaviour
 		StayEvent();
 		MonoBehaviourSingleton<ShopManager>.I.SendGetShop(delegate(bool is_success)
 		{
-			ResumeEvent(is_success, null);
+			ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -418,8 +420,8 @@ public class GameSection : UIBehaviour
 			}
 			MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(table.questID, is_free_join);
 			StayEvent();
-			_003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2C9 _003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2C;
-			CoopApp.EnterPartyQuest(new Action<bool, bool, bool, bool>((object)_003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2CE _003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2CE;
+			CoopApp.EnterPartyQuest(new Action<bool, bool, bool, bool>((object)_003COnQuery_QUEST_ROOM_IN_GAME_003Ec__AnonStorey2CE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -524,14 +526,14 @@ public class GameSection : UIBehaviour
 					{
 						ChangeStayEvent("YES_QUEST", null);
 					}
-					ResumeEvent(true, null);
+					ResumeEvent(true, null, false);
 					break;
 				case Error.ERR_CRYSTAL_NOT_ENOUGH:
 					ChangeStayEvent("NOT_ENOUGTH", null);
-					ResumeEvent(true, null);
+					ResumeEvent(true, null, false);
 					break;
 				default:
-					ResumeEvent(false, null);
+					ResumeEvent(false, null, false);
 					break;
 				}
 			});
@@ -672,7 +674,7 @@ public class GameSection : UIBehaviour
 			StayEvent();
 			MonoBehaviourSingleton<InventoryManager>.I.SendInventoryExtend(delegate(bool is_success)
 			{
-				ResumeEvent(is_success, null);
+				ResumeEvent(is_success, null, false);
 			});
 		}
 	}
@@ -758,7 +760,7 @@ public class GameSection : UIBehaviour
 			StayEvent();
 			Protocol.Send<ScreenshotSharingModel>(ScreenshotSharingModel.URL, delegate
 			{
-				ResumeEvent(true, null);
+				ResumeEvent(true, null, false);
 				PlayerPrefs.SetInt("share_screenshot", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
 			}, string.Empty);
 		}
@@ -779,11 +781,11 @@ public class GameSection : UIBehaviour
 			{
 				LoungeMatchingManager i2 = MonoBehaviourSingleton<LoungeMatchingManager>.I;
 				string loungeNumber2 = roomPass;
-				if (_003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2CA._003C_003Ef__am_0024cache1 == null)
+				if (_003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2CF._003C_003Ef__am_0024cache1 == null)
 				{
-					_003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2CA._003C_003Ef__am_0024cache1 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+					_003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2CF._003C_003Ef__am_0024cache1 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 				}
-				i2.SendApply(loungeNumber2, _003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2CA._003C_003Ef__am_0024cache1);
+				i2.SendApply(loungeNumber2, _003COnQuery_FORCE_MOVETO_LOUNGE_003Ec__AnonStorey2CF._003C_003Ef__am_0024cache1);
 			});
 		}
 		else

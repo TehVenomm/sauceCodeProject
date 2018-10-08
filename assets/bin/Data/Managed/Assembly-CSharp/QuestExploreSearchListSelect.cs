@@ -35,8 +35,8 @@ public class QuestExploreSearchListSelect : QuestSearchListSelectBase
 
 	protected unsafe override void SendSearchRequest(Action onFinish, Action<bool> cb)
 	{
-		_003CSendSearchRequest_003Ec__AnonStorey415 _003CSendSearchRequest_003Ec__AnonStorey;
-		MonoBehaviourSingleton<PartyManager>.I.SendEventSearch(eventId, new Action<bool, Error>((object)_003CSendSearchRequest_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendSearchRequest_003Ec__AnonStorey41B _003CSendSearchRequest_003Ec__AnonStorey41B;
+		MonoBehaviourSingleton<PartyManager>.I.SendEventSearch(eventId, new Action<bool, Error>((object)_003CSendSearchRequest_003Ec__AnonStorey41B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override void ResetSearchRequest()
@@ -55,8 +55,8 @@ public class QuestExploreSearchListSelect : QuestSearchListSelectBase
 			PartyModel.Party[] partys = MonoBehaviourSingleton<PartyManager>.I.partys.ToArray();
 			SetActive((Enum)UI.GRD_QUEST, true);
 			SetActive((Enum)UI.STR_NON_LIST, false);
-			_003CUpdateUI_003Ec__AnonStorey416 _003CUpdateUI_003Ec__AnonStorey;
-			SetGrid(UI.GRD_QUEST, "QuestExploreSearchListSelectItem", partys.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateUI_003Ec__AnonStorey41C _003CUpdateUI_003Ec__AnonStorey41C;
+			SetGrid(UI.GRD_QUEST, "QuestExploreSearchListSelectItem", partys.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey41C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			base.UpdateUI();
 		}
 	}

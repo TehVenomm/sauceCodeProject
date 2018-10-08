@@ -37,8 +37,8 @@ public class UILabel : UIWidget
 	[SerializeField]
 	private Font mTrueTypeFont;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private UIFont mFont;
 
 	[HideInInspector]
@@ -46,8 +46,8 @@ public class UILabel : UIWidget
 	[Multiline(6)]
 	private string mText = string.Empty;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private int mFontSize = 16;
 
 	[HideInInspector]
@@ -58,32 +58,32 @@ public class UILabel : UIWidget
 	[HideInInspector]
 	private NGUIText.Alignment mAlignment;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool mEncoding = true;
 
 	[SerializeField]
 	[HideInInspector]
 	private int mMaxLineCount;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Effect mEffectStyle;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Color mEffectColor = Color.get_black();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private NGUIText.SymbolStyle mSymbols = NGUIText.SymbolStyle.Normal;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Vector2 mEffectDistance = Vector2.get_one();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Overflow mOverflow;
 
 	[SerializeField]
@@ -110,32 +110,32 @@ public class UILabel : UIWidget
 	[SerializeField]
 	private int mSpacingY;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private bool mUseFloatSpacing;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private float mFloatSpacingX;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private float mFloatSpacingY;
 
 	[HideInInspector]
 	[SerializeField]
 	private bool mShrinkToFit;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private int mMaxLineWidth;
 
 	[HideInInspector]
 	[SerializeField]
 	private int mMaxLineHeight;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private float mLineWidth;
 
 	[HideInInspector]

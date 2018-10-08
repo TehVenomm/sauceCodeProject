@@ -106,7 +106,7 @@ public class AbilityItemSellConfirm : ItemSellConfirm
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<ItemExchangeManager>.I.SendInventorySellAbilityItem(uniqs, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 

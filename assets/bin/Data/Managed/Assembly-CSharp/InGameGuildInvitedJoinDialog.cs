@@ -107,7 +107,7 @@ public class InGameGuildInvitedJoinDialog : GameSection
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Expected O, but got Unknown
 			InGameGuildInvitedJoinDialog inGameGuildInvitedJoinDialog = this;
-			_003COnQuery_REJECT_003Ec__AnonStorey3A2 _003COnQuery_REJECT_003Ec__AnonStorey3A;
+			_003COnQuery_REJECT_003Ec__AnonStorey3A7 _003COnQuery_REJECT_003Ec__AnonStorey3A;
 			DoWaitProtocolBusyFinish(new Action((object)_003COnQuery_REJECT_003Ec__AnonStorey3A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		});
 	}

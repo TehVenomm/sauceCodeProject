@@ -68,8 +68,8 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 				item_num = info.Length;
 			}
 		}
-		_003CUpdateDynamicList_003Ec__AnonStorey33F _003CUpdateDynamicList_003Ec__AnonStorey33F;
-		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey33F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateDynamicList_003Ec__AnonStorey344 _003CUpdateDynamicList_003Ec__AnonStorey;
+		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected virtual void SetListItem(int i, Transform t, bool is_recycle, FriendCharaInfo data)
@@ -207,7 +207,7 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey341 _003CSendGetList_003Ec__AnonStorey;
+		_003CSendGetList_003Ec__AnonStorey346 _003CSendGetList_003Ec__AnonStorey;
 		MonoBehaviourSingleton<FriendManager>.I.SendGetFollowList(page, new Action<bool, FriendFollowListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

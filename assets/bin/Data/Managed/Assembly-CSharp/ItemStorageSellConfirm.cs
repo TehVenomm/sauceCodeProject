@@ -102,8 +102,8 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 		base.DrawIcon();
 		NeedMaterial[] reward_ary = CreateNeedMaterialAry();
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		_003CDrawIcon_003Ec__AnonStorey3EC _003CDrawIcon_003Ec__AnonStorey3EC;
-		SetGrid(UI.GRD_REWARD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey3EC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CDrawIcon_003Ec__AnonStorey3F2 _003CDrawIcon_003Ec__AnonStorey3F;
+		SetGrid(UI.GRD_REWARD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey3F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		SetActive((Enum)UI.STR_NON_REWARD, reward_ary.Length == 0);
 	}
 
@@ -197,7 +197,7 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<ItemExchangeManager>.I.SendInventorySellEquipItem(uniqs, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 		else if (tab == ItemStorageTop.TAB_MODE.MATERIAL)
@@ -205,7 +205,7 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<ItemExchangeManager>.I.SendInventorySellItem(uniqs, nums, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 		else
@@ -213,7 +213,7 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<ItemExchangeManager>.I.SendInventorySellSkillItem(uniqs, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 	}

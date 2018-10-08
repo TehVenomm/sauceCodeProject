@@ -178,8 +178,8 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 		coop_Model_Register.token = conn_data.token;
 		Logd("Regist. roomId={0}, token={1}", conn_data.roomId, conn_data.token);
 		registerAck = null;
-		_003CRegist_003Ec__AnonStorey4E3 _003CRegist_003Ec__AnonStorey4E;
-		SendServer(coop_Model_Register, true, new Func<Coop_Model_ACK, bool>((object)_003CRegist_003Ec__AnonStorey4E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
+		_003CRegist_003Ec__AnonStorey4ED _003CRegist_003Ec__AnonStorey4ED;
+		SendServer(coop_Model_Register, true, new Func<Coop_Model_ACK, bool>((object)_003CRegist_003Ec__AnonStorey4ED, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null);
 	}
 
 	public void ConnectAndRegist(ConnectData conn_data, Action<bool, bool> call_back)

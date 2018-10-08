@@ -42,8 +42,8 @@ public class ItemDetailOrderSellConfirm : GameSection
 		int num = 0;
 		int num2 = 0;
 		QuestItemInfo item_info = itemData.GetItemData() as QuestItemInfo;
-		_003CUpdateUI_003Ec__AnonStorey3EF _003CUpdateUI_003Ec__AnonStorey3EF;
-		SetGrid(UI.GRD_ICON, string.Empty, 1, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3EF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateUI_003Ec__AnonStorey3F5 _003CUpdateUI_003Ec__AnonStorey3F;
+		SetGrid(UI.GRD_ICON, string.Empty, 1, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		SetLabelText((Enum)UI.LBL_GOLD, num.ToString());
 		SetLabelText((Enum)UI.LBL_EXP, num2.ToString());
 		SetLabelText((Enum)UI.LBL_SELL, string.Format(base.sectionData.GetText("STR_SELL"), itemData.GetName(), sellNum));

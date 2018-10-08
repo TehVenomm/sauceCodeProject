@@ -37,8 +37,8 @@ class DeviceAuthMethodHandler extends LoginMethodHandler {
     }
 
     public static ScheduledThreadPoolExecutor getBackgroundExecutor() {
+        Class cls;
         synchronized (DeviceAuthMethodHandler.class) {
-            Class cls;
             try {
                 if (backgroundExecutor == null) {
                     cls = true;

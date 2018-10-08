@@ -111,6 +111,7 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<AchievementManager>();
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<StatusManager>();
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<FortuneWheelManager>();
+		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<TradingPostManager>();
 		Utility.CreateGameObjectAndComponent("StageManager", MonoBehaviourSingleton<AppMain>.I._transform, -1);
 		Utility.CreateGameObjectAndComponent("GuildManager", MonoBehaviourSingleton<AppMain>.I._transform, -1);
 		yield return (object)null;
@@ -147,7 +148,7 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 			bool wait = true;
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
 			{
-				((_003CStart_003Ec__Iterator1A)/*Error near IL_071d: stateMachine*/)._003Cwait_003E__14 = false;
+				((_003CStart_003Ec__Iterator1A)/*Error near IL_072d: stateMachine*/)._003Cwait_003E__14 = false;
 			}, false);
 			while (wait)
 			{

@@ -26,7 +26,7 @@ public class LoungeDialog : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendEntry(id, delegate(bool isSuccess)
 		{
-			GameSection.ResumeEvent(isSuccess, null);
+			GameSection.ResumeEvent(isSuccess, null, false);
 		});
 	}
 

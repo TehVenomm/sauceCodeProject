@@ -446,8 +446,8 @@ public class StatusEquip : EquipSelectBase
 			created_remove_btn = IsCreateRemoveButton();
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
-			_003CLocalInventory_003Ec__AnonStorey434 _003CLocalInventory_003Ec__AnonStorey;
-			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length + 2, false, new Func<int, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CLocalInventory_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CLocalInventory_003Ec__AnonStorey43A _003CLocalInventory_003Ec__AnonStorey43A;
+			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length + 2, false, new Func<int, bool>((object)_003CLocalInventory_003Ec__AnonStorey43A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), null, new Action<int, Transform, bool>((object)_003CLocalInventory_003Ec__AnonStorey43A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -765,8 +765,8 @@ public class StatusEquip : EquipSelectBase
 						{
 							toSlot = migrationSelectItem.GetExceedSkillSlotNo(j);
 						}
-						_003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey435 _003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey;
-						if (list2.All(new Func<MigrationSkillData, bool>((object)_003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+						_003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey43B _003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey43B;
+						if (list2.All(new Func<MigrationSkillData, bool>((object)_003COnQuery_StatusMigrationSkillConfirm_YES_003Ec__AnonStorey43B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
 						{
 							MigrationSkillData item = new MigrationSkillData(migrationSelectItem.uniqueID, toSlot, skillItem);
 							list2.Add(item);
@@ -832,12 +832,12 @@ public class StatusEquip : EquipSelectBase
 			migrationSendCount--;
 			if (migrationSendCount == 0)
 			{
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(true, null, false);
 			}
 		}
 		else
 		{
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(false, null, false);
 		}
 	}
 

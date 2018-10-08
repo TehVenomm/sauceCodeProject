@@ -111,7 +111,6 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
     }
 
     public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
-        String nextFieldName;
         jsonParser.setCurrentValue(obj);
         if (this._injectables != null) {
             injectValues(deserializationContext, obj);
@@ -122,6 +121,7 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
         if (this._externalTypeIdHandler != null) {
             return deserializeWithExternalTypeId(jsonParser, deserializationContext, obj);
         }
+        String nextFieldName;
         if (jsonParser.isExpectedStartObjectToken()) {
             nextFieldName = jsonParser.nextFieldName();
             if (nextFieldName == null) {

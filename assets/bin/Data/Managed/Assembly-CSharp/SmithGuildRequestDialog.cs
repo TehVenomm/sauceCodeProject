@@ -84,7 +84,7 @@ public class SmithGuildRequestDialog : GameSection
 			{
 				RequestEvent("CHAT", GuildMessage.VIEW_TYPE.DONATE);
 			}
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success, null, false);
 		});
 	}
 

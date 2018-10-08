@@ -128,8 +128,8 @@ namespace GooglePlayGames
 		{
 			if (mStats == null || !mStats.Valid)
 			{
-				_003CGetStats_003Ec__AnonStorey7FD _003CGetStats_003Ec__AnonStorey7FD;
-				mPlatform.GetPlayerStats(new Action<CommonStatusCodes, PlayerStats>((object)_003CGetStats_003Ec__AnonStorey7FD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CGetStats_003Ec__AnonStorey810 _003CGetStats_003Ec__AnonStorey;
+				mPlatform.GetPlayerStats(new Action<CommonStatusCodes, PlayerStats>((object)_003CGetStats_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			else
 			{

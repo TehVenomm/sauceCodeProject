@@ -317,10 +317,10 @@ public class CommonUtils {
     }
 
     public static String getAppIconHashOrNull(Context context) {
+        Closeable openRawResource;
         Throwable e;
         Throwable th;
         String str = null;
-        Closeable openRawResource;
         try {
             openRawResource = context.getResources().openRawResource(getAppIconResourceId(context));
             try {

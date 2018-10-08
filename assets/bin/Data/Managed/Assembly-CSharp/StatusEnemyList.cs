@@ -219,8 +219,8 @@ public class StatusEnemyList : GameSection
 			if (num > 0)
 			{
 				SetActive((Enum)targetType, true);
-				_003CCreateIcon_003Ec__AnonStorey497 _003CCreateIcon_003Ec__AnonStorey;
-				SetDynamicList((Enum)targetType, "EnemyCollectionIcon", num, false, null, null, new Action<int, Transform, bool>((object)_003CCreateIcon_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CCreateIcon_003Ec__AnonStorey49D _003CCreateIcon_003Ec__AnonStorey49D;
+				SetDynamicList((Enum)targetType, "EnemyCollectionIcon", num, false, null, null, new Action<int, Transform, bool>((object)_003CCreateIcon_003Ec__AnonStorey49D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 			else
 			{

@@ -20,8 +20,8 @@ public class UIScrollBar : UISlider
 	[HideInInspector]
 	private float mScroll;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Direction mDir = Direction.Upgraded;
 
 	[Obsolete("Use 'value' instead")]

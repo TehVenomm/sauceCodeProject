@@ -17,8 +17,8 @@ namespace GetSocialSdk.Ui
 		{
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0020: Expected O, but got Unknown
-			_003ConMentionClicked_003Ec__AnonStorey7F8 _003ConMentionClicked_003Ec__AnonStorey7F;
-			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003ConMentionClicked_003Ec__AnonStorey7F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003ConMentionClicked_003Ec__AnonStorey80B _003ConMentionClicked_003Ec__AnonStorey80B;
+			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003ConMentionClicked_003Ec__AnonStorey80B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 }

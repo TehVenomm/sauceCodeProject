@@ -13,7 +13,6 @@ import java.util.Locale;
 import java.util.Map;
 import net.gogame.gowrap.C1426R;
 import net.gogame.gowrap.Constants;
-import net.gogame.gowrap.InternalConstants;
 import net.gogame.gowrap.integrations.core.Wrapper;
 
 public class LocaleManager {
@@ -86,7 +85,7 @@ public class LocaleManager {
         Locale locale;
         Wrapper.INSTANCE.setCurrentLocale(this.context, str);
         Wrapper.INSTANCE.readConfiguration(this.context);
-        if (str.equals(InternalConstants.DEFAULT_LOCALE)) {
+        if (str.equals("default")) {
             locale = Locale.ENGLISH;
         } else {
             List arrayList = new ArrayList();

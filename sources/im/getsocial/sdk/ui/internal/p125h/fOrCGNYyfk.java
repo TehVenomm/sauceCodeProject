@@ -25,7 +25,6 @@ public final class fOrCGNYyfk {
 
     /* renamed from: a */
     public static Typeface m3329a(Context context, KluUZYuxme kluUZYuxme) {
-        Typeface typeface;
         int i = 1;
         String b = kluUZYuxme.m3155b();
         if (b == null) {
@@ -33,6 +32,7 @@ public final class fOrCGNYyfk {
         } else if (f2975b.containsKey(b)) {
             return (Typeface) f2975b.get(b);
         } else {
+            Typeface typeface;
             if ((b.lastIndexOf(AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER) != -1 ? 1 : 0) != 0) {
                 typeface = null;
                 InputStream a = XdbacJlTDQ.m3328a(context, b, im.getsocial.sdk.ui.internal.p131d.upgqDBbsrL.m3237a().m3255b().m3211b(), "getsocial-ui-internal");
@@ -61,10 +61,10 @@ public final class fOrCGNYyfk {
 
     /* renamed from: a */
     private static Typeface m3330a(InputStream inputStream) {
-        FileOutputStream fileOutputStream;
         Typeface createFromFile;
         Throwable th;
         Throwable th2;
+        FileOutputStream fileOutputStream;
         try {
             File createTempFile = File.createTempFile("temp", null);
             fileOutputStream = new FileOutputStream(createTempFile);

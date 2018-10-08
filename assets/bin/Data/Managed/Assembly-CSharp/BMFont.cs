@@ -9,24 +9,24 @@ public class BMFont
 	[SerializeField]
 	private int mSize = 16;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private int mBase;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private int mWidth;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private int mHeight;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private string mSpriteName;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private List<BMGlyph> mSaved = new List<BMGlyph>();
 
 	private Dictionary<int, BMGlyph> mDict = new Dictionary<int, BMGlyph>();

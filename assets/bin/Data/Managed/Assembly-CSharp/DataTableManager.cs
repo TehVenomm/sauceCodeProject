@@ -243,8 +243,8 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		int reqCount = list.Count;
 		foreach (DataLoadRequest item2 in list)
 		{
-			_003CLoadInitialTable_003Ec__AnonStorey71F _003CLoadInitialTable_003Ec__AnonStorey71F;
-			item2.onComplete += new Action((object)_003CLoadInitialTable_003Ec__AnonStorey71F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CLoadInitialTable_003Ec__AnonStorey732 _003CLoadInitialTable_003Ec__AnonStorey;
+			item2.onComplete += new Action((object)_003CLoadInitialTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 		Request(list);
 		return list;
@@ -252,9 +252,9 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 
 	public unsafe List<DataLoadRequest> LoadAllTable(Action onComplete, bool downloadOnly = false)
 	{
-		//IL_0377: Unknown result type (might be due to invalid IL or missing references)
-		//IL_037c: Expected O, but got Unknown
-		RequestParam[] array = new RequestParam[49]
+		//IL_0386: Unknown result type (might be due to invalid IL or missing references)
+		//IL_038b: Expected O, but got Unknown
+		RequestParam[] array = new RequestParam[50]
 		{
 			new RequestParam("AbilityDataTable", null),
 			new RequestParam("AbilityTable", null),
@@ -267,6 +267,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 			new RequestParam("GrowEnemyTable", null),
 			new RequestParam("ItemTable", null),
 			new RequestParam("TutorialGearSetTable", null),
+			new RequestParam("TradingPostTable", null),
 			new RequestParam("SETable", null),
 			new RequestParam("StringTable", null),
 			new RequestParam("TaskTable", null),
@@ -318,7 +319,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		int reqCount = list.Count;
 		foreach (DataLoadRequest item2 in list)
 		{
-			_003CLoadAllTable_003Ec__AnonStorey720 _003CLoadAllTable_003Ec__AnonStorey;
+			_003CLoadAllTable_003Ec__AnonStorey733 _003CLoadAllTable_003Ec__AnonStorey;
 			item2.onComplete += new Action((object)_003CLoadAllTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 		Request(list);
@@ -421,7 +422,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0069: Expected O, but got Unknown
 		DataLoadRequest req = new DataLoadRequest(name, hash, directory, downloadOnly);
-		_003CCreateRequest_003Ec__AnonStorey723 _003CCreateRequest_003Ec__AnonStorey;
+		_003CCreateRequest_003Ec__AnonStorey736 _003CCreateRequest_003Ec__AnonStorey;
 		req.onVerifyError += new Func<string, bool>((object)_003CCreateRequest_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		req.onError += delegate(DataTableLoadError error)
 		{
@@ -514,6 +515,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		Singleton<GrowSkillItemTable>.Create();
 		Singleton<ItemTable>.Create();
 		Singleton<TutorialGearSetTable>.Create();
+		Singleton<TradingPostTable>.Create();
 		Singleton<ItemToFieldTable>.Create();
 		Singleton<ItemToQuestTable>.Create();
 		Singleton<NPCMessageTable>.Create();
@@ -575,6 +577,8 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		RegisterTable("ItemTable", Singleton<ItemTable>.I, null);
 		TutorialGearSetTable i5 = Singleton<TutorialGearSetTable>.I;
 		RegisterTable("TutorialGearSetTable", new DataTableInterfaceProxy(i5.CreateTable), null);
+		TradingPostTable i6 = Singleton<TradingPostTable>.I;
+		RegisterTable("TradingPostTable", new DataTableInterfaceProxy(i6.CreateTable), null);
 		RegisterTable("NPCMessageTable", Singleton<NPCMessageTable>.I, null);
 		RegisterTable("NPCTable", Singleton<NPCTable>.I, null);
 		RegisterTable("SETable", Singleton<SETable>.I, null);
@@ -697,6 +701,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		RegisterTable("GrowEnemyTable", table, null);
 		RegisterTable("ItemTable", table, null);
 		RegisterTable("TutorialGearSetTable", table, null);
+		RegisterTable("TradingPostTable", table, null);
 		RegisterTable("SETable", table, null);
 		RegisterTable("StringTable", table, null);
 		RegisterTable("TaskTable", table, null);

@@ -57,7 +57,7 @@ public class Wrapper {
         }
         LocaleConfiguration localeConfiguration = (LocaleConfiguration) this.configuration.getIntegrations().getCore().getLocales().get(str);
         if (localeConfiguration == null) {
-            return (LocaleConfiguration) this.configuration.getIntegrations().getCore().getLocales().get(InternalConstants.DEFAULT_LOCALE);
+            return (LocaleConfiguration) this.configuration.getIntegrations().getCore().getLocales().get("default");
         }
         return localeConfiguration;
     }
@@ -92,7 +92,7 @@ public class Wrapper {
     public String getCurrentLocale(Context context) {
         String preference = PreferenceUtils.getPreference(context, InternalConstants.LANGUAGE);
         if (preference == null) {
-            return InternalConstants.DEFAULT_LOCALE;
+            return "default";
         }
         return preference;
     }
@@ -194,7 +194,7 @@ public class Wrapper {
             if (this.configuration != null && this.configuration.getIntegrations() != null && this.configuration.getIntegrations().getCore() != null && this.configuration.getIntegrations().getCore().getSupportedLocales() != null) {
                 List asList = Arrays.asList(context.getResources().getStringArray(C1426R.array.language_values));
                 List arrayList = new ArrayList();
-                arrayList.add(InternalConstants.DEFAULT_LOCALE);
+                arrayList.add("default");
                 for (String str : this.configuration.getIntegrations().getCore().getSupportedLocales()) {
                     if (asList.contains(str) && !arrayList.contains(str)) {
                         arrayList.add(str);

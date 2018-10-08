@@ -111,8 +111,8 @@ public class ItemSellConfirm : GameSection
 	{
 		SortCompareData[] sell_data_ary = sellData.ToArray();
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		_003CDrawIcon_003Ec__AnonStorey3EB _003CDrawIcon_003Ec__AnonStorey3EB;
-		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey3EB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CDrawIcon_003Ec__AnonStorey3F1 _003CDrawIcon_003Ec__AnonStorey3F;
+		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, new Action<int, Transform, bool>((object)_003CDrawIcon_003Ec__AnonStorey3F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected virtual int GetTargetIconNum(SortCompareData[] sell_data_ary, int i)

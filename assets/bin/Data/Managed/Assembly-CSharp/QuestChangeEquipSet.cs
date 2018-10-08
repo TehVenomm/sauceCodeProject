@@ -279,7 +279,7 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<StatusManager>.I.CheckChangeEquipSet(selfCharaEquipSetNo, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -290,7 +290,7 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 		base.OnQuery_SECTION_BACK();
 		MonoBehaviourSingleton<PartyManager>.I.SendIsEquip(false, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 

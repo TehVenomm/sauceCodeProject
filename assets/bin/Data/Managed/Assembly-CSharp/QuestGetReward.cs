@@ -176,8 +176,8 @@ public class QuestGetReward : GameSection
 					data[i].getType = data2.getType;
 				}
 			}
-			_003CUpdateUI_003Ec__AnonStorey41A _003CUpdateUI_003Ec__AnonStorey41A;
-			SetGrid(UI.GRD_ICON, string.Empty, num2, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey41A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateUI_003Ec__AnonStorey420 _003CUpdateUI_003Ec__AnonStorey;
+			SetGrid(UI.GRD_ICON, string.Empty, num2, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -189,7 +189,7 @@ public class QuestGetReward : GameSection
 			MonoBehaviourSingleton<QuestManager>.I.SendGetDeliveryList(delegate(bool b)
 			{
 				GameSection.ChangeStayEvent("FROM_DELIVERY", null);
-				GameSection.ResumeEvent(b, null);
+				GameSection.ResumeEvent(b, null, false);
 			});
 		}
 		else if (isStoryComplete)

@@ -48,8 +48,8 @@ public class GuildInviteFriend : QuestAcceptRoomInviteFriend
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey345 _003CSendGetList_003Ec__AnonStorey;
-		MonoBehaviourSingleton<GuildManager>.I.SendInviteList(new Action<bool, GuildInviteCharaInfo[]>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSendGetList_003Ec__AnonStorey34A _003CSendGetList_003Ec__AnonStorey34A;
+		MonoBehaviourSingleton<GuildManager>.I.SendInviteList(new Action<bool, GuildInviteCharaInfo[]>((object)_003CSendGetList_003Ec__AnonStorey34A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	protected override NOTIFY_FLAG GetUpdateUINotifyFlags()

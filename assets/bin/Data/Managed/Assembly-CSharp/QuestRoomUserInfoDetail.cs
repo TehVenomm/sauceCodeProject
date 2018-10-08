@@ -32,7 +32,7 @@ public class QuestRoomUserInfoDetail : QuestFriendDetailBase
 		}
 		observer = questRoomObserver.Initialize(from_search_section, is_entry_pass, dispatch_callback, change_event_callback, _003C_003Ef__am_0024cache2, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		}, IsRoomObserve());
 		GameSection.SetEventData(array[0]);
 		base.Initialize();

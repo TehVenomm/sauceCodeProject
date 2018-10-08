@@ -1561,12 +1561,12 @@ public class StringUtils {
         if (length != length2) {
             throw new IllegalArgumentException("Search and Replace array lengths don't match: " + length + " vs " + length2);
         }
-        int indexOf;
         boolean[] zArr = new boolean[length];
         int i2 = 0;
         length2 = -1;
         int i3 = -1;
         while (i2 < length) {
+            int indexOf;
             if (!(zArr[i2] || strArr[i2] == null || strArr[i2].isEmpty() || strArr2[i2] == null)) {
                 indexOf = str.indexOf(strArr[i2]);
                 if (indexOf == -1) {

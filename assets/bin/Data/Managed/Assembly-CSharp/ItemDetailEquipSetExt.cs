@@ -90,7 +90,7 @@ public class ItemDetailEquipSetExt : GameSection
 					}
 					MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(NOTIFY_FLAG.UPDATE_EQUIP_SET_INFO);
 				}
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 	}

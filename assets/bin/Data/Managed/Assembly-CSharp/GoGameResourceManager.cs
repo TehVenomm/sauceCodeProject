@@ -101,8 +101,8 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 	public unsafe string GetFullBundleName(string bundleName)
 	{
 		string[] split = bundleName.Split('.');
-		_003CGetFullBundleName_003Ec__AnonStorey4C0 _003CGetFullBundleName_003Ec__AnonStorey4C;
-		if (!InGameManager.languageVariants.Any(new Func<string, bool>((object)_003CGetFullBundleName_003Ec__AnonStorey4C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+		_003CGetFullBundleName_003Ec__AnonStorey4CA _003CGetFullBundleName_003Ec__AnonStorey4CA;
+		if (!InGameManager.languageVariants.Any(new Func<string, bool>((object)_003CGetFullBundleName_003Ec__AnonStorey4CA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
 		{
 			bundleName += GetVariantName(GetCategory(bundleName));
 		}
@@ -113,8 +113,8 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 	{
 		fullBundleName = fullBundleName.ToUpper();
 		string[] names = Enum.GetNames(typeof(RESOURCE_CATEGORY));
-		_003CGetCategory_003Ec__AnonStorey4C1 _003CGetCategory_003Ec__AnonStorey4C;
-		string value = names.FirstOrDefault(new Func<string, bool>((object)_003CGetCategory_003Ec__AnonStorey4C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CGetCategory_003Ec__AnonStorey4CB _003CGetCategory_003Ec__AnonStorey4CB;
+		string value = names.FirstOrDefault(new Func<string, bool>((object)_003CGetCategory_003Ec__AnonStorey4CB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (string.IsNullOrEmpty(value))
 		{
 			return null;
@@ -125,8 +125,8 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 	public unsafe string GetBundleNameWithoutVariant(string fullBundleName)
 	{
 		string[] splits = fullBundleName.Split('.');
-		_003CGetBundleNameWithoutVariant_003Ec__AnonStorey4C2 _003CGetBundleNameWithoutVariant_003Ec__AnonStorey4C;
-		if (InGameManager.languageVariants.Any(new Func<string, bool>((object)_003CGetBundleNameWithoutVariant_003Ec__AnonStorey4C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
+		_003CGetBundleNameWithoutVariant_003Ec__AnonStorey4CC _003CGetBundleNameWithoutVariant_003Ec__AnonStorey4CC;
+		if (InGameManager.languageVariants.Any(new Func<string, bool>((object)_003CGetBundleNameWithoutVariant_003Ec__AnonStorey4CC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
 		{
 			return fullBundleName.Remove(fullBundleName.LastIndexOf("."));
 		}

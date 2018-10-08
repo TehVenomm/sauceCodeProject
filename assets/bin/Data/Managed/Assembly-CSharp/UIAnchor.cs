@@ -30,8 +30,8 @@ public class UIAnchor
 
 	public Vector2 pixelOffset = Vector2.get_zero();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UIWidget widgetContainer;
 
 	private Transform mTrans;

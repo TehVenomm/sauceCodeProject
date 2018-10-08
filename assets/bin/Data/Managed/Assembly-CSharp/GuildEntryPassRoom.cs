@@ -45,7 +45,7 @@ public class GuildEntryPassRoom : QuestEntryPassRoom
 		}
 		catch
 		{
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(true, null, false);
 		}
 	}
 
@@ -66,7 +66,7 @@ public class GuildEntryPassRoom : QuestEntryPassRoom
 			{
 				MonoBehaviourSingleton<GuildManager>.I.SendRequestRequest(clanId, -1, new Action<bool, Error>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(true, null, false);
 		}
 	}
 

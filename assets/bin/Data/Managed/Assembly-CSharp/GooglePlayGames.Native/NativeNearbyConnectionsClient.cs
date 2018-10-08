@@ -22,16 +22,16 @@ namespace GooglePlayGames.Native
 			{
 				//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 				//IL_002e: Expected O, but got Unknown
-				_003COnMessageReceived_003Ec__AnonStorey82B _003COnMessageReceived_003Ec__AnonStorey82B;
-				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003COnMessageReceived_003Ec__AnonStorey82B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003COnMessageReceived_003Ec__AnonStorey83E _003COnMessageReceived_003Ec__AnonStorey83E;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003COnMessageReceived_003Ec__AnonStorey83E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 
 			public unsafe void OnRemoteEndpointDisconnected(string remoteEndpointId)
 			{
 				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0020: Expected O, but got Unknown
-				_003COnRemoteEndpointDisconnected_003Ec__AnonStorey82C _003COnRemoteEndpointDisconnected_003Ec__AnonStorey82C;
-				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003COnRemoteEndpointDisconnected_003Ec__AnonStorey82C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003COnRemoteEndpointDisconnected_003Ec__AnonStorey83F _003COnRemoteEndpointDisconnected_003Ec__AnonStorey83F;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003COnRemoteEndpointDisconnected_003Ec__AnonStorey83F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 
@@ -48,16 +48,16 @@ namespace GooglePlayGames.Native
 			{
 				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0020: Expected O, but got Unknown
-				_003COnEndpointFound_003Ec__AnonStorey82D _003COnEndpointFound_003Ec__AnonStorey82D;
-				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003COnEndpointFound_003Ec__AnonStorey82D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003COnEndpointFound_003Ec__AnonStorey840 _003COnEndpointFound_003Ec__AnonStorey;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003COnEndpointFound_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 
 			public unsafe void OnEndpointLost(string lostEndpointId)
 			{
 				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0020: Expected O, but got Unknown
-				_003COnEndpointLost_003Ec__AnonStorey82E _003COnEndpointLost_003Ec__AnonStorey82E;
-				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003COnEndpointLost_003Ec__AnonStorey82E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003COnEndpointLost_003Ec__AnonStorey841 _003COnEndpointLost_003Ec__AnonStorey;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003COnEndpointLost_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 
@@ -144,8 +144,8 @@ namespace GooglePlayGames.Native
 			}
 			resultCallback = Callbacks.AsOnGameThreadCallback(resultCallback);
 			requestCallback = Callbacks.AsOnGameThreadCallback(requestCallback);
-			_003CStartAdvertising_003Ec__AnonStorey827 _003CStartAdvertising_003Ec__AnonStorey;
-			mManager.StartAdvertising(name, appIdentifiers.Select<string, NativeAppIdentifier>(new Func<string, NativeAppIdentifier>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList(), ToTimeoutMillis(advertisingDuration), new Action<long, NativeStartAdvertisingResult>((object)_003CStartAdvertising_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<long, NativeConnectionRequest>((object)_003CStartAdvertising_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CStartAdvertising_003Ec__AnonStorey83A _003CStartAdvertising_003Ec__AnonStorey83A;
+			mManager.StartAdvertising(name, appIdentifiers.Select<string, NativeAppIdentifier>(new Func<string, NativeAppIdentifier>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList(), ToTimeoutMillis(advertisingDuration), new Action<long, NativeStartAdvertisingResult>((object)_003CStartAdvertising_003Ec__AnonStorey83A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<long, NativeConnectionRequest>((object)_003CStartAdvertising_003Ec__AnonStorey83A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
 		private static long ToTimeoutMillis(TimeSpan? span)
@@ -167,8 +167,8 @@ namespace GooglePlayGames.Native
 			responseCallback = Callbacks.AsOnGameThreadCallback(responseCallback);
 			using (NativeMessageListenerHelper listener2 = ToMessageListener(listener))
 			{
-				_003CSendConnectionRequest_003Ec__AnonStorey828 _003CSendConnectionRequest_003Ec__AnonStorey;
-				mManager.SendConnectionRequest(name, remoteEndpointId, payload, new Action<long, NativeConnectionResponse>((object)_003CSendConnectionRequest_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), listener2);
+				_003CSendConnectionRequest_003Ec__AnonStorey83B _003CSendConnectionRequest_003Ec__AnonStorey83B;
+				mManager.SendConnectionRequest(name, remoteEndpointId, payload, new Action<long, NativeConnectionResponse>((object)_003CSendConnectionRequest_003Ec__AnonStorey83B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), listener2);
 			}
 		}
 
@@ -180,8 +180,8 @@ namespace GooglePlayGames.Native
 			{
 				listener.OnMessageReceived(endpointId, data, isReliable);
 			});
-			_003CToMessageListener_003Ec__AnonStorey829 _003CToMessageListener_003Ec__AnonStorey;
-			nativeMessageListenerHelper.SetOnDisconnectedCallback(new Action<long, string>((object)_003CToMessageListener_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CToMessageListener_003Ec__AnonStorey83C _003CToMessageListener_003Ec__AnonStorey83C;
+			nativeMessageListenerHelper.SetOnDisconnectedCallback(new Action<long, string>((object)_003CToMessageListener_003Ec__AnonStorey83C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			return nativeMessageListenerHelper;
 		}
 
@@ -209,9 +209,9 @@ namespace GooglePlayGames.Native
 		{
 			listener = new OnGameThreadDiscoveryListener(listener);
 			NativeEndpointDiscoveryListenerHelper nativeEndpointDiscoveryListenerHelper = new NativeEndpointDiscoveryListenerHelper();
-			_003CToDiscoveryListener_003Ec__AnonStorey82A _003CToDiscoveryListener_003Ec__AnonStorey82A;
-			nativeEndpointDiscoveryListenerHelper.SetOnEndpointFound(new Action<long, NativeEndpointDetails>((object)_003CToDiscoveryListener_003Ec__AnonStorey82A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-			nativeEndpointDiscoveryListenerHelper.SetOnEndpointLostCallback(new Action<long, string>((object)_003CToDiscoveryListener_003Ec__AnonStorey82A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CToDiscoveryListener_003Ec__AnonStorey83D _003CToDiscoveryListener_003Ec__AnonStorey83D;
+			nativeEndpointDiscoveryListenerHelper.SetOnEndpointFound(new Action<long, NativeEndpointDetails>((object)_003CToDiscoveryListener_003Ec__AnonStorey83D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			nativeEndpointDiscoveryListenerHelper.SetOnEndpointLostCallback(new Action<long, string>((object)_003CToDiscoveryListener_003Ec__AnonStorey83D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			return nativeEndpointDiscoveryListenerHelper;
 		}
 

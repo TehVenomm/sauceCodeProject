@@ -234,6 +234,10 @@ public class BootProcess
 					yield return (object)null;
 				}
 				ResourceManager.internalMode = false;
+				load_queue.Load(RESOURCE_CATEGORY.SYSTEM, "SystemCommon", new string[1]
+				{
+					"GoGameSettingsManager"
+				}, false);
 				load_queue.Load(RESOURCE_CATEGORY.SHADER, null, null, true);
 				load_queue.Load(RESOURCE_CATEGORY.UI_FONT, null, null, true);
 				ResourceManager.internalMode = true;

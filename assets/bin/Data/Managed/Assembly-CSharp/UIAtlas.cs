@@ -37,24 +37,24 @@ public class UIAtlas
 	[SerializeField]
 	private Material material;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private List<UISpriteData> mSprites = new List<UISpriteData>();
 
 	[HideInInspector]
 	[SerializeField]
 	private float mPixelSize = 1f;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UIAtlas mReplacement;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Coordinates mCoordinates;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private List<Sprite> sprites = new List<Sprite>();
 
 	private int mPMA = -1;

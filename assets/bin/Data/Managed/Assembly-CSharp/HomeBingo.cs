@@ -471,7 +471,7 @@ public class HomeBingo : GameSection
 			DeliveryTable.DeliveryData.NeedData need = needs[i];
 			if ((uint)need.needId != 0)
 			{
-				_003CSetABingoChildrenData_003Ec__AnonStorey383 _003CSetABingoChildrenData_003Ec__AnonStorey;
+				_003CSetABingoChildrenData_003Ec__AnonStorey388 _003CSetABingoChildrenData_003Ec__AnonStorey;
 				GridData gridData = cardData.gridDataList.FirstOrDefault(new Func<GridData, bool>((object)_003CSetABingoChildrenData_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				if (gridData != null && gridData.deliveryData != null)
 				{
@@ -712,7 +712,7 @@ public class HomeBingo : GameSection
 		Transform cardTransform = cardData.cardTransform;
 		UpdateBingoName(cardTransform, cardData.eventData);
 		UpdateEndData(cardTransform, cardData.eventData);
-		_003CUpdateCard_003Ec__AnonStorey384 _003CUpdateCard_003Ec__AnonStorey;
+		_003CUpdateCard_003Ec__AnonStorey389 _003CUpdateCard_003Ec__AnonStorey;
 		SetGrid(cardTransform, UI.GRD_BINGO_LIST, GridItemName, cardData.gridDataList.Count + 1, false, new Action<int, Transform, bool>((object)_003CUpdateCard_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		UpdateReachs(cardData);
 	}
@@ -822,8 +822,8 @@ public class HomeBingo : GameSection
 		int exp = 0;
 		if (rewards != null && rewards.Length > 0)
 		{
-			_003CUpdateRewardIcon_003Ec__AnonStorey385 _003CUpdateRewardIcon_003Ec__AnonStorey;
-			SetGrid(cardTransform, UI.GRD_REWARD, string.Empty, rewards.Length, false, new Action<int, Transform, bool>((object)_003CUpdateRewardIcon_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateRewardIcon_003Ec__AnonStorey38A _003CUpdateRewardIcon_003Ec__AnonStorey38A;
+			SetGrid(cardTransform, UI.GRD_REWARD, string.Empty, rewards.Length, false, new Action<int, Transform, bool>((object)_003CUpdateRewardIcon_003Ec__AnonStorey38A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -897,8 +897,8 @@ public class HomeBingo : GameSection
 		Delivery deliveryInfo = gridData.deliveryInfo;
 		CardData cardData = GetCurrentCard();
 		MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-		_003COnQuery_COMPLETE_GRID_003Ec__AnonStorey386 _003COnQuery_COMPLETE_GRID_003Ec__AnonStorey;
-		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo.uId, false, new Action<bool, DeliveryRewardList>((object)_003COnQuery_COMPLETE_GRID_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003COnQuery_COMPLETE_GRID_003Ec__AnonStorey38B _003COnQuery_COMPLETE_GRID_003Ec__AnonStorey38B;
+		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo.uId, false, new Action<bool, DeliveryRewardList>((object)_003COnQuery_COMPLETE_GRID_003Ec__AnonStorey38B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private unsafe void OnQuery_COMPLETE_BINGO()
@@ -909,8 +909,8 @@ public class HomeBingo : GameSection
 		CardData cardData = GetCurrentCard();
 		DeliveryTable.DeliveryData.NeedData[] needs = bingoData.deliveryData.needs;
 		MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-		_003COnQuery_COMPLETE_BINGO_003Ec__AnonStorey388 _003COnQuery_COMPLETE_BINGO_003Ec__AnonStorey;
-		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo.uId, false, new Action<bool, DeliveryRewardList>((object)_003COnQuery_COMPLETE_BINGO_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003COnQuery_COMPLETE_BINGO_003Ec__AnonStorey38D _003COnQuery_COMPLETE_BINGO_003Ec__AnonStorey38D;
+		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo.uId, false, new Action<bool, DeliveryRewardList>((object)_003COnQuery_COMPLETE_BINGO_003Ec__AnonStorey38D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private unsafe void OnQuery_COMPLETE_ALL_BINGO()
@@ -921,8 +921,8 @@ public class HomeBingo : GameSection
 		CardData cardData = GetCurrentCard();
 		List<GridData> gridDatas = cardData.gridDataList;
 		MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-		_003COnQuery_COMPLETE_ALL_BINGO_003Ec__AnonStorey38A _003COnQuery_COMPLETE_ALL_BINGO_003Ec__AnonStorey38A;
-		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo.uId, false, new Action<bool, DeliveryRewardList>((object)_003COnQuery_COMPLETE_ALL_BINGO_003Ec__AnonStorey38A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003COnQuery_COMPLETE_ALL_BINGO_003Ec__AnonStorey38F _003COnQuery_COMPLETE_ALL_BINGO_003Ec__AnonStorey38F;
+		MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo.uId, false, new Action<bool, DeliveryRewardList>((object)_003COnQuery_COMPLETE_ALL_BINGO_003Ec__AnonStorey38F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void OnEndSendBingoMission(bool is_success, CardData cardData, BingoData bingoData, List<GridData> gridDatas)
@@ -958,7 +958,7 @@ public class HomeBingo : GameSection
 		}
 		else
 		{
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(false, null, false);
 		}
 	}
 
@@ -995,7 +995,7 @@ public class HomeBingo : GameSection
 		}
 		else
 		{
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(false, null, false);
 		}
 	}
 
@@ -1006,7 +1006,7 @@ public class HomeBingo : GameSection
 			deliveryData,
 			cardData.eventData
 		});
-		GameSection.ResumeEvent(true, null);
+		GameSection.ResumeEvent(true, null, false);
 		RefreshMissionData(currentCardIndex);
 		RefreshUI();
 	}
@@ -1173,7 +1173,7 @@ public class HomeBingo : GameSection
 			currentCardIndex++;
 			MoveToCenter(false, currentCardIndex, delegate
 			{
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(true, null, false);
 			});
 		}
 	}
@@ -1187,7 +1187,7 @@ public class HomeBingo : GameSection
 			currentCardIndex--;
 			MoveToCenter(true, currentCardIndex, delegate
 			{
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(true, null, false);
 			});
 		}
 	}

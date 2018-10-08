@@ -106,7 +106,7 @@ public class RushResultPoint : GameSection
 		SetLabelText((Enum)UI.LBL_GET_POINT, "0pt");
 		SetFontStyle((Enum)UI.LBL_TOTAL_POINT, 2);
 		SetLabelText((Enum)UI.LBL_TOTAL_POINT, d.userPoint.ToString("N0") + "pt");
-		_003CUpdateUI_003Ec__AnonStorey453 _003CUpdateUI_003Ec__AnonStorey;
+		_003CUpdateUI_003Ec__AnonStorey459 _003CUpdateUI_003Ec__AnonStorey;
 		SetGrid(UI.GRD_POINT_DETAIL, "RushResultPointDetailItem", d.bonusPoint.Count, true, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if (d.nextReward != null)
 		{
@@ -131,8 +131,8 @@ public class RushResultPoint : GameSection
 
 	private unsafe void SetAllRewardItem(UI targetGrid, List<PointEventCurrentData.Reward> rewardList)
 	{
-		_003CSetAllRewardItem_003Ec__AnonStorey454 _003CSetAllRewardItem_003Ec__AnonStorey;
-		SetGrid(targetGrid, "ItemIconReward", rewardList.Count, true, new Action<int, Transform, bool>((object)_003CSetAllRewardItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSetAllRewardItem_003Ec__AnonStorey45A _003CSetAllRewardItem_003Ec__AnonStorey45A;
+		SetGrid(targetGrid, "ItemIconReward", rewardList.Count, true, new Action<int, Transform, bool>((object)_003CSetAllRewardItem_003Ec__AnonStorey45A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void SetPoint(UI parent, int point)

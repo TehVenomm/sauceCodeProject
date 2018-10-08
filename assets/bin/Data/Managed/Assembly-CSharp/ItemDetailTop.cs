@@ -13,6 +13,7 @@ public class ItemDetailTop : GameSection
 		BTN_DETAIL_SELL,
 		STR_BTN_SELL,
 		STR_BTN_SELL_D,
+		BTN_SEARCH_TP,
 		OBJ_ICON_ROOT,
 		LBL_NAME,
 		LBL_SELL,
@@ -92,7 +93,8 @@ public class ItemDetailTop : GameSection
 			GachaQuest,
 			ChallengeQuest,
 			PointShop,
-			GuildRequest
+			GuildRequest,
+			TradingPostQuest
 		}
 
 		public TYPE type;
@@ -430,7 +432,7 @@ public class ItemDetailTop : GameSection
 		int num2 = 0;
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
-			_003CGetQuestNum_003Ec__AnonStorey362 _003CGetQuestNum_003Ec__AnonStorey;
+			_003CGetQuestNum_003Ec__AnonStorey367 _003CGetQuestNum_003Ec__AnonStorey;
 			num2 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CGetQuestNum_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 		}
 		int num3 = num - num2;
@@ -594,7 +596,8 @@ public class ItemDetailTop : GameSection
 				UIBehaviour.SetMaterialNumText(FindCtrl(detailBase, UI.LBL_HAVE_NUM), FindCtrl(detailBase, UI.LBL_NEED_NUM), data.GetNum(), GetNeedNum().Value);
 			}
 		}
-		SetActive((Enum)UI.BTN_DETAIL_SELL, data.CanSale() && MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
+		SetActive((Enum)UI.BTN_DETAIL_SELL, CanSell() && MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
+		SetActive((Enum)UI.BTN_SEARCH_TP, false);
 	}
 
 	private Transform CreateListItem(int index, Transform t)
@@ -627,12 +630,16 @@ public class ItemDetailTop : GameSection
 		{
 			return Realizes("QuestListGuildRequestItem", t, true);
 		}
+		if (m_ItemDestinations[index].type == ItemDestination.TYPE.TradingPostQuest)
+		{
+			return Realizes("QuestListSearchTradingPostItem", t, true);
+		}
 		return Realizes("QuestListFieldItem", t, true);
 	}
 
 	private void UpdateListItem(int i, Transform t, bool is_recycle)
 	{
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(t, UI.TEX_FIELD_SUB, false);
 		if (i < m_ItemDestinations.Count)
 		{
@@ -901,6 +908,9 @@ public class ItemDetailTop : GameSection
 				}
 				SetEvent(t, "OPEN_SEND_DIALOG", null);
 				break;
+			case ItemDestination.TYPE.TradingPostQuest:
+				SetEvent(t, "SEARCH_IN_TP", i);
+				break;
 			}
 		}
 	}
@@ -950,7 +960,7 @@ public class ItemDetailTop : GameSection
 				m_ItemDestinations.Remove(selectedPointShopDestination);
 			}
 			RefreshUI();
-			GameSection.ResumeEvent(isSuccess, null);
+			GameSection.ResumeEvent(isSuccess, null, false);
 		});
 	}
 
@@ -1277,7 +1287,7 @@ public class ItemDetailTop : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest(itemID, itemName, request, numRequest, delegate(bool success)
 		{
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success, null, false);
 			if (success)
 			{
 				((_003CCRSendDonateRequest_003Ec__Iterator72)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;

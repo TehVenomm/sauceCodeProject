@@ -395,7 +395,7 @@ public class QuestEventList : GameSection
 			hasNewEvent[0] = false;
 			EVENT_DISPLAY_PLACE lastPlace = EVENT_DISPLAY_PLACE.NONE;
 			float offsetY = 0f;
-			_003C_UpdateEvent_003Ec__AnonStorey3D3 _003C_UpdateEvent_003Ec__AnonStorey3D;
+			_003C_UpdateEvent_003Ec__AnonStorey3D9 _003C_UpdateEvent_003Ec__AnonStorey3D;
 			SetSimpleContent(UI.OBJ_EVENT_ROOT, string.Empty, eventList.Count, false, new Func<int, bool>((object)_003C_UpdateEvent_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Func<int, Transform, Transform>((object)_003C_UpdateEvent_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003C_UpdateEvent_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			SetActive((Enum)eventNewSprite, hasNewEvent[0]);
 		}
@@ -443,8 +443,8 @@ public class QuestEventList : GameSection
 		{
 			itemNum = 1;
 		}
-		_003C_UpdateCarnival_003Ec__AnonStorey3D4 _003C_UpdateCarnival_003Ec__AnonStorey3D;
-		SetTable(UI.TBL_CARNIVAL_QUEST, string.Empty, itemNum, false, new Func<int, Transform, Transform>((object)_003C_UpdateCarnival_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003C_UpdateCarnival_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003C_UpdateCarnival_003Ec__AnonStorey3DA _003C_UpdateCarnival_003Ec__AnonStorey3DA;
+		SetTable(UI.TBL_CARNIVAL_QUEST, string.Empty, itemNum, false, new Func<int, Transform, Transform>((object)_003C_UpdateCarnival_003Ec__AnonStorey3DA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003C_UpdateCarnival_003Ec__AnonStorey3DA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_CARNIVAL_QUEST);
 		component.set_enabled(true);
 		component.ResetPosition();
@@ -614,7 +614,7 @@ public class QuestEventList : GameSection
 			stringBuilder.Append("[-]");
 			SetLabelText(t, UI.LBL_RIGHT_VALUE, stringBuilder.ToString());
 			SetSupportEncoding(t, UI.LBL_RIGHT_VALUE, true);
-			SetActive(t, UI.LBL_RIGHT_VALUE, e.GetRest() >= 0);
+			SetActive(t, UI.LBL_RIGHT_VALUE, e.GetRest() > 0);
 			SetActive(t, UI.SPR_ICON_EXISTPRESENT, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableEventDeliveryNum(e.eventId) > 0);
 		}
 	}
@@ -811,9 +811,11 @@ public class QuestEventList : GameSection
 
 	private void OnQuery_TAB_CARNIVAL()
 	{
-		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "Carnival is unavailable", StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u), null, null, null), delegate
+		if (dispTab != eDispTab.Carnival)
 		{
-		}, false, 0);
+			dispTab = eDispTab.Carnival;
+			ChangeTab();
+		}
 	}
 
 	private void OnQuery_SELECT()
@@ -824,8 +826,8 @@ public class QuestEventList : GameSection
 	private unsafe void OnQuery_SELECT_DISABLE()
 	{
 		EventListData ev = GameSection.GetEventData() as EventListData;
-		_003COnQuery_SELECT_DISABLE_003Ec__AnonStorey3D5 _003COnQuery_SELECT_DISABLE_003Ec__AnonStorey3D;
-		Network.EventData eventData = MonoBehaviourSingleton<QuestManager>.I.eventList.Where(new Func<Network.EventData, bool>((object)_003COnQuery_SELECT_DISABLE_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
+		_003COnQuery_SELECT_DISABLE_003Ec__AnonStorey3DB _003COnQuery_SELECT_DISABLE_003Ec__AnonStorey3DB;
+		Network.EventData eventData = MonoBehaviourSingleton<QuestManager>.I.eventList.Where(new Func<Network.EventData, bool>((object)_003COnQuery_SELECT_DISABLE_003Ec__AnonStorey3DB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).First();
 		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)ev.preDeliveryId);
 		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, string.Format(StringTable.Get(STRING_CATEGORY.QUEST_DELIVERY, 5u), ev.name, eventData.name, deliveryTableData.name), null, null, null, null), delegate
 		{
@@ -945,8 +947,8 @@ public class QuestEventList : GameSection
 				else if (!ev.readPrologueStory)
 				{
 					GameSection.StayEvent();
-					_003C_CheckEvent_003Ec__AnonStorey3D6 _003C_CheckEvent_003Ec__AnonStorey3D;
-					MonoBehaviourSingleton<QuestManager>.I.SendQuestReadEventStory(ev.eventId, new Action<bool, Error>((object)_003C_CheckEvent_003Ec__AnonStorey3D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					_003C_CheckEvent_003Ec__AnonStorey3DC _003C_CheckEvent_003Ec__AnonStorey3DC;
+					MonoBehaviourSingleton<QuestManager>.I.SendQuestReadEventStory(ev.eventId, new Action<bool, Error>((object)_003C_CheckEvent_003Ec__AnonStorey3DC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 			}
 		}

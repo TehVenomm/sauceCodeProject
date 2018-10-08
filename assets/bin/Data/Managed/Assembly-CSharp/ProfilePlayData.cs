@@ -30,7 +30,7 @@ public class ProfilePlayData : GameSection
 	{
 		base.UpdateUI();
 		PlayDataTable.PlayData[] nameList = Singleton<PlayDataTable>.I.GetSortedPlayData(MonoBehaviourSingleton<AchievementManager>.I.GetAchievementCounterList().ToArray());
-		_003CUpdateUI_003Ec__AnonStorey405 _003CUpdateUI_003Ec__AnonStorey;
-		SetGrid(UI.GRD_LIST, "ProfilePlaydataListItem", nameList.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CUpdateUI_003Ec__AnonStorey40B _003CUpdateUI_003Ec__AnonStorey40B;
+		SetGrid(UI.GRD_LIST, "ProfilePlaydataListItem", nameList.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey40B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 }

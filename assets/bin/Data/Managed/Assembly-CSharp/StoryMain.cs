@@ -30,7 +30,7 @@ public class StoryMain : GameSection, StoryDirector.IStoryEventReceiver
 	}
 
 	[CompilerGenerated]
-	private sealed class AddMessage_003Ec__AnonStorey3DB
+	private sealed class AddMessage_003Ec__AnonStorey3E1
 	{
 		internal string name;
 
@@ -44,7 +44,7 @@ public class StoryMain : GameSection, StoryDirector.IStoryEventReceiver
 
 		internal StoryMain _003C_003Ef__this;
 
-		internal void _003C_003Em__389()
+		internal void _003C_003Em__388()
 		{
 			_003C_003Ef__this.AddMessage(name, msg, tail_dir, msg_type, labelOption);
 		}
@@ -132,16 +132,16 @@ public class StoryMain : GameSection, StoryDirector.IStoryEventReceiver
 	{
 		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004c: Expected O, but got Unknown
-		AddMessage_003Ec__AnonStorey3DB addMessage_003Ec__AnonStorey3DB = new AddMessage_003Ec__AnonStorey3DB();
-		addMessage_003Ec__AnonStorey3DB.name = name;
-		addMessage_003Ec__AnonStorey3DB.msg = msg;
-		addMessage_003Ec__AnonStorey3DB.tail_dir = tail_dir;
-		addMessage_003Ec__AnonStorey3DB.msg_type = msg_type;
-		addMessage_003Ec__AnonStorey3DB.labelOption = labelOption;
-		addMessage_003Ec__AnonStorey3DB._003C_003Ef__this = this;
+		AddMessage_003Ec__AnonStorey3E1 addMessage_003Ec__AnonStorey3E = new AddMessage_003Ec__AnonStorey3E1();
+		addMessage_003Ec__AnonStorey3E.name = name;
+		addMessage_003Ec__AnonStorey3E.msg = msg;
+		addMessage_003Ec__AnonStorey3E.tail_dir = tail_dir;
+		addMessage_003Ec__AnonStorey3E.msg_type = msg_type;
+		addMessage_003Ec__AnonStorey3E.labelOption = labelOption;
+		addMessage_003Ec__AnonStorey3E._003C_003Ef__this = this;
 		if (!(this == null))
 		{
-			addMessageFunc = new Action((object)addMessage_003Ec__AnonStorey3DB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			addMessageFunc = new Action((object)addMessage_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 	}
 

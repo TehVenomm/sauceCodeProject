@@ -203,22 +203,22 @@ public final class zzag implements zzb {
 
     public final zzc zza(String str) {
         zzc zzc;
-        zzaj zzaj;
         IOException e;
         Throwable th;
         NegativeArraySizeException e2;
-        zzaj zzaj2;
+        zzaj zzaj;
         synchronized (this) {
             zzai zzai = (zzai) this.zzbv.get(str);
             if (zzai == null) {
                 zzc = null;
             } else {
                 File zze = zze(str);
+                zzaj zzaj2;
                 try {
-                    zzaj = new zzaj(new BufferedInputStream(new FileInputStream(zze)));
+                    zzaj2 = new zzaj(new BufferedInputStream(new FileInputStream(zze)));
                     try {
-                        zzai.zzf(zzaj);
-                        byte[] zza = zza((InputStream) zzaj, (int) (zze.length() - ((long) zzaj.zzbz)));
+                        zzai.zzf(zzaj2);
+                        byte[] zza = zza((InputStream) zzaj2, (int) (zze.length() - ((long) zzaj2.zzbz)));
                         zzc zzc2 = new zzc();
                         zzc2.data = zza;
                         zzc2.zza = zzai.zza;
@@ -228,7 +228,7 @@ public final class zzag implements zzb {
                         zzc2.zze = zzai.zze;
                         zzc2.zzf = zzai.zzf;
                         try {
-                            zzaj.close();
+                            zzaj2.close();
                             zzc = zzc2;
                         } catch (IOException e3) {
                             zzc = null;
@@ -238,9 +238,9 @@ public final class zzag implements zzb {
                         try {
                             zzab.zzb("%s: %s", zze.getAbsolutePath(), e.toString());
                             remove(str);
-                            if (zzaj != null) {
+                            if (zzaj2 != null) {
                                 try {
-                                    zzaj.close();
+                                    zzaj2.close();
                                 } catch (IOException e5) {
                                     zzc = null;
                                 }
@@ -249,9 +249,9 @@ public final class zzag implements zzb {
                             return zzc;
                         } catch (Throwable th2) {
                             th = th2;
-                            if (zzaj != null) {
+                            if (zzaj2 != null) {
                                 try {
-                                    zzaj.close();
+                                    zzaj2.close();
                                 } catch (IOException e6) {
                                     zzc = null;
                                 }
@@ -260,13 +260,13 @@ public final class zzag implements zzb {
                         }
                     } catch (NegativeArraySizeException e7) {
                         e2 = e7;
-                        zzaj2 = zzaj;
+                        zzaj = zzaj2;
                         try {
                             zzab.zzb("%s: %s", zze.getAbsolutePath(), e2.toString());
                             remove(str);
-                            if (zzaj2 != null) {
+                            if (zzaj != null) {
                                 try {
-                                    zzaj2.close();
+                                    zzaj.close();
                                 } catch (IOException e8) {
                                     zzc = null;
                                 }
@@ -275,44 +275,44 @@ public final class zzag implements zzb {
                             return zzc;
                         } catch (Throwable th3) {
                             th = th3;
-                            zzaj = zzaj2;
-                            if (zzaj != null) {
-                                zzaj.close();
+                            zzaj2 = zzaj;
+                            if (zzaj2 != null) {
+                                zzaj2.close();
                             }
                             throw th;
                         }
                     } catch (Throwable th4) {
                         th = th4;
-                        if (zzaj != null) {
-                            zzaj.close();
+                        if (zzaj2 != null) {
+                            zzaj2.close();
                         }
                         throw th;
                     }
                 } catch (IOException e9) {
                     e = e9;
-                    zzaj = null;
-                    zzab.zzb("%s: %s", zze.getAbsolutePath(), e.toString());
-                    remove(str);
-                    if (zzaj != null) {
-                        zzaj.close();
-                    }
-                    zzc = null;
-                    return zzc;
-                } catch (NegativeArraySizeException e10) {
-                    e2 = e10;
                     zzaj2 = null;
-                    zzab.zzb("%s: %s", zze.getAbsolutePath(), e2.toString());
+                    zzab.zzb("%s: %s", zze.getAbsolutePath(), e.toString());
                     remove(str);
                     if (zzaj2 != null) {
                         zzaj2.close();
                     }
                     zzc = null;
                     return zzc;
-                } catch (Throwable th5) {
-                    th = th5;
+                } catch (NegativeArraySizeException e10) {
+                    e2 = e10;
                     zzaj = null;
+                    zzab.zzb("%s: %s", zze.getAbsolutePath(), e2.toString());
+                    remove(str);
                     if (zzaj != null) {
                         zzaj.close();
+                    }
+                    zzc = null;
+                    return zzc;
+                } catch (Throwable th5) {
+                    th = th5;
+                    zzaj2 = null;
+                    if (zzaj2 != null) {
+                        zzaj2.close();
                     }
                     throw th;
                 }

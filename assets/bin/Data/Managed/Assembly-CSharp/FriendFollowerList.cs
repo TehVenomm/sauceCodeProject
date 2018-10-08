@@ -56,8 +56,8 @@ public class FriendFollowerList : FollowListBase
 				component.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 			}
 			CleanItemList();
-			_003CUpdateDynamicList_003Ec__AnonStorey31E _003CUpdateDynamicList_003Ec__AnonStorey31E;
-			SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, currentPageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey31E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateDynamicList_003Ec__AnonStorey323 _003CUpdateDynamicList_003Ec__AnonStorey;
+			SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, currentPageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateDynamicList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -86,8 +86,8 @@ public class FriendFollowerList : FollowListBase
 		{
 			int chunkIndex = GetChunkIndex(page);
 			IsConnect = true;
-			_003CSendGetList_003Ec__AnonStorey31F _003CSendGetList_003Ec__AnonStorey31F;
-			MonoBehaviourSingleton<FriendManager>.I.SendGetFollowerList(chunkIndex, (int)m_currentSortType, new Action<bool, FriendFollowerListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey31F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSendGetList_003Ec__AnonStorey324 _003CSendGetList_003Ec__AnonStorey;
+			MonoBehaviourSingleton<FriendManager>.I.SendGetFollowerList(chunkIndex, (int)m_currentSortType, new Action<bool, FriendFollowerListModel.Param>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
 
@@ -207,7 +207,7 @@ public class FriendFollowerList : FollowListBase
 					GameSection.StayEvent();
 					SendGetList(nowPage, delegate(bool ret)
 					{
-						GameSection.ResumeEvent(ret, null);
+						GameSection.ResumeEvent(ret, null, false);
 					});
 				}
 			}

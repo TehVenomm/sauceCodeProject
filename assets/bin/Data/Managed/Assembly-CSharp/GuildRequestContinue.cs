@@ -23,7 +23,7 @@ public class GuildRequestContinue : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestExtend(delegate(bool questCompleteData)
 			{
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(true, null, false);
 				GameSection.SetEventData(questCompleteData);
 			});
 		}
@@ -34,7 +34,7 @@ public class GuildRequestContinue : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestRetire(delegate(bool questCompleteData)
 		{
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(true, null, false);
 			GameSection.SetEventData(questCompleteData);
 		});
 	}

@@ -53,7 +53,7 @@ public class ConfigTop : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<UserInfoManager>.I.SendStopper(enable, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 

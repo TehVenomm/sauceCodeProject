@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[ExecuteInEditMode]
 [RequireComponent(typeof(UIWidget))]
+[ExecuteInEditMode]
 public class AnimatedColor
 {
 	public Color color = Color.get_white();

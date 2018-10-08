@@ -436,7 +436,7 @@ public class FriendMessage : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<FriendManager>.I.SendGetMessageDetailList(MonoBehaviourSingleton<FriendManager>.I.talkUser.userId, nowPage, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 			if (is_success)
 			{
 				ScrollView.DisableSpring();
@@ -451,7 +451,7 @@ public class FriendMessage : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<FriendManager>.I.SendGetNoreadMessage(delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -465,7 +465,7 @@ public class FriendMessage : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<FriendManager>.I.SendFriendMessage(MonoBehaviourSingleton<FriendManager>.I.talkUser.userId, text, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -481,7 +481,7 @@ public class FriendMessage : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<FriendManager>.I.SendFriendMessage(MonoBehaviourSingleton<FriendManager>.I.talkUser.userId, message, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -809,7 +809,7 @@ public class FriendMessage : GameSection
 			ChatStampListItem item = iTransform.GetComponent<ChatStampListItem>();
 			item.Init(stampId);
 			ChatStampListItem chatStampListItem = item;
-			_003CInitStampItem_003Ec__AnonStorey322 _003CInitStampItem_003Ec__AnonStorey;
+			_003CInitStampItem_003Ec__AnonStorey327 _003CInitStampItem_003Ec__AnonStorey;
 			chatStampListItem.onButton = Delegate.Combine((Delegate)chatStampListItem.onButton, (Delegate)new Action((object)_003CInitStampItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

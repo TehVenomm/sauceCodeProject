@@ -135,7 +135,7 @@ public class ItemDetailLithographSellConfirm : ItemStorageSellConfirm
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<ItemExchangeManager>.I.SendInventorySellItem(list, list2, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 

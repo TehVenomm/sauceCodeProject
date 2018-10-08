@@ -75,7 +75,7 @@ public class AccountConflict : GameSection
 			{
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(NOTIFY_FLAG.FACEBOOK_LOGIN);
 			}
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success, null, false);
 		});
 	}
 
@@ -89,7 +89,7 @@ public class AccountConflict : GameSection
 				MenuReset.needClearCache = true;
 				MenuReset.needPredownload = true;
 			}
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success, null, false);
 		});
 	}
 

@@ -216,8 +216,8 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 		GameSection.StayEvent();
 		int retryCount = 0;
 		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 1);
-		_003COnQuery_MATCHING_003Ec__AnonStorey429 _003COnQuery_MATCHING_003Ec__AnonStorey;
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, true, new Action<bool, int, bool, float>((object)_003COnQuery_MATCHING_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003COnQuery_MATCHING_003Ec__AnonStorey42F _003COnQuery_MATCHING_003Ec__AnonStorey42F;
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, true, new Action<bool, int, bool, float>((object)_003COnQuery_MATCHING_003Ec__AnonStorey42F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private unsafe IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
@@ -228,7 +228,7 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 
 	private void OnQuery_AUTO_CREATE_ROOM()
 	{
-		GameSection.ResumeEvent(false, null);
+		GameSection.ResumeEvent(false, null, false);
 		string text = StringTable.Get(STRING_CATEGORY.MATCHING, 1u);
 		object[] array = new object[1]
 		{

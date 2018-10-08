@@ -371,8 +371,8 @@ public class CarnivalResultPoint : GameSection
 		SetActive((Enum)UI.BTN_OK, false);
 		InitTween((Enum)UI.OBJ_GET_REWARD_ROOT);
 		PointEventCurrentData.PointResultData data = currentData.pointRankingData;
-		_003CSetRewardUI_003Ec__AnonStorey438 _003CSetRewardUI_003Ec__AnonStorey;
-		SetGrid(UI.GRD_POINT_DETAIL, "CarnivalResultPointDetailItem", data.bonusPoint.Count, true, new Action<int, Transform, bool>((object)_003CSetRewardUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSetRewardUI_003Ec__AnonStorey43E _003CSetRewardUI_003Ec__AnonStorey43E;
+		SetGrid(UI.GRD_POINT_DETAIL, "CarnivalResultPointDetailItem", data.bonusPoint.Count, true, new Action<int, Transform, bool>((object)_003CSetRewardUI_003Ec__AnonStorey43E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		MonoBehaviourSingleton<GuildRequestManager>.I.isCompleteMulti = false;
 		SetLabelText((Enum)UI.LBL_GET_POINT, data.getPoint.ToString("N0"));
 		SetLabelText((Enum)UI.LBL_TOTAL_POINT, (data.userPoint + data.getPoint).ToString("N0"));
@@ -444,8 +444,8 @@ public class CarnivalResultPoint : GameSection
 
 	private unsafe void SetNextItemIcon(List<PointEventCurrentData.Reward> reward)
 	{
-		_003CSetNextItemIcon_003Ec__AnonStorey439 _003CSetNextItemIcon_003Ec__AnonStorey;
-		SetDynamicList((Enum)UI.OBJ_NEXT_REWARD_ITEM_ICON_ROOT, "ItemIcon", reward.Count, true, null, null, new Action<int, Transform, bool>((object)_003CSetNextItemIcon_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSetNextItemIcon_003Ec__AnonStorey43F _003CSetNextItemIcon_003Ec__AnonStorey43F;
+		SetDynamicList((Enum)UI.OBJ_NEXT_REWARD_ITEM_ICON_ROOT, "ItemIcon", reward.Count, true, null, null, new Action<int, Transform, bool>((object)_003CSetNextItemIcon_003Ec__AnonStorey43F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private IEnumerator CountUpAnimation(float currentPoint, int targetPoint, UI targetUI)
@@ -492,8 +492,8 @@ public class CarnivalResultPoint : GameSection
 
 	private unsafe void SetAllRewardItem(UI targetGrid, List<PointEventCurrentData.Reward> rewardList)
 	{
-		_003CSetAllRewardItem_003Ec__AnonStorey43A _003CSetAllRewardItem_003Ec__AnonStorey43A;
-		SetGrid(targetGrid, "ItemIconReward", rewardList.Count, true, new Action<int, Transform, bool>((object)_003CSetAllRewardItem_003Ec__AnonStorey43A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003CSetAllRewardItem_003Ec__AnonStorey440 _003CSetAllRewardItem_003Ec__AnonStorey;
+		SetGrid(targetGrid, "ItemIconReward", rewardList.Count, true, new Action<int, Transform, bool>((object)_003CSetAllRewardItem_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void SetPoint(UI parent, int point)

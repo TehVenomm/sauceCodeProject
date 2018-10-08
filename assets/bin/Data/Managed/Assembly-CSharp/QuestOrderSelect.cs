@@ -263,8 +263,8 @@ public class QuestOrderSelect : GameSection
 					int num3 = 0;
 					if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 					{
-						_003CShowOrder_003Ec__AnonStorey37A _003CShowOrder_003Ec__AnonStorey37A;
-						num3 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CShowOrder_003Ec__AnonStorey37A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
+						_003CShowOrder_003Ec__AnonStorey37F _003CShowOrder_003Ec__AnonStorey37F;
+						num3 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CShowOrder_003Ec__AnonStorey37F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 					}
 					int num4 = num2 - num3;
 					if (num4 > 0)
@@ -435,8 +435,8 @@ public class QuestOrderSelect : GameSection
 		int num3 = 0;
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
-			_003CUpdateGirdListItemQuest_003Ec__AnonStorey37C _003CUpdateGirdListItemQuest_003Ec__AnonStorey37C;
-			num3 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CUpdateGirdListItemQuest_003Ec__AnonStorey37C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
+			_003CUpdateGirdListItemQuest_003Ec__AnonStorey381 _003CUpdateGirdListItemQuest_003Ec__AnonStorey;
+			num3 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CUpdateGirdListItemQuest_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 		}
 		int num4 = num2 - num3;
 		SetLabelText(t, UI.LBL_ORDER_NUM, num4.ToString());
@@ -460,8 +460,8 @@ public class QuestOrderSelect : GameSection
 			}
 			else
 			{
-				_003CUpdateGirdListItemQuest_003Ec__AnonStorey37D _003CUpdateGirdListItemQuest_003Ec__AnonStorey37D;
-				onScrollViewReady = Delegate.Combine((Delegate)onScrollViewReady, (Delegate)new Action((object)_003CUpdateGirdListItemQuest_003Ec__AnonStorey37D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CUpdateGirdListItemQuest_003Ec__AnonStorey382 _003CUpdateGirdListItemQuest_003Ec__AnonStorey2;
+				onScrollViewReady = Delegate.Combine((Delegate)onScrollViewReady, (Delegate)new Action((object)_003CUpdateGirdListItemQuest_003Ec__AnonStorey2, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 		QuestItemInfo itemData = questSortData.itemData;
@@ -509,16 +509,16 @@ public class QuestOrderSelect : GameSection
 		//IL_0045: Expected O, but got Unknown
 		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005c: Expected O, but got Unknown
-		_003CPanelToStatic_003Ec__AnonStorey37E _003CPanelToStatic_003Ec__AnonStorey37E;
+		_003CPanelToStatic_003Ec__AnonStorey383 _003CPanelToStatic_003Ec__AnonStorey;
 		if (icon.isIconLoaded)
 		{
 			uiPanel.widgetsAreStatic = false;
 			AppMain i = MonoBehaviourSingleton<AppMain>.I;
-			i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003CPanelToStatic_003Ec__AnonStorey37E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003CPanelToStatic_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		else
 		{
-			icon.onIconLoaded = new Action((object)_003CPanelToStatic_003Ec__AnonStorey37E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			icon.onIconLoaded = new Action((object)_003CPanelToStatic_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 	}
 

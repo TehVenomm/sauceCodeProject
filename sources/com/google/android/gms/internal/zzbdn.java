@@ -10,9 +10,9 @@ public final class zzbdn {
     private static Boolean zzfzl;
 
     public static boolean zzcq(Context context) {
-        Context applicationContext;
         boolean booleanValue;
         synchronized (zzbdn.class) {
+            Context applicationContext;
             try {
                 applicationContext = context.getApplicationContext();
                 if (zzfzk == null || zzfzl == null || zzfzk != applicationContext) {

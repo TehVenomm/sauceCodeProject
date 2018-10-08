@@ -820,13 +820,13 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
     }
 
     private void writeSessionDevice(String str) throws Exception {
+        Flushable newInstance;
         Throwable e;
         OutputStream outputStream;
         Flushable flushable;
         Throwable th;
         Object obj;
         Closeable closeable = null;
-        Flushable newInstance;
         try {
             OutputStream clsFileOutputStream = new ClsFileOutputStream(this.filesDir, str + SESSION_DEVICE_TAG);
             try {
@@ -932,9 +932,9 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
     }
 
     private void writeSessionOS(String str) throws Exception {
+        Closeable clsFileOutputStream;
         Throwable e;
         Flushable flushable = null;
-        Closeable clsFileOutputStream;
         try {
             clsFileOutputStream = new ClsFileOutputStream(this.filesDir, str + SESSION_OS_TAG);
             try {
@@ -974,7 +974,6 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
     }
 
     private void writeSessionPartsToSessionFile(File file, String str, int i) {
-        OutputStream clsFileOutputStream;
         Throwable e;
         Flushable flushable;
         Throwable th;
@@ -989,6 +988,7 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
         boolean z2 = listFilesMatching2 != null && listFilesMatching2.length > 0;
         Fabric.getLogger().mo4753d("Fabric", String.format(Locale.US, "Session %s has non-fatal exceptions: %s", new Object[]{str, Boolean.valueOf(z2)}));
         if (z || z2) {
+            OutputStream clsFileOutputStream;
             try {
                 clsFileOutputStream = new ClsFileOutputStream(this.filesDir, str);
                 try {
@@ -1170,10 +1170,10 @@ class CrashlyticsUncaughtExceptionHandler implements UncaughtExceptionHandler {
     }
 
     private void writeToCosFromFile(CodedOutputStream codedOutputStream, File file) throws IOException {
-        Closeable fileInputStream;
         Throwable th;
         if (file.exists()) {
             byte[] bArr = new byte[((int) file.length())];
+            Closeable fileInputStream;
             try {
                 fileInputStream = new FileInputStream(file);
                 int i = 0;

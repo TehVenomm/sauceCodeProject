@@ -119,7 +119,7 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 		bool play_tween = true;
 		tweenCtrl.Play(true, delegate
 		{
-			((_003CDoShowDialog_003Ec__Iterator2A9)/*Error near IL_01c0: stateMachine*/)._003Cplay_tween_003E__4 = false;
+			((_003CDoShowDialog_003Ec__Iterator2AE)/*Error near IL_01c0: stateMachine*/)._003Cplay_tween_003E__4 = false;
 		});
 		yield return (object)new WaitForSeconds(desc.showTime);
 		while (play_tween)

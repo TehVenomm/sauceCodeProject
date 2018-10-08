@@ -306,8 +306,8 @@ public static class NGUIText
 		return ParseColor24(text, offset);
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static Color ParseColor24(string text, int offset)
 	{
 		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
@@ -318,8 +318,8 @@ public static class NGUIText
 		return new Color(num4 * (float)num, num4 * (float)num2, num4 * (float)num3);
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static Color ParseColor32(string text, int offset)
 	{
 		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
@@ -355,8 +355,8 @@ public static class NGUIText
 		return NGUIMath.DecimalToHex8(num);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static string EncodeColor24(Color c)
 	{
 		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
@@ -364,8 +364,8 @@ public static class NGUIText
 		return NGUIMath.DecimalToHex24(num);
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static string EncodeColor32(Color c)
 	{
 		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
@@ -786,15 +786,15 @@ public static class NGUIText
 		return indices[i];
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	private static bool IsSpace(int ch)
 	{
 		return ch == 32 || ch == 8202 || ch == 8203 || ch == 8201;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static void EndLine(ref StringBuilder s)
 	{
 		int num = s.Length - 1;
@@ -808,8 +808,8 @@ public static class NGUIText
 		}
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	private static void ReplaceSpaceWithNewline(ref StringBuilder s)
 	{
 		int num = s.Length - 1;

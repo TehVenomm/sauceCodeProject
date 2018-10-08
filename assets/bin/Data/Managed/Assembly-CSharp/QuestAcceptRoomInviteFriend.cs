@@ -100,7 +100,7 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 			{
 				currentList[i] = inviteUsers[nowPage * 10 + i];
 			}
-			_003CUpdateListUI_003Ec__AnonStorey343 _003CUpdateListUI_003Ec__AnonStorey;
+			_003CUpdateListUI_003Ec__AnonStorey348 _003CUpdateListUI_003Ec__AnonStorey;
 			SetDynamicList((Enum)UI.GRD_LIST, "QuestInviteeSelectListItem", currentPageItemLength, false, null, null, new Action<int, Transform, bool>((object)_003CUpdateListUI_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}
@@ -148,7 +148,7 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 
 	protected unsafe override void SendGetList(int page, Action<bool> callback)
 	{
-		_003CSendGetList_003Ec__AnonStorey344 _003CSendGetList_003Ec__AnonStorey;
+		_003CSendGetList_003Ec__AnonStorey349 _003CSendGetList_003Ec__AnonStorey;
 		MonoBehaviourSingleton<PartyManager>.I.SendInviteList(new Action<bool, PartyInviteCharaInfo[]>((object)_003CSendGetList_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 

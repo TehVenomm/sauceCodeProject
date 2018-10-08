@@ -164,8 +164,8 @@ namespace BestHTTP.Extensions
 
 		internal unsafe static string Read(this string str, ref int pos, char block, bool needResult = true)
 		{
-			_003CRead_003Ec__AnonStorey7E4 _003CRead_003Ec__AnonStorey7E;
-			return str.Read(ref pos, new Func<char, bool>((object)_003CRead_003Ec__AnonStorey7E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), needResult);
+			_003CRead_003Ec__AnonStorey7F7 _003CRead_003Ec__AnonStorey7F;
+			return str.Read(ref pos, new Func<char, bool>((object)_003CRead_003Ec__AnonStorey7F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), needResult);
 		}
 
 		internal static string Read(this string str, ref int pos, Func<char, bool> block, bool needResult = true)

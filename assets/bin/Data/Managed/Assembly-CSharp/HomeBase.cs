@@ -17,6 +17,9 @@ public abstract class HomeBase : GameSection
 		BTN_GIFTBOX,
 		BTN_CHAT,
 		OBJ_BALOON_ROOT,
+		OBJ_GIFT,
+		OBJ_GIFT_ON,
+		BTN_MENU_GG_ON,
 		OBJ_EXPLORE_BALLOON_POS,
 		BTN_CHAIR,
 		OBJ_NORMAL_NOTICE,
@@ -151,6 +154,8 @@ public abstract class HomeBase : GameSection
 
 	private int prevLevel = -1;
 
+	private int prevQuest = -1;
+
 	private bool fromQuestCounterAreaEvent;
 
 	private HomeTopBonusTime bonusTime;
@@ -184,22 +189,22 @@ public abstract class HomeBase : GameSection
 		{
 			yield return (object)new WaitForSeconds(0.04f);
 		}
-		if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM) && limitedLoginBonus != null && limitedLoginBonus.Count > 0)
+		if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM) && limitedLoginBonus != null && limitedLoginBonus.Count > 0 && _isWaitingLoginBonus)
 		{
 			SetupLoginBonus();
 		}
 		if (!HomeTutorialManager.DoesTutorialAfterGacha2())
 		{
-			goto IL_00b0;
+			goto IL_00ba;
 		}
-		goto IL_00b0;
-		IL_00b0:
+		goto IL_00ba;
+		IL_00ba:
 		yield return (object)null;
 	}
 
 	public override void Initialize()
 	{
-		//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_030f: Unknown result type (might be due to invalid IL or missing references)
 		DestroyInGameTutorialManager();
 		if (MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.selfCacheObject != null)
 		{
@@ -225,6 +230,7 @@ public abstract class HomeBase : GameSection
 		if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
 		{
 			prevLevel = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level;
+			prevQuest = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.questGrade;
 			MonoBehaviourSingleton<UIManager>.I.levelUp.GetNowStatus();
 		}
 		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.tutorialMessage != null)
@@ -334,35 +340,37 @@ public abstract class HomeBase : GameSection
 		UpdateGuildRequest();
 		UpdatePointShop();
 		UpdateGiftboxNum();
+		UpdateGuildBtn();
 	}
 
 	private void UpdateGuildBtn()
 	{
+		Transform ctrl = GetCtrl(UI.OBJ_GUILD);
 		SetActive((Enum)UI.OBJ_GUILD, true);
 		if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level >= 15)
 		{
 			if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId != -1 && MonoBehaviourSingleton<GuildManager>.I.guildData != null)
 			{
-				SetActive((Enum)UI.BTN_GUILD, true);
-				SetActive((Enum)UI.BTN_GUILD_NO_GUILD, false);
-				SetActive((Enum)UI.SPR_LOCK_GUILD, false);
+				SetActive(ctrl, UI.BTN_GUILD, true);
+				SetActive(ctrl, UI.BTN_GUILD_NO_GUILD, false);
+				SetActive(ctrl, UI.SPR_LOCK_GUILD, false);
 				UpdateClanBadge();
-				SetSprite((Enum)UI.SPR_GUILD_EMBLEM_1, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildData.emblem[0]));
-				SetSprite((Enum)UI.SPR_GUILD_EMBLEM_2, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildData.emblem[1]));
-				SetSprite((Enum)UI.SPR_GUILD_EMBLEM_3, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildData.emblem[2]));
+				SetSprite(ctrl, UI.SPR_GUILD_EMBLEM_1, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildData.emblem[0]));
+				SetSprite(ctrl, UI.SPR_GUILD_EMBLEM_2, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildData.emblem[1]));
+				SetSprite(ctrl, UI.SPR_GUILD_EMBLEM_3, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildData.emblem[2]));
 			}
 			else
 			{
-				SetActive((Enum)UI.BTN_GUILD, false);
-				SetActive((Enum)UI.BTN_GUILD_NO_GUILD, true);
-				SetActive((Enum)UI.SPR_LOCK_GUILD, false);
+				SetActive(ctrl, UI.BTN_GUILD, false);
+				SetActive(ctrl, UI.BTN_GUILD_NO_GUILD, true);
+				SetActive(ctrl, UI.SPR_LOCK_GUILD, false);
 			}
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_GUILD, false);
-			SetActive((Enum)UI.BTN_GUILD_NO_GUILD, false);
-			SetActive((Enum)UI.SPR_LOCK_GUILD, true);
+			SetActive(ctrl, UI.BTN_GUILD, false);
+			SetActive(ctrl, UI.BTN_GUILD_NO_GUILD, false);
+			SetActive(ctrl, UI.SPR_LOCK_GUILD, true);
 		}
 	}
 
@@ -446,7 +454,8 @@ public abstract class HomeBase : GameSection
 						num++;
 					}
 				}
-				SetBadge(GetCtrl(UI.BTN_MISSION), num, 1, 8, -8, false);
+				SetActive(GetCtrl(UI.BTN_MISSION), UI.OBJ_GIFT, ShouldEnableGiftIcon());
+				SetActive(GetCtrl(UI.BTN_MENU_GG_ON), UI.OBJ_GIFT_ON, ShouldEnableGiftIcon());
 			}
 		}
 		else if ((flags & NOTIFY_FLAG.UPDATE_ITEM_INVENTORY) != (NOTIFY_FLAG)0L)
@@ -508,6 +517,12 @@ public abstract class HomeBase : GameSection
 		{
 			MonoBehaviourSingleton<UIManager>.I.levelUp.PlayLevelUp();
 			prevLevel = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level;
+		}
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.questGrade != prevQuest)
+		{
+			SetActive(GetCtrl(UI.BTN_MISSION), UI.OBJ_GIFT, ShouldEnableGiftIcon());
+			SetActive(GetCtrl(UI.BTN_MENU_GG_ON), UI.OBJ_GIFT_ON, ShouldEnableGiftIcon());
+			prevQuest = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.questGrade;
 		}
 		CheckEventLock();
 	}
@@ -1149,6 +1164,16 @@ public abstract class HomeBase : GameSection
 		MonoBehaviourSingleton<UIManager>.I.mainMenu.SetMenuButtonEnable(flag);
 	}
 
+	protected bool ShouldEnableMissionButton()
+	{
+		return MonoBehaviourSingleton<UserInfoManager>.I.userStatus.questGrade > 0 && !HomeTutorialManager.ShouldRunGachaTutorial();
+	}
+
+	protected bool ShouldEnableGiftIcon()
+	{
+		return _taskBadgeNum > 0 && ShouldEnableMissionButton();
+	}
+
 	private void UpdateTicketNum()
 	{
 		if (MonoBehaviourSingleton<InventoryManager>.IsValid())
@@ -1169,16 +1194,16 @@ public abstract class HomeBase : GameSection
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
 			List<GuildRequestItem> guildRequestItemList = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList;
-			if (_003C_003Ef__am_0024cache45 == null)
-			{
-				_003C_003Ef__am_0024cache45 = new Func<GuildRequestItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			IEnumerable<GuildRequestItem> source = guildRequestItemList.Where(_003C_003Ef__am_0024cache45);
 			if (_003C_003Ef__am_0024cache46 == null)
 			{
 				_003C_003Ef__am_0024cache46 = new Func<GuildRequestItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			}
-			int num = source.Where(_003C_003Ef__am_0024cache46).Count();
+			IEnumerable<GuildRequestItem> source = guildRequestItemList.Where(_003C_003Ef__am_0024cache46);
+			if (_003C_003Ef__am_0024cache47 == null)
+			{
+				_003C_003Ef__am_0024cache47 = new Func<GuildRequestItem, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			}
+			int num = source.Where(_003C_003Ef__am_0024cache47).Count();
 			SetBadge(GetCtrl(UI.BTN_GUILD_REQUEST), num, 3, -8, -8, false);
 		}
 	}
@@ -1192,7 +1217,6 @@ public abstract class HomeBase : GameSection
 
 	protected virtual void LateUpdate()
 	{
-		UpdateGuildBtn();
 		UpdateNotice();
 		UpdateBalloon();
 		DirectDelivery();
@@ -2152,11 +2176,11 @@ public abstract class HomeBase : GameSection
 		GameSection.StayEvent();
 		DeliveryManager i = MonoBehaviourSingleton<DeliveryManager>.I;
 		int scriptId = num;
-		if (_003C_003Ef__am_0024cache47 == null)
+		if (_003C_003Ef__am_0024cache48 == null)
 		{
-			_003C_003Ef__am_0024cache47 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003C_003Ef__am_0024cache48 = new Action<bool, Error>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
-		i.SendReadStoryRead(scriptId, _003C_003Ef__am_0024cache47);
+		i.SendReadStoryRead(scriptId, _003C_003Ef__am_0024cache48);
 	}
 
 	private void OnQuery_TO_GIFTBOX()
@@ -2164,7 +2188,7 @@ public abstract class HomeBase : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<PresentManager>.I.SendGetPresent(0, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 
@@ -2173,9 +2197,9 @@ public abstract class HomeBase : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<UserInfoManager>.I.SendTutorialStep(delegate
 		{
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Expected O, but got Unknown
-			GameSection.ResumeEvent(false, null);
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Expected O, but got Unknown
+			GameSection.ResumeEvent(false, null, false);
 			string section_name = "TutorialStep6_1";
 			if (TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.EQUIP_CREATE_07))
 			{
@@ -2252,8 +2276,8 @@ public abstract class HomeBase : GameSection
 					Network.EventData firstEvent = validBingoDataListInSection[0];
 					List<DeliveryTable.DeliveryData> deliveryTableDataList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryTableDataList(false);
 					List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
-					_003COnQuery_BINGO_003Ec__AnonStorey368 _003COnQuery_BINGO_003Ec__AnonStorey;
-					int num = deliveryTableDataList.Where(new Func<DeliveryTable.DeliveryData, bool>((object)_003COnQuery_BINGO_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
+					_003COnQuery_BINGO_003Ec__AnonStorey36D _003COnQuery_BINGO_003Ec__AnonStorey36D;
+					int num = deliveryTableDataList.Where(new Func<DeliveryTable.DeliveryData, bool>((object)_003COnQuery_BINGO_003Ec__AnonStorey36D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 					int num2 = 0;
 					for (int i = 0; i < clearStatusDelivery.Count; i++)
 					{
@@ -2278,7 +2302,7 @@ public abstract class HomeBase : GameSection
 					GameSection.ChangeStayEvent("MINI_BINGO", null);
 				}
 			}
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(true, null, false);
 		});
 	}
 
@@ -2482,7 +2506,7 @@ public abstract class HomeBase : GameSection
 				{
 					MonoBehaviourSingleton<GameSceneManager>.I.StopAutoEvent(null);
 				}
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success, null, false);
 			});
 		}
 	}
@@ -2521,7 +2545,7 @@ public abstract class HomeBase : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<FriendManager>.I.SendGetFollowLink(delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 

@@ -327,38 +327,38 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 					type.groups.ForEach(delegate(GachaList.GachaGroup gr)
 					{
 						List<GachaList.Gacha> gachas = gr.gachas;
-						if (_003CSendGetGacha_003Ec__AnonStorey5E8._003C_003Ef__am_0024cache6 == null)
+						if (_003CSendGetGacha_003Ec__AnonStorey5F2._003C_003Ef__am_0024cache6 == null)
 						{
-							_003CSendGetGacha_003Ec__AnonStorey5E8._003C_003Ef__am_0024cache6 = new Func<GachaList.Gacha, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+							_003CSendGetGacha_003Ec__AnonStorey5F2._003C_003Ef__am_0024cache6 = new Func<GachaList.Gacha, bool>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 						}
-						List<GachaList.Gacha> oncePurchaseGachaList = gachas.Where(_003CSendGetGacha_003Ec__AnonStorey5E8._003C_003Ef__am_0024cache6).ToList();
+						List<GachaList.Gacha> oncePurchaseGachaList = gachas.Where(_003CSendGetGacha_003Ec__AnonStorey5F2._003C_003Ef__am_0024cache6).ToList();
 						int num = oncePurchaseGachaList.Count();
 						for (int i = 0; i < num; i++)
 						{
 							GachaList.Gacha gacha = oncePurchaseGachaList.ElementAt(i);
 							int gachaId = gacha.gachaId;
-							_003CSendGetGacha_003Ec__AnonStorey5E8._003CSendGetGacha_003Ec__AnonStorey5E6 _003CSendGetGacha_003Ec__AnonStorey5E;
-							List<GachaList.Gacha> list = gr.gachas.Where(new Func<GachaList.Gacha, bool>((object)_003CSendGetGacha_003Ec__AnonStorey5E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Where(new Func<GachaList.Gacha, bool>((object)_003CSendGetGacha_003Ec__AnonStorey5E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList();
+							_003CSendGetGacha_003Ec__AnonStorey5F2._003CSendGetGacha_003Ec__AnonStorey5F0 _003CSendGetGacha_003Ec__AnonStorey5F;
+							List<GachaList.Gacha> list = gr.gachas.Where(new Func<GachaList.Gacha, bool>((object)_003CSendGetGacha_003Ec__AnonStorey5F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Where(new Func<GachaList.Gacha, bool>((object)_003CSendGetGacha_003Ec__AnonStorey5F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList();
 							if (list.Count > 0)
 							{
 								gr.gachas.Remove(gacha);
-								IEnumerable<GachaList.Gacha> source = gr.gachas.Where(new Func<GachaList.Gacha, bool>((object)_003CSendGetGacha_003Ec__AnonStorey5E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-								if (_003CSendGetGacha_003Ec__AnonStorey5E8._003C_003Ef__am_0024cache7 == null)
+								IEnumerable<GachaList.Gacha> source = gr.gachas.Where(new Func<GachaList.Gacha, bool>((object)_003CSendGetGacha_003Ec__AnonStorey5F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+								if (_003CSendGetGacha_003Ec__AnonStorey5F2._003C_003Ef__am_0024cache7 == null)
 								{
-									_003CSendGetGacha_003Ec__AnonStorey5E8._003C_003Ef__am_0024cache7 = new Func<GachaList.Gacha, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+									_003CSendGetGacha_003Ec__AnonStorey5F2._003C_003Ef__am_0024cache7 = new Func<GachaList.Gacha, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 								}
-								int targetSubGroup = source.Select<GachaList.Gacha, int>(_003CSendGetGacha_003Ec__AnonStorey5E8._003C_003Ef__am_0024cache7).First();
+								int targetSubGroup = source.Select<GachaList.Gacha, int>(_003CSendGetGacha_003Ec__AnonStorey5F2._003C_003Ef__am_0024cache7).First();
 								List<GachaList.Gacha> gachas2 = gr.gachas;
-								if (_003CSendGetGacha_003Ec__AnonStorey5E8._003C_003Ef__am_0024cache8 == null)
+								if (_003CSendGetGacha_003Ec__AnonStorey5F2._003C_003Ef__am_0024cache8 == null)
 								{
-									_003CSendGetGacha_003Ec__AnonStorey5E8._003C_003Ef__am_0024cache8 = new Func<GachaList.Gacha, int, _003C_003E__AnonType0<GachaList.Gacha, int>>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+									_003CSendGetGacha_003Ec__AnonStorey5F2._003C_003Ef__am_0024cache8 = new Func<GachaList.Gacha, int, _003C_003E__AnonType0<GachaList.Gacha, int>>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 								}
-								var source2 = Enumerable.Select(gachas2, _003CSendGetGacha_003Ec__AnonStorey5E8._003C_003Ef__am_0024cache8).Where(new Func<_003C_003E__AnonType0<GachaList.Gacha, int>, bool>((object)_003CSendGetGacha_003Ec__AnonStorey5E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
-								if (_003CSendGetGacha_003Ec__AnonStorey5E8._003C_003Ef__am_0024cache9 == null)
+								var source2 = Enumerable.Select(gachas2, _003CSendGetGacha_003Ec__AnonStorey5F2._003C_003Ef__am_0024cache8).Where(new Func<_003C_003E__AnonType0<GachaList.Gacha, int>, bool>((object)_003CSendGetGacha_003Ec__AnonStorey5F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+								if (_003CSendGetGacha_003Ec__AnonStorey5F2._003C_003Ef__am_0024cache9 == null)
 								{
-									_003CSendGetGacha_003Ec__AnonStorey5E8._003C_003Ef__am_0024cache9 = new Func<_003C_003E__AnonType0<GachaList.Gacha, int>, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+									_003CSendGetGacha_003Ec__AnonStorey5F2._003C_003Ef__am_0024cache9 = new Func<_003C_003E__AnonType0<GachaList.Gacha, int>, int>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 								}
-								int index = Enumerable.Select(source2, _003CSendGetGacha_003Ec__AnonStorey5E8._003C_003Ef__am_0024cache9).First();
+								int index = Enumerable.Select(source2, _003CSendGetGacha_003Ec__AnonStorey5F2._003C_003Ef__am_0024cache9).First();
 								gr.gachas.Insert(index, gacha);
 							}
 						}

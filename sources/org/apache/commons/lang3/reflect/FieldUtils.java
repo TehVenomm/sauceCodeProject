@@ -273,9 +273,9 @@ public class FieldUtils {
     }
 
     public static void removeFinalModifier(Field field, boolean z) {
-        Field declaredField;
         int i = 1;
         Validate.isTrue(field != null, "The field must not be null", new Object[0]);
+        Field declaredField;
         try {
             if (Modifier.isFinal(field.getModifiers())) {
                 declaredField = Field.class.getDeclaredField("modifiers");

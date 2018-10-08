@@ -216,8 +216,8 @@ public class SmithEquipDirector : AnimationDirector
 		{
 			SetLinkCamera(true);
 		}
-		_003CPlayDirection_003Ec__AnonStorey477 _003CPlayDirection_003Ec__AnonStorey;
-		Play(name, new Action((object)_003CPlayDirection_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), 0f);
+		_003CPlayDirection_003Ec__AnonStorey47D _003CPlayDirection_003Ec__AnonStorey47D;
+		Play(name, new Action((object)_003CPlayDirection_003Ec__AnonStorey47D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), 0f);
 	}
 
 	private void PlayAudioOnEnd(string name)

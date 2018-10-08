@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/NGUI Progress Bar")]
+[ExecuteInEditMode]
 public class UIProgressBar : UIWidgetContainer
 {
 	public enum FillDirection
@@ -25,16 +25,16 @@ public class UIProgressBar : UIWidgetContainer
 	[SerializeField]
 	protected UIWidget mBG;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected UIWidget mFG;
 
 	[HideInInspector]
 	[SerializeField]
 	protected float mValue = 1f;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected FillDirection mFill;
 
 	protected Transform mTrans;

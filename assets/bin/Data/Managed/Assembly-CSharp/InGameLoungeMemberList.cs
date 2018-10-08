@@ -146,8 +146,8 @@ public class InGameLoungeMemberList : GameSection
 		ScrollViewResetPosition((Enum)UI.SCR_LIST);
 		UpdateAnchors();
 		AppMain i = MonoBehaviourSingleton<AppMain>.I;
-		_003COnScreenRotate_003Ec__AnonStorey3AF _003COnScreenRotate_003Ec__AnonStorey3AF;
-		i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003COnScreenRotate_003Ec__AnonStorey3AF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		_003COnScreenRotate_003Ec__AnonStorey3B5 _003COnScreenRotate_003Ec__AnonStorey3B;
+		i.onDelayCall = Delegate.Combine((Delegate)i.onDelayCall, (Delegate)new Action((object)_003COnScreenRotate_003Ec__AnonStorey3B, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	private void UpdateMemberList()
@@ -320,7 +320,7 @@ public class InGameLoungeMemberList : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendRoomPartyKick(delegate(bool isSuccess)
 		{
-			GameSection.ResumeEvent(isSuccess, null);
+			GameSection.ResumeEvent(isSuccess, null, false);
 		}, charaInfo.userId);
 	}
 }

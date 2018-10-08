@@ -326,8 +326,8 @@ public class ItemDetailEquip : SkillInfoBase
 				string allAbilityName = string.Empty;
 				string allAp = string.Empty;
 				string allAbilityDesc = string.Empty;
-				_003CUpdateUI_003Ec__AnonStorey3DD _003CUpdateUI_003Ec__AnonStorey3DD;
-				SetTable(detailBase, UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", equip.ability.Length + (flag ? 1 : 0), false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3DD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CUpdateUI_003Ec__AnonStorey3E3 _003CUpdateUI_003Ec__AnonStorey3E;
+				SetTable(detailBase, UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", equip.ability.Length + (flag ? 1 : 0), false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				PreCacheAbilityDetail(allAbilityName, allAp, allAbilityDesc);
 				if (empty_ability)
 				{
@@ -379,8 +379,8 @@ public class ItemDetailEquip : SkillInfoBase
 				string allAbilityName2 = string.Empty;
 				string allAp2 = string.Empty;
 				string allAbilityDesc2 = string.Empty;
-				_003CUpdateUI_003Ec__AnonStorey3E0 _003CUpdateUI_003Ec__AnonStorey3E;
-				SetTable(detailBase, UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", table.fixedAbility.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CUpdateUI_003Ec__AnonStorey3E6 _003CUpdateUI_003Ec__AnonStorey3E2;
+				SetTable(detailBase, UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", table.fixedAbility.Length, false, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey3E2, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				PreCacheAbilityDetail(allAbilityName2, allAp2, allAbilityDesc2);
 				SetActive(detailBase, UI.STR_NON_ABILITY, false);
 			}
@@ -498,7 +498,7 @@ public class ItemDetailEquip : SkillInfoBase
 		if (select_item != null)
 		{
 			GameSection.StayEvent();
-			_003COnQueryFavorite_003Ec__AnonStorey3E1 _003COnQueryFavorite_003Ec__AnonStorey3E;
+			_003COnQueryFavorite_003Ec__AnonStorey3E7 _003COnQueryFavorite_003Ec__AnonStorey3E;
 			MonoBehaviourSingleton<StatusManager>.I.SendInventoryEquipLock(select_item.uniqueID, new Action<bool, EquipItemInfo>((object)_003COnQueryFavorite_003Ec__AnonStorey3E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

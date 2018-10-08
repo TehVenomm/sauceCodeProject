@@ -173,7 +173,7 @@ public class QuestResultTrialEnd : GameSection
 				MonoBehaviourSingleton<InGameManager>.I.isTransitionQuestToField = true;
 				GameSection.ChangeStayEvent("QUEST_TO_FIELD", null);
 			}
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(true, null, false);
 		};
 		if (MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.isQuestResultFieldLeave)
 		{

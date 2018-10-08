@@ -82,7 +82,7 @@ public class Protocol
 	{
 		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0037: Expected O, but got Unknown
-		_003CSend_003Ec__AnonStorey704<T> _003CSend_003Ec__AnonStorey;
+		_003CSend_003Ec__AnonStorey717<T> _003CSend_003Ec__AnonStorey;
 		Action send = new Action((object)_003CSend_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		if (Begin(url, send, isAsync))
 		{
@@ -112,7 +112,7 @@ public class Protocol
 	{
 		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003f: Expected O, but got Unknown
-		_003CSend_003Ec__AnonStorey705<T1, T2> _003CSend_003Ec__AnonStorey;
+		_003CSend_003Ec__AnonStorey718<T1, T2> _003CSend_003Ec__AnonStorey;
 		Action send = new Action((object)_003CSend_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		if (Begin(url, send, isAsync))
 		{
@@ -142,7 +142,7 @@ public class Protocol
 	{
 		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003f: Expected O, but got Unknown
-		_003CSend_003Ec__AnonStorey706<T> _003CSend_003Ec__AnonStorey;
+		_003CSend_003Ec__AnonStorey719<T> _003CSend_003Ec__AnonStorey;
 		Action send = new Action((object)_003CSend_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		if (Begin(url, send, isAsync))
 		{
@@ -311,11 +311,11 @@ public class Protocol
 						Debug.Log((object)"kciked");
 						AppMain i = MonoBehaviourSingleton<AppMain>.I;
 						string empty = string.Empty;
-						if (_003CEnd_003Ec__AnonStorey707<T>._003C_003Ef__am_0024cache4 == null)
+						if (_003CEnd_003Ec__AnonStorey71A<T>._003C_003Ef__am_0024cache4 == null)
 						{
-							_003CEnd_003Ec__AnonStorey707<T>._003C_003Ef__am_0024cache4 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+							_003CEnd_003Ec__AnonStorey71A<T>._003C_003Ef__am_0024cache4 = new Action((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 						}
-						i.ChangeScene(empty, "HomeTop", _003CEnd_003Ec__AnonStorey707<T>._003C_003Ef__am_0024cache4);
+						i.ChangeScene(empty, "HomeTop", _003CEnd_003Ec__AnonStorey71A<T>._003C_003Ef__am_0024cache4);
 					}
 				}, true, code);
 			}

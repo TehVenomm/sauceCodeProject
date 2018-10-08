@@ -202,8 +202,8 @@ namespace GooglePlayGames.Native
 				//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0048: Expected O, but got Unknown
 				Logger.d("Invoking conflict callback");
-				_003CToOnGameThread_003Ec__AnonStorey84D._003CToOnGameThread_003Ec__AnonStorey84E _003CToOnGameThread_003Ec__AnonStorey84E;
-				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CToOnGameThread_003Ec__AnonStorey84E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CToOnGameThread_003Ec__AnonStorey860._003CToOnGameThread_003Ec__AnonStorey861 _003CToOnGameThread_003Ec__AnonStorey;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CToOnGameThread_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			};
 		}
 
@@ -243,7 +243,7 @@ namespace GooglePlayGames.Native
 				{
 					NativeSnapshotMetadata original = response.ConflictOriginal();
 					NativeSnapshotMetadata unmerged = response.ConflictUnmerged();
-					_003CInternalManualOpen_003Ec__AnonStorey84F._003CInternalManualOpen_003Ec__AnonStorey850 _003CInternalManualOpen_003Ec__AnonStorey;
+					_003CInternalManualOpen_003Ec__AnonStorey862._003CInternalManualOpen_003Ec__AnonStorey863 _003CInternalManualOpen_003Ec__AnonStorey;
 					NativeConflictResolver resolver = new NativeConflictResolver(mSnapshotManager, response.ConflictId(), original, unmerged, completedCallback, new Action((object)_003CInternalManualOpen_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					if (!prefetchDataOnConflict)
 					{
@@ -487,7 +487,7 @@ namespace GooglePlayGames.Native
 
 		private unsafe static Action<T1, T2> ToOnGameThread<T1, T2>(Action<T1, T2> toConvert)
 		{
-			_003CToOnGameThread_003Ec__AnonStorey855<T1, T2> _003CToOnGameThread_003Ec__AnonStorey;
+			_003CToOnGameThread_003Ec__AnonStorey868<T1, T2> _003CToOnGameThread_003Ec__AnonStorey;
 			return new Action<_003F, _003F>((object)_003CToOnGameThread_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 	}

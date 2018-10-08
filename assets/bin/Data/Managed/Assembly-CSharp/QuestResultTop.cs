@@ -623,7 +623,7 @@ public class QuestResultTop : GameSection
 		dropItemGRD = ((!is_mission_visible) ? UI.GRD_DROP_ITEM_2 : UI.GRD_DROP_ITEM);
 		dropItemSCR = ((!is_mission_visible) ? UI.OBJ_SCROLL_VIEW_2 : UI.OBJ_SCROLL_VIEW);
 		animScrollValue = ((!is_mission_visible) ? (-1.5f) : (-1.38f));
-		_003CUpdateUI_003Ec__AnonStorey2D3 _003CUpdateUI_003Ec__AnonStorey2D;
+		_003CUpdateUI_003Ec__AnonStorey2D8 _003CUpdateUI_003Ec__AnonStorey2D;
 		SetGrid(dropItemGRD, null, dropItemIconData.Length, true, new Action<int, Transform, bool>((object)_003CUpdateUI_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level > before_level)
 		{
@@ -1017,8 +1017,8 @@ public class QuestResultTop : GameSection
 			});
 			if (!IsExecuteNowSceneEvent(GetSceneName()))
 			{
-				_003COpenDropSell_003Ec__AnonStorey2D5 _003COpenDropSell_003Ec__AnonStorey2D;
-				this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenDropSell_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+				_003COpenDropSell_003Ec__AnonStorey2DA _003COpenDropSell_003Ec__AnonStorey2DA;
+				this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenDropSell_003Ec__AnonStorey2DA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 			}
 			else
 			{
@@ -1189,8 +1189,8 @@ public class QuestResultTop : GameSection
 				}
 				if (!IsExecuteNowSceneEvent(GetSceneName()))
 				{
-					_003COpenMissionClearRewardDialog_003Ec__AnonStorey2D6 _003COpenMissionClearRewardDialog_003Ec__AnonStorey2D;
-					this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenMissionClearRewardDialog_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+					_003COpenMissionClearRewardDialog_003Ec__AnonStorey2DB _003COpenMissionClearRewardDialog_003Ec__AnonStorey2DB;
+					this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenMissionClearRewardDialog_003Ec__AnonStorey2DB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 				}
 				else
 				{
@@ -1263,8 +1263,8 @@ public class QuestResultTop : GameSection
 				followBonusCallback = end_callback;
 				if (!IsExecuteNowSceneEvent(GetSceneName()))
 				{
-					_003COpenMutualFollowBonusDialog_003Ec__AnonStorey2D7 _003COpenMutualFollowBonusDialog_003Ec__AnonStorey2D;
-					this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenMutualFollowBonusDialog_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+					_003COpenMutualFollowBonusDialog_003Ec__AnonStorey2DC _003COpenMutualFollowBonusDialog_003Ec__AnonStorey2DC;
+					this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenMutualFollowBonusDialog_003Ec__AnonStorey2DC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 				}
 				else
 				{
@@ -1418,8 +1418,8 @@ public class QuestResultTop : GameSection
 			eventRewardCallback = end_callback;
 			if (!IsExecuteNowSceneEvent(GetSceneName()))
 			{
-				_003COpenEventRewardDialog_003Ec__AnonStorey2D8 _003COpenEventRewardDialog_003Ec__AnonStorey2D;
-				this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenEventRewardDialog_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+				_003COpenEventRewardDialog_003Ec__AnonStorey2DD _003COpenEventRewardDialog_003Ec__AnonStorey2DD;
+				this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenEventRewardDialog_003Ec__AnonStorey2DD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 			}
 			else
 			{
@@ -1576,8 +1576,8 @@ public class QuestResultTop : GameSection
 			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, first.accessoryItem, REWARD_CATEGORY.DROP);
 			if (!IsExecuteNowSceneEvent(GetSceneName()))
 			{
-				_003COpenFirstClearRewardDialog_003Ec__AnonStorey2D9 _003COpenFirstClearRewardDialog_003Ec__AnonStorey2D;
-				this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenFirstClearRewardDialog_003Ec__AnonStorey2D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+				_003COpenFirstClearRewardDialog_003Ec__AnonStorey2DE _003COpenFirstClearRewardDialog_003Ec__AnonStorey2DE;
+				this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), new Action((object)_003COpenFirstClearRewardDialog_003Ec__AnonStorey2DE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 			}
 			else
 			{
@@ -1654,7 +1654,7 @@ public class QuestResultTop : GameSection
 		MonoBehaviourSingleton<PartyManager>.I.SendRepeat(false, delegate(bool is_success)
 		{
 			GameSection.ChangeStayEvent("FRIEND", null);
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 

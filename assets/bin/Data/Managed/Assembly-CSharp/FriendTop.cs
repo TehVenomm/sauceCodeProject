@@ -30,7 +30,7 @@ public class FriendTop : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<FriendManager>.I.SendGetFollowLink(delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success, null, false);
 		});
 	}
 }

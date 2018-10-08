@@ -32,7 +32,7 @@ final class zzefl extends AbstractSet<Entry<K, V>> {
     }
 
     public final Iterator<Entry<K, V>> iterator() {
-        return new zzefk(this.zznad);
+        return new zzefk(this.zznad, null);
     }
 
     public final boolean remove(Object obj) {

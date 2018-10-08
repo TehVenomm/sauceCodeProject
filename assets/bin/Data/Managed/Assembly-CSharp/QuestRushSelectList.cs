@@ -150,8 +150,8 @@ public class QuestRushSelectList : QuestEventSelectList
 				}
 			}
 			bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-			_003CUpdateTable_003Ec__AnonStorey41F _003CUpdateTable_003Ec__AnonStorey41F;
-			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num3, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey41F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey41F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CUpdateTable_003Ec__AnonStorey425 _003CUpdateTable_003Ec__AnonStorey;
+			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num3, false, new Func<int, Transform, Transform>((object)_003CUpdateTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), new Action<int, Transform, bool>((object)_003CUpdateTable_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
 			component.set_enabled(true);
 			RepositionTable();
@@ -220,7 +220,7 @@ public class QuestRushSelectList : QuestEventSelectList
 			bool enable_clear_event = table.clearEventID != 0;
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-			_003COnQuery_SELECT_RUSH_003Ec__AnonStorey420 _003COnQuery_SELECT_RUSH_003Ec__AnonStorey;
+			_003COnQuery_SELECT_RUSH_003Ec__AnonStorey426 _003COnQuery_SELECT_RUSH_003Ec__AnonStorey;
 			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(deliveryInfo[num].uId, enable_clear_event, new Action<bool, DeliveryRewardList>((object)_003COnQuery_SELECT_RUSH_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 		else

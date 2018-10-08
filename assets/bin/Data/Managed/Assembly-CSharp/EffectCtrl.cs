@@ -15,8 +15,8 @@ public class EffectCtrl
 	[Tooltip("管理対象のAnimator\n空の場合はこのGameObjectにアタッチされたAnimatorが使用される")]
 	public Animator animator;
 
-	[Header("-- Loop End Behaviour --")]
 	[Tooltip("ル\u30fcプを抜ける時にパ\u30fcティクルを停止するかどうか")]
+	[Header("-- Loop End Behaviour --")]
 	public bool stopParticle = true;
 
 	[Tooltip("ル\u30fcプを抜ける時にAnimatorのENDを再生するかどうか")]
@@ -25,8 +25,8 @@ public class EffectCtrl
 	[Tooltip("AnimatorのENDを再生する時のクロスフェ\u30fcド時間（秒）")]
 	public float crossFadeTimeToEND = 0.1f;
 
-	[Header("-- Wait Destroy --")]
 	[Tooltip("指定時間を待ってから削除（秒）\n0に設定すると待たない")]
+	[Header("-- Wait Destroy --")]
 	public float waitTime = 0.2f;
 
 	[Tooltip("パ\u30fcティクルが全て消えてから削除")]

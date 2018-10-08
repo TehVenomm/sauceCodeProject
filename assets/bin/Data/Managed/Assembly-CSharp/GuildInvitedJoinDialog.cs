@@ -107,8 +107,8 @@ public class GuildInvitedJoinDialog : GameSection
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Expected O, but got Unknown
 			GuildInvitedJoinDialog guildInvitedJoinDialog = this;
-			_003COnQuery_REJECT_003Ec__AnonStorey347 _003COnQuery_REJECT_003Ec__AnonStorey;
-			DoWaitProtocolBusyFinish(new Action((object)_003COnQuery_REJECT_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003COnQuery_REJECT_003Ec__AnonStorey34C _003COnQuery_REJECT_003Ec__AnonStorey34C;
+			DoWaitProtocolBusyFinish(new Action((object)_003COnQuery_REJECT_003Ec__AnonStorey34C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		});
 	}
 
