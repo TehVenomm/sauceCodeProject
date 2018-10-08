@@ -44,10 +44,10 @@ public final class zzw {
 
     @Nullable
     public static WorkSource zzad(Context context, @Nullable String str) {
+        String valueOf;
         if (context == null || context.getPackageManager() == null || str == null) {
             return null;
         }
-        String valueOf;
         try {
             ApplicationInfo applicationInfo = zzbdp.zzcs(context).getApplicationInfo(str, 0);
             if (applicationInfo != null) {

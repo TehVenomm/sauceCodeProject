@@ -33,8 +33,8 @@ public class NestedScrollingChildHelper {
                 i3 = iArr2[0];
                 i4 = iArr2[1];
             } else {
-                i3 = 0;
                 i4 = 0;
+                i3 = 0;
             }
             if (iArr == null) {
                 if (this.mTempNestedScrollConsumed == null) {

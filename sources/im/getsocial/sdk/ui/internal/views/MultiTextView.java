@@ -177,11 +177,15 @@ public class MultiTextView extends View {
         if (this.f3173g.isEmpty()) {
             return getPaddingTop();
         }
+        int intValue;
         int i2 = 0;
-        for (int i3 = 0; i3 <= i; i3++) {
-            i2 += ((Integer) this.f3173g.get(i3)).intValue();
+        int i3 = 0;
+        while (i3 <= i) {
+            intValue = ((Integer) this.f3173g.get(i3)).intValue() + i2;
+            i3++;
+            i2 = intValue;
         }
-        int intValue = i2 - (((Integer) this.f3171e.get(0)).intValue() / 2);
+        intValue = i2 - (((Integer) this.f3171e.get(0)).intValue() / 2);
         switch (this.f3169c) {
             case 16:
             case 17:
@@ -228,10 +232,10 @@ public class MultiTextView extends View {
         int b = m3551b(0);
         int c = m3553c(0);
         Iterator it = this.f3168b.iterator();
-        int i = c;
+        int i = 0;
         int i2 = b;
-        int i3 = 0;
-        b = 0;
+        int i3 = c;
+        c = 0;
         while (it.hasNext()) {
             jjbQypPegg jjbqyppegg = (jjbQypPegg) it.next();
             jjbqyppegg.f3161f.getFontMetrics(this.f3167a);
@@ -239,24 +243,24 @@ public class MultiTextView extends View {
             int i4 = i3;
             i3 = i2;
             i2 = i;
-            i = b;
+            i = c;
             for (int i5 = 0; i5 < jjbqyppegg.f3163h.length; i5++) {
                 String str = jjbqyppegg.f3163h[i5];
                 int i6 = jjbqyppegg.f3164i[i5];
-                if (i4 + i6 > ((Integer) this.f3172f.get(i)).intValue() && this.f3172f.size() > i + 1) {
+                if (i2 + i6 > ((Integer) this.f3172f.get(i)).intValue() && this.f3172f.size() > i + 1) {
                     i++;
                     i3 = m3551b(i);
-                    i2 = m3553c(i);
-                    i4 = 0;
+                    i4 = m3553c(i);
+                    i2 = 0;
                 }
-                i4 += this.f3176j + i6;
+                i2 += this.f3176j + i6;
                 if (jjbqyppegg.f3162g != null) {
-                    canvas.drawText(str, ((float) ((i3 + 0) + (i6 / 2))) + jjbqyppegg.f3159d, (((float) i2) - this.f3167a.bottom) + jjbqyppegg.f3160e, jjbqyppegg.f3162g);
+                    canvas.drawText(str, ((float) ((i3 + 0) + (i6 / 2))) + jjbqyppegg.f3159d, (((float) i4) - this.f3167a.bottom) + jjbqyppegg.f3160e, jjbqyppegg.f3162g);
                 }
-                canvas.drawText(str, (float) ((i3 + 0) + (i6 / 2)), ((float) i2) - this.f3167a.bottom, jjbqyppegg.f3161f);
+                canvas.drawText(str, (float) ((i3 + 0) + (i6 / 2)), ((float) i4) - this.f3167a.bottom, jjbqyppegg.f3161f);
                 i3 += this.f3176j + i6;
             }
-            b = i;
+            c = i;
             i = i2;
             i2 = i3;
             i3 = i4;
@@ -281,12 +285,13 @@ public class MultiTextView extends View {
             int i3 = this.f3176j;
             int length = jjbqyppegg.f3163h.length;
             int[] c = jjbqyppegg.f3164i;
+            int length2 = c.length;
             paddingLeft = paddingRight + (i3 * length);
             paddingRight = 0;
-            while (paddingRight < c.length) {
-                i3 = c[paddingRight] + paddingLeft;
+            while (paddingRight < length2) {
+                i3 = c[paddingRight];
                 paddingRight++;
-                paddingLeft = i3;
+                paddingLeft += i3;
             }
             paddingRight = paddingLeft;
         }
@@ -310,34 +315,34 @@ public class MultiTextView extends View {
             this.f3173g.clear();
             this.f3176j = 0;
             Iterator it3 = this.f3168b.iterator();
+            i3 = 0;
             int i4 = 0;
             mode = 0;
-            i3 = 0;
             size = 0;
             while (it3.hasNext()) {
                 jjbqyppegg = (jjbQypPegg) it3.next();
                 jjbqyppegg.f3161f.getFontMetrics(this.f3167a);
                 this.f3176j = jjbqyppegg.f3165j;
                 for (int i5 : jjbqyppegg.f3164i) {
-                    if (mode + i5 <= this.f3174h) {
-                        i4 = Math.max(i4, (int) jjbqyppegg.f3158c);
+                    if (i4 + i5 <= this.f3174h) {
+                        i3 = Math.max(i3, (int) jjbqyppegg.f3158c);
                         size = this.f3176j;
-                        mode += i5 + size;
-                        i3 = Math.max(i3, ((int) ((-this.f3167a.top) + this.f3167a.bottom)) + i4);
+                        i4 += i5 + size;
+                        mode = Math.max(mode, ((int) ((-this.f3167a.top) + this.f3167a.bottom)) + i3);
                     } else {
-                        this.f3171e.add(Integer.valueOf(i4));
-                        this.f3172f.add(Integer.valueOf(mode - size));
-                        this.f3173g.add(Integer.valueOf(i3));
-                        i4 = (int) jjbqyppegg.f3158c;
+                        this.f3171e.add(Integer.valueOf(i3));
+                        this.f3172f.add(Integer.valueOf(i4 - size));
+                        this.f3173g.add(Integer.valueOf(mode));
+                        i3 = (int) jjbqyppegg.f3158c;
                         size = this.f3176j;
-                        mode = i5 + size;
-                        i3 = ((int) ((-this.f3167a.top) + this.f3167a.bottom)) + i4;
+                        i4 = i5 + size;
+                        mode = ((int) ((-this.f3167a.top) + this.f3167a.bottom)) + i3;
                     }
                 }
             }
-            this.f3171e.add(Integer.valueOf(i4));
-            this.f3172f.add(Integer.valueOf(mode - size));
-            this.f3173g.add(Integer.valueOf(i3));
+            this.f3171e.add(Integer.valueOf(i3));
+            this.f3172f.add(Integer.valueOf(i4 - size));
+            this.f3173g.add(Integer.valueOf(mode));
             if (this.f3172f.size() > this.f3170d) {
                 it2 = this.f3168b.iterator();
                 while (it2.hasNext()) {

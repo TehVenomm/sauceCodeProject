@@ -44,15 +44,15 @@ final class C0815s implements HttpRequest {
 
     /* renamed from: b */
     private void m623b(@NonNull File file, @NonNull URL url) {
-        OutputStream outputStream;
         PrintWriter printWriter;
         InputStream bufferedInputStream;
-        OutputStream outputStream2;
+        OutputStream outputStream;
         Throwable th;
         Throwable th2;
         ErrorResponse a;
         HttpsURLConnection httpsURLConnection;
         HttpsURLConnection httpsURLConnection2 = null;
+        OutputStream outputStream2;
         try {
             long length;
             HttpsURLConnection httpsURLConnection3 = (HttpsURLConnection) url.openConnection();
@@ -64,9 +64,9 @@ final class C0815s implements HttpRequest {
                 httpsURLConnection3.setRequestProperty(HttpRequest.HEADER_CONTENT_TYPE, "multipart/form-data; boundary=" + f667d);
                 httpsURLConnection3.setInstanceFollowRedirects(false);
                 httpsURLConnection3.setReadTimeout((int) a);
-                outputStream = httpsURLConnection3.getOutputStream();
+                outputStream2 = httpsURLConnection3.getOutputStream();
                 try {
-                    printWriter = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"), true);
+                    printWriter = new PrintWriter(new OutputStreamWriter(outputStream2, "UTF-8"), true);
                     try {
                         printWriter.append("--" + f667d).append("\r\n");
                         printWriter.append("Content-Disposition: form-data; name=\"binaryFile\"; filename=\"" + file.getName() + "\"").append("\r\n");
@@ -79,7 +79,7 @@ final class C0815s implements HttpRequest {
                         bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
                     } catch (Throwable e) {
                         bufferedInputStream = null;
-                        outputStream2 = outputStream;
+                        outputStream = outputStream2;
                         th = e;
                         httpsURLConnection2 = httpsURLConnection3;
                         th2 = th;
@@ -101,10 +101,10 @@ final class C0815s implements HttpRequest {
                                     Log.w(f666b, "Failed to close writer", th22);
                                 }
                             }
-                            if (outputStream2 != null) {
+                            if (outputStream != null) {
                                 try {
                                     Logger.m564v(f666b, "Closing output stream");
-                                    outputStream2.close();
+                                    outputStream.close();
                                 } catch (Throwable th222) {
                                     Log.w(f666b, "Failed to close output stream", th222);
                                 }
@@ -120,7 +120,7 @@ final class C0815s implements HttpRequest {
                             }
                         } catch (Throwable th3) {
                             th2222 = th3;
-                            outputStream = outputStream2;
+                            outputStream2 = outputStream;
                             if (httpsURLConnection2 != null) {
                                 Logger.m564v(f666b, "Disconnecting url connection");
                                 httpsURLConnection2.disconnect();
@@ -133,10 +133,10 @@ final class C0815s implements HttpRequest {
                                     Log.w(f666b, "Failed to close writer", e2);
                                 }
                             }
-                            if (outputStream != null) {
+                            if (outputStream2 != null) {
                                 try {
                                     Logger.m564v(f666b, "Closing output stream");
-                                    outputStream.close();
+                                    outputStream2.close();
                                 } catch (Throwable e22) {
                                     Log.w(f666b, "Failed to close output stream", e22);
                                 }
@@ -164,9 +164,9 @@ final class C0815s implements HttpRequest {
                             Logger.m564v(f666b, "Closing print writer");
                             printWriter.close();
                         }
-                        if (outputStream != null) {
+                        if (outputStream2 != null) {
                             Logger.m564v(f666b, "Closing output stream");
-                            outputStream.close();
+                            outputStream2.close();
                         }
                         if (bufferedInputStream != null) {
                             Logger.m564v(f666b, "Closing file input stream");
@@ -177,7 +177,7 @@ final class C0815s implements HttpRequest {
                 } catch (Throwable e22222) {
                     printWriter = null;
                     bufferedInputStream = null;
-                    outputStream2 = outputStream;
+                    outputStream = outputStream2;
                     httpsURLConnection = httpsURLConnection3;
                     th2222 = e22222;
                     httpsURLConnection2 = httpsURLConnection;
@@ -194,9 +194,9 @@ final class C0815s implements HttpRequest {
                         Logger.m564v(f666b, "Closing print writer");
                         printWriter.close();
                     }
-                    if (outputStream2 != null) {
+                    if (outputStream != null) {
                         Logger.m564v(f666b, "Closing output stream");
-                        outputStream2.close();
+                        outputStream.close();
                     }
                     if (bufferedInputStream != null) {
                         Logger.m564v(f666b, "Closing file input stream");
@@ -216,9 +216,9 @@ final class C0815s implements HttpRequest {
                         Logger.m564v(f666b, "Closing print writer");
                         printWriter.close();
                     }
-                    if (outputStream != null) {
+                    if (outputStream2 != null) {
                         Logger.m564v(f666b, "Closing output stream");
-                        outputStream.close();
+                        outputStream2.close();
                     }
                     if (bufferedInputStream != null) {
                         Logger.m564v(f666b, "Closing file input stream");
@@ -231,36 +231,13 @@ final class C0815s implements HttpRequest {
                 httpsURLConnection2 = httpsURLConnection3;
                 th2222 = th;
                 bufferedInputStream = null;
-                outputStream2 = null;
+                outputStream = null;
                 printWriter = null;
                 Log.e(f666b, "Error uploading file to " + url, th2222);
                 a = new C0807a().m596a(Kind.UNEXPECTED).m597a(th2222.getMessage()).m599b(url.toExternalForm()).m598a();
                 if (this.f669e != null) {
                     this.f669e.m576b(a);
                 }
-                if (httpsURLConnection2 != null) {
-                    Logger.m564v(f666b, "Disconnecting url connection");
-                    httpsURLConnection2.disconnect();
-                }
-                if (printWriter != null) {
-                    Logger.m564v(f666b, "Closing print writer");
-                    printWriter.close();
-                }
-                if (outputStream2 != null) {
-                    Logger.m564v(f666b, "Closing output stream");
-                    outputStream2.close();
-                }
-                if (bufferedInputStream != null) {
-                    Logger.m564v(f666b, "Closing file input stream");
-                    bufferedInputStream.close();
-                }
-            } catch (Throwable e22222222) {
-                outputStream = null;
-                printWriter = null;
-                bufferedInputStream = null;
-                httpsURLConnection = httpsURLConnection3;
-                th2222 = e22222222;
-                httpsURLConnection2 = httpsURLConnection;
                 if (httpsURLConnection2 != null) {
                     Logger.m564v(f666b, "Disconnecting url connection");
                     httpsURLConnection2.disconnect();
@@ -277,6 +254,29 @@ final class C0815s implements HttpRequest {
                     Logger.m564v(f666b, "Closing file input stream");
                     bufferedInputStream.close();
                 }
+            } catch (Throwable e22222222) {
+                outputStream2 = null;
+                printWriter = null;
+                bufferedInputStream = null;
+                httpsURLConnection = httpsURLConnection3;
+                th2222 = e22222222;
+                httpsURLConnection2 = httpsURLConnection;
+                if (httpsURLConnection2 != null) {
+                    Logger.m564v(f666b, "Disconnecting url connection");
+                    httpsURLConnection2.disconnect();
+                }
+                if (printWriter != null) {
+                    Logger.m564v(f666b, "Closing print writer");
+                    printWriter.close();
+                }
+                if (outputStream2 != null) {
+                    Logger.m564v(f666b, "Closing output stream");
+                    outputStream2.close();
+                }
+                if (bufferedInputStream != null) {
+                    Logger.m564v(f666b, "Closing file input stream");
+                    bufferedInputStream.close();
+                }
                 throw th2222;
             }
             try {
@@ -286,18 +286,18 @@ final class C0815s implements HttpRequest {
                 Log.v(f666b, "Reading bytes from fis");
                 int i = min;
                 while (i > 0) {
-                    outputStream.write(bArr, 0, i);
+                    outputStream2.write(bArr, 0, i);
                     m622a(Math.round((float) (((long) (99 * min)) / length)));
                     i = bufferedInputStream.read(bArr, 0, Math.min(bufferedInputStream.available(), 4096));
                     min += i;
                 }
                 Logger.m564v(f666b, "Finished write to output stream. Closing file input stream");
                 bufferedInputStream.close();
-                outputStream.flush();
+                outputStream2.flush();
                 printWriter.append("\r\n").flush();
                 printWriter.append("--" + f667d + "--").append("\r\n").flush();
                 printWriter.close();
-                outputStream.close();
+                outputStream2.close();
                 min = httpsURLConnection3.getResponseCode();
                 switch (C0816t.f671a[Status.getStatus(min).ordinal()]) {
                     case 1:
@@ -329,10 +329,10 @@ final class C0815s implements HttpRequest {
                         Log.w(f666b, "Failed to close writer", th22222);
                     }
                 }
-                if (outputStream != null) {
+                if (outputStream2 != null) {
                     try {
                         Logger.m564v(f666b, "Closing output stream");
-                        outputStream.close();
+                        outputStream2.close();
                     } catch (Throwable th222222) {
                         Log.w(f666b, "Failed to close output stream", th222222);
                     }
@@ -346,7 +346,7 @@ final class C0815s implements HttpRequest {
                     }
                 }
             } catch (Throwable e222222222) {
-                outputStream2 = outputStream;
+                outputStream = outputStream2;
                 httpsURLConnection = httpsURLConnection3;
                 th2222222 = e222222222;
                 httpsURLConnection2 = httpsURLConnection;
@@ -363,9 +363,9 @@ final class C0815s implements HttpRequest {
                     Logger.m564v(f666b, "Closing print writer");
                     printWriter.close();
                 }
-                if (outputStream2 != null) {
+                if (outputStream != null) {
                     Logger.m564v(f666b, "Closing output stream");
-                    outputStream2.close();
+                    outputStream.close();
                 }
                 if (bufferedInputStream != null) {
                     Logger.m564v(f666b, "Closing file input stream");
@@ -383,9 +383,9 @@ final class C0815s implements HttpRequest {
                     Logger.m564v(f666b, "Closing print writer");
                     printWriter.close();
                 }
-                if (outputStream != null) {
+                if (outputStream2 != null) {
                     Logger.m564v(f666b, "Closing output stream");
-                    outputStream.close();
+                    outputStream2.close();
                 }
                 if (bufferedInputStream != null) {
                     Logger.m564v(f666b, "Closing file input stream");
@@ -396,7 +396,7 @@ final class C0815s implements HttpRequest {
         } catch (Exception e3) {
             th2222222 = e3;
             bufferedInputStream = null;
-            outputStream2 = null;
+            outputStream = null;
             printWriter = null;
             Log.e(f666b, "Error uploading file to " + url, th2222222);
             a = new C0807a().m596a(Kind.UNEXPECTED).m597a(th2222222.getMessage()).m599b(url.toExternalForm()).m598a();
@@ -411,9 +411,9 @@ final class C0815s implements HttpRequest {
                 Logger.m564v(f666b, "Closing print writer");
                 printWriter.close();
             }
-            if (outputStream2 != null) {
+            if (outputStream != null) {
                 Logger.m564v(f666b, "Closing output stream");
-                outputStream2.close();
+                outputStream.close();
             }
             if (bufferedInputStream != null) {
                 Logger.m564v(f666b, "Closing file input stream");
@@ -421,7 +421,7 @@ final class C0815s implements HttpRequest {
             }
         } catch (Throwable th4) {
             th2222222 = th4;
-            outputStream = null;
+            outputStream2 = null;
             printWriter = null;
             bufferedInputStream = null;
             if (httpsURLConnection2 != null) {
@@ -432,9 +432,9 @@ final class C0815s implements HttpRequest {
                 Logger.m564v(f666b, "Closing print writer");
                 printWriter.close();
             }
-            if (outputStream != null) {
+            if (outputStream2 != null) {
                 Logger.m564v(f666b, "Closing output stream");
-                outputStream.close();
+                outputStream2.close();
             }
             if (bufferedInputStream != null) {
                 Logger.m564v(f666b, "Closing file input stream");

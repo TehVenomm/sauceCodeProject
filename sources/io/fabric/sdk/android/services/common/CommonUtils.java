@@ -443,8 +443,8 @@ public class CommonUtils {
 
     public static long getTotalRamInBytes() {
         long j;
+        String toUpperCase;
         synchronized (CommonUtils.class) {
-            String toUpperCase;
             try {
                 if (totalRamInBytes == -1) {
                     Object extractFieldFromSystemFile = extractFieldFromSystemFile(new File("/proc/meminfo"), "MemTotal");

@@ -3,22 +3,22 @@ using UnityEngine;
 
 public static class NGUIMath
 {
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static float Lerp(float from, float to, float factor)
 	{
 		return from * (1f - factor) + to * factor;
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static int ClampIndex(int val, int max)
 	{
 		return (val >= 0) ? ((val >= max) ? (max - 1) : val) : 0;
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static int RepeatIndex(int val, int max)
 	{
 		if (max < 1)
@@ -58,8 +58,8 @@ public static class NGUIMath
 		return val - (float)Mathf.FloorToInt(val);
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static int HexToDecimal(char ch)
 	{
 		switch (ch)
@@ -107,8 +107,8 @@ public static class NGUIMath
 		}
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static char DecimalToHexChar(int num)
 	{
 		if (num > 15)
@@ -122,8 +122,8 @@ public static class NGUIMath
 		return (char)(65 + num - 10);
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static string DecimalToHex8(int num)
 	{
 		num &= 0xFF;
@@ -145,8 +145,8 @@ public static class NGUIMath
 		return num.ToString("X8");
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static int ColorToInt(Color c)
 	{
 		int num = 0;
@@ -156,8 +156,8 @@ public static class NGUIMath
 		return num | Mathf.RoundToInt(c.a * 255f);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static Color IntToColor(int val)
 	{
 		//IL_0006: Unknown result type (might be due to invalid IL or missing references)

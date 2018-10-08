@@ -515,7 +515,7 @@ public class UITutorialOperationHelper
 
 	public static readonly string STR_BASIC_NEW = "LET'S FIGHT! ({0})";
 
-	public static readonly float WAITING_BASIC_TIME = 5f;
+	public static readonly float WAITING_BASIC_TIME = 10f;
 
 	public static readonly int SE_ID_COMPLETE = 40000100;
 

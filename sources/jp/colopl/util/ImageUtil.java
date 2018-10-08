@@ -39,9 +39,9 @@ public class ImageUtil {
     }
 
     public static Uri addImageAsApplication(ContentResolver contentResolver, String str, long j, String str2, String str3, Bitmap bitmap, byte[] bArr) {
+        OutputStream fileOutputStream;
         Throwable th;
         String str4 = str2 + Constants.URL_PATH_DELIMITER + str3;
-        OutputStream fileOutputStream;
         try {
             File file = new File(str2);
             if (!file.exists()) {

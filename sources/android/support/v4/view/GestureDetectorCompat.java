@@ -315,12 +315,12 @@ public final class GestureDetectorCompat {
                     this.mVelocityTracker.computeCurrentVelocity(1000, (float) this.mMaximumFlingVelocity);
                     int actionIndex2 = MotionEventCompat.getActionIndex(motionEvent);
                     actionIndex = motionEvent.getPointerId(actionIndex2);
-                    f = VelocityTrackerCompat.getXVelocity(this.mVelocityTracker, actionIndex);
+                    f2 = VelocityTrackerCompat.getXVelocity(this.mVelocityTracker, actionIndex);
                     float yVelocity2 = VelocityTrackerCompat.getYVelocity(this.mVelocityTracker, actionIndex);
                     for (actionIndex = 0; actionIndex < pointerCount; actionIndex++) {
                         if (actionIndex != actionIndex2) {
                             int pointerId2 = motionEvent.getPointerId(actionIndex);
-                            if ((VelocityTrackerCompat.getYVelocity(this.mVelocityTracker, pointerId2) * yVelocity2) + (VelocityTrackerCompat.getXVelocity(this.mVelocityTracker, pointerId2) * f) < 0.0f) {
+                            if ((VelocityTrackerCompat.getYVelocity(this.mVelocityTracker, pointerId2) * yVelocity2) + (VelocityTrackerCompat.getXVelocity(this.mVelocityTracker, pointerId2) * f2) < 0.0f) {
                                 this.mVelocityTracker.clear();
                                 return false;
                             }

@@ -30,8 +30,8 @@ public class UIStretch
 
 	public Vector2 borderPadding = Vector2.get_zero();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UIWidget widgetContainer;
 
 	private Transform mTrans;

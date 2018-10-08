@@ -51,9 +51,10 @@ public class NetworkNative
 		}
 	}
 
-	public static string getIPAHash()
+	public static string getAppStr()
 	{
-		return string.Empty;
+		string empty = string.Empty;
+		return AppMain.appStr;
 	}
 
 	public static string getUniqueDeviceId()

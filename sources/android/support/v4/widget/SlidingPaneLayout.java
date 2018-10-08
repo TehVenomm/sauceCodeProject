@@ -743,14 +743,13 @@ public class SlidingPaneLayout extends ViewGroup {
     }
 
     protected void onLayout(boolean z, int i, int i2, int i3, int i4) {
-        int i5;
         boolean isLayoutRtlSupport = isLayoutRtlSupport();
         if (isLayoutRtlSupport) {
             this.mDragHelper.setEdgeTrackingEnabled(2);
         } else {
             this.mDragHelper.setEdgeTrackingEnabled(1);
         }
-        int i6 = i3 - i;
+        int i5 = i3 - i;
         int paddingRight = isLayoutRtlSupport ? getPaddingRight() : getPaddingLeft();
         int paddingLeft = isLayoutRtlSupport ? getPaddingLeft() : getPaddingRight();
         int paddingTop = getPaddingTop();
@@ -759,46 +758,47 @@ public class SlidingPaneLayout extends ViewGroup {
             float f = (this.mCanSlide && this.mPreservedOpenState) ? 1.0f : 0.0f;
             this.mSlideOffset = f;
         }
-        int i7 = 0;
-        int i8 = paddingRight;
-        while (i7 < childCount) {
-            View childAt = getChildAt(i7);
+        int i6 = 0;
+        int i7 = paddingRight;
+        while (i6 < childCount) {
+            int i8;
+            View childAt = getChildAt(i6);
             if (childAt.getVisibility() == 8) {
-                i5 = paddingRight;
-                paddingRight = i8;
+                i8 = paddingRight;
+                paddingRight = i7;
             } else {
                 int i9;
                 LayoutParams layoutParams = (LayoutParams) childAt.getLayoutParams();
                 int measuredWidth = childAt.getMeasuredWidth();
                 if (layoutParams.slideable) {
-                    int min = (Math.min(i8, (i6 - paddingLeft) - this.mOverhangSize) - paddingRight) - (layoutParams.leftMargin + layoutParams.rightMargin);
+                    int min = (Math.min(i7, (i5 - paddingLeft) - this.mOverhangSize) - paddingRight) - (layoutParams.leftMargin + layoutParams.rightMargin);
                     this.mSlideRange = min;
                     i9 = isLayoutRtlSupport ? layoutParams.rightMargin : layoutParams.leftMargin;
-                    layoutParams.dimWhenOffset = ((paddingRight + i9) + min) + (measuredWidth / 2) > i6 - paddingLeft;
+                    layoutParams.dimWhenOffset = ((paddingRight + i9) + min) + (measuredWidth / 2) > i5 - paddingLeft;
                     int i10 = (int) (((float) min) * this.mSlideOffset);
-                    i5 = (i10 + i9) + paddingRight;
+                    i8 = (i10 + i9) + paddingRight;
                     this.mSlideOffset = ((float) i10) / ((float) this.mSlideRange);
                     paddingRight = 0;
                 } else if (!this.mCanSlide || this.mParallaxBy == 0) {
                     paddingRight = 0;
-                    i5 = i8;
+                    i8 = i7;
                 } else {
                     paddingRight = (int) ((1.0f - this.mSlideOffset) * ((float) this.mParallaxBy));
-                    i5 = i8;
+                    i8 = i7;
                 }
                 if (isLayoutRtlSupport) {
-                    i9 = (i6 - i5) + paddingRight;
-                    paddingRight = i9 - measuredWidth;
+                    paddingRight += i5 - i8;
+                    i9 = paddingRight - measuredWidth;
                 } else {
-                    paddingRight = i5 - paddingRight;
-                    i9 = paddingRight + measuredWidth;
+                    i9 = i8 - paddingRight;
+                    paddingRight = i9 + measuredWidth;
                 }
-                childAt.layout(paddingRight, paddingTop, i9, childAt.getMeasuredHeight() + paddingTop);
-                paddingRight = childAt.getWidth() + i8;
+                childAt.layout(i9, paddingTop, paddingRight, childAt.getMeasuredHeight() + paddingTop);
+                paddingRight = childAt.getWidth() + i7;
             }
-            i7++;
-            i8 = paddingRight;
-            paddingRight = i5;
+            i6++;
+            i7 = paddingRight;
+            paddingRight = i8;
         }
         if (this.mFirstLayout) {
             if (this.mCanSlide) {
@@ -809,8 +809,8 @@ public class SlidingPaneLayout extends ViewGroup {
                     dimChildView(this.mSlideableView, this.mSlideOffset, this.mSliderFadeColor);
                 }
             } else {
-                for (i5 = 0; i5 < childCount; i5++) {
-                    dimChildView(getChildAt(i5), 0.0f, this.mSliderFadeColor);
+                for (i8 = 0; i8 < childCount; i8++) {
+                    dimChildView(getChildAt(i8), 0.0f, this.mSliderFadeColor);
                 }
             }
             updateObscuredViewsVisibility(this.mSlideableView);

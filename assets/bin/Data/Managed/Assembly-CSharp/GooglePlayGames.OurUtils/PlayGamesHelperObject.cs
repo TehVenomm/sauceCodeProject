@@ -66,7 +66,7 @@ namespace GooglePlayGames.OurUtils
 			//IL_0029: Expected O, but got Unknown
 			if (instance != null)
 			{
-				_003CRunCoroutine_003Ec__AnonStorey807 _003CRunCoroutine_003Ec__AnonStorey;
+				_003CRunCoroutine_003Ec__AnonStorey808 _003CRunCoroutine_003Ec__AnonStorey;
 				RunOnGameThread(new Action((object)_003CRunCoroutine_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}

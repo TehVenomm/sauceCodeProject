@@ -119,8 +119,8 @@ public class NPCMessage : UIBehaviour
 		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		if (message.has_voice)
 		{
-			_003COnModelLoadComplete_003Ec__AnonStorey7CC _003COnModelLoadComplete_003Ec__AnonStorey7CC;
-			this.StartCoroutine(DoCacheVoice(new Action((object)_003COnModelLoadComplete_003Ec__AnonStorey7CC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
+			_003COnModelLoadComplete_003Ec__AnonStorey7CD _003COnModelLoadComplete_003Ec__AnonStorey7CD;
+			this.StartCoroutine(DoCacheVoice(new Action((object)_003COnModelLoadComplete_003Ec__AnonStorey7CD, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)));
 		}
 		else
 		{

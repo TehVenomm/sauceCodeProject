@@ -141,18 +141,15 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
                     Log.d(this.name, "DISK cache hit for " + obj.toString());
                     try {
                         valT = readValueFromDisk(fileForKey);
-                        if (valT == null) {
-                            valT = null;
-                        } else {
+                        if (valT != null) {
                             this.cache.put(obj, valT);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
                         valT = null;
                     }
-                } else {
-                    valT = null;
                 }
+                valT = null;
             }
         }
         return valT;

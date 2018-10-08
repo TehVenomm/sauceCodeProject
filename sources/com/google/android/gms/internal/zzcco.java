@@ -862,9 +862,9 @@ public class zzcco {
         r14.zzwh();	 Catch:{ all -> 0x019e }
         r6 = 0;
         r5 = 0;
-        r2 = r14.getWritableDatabase();	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r2 = r14.getWritableDatabase();	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r3 = 0;
-        r3 = android.text.TextUtils.isEmpty(r3);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r3 = android.text.TextUtils.isEmpty(r3);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         if (r3 == 0) goto L_0x01a7;
     L_0x0030:
         r8 = -1;
@@ -872,13 +872,13 @@ public class zzcco {
         if (r3 == 0) goto L_0x0140;
     L_0x0036:
         r3 = 2;
-        r3 = new java.lang.String[r3];	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r3 = new java.lang.String[r3];	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r7 = 0;
-        r8 = java.lang.String.valueOf(r16);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r3[r7] = r8;	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r8 = java.lang.String.valueOf(r16);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r3[r7] = r8;	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r7 = 1;
-        r8 = java.lang.String.valueOf(r22);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r3[r7] = r8;	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r8 = java.lang.String.valueOf(r22);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r3[r7] = r8;	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r7 = r3;
     L_0x0048:
         r8 = -1;
@@ -887,19 +887,19 @@ public class zzcco {
     L_0x004e:
         r3 = "rowid <= ? and ";
     L_0x0050:
-        r8 = java.lang.String.valueOf(r3);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r8 = r8.length();	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r9 = new java.lang.StringBuilder;	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r8 = java.lang.String.valueOf(r3);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r8 = r8.length();	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r9 = new java.lang.StringBuilder;	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r8 = r8 + 148;
-        r9.<init>(r8);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r9.<init>(r8);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r8 = "select app_id, metadata_fingerprint from raw_events where ";
-        r8 = r9.append(r8);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r3 = r8.append(r3);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r8 = r9.append(r8);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r3 = r8.append(r3);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r8 = "app_id in (select app_id from apps where config_fetched_time >= ?) order by rowid limit 1;";
-        r3 = r3.append(r8);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r3 = r3.toString();	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r5 = r2.rawQuery(r3, r7);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r3 = r5.moveToFirst();	 Catch:{ SQLiteException -> 0x07a8, all -> 0x07b5 }
+        r3 = r3.append(r8);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r3 = r3.toString();	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r5 = r2.rawQuery(r3, r7);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r3 = r5.moveToFirst();	 Catch:{ SQLiteException -> 0x07a9, all -> 0x07b6 }
         if (r3 != 0) goto L_0x0151;
     L_0x007d:
         if (r5 == 0) goto L_0x0082;
@@ -915,7 +915,7 @@ public class zzcco {
     L_0x008e:
         r2 = 1;
     L_0x008f:
-        if (r2 != 0) goto L_0x077f;
+        if (r2 != 0) goto L_0x0780;
     L_0x0091:
         r12 = 0;
         r0 = r15.zzitv;	 Catch:{ all -> 0x019e }
@@ -931,7 +931,7 @@ public class zzcco {
     L_0x00a5:
         r2 = r15.zzaom;	 Catch:{ all -> 0x019e }
         r2 = r2.size();	 Catch:{ all -> 0x019e }
-        if (r14 >= r2) goto L_0x05c7;
+        if (r14 >= r2) goto L_0x05c8;
     L_0x00ad:
         r3 = r20.zzauh();	 Catch:{ all -> 0x019e }
         r2 = r15.zzitv;	 Catch:{ all -> 0x019e }
@@ -970,7 +970,7 @@ public class zzcco {
     L_0x0108:
         r2 = 1;
     L_0x0109:
-        if (r2 != 0) goto L_0x079f;
+        if (r2 != 0) goto L_0x07a0;
     L_0x010b:
         r3 = "_err";
         r2 = r15.zzaom;	 Catch:{ all -> 0x019e }
@@ -978,7 +978,7 @@ public class zzcco {
         r2 = (com.google.android.gms.internal.zzcfz) r2;	 Catch:{ all -> 0x019e }
         r2 = r2.name;	 Catch:{ all -> 0x019e }
         r2 = r3.equals(r2);	 Catch:{ all -> 0x019e }
-        if (r2 != 0) goto L_0x079f;
+        if (r2 != 0) goto L_0x07a0;
     L_0x011d:
         r2 = r20.zzaug();	 Catch:{ all -> 0x019e }
         r3 = r15.zzitv;	 Catch:{ all -> 0x019e }
@@ -1001,10 +1001,10 @@ public class zzcco {
         goto L_0x00a5;
     L_0x0140:
         r3 = 1;
-        r3 = new java.lang.String[r3];	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r3 = new java.lang.String[r3];	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r7 = 0;
-        r8 = java.lang.String.valueOf(r22);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r3[r7] = r8;	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r8 = java.lang.String.valueOf(r22);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r3[r7] = r8;	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r7 = r3;
         goto L_0x0048;
     L_0x014d:
@@ -1012,40 +1012,40 @@ public class zzcco {
         goto L_0x0050;
     L_0x0151:
         r3 = 0;
-        r4 = r5.getString(r3);	 Catch:{ SQLiteException -> 0x07a8, all -> 0x07b5 }
+        r4 = r5.getString(r3);	 Catch:{ SQLiteException -> 0x07a9, all -> 0x07b6 }
         r3 = 1;
-        r3 = r5.getString(r3);	 Catch:{ SQLiteException -> 0x07ad, all -> 0x07b5 }
-        r5.close();	 Catch:{ SQLiteException -> 0x07ad, all -> 0x07b5 }
+        r3 = r5.getString(r3);	 Catch:{ SQLiteException -> 0x07ae, all -> 0x07b6 }
+        r5.close();	 Catch:{ SQLiteException -> 0x07ae, all -> 0x07b6 }
         r11 = r3;
         r12 = r4;
         r13 = r5;
     L_0x0161:
         r3 = "raw_events_metadata";
         r4 = 1;
-        r4 = new java.lang.String[r4];	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r4 = new java.lang.String[r4];	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r5 = 0;
         r6 = "metadata";
-        r4[r5] = r6;	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r4[r5] = r6;	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r5 = "app_id = ? and metadata_fingerprint = ?";
         r6 = 2;
-        r6 = new java.lang.String[r6];	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r6 = new java.lang.String[r6];	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r7 = 0;
-        r6[r7] = r12;	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r6[r7] = r12;	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r7 = 1;
-        r6[r7] = r11;	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r6[r7] = r11;	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r7 = 0;
         r8 = 0;
         r9 = "rowid";
         r10 = "2";
-        r13 = r2.query(r3, r4, r5, r6, r7, r8, r9, r10);	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
-        r3 = r13.moveToFirst();	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r13 = r2.query(r3, r4, r5, r6, r7, r8, r9, r10);	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
+        r3 = r13.moveToFirst();	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         if (r3 != 0) goto L_0x0212;
     L_0x0186:
-        r2 = r14.zzauk();	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
-        r2 = r2.zzayc();	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r2 = r14.zzauk();	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
+        r2 = r2.zzayc();	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r3 = "Raw event metadata record is missing. appId";
-        r4 = com.google.android.gms.internal.zzcbo.zzjf(r12);	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
-        r2.zzj(r3, r4);	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r4 = com.google.android.gms.internal.zzcbo.zzjf(r12);	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
+        r2.zzj(r3, r4);	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         if (r13 == 0) goto L_0x0082;
     L_0x0199:
         r13.close();	 Catch:{ all -> 0x019e }
@@ -1061,13 +1061,13 @@ public class zzcco {
         if (r3 == 0) goto L_0x01f8;
     L_0x01ad:
         r3 = 2;
-        r3 = new java.lang.String[r3];	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r3 = new java.lang.String[r3];	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r7 = 0;
         r8 = 0;
-        r3[r7] = r8;	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r3[r7] = r8;	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r7 = 1;
-        r8 = java.lang.String.valueOf(r16);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r3[r7] = r8;	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r8 = java.lang.String.valueOf(r16);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r3[r7] = r8;	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r7 = r3;
     L_0x01bc:
         r8 = -1;
@@ -1076,19 +1076,19 @@ public class zzcco {
     L_0x01c2:
         r3 = " and rowid <= ?";
     L_0x01c4:
-        r8 = java.lang.String.valueOf(r3);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r8 = r8.length();	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r9 = new java.lang.StringBuilder;	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r8 = java.lang.String.valueOf(r3);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r8 = r8.length();	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r9 = new java.lang.StringBuilder;	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r8 = r8 + 84;
-        r9.<init>(r8);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r9.<init>(r8);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r8 = "select metadata_fingerprint from raw_events where app_id = ?";
-        r8 = r9.append(r8);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r3 = r8.append(r3);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r8 = r9.append(r8);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r3 = r8.append(r3);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r8 = " order by rowid limit 1;";
-        r3 = r3.append(r8);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r3 = r3.toString();	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r5 = r2.rawQuery(r3, r7);	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
-        r3 = r5.moveToFirst();	 Catch:{ SQLiteException -> 0x07a8, all -> 0x07b5 }
+        r3 = r3.append(r8);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r3 = r3.toString();	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r5 = r2.rawQuery(r3, r7);	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
+        r3 = r5.moveToFirst();	 Catch:{ SQLiteException -> 0x07a9, all -> 0x07b6 }
         if (r3 != 0) goto L_0x0204;
     L_0x01f1:
         if (r5 == 0) goto L_0x0082;
@@ -1097,10 +1097,10 @@ public class zzcco {
         goto L_0x0082;
     L_0x01f8:
         r3 = 1;
-        r3 = new java.lang.String[r3];	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r3 = new java.lang.String[r3];	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r7 = 0;
         r8 = 0;
-        r3[r7] = r8;	 Catch:{ SQLiteException -> 0x07a3, all -> 0x032e }
+        r3[r7] = r8;	 Catch:{ SQLiteException -> 0x07a4, all -> 0x032e }
         r7 = r3;
         goto L_0x01bc;
     L_0x0201:
@@ -1108,8 +1108,8 @@ public class zzcco {
         goto L_0x01c4;
     L_0x0204:
         r3 = 0;
-        r3 = r5.getString(r3);	 Catch:{ SQLiteException -> 0x07a8, all -> 0x07b5 }
-        r5.close();	 Catch:{ SQLiteException -> 0x07a8, all -> 0x07b5 }
+        r3 = r5.getString(r3);	 Catch:{ SQLiteException -> 0x07a9, all -> 0x07b6 }
+        r5.close();	 Catch:{ SQLiteException -> 0x07a9, all -> 0x07b6 }
         r4 = 0;
         r11 = r3;
         r12 = r4;
@@ -1117,59 +1117,59 @@ public class zzcco {
         goto L_0x0161;
     L_0x0212:
         r3 = 0;
-        r3 = r13.getBlob(r3);	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r3 = r13.getBlob(r3);	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r4 = 0;
-        r5 = r3.length;	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
-        r3 = com.google.android.gms.internal.zzegf.zzh(r3, r4, r5);	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
-        r4 = new com.google.android.gms.internal.zzcgc;	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
-        r4.<init>();	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r5 = r3.length;	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
+        r3 = com.google.android.gms.internal.zzegf.zzh(r3, r4, r5);	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
+        r4 = new com.google.android.gms.internal.zzcgc;	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
+        r4.<init>();	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r4.zza(r3);	 Catch:{ IOException -> 0x029a }
-        r3 = r13.moveToNext();	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r3 = r13.moveToNext();	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         if (r3 == 0) goto L_0x023c;
     L_0x022b:
-        r3 = r14.zzauk();	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
-        r3 = r3.zzaye();	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r3 = r14.zzauk();	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
+        r3 = r3.zzaye();	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r5 = "Get multiple raw event metadata records, expected one. appId";
-        r6 = com.google.android.gms.internal.zzcbo.zzjf(r12);	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
-        r3.zzj(r5, r6);	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r6 = com.google.android.gms.internal.zzcbo.zzjf(r12);	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
+        r3.zzj(r5, r6);	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
     L_0x023c:
-        r13.close();	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
-        r15.zzb(r4);	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r13.close();	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
+        r15.zzb(r4);	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r4 = -1;
         r3 = (r16 > r4 ? 1 : (r16 == r4 ? 0 : -1));
         if (r3 == 0) goto L_0x02b3;
     L_0x0248:
         r5 = "app_id = ? and metadata_fingerprint = ? and rowid <= ?";
         r3 = 3;
-        r6 = new java.lang.String[r3];	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r6 = new java.lang.String[r3];	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r3 = 0;
         r6[r3] = r12;
         r3 = 1;
         r6[r3] = r11;
         r3 = 2;
-        r4 = java.lang.String.valueOf(r16);	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
-        r6[r3] = r4;	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r4 = java.lang.String.valueOf(r16);	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
+        r6[r3] = r4;	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
     L_0x025a:
         r3 = "raw_events";
         r4 = 4;
-        r4 = new java.lang.String[r4];	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r4 = new java.lang.String[r4];	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r7 = 0;
         r8 = "rowid";
-        r4[r7] = r8;	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r4[r7] = r8;	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r7 = 1;
         r8 = "name";
-        r4[r7] = r8;	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r4[r7] = r8;	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r7 = 2;
         r8 = "timestamp";
-        r4[r7] = r8;	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r4[r7] = r8;	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r7 = 3;
         r8 = "data";
-        r4[r7] = r8;	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r4[r7] = r8;	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r7 = 0;
         r8 = 0;
         r9 = "rowid";
         r10 = 0;
-        r3 = r2.query(r3, r4, r5, r6, r7, r8, r9, r10);	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r3 = r2.query(r3, r4, r5, r6, r7, r8, r9, r10);	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r2 = r3.moveToFirst();	 Catch:{ SQLiteException -> 0x02bf }
         if (r2 != 0) goto L_0x02d8;
     L_0x0282:
@@ -1184,11 +1184,11 @@ public class zzcco {
         goto L_0x0082;
     L_0x029a:
         r2 = move-exception;
-        r3 = r14.zzauk();	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
-        r3 = r3.zzayc();	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r3 = r14.zzauk();	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
+        r3 = r3.zzayc();	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r4 = "Data loss. Failed to merge raw event metadata. appId";
-        r5 = com.google.android.gms.internal.zzcbo.zzjf(r12);	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
-        r3.zze(r4, r5, r2);	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r5 = com.google.android.gms.internal.zzcbo.zzjf(r12);	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
+        r3.zze(r4, r5, r2);	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         if (r13 == 0) goto L_0x0082;
     L_0x02ae:
         r13.close();	 Catch:{ all -> 0x019e }
@@ -1196,7 +1196,7 @@ public class zzcco {
     L_0x02b3:
         r5 = "app_id = ? and metadata_fingerprint = ?";
         r3 = 2;
-        r6 = new java.lang.String[r3];	 Catch:{ SQLiteException -> 0x07bc, all -> 0x07b2 }
+        r6 = new java.lang.String[r3];	 Catch:{ SQLiteException -> 0x07bd, all -> 0x07b3 }
         r3 = 0;
         r6[r3] = r12;
         r3 = 1;
@@ -1205,11 +1205,11 @@ public class zzcco {
     L_0x02bf:
         r2 = move-exception;
     L_0x02c0:
-        r4 = r14.zzauk();	 Catch:{ all -> 0x07b9 }
-        r4 = r4.zzayc();	 Catch:{ all -> 0x07b9 }
+        r4 = r14.zzauk();	 Catch:{ all -> 0x07ba }
+        r4 = r4.zzayc();	 Catch:{ all -> 0x07ba }
         r5 = "Data loss. Error selecting raw event. appId";
-        r6 = com.google.android.gms.internal.zzcbo.zzjf(r12);	 Catch:{ all -> 0x07b9 }
-        r4.zze(r5, r6, r2);	 Catch:{ all -> 0x07b9 }
+        r6 = com.google.android.gms.internal.zzcbo.zzjf(r12);	 Catch:{ all -> 0x07ba }
+        r4.zze(r5, r6, r2);	 Catch:{ all -> 0x07ba }
         if (r3 == 0) goto L_0x0082;
     L_0x02d3:
         r3.close();	 Catch:{ all -> 0x019e }
@@ -1288,7 +1288,7 @@ public class zzcco {
         r2 = (com.google.android.gms.internal.zzcfz) r2;	 Catch:{ all -> 0x019e }
         r2 = r2.name;	 Catch:{ all -> 0x019e }
         r2 = com.google.android.gms.internal.zzcfo.zzki(r2);	 Catch:{ all -> 0x019e }
-        if (r2 == 0) goto L_0x05c5;
+        if (r2 == 0) goto L_0x05c6;
     L_0x0368:
         r3 = 0;
         r4 = 0;
@@ -1336,7 +1336,7 @@ public class zzcco {
         r8 = "_r";
         r9 = r3.name;	 Catch:{ all -> 0x019e }
         r8 = r8.equals(r9);	 Catch:{ all -> 0x019e }
-        if (r8 == 0) goto L_0x079c;
+        if (r8 == 0) goto L_0x079d;
     L_0x03b8:
         r8 = 1;
         r4 = java.lang.Long.valueOf(r8);	 Catch:{ all -> 0x019e }
@@ -1442,7 +1442,7 @@ public class zzcco {
         r4 = r4.zzis(r5);	 Catch:{ all -> 0x019e }
         r4 = (long) r4;	 Catch:{ all -> 0x019e }
         r2 = (r2 > r4 ? 1 : (r2 == r4 ? 0 : -1));
-        if (r2 <= 0) goto L_0x0799;
+        if (r2 <= 0) goto L_0x079a;
     L_0x04a8:
         r2 = r15.zzaom;	 Catch:{ all -> 0x019e }
         r2 = r2.get(r14);	 Catch:{ all -> 0x019e }
@@ -1458,7 +1458,7 @@ public class zzcco {
         r5 = r5[r3];	 Catch:{ all -> 0x019e }
         r5 = r5.name;	 Catch:{ all -> 0x019e }
         r4 = r4.equals(r5);	 Catch:{ all -> 0x019e }
-        if (r4 == 0) goto L_0x0555;
+        if (r4 == 0) goto L_0x0556;
     L_0x04c4:
         r4 = r2.zziys;	 Catch:{ all -> 0x019e }
         r4 = r4.length;	 Catch:{ all -> 0x019e }
@@ -1487,9 +1487,9 @@ public class zzcco {
         r2 = (com.google.android.gms.internal.zzcfz) r2;	 Catch:{ all -> 0x019e }
         r2 = r2.name;	 Catch:{ all -> 0x019e }
         r2 = com.google.android.gms.internal.zzcfo.zzju(r2);	 Catch:{ all -> 0x019e }
-        if (r2 == 0) goto L_0x05c5;
+        if (r2 == 0) goto L_0x05c6;
     L_0x04f2:
-        if (r17 == 0) goto L_0x05c5;
+        if (r17 == 0) goto L_0x05c6;
     L_0x04f4:
         r3 = r20.zzaue();	 Catch:{ all -> 0x019e }
         r4 = r20.zzaze();	 Catch:{ all -> 0x019e }
@@ -1510,7 +1510,7 @@ public class zzcco {
         r4 = r4.zzb(r5, r6);	 Catch:{ all -> 0x019e }
         r4 = (long) r4;	 Catch:{ all -> 0x019e }
         r2 = (r2 > r4 ? 1 : (r2 == r4 ? 0 : -1));
-        if (r2 <= 0) goto L_0x05c5;
+        if (r2 <= 0) goto L_0x05c6;
     L_0x051e:
         r2 = r20.zzauk();	 Catch:{ all -> 0x019e }
         r2 = r2.zzaye();	 Catch:{ all -> 0x019e }
@@ -1522,42 +1522,43 @@ public class zzcco {
         r2 = r15.zzaom;	 Catch:{ all -> 0x019e }
         r2 = r2.get(r14);	 Catch:{ all -> 0x019e }
         r2 = (com.google.android.gms.internal.zzcfz) r2;	 Catch:{ all -> 0x019e }
-        r3 = 0;
+        r4 = 0;
         r5 = 0;
         r7 = r2.zziys;	 Catch:{ all -> 0x019e }
         r8 = r7.length;	 Catch:{ all -> 0x019e }
-        r4 = 0;
-        r6 = r4;
-    L_0x0542:
-        if (r6 >= r8) goto L_0x0566;
-    L_0x0544:
+        r3 = 0;
+        r6 = r3;
+        r3 = r4;
+    L_0x0543:
+        if (r6 >= r8) goto L_0x0567;
+    L_0x0545:
         r4 = r7[r6];
         r9 = "_c";
         r10 = r4.name;	 Catch:{ all -> 0x019e }
         r9 = r9.equals(r10);	 Catch:{ all -> 0x019e }
-        if (r9 == 0) goto L_0x0559;
-    L_0x0550:
+        if (r9 == 0) goto L_0x055a;
+    L_0x0551:
         r5 = r6 + 1;
         r6 = r5;
         r5 = r4;
-        goto L_0x0542;
-    L_0x0555:
+        goto L_0x0543;
+    L_0x0556:
         r3 = r3 + 1;
         goto L_0x04b1;
-    L_0x0559:
+    L_0x055a:
         r9 = "_err";
         r4 = r4.name;	 Catch:{ all -> 0x019e }
         r4 = r9.equals(r4);	 Catch:{ all -> 0x019e }
-        if (r4 == 0) goto L_0x0796;
-    L_0x0563:
+        if (r4 == 0) goto L_0x0797;
+    L_0x0564:
         r3 = 1;
         r4 = r5;
-        goto L_0x0550;
-    L_0x0566:
-        if (r3 == 0) goto L_0x05a0;
-    L_0x0568:
-        if (r5 == 0) goto L_0x05a0;
-    L_0x056a:
+        goto L_0x0551;
+    L_0x0567:
+        if (r3 == 0) goto L_0x05a1;
+    L_0x0569:
+        if (r5 == 0) goto L_0x05a1;
+    L_0x056b:
         r3 = r2.zziys;	 Catch:{ all -> 0x019e }
         r3 = r3.length;	 Catch:{ all -> 0x019e }
         r3 = r3 + -1;
@@ -1567,23 +1568,23 @@ public class zzcco {
         r9 = r8.length;	 Catch:{ all -> 0x019e }
         r3 = 0;
         r6 = r3;
-    L_0x0577:
-        if (r6 >= r9) goto L_0x0586;
-    L_0x0579:
+    L_0x0578:
+        if (r6 >= r9) goto L_0x0587;
+    L_0x057a:
         r10 = r8[r6];
-        if (r10 == r5) goto L_0x0793;
-    L_0x057d:
+        if (r10 == r5) goto L_0x0794;
+    L_0x057e:
         r3 = r4 + 1;
         r7[r4] = r10;
-    L_0x0581:
+    L_0x0582:
         r4 = r6 + 1;
         r6 = r4;
         r4 = r3;
-        goto L_0x0577;
-    L_0x0586:
+        goto L_0x0578;
+    L_0x0587:
         r2.zziys = r7;	 Catch:{ all -> 0x019e }
         r3 = r12;
-    L_0x0589:
+    L_0x058a:
         r0 = r16;
         r4 = r0.zziza;	 Catch:{ all -> 0x019e }
         r2 = r15.zzaom;	 Catch:{ all -> 0x019e }
@@ -1595,17 +1596,17 @@ public class zzcco {
         r3 = r2;
         r2 = r18;
         goto L_0x0139;
-    L_0x05a0:
-        if (r5 == 0) goto L_0x05b0;
-    L_0x05a2:
+    L_0x05a1:
+        if (r5 == 0) goto L_0x05b1;
+    L_0x05a3:
         r2 = "_err";
         r5.name = r2;	 Catch:{ all -> 0x019e }
         r2 = 10;
         r2 = java.lang.Long.valueOf(r2);	 Catch:{ all -> 0x019e }
         r5.zziyw = r2;	 Catch:{ all -> 0x019e }
         r3 = r12;
-        goto L_0x0589;
-    L_0x05b0:
+        goto L_0x058a;
+    L_0x05b1:
         r2 = r20.zzauk();	 Catch:{ all -> 0x019e }
         r2 = r2.zzayc();	 Catch:{ all -> 0x019e }
         r3 = "Did not find conversion parameter. appId";
@@ -1613,21 +1614,21 @@ public class zzcco {
         r4 = r4.zzch;	 Catch:{ all -> 0x019e }
         r4 = com.google.android.gms.internal.zzcbo.zzjf(r4);	 Catch:{ all -> 0x019e }
         r2.zzj(r3, r4);	 Catch:{ all -> 0x019e }
-    L_0x05c5:
+    L_0x05c6:
         r3 = r12;
-        goto L_0x0589;
-    L_0x05c7:
+        goto L_0x058a;
+    L_0x05c8:
         r2 = r15.zzaom;	 Catch:{ all -> 0x019e }
         r2 = r2.size();	 Catch:{ all -> 0x019e }
-        if (r13 >= r2) goto L_0x05dd;
-    L_0x05cf:
+        if (r13 >= r2) goto L_0x05de;
+    L_0x05d0:
         r0 = r16;
         r2 = r0.zziza;	 Catch:{ all -> 0x019e }
         r2 = java.util.Arrays.copyOf(r2, r13);	 Catch:{ all -> 0x019e }
         r2 = (com.google.android.gms.internal.zzcfz[]) r2;	 Catch:{ all -> 0x019e }
         r0 = r16;
         r0.zziza = r2;	 Catch:{ all -> 0x019e }
-    L_0x05dd:
+    L_0x05de:
         r2 = r15.zzitv;	 Catch:{ all -> 0x019e }
         r2 = r2.zzch;	 Catch:{ all -> 0x019e }
         r3 = r15.zzitv;	 Catch:{ all -> 0x019e }
@@ -1647,12 +1648,12 @@ public class zzcco {
         r0 = r16;
         r0.zzize = r2;	 Catch:{ all -> 0x019e }
         r2 = 0;
-    L_0x060b:
+    L_0x060c:
         r0 = r16;
         r3 = r0.zziza;	 Catch:{ all -> 0x019e }
         r3 = r3.length;	 Catch:{ all -> 0x019e }
-        if (r2 >= r3) goto L_0x064b;
-    L_0x0612:
+        if (r2 >= r3) goto L_0x064c;
+    L_0x0613:
         r0 = r16;
         r3 = r0.zziza;	 Catch:{ all -> 0x019e }
         r3 = r3[r2];	 Catch:{ all -> 0x019e }
@@ -1662,33 +1663,33 @@ public class zzcco {
         r6 = r0.zzizd;	 Catch:{ all -> 0x019e }
         r6 = r6.longValue();	 Catch:{ all -> 0x019e }
         r4 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r4 >= 0) goto L_0x0630;
-    L_0x062a:
+        if (r4 >= 0) goto L_0x0631;
+    L_0x062b:
         r4 = r3.zziyt;	 Catch:{ all -> 0x019e }
         r0 = r16;
         r0.zzizd = r4;	 Catch:{ all -> 0x019e }
-    L_0x0630:
+    L_0x0631:
         r4 = r3.zziyt;	 Catch:{ all -> 0x019e }
         r4 = r4.longValue();	 Catch:{ all -> 0x019e }
         r0 = r16;
         r6 = r0.zzize;	 Catch:{ all -> 0x019e }
         r6 = r6.longValue();	 Catch:{ all -> 0x019e }
         r4 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r4 <= 0) goto L_0x0648;
-    L_0x0642:
+        if (r4 <= 0) goto L_0x0649;
+    L_0x0643:
         r3 = r3.zziyt;	 Catch:{ all -> 0x019e }
         r0 = r16;
         r0.zzize = r3;	 Catch:{ all -> 0x019e }
-    L_0x0648:
+    L_0x0649:
         r2 = r2 + 1;
-        goto L_0x060b;
-    L_0x064b:
+        goto L_0x060c;
+    L_0x064c:
         r2 = r15.zzitv;	 Catch:{ all -> 0x019e }
         r6 = r2.zzch;	 Catch:{ all -> 0x019e }
         r2 = r20.zzaue();	 Catch:{ all -> 0x019e }
         r7 = r2.zziw(r6);	 Catch:{ all -> 0x019e }
-        if (r7 != 0) goto L_0x06dd;
-    L_0x0659:
+        if (r7 != 0) goto L_0x06de;
+    L_0x065a:
         r2 = r20.zzauk();	 Catch:{ all -> 0x019e }
         r2 = r2.zzayc();	 Catch:{ all -> 0x019e }
         r3 = "Bundling raw events w/o app info. appId";
@@ -1696,36 +1697,36 @@ public class zzcco {
         r4 = r4.zzch;	 Catch:{ all -> 0x019e }
         r4 = com.google.android.gms.internal.zzcbo.zzjf(r4);	 Catch:{ all -> 0x019e }
         r2.zzj(r3, r4);	 Catch:{ all -> 0x019e }
-    L_0x066e:
+    L_0x066f:
         r0 = r16;
         r2 = r0.zziza;	 Catch:{ all -> 0x019e }
         r2 = r2.length;	 Catch:{ all -> 0x019e }
-        if (r2 <= 0) goto L_0x06a7;
-    L_0x0675:
+        if (r2 <= 0) goto L_0x06a8;
+    L_0x0676:
         com.google.android.gms.internal.zzcap.zzawj();	 Catch:{ all -> 0x019e }
         r2 = r20.zzauh();	 Catch:{ all -> 0x019e }
         r3 = r15.zzitv;	 Catch:{ all -> 0x019e }
         r3 = r3.zzch;	 Catch:{ all -> 0x019e }
         r2 = r2.zzjn(r3);	 Catch:{ all -> 0x019e }
-        if (r2 == 0) goto L_0x068a;
-    L_0x0686:
+        if (r2 == 0) goto L_0x068b;
+    L_0x0687:
         r3 = r2.zziyh;	 Catch:{ all -> 0x019e }
-        if (r3 != 0) goto L_0x0760;
-    L_0x068a:
+        if (r3 != 0) goto L_0x0761;
+    L_0x068b:
         r2 = r15.zzitv;	 Catch:{ all -> 0x019e }
         r2 = r2.zziln;	 Catch:{ all -> 0x019e }
         r2 = android.text.TextUtils.isEmpty(r2);	 Catch:{ all -> 0x019e }
-        if (r2 == 0) goto L_0x0749;
-    L_0x0694:
+        if (r2 == 0) goto L_0x074a;
+    L_0x0695:
         r2 = -1;
         r2 = java.lang.Long.valueOf(r2);	 Catch:{ all -> 0x019e }
         r0 = r16;
         r0.zzizx = r2;	 Catch:{ all -> 0x019e }
-    L_0x069e:
+    L_0x069f:
         r2 = r20.zzaue();	 Catch:{ all -> 0x019e }
         r0 = r16;
         r2.zza(r0, r12);	 Catch:{ all -> 0x019e }
-    L_0x06a7:
+    L_0x06a8:
         r2 = r20.zzaue();	 Catch:{ all -> 0x019e }
         r3 = r15.zzitw;	 Catch:{ all -> 0x019e }
         r2.zzae(r3);	 Catch:{ all -> 0x019e }
@@ -1733,52 +1734,52 @@ public class zzcco {
         r2 = r3.getWritableDatabase();	 Catch:{ all -> 0x019e }
         r4 = "delete from raw_events_metadata where app_id=? and metadata_fingerprint not in (select distinct metadata_fingerprint from raw_events where app_id=?)";
         r5 = 2;
-        r5 = new java.lang.String[r5];	 Catch:{ SQLiteException -> 0x0768 }
+        r5 = new java.lang.String[r5];	 Catch:{ SQLiteException -> 0x0769 }
         r7 = 0;
-        r5[r7] = r6;	 Catch:{ SQLiteException -> 0x0768 }
+        r5[r7] = r6;	 Catch:{ SQLiteException -> 0x0769 }
         r7 = 1;
-        r5[r7] = r6;	 Catch:{ SQLiteException -> 0x0768 }
-        r2.execSQL(r4, r5);	 Catch:{ SQLiteException -> 0x0768 }
-    L_0x06c6:
+        r5[r7] = r6;	 Catch:{ SQLiteException -> 0x0769 }
+        r2.execSQL(r4, r5);	 Catch:{ SQLiteException -> 0x0769 }
+    L_0x06c7:
         r2 = r20.zzaue();	 Catch:{ all -> 0x019e }
         r2.setTransactionSuccessful();	 Catch:{ all -> 0x019e }
         r0 = r16;
         r2 = r0.zziza;	 Catch:{ all -> 0x019e }
         r2 = r2.length;	 Catch:{ all -> 0x019e }
-        if (r2 <= 0) goto L_0x077c;
-    L_0x06d4:
-        r2 = 1;
+        if (r2 <= 0) goto L_0x077d;
     L_0x06d5:
+        r2 = 1;
+    L_0x06d6:
         r3 = r20.zzaue();
         r3.endTransaction();
-    L_0x06dc:
-        return r2;
     L_0x06dd:
+        return r2;
+    L_0x06de:
         r0 = r16;
         r2 = r0.zziza;	 Catch:{ all -> 0x019e }
         r2 = r2.length;	 Catch:{ all -> 0x019e }
-        if (r2 <= 0) goto L_0x066e;
-    L_0x06e4:
+        if (r2 <= 0) goto L_0x066f;
+    L_0x06e5:
         r2 = r7.zzaur();	 Catch:{ all -> 0x019e }
         r4 = 0;
         r4 = (r2 > r4 ? 1 : (r2 == r4 ? 0 : -1));
-        if (r4 == 0) goto L_0x0745;
-    L_0x06ee:
+        if (r4 == 0) goto L_0x0746;
+    L_0x06ef:
         r4 = java.lang.Long.valueOf(r2);	 Catch:{ all -> 0x019e }
-    L_0x06f2:
+    L_0x06f3:
         r0 = r16;
         r0.zzizg = r4;	 Catch:{ all -> 0x019e }
         r4 = r7.zzauq();	 Catch:{ all -> 0x019e }
         r8 = 0;
         r8 = (r4 > r8 ? 1 : (r4 == r8 ? 0 : -1));
-        if (r8 != 0) goto L_0x0790;
-    L_0x0700:
+        if (r8 != 0) goto L_0x0791;
+    L_0x0701:
         r4 = 0;
         r4 = (r2 > r4 ? 1 : (r2 == r4 ? 0 : -1));
-        if (r4 == 0) goto L_0x0747;
-    L_0x0706:
+        if (r4 == 0) goto L_0x0748;
+    L_0x0707:
         r2 = java.lang.Long.valueOf(r2);	 Catch:{ all -> 0x019e }
-    L_0x070a:
+    L_0x070b:
         r0 = r16;
         r0.zzizf = r2;	 Catch:{ all -> 0x019e }
         r7.zzava();	 Catch:{ all -> 0x019e }
@@ -1800,14 +1801,14 @@ public class zzcco {
         r0.zzilr = r2;	 Catch:{ all -> 0x019e }
         r2 = r20.zzaue();	 Catch:{ all -> 0x019e }
         r2.zza(r7);	 Catch:{ all -> 0x019e }
-        goto L_0x066e;
-    L_0x0745:
+        goto L_0x066f;
+    L_0x0746:
         r4 = 0;
-        goto L_0x06f2;
-    L_0x0747:
+        goto L_0x06f3;
+    L_0x0748:
         r2 = 0;
-        goto L_0x070a;
-    L_0x0749:
+        goto L_0x070b;
+    L_0x074a:
         r2 = r20.zzauk();	 Catch:{ all -> 0x019e }
         r2 = r2.zzaye();	 Catch:{ all -> 0x019e }
         r3 = "Did not find measurement config or missing version info. appId";
@@ -1815,75 +1816,75 @@ public class zzcco {
         r4 = r4.zzch;	 Catch:{ all -> 0x019e }
         r4 = com.google.android.gms.internal.zzcbo.zzjf(r4);	 Catch:{ all -> 0x019e }
         r2.zzj(r3, r4);	 Catch:{ all -> 0x019e }
-        goto L_0x069e;
-    L_0x0760:
+        goto L_0x069f;
+    L_0x0761:
         r2 = r2.zziyh;	 Catch:{ all -> 0x019e }
         r0 = r16;
         r0.zzizx = r2;	 Catch:{ all -> 0x019e }
-        goto L_0x069e;
-    L_0x0768:
+        goto L_0x069f;
+    L_0x0769:
         r2 = move-exception;
         r3 = r3.zzauk();	 Catch:{ all -> 0x019e }
         r3 = r3.zzayc();	 Catch:{ all -> 0x019e }
         r4 = "Failed to remove unused event metadata. appId";
         r5 = com.google.android.gms.internal.zzcbo.zzjf(r6);	 Catch:{ all -> 0x019e }
         r3.zze(r4, r5, r2);	 Catch:{ all -> 0x019e }
-        goto L_0x06c6;
-    L_0x077c:
+        goto L_0x06c7;
+    L_0x077d:
         r2 = 0;
-        goto L_0x06d5;
-    L_0x077f:
+        goto L_0x06d6;
+    L_0x0780:
         r2 = r20.zzaue();	 Catch:{ all -> 0x019e }
         r2.setTransactionSuccessful();	 Catch:{ all -> 0x019e }
         r2 = r20.zzaue();
         r2.endTransaction();
         r2 = 0;
-        goto L_0x06dc;
-    L_0x0790:
+        goto L_0x06dd;
+    L_0x0791:
         r2 = r4;
-        goto L_0x0700;
-    L_0x0793:
+        goto L_0x0701;
+    L_0x0794:
         r3 = r4;
-        goto L_0x0581;
-    L_0x0796:
+        goto L_0x0582;
+    L_0x0797:
         r4 = r5;
-        goto L_0x0550;
-    L_0x0799:
+        goto L_0x0551;
+    L_0x079a:
         r12 = 1;
         goto L_0x04e2;
-    L_0x079c:
+    L_0x079d:
         r3 = r4;
         goto L_0x03a9;
-    L_0x079f:
+    L_0x07a0:
         r2 = r12;
         r3 = r13;
         goto L_0x0139;
-    L_0x07a3:
+    L_0x07a4:
         r2 = move-exception;
         r12 = r4;
         r3 = r6;
         goto L_0x02c0;
-    L_0x07a8:
+    L_0x07a9:
         r2 = move-exception;
         r12 = r4;
         r3 = r5;
         goto L_0x02c0;
-    L_0x07ad:
+    L_0x07ae:
         r2 = move-exception;
         r12 = r4;
         r3 = r5;
         goto L_0x02c0;
-    L_0x07b2:
+    L_0x07b3:
         r2 = move-exception;
         goto L_0x0331;
-    L_0x07b5:
+    L_0x07b6:
         r2 = move-exception;
         r3 = r5;
         goto L_0x0330;
-    L_0x07b9:
+    L_0x07ba:
         r2 = move-exception;
         goto L_0x0330;
-    L_0x07bc:
+    L_0x07bd:
         r2 = move-exception;
         r3 = r13;
         goto L_0x02c0;
@@ -2001,7 +2002,6 @@ public class zzcco {
 
     @WorkerThread
     protected final void zza(int i, Throwable th, byte[] bArr) {
-        zzcdl zzaue;
         zzauj().zzug();
         zzwh();
         if (bArr == null) {
@@ -2021,6 +2021,7 @@ public class zzcco {
                 zzazh();
                 zzauk().zzayi().zze("Successful upload. Got network response. code, size", Integer.valueOf(i), Integer.valueOf(bArr.length));
                 zzaue().beginTransaction();
+                zzcdl zzaue;
                 try {
                     for (Long l : list) {
                         zzaue = zzaue();
@@ -2159,11 +2160,11 @@ public class zzcco {
                 zzcgc.zzizt = zza(zziw.getAppId(), zzcgc.zzizb, zzcgc.zziza);
                 zzcgc.zzizd = zzcfz.zziyt;
                 zzcgc.zzize = zzcfz.zziyt;
-                zzaus = zziw.zzaur();
-                zzcgc.zzizg = zzaus != 0 ? Long.valueOf(zzaus) : null;
-                long zzauq = zziw.zzauq();
-                if (zzauq != 0) {
-                    zzaus = zzauq;
+                long zzaur = zziw.zzaur();
+                zzcgc.zzizg = zzaur != 0 ? Long.valueOf(zzaur) : null;
+                zzaus = zziw.zzauq();
+                if (zzaus == 0) {
+                    zzaus = zzaur;
                 }
                 zzcgc.zzizf = zzaus != 0 ? Long.valueOf(zzaus) : null;
                 zziw.zzava();
@@ -2328,11 +2329,11 @@ public class zzcco {
 
     @WorkerThread
     public final void zzazf() {
-        String zzawt;
+        String zzaxh;
         zzauj().zzug();
         zzwh();
         this.zzits = true;
-        String zzaxh;
+        String zzawt;
         try {
             zzcap.zzawj();
             Boolean zzayn = zzaul().zzayn();

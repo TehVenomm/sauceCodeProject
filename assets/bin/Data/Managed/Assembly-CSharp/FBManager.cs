@@ -268,7 +268,7 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 	{
 		if (CheckAndSetActionExecuting())
 		{
-			_003CAppRequest_003Ec__AnonStorey7E5 _003CAppRequest_003Ec__AnonStorey7E;
+			_003CAppRequest_003Ec__AnonStorey7E6 _003CAppRequest_003Ec__AnonStorey7E;
 			OnActionCallback = new Action<bool, string>((object)_003CAppRequest_003Ec__AnonStorey7E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			FB.AppRequest(message, (IEnumerable<string>)to, (IEnumerable<object>)null, (IEnumerable<string>)null, (int?)null, data, title, new FacebookDelegate<IAppRequestResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
@@ -278,7 +278,7 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 	{
 		if (CheckAndSetActionExecuting())
 		{
-			_003CGetInvitableFriends_003Ec__AnonStorey7E6 _003CGetInvitableFriends_003Ec__AnonStorey7E;
+			_003CGetInvitableFriends_003Ec__AnonStorey7E7 _003CGetInvitableFriends_003Ec__AnonStorey7E;
 			OnActionCallback = new Action<bool, string>((object)_003CGetInvitableFriends_003Ec__AnonStorey7E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			FB.API("/me/invitable_friends?fields=id,name,picture&pretty=0&limit=5000", 0, new FacebookDelegate<IGraphResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), (IDictionary<string, string>)null);
 		}
@@ -288,7 +288,7 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 	{
 		if (CheckAndSetActionExecuting())
 		{
-			_003CGetFriends_003Ec__AnonStorey7E7 _003CGetFriends_003Ec__AnonStorey7E;
+			_003CGetFriends_003Ec__AnonStorey7E8 _003CGetFriends_003Ec__AnonStorey7E;
 			OnActionCallback = new Action<bool, string>((object)_003CGetFriends_003Ec__AnonStorey7E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			FB.API("/me/friends?fields=id,name,picture&pretty=0&limit=5000", 0, new FacebookDelegate<IGraphResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), (IDictionary<string, string>)null);
 		}

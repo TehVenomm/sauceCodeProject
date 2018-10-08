@@ -111,6 +111,7 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
     }
 
     public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
+        String nextFieldName;
         jsonParser.setCurrentValue(obj);
         if (this._injectables != null) {
             injectValues(deserializationContext, obj);
@@ -121,7 +122,6 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
         if (this._externalTypeIdHandler != null) {
             return deserializeWithExternalTypeId(jsonParser, deserializationContext, obj);
         }
-        String nextFieldName;
         if (jsonParser.isExpectedStartObjectToken()) {
             nextFieldName = jsonParser.nextFieldName();
             if (nextFieldName == null) {
@@ -235,12 +235,12 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
     }
 
     protected Object _deserializeUsingPropertyBased(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        Object build;
         PropertyBasedCreator propertyBasedCreator = this._propertyBasedCreator;
         PropertyValueBuffer startBuilding = propertyBasedCreator.startBuilding(jsonParser, deserializationContext, this._objectIdReader);
         JsonToken currentToken = jsonParser.getCurrentToken();
         TokenBuffer tokenBuffer = null;
         while (currentToken == JsonToken.FIELD_NAME) {
+            Object build;
             String currentName = jsonParser.getCurrentName();
             jsonParser.nextToken();
             SettableBeanProperty findCreatorProperty = propertyBasedCreator.findCreatorProperty(currentName);

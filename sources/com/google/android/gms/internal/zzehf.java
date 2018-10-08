@@ -274,29 +274,30 @@ public final class zzehf extends zzegi<zzehf> implements Cloneable {
     protected final int zzn() {
         int i;
         int i2;
-        int i3 = 0;
+        int i3;
+        int i4 = 0;
         int zzn = super.zzn();
         if (this.zznfo != null && this.zznfo.length > 0) {
             i = 0;
             i2 = 0;
             for (String str : this.zznfo) {
                 if (str != null) {
-                    i2++;
-                    i += zzegg.zzrc(str);
+                    i++;
+                    i2 += zzegg.zzrc(str);
                 }
             }
-            zzn = (i + zzn) + (i2 * 1);
+            zzn = (i * 1) + (zzn + i2);
         }
         if (this.zznfp != null && this.zznfp.length > 0) {
-            i = 0;
+            i3 = 0;
             i2 = 0;
             for (String str2 : this.zznfp) {
                 if (str2 != null) {
                     i2++;
-                    i += zzegg.zzrc(str2);
+                    i3 += zzegg.zzrc(str2);
                 }
             }
-            zzn = (i + zzn) + (i2 * 1);
+            zzn = (zzn + i3) + (i2 * 1);
         }
         if (this.zznfq != null && this.zznfq.length > 0) {
             i = 0;
@@ -306,20 +307,18 @@ public final class zzehf extends zzegi<zzehf> implements Cloneable {
             zzn = (i + zzn) + (this.zznfq.length * 1);
         }
         if (this.zznfr != null && this.zznfr.length > 0) {
-            i = 0;
+            i3 = 0;
             for (long zzcp : this.zznfr) {
-                i += zzegg.zzcp(zzcp);
+                i3 += zzegg.zzcp(zzcp);
             }
-            zzn = (i + zzn) + (this.zznfr.length * 1);
+            zzn = (zzn + i3) + (this.zznfr.length * 1);
         }
         if (this.zznfs == null || this.zznfs.length <= 0) {
             return zzn;
         }
-        i = 0;
-        while (i3 < this.zznfs.length) {
-            i += zzegg.zzcp(this.zznfs[i3]);
-            i3++;
+        for (long zzcp2 : this.zznfs) {
+            i4 += zzegg.zzcp(zzcp2);
         }
-        return (i + zzn) + (this.zznfs.length * 1);
+        return (zzn + i4) + (this.zznfs.length * 1);
     }
 }

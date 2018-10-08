@@ -149,8 +149,8 @@ public class PropertyReference
 		return null;
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public object Get()
 	{
 		if (mProperty == null && mField == null && isValid)

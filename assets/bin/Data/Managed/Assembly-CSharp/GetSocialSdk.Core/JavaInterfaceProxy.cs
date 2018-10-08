@@ -50,8 +50,8 @@ namespace GetSocialSdk.Core
 				try
 				{
 					GetSocialError ex = throwable.ToGetSocialError();
-					_003CHandleError_003Ec__AnonStorey7ED _003CHandleError_003Ec__AnonStorey7ED;
-					ExecuteOnMainThread(new Action((object)_003CHandleError_003Ec__AnonStorey7ED, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+					_003CHandleError_003Ec__AnonStorey7EE _003CHandleError_003Ec__AnonStorey7EE;
+					ExecuteOnMainThread(new Action((object)_003CHandleError_003Ec__AnonStorey7EE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 				}
 				finally
 				{
@@ -66,8 +66,8 @@ namespace GetSocialSdk.Core
 			//IL_002b: Expected O, but got Unknown
 			if (onSuccess != null)
 			{
-				_003CHandleValue_003Ec__AnonStorey7EE<T> _003CHandleValue_003Ec__AnonStorey7EE;
-				ExecuteOnMainThread(new Action((object)_003CHandleValue_003Ec__AnonStorey7EE, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CHandleValue_003Ec__AnonStorey7EF<T> _003CHandleValue_003Ec__AnonStorey7EF;
+				ExecuteOnMainThread(new Action((object)_003CHandleValue_003Ec__AnonStorey7EF, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			}
 		}
 	}

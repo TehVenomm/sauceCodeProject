@@ -272,6 +272,8 @@ public class TutorialWeaponSelect : GameSection
 		RefreshUI();
 		PreLoadModel();
 		MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_2_name_creation, "Tutorial");
+		Debug.LogWarning((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_2_name_creation.ToString()));
+		MonoBehaviourSingleton<GoWrapManager>.I.SendStatusTracking(TRACK_TUTORIAL_STEP_BIT.tutorial_2_name_creation, "Tutorial", null, null);
 	}
 
 	private void PreLoadModel()

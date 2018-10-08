@@ -64,6 +64,7 @@ public enum ImagePicker {
         /* renamed from: a */
         protected List<C0824b> m639a(Pair<Context, List<Uri>>... pairArr) {
             InputStream openInputStream;
+            FileOutputStream fileOutputStream;
             Throwable e;
             Throwable th;
             Context context = (Context) pairArr[0].first;
@@ -78,7 +79,6 @@ public enum ImagePicker {
                 }
             }
             for (C0824b c0824b2 : arrayList2) {
-                FileOutputStream fileOutputStream;
                 try {
                     File file = new File(SdkCache.INSTANCE.getSdkCacheDir(context) + File.separator + String.format(Locale.US, "attachment-%s.jpg", new Object[]{Long.valueOf(System.currentTimeMillis())}));
                     openInputStream = context.getContentResolver().openInputStream(c0824b2.m642b());

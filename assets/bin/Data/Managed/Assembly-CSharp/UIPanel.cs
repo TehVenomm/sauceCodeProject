@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/NGUI Panel")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/NGUI Panel")]
 public class UIPanel : UIRect
 {
 	public enum RenderQueue
@@ -65,16 +65,16 @@ public class UIPanel : UIRect
 	[SerializeField]
 	private UIDrawCall.Clipping mClipping;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Vector4 mClipRange = new Vector4(0f, 0f, 300f, 200f);
 
 	[HideInInspector]
 	[SerializeField]
 	private Vector2 mClipSoftness = new Vector2(4f, 4f);
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private int mDepth;
 
 	[HideInInspector]

@@ -217,8 +217,8 @@ public class TutorialMessage : UIBehaviour
 
 	private int skipSectionRunCount;
 
-	[SerializeField]
 	[Range(0f, 1f)]
+	[SerializeField]
 	private Vector3 HOLE_SIZE = new Vector3(0.3f, 0.2f, 1f);
 
 	private BetterList<CursorInfo> cursorAttachList = new BetterList<CursorInfo>();
@@ -1469,10 +1469,10 @@ public class TutorialMessage : UIBehaviour
 
 	public static bool IsActiveButton(GameObject button)
 	{
-		//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0204: Expected O, but got Unknown
-		//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0227: Expected O, but got Unknown
+		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019a: Expected O, but got Unknown
+		//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bd: Expected O, but got Unknown
 		if (!MonoBehaviourSingleton<GameSceneManager>.IsValid() || (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.tutorialMessage == null) || button == null)
 		{
 			return true;
@@ -1483,10 +1483,6 @@ public class TutorialMessage : UIBehaviour
 		}
 		string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
 		if (!string.IsNullOrEmpty(currentSectionName) && currentSectionName.Contains("InGameMain") && currentSectionName.Contains("Confirm"))
-		{
-			return true;
-		}
-		if (currentSectionName == "HomeTop" && MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_UPGRADE_ITEM) && (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2) || !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_MAINSTATUS) || !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_QUEST)))
 		{
 			return true;
 		}

@@ -51,14 +51,14 @@ public class WebViewAppLinkResolver implements AppLinkResolver {
     }
 
     private static AppLink makeAppLinkFromAlData(Map<String, Object> map, Uri uri) {
-        Map map2;
         Uri uri2;
         List arrayList = new ArrayList();
         List list = (List) map.get("android");
         if (list == null) {
             list = Collections.emptyList();
         }
-        for (Map map22 : r0) {
+        for (Map map2 : r0) {
+            Map map22;
             List alList = getAlList(map22, "url");
             List alList2 = getAlList(map22, KEY_PACKAGE);
             List alList3 = getAlList(map22, KEY_CLASS);

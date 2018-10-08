@@ -89,11 +89,13 @@ abstract class MapCollections<K, V> {
         }
 
         public int hashCode() {
+            int colGetSize = MapCollections.this.colGetSize() - 1;
             int i = 0;
-            for (int colGetSize = MapCollections.this.colGetSize() - 1; colGetSize >= 0; colGetSize--) {
+            while (colGetSize >= 0) {
                 Object colGetEntry = MapCollections.this.colGetEntry(colGetSize, 0);
                 Object colGetEntry2 = MapCollections.this.colGetEntry(colGetSize, 1);
-                i = ((colGetEntry2 == null ? 0 : colGetEntry2.hashCode()) ^ (colGetEntry == null ? 0 : colGetEntry.hashCode())) + i;
+                colGetSize--;
+                i += (colGetEntry2 == null ? 0 : colGetEntry2.hashCode()) ^ (colGetEntry == null ? 0 : colGetEntry.hashCode());
             }
             return i;
         }
@@ -161,11 +163,9 @@ abstract class MapCollections<K, V> {
 
         public int hashCode() {
             int i = 0;
-            int colGetSize = MapCollections.this.colGetSize() - 1;
-            while (colGetSize >= 0) {
+            for (int colGetSize = MapCollections.this.colGetSize() - 1; colGetSize >= 0; colGetSize--) {
                 Object colGetEntry = MapCollections.this.colGetEntry(colGetSize, 0);
-                colGetSize--;
-                i = (colGetEntry == null ? 0 : colGetEntry.hashCode()) + i;
+                i += colGetEntry == null ? 0 : colGetEntry.hashCode();
             }
             return i;
         }
@@ -343,8 +343,8 @@ abstract class MapCollections<K, V> {
             while (i < colGetSize) {
                 if (collection.contains(MapCollections.this.colGetEntry(i, 1))) {
                     MapCollections.this.colRemoveAt(i);
-                    i--;
                     colGetSize--;
+                    i--;
                     z = true;
                 }
                 i++;
@@ -359,8 +359,8 @@ abstract class MapCollections<K, V> {
             while (i < colGetSize) {
                 if (!collection.contains(MapCollections.this.colGetEntry(i, 1))) {
                     MapCollections.this.colRemoveAt(i);
-                    colGetSize--;
                     i--;
+                    colGetSize--;
                     z = true;
                 }
                 i++;

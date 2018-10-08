@@ -174,6 +174,7 @@ public class BeanAsArrayBuilderDeserializer extends BeanDeserializerBase {
     }
 
     protected final Object _deserializeUsingPropertyBased(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        SettableBeanProperty settableBeanProperty;
         PropertyBasedCreator propertyBasedCreator = this._propertyBasedCreator;
         PropertyValueBuffer startBuilding = propertyBasedCreator.startBuilding(jsonParser, deserializationContext, this._objectIdReader);
         SettableBeanProperty[] settableBeanPropertyArr = this._orderedProperties;
@@ -181,7 +182,6 @@ public class BeanAsArrayBuilderDeserializer extends BeanDeserializerBase {
         Object obj = null;
         int i = 0;
         while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
-            SettableBeanProperty settableBeanProperty;
             if (i < length) {
                 settableBeanProperty = settableBeanPropertyArr[i];
             } else {

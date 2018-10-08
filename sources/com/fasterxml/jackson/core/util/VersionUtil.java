@@ -36,8 +36,8 @@ public class VersionUtil {
     }
 
     public static Version packageVersionFor(Class<?> cls) {
-        Version version;
         Class cls2;
+        Version version;
         try {
             cls2 = Class.forName(cls.getPackage().getName() + ".PackageVersion", true, cls.getClassLoader());
             version = ((Versioned) cls2.newInstance()).version();

@@ -18,8 +18,8 @@ namespace GetSocialSdk.Ui
 		{
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Expected O, but got Unknown
-			_003ConUiAction_003Ec__AnonStorey7F9 _003ConUiAction_003Ec__AnonStorey7F;
-			_uiActionListener(toUIActionEnum(actionType), new Action((object)_003ConUiAction_003Ec__AnonStorey7F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003ConUiAction_003Ec__AnonStorey7FA _003ConUiAction_003Ec__AnonStorey7FA;
+			_uiActionListener(toUIActionEnum(actionType), new Action((object)_003ConUiAction_003Ec__AnonStorey7FA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
 		private UiAction toUIActionEnum(AndroidJavaObject actionType)

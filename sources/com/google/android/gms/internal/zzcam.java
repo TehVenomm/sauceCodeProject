@@ -480,19 +480,16 @@ final class zzcam extends zzcdm {
                     if (hashSet.contains(Integer.valueOf(intValue3))) {
                         zzauk().zzayi().zzj("Skipping failed audience ID", Integer.valueOf(intValue3));
                     } else {
-                        bitSet2 = (BitSet) arrayMap2.get(Integer.valueOf(intValue3));
-                        BitSet bitSet3 = (BitSet) arrayMap3.get(Integer.valueOf(intValue3));
+                        bitSet = (BitSet) arrayMap2.get(Integer.valueOf(intValue3));
+                        bitSet2 = (BitSet) arrayMap3.get(Integer.valueOf(intValue3));
                         if (((zzcfy) arrayMap.get(Integer.valueOf(intValue3))) == null) {
                             zzcfy zzcfy2 = new zzcfy();
                             arrayMap.put(Integer.valueOf(intValue3), zzcfy2);
                             zzcfy2.zziyq = Boolean.valueOf(true);
+                            bitSet = new BitSet();
+                            arrayMap2.put(Integer.valueOf(intValue3), bitSet);
                             bitSet2 = new BitSet();
-                            arrayMap2.put(Integer.valueOf(intValue3), bitSet2);
-                            bitSet3 = new BitSet();
-                            arrayMap3.put(Integer.valueOf(intValue3), bitSet3);
-                            bitSet = bitSet3;
-                        } else {
-                            bitSet = bitSet3;
+                            arrayMap3.put(Integer.valueOf(intValue3), bitSet2);
                         }
                         for (zzcfq zzcfq : (List) r9.get(Integer.valueOf(intValue3))) {
                             if (zzauk().zzad(2)) {
@@ -501,7 +498,7 @@ final class zzcam extends zzcdm {
                             }
                             if (zzcfq.zzixi == null || zzcfq.zzixi.intValue() > 256) {
                                 zzauk().zzaye().zze("Invalid event filter ID. appId, id", zzcbo.zzjf(str), String.valueOf(zzcfq.zzixi));
-                            } else if (bitSet2.get(zzcfq.zzixi.intValue())) {
+                            } else if (bitSet.get(zzcfq.zzixi.intValue())) {
                                 zzauk().zzayi().zze("Event filter already evaluated true. audience ID, filter ID", Integer.valueOf(intValue3), zzcfq.zzixi);
                             } else {
                                 Object obj;
@@ -516,9 +513,9 @@ final class zzcam extends zzcdm {
                                 if (zza == null) {
                                     hashSet.add(Integer.valueOf(intValue3));
                                 } else {
-                                    bitSet.set(zzcfq.zzixi.intValue());
+                                    bitSet2.set(zzcfq.zzixi.intValue());
                                     if (zza.booleanValue()) {
-                                        bitSet2.set(zzcfq.zzixi.intValue());
+                                        bitSet.set(zzcfq.zzixi.intValue());
                                     }
                                 }
                             }

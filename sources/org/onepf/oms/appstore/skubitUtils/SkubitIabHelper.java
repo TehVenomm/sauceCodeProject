@@ -374,12 +374,12 @@ public class SkubitIabHelper implements AppstoreInAppBillingService {
     }
 
     public void processPurchaseSuccess(@NotNull Intent intent, @Nullable String str, @Nullable String str2) {
-        IabResult iabResult;
         Logger.m4025d("Successful resultcode from purchase activity.");
         Logger.m4026d("Purchase data: ", str);
         Logger.m4026d("Data signature: ", str2);
         Logger.m4026d("Extras: ", intent.getExtras());
         Logger.m4026d("Expected item type: ", this.mPurchasingItemType);
+        IabResult iabResult;
         if (str == null || str2 == null) {
             Logger.m4027e("In-app billing error: BUG: either purchaseData or dataSignature is null.");
             Logger.m4026d("Extras: ", intent.getExtras());

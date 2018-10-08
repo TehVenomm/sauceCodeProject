@@ -131,7 +131,7 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 		{
 			float num7 = FixedPanelNGUI.GetOffseMoveHeightIfIphoneX(resokution.y) / 2f;
 			num4 += (int)(5f * num7 / 2f);
-			num6 -= (int)num7;
+			num6 -= (int)num7 / 2;
 			num3 += (int)num7;
 			num5 += (int)num7;
 		}

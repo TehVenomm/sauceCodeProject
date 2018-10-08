@@ -1768,7 +1768,7 @@ public class InGameTutorialManager
 
 		private readonly float SOLO_BATTLE_TIME_LIMIT = 30f;
 
-		private readonly float SKILL_WAIT_LIMIT_TIME = 20f;
+		private readonly float SKILL_WAIT_LIMIT_TIME = 25f;
 
 		private readonly float BATTLE_WITH_FRIEND_TIME = 35f;
 
@@ -1803,6 +1803,8 @@ public class InGameTutorialManager
 		private bool showPhase1BotCam;
 
 		private bool initFakeCamera;
+
+		private bool boolSkillNpc;
 
 		private Transform playerStatusRoot;
 
@@ -1846,7 +1848,7 @@ public class InGameTutorialManager
 
 		private StageObjectManager.CreatePlayerInfo.ExtentionInfo[] listNpcInfo = new StageObjectManager.CreatePlayerInfo.ExtentionInfo[3];
 
-		private Vector3[] initPos = (Vector3[])new Vector3[3];
+		private Vector3[] initNPCPos = (Vector3[])new Vector3[3];
 
 		private static int ENTRY_VOICE_PATTERN_1 = 18;
 
@@ -2080,6 +2082,51 @@ public class InGameTutorialManager
 						timer = 0f;
 					}
 				}
+			}
+			if (boolSkillNpc)
+			{
+				if (showBotTimer <= SHOW_BOT_SKILL_TIME)
+				{
+					showBotTimer += Time.get_deltaTime();
+				}
+				else
+				{
+					boolSkillNpc = false;
+					showBotTimer = 0f;
+					MonoBehaviourSingleton<InGameCameraManager>.I.set_enabled(true);
+					bossController.set_enabled(true);
+				}
+			}
+		}
+
+		private void UpdateCamNpcUseSkill(Transform npcTransform)
+		{
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			if (!(npcTransform == null))
+			{
+				MonoBehaviourSingleton<InGameCameraManager>.I.set_enabled(false);
+				Vector3 val = npcTransform.get_position() - boss.get_transform().get_position();
+				Vector3 val2 = npcTransform.get_position() + val.get_normalized() * 3f;
+				object mainCameraTransform = (object)MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
+				float x = val2.x;
+				Vector3 position = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_position();
+				mainCameraTransform.set_position(new Vector3(x, position.y, val2.z));
+				MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.LookAt(npcTransform);
+				showBotTimer = 0f;
+				boolSkillNpc = true;
+				bossController.set_enabled(false);
 			}
 		}
 
@@ -2397,7 +2444,8 @@ public class InGameTutorialManager
 				camFov = MonoBehaviourSingleton<AppMain>.I.mainCamera.get_fieldOfView();
 				currentPhase = Phase.BATTLE_WITH_FRIENDS;
 				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_4_battle_NPC_appear, "Tutorial");
-				Debug.Log((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_4_battle_NPC_appear.ToString()));
+				Debug.LogWarning((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_4_battle_NPC_appear.ToString()));
+				MonoBehaviourSingleton<GoWrapManager>.I.SendStatusTracking(TRACK_TUTORIAL_STEP_BIT.tutorial_4_battle_NPC_appear, "Tutorial", null, null);
 				timer = 0f;
 			}
 		}
@@ -2416,9 +2464,9 @@ public class InGameTutorialManager
 			{
 				yield return (object)null;
 			}
-			tutorialManager.StartCoroutine(EnableNpc(3.5f, listNpc[0], listNpcInfo[0], initPos[0]));
-			tutorialManager.StartCoroutine(EnableNpc(2f, listNpc[1], listNpcInfo[1], initPos[1]));
-			tutorialManager.StartCoroutine(EnableNpc(2.5f, listNpc[2], listNpcInfo[2], initPos[2]));
+			tutorialManager.StartCoroutine(EnableNpc(3.5f, listNpc[0], listNpcInfo[0], initNPCPos[0]));
+			tutorialManager.StartCoroutine(EnableNpc(2.5f, listNpc[1], listNpcInfo[1], initNPCPos[1]));
+			tutorialManager.StartCoroutine(EnableNpc(3f, listNpc[2], listNpcInfo[2], initNPCPos[2]));
 		}
 
 		private void LoadNpc()
@@ -2471,10 +2519,8 @@ public class InGameTutorialManager
 				npcUseSkill1.UseSkill();
 				npcUseSkill1 = null;
 			}
-			if (timer > SECOND_SKILL_TIME && npcUseSkill2 != null)
+			if (timer > SECOND_SKILL_TIME && npcUseSkill0 != null)
 			{
-				npcUseSkill2.UseSkill();
-				npcUseSkill2 = null;
 				npcUseSkill0.UseSkill();
 				npcUseSkill0 = null;
 			}
@@ -2490,23 +2536,23 @@ public class InGameTutorialManager
 		{
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 			Player player = MonoBehaviourSingleton<StageObjectManager>.I.CreateNonPlayer(npcId, extention_info, pos, 0f, null, null);
 			player.onTheGround = false;
 			NpcController component = player.get_gameObject().GetComponent<NpcController>();
+			player.SetDiableAction(Character.ACTION_ID.MOVE, true);
+			player.get_transform().set_position(new Vector3(0f, (float)(10000 + Random.Range(0, 100)), 0f));
+			player.ActiveShadow(false);
 			if (component != null)
 			{
 				component.SetPose(true);
 			}
+			initNPCPos[extention_info.npcLvIndex] = pos;
 			listNpc[extention_info.npcLvIndex] = player;
 			listNpcInfo[extention_info.npcLvIndex] = extention_info;
-			initPos[extention_info.npcLvIndex] = pos;
-			player.get_transform().set_position(new Vector3(0f, 10000f, 0f));
-			player.SetDiableAction(Character.ACTION_ID.MOVE, true);
-			player.ActiveShadow(false);
 		}
 
 		private IEnumerator EnableNpc(float delay, Player npc, StageObjectManager.CreatePlayerInfo.ExtentionInfo extention_info, Vector3 pos)
@@ -2517,9 +2563,10 @@ public class InGameTutorialManager
 			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			yield return (object)new WaitForSeconds(delay);
 			NpcController npcController = npc.get_gameObject().GetComponent<NpcController>();
+			Debug.Log((object)$"Set enable npc {pos.x} {pos.z}");
+			npc.get_transform().set_position(pos);
 			npc.onTheGround = true;
 			npc.ActiveShadow(true);
-			npc.get_transform().set_position(pos);
 			npc.get_transform().set_eulerAngles(Vector3.get_zero());
 			npc.SetDiableAction(Character.ACTION_ID.MOVE, false);
 			GameObject appearEffect = tutorialManager.appearEffect;
@@ -2608,20 +2655,21 @@ public class InGameTutorialManager
 
 		private unsafe void EnemyEscapeBattle()
 		{
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Expected O, but got Unknown
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0132: Expected O, but got Unknown
+			//IL_00da: Expected O, but got Unknown
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Expected O, but got Unknown
 			if (base.character.actionID != (Character.ACTION_ID)21)
 			{
 				if (!isTrackDragonFight)
 				{
 					isTrackDragonFight = true;
 					MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_5_battle_end, "Tutorial");
-					Debug.Log((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_5_battle_end.ToString()));
+					Debug.LogWarning((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_5_battle_end.ToString()));
+					MonoBehaviourSingleton<GoWrapManager>.I.SendStatusTracking(TRACK_TUTORIAL_STEP_BIT.tutorial_5_battle_end, "Tutorial", null, null);
 				}
 				currentPhase = Phase.NONE;
 				if (playerStatusRoot != null)
@@ -2656,8 +2704,6 @@ public class InGameTutorialManager
 
 		public override void Final()
 		{
-			MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_5_battle_end, "Tutorial");
-			Debug.Log((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_5_battle_end.ToString()));
 		}
 	}
 
@@ -2683,9 +2729,13 @@ public class InGameTutorialManager
 
 	private static readonly float BOT_POSE_TIME = 4f;
 
-	private static readonly float SECOND_SKILL_TIME = 30f;
+	private static readonly float SECOND_SKILL_TIME = 20f;
 
-	private static readonly float FIRST_SKILL_TIME_OFFSET = 15f;
+	private static readonly float FIRST_SKILL_TIME_OFFSET = 10f;
+
+	private static readonly float SHOW_BOT_SKILL_CAM_COORDINATE_OFFSET = 2.5f;
+
+	private static readonly float SHOW_BOT_SKILL_TIME = 2f;
 
 	public static readonly float DURATION_DISP_DIALOG = 2f;
 
@@ -2839,6 +2889,7 @@ public class InGameTutorialManager
 			"mdl_arrow_01"
 		}, false);
 		LoadObject loadedAppear = loadingQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_battle_start_01", false);
+		loadingQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_wsk_bow_01_01", false);
 		MonoBehaviourSingleton<UIManager>.I.LoadUI(false, false, true, false);
 		loadingQueue.CacheSE(UITutorialOperationHelper.SE_ID_COMPLETE, null);
 		if (loadingQueue.IsLoading())

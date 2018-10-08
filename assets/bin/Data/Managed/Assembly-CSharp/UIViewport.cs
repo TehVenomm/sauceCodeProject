@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/Viewport Camera")]
 [RequireComponent(typeof(Camera))]
+[AddComponentMenu("NGUI/UI/Viewport Camera")]
 [ExecuteInEditMode]
 public class UIViewport
 {

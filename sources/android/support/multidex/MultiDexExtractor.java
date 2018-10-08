@@ -201,10 +201,10 @@ final class MultiDexExtractor {
     }
 
     private static void extract(ZipFile zipFile, ZipEntry zipEntry, File file, String str) throws IOException, FileNotFoundException {
+        ZipOutputStream zipOutputStream;
         Closeable inputStream = zipFile.getInputStream(zipEntry);
         File createTempFile = File.createTempFile(str, EXTRACTED_SUFFIX, file.getParentFile());
         Log.i(TAG, "Extracting " + createTempFile.getPath());
-        ZipOutputStream zipOutputStream;
         try {
             zipOutputStream = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(createTempFile)));
             ZipEntry zipEntry2 = new ZipEntry("classes.dex");

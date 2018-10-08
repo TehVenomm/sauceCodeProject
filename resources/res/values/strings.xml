@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="com.crashlytics.android.build_id">7bc68469-b170-4646-8568-04fb1788f9f0</string>
+    <string name="com.crashlytics.android.build_id">de017112-95b9-493a-8f42-b85cfd8a27f8</string>
     <string name="app_name">Dragon Project</string>
     <string name="notification_title">Dragon Project</string>
     <string name="text_message_purchase_status">Payment being processed</string>

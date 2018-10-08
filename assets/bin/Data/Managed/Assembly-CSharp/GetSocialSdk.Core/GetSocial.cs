@@ -398,8 +398,8 @@ namespace GetSocialSdk.Core
 		public unsafe static void SetNotificationListener(NotificationListener listener)
 		{
 			Check.Argument.IsNotNull(listener, "Notification Action Listener", null);
-			_003CSetNotificationListener_003Ec__AnonStorey7EA _003CSetNotificationListener_003Ec__AnonStorey7EA;
-			GetSocialImpl.SetNotificationListener(new Func<Notification, bool, bool>((object)_003CSetNotificationListener_003Ec__AnonStorey7EA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CSetNotificationListener_003Ec__AnonStorey7EB _003CSetNotificationListener_003Ec__AnonStorey7EB;
+			GetSocialImpl.SetNotificationListener(new Func<Notification, bool, bool>((object)_003CSetNotificationListener_003Ec__AnonStorey7EB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
 		public static void GetGlobalFeedAnnouncements(Action<List<ActivityPost>> onSuccess, Action<GetSocialError> onFailure)

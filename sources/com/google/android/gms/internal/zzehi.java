@@ -556,12 +556,10 @@ public final class zzehi extends zzegi<zzehi> implements Cloneable {
             zzn += zzegg.zzv(19, this.zzngo);
         }
         if (this.zzngp != null && this.zzngp.length > 0) {
-            i = 0;
-            while (i2 < this.zzngp.length) {
-                i += zzegg.zzgs(this.zzngp[i2]);
-                i2++;
+            for (int zzgs : this.zzngp) {
+                i2 += zzegg.zzgs(zzgs);
             }
-            zzn = (zzn + i) + (this.zzngp.length * 2);
+            zzn = (zzn + i2) + (this.zzngp.length * 2);
         }
         if (this.zznga != 0) {
             zzn += zzegg.zze(21, this.zznga);

@@ -48,7 +48,7 @@ namespace GetSocialSdk.Ui
 			SetTitleAJO(builder);
 			SetViewStateListener(builder);
 			GetSocialUiFactory.InstantiateGetSocialUi();
-			_003CShowBuilder_003Ec__AnonStorey7F1 _003CShowBuilder_003Ec__AnonStorey7F;
+			_003CShowBuilder_003Ec__AnonStorey7F2 _003CShowBuilder_003Ec__AnonStorey7F;
 			return JniUtils.RunOnUiThreadSafe(new Action((object)_003CShowBuilder_003Ec__AnonStorey7F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 

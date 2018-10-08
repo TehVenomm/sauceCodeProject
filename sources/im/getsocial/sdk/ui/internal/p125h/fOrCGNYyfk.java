@@ -61,10 +61,10 @@ public final class fOrCGNYyfk {
 
     /* renamed from: a */
     private static Typeface m3330a(InputStream inputStream) {
-        FileOutputStream fileOutputStream;
         Typeface createFromFile;
         Throwable th;
         Throwable th2;
+        FileOutputStream fileOutputStream;
         try {
             File createTempFile = File.createTempFile("temp", null);
             fileOutputStream = new FileOutputStream(createTempFile);

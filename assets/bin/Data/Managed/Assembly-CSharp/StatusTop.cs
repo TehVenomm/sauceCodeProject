@@ -194,7 +194,7 @@ public class StatusTop : SkillInfoBase
 
 	public unsafe override void Initialize()
 	{
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
 		showEquipMode = true;
 		tweenTarget = null;
 		SetActive((Enum)UI.OBJ_WITH_MONSTER_ROOT, true);
@@ -213,6 +213,18 @@ public class StatusTop : SkillInfoBase
 			RefreshUI();
 		});
 		SetCenter(GetCtrl(UI.GRD_DRUM), equipSetNo, true);
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA_QUEST_WIN) && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.FORGE_ITEM))
+		{
+			MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_11_weapon_tut, "Tutorial");
+			Debug.LogWarning((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_11_weapon_tut.ToString()));
+			MonoBehaviourSingleton<GoWrapManager>.I.SendStatusTracking(TRACK_TUTORIAL_STEP_BIT.tutorial_11_weapon_tut, "Tutorial", null, null);
+		}
+		else if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SHADOW_QUEST_WIN) && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
+		{
+			MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_15_upgrading_tut, "Tutorial");
+			Debug.LogWarning((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_15_upgrading_tut.ToString()));
+			MonoBehaviourSingleton<GoWrapManager>.I.SendStatusTracking(TRACK_TUTORIAL_STEP_BIT.tutorial_15_upgrading_tut, "Tutorial", null, null);
+		}
 		this.StartCoroutine(DoInitialize());
 	}
 

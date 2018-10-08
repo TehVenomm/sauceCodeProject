@@ -18,12 +18,12 @@ public final class jMsobIMeui {
 
     /* renamed from: a */
     public static String m2116a(String str) {
+        Closeable inputStreamReader;
+        Closeable bufferedReader;
         String readLine;
         Closeable closeable;
         Throwable th;
         Closeable closeable2 = null;
-        Closeable inputStreamReader;
-        Closeable bufferedReader;
         try {
             inputStreamReader = new InputStreamReader(Runtime.getRuntime().exec(new String[]{"getprop", str}).getInputStream(), Charset.defaultCharset());
             try {

@@ -228,12 +228,13 @@ final class ReflectionHelper {
     }
 
     protected static Field getFieldID(Class cls, String str, String str2, boolean z) {
-        Field field = null;
+        Field field;
         C0729a c0729a = new C0729a(cls, str, str2);
         if (m404a(c0729a)) {
             field = (Field) c0729a.f374a;
         } else {
             Class[] a = m405a(str2);
+            field = null;
             float f = 0.0f;
             while (cls != null) {
                 Field[] declaredFields = cls.getDeclaredFields();
@@ -280,12 +281,13 @@ final class ReflectionHelper {
     }
 
     protected static Method getMethodID(Class cls, String str, String str2, boolean z) {
-        Method method = null;
+        Method method;
         C0729a c0729a = new C0729a(cls, str, str2);
         if (m404a(c0729a)) {
             method = (Method) c0729a.f374a;
         } else {
             Class[] a = m405a(str2);
+            method = null;
             float f = 0.0f;
             while (cls != null) {
                 Method[] declaredMethods = cls.getDeclaredMethods();

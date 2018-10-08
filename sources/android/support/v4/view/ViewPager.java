@@ -1628,7 +1628,6 @@ public class ViewPager extends ViewGroup {
     }
 
     protected void onMeasure(int i, int i2) {
-        LayoutParams layoutParams;
         int i3;
         setMeasuredDimension(getDefaultSize(0, i), getDefaultSize(0, i2));
         int measuredWidth = getMeasuredWidth();
@@ -1637,6 +1636,7 @@ public class ViewPager extends ViewGroup {
         int measuredHeight = (getMeasuredHeight() - getPaddingTop()) - getPaddingBottom();
         int childCount = getChildCount();
         for (int i4 = 0; i4 < childCount; i4++) {
+            LayoutParams layoutParams;
             int i5;
             View childAt = getChildAt(i4);
             if (childAt.getVisibility() != 8) {
@@ -1654,29 +1654,48 @@ public class ViewPager extends ViewGroup {
                         i3 = 1073741824;
                     }
                     if (layoutParams.width != -2) {
-                        i7 = 1073741824;
-                        i5 = layoutParams.width != -1 ? layoutParams.width : paddingLeft;
-                    } else {
-                        i7 = i5;
-                        i5 = paddingLeft;
+                        i5 = 1073741824;
+                        if (layoutParams.width != -1) {
+                            i7 = layoutParams.width;
+                            if (layoutParams.height != -2) {
+                                i3 = 1073741824;
+                                if (layoutParams.height != -1) {
+                                    measuredWidth = layoutParams.height;
+                                    childAt.measure(MeasureSpec.makeMeasureSpec(i7, i5), MeasureSpec.makeMeasureSpec(measuredWidth, i3));
+                                    if (obj == null) {
+                                        measuredHeight -= childAt.getMeasuredHeight();
+                                    } else if (obj2 == null) {
+                                        paddingLeft -= childAt.getMeasuredWidth();
+                                    }
+                                }
+                            }
+                            measuredWidth = measuredHeight;
+                            childAt.measure(MeasureSpec.makeMeasureSpec(i7, i5), MeasureSpec.makeMeasureSpec(measuredWidth, i3));
+                            if (obj == null) {
+                                measuredHeight -= childAt.getMeasuredHeight();
+                            } else if (obj2 == null) {
+                                paddingLeft -= childAt.getMeasuredWidth();
+                            }
+                        }
                     }
+                    i7 = paddingLeft;
                     if (layoutParams.height != -2) {
                         i3 = 1073741824;
                         if (layoutParams.height != -1) {
                             measuredWidth = layoutParams.height;
-                            childAt.measure(MeasureSpec.makeMeasureSpec(i5, i7), MeasureSpec.makeMeasureSpec(measuredWidth, i3));
-                            if (obj != null) {
+                            childAt.measure(MeasureSpec.makeMeasureSpec(i7, i5), MeasureSpec.makeMeasureSpec(measuredWidth, i3));
+                            if (obj == null) {
                                 measuredHeight -= childAt.getMeasuredHeight();
-                            } else if (obj2 != null) {
+                            } else if (obj2 == null) {
                                 paddingLeft -= childAt.getMeasuredWidth();
                             }
                         }
                     }
                     measuredWidth = measuredHeight;
-                    childAt.measure(MeasureSpec.makeMeasureSpec(i5, i7), MeasureSpec.makeMeasureSpec(measuredWidth, i3));
-                    if (obj != null) {
+                    childAt.measure(MeasureSpec.makeMeasureSpec(i7, i5), MeasureSpec.makeMeasureSpec(measuredWidth, i3));
+                    if (obj == null) {
                         measuredHeight -= childAt.getMeasuredHeight();
-                    } else if (obj2 != null) {
+                    } else if (obj2 == null) {
                         paddingLeft -= childAt.getMeasuredWidth();
                     }
                 }

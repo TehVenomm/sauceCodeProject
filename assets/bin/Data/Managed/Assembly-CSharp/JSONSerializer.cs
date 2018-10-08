@@ -360,8 +360,8 @@ public static class JSONSerializer
 						Type type2 = typeFromHandle.MakeGenericType(containedType);
 						MethodInfo addMethod = type2.GetMethod("Add");
 						object list = Activator.CreateInstance(type2);
-						_003CDeserializeObject_003Ec__AnonStorey88E _003CDeserializeObject_003Ec__AnonStorey88E;
-						stream.List(GetName(item), new Action<int, JSONInStream>((object)_003CDeserializeObject_003Ec__AnonStorey88E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+						_003CDeserializeObject_003Ec__AnonStorey88F _003CDeserializeObject_003Ec__AnonStorey88F;
+						stream.List(GetName(item), new Action<int, JSONInStream>((object)_003CDeserializeObject_003Ec__AnonStorey88F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 						item.SetValue(obj, list);
 					}
 					else if (item.FieldType.IsArray)
@@ -372,8 +372,8 @@ public static class JSONSerializer
 						MethodInfo addMethod2 = type3.GetMethod("Add");
 						MethodInfo method2 = type3.GetMethod("ToArray");
 						object list2 = Activator.CreateInstance(type3);
-						_003CDeserializeObject_003Ec__AnonStorey88F _003CDeserializeObject_003Ec__AnonStorey88F;
-						stream.List(GetName(item), new Action<int, JSONInStream>((object)_003CDeserializeObject_003Ec__AnonStorey88F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+						_003CDeserializeObject_003Ec__AnonStorey890 _003CDeserializeObject_003Ec__AnonStorey;
+						stream.List(GetName(item), new Action<int, JSONInStream>((object)_003CDeserializeObject_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 						object value2 = method2.Invoke(list2, new object[0]);
 						item.SetValue(obj, value2);
 					}

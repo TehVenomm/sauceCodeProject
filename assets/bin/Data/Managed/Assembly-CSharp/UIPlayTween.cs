@@ -2,8 +2,8 @@ using AnimationOrTween;
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Play Tween")]
+[ExecuteInEditMode]
 public class UIPlayTween
 {
 	public static UIPlayTween current;

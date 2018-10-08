@@ -20,7 +20,7 @@ namespace GetSocialSdk.Ui
 			//IL_003b: Expected O, but got Unknown
 			Debug.Log((object)">>>>>>> XXXX");
 			ActivityPost activityPost = new ActivityPost().ParseFromAJO(post);
-			_003ConButtonClicked_003Ec__AnonStorey7F2 _003ConButtonClicked_003Ec__AnonStorey7F;
+			_003ConButtonClicked_003Ec__AnonStorey7F3 _003ConButtonClicked_003Ec__AnonStorey7F;
 			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003ConButtonClicked_003Ec__AnonStorey7F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

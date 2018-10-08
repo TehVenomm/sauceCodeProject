@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/NGUI Label")]
+[ExecuteInEditMode]
 public class UILabel : UIWidget
 {
 	public enum Effect
@@ -33,49 +33,49 @@ public class UILabel : UIWidget
 
 	public Crispness keepCrispWhenShrunk = Crispness.OnDesktop;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Font mTrueTypeFont;
 
 	[HideInInspector]
 	[SerializeField]
 	private UIFont mFont;
 
-	[Multiline(6)]
 	[SerializeField]
 	[HideInInspector]
+	[Multiline(6)]
 	private string mText = string.Empty;
 
 	[HideInInspector]
 	[SerializeField]
 	private int mFontSize = 16;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private FontStyle mFontStyle;
 
 	[SerializeField]
 	[HideInInspector]
 	private NGUIText.Alignment mAlignment;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private bool mEncoding = true;
 
 	[HideInInspector]
 	[SerializeField]
 	private int mMaxLineCount;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Effect mEffectStyle;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Color mEffectColor = Color.get_black();
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private NGUIText.SymbolStyle mSymbols = NGUIText.SymbolStyle.Normal;
 
 	[HideInInspector]
@@ -98,32 +98,32 @@ public class UILabel : UIWidget
 	[HideInInspector]
 	private Color mGradientTop = Color.get_white();
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Color mGradientBottom = new Color(0.7f, 0.7f, 0.7f);
 
 	[HideInInspector]
 	[SerializeField]
 	private int mSpacingX;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private int mSpacingY;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool mUseFloatSpacing;
 
 	[SerializeField]
 	[HideInInspector]
 	private float mFloatSpacingX;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private float mFloatSpacingY;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private bool mShrinkToFit;
 
 	[SerializeField]

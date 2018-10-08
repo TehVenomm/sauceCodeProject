@@ -464,7 +464,7 @@ public class QuestTable : Singleton<QuestTable>
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
 			uint questId = quest_item.infoData.questData.tableData.questID;
-			_003CGetQuestNum_003Ec__AnonStorey7A4 _003CGetQuestNum_003Ec__AnonStorey7A;
+			_003CGetQuestNum_003Ec__AnonStorey7A5 _003CGetQuestNum_003Ec__AnonStorey7A;
 			num2 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where(new Func<GuildRequestItem, bool>((object)_003CGetQuestNum_003Ec__AnonStorey7A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).Count();
 		}
 		int num3 = num - num2;

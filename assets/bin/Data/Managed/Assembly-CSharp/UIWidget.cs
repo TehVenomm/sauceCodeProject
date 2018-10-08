@@ -32,8 +32,8 @@ public class UIWidget : UIRect
 
 	public delegate bool HitCheck(Vector3 worldPos);
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected Color mColor = Color.get_white();
 
 	[HideInInspector]
@@ -44,8 +44,8 @@ public class UIWidget : UIRect
 	[SerializeField]
 	protected int mWidth = 100;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	protected int mHeight = 100;
 
 	[HideInInspector]
@@ -783,8 +783,8 @@ public class UIWidget : UIRect
 		}
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static int FullCompareFunc(UIWidget left, UIWidget right)
 	{
 		int num = UIPanel.CompareFunc(left.panel, right.panel);

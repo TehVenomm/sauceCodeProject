@@ -332,10 +332,11 @@ public final class cjrhisSQCL implements XdbacJlTDQ, pdwpUtZXDT, Cloneable {
         QCXFOjcJkE qCXFOjcJkE3 = qCXFOjcJkE2;
         do {
             int i2 = qCXFOjcJkE3.f984b;
-            while (i2 < qCXFOjcJkE3.f985c) {
-                int i3 = qCXFOjcJkE3.f983a[i2] + (i * 31);
+            int i3 = qCXFOjcJkE3.f985c;
+            while (i2 < i3) {
+                byte b = qCXFOjcJkE3.f983a[i2];
                 i2++;
-                i = i3;
+                i = (i * 31) + b;
             }
             qCXFOjcJkE3 = qCXFOjcJkE3.f988f;
         } while (qCXFOjcJkE3 != this.f997a);

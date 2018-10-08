@@ -34,8 +34,8 @@ namespace GetSocialSdk.Ui
 		{
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0020: Expected O, but got Unknown
-			_003CLoadConfiguration_003Ec__AnonStorey7FA _003CLoadConfiguration_003Ec__AnonStorey7FA;
-			return JniUtils.RunOnUiThreadSafe(new Action((object)_003CLoadConfiguration_003Ec__AnonStorey7FA, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CLoadConfiguration_003Ec__AnonStorey7FB _003CLoadConfiguration_003Ec__AnonStorey7FB;
+			return JniUtils.RunOnUiThreadSafe(new Action((object)_003CLoadConfiguration_003Ec__AnonStorey7FB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
 		public bool ShowView<T>(ViewBuilder<T> viewBuilder) where T : ViewBuilder<T>
@@ -52,8 +52,8 @@ namespace GetSocialSdk.Ui
 		{
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0020: Expected O, but got Unknown
-			_003CCloseView_003Ec__AnonStorey7FB _003CCloseView_003Ec__AnonStorey7FB;
-			return JniUtils.RunOnUiThreadSafe(new Action((object)_003CCloseView_003Ec__AnonStorey7FB, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+			_003CCloseView_003Ec__AnonStorey7FC _003CCloseView_003Ec__AnonStorey7FC;
+			return JniUtils.RunOnUiThreadSafe(new Action((object)_003CCloseView_003Ec__AnonStorey7FC, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
 		public unsafe bool RestoreView()

@@ -5,6 +5,10 @@ using System.Text;
 
 public class Cipher
 {
+	public const string CRYPT_HASH_KEY = "$-5as;hgfm,vgs^*;fd@345-9zds3k5p";
+
+	public const string CRYPT_IV_128 = "8)&#$.Dtsf7%od;.";
+
 	public const string DEFAULT_NETWORKHASH = "ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,";
 
 	public const string DEFAULT_IV_128 = "yCNBH$$rCNGvC+#f";

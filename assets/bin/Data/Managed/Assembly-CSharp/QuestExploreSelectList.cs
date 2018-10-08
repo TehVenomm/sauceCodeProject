@@ -132,9 +132,9 @@ public class QuestExploreSelectList : QuestEventSelectList
 
 	protected unsafe override void UpdateTable()
 	{
-		//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a9: Expected O, but got Unknown
-		//IL_02b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b5: Expected O, but got Unknown
+		//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
 		SetLabelText((Enum)UI.LBL_CURRENT_POINT, StringTable.Format(STRING_CATEGORY.EXPLORE, 0u, currentData.point));
 		SetLabelText((Enum)UI.LBL_POINT_TITLE, StringTable.Get(STRING_CATEGORY.EXPLORE, 1u));
 		if (currentData.reward != null && currentData.reward.reward.Count > 0)
@@ -142,6 +142,7 @@ public class QuestExploreSelectList : QuestEventSelectList
 			SetActive((Enum)UI.OBJ_NEXT_REWARD_ROOT, true);
 			QuestExplorePointModel.Param.Reward reward = currentData.reward.reward[0];
 			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)reward.type, (uint)reward.itemId, GetCtrl(UI.OBJ_NEXT_REWARD_ICON_POS), reward.num, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
+			itemIcon.GetComponent<BoxCollider>().set_enabled(false);
 			string rewardName = Utility.GetRewardName((REWARD_TYPE)reward.type, (uint)reward.itemId);
 			rewardName = Utility.TrimText(rewardName, GetCtrl(UI.LBL_NEXT_REWARD_NAME).GetComponent<UILabel>());
 			SetLabelText((Enum)UI.LBL_NEXT_POINT, StringTable.Format(STRING_CATEGORY.EXPLORE, 0u, currentData.reward.point));

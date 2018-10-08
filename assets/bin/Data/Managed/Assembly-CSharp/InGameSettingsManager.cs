@@ -603,8 +603,8 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 			[Tooltip("[Burst] 兜割り(単発射撃へ接続可能)")]
 			public int BurstAvoidAttackID = 79;
 
-			[SerializeField]
 			[Tooltip("[Burst] 距離減衰の最小減衰距離")]
+			[SerializeField]
 			private float MinAttenuationDistance = 10f;
 
 			[Tooltip("[Burst] 距離減衰の最大減衰距離")]
@@ -615,28 +615,28 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 			[SerializeField]
 			private float MinAttenuationDmgRate = 0.01f;
 
-			[Tooltip("[Burst] 距離減衰の最大ダメ\u30fcジレ\u30fcト")]
 			[SerializeField]
+			[Tooltip("[Burst] 距離減衰の最大ダメ\u30fcジレ\u30fcト")]
 			private float MaxAttenuationDmgRate = 1f;
 
-			[SerializeField]
 			[Tooltip("[Burst] 距離減衰定義(X:正規化距離[0.0 1.0] Y:正規化ダメ\u30fcジ補正値[0.0 1.0]")]
+			[SerializeField]
 			private AnimationCurve AnimCurve = Curves.CreateEaseInCurve();
 
 			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			[SerializeField]
 			public float SingleShotBaseDmgRate = 1f;
 
-			[SerializeField]
 			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
+			[SerializeField]
 			public float SingleShotElementDmgRate = 2f;
 
 			[SerializeField]
 			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
 			public float FullBurstBaseDmgRate = 2f;
 
-			[SerializeField]
 			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
+			[SerializeField]
 			public float FullBurstElementDmgRate = 4f;
 
 			[Tooltip("単発ショットのヒットエフェクト(属性差分あり")]

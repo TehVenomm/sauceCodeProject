@@ -1249,45 +1249,45 @@ public class UTF8StreamJsonParser extends ParserBase {
     }
 
     private final JsonToken _parseNumber2(char[] cArr, int i, boolean z, int i2) throws IOException {
-        int i3;
-        int i4 = i2;
-        int i5 = i;
+        int i3 = i2;
+        int i4 = i;
         char[] cArr2 = cArr;
         while (true) {
+            int i5;
             if (this._inputPtr < this._inputEnd || loadMore()) {
                 byte[] bArr = this._inputBuffer;
-                i3 = this._inputPtr;
-                this._inputPtr = i3 + 1;
-                i3 = bArr[i3] & 255;
-                if (i3 <= 57 && i3 >= 48) {
+                i5 = this._inputPtr;
+                this._inputPtr = i5 + 1;
+                i5 = bArr[i5] & 255;
+                if (i5 <= 57 && i5 >= 48) {
                     int i6;
-                    if (i5 >= cArr2.length) {
+                    if (i4 >= cArr2.length) {
                         cArr2 = this._textBuffer.finishCurrentSegment();
                         i6 = 0;
                     } else {
-                        i6 = i5;
+                        i6 = i4;
                     }
-                    i5 = i6 + 1;
-                    cArr2[i6] = (char) i3;
-                    i4++;
+                    i4 = i6 + 1;
+                    cArr2[i6] = (char) i5;
+                    i3++;
                 }
             } else {
-                this._textBuffer.setCurrentLength(i5);
-                return resetInt(z, i4);
+                this._textBuffer.setCurrentLength(i4);
+                return resetInt(z, i3);
             }
         }
-        if (i3 == 46 || i3 == 101 || i3 == 69) {
-            return _parseFloat(cArr2, i5, i3, z, i4);
+        if (i5 == 46 || i5 == 101 || i5 == 69) {
+            return _parseFloat(cArr2, i4, i5, z, i3);
         }
         this._inputPtr--;
-        this._textBuffer.setCurrentLength(i5);
+        this._textBuffer.setCurrentLength(i4);
         if (this._parsingContext.inRoot()) {
             bArr = this._inputBuffer;
             int i7 = this._inputPtr;
             this._inputPtr = i7 + 1;
             _verifyRootSpace(bArr[i7] & 255);
         }
-        return resetInt(z, i4);
+        return resetInt(z, i3);
     }
 
     private final int _verifyNoLeadingZeroes() throws IOException {
@@ -1792,10 +1792,10 @@ public class UTF8StreamJsonParser extends ParserBase {
     }
 
     protected final String parseEscapedName(int[] iArr, int i, int i2, int i3, int i4) throws IOException {
-        int i5;
         int[] iArr2 = _icLatin1;
         while (true) {
             int[] iArr3;
+            int i5;
             int i6;
             int i7;
             byte[] bArr;
@@ -1826,43 +1826,43 @@ public class UTF8StreamJsonParser extends ParserBase {
                         iArr3 = iArr;
                     }
                     if (i3 < 2048) {
-                        i6 = ((i3 >> 6) | 192) | (i2 << 8);
+                        i5 = ((i3 >> 6) | 192) | (i2 << 8);
                         iArr4 = iArr3;
-                        i5 = i4 + 1;
+                        i6 = i4 + 1;
                     } else {
                         int[] iArr5;
                         int i9;
                         i7 = ((i3 >> 12) | 224) | (i2 << 8);
-                        i6 = i4 + 1;
-                        if (i6 >= 4) {
+                        i5 = i4 + 1;
+                        if (i5 >= 4) {
                             if (i8 >= iArr3.length) {
                                 iArr3 = growArrayBy(iArr3, iArr3.length);
                                 this._quadBuffer = iArr3;
                             }
-                            i6 = i8 + 1;
+                            i5 = i8 + 1;
                             iArr3[i8] = i7;
-                            i7 = i6;
+                            i7 = i5;
                             iArr5 = iArr3;
-                            i5 = 0;
                             i6 = 0;
+                            i5 = 0;
                         } else {
-                            i9 = i6;
-                            i6 = i7;
+                            i9 = i5;
+                            i5 = i7;
                             i7 = i8;
                             iArr5 = iArr3;
-                            i5 = i9;
+                            i6 = i9;
                         }
-                        i6 = (i6 << 8) | (((i3 >> 6) & 63) | 128);
-                        i5++;
+                        i5 = (i5 << 8) | (((i3 >> 6) & 63) | 128);
+                        i6++;
                         i9 = i7;
                         iArr4 = iArr5;
                         i8 = i9;
                     }
                     i2 = (i3 & 63) | 128;
-                    i4 = i5;
+                    i4 = i6;
                     i = i8;
                     iArr3 = iArr4;
-                    i7 = i6;
+                    i7 = i5;
                     if (i4 >= 4) {
                         i4++;
                         i2 |= i7 << 8;
@@ -1872,19 +1872,19 @@ public class UTF8StreamJsonParser extends ParserBase {
                             iArr3 = growArrayBy(iArr3, iArr3.length);
                             this._quadBuffer = iArr3;
                         }
-                        i6 = i + 1;
+                        i5 = i + 1;
                         iArr3[i] = i7;
                         i4 = 1;
-                        i = i6;
+                        i = i5;
                         iArr = iArr3;
                     }
                     if (this._inputPtr >= this._inputEnd && !loadMore()) {
                         _reportInvalidEOF(" in field name");
                     }
                     bArr = this._inputBuffer;
-                    i6 = this._inputPtr;
-                    this._inputPtr = i6 + 1;
-                    i3 = bArr[i6] & 255;
+                    i5 = this._inputPtr;
+                    this._inputPtr = i5 + 1;
+                    i3 = bArr[i5] & 255;
                 }
             }
             i7 = i2;
@@ -1895,10 +1895,10 @@ public class UTF8StreamJsonParser extends ParserBase {
                     iArr3 = growArrayBy(iArr3, iArr3.length);
                     this._quadBuffer = iArr3;
                 }
-                i6 = i + 1;
+                i5 = i + 1;
                 iArr3[i] = i7;
                 i4 = 1;
-                i = i6;
+                i = i5;
                 iArr = iArr3;
             } else {
                 i4++;
@@ -1907,18 +1907,18 @@ public class UTF8StreamJsonParser extends ParserBase {
             }
             _reportInvalidEOF(" in field name");
             bArr = this._inputBuffer;
-            i6 = this._inputPtr;
-            this._inputPtr = i6 + 1;
-            i3 = bArr[i6] & 255;
+            i5 = this._inputPtr;
+            this._inputPtr = i5 + 1;
+            i3 = bArr[i5] & 255;
         }
         if (i4 > 0) {
             if (i >= iArr.length) {
                 iArr = growArrayBy(iArr, iArr.length);
                 this._quadBuffer = iArr;
             }
-            i5 = i + 1;
+            i6 = i + 1;
             iArr[i] = pad(i2, i4);
-            i = i5;
+            i = i6;
         }
         String findName = this._symbols.findName(iArr, i);
         if (findName == null) {

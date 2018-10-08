@@ -175,8 +175,6 @@ public class Opening : GameSection
 		titleAnimation = titleObjectRoot.GetComponent<Animation>();
 		cutSceneAnimation.Stop();
 		MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapPortalID(10000101u);
-		MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_1_login_screen, "Tutorial");
-		Debug.Log((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_1_login_screen.ToString()));
 		MonoBehaviourSingleton<UIManager>.I.loading.HideAllPermissionMsg();
 		base.Initialize();
 		PredownloadManager.openingMode = true;
@@ -186,12 +184,12 @@ public class Opening : GameSection
 		DataTableManager dataTableManager = MonoBehaviourSingleton<DataTableManager>.I;
 		Protocol.Send<CheckRegisterModel>(CheckRegisterModel.URL, delegate
 		{
-			((_003CDoInitialzie_003Ec__Iterator10E)/*Error near IL_03b5: stateMachine*/)._003CupdatedTableIndex_003E__15 = true;
+			((_003CDoInitialzie_003Ec__Iterator10E)/*Error near IL_0389: stateMachine*/)._003CupdatedTableIndex_003E__15 = true;
 		}, string.Empty);
-		yield return (object)new WaitUntil(new Func<bool>((object)/*Error near IL_03cc: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		yield return (object)new WaitUntil(new Func<bool>((object)/*Error near IL_03a0: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		isDownloading = true;
 		dataTableManager.InitializeForDownload();
-		dataTableManager.UpdateManifest(new Action((object)/*Error near IL_040b: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		dataTableManager.UpdateManifest(new Action((object)/*Error near IL_03df: stateMachine*/, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		TitleTop.isFirstBoot = false;
 	}
 

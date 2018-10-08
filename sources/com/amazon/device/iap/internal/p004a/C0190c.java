@@ -139,16 +139,17 @@ public final class C0190c implements C0189c {
         RequestStatus valueOf;
         Throwable e;
         List list;
+        RequestId requestId;
         RequestStatus requestStatus;
-        Throwable th;
         boolean z;
-        RequestStatus requestStatus2;
+        Throwable th;
         UserData userData;
-        boolean z2;
         List list2;
+        boolean z2;
         UserData userData2;
+        RequestStatus requestStatus2;
         int i = 0;
-        RequestId requestId = null;
+        RequestId requestId2 = null;
         RequestStatus requestStatus3 = RequestStatus.FAILED;
         try {
             JSONObject jSONObject = new JSONObject(intent.getStringExtra("purchaseUpdatesOutput"));
@@ -158,18 +159,18 @@ public final class C0190c implements C0189c {
             } catch (Exception e2) {
                 e = e2;
                 list = null;
-                requestStatus = requestStatus3;
-                th = e;
-                z = false;
-                requestStatus2 = requestStatus;
                 requestId = fromString;
+                requestStatus = requestStatus3;
+                z = false;
+                th = e;
                 userData = null;
+                requestId2 = requestId;
                 Log.e(f16a, "Error parsing purchase updates output", th);
-                z2 = z;
-                valueOf = requestStatus2;
                 list2 = list;
+                z2 = z;
                 userData2 = userData;
-                fromString = requestId;
+                valueOf = requestStatus;
+                fromString = requestId2;
                 return new PurchaseUpdatesResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setUserData(userData2).setReceipts(list2).setHasMore(z2).build();
             }
             try {
@@ -177,19 +178,20 @@ public final class C0190c implements C0189c {
                 try {
                     String optString = jSONObject.optString(AmazonAppstoreBillingService.JSON_KEY_USER_ID);
                     userData2 = new UserDataBuilder().setUserId(optString).setMarketplace(jSONObject.optString("marketplace")).build();
-                } catch (Throwable e3) {
+                } catch (Exception e3) {
                     th = e3;
-                    list = null;
-                    requestStatus2 = valueOf;
-                    z = z2;
-                    requestId = fromString;
                     userData = null;
+                    z = z2;
+                    requestStatus2 = valueOf;
+                    list = null;
+                    requestId2 = fromString;
+                    requestStatus = requestStatus2;
                     Log.e(f16a, "Error parsing purchase updates output", th);
-                    z2 = z;
-                    valueOf = requestStatus2;
                     list2 = list;
+                    z2 = z;
                     userData2 = userData;
-                    fromString = requestId;
+                    valueOf = requestStatus;
+                    fromString = requestId2;
                     return new PurchaseUpdatesResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setUserData(userData2).setReceipts(list2).setHasMore(z2).build();
                 }
                 try {
@@ -209,64 +211,63 @@ public final class C0190c implements C0189c {
                                 }
                             }
                             list2 = arrayList;
-                        } catch (Throwable e32) {
-                            requestId = fromString;
-                            userData = userData2;
+                        } catch (Exception e5) {
+                            th = e5;
+                            requestId2 = fromString;
+                            requestStatus = valueOf;
                             list = arrayList;
-                            th = e32;
-                            requestStatus2 = valueOf;
+                            userData = userData2;
                             z = z2;
                         }
                     } else {
                         list2 = null;
                     }
-                } catch (Throwable e322) {
-                    th = e322;
-                    requestStatus2 = valueOf;
+                } catch (Exception e6) {
+                    th = e6;
+                    userData = userData2;
                     z = z2;
-                    UserData userData3 = userData2;
+                    requestStatus2 = valueOf;
                     list = null;
-                    requestId = fromString;
-                    userData = userData3;
+                    requestId2 = fromString;
+                    requestStatus = requestStatus2;
                     Log.e(f16a, "Error parsing purchase updates output", th);
-                    z2 = z;
-                    valueOf = requestStatus2;
                     list2 = list;
+                    z2 = z;
                     userData2 = userData;
-                    fromString = requestId;
+                    valueOf = requestStatus;
+                    fromString = requestId2;
                     return new PurchaseUpdatesResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setUserData(userData2).setReceipts(list2).setHasMore(z2).build();
                 }
-            } catch (Throwable th2) {
-                Throwable th3 = th2;
+            } catch (Exception e7) {
+                e = e7;
                 requestStatus3 = valueOf;
-                e = th3;
                 list = null;
-                requestStatus = requestStatus3;
-                th2 = e;
-                z = false;
-                requestStatus2 = requestStatus;
                 requestId = fromString;
+                requestStatus = requestStatus3;
+                z = false;
+                th = e;
                 userData = null;
-                Log.e(f16a, "Error parsing purchase updates output", th2);
-                z2 = z;
-                valueOf = requestStatus2;
+                requestId2 = requestId;
+                Log.e(f16a, "Error parsing purchase updates output", th);
                 list2 = list;
+                z2 = z;
                 userData2 = userData;
-                fromString = requestId;
+                valueOf = requestStatus;
+                fromString = requestId2;
                 return new PurchaseUpdatesResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setUserData(userData2).setReceipts(list2).setHasMore(z2).build();
             }
-        } catch (Throwable e5) {
-            z = false;
+        } catch (Throwable e8) {
+            requestStatus = requestStatus3;
             list = null;
-            requestStatus2 = requestStatus3;
-            th2 = e5;
+            z = false;
+            th = e8;
             userData = null;
-            Log.e(f16a, "Error parsing purchase updates output", th2);
-            z2 = z;
-            valueOf = requestStatus2;
+            Log.e(f16a, "Error parsing purchase updates output", th);
             list2 = list;
+            z2 = z;
             userData2 = userData;
-            fromString = requestId;
+            valueOf = requestStatus;
+            fromString = requestId2;
             return new PurchaseUpdatesResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setUserData(userData2).setReceipts(list2).setHasMore(z2).build();
         }
         return new PurchaseUpdatesResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setUserData(userData2).setReceipts(list2).setHasMore(z2).build();
@@ -281,14 +282,9 @@ public final class C0190c implements C0189c {
     private ProductDataResponse m39d(Intent intent) {
         RequestId fromString;
         ProductDataResponse.RequestStatus valueOf;
-        RequestId requestId;
-        Throwable th;
+        Set linkedHashSet;
         Throwable e;
-        Set set;
-        Map map;
-        RequestId requestId2;
-        Throwable th2;
-        Set set2 = null;
+        Map map = null;
         ProductDataResponse.RequestStatus requestStatus = ProductDataResponse.RequestStatus.FAILED;
         try {
             JSONObject jSONObject = new JSONObject(intent.getStringExtra("itemDataOutput"));
@@ -298,19 +294,13 @@ public final class C0190c implements C0189c {
                 try {
                     if (valueOf != ProductDataResponse.RequestStatus.FAILED) {
                         Map hashMap;
-                        Set linkedHashSet = new LinkedHashSet();
+                        linkedHashSet = new LinkedHashSet();
                         try {
                             hashMap = new HashMap();
-                        } catch (Throwable e2) {
-                            requestId = fromString;
-                            th = e2;
-                            requestStatus = valueOf;
-                            set = linkedHashSet;
-                            map = null;
-                            requestId2 = requestId;
-                            Log.e(f16a, "Error parsing item data output", th);
-                            fromString = requestId2;
-                            return new ProductDataResponseBuilder().setRequestId(fromString).setRequestStatus(requestStatus).setProductData(map).setUnavailableSkus(set).build();
+                        } catch (Exception e2) {
+                            e = e2;
+                            Log.e(f16a, "Error parsing item data output", e);
+                            return new ProductDataResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setProductData(map).setUnavailableSkus(linkedHashSet).build();
                         }
                         try {
                             JSONArray optJSONArray = jSONObject.optJSONArray("unavailableSkus");
@@ -327,59 +317,40 @@ public final class C0190c implements C0189c {
                                     hashMap.put(str, m31a(str, jSONObject.optJSONObject(str)));
                                 }
                             }
-                            set2 = linkedHashSet;
                             map = hashMap;
                         } catch (Throwable e3) {
-                            requestId = fromString;
-                            th = e3;
-                            requestId2 = requestId;
-                            ProductDataResponse.RequestStatus requestStatus2 = valueOf;
-                            set = linkedHashSet;
-                            map = hashMap;
-                            requestStatus = requestStatus2;
-                            Log.e(f16a, "Error parsing item data output", th);
-                            fromString = requestId2;
-                            return new ProductDataResponseBuilder().setRequestId(fromString).setRequestStatus(requestStatus).setProductData(map).setUnavailableSkus(set).build();
+                            Map map2 = hashMap;
+                            e = e3;
+                            map = map2;
+                            Log.e(f16a, "Error parsing item data output", e);
+                            return new ProductDataResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setProductData(map).setUnavailableSkus(linkedHashSet).build();
                         }
                     }
-                    map = null;
-                    requestStatus = valueOf;
-                    set = set2;
+                    linkedHashSet = null;
                 } catch (Exception e4) {
-                    e2 = e4;
-                    map = null;
-                    th2 = e2;
+                    e = e4;
                     requestStatus = valueOf;
-                    set = null;
-                    requestId2 = fromString;
-                    th = th2;
-                    Log.e(f16a, "Error parsing item data output", th);
-                    fromString = requestId2;
-                    return new ProductDataResponseBuilder().setRequestId(fromString).setRequestStatus(requestStatus).setProductData(map).setUnavailableSkus(set).build();
+                    valueOf = requestStatus;
+                    linkedHashSet = null;
+                    Log.e(f16a, "Error parsing item data output", e);
+                    return new ProductDataResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setProductData(map).setUnavailableSkus(linkedHashSet).build();
                 }
-            } catch (Throwable e5) {
-                th2 = e5;
+            } catch (Exception e5) {
+                e = e5;
                 valueOf = requestStatus;
-                e2 = th2;
-                map = null;
-                th2 = e2;
-                requestStatus = valueOf;
-                set = null;
-                requestId2 = fromString;
-                th = th2;
-                Log.e(f16a, "Error parsing item data output", th);
-                fromString = requestId2;
-                return new ProductDataResponseBuilder().setRequestId(fromString).setRequestStatus(requestStatus).setProductData(map).setUnavailableSkus(set).build();
+                linkedHashSet = null;
+                Log.e(f16a, "Error parsing item data output", e);
+                return new ProductDataResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setProductData(map).setUnavailableSkus(linkedHashSet).build();
             }
         } catch (Exception e6) {
-            th = e6;
-            set = null;
-            map = null;
-            Log.e(f16a, "Error parsing item data output", th);
-            fromString = requestId2;
-            return new ProductDataResponseBuilder().setRequestId(fromString).setRequestStatus(requestStatus).setProductData(map).setUnavailableSkus(set).build();
+            e = e6;
+            fromString = null;
+            valueOf = requestStatus;
+            linkedHashSet = null;
+            Log.e(f16a, "Error parsing item data output", e);
+            return new ProductDataResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setProductData(map).setUnavailableSkus(linkedHashSet).build();
         }
-        return new ProductDataResponseBuilder().setRequestId(fromString).setRequestStatus(requestStatus).setProductData(map).setUnavailableSkus(set).build();
+        return new ProductDataResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setProductData(map).setUnavailableSkus(linkedHashSet).build();
     }
 
     /* renamed from: e */
@@ -399,6 +370,7 @@ public final class C0190c implements C0189c {
     /* renamed from: f */
     private UserDataResponse m41f(Intent intent) {
         RequestId fromString;
+        UserDataResponse.RequestStatus valueOf;
         Throwable e;
         UserData userData = null;
         UserDataResponse.RequestStatus requestStatus = UserDataResponse.RequestStatus.FAILED;
@@ -406,25 +378,32 @@ public final class C0190c implements C0189c {
             JSONObject jSONObject = new JSONObject(intent.getStringExtra("userOutput"));
             fromString = RequestId.fromString(jSONObject.optString("requestId"));
             try {
-                requestStatus = UserDataResponse.RequestStatus.valueOf(jSONObject.optString("status"));
-                if (requestStatus == UserDataResponse.RequestStatus.SUCCESSFUL) {
-                    String optString = jSONObject.optString(AmazonAppstoreBillingService.JSON_KEY_USER_ID);
-                    userData = new UserDataBuilder().setUserId(optString).setMarketplace(jSONObject.optString("marketplace")).build();
+                valueOf = UserDataResponse.RequestStatus.valueOf(jSONObject.optString("status"));
+                try {
+                    if (valueOf == UserDataResponse.RequestStatus.SUCCESSFUL) {
+                        String optString = jSONObject.optString(AmazonAppstoreBillingService.JSON_KEY_USER_ID);
+                        userData = new UserDataBuilder().setUserId(optString).setMarketplace(jSONObject.optString("marketplace")).build();
+                    }
+                } catch (Exception e2) {
+                    e = e2;
+                    Log.e(f16a, "Error parsing userid output", e);
+                    return new UserDataResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setUserData(userData).build();
                 }
-            } catch (Throwable e2) {
-                Throwable th = e2;
-                requestStatus = requestStatus;
-                e2 = th;
-                Log.e(f16a, "Error parsing userid output", e2);
-                return new UserDataResponseBuilder().setRequestId(fromString).setRequestStatus(requestStatus).setUserData(userData).build();
+            } catch (Throwable e3) {
+                Throwable th = e3;
+                valueOf = requestStatus;
+                e = th;
+                Log.e(f16a, "Error parsing userid output", e);
+                return new UserDataResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setUserData(userData).build();
             }
-        } catch (Throwable e3) {
-            e2 = e3;
+        } catch (Throwable e4) {
+            valueOf = requestStatus;
+            e = e4;
             fromString = null;
-            Log.e(f16a, "Error parsing userid output", e2);
-            return new UserDataResponseBuilder().setRequestId(fromString).setRequestStatus(requestStatus).setUserData(userData).build();
+            Log.e(f16a, "Error parsing userid output", e);
+            return new UserDataResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setUserData(userData).build();
         }
-        return new UserDataResponseBuilder().setRequestId(fromString).setRequestStatus(requestStatus).setUserData(userData).build();
+        return new UserDataResponseBuilder().setRequestId(fromString).setRequestStatus(valueOf).setUserData(userData).build();
     }
 
     /* renamed from: g */
@@ -436,6 +415,7 @@ public final class C0190c implements C0189c {
     private PurchaseResponse m43h(Intent intent) {
         RequestId fromString;
         UserData build;
+        PurchaseResponse.RequestStatus safeValueOf;
         Throwable e;
         Receipt receipt = null;
         PurchaseResponse.RequestStatus requestStatus = PurchaseResponse.RequestStatus.FAILED;
@@ -446,32 +426,40 @@ public final class C0190c implements C0189c {
                 String optString = jSONObject.optString(AmazonAppstoreBillingService.JSON_KEY_USER_ID);
                 build = new UserDataBuilder().setUserId(optString).setMarketplace(jSONObject.optString("marketplace")).build();
                 try {
-                    requestStatus = PurchaseResponse.RequestStatus.safeValueOf(jSONObject.optString(AmazonAppstoreBillingService.JSON_KEY_PURCHASE_STATUS));
-                    jSONObject = jSONObject.optJSONObject("receipt");
-                    if (jSONObject != null) {
-                        receipt = m32a(jSONObject);
+                    safeValueOf = PurchaseResponse.RequestStatus.safeValueOf(jSONObject.optString(AmazonAppstoreBillingService.JSON_KEY_PURCHASE_STATUS));
+                    try {
+                        JSONObject optJSONObject = jSONObject.optJSONObject("receipt");
+                        if (optJSONObject != null) {
+                            receipt = m32a(optJSONObject);
+                        }
+                    } catch (Exception e2) {
+                        e = e2;
+                        Log.e(f16a, "Error parsing purchase output", e);
+                        return new PurchaseResponseBuilder().setRequestId(fromString).setRequestStatus(safeValueOf).setUserData(build).setReceipt(receipt).build();
                     }
-                } catch (Throwable e2) {
-                    Throwable th = e2;
-                    requestStatus = requestStatus;
-                    e2 = th;
-                    Log.e(f16a, "Error parsing purchase output", e2);
-                    return new PurchaseResponseBuilder().setRequestId(fromString).setRequestStatus(requestStatus).setUserData(build).setReceipt(receipt).build();
+                } catch (Throwable e3) {
+                    Throwable th = e3;
+                    safeValueOf = requestStatus;
+                    e = th;
+                    Log.e(f16a, "Error parsing purchase output", e);
+                    return new PurchaseResponseBuilder().setRequestId(fromString).setRequestStatus(safeValueOf).setUserData(build).setReceipt(receipt).build();
                 }
-            } catch (Throwable e3) {
-                e2 = e3;
+            } catch (Throwable e4) {
+                safeValueOf = requestStatus;
+                e = e4;
                 build = null;
-                Log.e(f16a, "Error parsing purchase output", e2);
-                return new PurchaseResponseBuilder().setRequestId(fromString).setRequestStatus(requestStatus).setUserData(build).setReceipt(receipt).build();
+                Log.e(f16a, "Error parsing purchase output", e);
+                return new PurchaseResponseBuilder().setRequestId(fromString).setRequestStatus(safeValueOf).setUserData(build).setReceipt(receipt).build();
             }
-        } catch (Throwable e4) {
-            e2 = e4;
-            build = null;
+        } catch (Throwable e42) {
             fromString = null;
-            Log.e(f16a, "Error parsing purchase output", e2);
-            return new PurchaseResponseBuilder().setRequestId(fromString).setRequestStatus(requestStatus).setUserData(build).setReceipt(receipt).build();
+            safeValueOf = requestStatus;
+            e = e42;
+            build = null;
+            Log.e(f16a, "Error parsing purchase output", e);
+            return new PurchaseResponseBuilder().setRequestId(fromString).setRequestStatus(safeValueOf).setUserData(build).setReceipt(receipt).build();
         }
-        return new PurchaseResponseBuilder().setRequestId(fromString).setRequestStatus(requestStatus).setUserData(build).setReceipt(receipt).build();
+        return new PurchaseResponseBuilder().setRequestId(fromString).setRequestStatus(safeValueOf).setUserData(build).setReceipt(receipt).build();
     }
 
     /* renamed from: a */

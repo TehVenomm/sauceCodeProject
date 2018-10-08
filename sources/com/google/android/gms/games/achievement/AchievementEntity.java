@@ -231,8 +231,8 @@ public final class AchievementEntity extends zzc implements Achievement {
             currentSteps = getCurrentSteps();
             totalSteps = getTotalSteps();
         } else {
-            totalSteps = 0;
             currentSteps = 0;
+            totalSteps = 0;
         }
         return Arrays.hashCode(new Object[]{getAchievementId(), getName(), Integer.valueOf(getType()), getDescription(), Long.valueOf(getXpValue()), Integer.valueOf(getState()), Long.valueOf(getLastUpdatedTimestamp()), getPlayer(), Integer.valueOf(currentSteps), Integer.valueOf(totalSteps)});
     }

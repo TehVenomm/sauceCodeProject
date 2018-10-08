@@ -44,7 +44,7 @@ public class EnemyFieldDropItemTable : Singleton<EnemyFieldDropItemTable>
 				value = new List<EnemyFieldDropItemData>();
 				enemyToItemTable[enemyId] = value;
 			}
-			_003CAdd_003Ec__AnonStorey763 _003CAdd_003Ec__AnonStorey;
+			_003CAdd_003Ec__AnonStorey764 _003CAdd_003Ec__AnonStorey;
 			if (!value.Any(new Func<EnemyFieldDropItemData, bool>((object)_003CAdd_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)))
 			{
 				EnemyFieldDropItemData item = new EnemyFieldDropItemData(enemyId, itemId, fieldId, partIds);

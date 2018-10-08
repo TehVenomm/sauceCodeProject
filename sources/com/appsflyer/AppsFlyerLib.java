@@ -249,6 +249,7 @@ public class AppsFlyerLib implements C0259b {
 
         public void run() {
             HttpURLConnection httpURLConnection;
+            Map ˋ;
             Throwable e;
             if (this.f130 != null && this.f130.length() != 0 && !this.f134.isTrackingStopped()) {
                 this.f133.incrementAndGet();
@@ -272,7 +273,6 @@ public class AppsFlyerLib implements C0259b {
                     C0300y.m378().m391(append.toString(), "");
                     C02695.m293(new StringBuilder("Calling server for attribution url: ").append(append.toString()).toString());
                     httpURLConnection = (HttpURLConnection) new URL(append.toString()).openConnection();
-                    Map ˋ;
                     Map ˎ;
                     try {
                         httpURLConnection.setRequestMethod(HttpRequest.METHOD_GET);

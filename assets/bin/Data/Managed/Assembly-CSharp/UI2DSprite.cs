@@ -5,8 +5,8 @@ using UnityEngine;
 [AddComponentMenu("NGUI/UI/NGUI Unity2D Sprite")]
 public class UI2DSprite : UIBasicSprite
 {
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Sprite mSprite;
 
 	[SerializeField]
@@ -17,16 +17,16 @@ public class UI2DSprite : UIBasicSprite
 	[SerializeField]
 	private Shader mShader;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Vector4 mBorder = Vector4.get_zero();
 
 	[HideInInspector]
 	[SerializeField]
 	private bool mFixedAspect;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private float mPixelSize = 1f;
 
 	public Sprite nextSprite;

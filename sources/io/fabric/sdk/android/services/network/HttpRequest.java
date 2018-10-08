@@ -1218,10 +1218,10 @@ public class HttpRequest {
     }
 
     public HttpRequest part(String str, String str2, String str3, File file) throws HttpRequestException {
+        InputStream bufferedInputStream;
         IOException e;
         Throwable th;
         InputStream inputStream = null;
-        InputStream bufferedInputStream;
         try {
             bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
             try {

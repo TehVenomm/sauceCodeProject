@@ -12,8 +12,8 @@ public class UISlider : UIProgressBar
 		Upgraded
 	}
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Transform foreground;
 
 	[SerializeField]

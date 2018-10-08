@@ -41,11 +41,11 @@ public class zzb implements Creator<AgeRangeEntity> {
             int zzK = zza.zzK(parcel);
             switch (zza.zzaV(zzK)) {
                 case 1:
-                    i2 = zza.zzg(parcel, zzK);
+                    i3 = zza.zzg(parcel, zzK);
                     hashSet.add(Integer.valueOf(1));
                     break;
                 case 2:
-                    i3 = zza.zzg(parcel, zzK);
+                    i2 = zza.zzg(parcel, zzK);
                     hashSet.add(Integer.valueOf(2));
                     break;
                 case 3:
@@ -58,7 +58,7 @@ public class zzb implements Creator<AgeRangeEntity> {
             }
         }
         if (parcel.dataPosition() == zzL) {
-            return new AgeRangeEntity(hashSet, i2, i3, i);
+            return new AgeRangeEntity(hashSet, i3, i2, i);
         }
         throw new zza.zza("Overread allowed size end=" + zzL, parcel);
     }

@@ -1277,8 +1277,8 @@ public static class NGUITools
 		}
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	private static void CallCreatePanel(Transform t)
 	{
 		//IL_002a: Unknown result type (might be due to invalid IL or missing references)

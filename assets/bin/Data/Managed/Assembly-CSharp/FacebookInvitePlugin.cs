@@ -24,7 +24,7 @@ public class FacebookInvitePlugin : InviteChannelPlugin
 
 	private unsafe static void SendInvite(string referralDataUrl, Uri imageUrl, Action completeCallback, Action cancelCallback, Action<GetSocialError> errorCallback)
 	{
-		_003CSendInvite_003Ec__AnonStorey7E8 _003CSendInvite_003Ec__AnonStorey7E;
+		_003CSendInvite_003Ec__AnonStorey7E9 _003CSendInvite_003Ec__AnonStorey7E;
 		Mobile.AppInvite(new Uri(referralDataUrl), imageUrl, new FacebookDelegate<IAppInviteResult>((object)_003CSendInvite_003Ec__AnonStorey7E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 }

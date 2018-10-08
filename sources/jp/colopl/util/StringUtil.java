@@ -19,12 +19,12 @@ public class StringUtil {
     private static final String TAG = "StringUtil";
 
     public static String convertToString(InputStream inputStream) {
-        BufferedReader bufferedReader;
         IOException e;
         UnsupportedEncodingException e2;
         Throwable th;
         Object obj;
         String str = null;
+        BufferedReader bufferedReader;
         try {
             try {
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));

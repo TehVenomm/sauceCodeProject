@@ -28,7 +28,6 @@ class zzefe<K extends Comparable<K>, V> extends AbstractMap<K, V> {
 
     private final int zza(K k) {
         int compareTo;
-        int i = 0;
         int size = this.zzmzw.size() - 1;
         if (size >= 0) {
             compareTo = k.compareTo((Comparable) ((zzefj) this.zzmzw.get(size)).getKey());
@@ -39,6 +38,7 @@ class zzefe<K extends Comparable<K>, V> extends AbstractMap<K, V> {
                 return size;
             }
         }
+        int i = 0;
         int i2 = size;
         while (i <= i2) {
             size = (i + i2) / 2;

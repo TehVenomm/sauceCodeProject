@@ -44,7 +44,7 @@ public class StoryMain : GameSection, StoryDirector.IStoryEventReceiver
 
 		internal StoryMain _003C_003Ef__this;
 
-		internal void _003C_003Em__387()
+		internal void _003C_003Em__389()
 		{
 			_003C_003Ef__this.AddMessage(name, msg, tail_dir, msg_type, labelOption);
 		}

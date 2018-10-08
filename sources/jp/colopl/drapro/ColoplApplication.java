@@ -321,8 +321,8 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
             equals2 = provider.equals("network");
             isCellbasedLocation = LocationUtil.isCellbasedLocation(location);
         } else {
-            isCellbasedLocation = false;
             equals = false;
+            isCellbasedLocation = false;
             equals2 = false;
         }
         LocationExtras locationExtras = new LocationExtras();
@@ -359,15 +359,15 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
                 } else {
                     if (location == this.firstNetworkLocation) {
                         LogUtil.m3770v(TAG, "Through Update Check");
-                        isCellbasedLocation = true;
+                        equals = true;
                     } else {
-                        isCellbasedLocation = false;
+                        equals = false;
                     }
                     this.sameLocationCount = 0;
                     this.previousNWLocation = location;
                     LogUtil.m3770v(TAG, "Available Location");
                     z2 = false;
-                    z3 = isCellbasedLocation;
+                    z3 = equals;
                 }
                 if (updateLocation(obj, z2, z3)) {
                     LogUtil.m3770v(TAG, "Update Location");
@@ -396,16 +396,16 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
             if (this.previousNWLocation == null) {
             }
             if (location == this.firstNetworkLocation) {
-                isCellbasedLocation = false;
+                equals = false;
             } else {
                 LogUtil.m3770v(TAG, "Through Update Check");
-                isCellbasedLocation = true;
+                equals = true;
             }
             this.sameLocationCount = 0;
             this.previousNWLocation = location;
             LogUtil.m3770v(TAG, "Available Location");
             z2 = false;
-            z3 = isCellbasedLocation;
+            z3 = equals;
         }
         if (updateLocation(obj, z2, z3)) {
             LogUtil.m3770v(TAG, "Update Location");

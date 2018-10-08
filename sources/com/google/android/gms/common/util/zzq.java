@@ -20,39 +20,38 @@ public final class zzq {
     }
 
     private static String zzcg(int i) {
-        String trim;
+        Closeable bufferedReader;
         Throwable th;
-        Closeable closeable = null;
+        String str = null;
         if (i > 0) {
             ThreadPolicy allowThreadDiskReads;
-            Closeable bufferedReader;
             try {
                 allowThreadDiskReads = StrictMode.allowThreadDiskReads();
                 bufferedReader = new BufferedReader(new FileReader("/proc/" + i + "/cmdline"));
                 try {
                     StrictMode.setThreadPolicy(allowThreadDiskReads);
-                    trim = bufferedReader.readLine().trim();
+                    str = bufferedReader.readLine().trim();
                     zzm.closeQuietly(bufferedReader);
                 } catch (IOException e) {
                     zzm.closeQuietly(bufferedReader);
-                    return trim;
+                    return str;
                 } catch (Throwable th2) {
-                    Closeable closeable2 = bufferedReader;
                     th = th2;
-                    closeable = closeable2;
-                    zzm.closeQuietly(closeable);
+                    zzm.closeQuietly(bufferedReader);
                     throw th;
                 }
             } catch (IOException e2) {
-                bufferedReader = closeable;
+                bufferedReader = str;
                 zzm.closeQuietly(bufferedReader);
-                return trim;
+                return str;
             } catch (Throwable th3) {
-                th = th3;
-                zzm.closeQuietly(closeable);
+                Throwable th4 = th3;
+                bufferedReader = str;
+                th = th4;
+                zzm.closeQuietly(bufferedReader);
                 throw th;
             }
         }
-        return trim;
+        return str;
     }
 }

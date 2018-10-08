@@ -63,9 +63,9 @@ public final class zzcbk extends zzcdm {
         r10.put(r0, r1);
         r0 = "entry";
         r10.put(r0, r15);
-        r1 = 5;
         com.google.android.gms.internal.zzcap.zzaws();
         r0 = 0;
+        r1 = 5;
         r7 = r0;
         r0 = r1;
     L_0x0026:
@@ -371,14 +371,15 @@ public final class zzcbk extends zzcdm {
 
     @TargetApi(11)
     public final List<zza> zzdv(int i) {
+        Object e;
         Cursor cursor;
-        SQLiteFullException sQLiteFullException;
+        SQLiteDatabase sQLiteDatabase;
+        SQLiteDatabase sQLiteDatabase2;
         SQLiteException sQLiteException;
-        Cursor cursor2;
-        Throwable th;
+        SQLiteDatabase sQLiteDatabase3;
         Object obj;
         int i2;
-        Throwable th2;
+        Throwable th;
         Parcel obtain;
         zzug();
         zzatu();
@@ -392,64 +393,64 @@ public final class zzcbk extends zzcdm {
         int i3 = 5;
         int i4 = 0;
         while (i4 < 5) {
-            SQLiteDatabase sQLiteDatabase = null;
-            SQLiteDatabase sQLiteDatabase2 = null;
-            SQLiteDatabase sQLiteDatabase3 = null;
+            Cursor cursor2;
+            SQLiteDatabase sQLiteDatabase4 = null;
             try {
-                sQLiteDatabase2 = getWritableDatabase();
-                if (sQLiteDatabase2 == null) {
+                sQLiteDatabase4 = getWritableDatabase();
+                if (sQLiteDatabase4 == null) {
                     try {
                         this.zzipd = true;
-                        if (sQLiteDatabase2 != null) {
-                            sQLiteDatabase2.close();
+                        if (sQLiteDatabase4 != null) {
+                            sQLiteDatabase4.close();
                         }
                         return null;
-                    } catch (SQLiteFullException e) {
+                    } catch (SQLiteFullException e2) {
+                        e = e2;
                         cursor = null;
-                        sQLiteFullException = e;
-                        sQLiteDatabase3 = sQLiteDatabase2;
-                        SQLiteFullException sQLiteFullException2 = sQLiteFullException;
-                    } catch (SQLiteException e2) {
-                        sQLiteException = e2;
+                        sQLiteDatabase = sQLiteDatabase4;
+                    } catch (SQLiteException e3) {
                         cursor2 = null;
-                        sQLiteDatabase = sQLiteDatabase2;
-                        SQLiteException sQLiteException2 = sQLiteException;
-                        if (VERSION.SDK_INT >= 11) {
-                        }
-                        if (sQLiteDatabase != null) {
-                            try {
-                                if (sQLiteDatabase.inTransaction()) {
-                                    sQLiteDatabase.endTransaction();
-                                }
-                            } catch (Throwable th3) {
-                                th = th3;
+                        sQLiteDatabase2 = sQLiteDatabase4;
+                        sQLiteException = e3;
+                        sQLiteDatabase3 = sQLiteDatabase2;
+                        try {
+                            if (VERSION.SDK_INT >= 11) {
                             }
+                            if (sQLiteDatabase3 != null) {
+                                if (sQLiteDatabase3.inTransaction()) {
+                                    sQLiteDatabase3.endTransaction();
+                                }
+                            }
+                            zzauk().zzayc().zzj("Error reading entries from local database", obj);
+                            this.zzipd = true;
+                            i2 = i3;
+                            if (cursor2 != null) {
+                                cursor2.close();
+                            }
+                            if (sQLiteDatabase3 != null) {
+                                sQLiteDatabase3.close();
+                            }
+                            i4++;
+                            i3 = i2;
+                        } catch (Throwable th2) {
+                            sQLiteDatabase2 = sQLiteDatabase3;
+                            th = th2;
+                            sQLiteDatabase4 = sQLiteDatabase2;
                         }
-                        zzauk().zzayc().zzj("Error reading entries from local database", obj);
-                        this.zzipd = true;
-                        i2 = i3;
-                        if (cursor2 != null) {
-                            cursor2.close();
-                        }
-                        if (sQLiteDatabase != null) {
-                            sQLiteDatabase.close();
-                        }
-                        i4++;
-                        i3 = i2;
-                    } catch (Throwable th4) {
-                        th2 = th4;
-                        cursor = null;
+                    } catch (Throwable th3) {
+                        th = th3;
+                        cursor2 = null;
                     }
                 } else {
-                    sQLiteDatabase2.beginTransaction();
+                    sQLiteDatabase4.beginTransaction();
                     String[] strArr = new String[]{"rowid", ShareConstants.MEDIA_TYPE, "entry"};
-                    cursor = sQLiteDatabase2.query("messages", strArr, null, null, null, null, "rowid asc", Integer.toString(100));
+                    cursor2 = sQLiteDatabase4.query("messages", strArr, null, null, null, null, "rowid asc", Integer.toString(100));
                     long j = -1;
-                    while (cursor.moveToNext()) {
+                    while (cursor2.moveToNext()) {
                         try {
-                            j = cursor.getLong(0);
-                            int i5 = cursor.getInt(1);
-                            byte[] blob = cursor.getBlob(2);
+                            j = cursor2.getLong(0);
+                            int i5 = cursor2.getInt(1);
+                            byte[] blob = cursor2.getBlob(2);
                             if (i5 == 0) {
                                 obtain = Parcel.obtain();
                                 try {
@@ -460,108 +461,109 @@ public final class zzcbk extends zzcdm {
                                     if (zzcbc != null) {
                                         arrayList.add(zzcbc);
                                     }
-                                } catch (zzc e3) {
+                                } catch (zzc e4) {
                                     zzauk().zzayc().log("Failed to load event from local database");
                                     obtain.recycle();
-                                } catch (Throwable th22) {
+                                } catch (Throwable th4) {
                                     obtain.recycle();
-                                    throw th22;
+                                    throw th4;
                                 }
                             } else if (i5 == 1) {
                                 obtain = Parcel.obtain();
                                 try {
                                     obtain.unmarshall(blob, 0, blob.length);
                                     obtain.setDataPosition(0);
-                                    r1 = (zzcfl) zzcfl.CREATOR.createFromParcel(obtain);
+                                    e = (zzcfl) zzcfl.CREATOR.createFromParcel(obtain);
                                     obtain.recycle();
-                                } catch (zzc e4) {
+                                } catch (zzc e5) {
                                     zzauk().zzayc().log("Failed to load user property from local database");
                                     obtain.recycle();
-                                    r1 = null;
-                                } catch (Throwable th222) {
+                                    e = null;
+                                } catch (Throwable th42) {
                                     obtain.recycle();
-                                    throw th222;
+                                    throw th42;
                                 }
-                                if (r1 != null) {
-                                    arrayList.add(r1);
+                                if (e != null) {
+                                    arrayList.add(e);
                                 }
                             } else if (i5 == 2) {
                                 obtain = Parcel.obtain();
                                 try {
                                     obtain.unmarshall(blob, 0, blob.length);
                                     obtain.setDataPosition(0);
-                                    r1 = (zzcan) zzcan.CREATOR.createFromParcel(obtain);
+                                    e = (zzcan) zzcan.CREATOR.createFromParcel(obtain);
                                     obtain.recycle();
-                                } catch (zzc e5) {
+                                } catch (zzc e6) {
                                     zzauk().zzayc().log("Failed to load user property from local database");
                                     obtain.recycle();
-                                    r1 = null;
-                                } catch (Throwable th2222) {
+                                    e = null;
+                                } catch (Throwable th422) {
                                     obtain.recycle();
-                                    throw th2222;
+                                    throw th422;
                                 }
-                                if (r1 != null) {
-                                    arrayList.add(r1);
+                                if (e != null) {
+                                    arrayList.add(e);
                                 }
                             } else {
                                 zzauk().zzayc().log("Unknown record type in local database");
                             }
-                        } catch (SQLiteFullException e6) {
-                            sQLiteFullException = e6;
+                        } catch (SQLiteFullException e7) {
+                            e = e7;
+                            cursor = cursor2;
+                            sQLiteDatabase = sQLiteDatabase4;
+                        } catch (SQLiteException e32) {
+                            sQLiteDatabase2 = sQLiteDatabase4;
+                            obj = e32;
                             sQLiteDatabase3 = sQLiteDatabase2;
-                            obj = sQLiteFullException;
-                        } catch (SQLiteException e22) {
-                            sQLiteException = e22;
-                            cursor2 = cursor;
-                            sQLiteDatabase = sQLiteDatabase2;
-                            obj = sQLiteException;
                         } catch (Throwable th5) {
-                            th2222 = th5;
+                            th422 = th5;
                         }
                     }
-                    if (sQLiteDatabase2.delete("messages", "rowid <= ?", new String[]{Long.toString(j)}) < arrayList.size()) {
+                    if (sQLiteDatabase4.delete("messages", "rowid <= ?", new String[]{Long.toString(j)}) < arrayList.size()) {
                         zzauk().zzayc().log("Fewer entries removed from local database than expected");
                     }
-                    sQLiteDatabase2.setTransactionSuccessful();
-                    sQLiteDatabase2.endTransaction();
-                    if (cursor != null) {
-                        cursor.close();
+                    sQLiteDatabase4.setTransactionSuccessful();
+                    sQLiteDatabase4.endTransaction();
+                    if (cursor2 != null) {
+                        cursor2.close();
                     }
-                    if (sQLiteDatabase2 != null) {
-                        sQLiteDatabase2.close();
+                    if (sQLiteDatabase4 != null) {
+                        sQLiteDatabase4.close();
                     }
                     return arrayList;
                 }
-            } catch (SQLiteFullException e7) {
-                obj = e7;
+            } catch (SQLiteFullException e8) {
+                e = e8;
                 cursor = null;
+                sQLiteDatabase = null;
                 try {
-                    zzauk().zzayc().zzj("Error reading entries from local database", obj);
+                    zzauk().zzayc().zzj("Error reading entries from local database", e);
                     this.zzipd = true;
                     if (cursor != null) {
                         cursor.close();
                     }
-                    if (sQLiteDatabase3 != null) {
-                        sQLiteDatabase3.close();
+                    if (sQLiteDatabase != null) {
+                        sQLiteDatabase.close();
                         i2 = i3;
                     } else {
                         i2 = i3;
                     }
                     i4++;
                     i3 = i2;
-                } catch (Throwable th6) {
-                    th = th6;
-                    Cursor cursor3 = cursor;
-                    sQLiteDatabase = sQLiteDatabase3;
-                    cursor2 = cursor3;
+                } catch (Throwable th22) {
+                    th422 = th22;
+                    sQLiteDatabase4 = sQLiteDatabase;
+                    cursor2 = cursor;
                 }
-            } catch (SQLiteException e8) {
-                obj = e8;
+            } catch (SQLiteException e322) {
                 cursor2 = null;
+                sQLiteDatabase2 = sQLiteDatabase4;
+                sQLiteException = e322;
+                sQLiteDatabase3 = sQLiteDatabase2;
                 if (VERSION.SDK_INT >= 11 || !(obj instanceof SQLiteDatabaseLockedException)) {
-                    if (sQLiteDatabase != null) {
-                        if (sQLiteDatabase.inTransaction()) {
-                            sQLiteDatabase.endTransaction();
+                    if (sQLiteDatabase3 != null) {
+                        if (sQLiteDatabase3.inTransaction()) {
+                            sQLiteDatabase3.endTransaction();
                         }
                     }
                     zzauk().zzayc().zzj("Error reading entries from local database", obj);
@@ -574,36 +576,26 @@ public final class zzcbk extends zzcdm {
                 if (cursor2 != null) {
                     cursor2.close();
                 }
-                if (sQLiteDatabase != null) {
-                    sQLiteDatabase.close();
+                if (sQLiteDatabase3 != null) {
+                    sQLiteDatabase3.close();
                 }
                 i4++;
                 i3 = i2;
-            } catch (Throwable th7) {
-                th2222 = th7;
-                cursor = null;
+            } catch (Throwable th222) {
+                cursor2 = null;
+                th422 = th222;
+                sQLiteDatabase4 = null;
             }
         }
         zzauk().zzaye().log("Failed to read events from database in reasonable time");
         return null;
-        SQLiteDatabase sQLiteDatabase4 = sQLiteDatabase;
-        cursor = cursor2;
-        th2222 = th;
-        sQLiteDatabase2 = sQLiteDatabase4;
-        if (cursor != null) {
-            cursor.close();
+        if (cursor2 != null) {
+            cursor2.close();
         }
-        if (sQLiteDatabase2 != null) {
-            sQLiteDatabase2.close();
+        if (sQLiteDatabase4 != null) {
+            sQLiteDatabase4.close();
         }
-        throw th2222;
-        if (cursor != null) {
-            cursor.close();
-        }
-        if (sQLiteDatabase2 != null) {
-            sQLiteDatabase2.close();
-        }
-        throw th2222;
+        throw th422;
     }
 
     public final /* bridge */ /* synthetic */ void zzug() {

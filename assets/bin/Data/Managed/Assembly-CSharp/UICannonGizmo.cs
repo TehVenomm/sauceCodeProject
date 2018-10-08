@@ -11,12 +11,12 @@ public class UICannonGizmo : UIStatusGizmoBase
 	[SerializeField]
 	protected Vector3 offset;
 
-	[Tooltip("スクリ\u30fcン横オフセット")]
 	[SerializeField]
+	[Tooltip("スクリ\u30fcン横オフセット")]
 	protected float screenSideOffset = 22f;
 
-	[Tooltip("スクリ\u30fcン下オフセット")]
 	[SerializeField]
+	[Tooltip("スクリ\u30fcン下オフセット")]
 	protected float screenBottomOffset = 112f;
 
 	private FieldGimmickCannonObject _owner;

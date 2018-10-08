@@ -42,13 +42,13 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 
 	private bool isPreload;
 
-	public static string APP_HOST => "http://appprd-136.dragonproject.gogame.net/";
+	public static string APP_HOST => "http://appprd.dragonproject.gogame.net/";
 
 	public static string IMG_HOST => "http://cdnprd.dragonproject.gogame.net/resources/";
 
 	public static string TABLE_HOST => "http://cdnprd.dragonproject.gogame.net/resources/tables/";
 
-	public static string CLAN_HOST => "http://clanprd-136.dragonproject.gogame.net/";
+	public static string CLAN_HOST => "http://prdclan.dragonproject.gogame.net/";
 
 	public float lastRequestTime
 	{

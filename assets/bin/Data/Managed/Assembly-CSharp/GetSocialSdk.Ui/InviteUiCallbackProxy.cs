@@ -25,7 +25,7 @@ namespace GetSocialSdk.Ui
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002a: Expected O, but got Unknown
 			Debug.Log((object)"Complete");
-			_003ConComplete_003Ec__AnonStorey7F4 _003ConComplete_003Ec__AnonStorey7F;
+			_003ConComplete_003Ec__AnonStorey7F5 _003ConComplete_003Ec__AnonStorey7F;
 			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003ConComplete_003Ec__AnonStorey7F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
@@ -34,7 +34,7 @@ namespace GetSocialSdk.Ui
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002a: Expected O, but got Unknown
 			Debug.Log((object)"Cancel");
-			_003ConCancel_003Ec__AnonStorey7F5 _003ConCancel_003Ec__AnonStorey7F;
+			_003ConCancel_003Ec__AnonStorey7F6 _003ConCancel_003Ec__AnonStorey7F;
 			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003ConCancel_003Ec__AnonStorey7F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 
@@ -43,7 +43,7 @@ namespace GetSocialSdk.Ui
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0031: Expected O, but got Unknown
 			Debug.Log((object)"Failure");
-			_003ConError_003Ec__AnonStorey7F6 _003ConError_003Ec__AnonStorey7F;
+			_003ConError_003Ec__AnonStorey7F7 _003ConError_003Ec__AnonStorey7F;
 			JavaInterfaceProxy.ExecuteOnMainThread(new Action((object)_003ConError_003Ec__AnonStorey7F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 		}
 	}

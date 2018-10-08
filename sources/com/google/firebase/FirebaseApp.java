@@ -202,31 +202,31 @@ public class FirebaseApp {
     }
 
     private final <T> void zza(Class<T> cls, T t, Iterable<String> iterable) {
+        String valueOf;
         boolean isDeviceProtectedStorage = ContextCompat.isDeviceProtectedStorage(this.mApplicationContext);
         if (isDeviceProtectedStorage) {
             zzd.zzee(this.mApplicationContext);
         }
-        for (String str : iterable) {
-            String str2;
+        for (String valueOf2 : iterable) {
             if (isDeviceProtectedStorage) {
                 try {
-                    if (!zzled.contains(str2)) {
+                    if (!zzled.contains(valueOf2)) {
                     }
                 } catch (ClassNotFoundException e) {
-                    if (zzlee.contains(str2)) {
-                        throw new IllegalStateException(String.valueOf(str2).concat(" is missing, but is required. Check if it has been removed by Proguard."));
+                    if (zzlee.contains(valueOf2)) {
+                        throw new IllegalStateException(String.valueOf(valueOf2).concat(" is missing, but is required. Check if it has been removed by Proguard."));
                     }
-                    Log.d("FirebaseApp", String.valueOf(str2).concat(" is not linked. Skipping initialization."));
+                    Log.d("FirebaseApp", String.valueOf(valueOf2).concat(" is not linked. Skipping initialization."));
                 } catch (NoSuchMethodException e2) {
-                    throw new IllegalStateException(String.valueOf(str2).concat("#getInstance has been removed by Proguard. Add keep rule to prevent it."));
+                    throw new IllegalStateException(String.valueOf(valueOf2).concat("#getInstance has been removed by Proguard. Add keep rule to prevent it."));
                 } catch (Throwable e3) {
                     Log.wtf("FirebaseApp", "Firebase API initialization failure.", e3);
                 } catch (Throwable e4) {
-                    str2 = String.valueOf(str2);
-                    Log.wtf("FirebaseApp", str2.length() != 0 ? "Failed to initialize ".concat(str2) : new String("Failed to initialize "), e4);
+                    valueOf2 = String.valueOf(valueOf2);
+                    Log.wtf("FirebaseApp", valueOf2.length() != 0 ? "Failed to initialize ".concat(valueOf2) : new String("Failed to initialize "), e4);
                 }
             }
-            Method method = Class.forName(str2).getMethod("getInstance", new Class[]{cls});
+            Method method = Class.forName(valueOf2).getMethod("getInstance", new Class[]{cls});
             int modifiers = method.getModifiers();
             if (Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers)) {
                 method.invoke(null, new Object[]{t});

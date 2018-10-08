@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Toggle")]
+[ExecuteInEditMode]
 public class UIToggle : UIWidgetContainer
 {
 	public delegate bool Validate(bool choice);
@@ -43,8 +43,8 @@ public class UIToggle : UIWidgetContainer
 	[HideInInspector]
 	private GameObject eventReceiver;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private string functionName = "OnActivate";
 
 	[SerializeField]

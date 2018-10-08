@@ -639,7 +639,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 	public unsafe void UpdateEquip(EquipItemInfo equip)
 	{
 		int i = 0;
-		_003CUpdateEquip_003Ec__AnonStorey6D0 _003CUpdateEquip_003Ec__AnonStorey6D;
+		_003CUpdateEquip_003Ec__AnonStorey6D1 _003CUpdateEquip_003Ec__AnonStorey6D;
 		for (int num = equipSet.Length; i < num; i++)
 		{
 			IsEquipping(i, equip, new Action<int, int>((object)_003CUpdateEquip_003Ec__AnonStorey6D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
@@ -791,7 +791,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				equipItem = new CharaInfo.EquipItem();
 				equipItem.eId = PlayerPrefs.GetInt("Tut_Weapon");
 				equipItem.lv = 1;
-				equipItem.sIds.Add(100102102);
+				equipItem.sIds.Add(105200200);
 				equipItem.sLvs.Add(1);
 				equipItem.sExs.Add(0);
 			}

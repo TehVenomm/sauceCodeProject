@@ -35,5 +35,15 @@ public enum TRACK_TUTORIAL_STEP_BIT
 	tutorial_4_battle_NPC_appear = 0x20,
 	tutorial_5_battle_end = 33,
 	tutorial_6_pamela_greeting = 34,
+	tutorial_7_town_hall_1 = 35,
+	tutorial_8_gacha = 36,
+	tutorial_9_behemoth_fight_begin_1 = 37,
+	tutorial_10_town_hall_2 = 38,
+	tutorial_11_weapon_tut = 39,
+	tutorial_12_town_hall_3 = 40,
+	tutorial_13_behemoth_fight_begin_2 = 41,
+	tutorial_14_town_hall_4 = 42,
+	tutorial_15_upgrading_tut = 43,
+	tutorial_16_tutorial_end = 44,
 	MAX = 0x40
 }

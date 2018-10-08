@@ -145,16 +145,16 @@ class FragmentTransition {
                     ArrayList arrayList4;
                     int size = backStackRecord.mSharedElementSourceNames.size();
                     if (booleanValue) {
+                        arrayList3 = backStackRecord.mSharedElementSourceNames;
+                        arrayList4 = backStackRecord.mSharedElementTargetNames;
+                    } else {
                         ArrayList arrayList5 = backStackRecord.mSharedElementSourceNames;
                         arrayList3 = backStackRecord.mSharedElementTargetNames;
                         arrayList4 = arrayList5;
-                    } else {
-                        arrayList3 = backStackRecord.mSharedElementSourceNames;
-                        arrayList4 = backStackRecord.mSharedElementTargetNames;
                     }
                     for (int i5 = 0; i5 < size; i5++) {
-                        String str = (String) arrayList3.get(i5);
-                        String str2 = (String) arrayList4.get(i5);
+                        String str = (String) arrayList4.get(i5);
+                        String str2 = (String) arrayList3.get(i5);
                         String str3 = (String) arrayMap.remove(str2);
                         if (str3 != null) {
                             arrayMap.put(str, str3);

@@ -15,8 +15,8 @@ public class EffectCtrl
 	[Tooltip("管理対象のAnimator\n空の場合はこのGameObjectにアタッチされたAnimatorが使用される")]
 	public Animator animator;
 
-	[Tooltip("ル\u30fcプを抜ける時にパ\u30fcティクルを停止するかどうか")]
 	[Header("-- Loop End Behaviour --")]
+	[Tooltip("ル\u30fcプを抜ける時にパ\u30fcティクルを停止するかどうか")]
 	public bool stopParticle = true;
 
 	[Tooltip("ル\u30fcプを抜ける時にAnimatorのENDを再生するかどうか")]

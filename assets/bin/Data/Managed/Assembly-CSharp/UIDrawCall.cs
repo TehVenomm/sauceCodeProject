@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Internal/Draw Call")]
+[ExecuteInEditMode]
 public class UIDrawCall
 {
 	public enum Clipping

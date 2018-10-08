@@ -614,7 +614,7 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 	public void SendHomeInfo(Action<bool, bool, int> callBack)
 	{
 		HomeInfoModel.SendForm sendForm = new HomeInfoModel.SendForm();
-		sendForm.appStr = AppMain.appStr;
+		sendForm.appStr = NetworkNative.getAppStr();
 		Protocol.SendAsync("ajax/home/info", sendForm, delegate(HomeInfoModel ret)
 		{
 			bool flag = false;
@@ -1174,15 +1174,19 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 			}
 			userStatus.tutorialBit = diff.tutorialBit[0];
 			flag = true;
-			if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA1, oldTutorialBit))
+			if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA_QUEST_START, oldTutorialBit))
 			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_monster_gacha, "Tutorial");
+				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_9_behemoth_fight_begin_1, "Tutorial");
+				Debug.LogWarning((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_9_behemoth_fight_begin_1.ToString()));
+				MonoBehaviourSingleton<GoWrapManager>.I.SendStatusTracking(TRACK_TUTORIAL_STEP_BIT.tutorial_9_behemoth_fight_begin_1, "Tutorial", null, null);
 			}
-			else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA_QUEST_BATTLE_RESULT, oldTutorialBit))
+			else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.SHADOW_QUEST_START, oldTutorialBit))
 			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_monster_gacha_fight, "Tutorial");
+				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_13_behemoth_fight_begin_2, "Tutorial");
+				Debug.LogWarning((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_13_behemoth_fight_begin_2.ToString()));
+				MonoBehaviourSingleton<GoWrapManager>.I.SendStatusTracking(TRACK_TUTORIAL_STEP_BIT.tutorial_13_behemoth_fight_begin_2, "Tutorial", null, null);
 			}
-			else if (!CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA2, oldTutorialBit) && !CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.SKILL_EQUIP, oldTutorialBit) && !CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.CLAIM_REWARD, oldTutorialBit))
+			else if (!CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA1, oldTutorialBit) && !CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA_QUEST_BATTLE_RESULT, oldTutorialBit) && !CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA2, oldTutorialBit) && !CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.SKILL_EQUIP, oldTutorialBit) && !CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.CLAIM_REWARD, oldTutorialBit))
 			{
 				if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.FORGE_ITEM, oldTutorialBit))
 				{

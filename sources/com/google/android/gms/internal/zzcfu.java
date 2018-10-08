@@ -158,10 +158,10 @@ public final class zzcfu extends zzegi<zzcfu> {
         int i2 = 0;
         for (String str : this.zziyd) {
             if (str != null) {
-                i++;
-                i2 += zzegg.zzrc(str);
+                i2++;
+                i += zzegg.zzrc(str);
             }
         }
-        return (zzn + i2) + (i * 1);
+        return (zzn + i) + (i2 * 1);
     }
 }

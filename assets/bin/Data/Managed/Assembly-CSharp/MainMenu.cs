@@ -149,6 +149,9 @@ public class MainMenu : UIBehaviour
 		}
 		else
 		{
+			ResetTween((Enum)UI.TWN_POP_MENU, 0);
+			isPopMenu = true;
+			SkipTween((Enum)UI.TWN_POP_MENU, true, 0);
 			UpdateNewMapUI();
 		}
 	}

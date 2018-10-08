@@ -306,8 +306,8 @@ public static class NGUIText
 		return ParseColor24(text, offset);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static Color ParseColor24(string text, int offset)
 	{
 		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
@@ -331,16 +331,16 @@ public static class NGUIText
 		return new Color(num5 * (float)num, num5 * (float)num2, num5 * (float)num3, num5 * (float)num4);
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static string EncodeColor(Color c)
 	{
 		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 		return EncodeColor24(c);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static string EncodeColor(string text, Color c)
 	{
 		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
@@ -355,8 +355,8 @@ public static class NGUIText
 		return NGUIMath.DecimalToHex8(num);
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static string EncodeColor24(Color c)
 	{
 		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
@@ -364,8 +364,8 @@ public static class NGUIText
 		return NGUIMath.DecimalToHex24(num);
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static string EncodeColor32(Color c)
 	{
 		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
@@ -384,8 +384,8 @@ public static class NGUIText
 		return ParseSymbol(text, ref index, null, false, ref sub, ref bold, ref italic, ref underline, ref strike, ref ignoreColor);
 	}
 
-	[DebuggerHidden]
 	[DebuggerStepThrough]
+	[DebuggerHidden]
 	public static bool IsHex(char ch)
 	{
 		return (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F');
@@ -793,8 +793,8 @@ public static class NGUIText
 		return ch == 32 || ch == 8202 || ch == 8203 || ch == 8201;
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public static void EndLine(ref StringBuilder s)
 	{
 		int num = s.Length - 1;

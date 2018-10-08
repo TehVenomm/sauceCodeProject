@@ -147,11 +147,11 @@ public final class zzehh extends zzegi<zzehh> implements Cloneable {
             int i2 = 0;
             for (byte[] bArr : this.zznfw) {
                 if (bArr != null) {
-                    i++;
-                    i2 += zzegg.zzaw(bArr);
+                    i2++;
+                    i += zzegg.zzaw(bArr);
                 }
             }
-            zzn = (zzn + i2) + (i * 1);
+            zzn = (zzn + i) + (i2 * 1);
         }
         if (this.zznfx) {
             zzn += zzegg.zzgr(3) + 1;

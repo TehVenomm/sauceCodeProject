@@ -30,10 +30,10 @@ public final class FaqSupport {
     }
 
     private static Category parse(File file, String str) throws IOException {
+        JsonReader jsonReader;
         InputStream newInputStream = IOUtils.newInputStream(file);
         try {
             Reader inputStreamReader = new InputStreamReader(newInputStream, "UTF-8");
-            JsonReader jsonReader;
             Category parse;
             try {
                 jsonReader = new JsonReader(inputStreamReader);

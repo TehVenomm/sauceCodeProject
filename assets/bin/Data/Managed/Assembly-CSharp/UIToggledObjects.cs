@@ -12,8 +12,8 @@ public class UIToggledObjects
 	[SerializeField]
 	private GameObject target;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool inverse;
 
 	public UIToggledObjects()

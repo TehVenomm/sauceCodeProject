@@ -17,8 +17,8 @@ namespace GooglePlayGames.Native
 			{
 				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0020: Expected O, but got Unknown
-				_003CToOnGameThread_003Ec__AnonStorey80C<T>._003CToOnGameThread_003Ec__AnonStorey80D _003CToOnGameThread_003Ec__AnonStorey80D;
-				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CToOnGameThread_003Ec__AnonStorey80D, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+				_003CToOnGameThread_003Ec__AnonStorey80D<T>._003CToOnGameThread_003Ec__AnonStorey80E _003CToOnGameThread_003Ec__AnonStorey80E;
+				PlayGamesHelperObject.RunOnGameThread(new Action((object)_003CToOnGameThread_003Ec__AnonStorey80E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 			};
 		}
 
@@ -28,8 +28,8 @@ namespace GooglePlayGames.Native
 			{
 				return new Action<_003F, _003F>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			}
-			_003CToOnGameThread_003Ec__AnonStorey80E<T1, T2> _003CToOnGameThread_003Ec__AnonStorey80E;
-			return new Action<_003F, _003F>((object)_003CToOnGameThread_003Ec__AnonStorey80E, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			_003CToOnGameThread_003Ec__AnonStorey80F<T1, T2> _003CToOnGameThread_003Ec__AnonStorey80F;
+			return new Action<_003F, _003F>((object)_003CToOnGameThread_003Ec__AnonStorey80F, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 
 		internal unsafe static Action<T1, T2, T3> ToOnGameThread<T1, T2, T3>(Action<T1, T2, T3> toConvert)
@@ -38,7 +38,7 @@ namespace GooglePlayGames.Native
 			{
 				return new Action<_003F, _003F, _003F>((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 			}
-			_003CToOnGameThread_003Ec__AnonStorey810<T1, T2, T3> _003CToOnGameThread_003Ec__AnonStorey;
+			_003CToOnGameThread_003Ec__AnonStorey811<T1, T2, T3> _003CToOnGameThread_003Ec__AnonStorey;
 			return new Action<_003F, _003F, _003F>((object)_003CToOnGameThread_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
 	}

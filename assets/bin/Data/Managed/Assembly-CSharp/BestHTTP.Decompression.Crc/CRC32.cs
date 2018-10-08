@@ -4,9 +4,9 @@ using System.Runtime.InteropServices;
 
 namespace BestHTTP.Decompression.Crc
 {
+	[ComVisible(true)]
 	[ClassInterface(ClassInterfaceType.AutoDispatch)]
 	[Guid("ebc25cf6-9120-4283-b972-0e5520d0000C")]
-	[ComVisible(true)]
 	internal class CRC32
 	{
 		private const int BUFFER_SIZE = 8192;

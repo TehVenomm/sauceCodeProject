@@ -1,5 +1,6 @@
 using gogame;
 using Network;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -57,6 +58,14 @@ public class GoWrapManager : MonoBehaviourSingleton<GoWrapManager>, IGoWrapDeleg
 				GameSaveData.instance.SetPushedTrackTutorialBit(stepName);
 			}
 		}
+	}
+
+	public unsafe void SendStatusTracking(TRACK_TUTORIAL_STEP_BIT _stepName, string _category, Dictionary<string, object> dictionary = null, Action<bool> call_back = null)
+	{
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Expected O, but got Unknown
+		_003CSendStatusTracking_003Ec__AnonStorey550 _003CSendStatusTracking_003Ec__AnonStorey;
+		Protocol.Force(new Action((object)_003CSendStatusTracking_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 	}
 
 	public void trackEvent(string name, string category)

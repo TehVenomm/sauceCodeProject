@@ -5,16 +5,16 @@ using UnityEngine;
 [AddComponentMenu("NGUI/UI/NGUI Texture")]
 public class UITexture : UIBasicSprite
 {
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Rect mRect = new Rect(0f, 0f, 1f, 1f);
 
 	[HideInInspector]
 	[SerializeField]
 	private Texture mTexture;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Material mMat;
 
 	[HideInInspector]
@@ -25,8 +25,8 @@ public class UITexture : UIBasicSprite
 	[SerializeField]
 	private Vector4 mBorder = Vector4.get_zero();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool mFixedAspect;
 
 	[NonSerialized]

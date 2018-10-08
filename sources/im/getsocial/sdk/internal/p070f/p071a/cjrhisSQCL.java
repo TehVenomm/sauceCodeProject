@@ -253,8 +253,8 @@ public class cjrhisSQCL extends jjbQypPegg implements upgqDBbsrL {
 
         /* renamed from: a */
         protected final /* synthetic */ Object mo4499a(zoToeBNOjF zotoebnojf, XdbacJlTDQ xdbacJlTDQ) {
-            Object obj = null;
             KkSvQPDhNi kkSvQPDhNi = null;
+            Object obj = null;
             while (true) {
                 im.getsocial.p018b.p021c.p022a.upgqDBbsrL c = zotoebnojf.mo4326c();
                 if (c.f1055b != (byte) 0) {
@@ -321,8 +321,8 @@ public class cjrhisSQCL extends jjbQypPegg implements upgqDBbsrL {
 
         /* renamed from: a */
         protected final /* synthetic */ Object mo4499a(zoToeBNOjF zotoebnojf, XdbacJlTDQ xdbacJlTDQ) {
-            Object obj = null;
             KkSvQPDhNi kkSvQPDhNi = null;
+            Object obj = null;
             while (true) {
                 im.getsocial.p018b.p021c.p022a.upgqDBbsrL c = zotoebnojf.mo4326c();
                 if (c.f1055b != (byte) 0) {
@@ -385,8 +385,8 @@ public class cjrhisSQCL extends jjbQypPegg implements upgqDBbsrL {
 
         /* renamed from: a */
         protected final /* synthetic */ Object mo4499a(zoToeBNOjF zotoebnojf, XdbacJlTDQ xdbacJlTDQ) {
-            Object obj = null;
             KkSvQPDhNi kkSvQPDhNi = null;
+            Object obj = null;
             while (true) {
                 im.getsocial.p018b.p021c.p022a.upgqDBbsrL c = zotoebnojf.mo4326c();
                 if (c.f1055b != (byte) 0) {
@@ -659,8 +659,8 @@ public class cjrhisSQCL extends jjbQypPegg implements upgqDBbsrL {
 
         /* renamed from: a */
         protected final /* synthetic */ Object mo4499a(zoToeBNOjF zotoebnojf, XdbacJlTDQ xdbacJlTDQ) {
-            Object obj = null;
             KkSvQPDhNi kkSvQPDhNi = null;
+            Object obj = null;
             while (true) {
                 im.getsocial.p018b.p021c.p022a.upgqDBbsrL c = zotoebnojf.mo4326c();
                 if (c.f1055b != (byte) 0) {
@@ -801,8 +801,8 @@ public class cjrhisSQCL extends jjbQypPegg implements upgqDBbsrL {
 
         /* renamed from: a */
         protected final /* synthetic */ Object mo4499a(zoToeBNOjF zotoebnojf, XdbacJlTDQ xdbacJlTDQ) {
-            Object obj = null;
             KkSvQPDhNi kkSvQPDhNi = null;
+            Object obj = null;
             while (true) {
                 im.getsocial.p018b.p021c.p022a.upgqDBbsrL c = zotoebnojf.mo4326c();
                 if (c.f1055b != (byte) 0) {
@@ -1014,8 +1014,8 @@ public class cjrhisSQCL extends jjbQypPegg implements upgqDBbsrL {
 
         /* renamed from: a */
         protected final /* synthetic */ Object mo4499a(zoToeBNOjF zotoebnojf, XdbacJlTDQ xdbacJlTDQ) {
-            Object obj = null;
             KkSvQPDhNi kkSvQPDhNi = null;
+            Object obj = null;
             while (true) {
                 im.getsocial.p018b.p021c.p022a.upgqDBbsrL c = zotoebnojf.mo4326c();
                 if (c.f1055b != (byte) 0) {
@@ -1563,8 +1563,8 @@ public class cjrhisSQCL extends jjbQypPegg implements upgqDBbsrL {
 
         /* renamed from: a */
         protected final /* synthetic */ Object mo4499a(zoToeBNOjF zotoebnojf, XdbacJlTDQ xdbacJlTDQ) {
-            Object obj = null;
             KkSvQPDhNi kkSvQPDhNi = null;
+            Object obj = null;
             while (true) {
                 im.getsocial.p018b.p021c.p022a.upgqDBbsrL c = zotoebnojf.mo4326c();
                 if (c.f1055b != (byte) 0) {
@@ -1637,8 +1637,8 @@ public class cjrhisSQCL extends jjbQypPegg implements upgqDBbsrL {
 
         /* renamed from: a */
         protected final /* synthetic */ Object mo4499a(zoToeBNOjF zotoebnojf, XdbacJlTDQ xdbacJlTDQ) {
-            Object obj = null;
             KkSvQPDhNi kkSvQPDhNi = null;
+            Object obj = null;
             while (true) {
                 im.getsocial.p018b.p021c.p022a.upgqDBbsrL c = zotoebnojf.mo4326c();
                 if (c.f1055b != (byte) 0) {
@@ -2101,8 +2101,8 @@ public class cjrhisSQCL extends jjbQypPegg implements upgqDBbsrL {
 
         /* renamed from: a */
         protected final /* synthetic */ Object mo4499a(zoToeBNOjF zotoebnojf, XdbacJlTDQ xdbacJlTDQ) {
-            Object obj = null;
             KkSvQPDhNi kkSvQPDhNi = null;
+            Object obj = null;
             while (true) {
                 im.getsocial.p018b.p021c.p022a.upgqDBbsrL c = zotoebnojf.mo4326c();
                 if (c.f1055b != (byte) 0) {
@@ -2179,8 +2179,8 @@ public class cjrhisSQCL extends jjbQypPegg implements upgqDBbsrL {
 
         /* renamed from: a */
         protected final /* synthetic */ Object mo4499a(zoToeBNOjF zotoebnojf, XdbacJlTDQ xdbacJlTDQ) {
-            Object obj = null;
             KkSvQPDhNi kkSvQPDhNi = null;
+            Object obj = null;
             while (true) {
                 im.getsocial.p018b.p021c.p022a.upgqDBbsrL c = zotoebnojf.mo4326c();
                 if (c.f1055b != (byte) 0) {
@@ -2317,8 +2317,8 @@ public class cjrhisSQCL extends jjbQypPegg implements upgqDBbsrL {
 
         /* renamed from: a */
         protected final /* synthetic */ Object mo4499a(zoToeBNOjF zotoebnojf, XdbacJlTDQ xdbacJlTDQ) {
-            Object obj = null;
             KkSvQPDhNi kkSvQPDhNi = null;
+            Object obj = null;
             while (true) {
                 im.getsocial.p018b.p021c.p022a.upgqDBbsrL c = zotoebnojf.mo4326c();
                 if (c.f1055b != (byte) 0) {
@@ -2393,8 +2393,8 @@ public class cjrhisSQCL extends jjbQypPegg implements upgqDBbsrL {
 
         /* renamed from: a */
         protected final /* synthetic */ Object mo4499a(zoToeBNOjF zotoebnojf, XdbacJlTDQ xdbacJlTDQ) {
-            Object obj = null;
             KkSvQPDhNi kkSvQPDhNi = null;
+            Object obj = null;
             while (true) {
                 im.getsocial.p018b.p021c.p022a.upgqDBbsrL c = zotoebnojf.mo4326c();
                 if (c.f1055b != (byte) 0) {

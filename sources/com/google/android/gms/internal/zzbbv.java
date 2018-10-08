@@ -1,12 +1,10 @@
 package com.google.android.gms.internal;
 
-import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Drawable.Callback;
 import android.graphics.drawable.Drawable.ConstantState;
-import android.os.SystemClock;
 
 public final class zzbbv extends Drawable implements Callback {
     private int mFrom;
@@ -61,56 +59,106 @@ public final class zzbbv extends Drawable implements Callback {
         return this.zzfsc;
     }
 
-    public final void draw(Canvas canvas) {
-        int i = 1;
-        switch (this.zzfrs) {
-            case 1:
-                this.zzdqy = SystemClock.uptimeMillis();
-                this.zzfrs = 2;
-                i = 0;
-                break;
-            case 2:
-                if (this.zzdqy >= 0) {
-                    float uptimeMillis = ((float) (SystemClock.uptimeMillis() - this.zzdqy)) / ((float) this.zzfrv);
-                    if (uptimeMillis < 1.0f) {
-                        i = 0;
-                    }
-                    if (i != 0) {
-                        this.zzfrs = 0;
-                    }
-                    this.zzfrw = (int) ((Math.min(uptimeMillis, 1.0f) * ((float) this.zzfrt)) + 0.0f);
-                    break;
-                }
-                break;
-        }
-        int i2 = this.zzfrw;
-        boolean z = this.zzfrn;
-        Drawable drawable = this.zzfrz;
-        Drawable drawable2 = this.zzfsa;
-        if (i != 0) {
-            if (!z || i2 == 0) {
-                drawable.draw(canvas);
-            }
-            if (i2 == this.zzfru) {
-                drawable2.setAlpha(this.zzfru);
-                drawable2.draw(canvas);
-                return;
-            }
-            return;
-        }
-        if (z) {
-            drawable.setAlpha(this.zzfru - i2);
-        }
-        drawable.draw(canvas);
-        if (z) {
-            drawable.setAlpha(this.zzfru);
-        }
-        if (i2 > 0) {
-            drawable2.setAlpha(i2);
-            drawable2.draw(canvas);
-            drawable2.setAlpha(this.zzfru);
-        }
-        invalidateSelf();
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public final void draw(android.graphics.Canvas r8) {
+        /*
+        r7 = this;
+        r1 = 1;
+        r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
+        r0 = 0;
+        r2 = r7.zzfrs;
+        switch(r2) {
+            case 1: goto L_0x0028;
+            case 2: goto L_0x0032;
+            default: goto L_0x0009;
+        };
+    L_0x0009:
+        r0 = r1;
+    L_0x000a:
+        r1 = r7.zzfrw;
+        r2 = r7.zzfrn;
+        r3 = r7.zzfrz;
+        r4 = r7.zzfsa;
+        if (r0 == 0) goto L_0x005f;
+    L_0x0014:
+        if (r2 == 0) goto L_0x0018;
+    L_0x0016:
+        if (r1 != 0) goto L_0x001b;
+    L_0x0018:
+        r3.draw(r8);
+    L_0x001b:
+        r0 = r7.zzfru;
+        if (r1 != r0) goto L_0x0027;
+    L_0x001f:
+        r0 = r7.zzfru;
+        r4.setAlpha(r0);
+        r4.draw(r8);
+    L_0x0027:
+        return;
+    L_0x0028:
+        r2 = android.os.SystemClock.uptimeMillis();
+        r7.zzdqy = r2;
+        r1 = 2;
+        r7.zzfrs = r1;
+        goto L_0x000a;
+    L_0x0032:
+        r2 = r7.zzdqy;
+        r4 = 0;
+        r2 = (r2 > r4 ? 1 : (r2 == r4 ? 0 : -1));
+        if (r2 < 0) goto L_0x0009;
+    L_0x003a:
+        r2 = android.os.SystemClock.uptimeMillis();
+        r4 = r7.zzdqy;
+        r2 = r2 - r4;
+        r2 = (float) r2;
+        r3 = r7.zzfrv;
+        r3 = (float) r3;
+        r2 = r2 / r3;
+        r3 = (r2 > r6 ? 1 : (r2 == r6 ? 0 : -1));
+        if (r3 < 0) goto L_0x005d;
+    L_0x004a:
+        if (r1 == 0) goto L_0x004e;
+    L_0x004c:
+        r7.zzfrs = r0;
+    L_0x004e:
+        r0 = java.lang.Math.min(r2, r6);
+        r2 = r7.zzfrt;
+        r2 = (float) r2;
+        r0 = r0 * r2;
+        r2 = 0;
+        r0 = r0 + r2;
+        r0 = (int) r0;
+        r7.zzfrw = r0;
+        r0 = r1;
+        goto L_0x000a;
+    L_0x005d:
+        r1 = r0;
+        goto L_0x004a;
+    L_0x005f:
+        if (r2 == 0) goto L_0x0067;
+    L_0x0061:
+        r0 = r7.zzfru;
+        r0 = r0 - r1;
+        r3.setAlpha(r0);
+    L_0x0067:
+        r3.draw(r8);
+        if (r2 == 0) goto L_0x0071;
+    L_0x006c:
+        r0 = r7.zzfru;
+        r3.setAlpha(r0);
+    L_0x0071:
+        if (r1 <= 0) goto L_0x007e;
+    L_0x0073:
+        r4.setAlpha(r1);
+        r4.draw(r8);
+        r0 = r7.zzfru;
+        r4.setAlpha(r0);
+    L_0x007e:
+        r7.invalidateSelf();
+        goto L_0x0027;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.internal.zzbbv.draw(android.graphics.Canvas):void");
     }
 
     public final int getChangingConfigurations() {

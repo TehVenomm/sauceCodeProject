@@ -33,28 +33,28 @@ public class UIAtlas
 		TexCoords
 	}
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Material material;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private List<UISpriteData> mSprites = new List<UISpriteData>();
 
 	[HideInInspector]
 	[SerializeField]
 	private float mPixelSize = 1f;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private UIAtlas mReplacement;
 
 	[HideInInspector]
 	[SerializeField]
 	private Coordinates mCoordinates;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private List<Sprite> sprites = new List<Sprite>();
 
 	private int mPMA = -1;

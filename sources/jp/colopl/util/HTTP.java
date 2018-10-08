@@ -56,10 +56,10 @@ public class HTTP {
     }
 
     public static String get(String str, List<String> list) {
-        String convertToString;
         URLConnection uRLConnection;
         String str2;
         try {
+            String convertToString;
             URLConnection openConnection = new URL(str).openConnection();
             try {
                 openConnection.setRequestProperty("User-Agent", getUserAgent());

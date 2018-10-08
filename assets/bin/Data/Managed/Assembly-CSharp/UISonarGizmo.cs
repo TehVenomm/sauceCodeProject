@@ -11,12 +11,12 @@ public class UISonarGizmo : UIStatusGizmoBase
 	[SerializeField]
 	protected Vector3 offset;
 
-	[SerializeField]
 	[Tooltip("スクリ\u30fcン横オフセット")]
+	[SerializeField]
 	protected float screenSideOffset = 22f;
 
-	[SerializeField]
 	[Tooltip("スクリ\u30fcン下オフセット")]
+	[SerializeField]
 	protected float screenBottomOffset = 112f;
 
 	private FieldSonarObject _sonar;

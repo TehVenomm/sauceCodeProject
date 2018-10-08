@@ -639,7 +639,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 					if (fieldPortal == null || fieldPortal.point < portalPoint)
 					{
 						SetExplorePortalPoint(portalId, point);
-						_003CUpdatePortalPointForExplore_003Ec__AnonStorey694 _003CUpdatePortalPointForExplore_003Ec__AnonStorey;
+						_003CUpdatePortalPointForExplore_003Ec__AnonStorey695 _003CUpdatePortalPointForExplore_003Ec__AnonStorey;
 						MonoBehaviourSingleton<FieldManager>.I.SendFieldQuestOpenPortal(portalId, new Action<bool, Error>((object)_003CUpdatePortalPointForExplore_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
 					}
 					else
@@ -1677,7 +1677,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		{
 			excludeLocationType = EVENT_DISPLAY_LOCATION_TYPE.FIELD;
 		}
-		_003CGetValidBingoDataListInSection_003Ec__AnonStorey6A2 _003CGetValidBingoDataListInSection_003Ec__AnonStorey6A;
+		_003CGetValidBingoDataListInSection_003Ec__AnonStorey6A3 _003CGetValidBingoDataListInSection_003Ec__AnonStorey6A;
 		return bingoEventList.Where(new Func<Network.EventData, bool>((object)_003CGetValidBingoDataListInSection_003Ec__AnonStorey6A, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)).ToList();
 	}
 

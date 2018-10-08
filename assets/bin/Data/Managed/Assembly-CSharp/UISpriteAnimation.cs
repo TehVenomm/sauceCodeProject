@@ -14,8 +14,8 @@ public class UISpriteAnimation
 	[SerializeField]
 	protected string mPrefix = string.Empty;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected bool mLoop = true;
 
 	[HideInInspector]

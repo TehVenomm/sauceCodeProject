@@ -845,11 +845,11 @@ class PersistentHitStore implements HitStore {
     }
 
     CustomVariableBuffer getVisitorVarBuffer(SQLiteDatabase sQLiteDatabase) {
+        Cursor query;
         SQLiteException e;
         Throwable th;
         Cursor cursor = null;
         CustomVariableBuffer customVariableBuffer = new CustomVariableBuffer();
-        Cursor query;
         try {
             SQLiteDatabase sQLiteDatabase2 = sQLiteDatabase;
             query = sQLiteDatabase2.query("custom_var_cache", null, "cv_scope= ?", new String[]{Integer.toString(1)}, null, null, null);
@@ -903,10 +903,10 @@ class PersistentHitStore implements HitStore {
     }
 
     public void loadExistingSession(SQLiteDatabase sQLiteDatabase) {
-        Cursor query;
         SQLiteException sQLiteException;
         Cursor cursor;
         Throwable th;
+        Cursor query;
         try {
             query = sQLiteDatabase.query(SettingsJsonConstants.SESSION_KEY, null, null, null, null, null, null);
             try {
@@ -979,11 +979,11 @@ class PersistentHitStore implements HitStore {
     }
 
     public Event[] peekEvents(int i, SQLiteDatabase sQLiteDatabase, int i2) {
+        Cursor query;
         SQLiteException e;
         Cursor cursor;
         Throwable th;
         List arrayList = new ArrayList();
-        Cursor query;
         try {
             query = sQLiteDatabase.query("events", null, null, null, null, null, EVENT_ID, Integer.toString(i));
             while (query.moveToNext()) {
@@ -1052,11 +1052,11 @@ class PersistentHitStore implements HitStore {
     }
 
     public Hit[] peekHits(int i) {
+        Cursor query;
         SQLiteException e;
         Throwable th;
         Cursor cursor = null;
         List arrayList = new ArrayList();
-        Cursor query;
         try {
             query = this.databaseHelper.getReadableDatabase().query("hits", null, null, null, null, null, HIT_ID, Integer.toString(i));
             while (query.moveToNext()) {

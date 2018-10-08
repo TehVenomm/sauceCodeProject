@@ -956,6 +956,7 @@ final class zzcaq extends zzcdm {
 
     @WorkerThread
     public final zzcfn zzaj(String str, String str2) {
+        Cursor query;
         Object e;
         Cursor cursor;
         Throwable th;
@@ -963,7 +964,6 @@ final class zzcaq extends zzcdm {
         zzbp.zzgf(str2);
         zzug();
         zzwh();
-        Cursor query;
         try {
             query = getWritableDatabase().query("user_attributes", new String[]{"set_timestamp", Param.VALUE, Param.ORIGIN}, "app_id=? and name=?", new String[]{str, str2}, null, null, null);
             try {
@@ -1191,7 +1191,6 @@ final class zzcaq extends zzcdm {
     }
 
     final Map<Integer, List<zzcft>> zzan(String str, String str2) {
-        Cursor query;
         Object e;
         Throwable th;
         Cursor cursor = null;
@@ -1200,6 +1199,7 @@ final class zzcaq extends zzcdm {
         zzbp.zzgf(str);
         zzbp.zzgf(str2);
         Map<Integer, List<zzcft>> arrayMap = new ArrayMap();
+        Cursor query;
         try {
             query = getWritableDatabase().query("property_filters", new String[]{"audience_id", ShareConstants.WEB_DIALOG_PARAM_DATA}, "app_id=? AND property_name=?", new String[]{str, str2}, null, null, null);
             if (query.moveToFirst()) {
@@ -1318,11 +1318,11 @@ final class zzcaq extends zzcdm {
 
     @WorkerThread
     public final String zzaxh() {
+        Cursor rawQuery;
         String string;
         Object e;
         Throwable th;
         Cursor cursor = null;
-        Cursor rawQuery;
         try {
             rawQuery = getWritableDatabase().rawQuery("select app_id from queue order by has_realtime desc, rowid asc limit 1;", null);
             try {
@@ -1522,11 +1522,8 @@ final class zzcaq extends zzcdm {
                         String string4 = query.getString(5);
                         long j = query.getLong(6);
                         zzcbc zzcbc = (zzcbc) zzaug().zzb(query.getBlob(7), zzcbc.CREATOR);
-                        long j2 = query.getLong(8);
-                        zzcbc zzcbc2 = (zzcbc) zzaug().zzb(query.getBlob(9), zzcbc.CREATOR);
-                        long j3 = query.getLong(10);
                         List<zzcan> list = arrayList;
-                        list.add(new zzcan(string, string2, new zzcfl(string3, j3, zza, string2), j2, z, string4, zzcbc, j, zzcbc2, query.getLong(11), (zzcbc) zzaug().zzb(query.getBlob(12), zzcbc.CREATOR)));
+                        list.add(new zzcan(string, string2, new zzcfl(string3, query.getLong(10), zza, string2), query.getLong(8), z, string4, zzcbc, j, (zzcbc) zzaug().zzb(query.getBlob(9), zzcbc.CREATOR), query.getLong(11), (zzcbc) zzaug().zzb(query.getBlob(12), zzcbc.CREATOR)));
                     } while (query.moveToNext());
                     if (query != null) {
                         query.close();
@@ -1935,13 +1932,13 @@ final class zzcaq extends zzcdm {
 
     @WorkerThread
     public final byte[] zziy(String str) {
+        Cursor query;
         Object e;
         Throwable th;
         Cursor cursor = null;
         zzbp.zzgf(str);
         zzug();
         zzwh();
-        Cursor query;
         try {
             query = getWritableDatabase().query("apps", new String[]{"remote_config"}, "app_id=?", new String[]{str}, null, null, null);
             try {
@@ -2065,6 +2062,7 @@ final class zzcaq extends zzcdm {
 
     @WorkerThread
     public final List<Pair<zzcgc, Long>> zzl(String str, int i, int i2) {
+        Cursor query;
         List<Pair<zzcgc, Long>> arrayList;
         Object e;
         Cursor cursor;
@@ -2078,7 +2076,6 @@ final class zzcaq extends zzcdm {
         }
         zzbp.zzbh(z);
         zzbp.zzgf(str);
-        Cursor query;
         try {
             query = getWritableDatabase().query("queue", new String[]{"rowid", ShareConstants.WEB_DIALOG_PARAM_DATA}, "app_id=?", new String[]{str}, null, null, "rowid", String.valueOf(i));
             try {

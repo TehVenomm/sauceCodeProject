@@ -37,10 +37,10 @@ class CheckForUpdatesRequest extends AbstractSpiCall {
     }
 
     public CheckForUpdatesResponse invoke(String str, String str2, BuildProperties buildProperties) {
-        HttpRequest applyHeadersTo;
         Throwable e;
         Throwable th;
         CheckForUpdatesResponse checkForUpdatesResponse = null;
+        HttpRequest applyHeadersTo;
         try {
             Map queryParamsFor = getQueryParamsFor(buildProperties);
             try {
