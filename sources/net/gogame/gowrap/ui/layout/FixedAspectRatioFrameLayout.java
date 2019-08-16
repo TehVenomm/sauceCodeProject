@@ -5,7 +5,7 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.View.MeasureSpec;
 import android.widget.FrameLayout;
-import net.gogame.gowrap.p019ui.common.C1680R;
+import net.gogame.gowrap.p019ui.common.C1685R;
 
 /* renamed from: net.gogame.gowrap.ui.layout.FixedAspectRatioFrameLayout */
 public class FixedAspectRatioFrameLayout extends FrameLayout {
@@ -28,10 +28,10 @@ public class FixedAspectRatioFrameLayout extends FrameLayout {
     }
 
     private void init(Context context, AttributeSet attributeSet) {
-        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, C1680R.styleable.FixedAspectRatioFrameLayout);
-        this.mAspectRatioWidth = obtainStyledAttributes.getInt(C1680R.styleable.FixedAspectRatioFrameLayout_aspectRatioWidth, 4);
-        this.mAspectRatioHeight = obtainStyledAttributes.getInt(C1680R.styleable.FixedAspectRatioFrameLayout_aspectRatioHeight, 3);
-        this.maxHeight = obtainStyledAttributes.getDimension(C1680R.styleable.FixedAspectRatioFrameLayout_maxHeight, Float.MAX_VALUE);
+        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, C1685R.styleable.FixedAspectRatioFrameLayout);
+        this.mAspectRatioWidth = obtainStyledAttributes.getInt(C1685R.styleable.FixedAspectRatioFrameLayout_aspectRatioWidth, 4);
+        this.mAspectRatioHeight = obtainStyledAttributes.getInt(C1685R.styleable.FixedAspectRatioFrameLayout_aspectRatioHeight, 3);
+        this.maxHeight = obtainStyledAttributes.getDimension(C1685R.styleable.FixedAspectRatioFrameLayout_maxHeight, Float.MAX_VALUE);
         obtainStyledAttributes.recycle();
     }
 

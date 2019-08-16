@@ -19,37 +19,37 @@ import org.jetbrains.annotations.NotNull;
 public final class C1415m {
 
     /* renamed from: a */
-    public static final String[] f1172a = {"ui/ic_tick.png", "ui/ic_arrow_dwn.png", "ui/ic_arrow_dwn_grey.png", "ui/separator.png", "ui/ic_close.png", "ui/ic_qest_white.png", "ui/gopay_logo.png"};
+    public static final String[] f1166a = {"ui/ic_tick.png", "ui/ic_arrow_dwn.png", "ui/ic_arrow_dwn_grey.png", "ui/separator.png", "ui/ic_close.png", "ui/ic_qest_white.png", "ui/gopay_logo.png"};
     /* access modifiers changed from: private */
 
     /* renamed from: b */
-    public static String f1173b;
+    public static String f1167b;
 
     /* renamed from: c */
-    private static final int f1174c;
+    private static final int f1168c;
 
     /* renamed from: d */
-    private static final int f1175d;
+    private static final int f1169d;
     /* access modifiers changed from: private */
 
     /* renamed from: e */
-    public static ArrayList f1176e = new ArrayList();
+    public static ArrayList f1170e = new ArrayList();
     /* access modifiers changed from: private */
 
     /* renamed from: f */
-    public static final LruCache f1177f = new C1649n(f1175d);
+    public static final LruCache f1171f = new C1649n(f1169d);
 
     /* renamed from: g */
-    private static int f1178g = 0;
+    private static int f1172g = 0;
     /* access modifiers changed from: private */
 
     /* renamed from: h */
-    public static int f1179h = 0;
+    public static int f1173h = 0;
 
     static {
         int maxMemory = (int) (Runtime.getRuntime().maxMemory() / PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID);
-        f1174c = maxMemory;
-        f1175d = maxMemory / 8;
+        f1168c = maxMemory;
+        f1169d = maxMemory / 8;
     }
 
     /* renamed from: a */
@@ -57,9 +57,9 @@ public final class C1415m {
         Bitmap bitmap = null;
         if (str3 != null && str3.length() != 0) {
             String str4 = str2 + str3;
-            bitmap = (Bitmap) f1177f.get(str4);
+            bitmap = (Bitmap) f1171f.get(str4);
             if (bitmap == null) {
-                f1176e.add(new C1651p(str4, str, str3, qVar).execute(new Void[0]));
+                f1170e.add(new C1651p(str4, str, str3, qVar).execute(new Void[0]));
             } else if (qVar != null) {
                 qVar.mo22645a(bitmap);
             }
@@ -71,7 +71,7 @@ public final class C1415m {
 
     /* renamed from: a */
     public static void m920a(String str) {
-        f1173b = str;
+        f1167b = str;
     }
 
     /* renamed from: a */
@@ -85,16 +85,16 @@ public final class C1415m {
             rVar.mo22684a();
             return;
         }
-        Iterator it = f1176e.iterator();
+        Iterator it = f1170e.iterator();
         while (it.hasNext()) {
             AsyncTask asyncTask = (AsyncTask) it.next();
             if (asyncTask.getStatus() != Status.FINISHED) {
                 asyncTask.cancel(true);
             }
         }
-        f1176e.clear();
-        f1178g = 0;
-        f1179h = 0;
+        f1170e.clear();
+        f1172g = 0;
+        f1173h = 0;
         C1650o oVar = new C1650o(r2, rVar);
         for (String split : strArr) {
             String[] split2 = split.split(Constants.URL_PATH_DELIMITER);
@@ -104,12 +104,12 @@ public final class C1415m {
 
     /* renamed from: a */
     public static boolean m923a() {
-        return new File(f1173b + "/assets").exists();
+        return new File(f1167b + "/assets").exists();
     }
 
     /* renamed from: b */
     private static Bitmap m924b(String str) {
-        return (Bitmap) f1177f.get(str);
+        return (Bitmap) f1171f.get(str);
     }
 
     /* access modifiers changed from: private */
@@ -125,7 +125,7 @@ public final class C1415m {
 
     /* renamed from: b */
     public static void m926b() {
-        f1177f.evictAll();
+        f1171f.evictAll();
     }
 
     /* renamed from: b */
@@ -135,7 +135,7 @@ public final class C1415m {
 
     /* renamed from: c */
     public static Bitmap m928c() {
-        return m924b(f1172a[0]);
+        return m924b(f1166a[0]);
     }
 
     /* renamed from: c */
@@ -145,38 +145,38 @@ public final class C1415m {
 
     /* renamed from: d */
     public static Bitmap m930d() {
-        return m924b(f1172a[1]);
+        return m924b(f1166a[1]);
     }
 
     /* renamed from: e */
     public static Bitmap m931e() {
-        return m924b(f1172a[2]);
+        return m924b(f1166a[2]);
     }
 
     /* renamed from: f */
     public static Bitmap m932f() {
-        return m924b(f1172a[3]);
+        return m924b(f1166a[3]);
     }
 
     /* renamed from: g */
     public static Bitmap m933g() {
-        return m924b(f1172a[4]);
+        return m924b(f1166a[4]);
     }
 
     /* renamed from: h */
     public static Bitmap m934h() {
-        return m924b(f1172a[5]);
+        return m924b(f1166a[5]);
     }
 
     /* renamed from: i */
     public static Bitmap m935i() {
-        return m924b(f1172a[6]);
+        return m924b(f1166a[6]);
     }
 
     /* renamed from: j */
     public static String m936j() {
         try {
-            File file = new File(f1173b + "/assets/error.html");
+            File file = new File(f1167b + "/assets/error.html");
             if (file.exists()) {
                 return IOUtils.readString(new FileInputStream(file), "UTF-8");
             }
@@ -187,15 +187,15 @@ public final class C1415m {
 
     /* renamed from: k */
     static /* synthetic */ int m937k() {
-        int i = f1179h;
-        f1179h = i + 1;
+        int i = f1173h;
+        f1173h = i + 1;
         return i;
     }
 
     /* renamed from: l */
     static /* synthetic */ int m938l() {
-        int i = f1178g + 1;
-        f1178g = i;
+        int i = f1172g + 1;
+        f1172g = i;
         return i;
     }
 }

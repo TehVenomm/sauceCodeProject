@@ -93,7 +93,7 @@ public class CustomTabsClient {
     }
 
     public CustomTabsSession newSession(final CustomTabsCallback customTabsCallback) {
-        C16882 r1 = new Stub() {
+        C16932 r1 = new Stub() {
             private Handler mHandler = new Handler(Looper.getMainLooper());
 
             public void onNavigationEvent(final int i, final Bundle bundle) {

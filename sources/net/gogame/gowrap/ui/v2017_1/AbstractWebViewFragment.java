@@ -70,15 +70,15 @@ public abstract class AbstractWebViewFragment extends Fragment implements BackPr
     static /* synthetic */ class C14634 {
 
         /* renamed from: $SwitchMap$net$gogame$gowrap$ui$v2017_1$AbstractWebViewFragment$BackgroundMode */
-        static final /* synthetic */ int[] f1197x21f53947 = new int[BackgroundMode.values().length];
+        static final /* synthetic */ int[] f1187x21f53947 = new int[BackgroundMode.values().length];
 
         static {
             try {
-                f1197x21f53947[BackgroundMode.TRANSPARENT.ordinal()] = 1;
+                f1187x21f53947[BackgroundMode.TRANSPARENT.ordinal()] = 1;
             } catch (NoSuchFieldError e) {
             }
             try {
-                f1197x21f53947[BackgroundMode.DEFAULT.ordinal()] = 2;
+                f1187x21f53947[BackgroundMode.DEFAULT.ordinal()] = 2;
             } catch (NoSuchFieldError e2) {
             }
         }
@@ -293,7 +293,7 @@ public abstract class AbstractWebViewFragment extends Fragment implements BackPr
                 if (!(!StringUtils.isEquals(parse.getScheme(), ShareConstants.WEB_DIALOG_PARAM_DATA)) || NetworkUtils.isNetworkAvailable(webView.getContext())) {
                     BackgroundMode backgroundMode = AbstractWebViewFragment.this.getBackgroundMode(parse);
                     if (AbstractWebViewFragment.this.backgroundMode != backgroundMode) {
-                        switch (C14634.f1197x21f53947[backgroundMode.ordinal()]) {
+                        switch (C14634.f1187x21f53947[backgroundMode.ordinal()]) {
                             case 1:
                                 webView.setBackgroundColor(0);
                                 break;

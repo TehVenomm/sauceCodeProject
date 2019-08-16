@@ -10,12 +10,12 @@ public class MailTo {
     private static final String BODY = "body";
 
     /* renamed from: CC */
-    private static final String f1203CC = "cc";
+    private static final String f1193CC = "cc";
     public static final String MAILTO_SCHEME = "mailto:";
     private static final String SUBJECT = "subject";
 
     /* renamed from: TO */
-    private static final String f1204TO = "to";
+    private static final String f1194TO = "to";
     private HashMap<String, String> mHeaders = new HashMap<>();
 
     private MailTo() {
@@ -59,7 +59,7 @@ public class MailTo {
     }
 
     public String getCc() {
-        return (String) this.mHeaders.get(f1203CC);
+        return (String) this.mHeaders.get(f1193CC);
     }
 
     public Map<String, String> getHeaders() {

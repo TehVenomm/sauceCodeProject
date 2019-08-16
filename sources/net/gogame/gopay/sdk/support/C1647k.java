@@ -4,14 +4,14 @@ package net.gogame.gopay.sdk.support;
 public final class C1647k {
 
     /* renamed from: a */
-    public static final int f1309a = 1;
+    public static final int f1297a = 1;
 
     /* renamed from: b */
-    public static final int f1310b = 2;
+    public static final int f1298b = 2;
 
     /* renamed from: c */
-    public static final int f1311c = 3;
+    public static final int f1299c = 3;
 
     /* renamed from: d */
-    private static final /* synthetic */ int[] f1312d = {f1309a, f1310b, f1311c};
+    private static final /* synthetic */ int[] f1300d = {f1297a, f1298b, f1299c};
 }

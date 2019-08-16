@@ -4,13 +4,13 @@ package net.gogame.gopay.sdk.iab;
 public final class C1395f extends C1365a {
 
     /* renamed from: a */
-    final String f1104a;
+    final String f1098a;
 
     /* renamed from: b */
-    final boolean f1105b = true;
+    final boolean f1099b = true;
 
     public C1395f(String str, String str2) {
         super(null, str, null);
-        this.f1104a = str2;
+        this.f1098a = str2;
     }
 }

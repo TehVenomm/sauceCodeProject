@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace UnityStandardAssets.ImageEffects
 {
-	[ExecuteInEditMode]
-	[RequireComponent(typeof(Camera))]
 	[AddComponentMenu("Image Effects/Camera/Camera Motion Blur")]
+	[RequireComponent(typeof(Camera))]
+	[ExecuteInEditMode]
 	public class CameraMotionBlur : PostEffectsBase
 	{
 		public enum MotionBlurFilter

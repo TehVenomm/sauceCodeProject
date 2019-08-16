@@ -8,37 +8,37 @@ import net.gogame.gopay.sdk.support.C1652q;
 final class C1627j implements C1652q {
 
     /* renamed from: a */
-    C1623bv f1283a = this.f1284b;
+    C1623bv f1271a = this.f1272b;
 
     /* renamed from: b */
-    final /* synthetic */ C1623bv f1284b;
+    final /* synthetic */ C1623bv f1272b;
 
     /* renamed from: c */
-    final /* synthetic */ int f1285c;
+    final /* synthetic */ int f1273c;
 
     /* renamed from: d */
-    final /* synthetic */ C1398i f1286d;
+    final /* synthetic */ C1398i f1274d;
 
     C1627j(C1398i iVar, C1623bv bvVar, int i) {
-        this.f1286d = iVar;
-        this.f1284b = bvVar;
-        this.f1285c = i;
+        this.f1274d = iVar;
+        this.f1272b = bvVar;
+        this.f1273c = i;
     }
 
     /* renamed from: a */
     public final void mo22645a(Bitmap bitmap) {
-        if (this.f1283a.f1274c != this.f1285c) {
+        if (this.f1271a.f1262c != this.f1273c) {
             return;
         }
         if (bitmap != null) {
             int width = bitmap.getWidth();
             int height = bitmap.getHeight();
-            BitmapDrawable bitmapDrawable = new BitmapDrawable(this.f1286d.f993a.getResources(), bitmap);
+            BitmapDrawable bitmapDrawable = new BitmapDrawable(this.f1274d.f987a.getResources(), bitmap);
             bitmapDrawable.setBounds(0, 0, width, height);
-            this.f1283a.f1272a.setImageDrawable(bitmapDrawable);
-            this.f1283a.f1272a.setVisibility(0);
+            this.f1271a.f1260a.setImageDrawable(bitmapDrawable);
+            this.f1271a.f1260a.setVisibility(0);
             return;
         }
-        this.f1283a.f1272a.setVisibility(4);
+        this.f1271a.f1260a.setVisibility(4);
     }
 }

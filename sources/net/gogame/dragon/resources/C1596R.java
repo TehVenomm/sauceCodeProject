@@ -93,7 +93,7 @@ public final class C1596R {
         public static final int notification_title = 2131034226;
 
         /* renamed from: ok */
-        public static final int f1212ok = 2131034227;
+        public static final int f1200ok = 2131034227;
         public static final int payment_cancel_message = 2131034228;
         public static final int payment_cancel_title = 2131034229;
         public static final int payment_check_inventory_error_message = 2131034230;

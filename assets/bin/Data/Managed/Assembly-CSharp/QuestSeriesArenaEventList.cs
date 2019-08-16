@@ -120,7 +120,7 @@ public class QuestSeriesArenaEventList : QuestEventSelectList
 		if (MonoBehaviourSingleton<ResourceManager>.I.manifest == null || hash.get_isValid())
 		{
 			LoadingQueue load_queue = new LoadingQueue(this);
-			LoadObject lo_bg = load_queue.Load(RESOURCE_CATEGORY.EVENT_BG, resourceName);
+			LoadObject lo_bg = load_queue.Load(isEventAsset: true, RESOURCE_CATEGORY.EVENT_BG, resourceName);
 			if (load_queue.IsLoading())
 			{
 				yield return load_queue.Wait();

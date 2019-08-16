@@ -23,37 +23,37 @@ public class VipClient implements IVipClient {
     public static final VipClient INSTANCE = new VipClient();
 
     /* renamed from: a */
-    private String f1355a = null;
+    private String f1341a = null;
 
     /* renamed from: b */
-    private String f1356b = null;
+    private String f1342b = null;
 
     /* renamed from: c */
-    private String f1357c = null;
+    private String f1343c = null;
 
     /* renamed from: d */
-    private String f1358d = null;
+    private String f1344d = null;
 
     /* renamed from: e */
-    private String f1359e = null;
+    private String f1345e = null;
 
     /* renamed from: f */
-    private VipStatus f1360f = null;
+    private VipStatus f1346f = null;
 
     /* renamed from: g */
-    private final Set<Listener> f1361g = new HashSet();
+    private final Set<Listener> f1347g = new HashSet();
 
     /* renamed from: h */
-    private final Map<String, String> f1362h = new HashMap();
+    private final Map<String, String> f1348h = new HashMap();
 
     /* renamed from: i */
-    private final Map<String, String> f1363i = new HashMap();
+    private final Map<String, String> f1349i = new HashMap();
 
     /* renamed from: j */
-    private TaskQueue<BaseEvent> f1364j = null;
+    private TaskQueue<BaseEvent> f1350j = null;
 
     /* renamed from: k */
-    private final TaskQueue.Listener<BaseEvent> f1365k = new TaskQueue.Listener<BaseEvent>() {
+    private final TaskQueue.Listener<BaseEvent> f1351k = new TaskQueue.Listener<BaseEvent>() {
         /* renamed from: a */
         public boolean onTask(BaseEvent baseEvent) {
             if (!(baseEvent instanceof PurchaseEvent)) {
@@ -77,15 +77,15 @@ public class VipClient implements IVipClient {
     }
 
     public void init(Context context, String str, String str2) {
-        this.f1355a = str;
-        this.f1356b = str2;
-        this.f1357c = context.getApplicationContext().getPackageName();
-        this.f1358d = getAppVersion(context);
-        this.f1359e = Secure.getString(context.getContentResolver(), "android_id");
-        if (this.f1364j == null) {
+        this.f1341a = str;
+        this.f1342b = str2;
+        this.f1343c = context.getApplicationContext().getPackageName();
+        this.f1344d = getAppVersion(context);
+        this.f1345e = Secure.getString(context.getContentResolver(), "android_id");
+        if (this.f1350j == null) {
             try {
-                this.f1364j = new CustomTaskQueue(context, new File(context.getFilesDir(), "gopay-vip-client-queue.dat"), this.f1365k);
-                this.f1364j.start();
+                this.f1350j = new CustomTaskQueue(context, new File(context.getFilesDir(), "gopay-vip-client-queue.dat"), this.f1351k);
+                this.f1350j.start();
             } catch (Exception e) {
                 Log.e("goPay", "Exception", e);
             }
@@ -103,9 +103,9 @@ public class VipClient implements IVipClient {
     public void setExtraData(String str, String str2) {
         if (str != null) {
             if (str2 != null) {
-                this.f1362h.put(str, str2);
+                this.f1348h.put(str, str2);
             } else {
-                this.f1362h.remove(str);
+                this.f1348h.remove(str);
             }
         }
     }
@@ -113,36 +113,36 @@ public class VipClient implements IVipClient {
     public void setExtraHeader(String str, String str2) {
         if (str != null) {
             if (str2 != null) {
-                this.f1363i.put(str, str2);
+                this.f1349i.put(str, str2);
             } else {
-                this.f1363i.remove(str);
+                this.f1349i.remove(str);
             }
         }
     }
 
     public void addListener(Listener listener) {
         if (listener != null) {
-            this.f1361g.add(listener);
+            this.f1347g.add(listener);
         }
     }
 
     public void removeListener(Listener listener) {
         if (listener != null) {
-            this.f1361g.remove(listener);
+            this.f1347g.remove(listener);
         }
     }
 
     public VipStatus getVipStatus() {
-        return this.f1360f;
+        return this.f1346f;
     }
 
     /* access modifiers changed from: private */
     /* renamed from: a */
     public void m975a(VipStatus vipStatus) {
-        this.f1360f = vipStatus;
+        this.f1346f = vipStatus;
         m978b(vipStatus);
-        if (this.f1360f != null) {
-            Log.v("goPay", String.format("VIP status for %s: %s / %s / %s", new Object[]{this.f1360f.getGuid(), Boolean.valueOf(this.f1360f.isVip()), Boolean.valueOf(this.f1360f.isSuspended()), this.f1360f.getSuspensionMessage()}));
+        if (this.f1346f != null) {
+            Log.v("goPay", String.format("VIP status for %s: %s / %s / %s", new Object[]{this.f1346f.getGuid(), Boolean.valueOf(this.f1346f.isVip()), Boolean.valueOf(this.f1346f.isSuspended()), this.f1346f.getSuspensionMessage()}));
             return;
         }
         Log.v("goPay", "VIP status cleared due to error");
@@ -150,7 +150,7 @@ public class VipClient implements IVipClient {
 
     public void checkVipStatus(final String str, boolean z) {
         if (str != null) {
-            if (z || this.f1360f == null || !m976a((Object) this.f1360f.getGuid(), (Object) str)) {
+            if (z || this.f1346f == null || !m976a((Object) this.f1346f.getGuid(), (Object) str)) {
                 new Thread(new Runnable() {
                     public void run() {
                         try {
@@ -177,7 +177,7 @@ public class VipClient implements IVipClient {
 
     public void trackPurchase(PurchaseEvent purchaseEvent) {
         if (purchaseEvent != null) {
-            this.f1364j.add(purchaseEvent);
+            this.f1350j.add(purchaseEvent);
         }
     }
 
@@ -197,7 +197,7 @@ public class VipClient implements IVipClient {
 
     /* renamed from: b */
     private void m978b(VipStatus vipStatus) {
-        for (Listener listener : this.f1361g) {
+        for (Listener listener : this.f1347g) {
             if (listener != null) {
                 try {
                     listener.onVipStatus(vipStatus);
@@ -211,8 +211,8 @@ public class VipClient implements IVipClient {
     /* renamed from: a */
     private Map<String, String> m969a() {
         LinkedHashMap linkedHashMap = new LinkedHashMap();
-        if (this.f1362h != null) {
-            for (Entry entry : this.f1362h.entrySet()) {
+        if (this.f1348h != null) {
+            for (Entry entry : this.f1348h.entrySet()) {
                 String str = (String) entry.getKey();
                 String str2 = (String) entry.getValue();
                 if (!(str == null || str2 == null || linkedHashMap.containsKey(str))) {
@@ -220,21 +220,21 @@ public class VipClient implements IVipClient {
                 }
             }
         }
-        if (this.f1355a != null) {
-            linkedHashMap.put("appId", this.f1355a);
+        if (this.f1341a != null) {
+            linkedHashMap.put("appId", this.f1341a);
         }
-        if (this.f1357c != null) {
-            linkedHashMap.put("bundle_id", this.f1357c);
+        if (this.f1343c != null) {
+            linkedHashMap.put("bundle_id", this.f1343c);
         }
-        if (this.f1358d != null) {
-            linkedHashMap.put("app_version", this.f1358d);
+        if (this.f1344d != null) {
+            linkedHashMap.put("app_version", this.f1344d);
         }
         linkedHashMap.put("platform", "android");
         linkedHashMap.put("os_version", VERSION.RELEASE);
         linkedHashMap.put("sdk", "gopay-vip-sdk-android");
         linkedHashMap.put("sdk_version", BuildConfig.VERSION_NAME);
-        if (this.f1359e != null) {
-            linkedHashMap.put("device_id", this.f1359e);
+        if (this.f1345e != null) {
+            linkedHashMap.put("device_id", this.f1345e);
         }
         return linkedHashMap;
     }
@@ -242,8 +242,8 @@ public class VipClient implements IVipClient {
     /* renamed from: b */
     private Map<String, String> m977b() {
         Map<String, String> a = m969a();
-        if (this.f1355a != null) {
-            a.put("appId", this.f1355a);
+        if (this.f1341a != null) {
+            a.put("appId", this.f1341a);
         }
         return a;
     }
@@ -251,8 +251,8 @@ public class VipClient implements IVipClient {
     /* renamed from: c */
     private Map<String, String> m979c() {
         Map<String, String> a = m969a();
-        if (this.f1355a != null) {
-            a.put("app_id", this.f1355a);
+        if (this.f1341a != null) {
+            a.put("app_id", this.f1341a);
         }
         return a;
     }
@@ -264,7 +264,7 @@ public class VipClient implements IVipClient {
         if (str != null) {
             b.put("guid", str);
         }
-        JSONObject a = C1666a.m987a("https://gp-vip.gogame.net/vip/v1/get_vip_status/", b, this.f1356b, this.f1363i);
+        JSONObject a = C1666a.m987a("https://gp-vip.gogame.net/vip/v1/get_vip_status/", b, this.f1342b, this.f1349i);
         return new VipStatus(str, a.optBoolean("vip_status", false), a.optBoolean("suspended", false), a.optString("suspension_message", null));
     }
 
@@ -298,7 +298,7 @@ public class VipClient implements IVipClient {
             c.put("verified", String.valueOf(VerificationStatus.NOT_VERIFIED.getValue()));
         }
         c.put("sandbox", purchaseEvent.isSandbox() ? AppEventsConstants.EVENT_PARAM_VALUE_YES : AppEventsConstants.EVENT_PARAM_VALUE_NO);
-        JSONObject a = C1666a.m987a("https://gp-vip.gogame.net/billing/v3/log_client_transaction/", c, this.f1356b, this.f1363i);
+        JSONObject a = C1666a.m987a("https://gp-vip.gogame.net/billing/v3/log_client_transaction/", c, this.f1342b, this.f1349i);
         BaseBillingResponse baseBillingResponse = new BaseBillingResponse();
         baseBillingResponse.setStatus(a.optBoolean("status", false));
         baseBillingResponse.setStatusCode(a.optInt("statusCode", 0));

@@ -4,15 +4,15 @@ package net.gogame.gopay.sdk;
 final class C1417t implements Runnable {
 
     /* renamed from: a */
-    final /* synthetic */ StoreActivity f1181a;
+    final /* synthetic */ StoreActivity f1175a;
 
     C1417t(StoreActivity storeActivity) {
-        this.f1181a = storeActivity;
+        this.f1175a = storeActivity;
     }
 
     public final void run() {
-        if (this.f1181a.f989b != null) {
-            this.f1181a.f989b.hide();
+        if (this.f1175a.f983b != null) {
+            this.f1175a.f983b.hide();
         }
     }
 }

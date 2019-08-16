@@ -21,7 +21,7 @@ public class Article extends BaseJsonObject {
     private Long endDateTime;
 
     /* renamed from: id */
-    private long f1408id;
+    private long f1398id;
     private Long startDateTime;
     private String title;
 
@@ -57,7 +57,7 @@ public class Article extends BaseJsonObject {
     /* access modifiers changed from: protected */
     public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, "id")) {
-            this.f1408id = jsonReader.nextLong();
+            this.f1398id = jsonReader.nextLong();
             return true;
         } else if (StringUtils.isEquals(str, KEY_START_DATE_TIME)) {
             this.startDateTime = JSONUtils.optLong(jsonReader);
@@ -88,11 +88,11 @@ public class Article extends BaseJsonObject {
     }
 
     public long getId() {
-        return this.f1408id;
+        return this.f1398id;
     }
 
     public void setId(long j) {
-        this.f1408id = j;
+        this.f1398id = j;
     }
 
     public Long getDateTime() {

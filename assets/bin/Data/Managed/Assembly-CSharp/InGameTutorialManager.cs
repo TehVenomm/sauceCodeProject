@@ -2036,6 +2036,10 @@ public class InGameTutorialManager : MonoBehaviour
 
 		public override void Update()
 		{
+			if (boss != null)
+			{
+				boss.hpMax = 500000;
+			}
 			if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 			{
 				Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;

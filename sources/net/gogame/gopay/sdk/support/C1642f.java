@@ -4,13 +4,13 @@ package net.gogame.gopay.sdk.support;
 final class C1642f implements Runnable {
 
     /* renamed from: a */
-    final /* synthetic */ C1414c f1307a;
+    final /* synthetic */ C1414c f1295a;
 
     C1642f(C1414c cVar) {
-        this.f1307a = cVar;
+        this.f1295a = cVar;
     }
 
     public final void run() {
-        this.f1307a.requestLayout();
+        this.f1295a.requestLayout();
     }
 }

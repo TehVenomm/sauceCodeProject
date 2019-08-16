@@ -10,23 +10,23 @@ import android.widget.AdapterView.OnItemClickListener;
 final class C1385bh implements OnItemClickListener {
 
     /* renamed from: a */
-    final /* synthetic */ OnClickListener f1086a;
+    final /* synthetic */ OnClickListener f1080a;
 
     /* renamed from: b */
-    final /* synthetic */ Dialog f1087b;
+    final /* synthetic */ Dialog f1081b;
 
     /* renamed from: c */
-    final /* synthetic */ PurchaseActivity f1088c;
+    final /* synthetic */ PurchaseActivity f1082c;
 
     C1385bh(PurchaseActivity purchaseActivity, OnClickListener onClickListener, Dialog dialog) {
-        this.f1088c = purchaseActivity;
-        this.f1086a = onClickListener;
-        this.f1087b = dialog;
+        this.f1082c = purchaseActivity;
+        this.f1080a = onClickListener;
+        this.f1081b = dialog;
     }
 
     public final void onItemClick(AdapterView adapterView, View view, int i, long j) {
-        this.f1086a.onClick(null, i);
-        this.f1088c.f1058z.setEnabled(true);
-        this.f1087b.dismiss();
+        this.f1080a.onClick(null, i);
+        this.f1082c.f1052z.setEnabled(true);
+        this.f1081b.dismiss();
     }
 }

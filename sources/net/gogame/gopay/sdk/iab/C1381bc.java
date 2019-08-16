@@ -8,17 +8,17 @@ import net.gogame.gopay.sdk.C1361f;
 final class C1381bc implements OnClickListener {
 
     /* renamed from: a */
-    final /* synthetic */ C1361f f1080a;
+    final /* synthetic */ C1361f f1074a;
 
     /* renamed from: b */
-    final /* synthetic */ PurchaseActivity f1081b;
+    final /* synthetic */ PurchaseActivity f1075b;
 
     C1381bc(PurchaseActivity purchaseActivity, C1361f fVar) {
-        this.f1081b = purchaseActivity;
-        this.f1080a = fVar;
+        this.f1075b = purchaseActivity;
+        this.f1074a = fVar;
     }
 
     public final void onClick(DialogInterface dialogInterface, int i) {
-        PurchaseActivity.m811b(this.f1081b, this.f1080a.f997a, this.f1080a.f999c);
+        PurchaseActivity.m811b(this.f1075b, this.f1074a.f991a, this.f1074a.f993c);
     }
 }

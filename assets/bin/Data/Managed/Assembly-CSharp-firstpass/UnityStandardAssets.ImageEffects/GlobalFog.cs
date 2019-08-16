@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace UnityStandardAssets.ImageEffects
 {
-	[ExecuteInEditMode]
-	[RequireComponent(typeof(Camera))]
 	[AddComponentMenu("Image Effects/Rendering/Global Fog")]
+	[RequireComponent(typeof(Camera))]
+	[ExecuteInEditMode]
 	internal class GlobalFog : PostEffectsBase
 	{
 		[Tooltip("Apply distance-based fog?")]

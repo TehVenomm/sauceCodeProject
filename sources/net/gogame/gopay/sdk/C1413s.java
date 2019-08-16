@@ -6,18 +6,18 @@ import android.app.ProgressDialog;
 final class C1413s implements Runnable {
 
     /* renamed from: a */
-    final /* synthetic */ StoreActivity f1139a;
+    final /* synthetic */ StoreActivity f1133a;
 
     C1413s(StoreActivity storeActivity) {
-        this.f1139a = storeActivity;
+        this.f1133a = storeActivity;
     }
 
     public final void run() {
-        if (this.f1139a.f989b == null) {
-            this.f1139a.f989b = new ProgressDialog(this.f1139a);
-            this.f1139a.f989b.setCancelable(false);
-            this.f1139a.f989b.setIndeterminate(true);
+        if (this.f1133a.f983b == null) {
+            this.f1133a.f983b = new ProgressDialog(this.f1133a);
+            this.f1133a.f983b.setCancelable(false);
+            this.f1133a.f983b.setIndeterminate(true);
         }
-        this.f1139a.f989b.show();
+        this.f1133a.f983b.show();
     }
 }

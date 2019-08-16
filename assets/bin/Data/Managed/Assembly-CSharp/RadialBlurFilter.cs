@@ -64,11 +64,11 @@ public class RadialBlurFilter : FilterBase
 	{
 		if (_blurMaterial != null)
 		{
-			Graphics.Blit(src, null, _blurMaterial);
+			Graphics.Blit(src, dest, _blurMaterial);
 		}
 		else
 		{
-			Graphics.Blit(src, null);
+			Graphics.Blit(src, dest);
 		}
 	}
 }

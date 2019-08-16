@@ -1388,12 +1388,6 @@
     <style name="net_gogame_gowrap_help_button">
         <item name="android:layout_width">fill_parent</item>
     </style>
-    <style name="net_gogame_gowrap_ranking_button">
-        <item name="android:layout_width">fill_parent</item>
-    </style>
-    <style name="net_gogame_gowrap_tips_button">
-        <item name="android:layout_width">fill_parent</item>
-    </style>
     <style name="net_gogame_gowrap_back_button_new">
         <item name="android:background">@drawable/net_gogame_gowrap_icon_back</item>
     </style>
@@ -1609,10 +1603,6 @@
         <item name="android:visibility">visible</item>
     </style>
     <style name="net_gogame_gowrap_text_appeareance" parent="@android:style/TextAppearance" />
-    <style name="net_gogame_gowrap_title_text_appeareance" parent="@style/net_gogame_gowrap_text_appeareance">
-        <item name="android:textSize">24.0sp</item>
-        <item name="android:textColor">#ff7c7c7c</item>
-    </style>
     <style name="net_gogame_gowrap_webview_container" />
     <style name="net_gogame_gowrap_webview_container_internal">
         <item name="android:layout_margin">10.0dip</item>

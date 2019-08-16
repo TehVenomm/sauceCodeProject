@@ -10,24 +10,24 @@ import android.widget.AdapterView.OnItemClickListener;
 final class C1368ag implements OnItemClickListener {
 
     /* renamed from: a */
-    final /* synthetic */ PurchaseActivity f1064a;
+    final /* synthetic */ PurchaseActivity f1058a;
 
     C1368ag(PurchaseActivity purchaseActivity) {
-        this.f1064a = purchaseActivity;
+        this.f1058a = purchaseActivity;
     }
 
     public final void onItemClick(AdapterView adapterView, View view, int i, long j) {
-        if (!this.f1064a.f1026K || this.f1064a.f1025J || !this.f1064a.f1027L) {
-            this.f1064a.f1025J = false;
-            this.f1064a.f1018C.f1111e = i;
-            if (this.f1064a.f1018C.f1112f != null) {
-                this.f1064a.f1018C.f1112f.setBackgroundColor(Color.rgb(241, 241, 241));
+        if (!this.f1058a.f1020K || this.f1058a.f1019J || !this.f1058a.f1021L) {
+            this.f1058a.f1019J = false;
+            this.f1058a.f1012C.f1105e = i;
+            if (this.f1058a.f1012C.f1106f != null) {
+                this.f1058a.f1012C.f1106f.setBackgroundColor(Color.rgb(241, 241, 241));
             }
-            this.f1064a.f1018C.f1112f = view;
+            this.f1058a.f1012C.f1106f = view;
             view.setBackgroundColor(-1);
-            this.f1064a.m803a((C1365a) this.f1064a.f1018C.getItem(i));
+            this.f1058a.m803a((C1365a) this.f1058a.f1012C.getItem(i));
             return;
         }
-        new Builder(this.f1064a).setTitle(this.f1064a.f1047o).setMessage(this.f1064a.f1046n).setPositiveButton(this.f1064a.f1044l, new C1608ah(this, i, view)).setNegativeButton(this.f1064a.f1045m, new C1609ai(this)).setCancelable(false).show();
+        new Builder(this.f1058a).setTitle(this.f1058a.f1041o).setMessage(this.f1058a.f1040n).setPositiveButton(this.f1058a.f1038l, new C1608ah(this, i, view)).setNegativeButton(this.f1058a.f1039m, new C1609ai(this)).setCancelable(false).show();
     }
 }

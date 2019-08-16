@@ -3,8 +3,8 @@ using UnityEngine;
 namespace UnityStandardAssets.ImageEffects
 {
 	[ExecuteInEditMode]
-	[RequireComponent(typeof(Camera))]
 	[AddComponentMenu("Image Effects/Displacement/Fisheye")]
+	[RequireComponent(typeof(Camera))]
 	public class Fisheye : PostEffectsBase
 	{
 		[Range(0f, 1.5f)]

@@ -24,27 +24,27 @@ import net.gogame.gopay.sdk.support.C1415m;
 public final class C1394bs extends C1359a {
 
     /* renamed from: d */
-    WeakReference f1101d;
+    WeakReference f1095d;
 
     /* renamed from: e */
-    int f1102e = 0;
+    int f1096e = 0;
 
     /* renamed from: f */
-    C1365a f1103f;
+    C1365a f1097f;
 
     public C1394bs(Context context, C1398i iVar) {
         super(context);
-        this.f1101d = new WeakReference(iVar);
+        this.f1095d = new WeakReference(iVar);
     }
 
     /* renamed from: c */
     private C1365a m851c(int i) {
-        return i == 0 ? this.f1103f : (C1365a) ((C1398i) this.f1101d.get()).getItem(getItem(i).intValue());
+        return i == 0 ? this.f1097f : (C1365a) ((C1398i) this.f1095d.get()).getItem(getItem(i).intValue());
     }
 
     /* renamed from: a */
     public final void mo21548a(C1365a aVar) {
-        this.f1103f = aVar;
+        this.f1097f = aVar;
         notifyDataSetChanged();
     }
 
@@ -52,17 +52,17 @@ public final class C1394bs extends C1359a {
     /* renamed from: a */
     public final void mo21549a(C1623bv bvVar, Bitmap bitmap) {
         if (bitmap == null) {
-            bvVar.f1272a.setVisibility(4);
-            bvVar.f1273b.setVisibility(0);
+            bvVar.f1260a.setVisibility(4);
+            bvVar.f1261b.setVisibility(0);
             return;
         }
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
-        BitmapDrawable bitmapDrawable = new BitmapDrawable(this.f993a.getResources(), bitmap);
+        BitmapDrawable bitmapDrawable = new BitmapDrawable(this.f987a.getResources(), bitmap);
         bitmapDrawable.setBounds(0, 0, width, height);
-        bvVar.f1272a.setImageDrawable(bitmapDrawable);
-        bvVar.f1272a.setVisibility(0);
-        bvVar.f1273b.setVisibility(4);
+        bvVar.f1260a.setImageDrawable(bitmapDrawable);
+        bvVar.f1260a.setVisibility(0);
+        bvVar.f1261b.setVisibility(4);
     }
 
     /* renamed from: b */
@@ -71,20 +71,20 @@ public final class C1394bs extends C1359a {
     }
 
     public final int getCount() {
-        return (this.f1103f != null ? 1 : 0) + super.getCount();
+        return (this.f1097f != null ? 1 : 0) + super.getCount();
     }
 
     public final View getView(int i, View view, ViewGroup viewGroup) {
         if (view == 0) {
-            r11 = new RelativeLayout(this.f993a);
+            r11 = new RelativeLayout(this.f987a);
             r11.setLayoutParams(new LayoutParams(mo21497a(80), -1));
-            ImageView imageView = new ImageView(this.f993a);
+            ImageView imageView = new ImageView(this.f987a);
             imageView.setTag(Integer.valueOf(1));
             imageView.setScaleType(ScaleType.FIT_CENTER);
             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(mo21497a(77), mo21497a(49));
             layoutParams.addRule(13);
             r11.addView(imageView, layoutParams);
-            TextView textView = new TextView(this.f993a);
+            TextView textView = new TextView(this.f987a);
             textView.setBackgroundColor(0);
             textView.setTextColor(ViewCompat.MEASURED_STATE_MASK);
             textView.setGravity(17);
@@ -97,7 +97,7 @@ public final class C1394bs extends C1359a {
             r11.setTag(new C1623bv(imageView, textView, i));
             view = r11;
         }
-        if (i == this.f1102e) {
+        if (i == this.f1096e) {
             int a = mo21497a(2);
             GradientDrawable gradientDrawable = new GradientDrawable();
             gradientDrawable.setStroke(a, Color.rgb(92, 176, 59));
@@ -116,13 +116,13 @@ public final class C1394bs extends C1359a {
             view.setBackgroundColor(0);
         }
         C1623bv bvVar = (C1623bv) view.getTag();
-        bvVar.f1274c = i;
-        bvVar.f1273b.setText(m851c(bvVar.f1274c).getDisplayName());
-        bvVar.f1272a.setVisibility(4);
+        bvVar.f1262c = i;
+        bvVar.f1261b.setText(m851c(bvVar.f1262c).getDisplayName());
+        bvVar.f1260a.setVisibility(4);
         if (mo21498a() == null) {
-            bvVar.f1273b.setVisibility(0);
+            bvVar.f1261b.setVisibility(0);
         }
-        C1365a c = m851c(bvVar.f1274c);
+        C1365a c = m851c(bvVar.f1262c);
         if (c instanceof C1395f) {
             mo21549a(bvVar, C1415m.m935i());
         } else {

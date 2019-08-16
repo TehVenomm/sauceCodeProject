@@ -19,22 +19,22 @@ import org.onepf.oms.appstore.googleUtils.IabException;
 public class StoreActivity extends Activity {
 
     /* renamed from: a */
-    private Handler f988a;
+    private Handler f982a;
     /* access modifiers changed from: private */
 
     /* renamed from: b */
-    public ProgressDialog f989b;
+    public ProgressDialog f983b;
 
     /* renamed from: c */
-    private C1407m f990c;
+    private C1407m f984c;
     /* access modifiers changed from: private */
 
     /* renamed from: d */
-    public C1360d f991d;
+    public C1360d f985d;
     /* access modifiers changed from: private */
 
     /* renamed from: e */
-    public C1418w f992e;
+    public C1418w f986e;
 
     /* access modifiers changed from: private */
     /* renamed from: a */
@@ -44,16 +44,16 @@ public class StoreActivity extends Activity {
 
     /* renamed from: b */
     private void m763b() {
-        this.f988a.post(new C1417t(this));
+        this.f982a.post(new C1417t(this));
     }
 
     /* renamed from: d */
     static /* synthetic */ void m766d(StoreActivity storeActivity) {
-        storeActivity.f988a.post(new C1413s(storeActivity));
+        storeActivity.f982a.post(new C1413s(storeActivity));
         try {
-            C1363h a = C1406j.m865a(storeActivity.f990c.f1129a, storeActivity.f990c.f1130b, C1406j.m858a());
-            C1406j.m868a(a.f1009a);
-            storeActivity.f988a.post(new C1411q(storeActivity, a));
+            C1363h a = C1406j.m865a(storeActivity.f984c.f1123a, storeActivity.f984c.f1124b, C1406j.m858a());
+            C1406j.m868a(a.f1003a);
+            storeActivity.f982a.post(new C1411q(storeActivity, a));
         } catch (IabException e) {
         } finally {
             storeActivity.m763b();
@@ -66,7 +66,7 @@ public class StoreActivity extends Activity {
         C1415m.m920a(getFilesDir().getPath());
         requestWindowFeature(1);
         setTitle(C1416s.m943a("store_title"));
-        this.f988a = new Handler();
+        this.f982a = new Handler();
         String str = null;
         String str2 = null;
         if (getIntent().getExtras().getString("appId") != null) {
@@ -75,7 +75,7 @@ public class StoreActivity extends Activity {
         if (getIntent().getExtras().getString("guid") != null) {
             str2 = getIntent().getExtras().getString("guid");
         }
-        this.f990c = new C1407m(str, str2);
+        this.f984c = new C1407m(str, str2);
         LinearLayout linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(1);
         RelativeLayout relativeLayout = new RelativeLayout(this);
@@ -92,10 +92,10 @@ public class StoreActivity extends Activity {
         textView.setLayoutParams(layoutParams);
         textView.setText(C1416s.m943a("store_title"));
         relativeLayout.addView(textView);
-        this.f991d = new C1360d(this, true);
+        this.f985d = new C1360d(this, true);
         Spinner spinner = new Spinner(this);
         spinner.setBackgroundColor(0);
-        spinner.setAdapter(this.f991d);
+        spinner.setAdapter(this.f985d);
         spinner.setPadding(0, 0, 0, 0);
         spinner.setOnItemSelectedListener(new C1409o(this));
         LayoutParams layoutParams2 = new LayoutParams(-2, -2);
@@ -106,8 +106,8 @@ public class StoreActivity extends Activity {
             linearLayout.setLongClickable(true);
             linearLayout.setOnLongClickListener(new C1410p(this));
         }
-        this.f992e = new C1418w(this, this.f990c);
-        linearLayout.addView(this.f992e);
+        this.f986e = new C1418w(this, this.f984c);
+        linearLayout.addView(this.f986e);
         setContentView(linearLayout);
     }
 
@@ -120,6 +120,6 @@ public class StoreActivity extends Activity {
     /* access modifiers changed from: protected */
     public void onStop() {
         super.onStop();
-        this.f989b.dismiss();
+        this.f983b.dismiss();
     }
 }

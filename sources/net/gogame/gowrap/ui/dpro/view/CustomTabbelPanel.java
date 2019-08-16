@@ -455,14 +455,10 @@ public class CustomTabbelPanel extends ViewGroup {
         this.mCloseButtonPadding = new Margins(this.mCloseButtonPaddingLeft, this.mCloseButtonPaddingTop, this.mCloseButtonPaddingRight, this.mCloseButtonPaddingBottom);
         if (isInEditMode()) {
             this.tabLabels.add("News");
-            this.tabLabels.add("Tips");
-            this.tabLabels.add("Ranking");
             this.tabLabels.add("Help");
             return;
         }
         this.tabLabels.add("News");
-        this.tabLabels.add("Tips");
-        this.tabLabels.add("Ranking");
         this.tabLabels.add("Help");
     }
 

@@ -25,16 +25,16 @@ public class MyUncaughtExceptionHandler implements UncaughtExceptionHandler {
         PrintWriter printWriter = new PrintWriter(new FileOutputStream(getTempFile()));
         StringBuilder sb = new StringBuilder();
         sb.append("----Thread-----\n");
-        sb.append("Thread: ").append(thread.toString()).append(StringUtils.f1199LF);
-        sb.append("----Exception-----").append(StringUtils.f1199LF);
-        sb.append("Class: ").append(th.getClass().getCanonicalName()).append(StringUtils.f1199LF);
-        sb.append("Message: ").append(th.getMessage()).append(StringUtils.f1199LF);
+        sb.append("Thread: ").append(thread.toString()).append(StringUtils.f1189LF);
+        sb.append("----Exception-----").append(StringUtils.f1189LF);
+        sb.append("Class: ").append(th.getClass().getCanonicalName()).append(StringUtils.f1189LF);
+        sb.append("Message: ").append(th.getMessage()).append(StringUtils.f1189LF);
         printWriter.print(sb.toString());
         StackTraceElement[] stackTrace = th.getStackTrace();
         if (stackTrace != null) {
             sb.setLength(0);
             for (StackTraceElement stackTraceElement : stackTrace) {
-                sb.append("     at ").append(stackTraceElement.toString()).append(StringUtils.f1199LF);
+                sb.append("     at ").append(stackTraceElement.toString()).append(StringUtils.f1189LF);
             }
             printWriter.print(sb.toString());
         }
@@ -44,14 +44,14 @@ public class MyUncaughtExceptionHandler implements UncaughtExceptionHandler {
             printWriter.println("cause is null");
         } else {
             sb.setLength(0);
-            sb.append("Class: ").append(cause.getClass().getCanonicalName()).append(StringUtils.f1199LF);
-            sb.append("Message: ").append(cause.getMessage()).append(StringUtils.f1199LF);
+            sb.append("Class: ").append(cause.getClass().getCanonicalName()).append(StringUtils.f1189LF);
+            sb.append("Message: ").append(cause.getMessage()).append(StringUtils.f1189LF);
             printWriter.print(sb.toString());
             StackTraceElement[] stackTrace2 = cause.getStackTrace();
             if (stackTrace2 != null) {
                 sb.setLength(0);
                 for (StackTraceElement stackTraceElement2 : stackTrace2) {
-                    sb.append("     at ").append(stackTraceElement2.toString()).append(StringUtils.f1199LF);
+                    sb.append("     at ").append(stackTraceElement2.toString()).append(StringUtils.f1189LF);
                 }
                 printWriter.print(sb.toString());
             }

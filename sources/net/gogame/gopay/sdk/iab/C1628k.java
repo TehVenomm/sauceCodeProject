@@ -8,41 +8,41 @@ import net.gogame.gopay.sdk.support.C1652q;
 final class C1628k implements C1652q {
 
     /* renamed from: a */
-    C1623bv f1287a = this.f1288b;
+    C1623bv f1275a = this.f1276b;
 
     /* renamed from: b */
-    final /* synthetic */ C1623bv f1288b;
+    final /* synthetic */ C1623bv f1276b;
 
     /* renamed from: c */
-    final /* synthetic */ int f1289c;
+    final /* synthetic */ int f1277c;
 
     /* renamed from: d */
-    final /* synthetic */ C1398i f1290d;
+    final /* synthetic */ C1398i f1278d;
 
     C1628k(C1398i iVar, C1623bv bvVar, int i) {
-        this.f1290d = iVar;
-        this.f1288b = bvVar;
-        this.f1289c = i;
+        this.f1278d = iVar;
+        this.f1276b = bvVar;
+        this.f1277c = i;
     }
 
     /* renamed from: a */
     public final void mo22645a(Bitmap bitmap) {
-        if (this.f1287a.f1274c != this.f1289c) {
+        if (this.f1275a.f1262c != this.f1277c) {
             return;
         }
         if (bitmap != null) {
             int width = bitmap.getWidth();
             int height = bitmap.getHeight();
-            BitmapDrawable bitmapDrawable = new BitmapDrawable(this.f1290d.f993a.getResources(), bitmap);
+            BitmapDrawable bitmapDrawable = new BitmapDrawable(this.f1278d.f987a.getResources(), bitmap);
             bitmapDrawable.setBounds(0, 0, width, height);
-            this.f1287a.f1272a.setImageDrawable(bitmapDrawable);
-            this.f1287a.f1272a.setMinimumWidth(this.f1290d.mo21497a(width));
-            this.f1287a.f1272a.setMinimumHeight(this.f1290d.mo21497a(height));
-            this.f1287a.f1273b.setVisibility(4);
-            this.f1287a.f1272a.setVisibility(0);
+            this.f1275a.f1260a.setImageDrawable(bitmapDrawable);
+            this.f1275a.f1260a.setMinimumWidth(this.f1278d.mo21497a(width));
+            this.f1275a.f1260a.setMinimumHeight(this.f1278d.mo21497a(height));
+            this.f1275a.f1261b.setVisibility(4);
+            this.f1275a.f1260a.setVisibility(0);
             return;
         }
-        this.f1287a.f1272a.setVisibility(4);
-        this.f1287a.f1273b.setVisibility(0);
+        this.f1275a.f1260a.setVisibility(4);
+        this.f1275a.f1261b.setVisibility(0);
     }
 }

@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import com.zopim.android.sdk.C1122R;
+import p017io.fabric.sdk.android.services.common.AbstractSpiCall;
 
 public class ChatAdapter extends BaseAdapter {
     private final ChatContext chatContext;
@@ -55,7 +56,7 @@ public class ChatAdapter extends BaseAdapter {
     }
 
     public long getItemId(int i) {
-        return (long) (i + 10000);
+        return (long) (i + AbstractSpiCall.DEFAULT_TIMEOUT);
     }
 
     public View getView(int i, View view, ViewGroup viewGroup) {

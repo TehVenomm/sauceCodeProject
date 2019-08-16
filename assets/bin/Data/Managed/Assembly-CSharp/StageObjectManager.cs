@@ -1274,11 +1274,11 @@ public class StageObjectManager : MonoBehaviourSingleton<StageObjectManager>
 				enemy.AddController<EnemyController>();
 			}
 		}
-		enemy.id = id;
 		if (!flag)
 		{
 			val.SetActive(true);
 		}
+		enemy.id = id;
 		if (QuestManager.IsValidInGame())
 		{
 			enemy.enemyReward = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyReward();

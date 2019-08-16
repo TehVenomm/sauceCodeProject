@@ -3,8 +3,8 @@ using UnityEngine;
 namespace UnityStandardAssets.ImageEffects
 {
 	[ExecuteInEditMode]
-	[RequireComponent(typeof(Camera))]
 	[AddComponentMenu("Image Effects/Other/Screen Overlay")]
+	[RequireComponent(typeof(Camera))]
 	public class ScreenOverlay : PostEffectsBase
 	{
 		public enum OverlayBlendMode

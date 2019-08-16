@@ -7,15 +7,15 @@ import android.content.DialogInterface.OnClickListener;
 final class C1633v implements OnClickListener {
 
     /* renamed from: a */
-    final /* synthetic */ C1403u f1297a;
+    final /* synthetic */ C1403u f1285a;
 
     C1633v(C1403u uVar) {
-        this.f1297a = uVar;
+        this.f1285a = uVar;
     }
 
     public final void onClick(DialogInterface dialogInterface, int i) {
-        this.f1297a.f1118a.f1026K = false;
-        this.f1297a.f1118a.f1027L = false;
-        PurchaseActivity.m813b(this.f1297a.f1118a, true);
+        this.f1285a.f1112a.f1020K = false;
+        this.f1285a.f1112a.f1021L = false;
+        PurchaseActivity.m813b(this.f1285a.f1112a, true);
     }
 }

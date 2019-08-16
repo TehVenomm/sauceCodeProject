@@ -8,10 +8,10 @@ import android.widget.AdapterView.OnItemLongClickListener;
 final class C1369aj implements OnItemLongClickListener {
 
     /* renamed from: a */
-    final /* synthetic */ PurchaseActivity f1065a;
+    final /* synthetic */ PurchaseActivity f1059a;
 
     C1369aj(PurchaseActivity purchaseActivity) {
-        this.f1065a = purchaseActivity;
+        this.f1059a = purchaseActivity;
     }
 
     public final boolean onItemLongClick(AdapterView adapterView, View view, int i, long j) {
@@ -67,49 +67,49 @@ final class C1369aj implements OnItemLongClickListener {
         /*
             this = this;
             r2 = 241(0xf1, float:3.38E-43)
-            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1065a
-            boolean r0 = r0.f1026K
+            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1059a
+            boolean r0 = r0.f1020K
             if (r0 == 0) goto L_0x002b
-            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1065a
-            boolean r0 = r0.f1025J
+            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1059a
+            boolean r0 = r0.f1019J
             if (r0 != 0) goto L_0x002b
-            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1065a
-            boolean r0 = r0.f1027L
+            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1059a
+            boolean r0 = r0.f1021L
             if (r0 == 0) goto L_0x002b
-            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1065a
+            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1059a
             net.gogame.gopay.sdk.iab.ak r1 = new net.gogame.gopay.sdk.iab.ak
             r1.<init>(r3, r6, r5)
             net.gogame.gopay.sdk.iab.al r2 = new net.gogame.gopay.sdk.iab.al
             r2.<init>(r3)
-            new android.app.AlertDialog.Builder(r0).setTitle(r0.f1047o).setMessage(r0.f1046n).setPositiveButton(r0.f1044l, r1).setNegativeButton(r0.f1045m, r2).setCancelable(false).show()
+            new android.app.AlertDialog.Builder(r0).setTitle(r0.f1041o).setMessage(r0.f1040n).setPositiveButton(r0.f1038l, r1).setNegativeButton(r0.f1039m, r2).setCancelable(false).show()
         L_0x0029:
             r0 = 1
             return r0
         L_0x002b:
-            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1065a
+            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1059a
             r1 = 0
-            r0.f1025J = r1
-            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1065a
-            net.gogame.gopay.sdk.iab.i r0 = r0.f1018C
-            r0.f1111e = r6
-            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1065a
-            net.gogame.gopay.sdk.iab.i r0 = r0.f1018C
-            android.view.View r0 = r0.f1112f
+            r0.f1019J = r1
+            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1059a
+            net.gogame.gopay.sdk.iab.i r0 = r0.f1012C
+            r0.f1105e = r6
+            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1059a
+            net.gogame.gopay.sdk.iab.i r0 = r0.f1012C
+            android.view.View r0 = r0.f1106f
             if (r0 == 0) goto L_0x0052
-            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1065a
-            net.gogame.gopay.sdk.iab.i r0 = r0.f1018C
-            android.view.View r0 = r0.f1112f
+            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1059a
+            net.gogame.gopay.sdk.iab.i r0 = r0.f1012C
+            android.view.View r0 = r0.f1106f
             int r1 = android.graphics.Color.rgb(r2, r2, r2)
             r0.setBackgroundColor(r1)
         L_0x0052:
-            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1065a
-            net.gogame.gopay.sdk.iab.i r0 = r0.f1018C
-            r0.f1112f = r5
+            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1059a
+            net.gogame.gopay.sdk.iab.i r0 = r0.f1012C
+            r0.f1106f = r5
             r0 = -1
             r5.setBackgroundColor(r0)
-            net.gogame.gopay.sdk.iab.PurchaseActivity r1 = r3.f1065a
-            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1065a
-            net.gogame.gopay.sdk.iab.i r0 = r0.f1018C
+            net.gogame.gopay.sdk.iab.PurchaseActivity r1 = r3.f1059a
+            net.gogame.gopay.sdk.iab.PurchaseActivity r0 = r3.f1059a
+            net.gogame.gopay.sdk.iab.i r0 = r0.f1012C
             java.lang.Object r0 = r0.getItem(r6)
             net.gogame.gopay.sdk.iab.a r0 = (net.gogame.gopay.sdk.iab.C1365a) r0
             r1.m803a(r0)

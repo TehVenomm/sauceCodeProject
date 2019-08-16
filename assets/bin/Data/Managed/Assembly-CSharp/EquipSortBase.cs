@@ -179,11 +179,10 @@ public class EquipSortBase : SortBase
 	public override void UpdateUI()
 	{
 		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0297: Unknown result type (might be due to invalid IL or missing references)
-		//IL_078b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0279: Unknown result type (might be due to invalid IL or missing references)
+		//IL_076d: Unknown result type (might be due to invalid IL or missing references)
 		SetActive((Enum)UI.OBJ_TYPE, is_visible: false);
 		if (sortOrder.dialogType == DIALOG_TYPE.STORAGE_SKILL || sortOrder.dialogType == DIALOG_TYPE.SKILL)
 		{
@@ -216,7 +215,7 @@ public class EquipSortBase : SortBase
 					num = 95;
 					SetActive((Enum)UI.OBJ_TYPE, is_visible: true);
 				}
-				int num3 = num / 2;
+				int num3 = num;
 				UIWidget component2 = base.GetComponent<UIWidget>((Enum)UI.Frame);
 				if (component2 != null)
 				{
@@ -225,7 +224,6 @@ public class EquipSortBase : SortBase
 					component2.UpdateAnchors();
 				}
 				Transform ctrl = GetCtrl(UI.OBJ_SORT_ROOT);
-				ctrl.set_localPosition(new Vector3(0f, (float)(-(num + 45)), 0f));
 				Transform ctrl2 = GetCtrl(UI.SPR_SORT_UNDER_LINE);
 				ctrl2.set_localPosition(new Vector3(0f, (float)(-(130 + num3)), 0f));
 			}

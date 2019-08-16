@@ -8,18 +8,18 @@ import android.view.View.OnClickListener;
 final class C1403u implements OnClickListener {
 
     /* renamed from: a */
-    final /* synthetic */ PurchaseActivity f1118a;
+    final /* synthetic */ PurchaseActivity f1112a;
 
     C1403u(PurchaseActivity purchaseActivity) {
-        this.f1118a = purchaseActivity;
+        this.f1112a = purchaseActivity;
     }
 
     public final void onClick(View view) {
-        if (!this.f1118a.f1036d) {
-            if (!this.f1118a.f1026K || this.f1118a.f1025J || !this.f1118a.f1027L) {
-                PurchaseActivity.m813b(this.f1118a, true);
+        if (!this.f1112a.f1030d) {
+            if (!this.f1112a.f1020K || this.f1112a.f1019J || !this.f1112a.f1021L) {
+                PurchaseActivity.m813b(this.f1112a, true);
             } else {
-                new Builder(this.f1118a).setTitle(this.f1118a.f1047o).setMessage(this.f1118a.f1046n).setPositiveButton(this.f1118a.f1044l, new C1633v(this)).setNegativeButton(this.f1118a.f1045m, new C1634w(this)).setCancelable(false).show();
+                new Builder(this.f1112a).setTitle(this.f1112a.f1041o).setMessage(this.f1112a.f1040n).setPositiveButton(this.f1112a.f1038l, new C1633v(this)).setNegativeButton(this.f1112a.f1039m, new C1634w(this)).setCancelable(false).show();
             }
         }
     }

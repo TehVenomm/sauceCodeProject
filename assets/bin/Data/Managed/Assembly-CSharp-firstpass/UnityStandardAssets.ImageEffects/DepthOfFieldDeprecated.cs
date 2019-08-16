@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace UnityStandardAssets.ImageEffects
 {
-	[ExecuteInEditMode]
-	[RequireComponent(typeof(Camera))]
 	[AddComponentMenu("Image Effects/Camera/Depth of Field (deprecated)")]
+	[RequireComponent(typeof(Camera))]
+	[ExecuteInEditMode]
 	public class DepthOfFieldDeprecated : PostEffectsBase
 	{
 		public enum Dof34QualitySetting

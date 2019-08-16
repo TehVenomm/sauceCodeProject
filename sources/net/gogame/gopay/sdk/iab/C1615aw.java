@@ -4,17 +4,17 @@ package net.gogame.gopay.sdk.iab;
 final class C1615aw implements Runnable {
 
     /* renamed from: a */
-    final /* synthetic */ String f1255a;
+    final /* synthetic */ String f1243a;
 
     /* renamed from: b */
-    final /* synthetic */ C1376at f1256b;
+    final /* synthetic */ C1376at f1244b;
 
     C1615aw(C1376at atVar, String str) {
-        this.f1256b = atVar;
-        this.f1255a = str;
+        this.f1244b = atVar;
+        this.f1243a = str;
     }
 
     public final void run() {
-        this.f1256b.f1073b.f1057y.loadData(this.f1255a, "text/html; charset=UTF-8", null);
+        this.f1244b.f1067b.f1051y.loadData(this.f1243a, "text/html; charset=UTF-8", null);
     }
 }

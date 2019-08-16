@@ -8,18 +8,18 @@ import android.view.View.OnTouchListener;
 final class C1404x implements OnTouchListener {
 
     /* renamed from: a */
-    final /* synthetic */ PurchaseActivity f1119a;
+    final /* synthetic */ PurchaseActivity f1113a;
 
     C1404x(PurchaseActivity purchaseActivity) {
-        this.f1119a = purchaseActivity;
+        this.f1113a = purchaseActivity;
     }
 
     public final boolean onTouch(View view, MotionEvent motionEvent) {
-        this.f1119a.f1024I = false;
-        if (!this.f1119a.f1036d) {
+        this.f1113a.f1018I = false;
+        if (!this.f1113a.f1030d) {
             return false;
         }
-        PurchaseActivity.m813b(this.f1119a, false);
-        return this.f1119a.f1025J;
+        PurchaseActivity.m813b(this.f1113a, false);
+        return this.f1113a.f1019J;
     }
 }

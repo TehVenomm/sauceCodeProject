@@ -14,60 +14,60 @@ import java.util.NoSuchElementException;
 public final class QueueFile implements Closeable, Iterable<byte[]> {
 
     /* renamed from: i */
-    private static final byte[] f1373i = new byte[4096];
+    private static final byte[] f1359i = new byte[4096];
 
     /* renamed from: a */
-    final RandomAccessFile f1374a;
+    final RandomAccessFile f1360a;
 
     /* renamed from: b */
-    boolean f1375b;
+    boolean f1361b;
 
     /* renamed from: c */
-    int f1376c;
+    int f1362c;
 
     /* renamed from: d */
-    long f1377d;
+    long f1363d;
 
     /* renamed from: e */
-    int f1378e;
+    int f1364e;
 
     /* renamed from: f */
-    C1667a f1379f;
+    C1667a f1365f;
 
     /* renamed from: g */
-    int f1380g;
+    int f1366g;
 
     /* renamed from: h */
-    boolean f1381h;
+    boolean f1367h;
 
     /* renamed from: j */
-    private C1667a f1382j;
+    private C1667a f1368j;
 
     /* renamed from: k */
-    private final byte[] f1383k;
+    private final byte[] f1369k;
 
     /* renamed from: l */
-    private final boolean f1384l;
+    private final boolean f1370l;
 
     /* renamed from: net.gogame.gopay.vip.tape2.QueueFile$a */
     static class C1667a {
 
         /* renamed from: a */
-        static final C1667a f1385a = new C1667a(0, 0);
+        static final C1667a f1371a = new C1667a(0, 0);
 
         /* renamed from: b */
-        final long f1386b;
+        final long f1372b;
 
         /* renamed from: c */
-        final int f1387c;
+        final int f1373c;
 
         C1667a(long j, int i) {
-            this.f1386b = j;
-            this.f1387c = i;
+            this.f1372b = j;
+            this.f1373c = i;
         }
 
         public String toString() {
-            return getClass().getSimpleName() + "[position=" + this.f1386b + ", length=" + this.f1387c + "]";
+            return getClass().getSimpleName() + "[position=" + this.f1372b + ", length=" + this.f1373c + "]";
         }
     }
 
@@ -75,50 +75,50 @@ public final class QueueFile implements Closeable, Iterable<byte[]> {
     private final class C1668b implements Iterator<byte[]> {
 
         /* renamed from: a */
-        int f1388a = 0;
+        int f1374a = 0;
 
         /* renamed from: b */
-        int f1389b = QueueFile.this.f1380g;
+        int f1375b = QueueFile.this.f1366g;
 
         /* renamed from: d */
-        private long f1391d = QueueFile.this.f1379f.f1386b;
+        private long f1377d = QueueFile.this.f1365f.f1372b;
 
         C1668b() {
         }
 
         /* renamed from: b */
         private void m1005b() {
-            if (QueueFile.this.f1380g != this.f1389b) {
+            if (QueueFile.this.f1366g != this.f1375b) {
                 throw new ConcurrentModificationException();
             }
         }
 
         public boolean hasNext() {
-            if (QueueFile.this.f1381h) {
+            if (QueueFile.this.f1367h) {
                 throw new IllegalStateException("closed");
             }
             m1005b();
-            return this.f1388a != QueueFile.this.f1378e;
+            return this.f1374a != QueueFile.this.f1364e;
         }
 
         /* renamed from: a */
         public byte[] next() {
-            if (QueueFile.this.f1381h) {
+            if (QueueFile.this.f1367h) {
                 throw new IllegalStateException("closed");
             }
             m1005b();
             if (QueueFile.this.isEmpty()) {
                 throw new NoSuchElementException();
-            } else if (this.f1388a >= QueueFile.this.f1378e) {
+            } else if (this.f1374a >= QueueFile.this.f1364e) {
                 throw new NoSuchElementException();
             } else {
                 try {
-                    C1667a a = QueueFile.this.mo22788a(this.f1391d);
-                    byte[] bArr = new byte[a.f1387c];
-                    this.f1391d = QueueFile.this.mo22792b(a.f1386b + 4);
-                    QueueFile.this.mo22789a(this.f1391d, bArr, 0, a.f1387c);
-                    this.f1391d = QueueFile.this.mo22792b(a.f1386b + 4 + ((long) a.f1387c));
-                    this.f1388a++;
+                    C1667a a = QueueFile.this.mo22788a(this.f1377d);
+                    byte[] bArr = new byte[a.f1373c];
+                    this.f1377d = QueueFile.this.mo22792b(a.f1372b + 4);
+                    QueueFile.this.mo22789a(this.f1377d, bArr, 0, a.f1373c);
+                    this.f1377d = QueueFile.this.mo22792b(a.f1372b + 4 + ((long) a.f1373c));
+                    this.f1374a++;
                     return bArr;
                 } catch (IOException e) {
                     throw new RuntimeException("todo: throw a proper error", e);
@@ -130,13 +130,13 @@ public final class QueueFile implements Closeable, Iterable<byte[]> {
             m1005b();
             if (QueueFile.this.isEmpty()) {
                 throw new NoSuchElementException();
-            } else if (this.f1388a != 1) {
+            } else if (this.f1374a != 1) {
                 throw new UnsupportedOperationException("Removal is only permitted from the head.");
             } else {
                 try {
                     QueueFile.this.remove();
-                    this.f1389b = QueueFile.this.f1380g;
-                    this.f1388a--;
+                    this.f1375b = QueueFile.this.f1366g;
+                    this.f1374a--;
                 } catch (IOException e) {
                     throw new RuntimeException("todo: throw a proper error", e);
                 }
@@ -191,37 +191,37 @@ public final class QueueFile implements Closeable, Iterable<byte[]> {
     QueueFile(RandomAccessFile randomAccessFile, boolean z, boolean z2) throws IOException {
         long a;
         long a2;
-        this.f1383k = new byte[32];
-        this.f1380g = 0;
-        this.f1374a = randomAccessFile;
-        this.f1384l = z;
+        this.f1369k = new byte[32];
+        this.f1366g = 0;
+        this.f1360a = randomAccessFile;
+        this.f1370l = z;
         randomAccessFile.seek(0);
-        randomAccessFile.readFully(this.f1383k);
-        this.f1375b = !z2 && (this.f1383k[0] & 128) != 0;
-        if (this.f1375b) {
-            this.f1376c = 32;
-            int a3 = m989a(this.f1383k, 0) & Integer.MAX_VALUE;
+        randomAccessFile.readFully(this.f1369k);
+        this.f1361b = !z2 && (this.f1369k[0] & 128) != 0;
+        if (this.f1361b) {
+            this.f1362c = 32;
+            int a3 = m989a(this.f1369k, 0) & Integer.MAX_VALUE;
             if (a3 != 1) {
                 throw new IOException("Unable to read version " + a3 + " format. Supported versions are 1 and legacy.");
             }
-            this.f1377d = m998b(this.f1383k, 4);
-            this.f1378e = m989a(this.f1383k, 12);
-            a = m998b(this.f1383k, 16);
-            a2 = m998b(this.f1383k, 24);
+            this.f1363d = m998b(this.f1369k, 4);
+            this.f1364e = m989a(this.f1369k, 12);
+            a = m998b(this.f1369k, 16);
+            a2 = m998b(this.f1369k, 24);
         } else {
-            this.f1376c = 16;
-            this.f1377d = (long) m989a(this.f1383k, 0);
-            this.f1378e = m989a(this.f1383k, 4);
-            a = (long) m989a(this.f1383k, 8);
-            a2 = (long) m989a(this.f1383k, 12);
+            this.f1362c = 16;
+            this.f1363d = (long) m989a(this.f1369k, 0);
+            this.f1364e = m989a(this.f1369k, 4);
+            a = (long) m989a(this.f1369k, 8);
+            a2 = (long) m989a(this.f1369k, 12);
         }
-        if (this.f1377d > randomAccessFile.length()) {
-            throw new IOException("File is truncated. Expected length: " + this.f1377d + ", Actual length: " + randomAccessFile.length());
-        } else if (this.f1377d <= ((long) this.f1376c)) {
-            throw new IOException("File is corrupt; length stored in header (" + this.f1377d + ") is invalid.");
+        if (this.f1363d > randomAccessFile.length()) {
+            throw new IOException("File is truncated. Expected length: " + this.f1363d + ", Actual length: " + randomAccessFile.length());
+        } else if (this.f1363d <= ((long) this.f1362c)) {
+            throw new IOException("File is corrupt; length stored in header (" + this.f1363d + ") is invalid.");
         } else {
-            this.f1379f = mo22788a(a);
-            this.f1382j = mo22788a(a2);
+            this.f1365f = mo22788a(a);
+            this.f1368j = mo22788a(a2);
         }
     }
 
@@ -257,60 +257,60 @@ public final class QueueFile implements Closeable, Iterable<byte[]> {
 
     /* renamed from: a */
     private void m993a(long j, int i, long j2, long j3) throws IOException {
-        this.f1374a.seek(0);
-        if (this.f1375b) {
-            m995a(this.f1383k, 0, -2147483647);
-            m996a(this.f1383k, 4, j);
-            m995a(this.f1383k, 12, i);
-            m996a(this.f1383k, 16, j2);
-            m996a(this.f1383k, 24, j3);
-            this.f1374a.write(this.f1383k, 0, 32);
+        this.f1360a.seek(0);
+        if (this.f1361b) {
+            m995a(this.f1369k, 0, -2147483647);
+            m996a(this.f1369k, 4, j);
+            m995a(this.f1369k, 12, i);
+            m996a(this.f1369k, 16, j2);
+            m996a(this.f1369k, 24, j3);
+            this.f1360a.write(this.f1369k, 0, 32);
             return;
         }
-        m995a(this.f1383k, 0, (int) j);
-        m995a(this.f1383k, 4, i);
-        m995a(this.f1383k, 8, (int) j2);
-        m995a(this.f1383k, 12, (int) j3);
-        this.f1374a.write(this.f1383k, 0, 16);
+        m995a(this.f1369k, 0, (int) j);
+        m995a(this.f1369k, 4, i);
+        m995a(this.f1369k, 8, (int) j2);
+        m995a(this.f1369k, 12, (int) j3);
+        this.f1360a.write(this.f1369k, 0, 16);
     }
 
     /* access modifiers changed from: 0000 */
     /* renamed from: a */
     public C1667a mo22788a(long j) throws IOException {
         if (j == 0) {
-            return C1667a.f1385a;
+            return C1667a.f1371a;
         }
-        mo22789a(j, this.f1383k, 0, 4);
-        return new C1667a(j, m989a(this.f1383k, 0));
+        mo22789a(j, this.f1369k, 0, 4);
+        return new C1667a(j, m989a(this.f1369k, 0));
     }
 
     /* access modifiers changed from: 0000 */
     /* renamed from: b */
     public long mo22792b(long j) {
-        return j < this.f1377d ? j : (((long) this.f1376c) + j) - this.f1377d;
+        return j < this.f1363d ? j : (((long) this.f1362c) + j) - this.f1363d;
     }
 
     /* renamed from: b */
     private void m999b(long j, byte[] bArr, int i, int i2) throws IOException {
         long b = mo22792b(j);
-        if (((long) i2) + b <= this.f1377d) {
-            this.f1374a.seek(b);
-            this.f1374a.write(bArr, i, i2);
+        if (((long) i2) + b <= this.f1363d) {
+            this.f1360a.seek(b);
+            this.f1360a.write(bArr, i, i2);
             return;
         }
-        int i3 = (int) (this.f1377d - b);
-        this.f1374a.seek(b);
-        this.f1374a.write(bArr, i, i3);
-        this.f1374a.seek((long) this.f1376c);
-        this.f1374a.write(bArr, i + i3, i2 - i3);
+        int i3 = (int) (this.f1363d - b);
+        this.f1360a.seek(b);
+        this.f1360a.write(bArr, i, i3);
+        this.f1360a.seek((long) this.f1362c);
+        this.f1360a.write(bArr, i + i3, i2 - i3);
     }
 
     /* renamed from: a */
     private void m994a(long j, long j2) throws IOException {
         long j3 = j;
         while (j2 > 0) {
-            int min = (int) Math.min(j2, (long) f1373i.length);
-            m999b(j3, f1373i, 0, min);
+            int min = (int) Math.min(j2, (long) f1359i.length);
+            m999b(j3, f1359i, 0, min);
             j2 -= (long) min;
             j3 += (long) min;
         }
@@ -320,16 +320,16 @@ public final class QueueFile implements Closeable, Iterable<byte[]> {
     /* renamed from: a */
     public void mo22789a(long j, byte[] bArr, int i, int i2) throws IOException {
         long b = mo22792b(j);
-        if (((long) i2) + b <= this.f1377d) {
-            this.f1374a.seek(b);
-            this.f1374a.readFully(bArr, i, i2);
+        if (((long) i2) + b <= this.f1363d) {
+            this.f1360a.seek(b);
+            this.f1360a.readFully(bArr, i, i2);
             return;
         }
-        int i3 = (int) (this.f1377d - b);
-        this.f1374a.seek(b);
-        this.f1374a.readFully(bArr, i, i3);
-        this.f1374a.seek((long) this.f1376c);
-        this.f1374a.readFully(bArr, i + i3, i2 - i3);
+        int i3 = (int) (this.f1363d - b);
+        this.f1360a.seek(b);
+        this.f1360a.readFully(bArr, i, i3);
+        this.f1360a.seek((long) this.f1362c);
+        this.f1360a.readFully(bArr, i + i3, i2 - i3);
     }
 
     public void add(byte[] bArr) throws IOException {
@@ -342,48 +342,48 @@ public final class QueueFile implements Closeable, Iterable<byte[]> {
             throw new NullPointerException("data == null");
         } else if ((i | i2) < 0 || i2 > bArr.length - i) {
             throw new IndexOutOfBoundsException();
-        } else if (this.f1381h) {
+        } else if (this.f1367h) {
             throw new IOException("closed");
         } else {
             m1000c((long) i2);
             boolean isEmpty = isEmpty();
             if (isEmpty) {
-                b = (long) this.f1376c;
+                b = (long) this.f1362c;
             } else {
-                b = mo22792b(this.f1382j.f1386b + 4 + ((long) this.f1382j.f1387c));
+                b = mo22792b(this.f1368j.f1372b + 4 + ((long) this.f1368j.f1373c));
             }
             C1667a aVar = new C1667a(b, i2);
-            m995a(this.f1383k, 0, i2);
-            m999b(aVar.f1386b, this.f1383k, 0, 4);
-            m999b(aVar.f1386b + 4, bArr, i, i2);
-            m993a(this.f1377d, this.f1378e + 1, isEmpty ? aVar.f1386b : this.f1379f.f1386b, aVar.f1386b);
-            this.f1382j = aVar;
-            this.f1378e++;
-            this.f1380g++;
+            m995a(this.f1369k, 0, i2);
+            m999b(aVar.f1372b, this.f1369k, 0, 4);
+            m999b(aVar.f1372b + 4, bArr, i, i2);
+            m993a(this.f1363d, this.f1364e + 1, isEmpty ? aVar.f1372b : this.f1365f.f1372b, aVar.f1372b);
+            this.f1368j = aVar;
+            this.f1364e++;
+            this.f1366g++;
             if (isEmpty) {
-                this.f1379f = this.f1382j;
+                this.f1365f = this.f1368j;
             }
         }
     }
 
     /* renamed from: a */
     private long m990a() {
-        if (this.f1378e == 0) {
-            return (long) this.f1376c;
+        if (this.f1364e == 0) {
+            return (long) this.f1362c;
         }
-        if (this.f1382j.f1386b >= this.f1379f.f1386b) {
-            return (this.f1382j.f1386b - this.f1379f.f1386b) + 4 + ((long) this.f1382j.f1387c) + ((long) this.f1376c);
+        if (this.f1368j.f1372b >= this.f1365f.f1372b) {
+            return (this.f1368j.f1372b - this.f1365f.f1372b) + 4 + ((long) this.f1368j.f1373c) + ((long) this.f1362c);
         }
-        return (((this.f1382j.f1386b + 4) + ((long) this.f1382j.f1387c)) + this.f1377d) - this.f1379f.f1386b;
+        return (((this.f1368j.f1372b + 4) + ((long) this.f1368j.f1373c)) + this.f1363d) - this.f1365f.f1372b;
     }
 
     /* renamed from: b */
     private long m997b() {
-        return this.f1377d - m990a();
+        return this.f1363d - m990a();
     }
 
     public boolean isEmpty() {
-        return this.f1378e == 0;
+        return this.f1364e == 0;
     }
 
     /* renamed from: c */
@@ -392,7 +392,7 @@ public final class QueueFile implements Closeable, Iterable<byte[]> {
         long j3 = 4 + j;
         long b = m997b();
         if (b < j3) {
-            long j4 = this.f1377d;
+            long j4 = this.f1363d;
             while (true) {
                 b += j4;
                 j2 = j4 << 1;
@@ -402,43 +402,43 @@ public final class QueueFile implements Closeable, Iterable<byte[]> {
                 j4 = j2;
             }
             m1001d(j2);
-            long b2 = mo22792b(this.f1382j.f1386b + 4 + ((long) this.f1382j.f1387c));
-            if (b2 <= this.f1379f.f1386b) {
-                FileChannel channel = this.f1374a.getChannel();
-                channel.position(this.f1377d);
-                long j5 = b2 - ((long) this.f1376c);
-                if (channel.transferTo((long) this.f1376c, j5, channel) != j5) {
+            long b2 = mo22792b(this.f1368j.f1372b + 4 + ((long) this.f1368j.f1373c));
+            if (b2 <= this.f1365f.f1372b) {
+                FileChannel channel = this.f1360a.getChannel();
+                channel.position(this.f1363d);
+                long j5 = b2 - ((long) this.f1362c);
+                if (channel.transferTo((long) this.f1362c, j5, channel) != j5) {
                     throw new AssertionError("Copied insufficient number of bytes!");
-                } else if (this.f1384l) {
-                    m994a((long) this.f1376c, j5);
+                } else if (this.f1370l) {
+                    m994a((long) this.f1362c, j5);
                 }
             }
-            if (this.f1382j.f1386b < this.f1379f.f1386b) {
-                long j6 = (this.f1377d + this.f1382j.f1386b) - ((long) this.f1376c);
-                m993a(j2, this.f1378e, this.f1379f.f1386b, j6);
-                this.f1382j = new C1667a(j6, this.f1382j.f1387c);
+            if (this.f1368j.f1372b < this.f1365f.f1372b) {
+                long j6 = (this.f1363d + this.f1368j.f1372b) - ((long) this.f1362c);
+                m993a(j2, this.f1364e, this.f1365f.f1372b, j6);
+                this.f1368j = new C1667a(j6, this.f1368j.f1373c);
             } else {
-                m993a(j2, this.f1378e, this.f1379f.f1386b, this.f1382j.f1386b);
+                m993a(j2, this.f1364e, this.f1365f.f1372b, this.f1368j.f1372b);
             }
-            this.f1377d = j2;
+            this.f1363d = j2;
         }
     }
 
     /* renamed from: d */
     private void m1001d(long j) throws IOException {
-        this.f1374a.setLength(j);
-        this.f1374a.getChannel().force(true);
+        this.f1360a.setLength(j);
+        this.f1360a.getChannel().force(true);
     }
 
     public byte[] peek() throws IOException {
-        if (this.f1381h) {
+        if (this.f1367h) {
             throw new IOException("closed");
         } else if (isEmpty()) {
             return null;
         } else {
-            int i = this.f1379f.f1387c;
+            int i = this.f1365f.f1373c;
             byte[] bArr = new byte[i];
-            mo22789a(4 + this.f1379f.f1386b, bArr, 0, i);
+            mo22789a(4 + this.f1365f.f1372b, bArr, 0, i);
             return bArr;
         }
     }
@@ -448,7 +448,7 @@ public final class QueueFile implements Closeable, Iterable<byte[]> {
     }
 
     public int size() {
-        return this.f1378e;
+        return this.f1364e;
     }
 
     public void remove() throws IOException {
@@ -459,31 +459,31 @@ public final class QueueFile implements Closeable, Iterable<byte[]> {
         if (i < 0) {
             throw new IllegalArgumentException("Cannot remove negative (" + i + ") number of elements.");
         } else if (i != 0) {
-            if (i == this.f1378e) {
+            if (i == this.f1364e) {
                 clear();
             } else if (isEmpty()) {
                 throw new NoSuchElementException();
-            } else if (i > this.f1378e) {
-                throw new IllegalArgumentException("Cannot remove more elements (" + i + ") than present in queue (" + this.f1378e + ").");
+            } else if (i > this.f1364e) {
+                throw new IllegalArgumentException("Cannot remove more elements (" + i + ") than present in queue (" + this.f1364e + ").");
             } else {
-                long j = this.f1379f.f1386b;
-                long j2 = this.f1379f.f1386b;
+                long j = this.f1365f.f1372b;
+                long j2 = this.f1365f.f1372b;
                 int i2 = 0;
-                int i3 = this.f1379f.f1387c;
+                int i3 = this.f1365f.f1373c;
                 long j3 = 0;
                 while (i2 < i) {
                     j3 += (long) (i3 + 4);
                     long b = mo22792b(4 + j2 + ((long) i3));
-                    mo22789a(b, this.f1383k, 0, 4);
+                    mo22789a(b, this.f1369k, 0, 4);
                     i2++;
-                    i3 = m989a(this.f1383k, 0);
+                    i3 = m989a(this.f1369k, 0);
                     j2 = b;
                 }
-                m993a(this.f1377d, this.f1378e - i, j2, this.f1382j.f1386b);
-                this.f1378e -= i;
-                this.f1380g++;
-                this.f1379f = new C1667a(j2, i3);
-                if (this.f1384l) {
+                m993a(this.f1363d, this.f1364e - i, j2, this.f1368j.f1372b);
+                this.f1364e -= i;
+                this.f1366g++;
+                this.f1365f = new C1667a(j2, i3);
+                if (this.f1370l) {
                     m994a(j, j3);
                 }
             }
@@ -491,30 +491,30 @@ public final class QueueFile implements Closeable, Iterable<byte[]> {
     }
 
     public void clear() throws IOException {
-        if (this.f1381h) {
+        if (this.f1367h) {
             throw new IOException("closed");
         }
         m993a((long) PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM, 0, 0, 0);
-        if (this.f1384l) {
-            this.f1374a.seek((long) this.f1376c);
-            this.f1374a.write(f1373i, 0, 4096 - this.f1376c);
+        if (this.f1370l) {
+            this.f1360a.seek((long) this.f1362c);
+            this.f1360a.write(f1359i, 0, 4096 - this.f1362c);
         }
-        this.f1378e = 0;
-        this.f1379f = C1667a.f1385a;
-        this.f1382j = C1667a.f1385a;
-        if (this.f1377d > PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM) {
+        this.f1364e = 0;
+        this.f1365f = C1667a.f1371a;
+        this.f1368j = C1667a.f1371a;
+        if (this.f1363d > PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM) {
             m1001d(PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM);
         }
-        this.f1377d = PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM;
-        this.f1380g++;
+        this.f1363d = PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM;
+        this.f1366g++;
     }
 
     public void close() throws IOException {
-        this.f1381h = true;
-        this.f1374a.close();
+        this.f1367h = true;
+        this.f1360a.close();
     }
 
     public String toString() {
-        return getClass().getSimpleName() + "[length=" + this.f1377d + ", size=" + this.f1378e + ", first=" + this.f1379f + ", last=" + this.f1382j + "]";
+        return getClass().getSimpleName() + "[length=" + this.f1363d + ", size=" + this.f1364e + ", first=" + this.f1365f + ", last=" + this.f1368j + "]";
     }
 }

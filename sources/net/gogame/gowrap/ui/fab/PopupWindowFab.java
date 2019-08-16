@@ -210,7 +210,7 @@ public class PopupWindowFab extends AbstractFab {
                 view2 = leafView;
             }
             this.retries = 0;
-            C17235 r3 = new OnTouchListener() {
+            C17125 r3 = new OnTouchListener() {
                 private float initialTouchX;
                 private float initialTouchY;
                 private int initialX;
@@ -364,7 +364,7 @@ public class PopupWindowFab extends AbstractFab {
     public AnimatorSet getAnimation(final Activity activity, final int i) {
         int ceil;
         int i2;
-        C17288 r1 = new AnimatorUpdateListener() {
+        C17178 r1 = new AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 PopupWindowFab.this.offsetX = ((Integer) valueAnimator.getAnimatedValue()).intValue();
                 if (PopupWindowFab.this.view != null) {
@@ -429,7 +429,7 @@ public class PopupWindowFab extends AbstractFab {
     @TargetApi(11)
     public AnimatorSet getInsideAnimation(final Activity activity, int i) {
         int ceil;
-        C17299 r1 = new AnimatorUpdateListener() {
+        C17189 r1 = new AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 PopupWindowFab.this.offsetX = ((Integer) valueAnimator.getAnimatedValue()).intValue();
                 PopupWindowFab.this.updateFabLocation(activity);

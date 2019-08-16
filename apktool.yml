@@ -1,5 +1,5 @@
 !!brut.androlib.meta.MetaInfo
-apkFileName: DragonProject_v1.6.3_apkpure.com.apk
+apkFileName: DragonProject.ver.1.6.6.build.2019080602.apk
 compressionType: false
 doNotCompress:
 - arsc
@@ -39,19 +39,6 @@ doNotCompress:
 - res/drawable-hdpi-v4/net_gogame_gowrap_button_background_wiki.9.png
 - res/drawable-hdpi-v4/net_gogame_gowrap_button_background_youtube.9.png
 - res/drawable-hdpi-v4/net_gogame_gowrap_default_button_background.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_armory_equipment_foreground.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_armory_summary_background.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_edittext_background.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_center_default.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_center_selected.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_default_background.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_left_default.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_left_selected.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_right_default.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_right_selected.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_friends_background.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_page_indicator_background.9.png
-- jpg
 - res/drawable-hdpi-v4/net_gogame_gowrap_edittext_background.9.png
 - res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_admin_bottom.9.png
 - res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_admin_top.9.png
@@ -136,7 +123,6 @@ doNotCompress:
 - res/drawable-xhdpi-v4/com_facebook_tooltip_blue_background.9.png
 - res/drawable-xhdpi-v4/net_gogame_gowrap_dialog_background_bottom.9.png
 - res/drawable-xhdpi-v4/net_gogame_gowrap_dialog_background_top.9.png
-- res/drawable-xhdpi-v4/net_gogame_gowrap_dpro_equip_item_frame.9.png
 - res/drawable-xhdpi-v4/net_gogame_gowrap_sns_button_background.9.png
 - res/drawable-xhdpi-v4/notification_bg_low_normal.9.png
 - res/drawable-xhdpi-v4/notification_bg_low_pressed.9.png
@@ -230,5 +216,5 @@ usesFramework:
   tag: null
 version: 2.4.0
 versionInfo:
-  versionCode: '2019071802'
-  versionName: 1.6.3
+  versionCode: '2019080602'
+  versionName: 1.6.6

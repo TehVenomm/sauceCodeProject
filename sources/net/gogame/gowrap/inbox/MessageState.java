@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class MessageState implements Serializable {
 
     /* renamed from: id */
-    private long f1404id;
+    private long f1394id;
     private boolean read;
     private long timestamp;
     private String type;
@@ -19,11 +19,11 @@ public class MessageState implements Serializable {
     }
 
     public long getId() {
-        return this.f1404id;
+        return this.f1394id;
     }
 
     public void setId(long j) {
-        this.f1404id = j;
+        this.f1394id = j;
     }
 
     public long getTimestamp() {

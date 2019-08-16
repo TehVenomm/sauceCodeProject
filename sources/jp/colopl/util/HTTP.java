@@ -21,6 +21,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
+import p017io.fabric.sdk.android.services.common.AbstractSpiCall;
 import p017io.fabric.sdk.android.services.network.HttpRequest;
 import p018jp.colopl.config.Config;
 import p018jp.colopl.drapro.AppConsts;
@@ -28,9 +29,9 @@ import p018jp.colopl.util.HttpMultipartRequest.ProgressCallback;
 
 /* renamed from: jp.colopl.util.HTTP */
 public class HTTP {
-    private static int CONNECT_TIMEOUT = 10000;
+    private static int CONNECT_TIMEOUT = AbstractSpiCall.DEFAULT_TIMEOUT;
     private static int CONNECT_TIMEOUT_FOR_UPLOAD = 300000;
-    private static int READ_TIMEOUT = 10000;
+    private static int READ_TIMEOUT = AbstractSpiCall.DEFAULT_TIMEOUT;
     private static int READ_TIMEOUT_FOR_UPLOAD = 300000;
     private static String userAgent;
 

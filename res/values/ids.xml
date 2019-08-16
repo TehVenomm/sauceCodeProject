@@ -152,61 +152,9 @@
     <item type="id" name="net_gogame_gowrap_dialog_icon_alert" />
     <item type="id" name="net_gogame_gowrap_dialog_icon_info" />
     <item type="id" name="net_gogame_gowrap_dialog_message" />
-    <item type="id" name="net_gogame_gowrap_armory_user_name" />
-    <item type="id" name="net_gogame_gowrap_armory_user_title" />
-    <item type="id" name="net_gogame_gowrap_armory_user_level" />
-    <item type="id" name="net_gogame_gowrap_armory_user_power_rating" />
-    <item type="id" name="net_gogame_gowrap_back_button" />
-    <item type="id" name="net_gogame_gowrap_armory_hunter_id" />
-    <item type="id" name="net_gogame_gowrap_armory_user_atk" />
-    <item type="id" name="net_gogame_gowrap_armory_user_def" />
-    <item type="id" name="net_gogame_gowrap_armory_user_hp" />
-    <item type="id" name="net_gogame_gowrap_armory_equipment_list" />
-    <item type="id" name="net_gogame_gowrap_armory_equipment_icon" />
-    <item type="id" name="net_gogame_gowrap_armory_equipment_name" />
-    <item type="id" name="net_gogame_gowrap_armory_equipment_rarity" />
-    <item type="id" name="net_gogame_gowrap_armory_equipment_level" />
-    <item type="id" name="net_gogame_gowrap_armory_skillitem_icon" />
-    <item type="id" name="net_gogame_gowrap_armory_skillitem_name" />
-    <item type="id" name="net_gogame_gowrap_armory_skillitem_rarity" />
-    <item type="id" name="net_gogame_gowrap_armory_skillitem_level" />
-    <item type="id" name="net_gogame_gowrap_equipment_collection_user_name" />
-    <item type="id" name="net_gogame_gowrap_equipment_collection_user_title" />
-    <item type="id" name="net_gogame_gowrap_equipment_collection_user_level" />
-    <item type="id" name="net_gogame_gowrap_equipment_collection_points" />
-    <item type="id" name="net_gogame_gowrap_equipment_collection_hunter_id" />
-    <item type="id" name="net_gogame_gowrap_equipment_collection_forged_count" />
-    <item type="id" name="net_gogame_gowrap_equipment_collection_total_count" />
-    <item type="id" name="net_gogame_gowrap_equipment_collection_container" />
-    <item type="id" name="net_gogame_gowrap_equipment_collection_list" />
-    <item type="id" name="net_gogame_gowrap_pager_container" />
-    <item type="id" name="net_gogame_gowrap_pager_previous_button" />
-    <item type="id" name="net_gogame_gowrap_pager_text" />
-    <item type="id" name="net_gogame_gowrap_pager_next_button" />
-    <item type="id" name="net_gogame_gowrap_armory_equipment_frame" />
-    <item type="id" name="net_gogame_gowrap_armory_equipment_element" />
-    <item type="id" name="net_gogame_gowrap_armory_equipment_index" />
-    <item type="id" name="net_gogame_gowrap_ranking_button_container" />
-    <item type="id" name="net_gogame_gowrap_ranking_power_rating_all_users_button" />
-    <item type="id" name="net_gogame_gowrap_ranking_power_rating_new_users_button" />
-    <item type="id" name="net_gogame_gowrap_ranking_equipment_collection_all_users_button" />
-    <item type="id" name="net_gogame_gowrap_ranking_search_button" />
-    <item type="id" name="net_gogame_gowrap_ranking_search_container" />
-    <item type="id" name="net_gogame_gowrap_ranking_search" />
-    <item type="id" name="net_gogame_gowrap_ranking_search_submit_button" />
-    <item type="id" name="net_gogame_gowrap_ranking_results_container" />
-    <item type="id" name="net_gogame_gowrap_ranking_hunter_entry_container" />
-    <item type="id" name="net_gogame_gowrap_ranking_hunter_entry" />
-    <item type="id" name="net_gogame_gowrap_ranking_listview" />
     <item type="id" name="net_gogame_gowrap_main_tabbed_panel" />
     <item type="id" name="net_gogame_gowrap_main_fragment_container" />
     <item type="id" name="net_gogame_gowrap_main_sns_button" />
-    <item type="id" name="net_gogame_gowrap_ranking_position" />
-    <item type="id" name="net_gogame_gowrap_ranking_title" />
-    <item type="id" name="net_gogame_gowrap_ranking_level" />
-    <item type="id" name="net_gogame_gowrap_ranking_value" />
-    <item type="id" name="net_gogame_gowrap_ranking_name" />
-    <item type="id" name="net_gogame_gowrap_ranking_hunter_id" />
     <item type="id" name="net_gogame_gowrap_community_header" />
     <item type="id" name="net_gogame_gowrap_facebook_button" />
     <item type="id" name="net_gogame_gowrap_twitter_button" />
@@ -214,6 +162,7 @@
     <item type="id" name="net_gogame_gowrap_youtube_button" />
     <item type="id" name="net_gogame_gowrap_forum_button" />
     <item type="id" name="net_gogame_gowrap_wiki_button" />
+    <item type="id" name="net_gogame_gowrap_back_button" />
     <item type="id" name="net_gogame_gowrap_faq_listview" />
     <item type="id" name="net_gogame_gowrap_faq_article_title" />
     <item type="id" name="net_gogame_gowrap_faq_section_name" />
@@ -239,9 +188,6 @@
     <item type="id" name="net_gogame_gowrap_support_form_button" />
     <item type="id" name="net_gogame_gowrap_support_chat_button" />
     <item type="id" name="net_gogame_gowrap_support_search_textfield" />
-    <item type="id" name="net_gogame_gowrap_tip1_button" />
-    <item type="id" name="net_gogame_gowrap_tip2_button" />
-    <item type="id" name="net_gogame_gowrap_tip3_button" />
     <item type="id" name="net_gogame_gowrap_navbar" />
     <item type="id" name="net_gogame_gowrap_info_button" />
     <item type="id" name="net_gogame_gowrap_language_button" />
@@ -250,7 +196,6 @@
     <item type="id" name="net_gogame_gowrap_help_button" />
     <item type="id" name="net_gogame_gowrap_contact_button" />
     <item type="id" name="net_gogame_gowrap_close_button" />
-    <item type="id" name="net_gogame_gowrap_news_icon" />
     <item type="id" name="net_gogame_gowrap_news_icon_top" />
     <item type="id" name="net_gogame_gowrap_news_icon_bottom" />
     <item type="id" name="net_gogame_gowrap_news_title" />
@@ -259,7 +204,6 @@
     <item type="id" name="net_gogame_gowrap_newsfeed_item_photo" />
     <item type="id" name="net_gogame_gowrap_newsfeed_item_content_background" />
     <item type="id" name="net_gogame_gowrap_newsfeed_item_content" />
-    <item type="id" name="net_gogame_gowrap_newsfeed_item_text" />
     <item type="id" name="net_gogame_gowrap_newsfeed_item_timestamp" />
     <item type="id" name="net_gogame_gowrap_newsfeed_item_message" />
     <item type="id" name="net_gogame_gowrap_newsfeed_item_button" />
@@ -272,5 +216,4 @@
     <item type="id" name="net_gogame_gowrap_error_container" />
     <item type="id" name="net_gogame_gowrap_news_article_timestamp" />
     <item type="id" name="net_gogame_gowrap_news_article_container" />
-    <item type="id" name="net_gogame_gowrap_more_tips_button" />
 </resources>

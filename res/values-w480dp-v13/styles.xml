@@ -3,10 +3,4 @@
     <style name="net_gogame_gowrap_help_button">
         <item name="android:layout_width">448.0dip</item>
     </style>
-    <style name="net_gogame_gowrap_ranking_button">
-        <item name="android:layout_width">448.0dip</item>
-    </style>
-    <style name="net_gogame_gowrap_tips_button">
-        <item name="android:layout_width">448.0dip</item>
-    </style>
 </resources>

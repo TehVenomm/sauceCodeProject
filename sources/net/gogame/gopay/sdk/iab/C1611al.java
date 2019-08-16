@@ -7,10 +7,10 @@ import android.content.DialogInterface.OnClickListener;
 final class C1611al implements OnClickListener {
 
     /* renamed from: a */
-    final /* synthetic */ C1369aj f1249a;
+    final /* synthetic */ C1369aj f1237a;
 
     C1611al(C1369aj ajVar) {
-        this.f1249a = ajVar;
+        this.f1237a = ajVar;
     }
 
     public final void onClick(DialogInterface dialogInterface, int i) {

@@ -76,7 +76,7 @@
     <string name="abc_font_family_subhead_material">sans-serif</string>
     <string name="abc_font_family_title_material">sans-serif-medium</string>
     <string name="app_name">Dragon Project</string>
-    <string name="com.crashlytics.android.build_id">942781f4-0a33-4314-ae33-d7360aec891b</string>
+    <string name="com.crashlytics.android.build_id">08aaf680-61f4-4e3b-b74f-301ec8b2e502</string>
     <string name="copy_to_clipboard">Copied to the clipboard</string>
     <string name="default_web_client_id">683498632423-lpl19njuit2sm48nll476p0k3hij8ikc.apps.googleusercontent.com</string>
     <string name="dialog_button_cancel">Cancel</string>
@@ -221,19 +221,6 @@ http://itunes.apple.com/app/id1244634394"</string>
     <string name="net_gogame_gowrap_news_banner_time_period_until_format">Until %1$s (GMT/UTC)</string>
     <string name="net_gogame_gowrap_news_no_data_error_message">Could not retrieve news feed, please try again later.</string>
     <string name="net_gogame_gowrap_newsfeed_visit_site_for_more_button_caption">Visit Facebook for more</string>
-    <string name="net_gogame_gowrap_ranking_equipment_collection_all_users_button_caption">Collection</string>
-    <string name="net_gogame_gowrap_ranking_friends_ranking_title">"Friends' ranking"</string>
-    <string name="net_gogame_gowrap_ranking_level_header_caption">Level</string>
-    <string name="net_gogame_gowrap_ranking_no_data_error_message">Could not retrieve rankings, please try again later.</string>
-    <string name="net_gogame_gowrap_ranking_player_header_caption">Player</string>
-    <string name="net_gogame_gowrap_ranking_points_header_caption">Points</string>
-    <string name="net_gogame_gowrap_ranking_position_header_caption">\#</string>
-    <string name="net_gogame_gowrap_ranking_power_header_caption">Power</string>
-    <string name="net_gogame_gowrap_ranking_power_rating_all_users_button_caption">Power</string>
-    <string name="net_gogame_gowrap_ranking_power_rating_new_users_button_caption">Top Newbies</string>
-    <string name="net_gogame_gowrap_ranking_search_button_caption">Search</string>
-    <string name="net_gogame_gowrap_ranking_search_hint">Search by hunter ID</string>
-    <string name="net_gogame_gowrap_ranking_title">Ranking</string>
     <string name="net_gogame_gowrap_sns_blurb">Get free Tickets and rewards regularly on our Official Facebook group</string>
     <string name="net_gogame_gowrap_support_faq_title">FAQ</string>
     <string name="net_gogame_gowrap_support_form_body_label">Problem Description *</string>
@@ -243,12 +230,4 @@ http://itunes.apple.com/app/id1244634394"</string>
     <string name="net_gogame_gowrap_support_form_mobile_number_label">Mobile number</string>
     <string name="net_gogame_gowrap_support_form_name_label">Your name *</string>
     <string name="net_gogame_gowrap_support_form_required_label">* REQUIRED</string>
-    <string name="net_gogame_gowrap_tips_article1_description">"To understand forging, you'll first need to know this basic formula."</string>
-    <string name="net_gogame_gowrap_tips_article1_title">Forging Logic</string>
-    <string name="net_gogame_gowrap_tips_article2_description">"New to Dragon Project? Read this for five simple tips that'll help you in your journey ahead."</string>
-    <string name="net_gogame_gowrap_tips_article2_title">5 simple tips for newbies</string>
-    <string name="net_gogame_gowrap_tips_article3_description">"Just started? Completely clueless? We're here to help with a quick overview of the basics."</string>
-    <string name="net_gogame_gowrap_tips_article3_title">"Ultimate Beginner's Guide"</string>
-    <string name="net_gogame_gowrap_tips_more_tips_button_caption">Tap for more guides »</string>
-    <string name="net_gogame_gowrap_tips_see_more_button_caption">See more</string>
 </resources>

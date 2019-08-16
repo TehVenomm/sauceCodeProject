@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace UnityStandardAssets.ImageEffects
 {
-	[ExecuteInEditMode]
-	[RequireComponent(typeof(Camera))]
 	[AddComponentMenu("Image Effects/Edge Detection/Edge Detection")]
+	[RequireComponent(typeof(Camera))]
+	[ExecuteInEditMode]
 	public class EdgeDetection : PostEffectsBase
 	{
 		public enum EdgeDetectMode

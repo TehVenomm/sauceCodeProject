@@ -4,9 +4,9 @@ package net.gogame.gopay.sdk;
 public final class C1602c {
 
     /* renamed from: a */
-    private final boolean f1216a;
+    private final boolean f1204a;
 
     public C1602c(boolean z) {
-        this.f1216a = z;
+        this.f1204a = z;
     }
 }

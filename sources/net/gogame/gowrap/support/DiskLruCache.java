@@ -476,14 +476,14 @@ public final class DiskLruCache implements Closeable {
         }
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(this.journalFileTmp), 8192);
         bufferedWriter.write(MAGIC);
-        bufferedWriter.write(StringUtils.f1199LF);
+        bufferedWriter.write(StringUtils.f1189LF);
         bufferedWriter.write("1");
-        bufferedWriter.write(StringUtils.f1199LF);
+        bufferedWriter.write(StringUtils.f1189LF);
         bufferedWriter.write(Integer.toString(this.appVersion));
-        bufferedWriter.write(StringUtils.f1199LF);
+        bufferedWriter.write(StringUtils.f1189LF);
         bufferedWriter.write(Integer.toString(this.valueCount));
-        bufferedWriter.write(StringUtils.f1199LF);
-        bufferedWriter.write(StringUtils.f1199LF);
+        bufferedWriter.write(StringUtils.f1189LF);
+        bufferedWriter.write(StringUtils.f1189LF);
         for (Entry entry : this.lruEntries.values()) {
             if (entry.currentEditor != null) {
                 bufferedWriter.write("DIRTY " + entry.key + 10);
@@ -696,7 +696,7 @@ public final class DiskLruCache implements Closeable {
     }
 
     private void validateKey(String str) {
-        if (str.contains(" ") || str.contains(StringUtils.f1199LF) || str.contains(StringUtils.f1198CR)) {
+        if (str.contains(" ") || str.contains(StringUtils.f1189LF) || str.contains(StringUtils.f1188CR)) {
             throw new IllegalArgumentException("keys must not contain spaces or newlines: \"" + str + "\"");
         }
     }

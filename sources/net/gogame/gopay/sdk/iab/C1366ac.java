@@ -9,23 +9,23 @@ import android.widget.AdapterView.OnItemClickListener;
 final class C1366ac implements OnItemClickListener {
 
     /* renamed from: a */
-    final /* synthetic */ PurchaseActivity f1062a;
+    final /* synthetic */ PurchaseActivity f1056a;
 
     C1366ac(PurchaseActivity purchaseActivity) {
-        this.f1062a = purchaseActivity;
+        this.f1056a = purchaseActivity;
     }
 
     public final void onItemClick(AdapterView adapterView, View view, int i, long j) {
         if (i != 0) {
-            if (!this.f1062a.f1026K || this.f1062a.f1036d || this.f1062a.f1025J || !this.f1062a.f1027L) {
-                this.f1062a.f1025J = false;
-                if (this.f1062a.f1036d) {
-                    PurchaseActivity.m813b(this.f1062a, false);
+            if (!this.f1056a.f1020K || this.f1056a.f1030d || this.f1056a.f1019J || !this.f1056a.f1021L) {
+                this.f1056a.f1019J = false;
+                if (this.f1056a.f1030d) {
+                    PurchaseActivity.m813b(this.f1056a, false);
                 }
-                PurchaseActivity.m816c(this.f1062a, this.f1062a.f1019D.getItem(i).intValue());
+                PurchaseActivity.m816c(this.f1056a, this.f1056a.f1013D.getItem(i).intValue());
                 return;
             }
-            new Builder(this.f1062a).setTitle(this.f1062a.f1047o).setMessage(this.f1062a.f1046n).setPositiveButton(this.f1062a.f1044l, new C1606ad(this, i)).setNegativeButton(this.f1062a.f1045m, new C1607ae(this)).setCancelable(false).show();
+            new Builder(this.f1056a).setTitle(this.f1056a.f1041o).setMessage(this.f1056a.f1040n).setPositiveButton(this.f1056a.f1038l, new C1606ad(this, i)).setNegativeButton(this.f1056a.f1039m, new C1607ae(this)).setCancelable(false).show();
         }
     }
 }

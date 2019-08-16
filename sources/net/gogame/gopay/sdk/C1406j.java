@@ -38,32 +38,32 @@ import p017io.fabric.sdk.android.services.network.HttpRequest;
 public final class C1406j {
 
     /* renamed from: a */
-    private static String f1121a = null;
+    private static String f1115a = null;
 
     /* renamed from: b */
-    private static String f1122b;
+    private static String f1116b;
 
     /* renamed from: c */
-    private static String f1123c;
+    private static String f1117c;
 
     /* renamed from: d */
-    private static String f1124d;
+    private static String f1118d;
 
     /* renamed from: e */
-    private static String f1125e;
+    private static String f1119e;
 
     /* renamed from: f */
-    private static String f1126f = "";
+    private static String f1120f = "";
 
     /* renamed from: g */
-    private static String f1127g = "";
+    private static String f1121g = "";
 
     /* renamed from: h */
-    private static String f1128h = "";
+    private static String f1122h = "";
 
     /* renamed from: a */
     public static String m858a() {
-        return f1121a;
+        return f1115a;
     }
 
     /* renamed from: a */
@@ -75,15 +75,15 @@ public final class C1406j {
         map.put("sdk_version", "1.1.7");
         map.put("lang", Locale.getDefault().getISO3Language());
         map.put("tz", TimeZone.getDefault().getID());
-        map.put("game_version", f1128h);
-        if (f1126f != null) {
-            map.put("device_id", f1126f);
+        map.put("game_version", f1122h);
+        if (f1120f != null) {
+            map.put("device_id", f1120f);
         }
-        if (f1127g != null) {
-            map.put("bundle_id", f1127g);
+        if (f1121g != null) {
+            map.put("bundle_id", f1121g);
         }
-        if (f1125e != null && f1125e.length() > 0) {
-            map.put("glang", f1125e);
+        if (f1119e != null && f1119e.length() > 0) {
+            map.put("glang", f1119e);
         }
         String str2 = "";
         if (str.indexOf("http") >= 0) {
@@ -96,7 +96,7 @@ public final class C1406j {
         if (map != null) {
             str3 = str3 + m860a(map);
         }
-        f1122b = m874c(str3, f1123c, "HmacSHA256");
+        f1116b = m874c(str3, f1117c, "HmacSHA256");
         return str + "?" + m860a(map);
     }
 
@@ -253,7 +253,7 @@ public final class C1406j {
 
     /* renamed from: a */
     public static void m868a(String str) {
-        f1121a = str;
+        f1115a = str;
     }
 
     /* renamed from: a */
@@ -262,9 +262,9 @@ public final class C1406j {
             HashMap hashMap = new HashMap();
             hashMap.put("appId", str);
             hashMap.put("guid", str2);
-            if (!(f1124d == null || f1123c == null)) {
+            if (!(f1118d == null || f1117c == null)) {
                 try {
-                    hashMap.put("uid", IOUtils.encrypt(f1123c, f1124d));
+                    hashMap.put("uid", IOUtils.encrypt(f1117c, f1118d));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -316,7 +316,7 @@ public final class C1406j {
 
     /* renamed from: b */
     public static void m873b(String str) {
-        f1123c = str;
+        f1117c = str;
     }
 
     /* renamed from: c */
@@ -351,7 +351,7 @@ public final class C1406j {
 
     /* renamed from: c */
     public static void m876c(String str) {
-        f1124d = str;
+        f1118d = str;
     }
 
     @NotNull
@@ -366,7 +366,7 @@ public final class C1406j {
 
     /* renamed from: d */
     public static void m878d(String str) {
-        f1126f = str;
+        f1120f = str;
     }
 
     @NotNull
@@ -390,7 +390,7 @@ public final class C1406j {
 
     /* renamed from: e */
     public static void m880e(String str) {
-        f1127g = str;
+        f1121g = str;
     }
 
     @NotNull
@@ -413,7 +413,7 @@ public final class C1406j {
 
     /* renamed from: f */
     public static void m882f(String str) {
-        f1128h = str;
+        f1122h = str;
     }
 
     @NotNull
@@ -424,14 +424,14 @@ public final class C1406j {
 
     /* renamed from: g */
     public static void m884g(String str) {
-        f1125e = str;
+        f1119e = str;
     }
 
     /* renamed from: h */
     private static HttpURLConnection m885h(String str) {
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(str).openConnection();
-            httpURLConnection.addRequestProperty("Go-Token", f1122b);
+            httpURLConnection.addRequestProperty("Go-Token", f1116b);
             httpURLConnection.setRequestProperty("http.keepAlive", "false");
             httpURLConnection.setRequestMethod(HttpRequest.METHOD_GET);
             httpURLConnection.setConnectTimeout(5000);

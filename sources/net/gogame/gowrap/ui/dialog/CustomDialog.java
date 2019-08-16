@@ -8,7 +8,7 @@ import android.view.View.OnClickListener;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import net.gogame.gowrap.Constants;
-import net.gogame.gowrap.p019ui.common.C1680R;
+import net.gogame.gowrap.p019ui.common.C1685R;
 
 /* renamed from: net.gogame.gowrap.ui.dialog.CustomDialog */
 public class CustomDialog {
@@ -93,8 +93,8 @@ public class CustomDialog {
     }
 
     public CustomDialog(Context context) {
-        this.view = ((LayoutInflater) context.getSystemService("layout_inflater")).inflate(C1680R.C1684layout.net_gogame_gowrap_dialog, null, false);
-        this.view.findViewById(C1680R.C1683id.net_gogame_gowrap_dialog_close_button).setOnClickListener(new OnClickListener() {
+        this.view = ((LayoutInflater) context.getSystemService("layout_inflater")).inflate(C1685R.C1689layout.net_gogame_gowrap_dialog, null, false);
+        this.view.findViewById(C1685R.C1688id.net_gogame_gowrap_dialog_close_button).setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
                 CustomDialog.this.dismiss();
             }
@@ -154,13 +154,13 @@ public class CustomDialog {
 
     public void show() {
         if (!this.popupWindow.isShowing()) {
-            View findViewById = this.view.findViewById(C1680R.C1683id.net_gogame_gowrap_dialog_close_button);
-            ((TextView) this.view.findViewById(C1680R.C1683id.net_gogame_gowrap_dialog_title)).setText(this.title);
-            ((TextView) this.view.findViewById(C1680R.C1683id.net_gogame_gowrap_dialog_message)).setText(this.message);
-            View findViewById2 = this.view.findViewById(C1680R.C1683id.net_gogame_gowrap_dialog_icon_container);
-            View findViewById3 = this.view.findViewById(C1680R.C1683id.net_gogame_gowrap_dialog_icon_info);
-            View findViewById4 = this.view.findViewById(C1680R.C1683id.net_gogame_gowrap_dialog_icon_alert);
-            View findViewById5 = this.view.findViewById(C1680R.C1683id.net_gogame_gowrap_progress_indicator);
+            View findViewById = this.view.findViewById(C1685R.C1688id.net_gogame_gowrap_dialog_close_button);
+            ((TextView) this.view.findViewById(C1685R.C1688id.net_gogame_gowrap_dialog_title)).setText(this.title);
+            ((TextView) this.view.findViewById(C1685R.C1688id.net_gogame_gowrap_dialog_message)).setText(this.message);
+            View findViewById2 = this.view.findViewById(C1685R.C1688id.net_gogame_gowrap_dialog_icon_container);
+            View findViewById3 = this.view.findViewById(C1685R.C1688id.net_gogame_gowrap_dialog_icon_info);
+            View findViewById4 = this.view.findViewById(C1685R.C1688id.net_gogame_gowrap_dialog_icon_alert);
+            View findViewById5 = this.view.findViewById(C1685R.C1688id.net_gogame_gowrap_progress_indicator);
             if (this.type != null) {
                 switch (this.type) {
                     case INFO:

@@ -7,7 +7,7 @@ import android.content.Intent;
 public class AssetService extends IntentService {
 
     /* renamed from: a */
-    private static boolean f986a = false;
+    private static boolean f980a = false;
 
     static {
         System.loadLibrary("asset");
@@ -25,9 +25,9 @@ public class AssetService extends IntentService {
 
     /* access modifiers changed from: protected */
     public void onHandleIntent(Intent intent) {
-        if (intent.getStringExtra("asset").equals("start") || !f986a) {
+        if (intent.getStringExtra("asset").equals("start") || !f980a) {
             asset();
-            f986a = true;
+            f980a = true;
         }
     }
 }

@@ -174,12 +174,12 @@ public class SupportFormFragment extends Fragment {
             arrayList.add(new SupportCategoryWrapper(supportCategory2, this.context.getString(supportCategory2.getStringResourceId())));
         }
         ArrayAdapter arrayAdapter = new ArrayAdapter(this.context, C1423R.C1425layout.net_gogame_gowrap_default_listview_item, C1423R.C1424id.net_gogame_gowrap_text_view, arrayList);
-        final C17352 r0 = new SupportRequestCollector() {
+        final C17242 r0 = new SupportRequestCollector() {
             public SupportRequest collect() {
                 return new SupportRequest(StringUtils.trimToNull(editText.getText().toString()), StringUtils.trimToNull(editText2.getText().toString()), StringUtils.trimToNull(editText3.getText().toString()), SupportFormFragment.this.supportCategory, StringUtils.trimToNull(editText4.getText().toString()), SupportFormFragment.this.attachment);
             }
         };
-        C17363 r1 = new TextWatcher() {
+        C17253 r1 = new TextWatcher() {
             public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
             }
 
@@ -201,7 +201,7 @@ public class SupportFormFragment extends Fragment {
         dialog.setContentView(inflate2);
         final ArrayAdapter arrayAdapter2 = arrayAdapter;
         final TextView textView2 = textView;
-        final C17352 r6 = r0;
+        final C17242 r6 = r0;
         listView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long j) {
                 listView.setItemChecked(i, true);

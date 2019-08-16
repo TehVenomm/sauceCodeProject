@@ -3,8 +3,8 @@ using UnityEngine;
 namespace UnityStandardAssets.ImageEffects
 {
 	[ExecuteInEditMode]
-	[RequireComponent(typeof(Camera))]
 	[AddComponentMenu("Image Effects/Noise/Noise and Scratches")]
+	[RequireComponent(typeof(Camera))]
 	public class NoiseAndScratches : MonoBehaviour
 	{
 		public bool monochrome = true;

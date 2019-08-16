@@ -133,13 +133,9 @@
     <dimen name="net_gogame_gowrap_community_image_button_text_size">14.0sp</dimen>
     <dimen name="net_gogame_gowrap_margin_left">8.0dip</dimen>
     <dimen name="net_gogame_gowrap_margin_right">8.0dip</dimen>
-    <dimen name="net_gogame_gowrap_padding_left">8.0dip</dimen>
-    <dimen name="net_gogame_gowrap_padding_right">8.0dip</dimen>
     <dimen name="net_gogame_gowrap_border_radius">12.0dip</dimen>
     <dimen name="net_gogame_gowrap_image_button_border_radius">8.0dip</dimen>
     <dimen name="net_gogame_gowrap_margin_bottom">8.0dip</dimen>
     <dimen name="net_gogame_gowrap_margin_top">8.0dip</dimen>
     <dimen name="net_gogame_gowrap_navbar_button_padding">4.0dip</dimen>
-    <dimen name="net_gogame_gowrap_padding_bottom">8.0dip</dimen>
-    <dimen name="net_gogame_gowrap_padding_top">8.0dip</dimen>
 </resources>

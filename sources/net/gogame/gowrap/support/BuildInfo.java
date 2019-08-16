@@ -34,9 +34,9 @@ public final class BuildInfo {
     public static void showBuildInfoDialog(final Context context) {
         try {
             Class cls = Class.forName("net.gogame.gowrap.BuildProperties");
-            StringBuilder append = new StringBuilder().append("App package name: ").append(AppInfo.getPackageName(context)).append(StringUtils.f1199LF).append("App version: ").append(AppInfo.getAppVersion(context)).append(StringUtils.f1199LF).append(StringUtils.f1199LF).append("Variant: ").append(CoreSupport.INSTANCE.getVariantId()).append(StringUtils.f1199LF).append("Version: ").append(getProperty(cls, "VERSION")).append(StringUtils.f1199LF).append("Build date: ").append(getProperty(cls, "BUILD_DATE")).append(StringUtils.f1199LF).append(StringUtils.f1199LF).append("Branch: ").append(getProperty(cls, "GIT_BRANCH")).append(StringUtils.f1199LF).append("Commit ID: ").append(getProperty(cls, "GIT_COMMIT_ID_ABBREV")).append(StringUtils.f1199LF).append("Commit date: ").append(getProperty(cls, "GIT_COMMIT_DATE")).append(StringUtils.f1199LF);
+            StringBuilder append = new StringBuilder().append("App package name: ").append(AppInfo.getPackageName(context)).append(StringUtils.f1189LF).append("App version: ").append(AppInfo.getAppVersion(context)).append(StringUtils.f1189LF).append(StringUtils.f1189LF).append("Variant: ").append(CoreSupport.INSTANCE.getVariantId()).append(StringUtils.f1189LF).append("Version: ").append(getProperty(cls, "VERSION")).append(StringUtils.f1189LF).append("Build date: ").append(getProperty(cls, "BUILD_DATE")).append(StringUtils.f1189LF).append(StringUtils.f1189LF).append("Branch: ").append(getProperty(cls, "GIT_BRANCH")).append(StringUtils.f1189LF).append("Commit ID: ").append(getProperty(cls, "GIT_COMMIT_ID_ABBREV")).append(StringUtils.f1189LF).append("Commit date: ").append(getProperty(cls, "GIT_COMMIT_DATE")).append(StringUtils.f1189LF);
             if (GoWrapImpl.INSTANCE.getGuid() != null) {
-                append.append(StringUtils.f1199LF).append("GUID: ").append(GoWrapImpl.INSTANCE.getGuid()).append(StringUtils.f1199LF);
+                append.append(StringUtils.f1189LF).append("GUID: ").append(GoWrapImpl.INSTANCE.getGuid()).append(StringUtils.f1189LF);
             }
             final String sb = append.toString();
             AlertDialog show = new Builder(context).setTitle("Info").setMessage(sb).show();

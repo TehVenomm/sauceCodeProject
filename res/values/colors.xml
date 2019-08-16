@@ -103,6 +103,4 @@
     <color name="net_gogame_gowrap_support_form_background_color">#ffebebeb</color>
     <color name="net_gogame_gowrap_support_form_field_text_color">#ffe4dfd4</color>
     <color name="net_gogame_gowrap_support_form_field_text_hint_color">#ff877754</color>
-    <color name="net_gogame_gowrap_tabbed_panel_inner_line_color">#ff2f93a0</color>
-    <color name="net_gogame_gowrap_tabbed_panel_outer_line_color">#ff4bd7f3</color>
 </resources>

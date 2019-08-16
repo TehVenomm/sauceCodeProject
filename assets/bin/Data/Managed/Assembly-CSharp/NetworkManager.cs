@@ -42,7 +42,7 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 
 	private bool isPreload;
 
-	public static string APP_HOST => "http://appprd-163.dragonproject.gogame.net/";
+	public static string APP_HOST => "http://appprd.dragonproject.gogame.net/";
 
 	public static string IMG_HOST => "http://cdnprd.dragonproject.gogame.net/resources/";
 

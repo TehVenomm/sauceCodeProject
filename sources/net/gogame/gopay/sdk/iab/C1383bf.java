@@ -7,13 +7,13 @@ import android.content.DialogInterface.OnCancelListener;
 final class C1383bf implements OnCancelListener {
 
     /* renamed from: a */
-    final /* synthetic */ PurchaseActivity f1083a;
+    final /* synthetic */ PurchaseActivity f1077a;
 
     C1383bf(PurchaseActivity purchaseActivity) {
-        this.f1083a = purchaseActivity;
+        this.f1077a = purchaseActivity;
     }
 
     public final void onCancel(DialogInterface dialogInterface) {
-        this.f1083a.f1058z.setEnabled(true);
+        this.f1077a.f1052z.setEnabled(true);
     }
 }

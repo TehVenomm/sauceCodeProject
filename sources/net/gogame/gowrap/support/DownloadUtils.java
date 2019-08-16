@@ -16,6 +16,7 @@ import java.util.Map;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.p021io.utils.FileUtils;
 import net.gogame.gowrap.p021io.utils.IOUtils;
+import p017io.fabric.sdk.android.services.common.AbstractSpiCall;
 import p017io.fabric.sdk.android.services.network.HttpRequest;
 
 public final class DownloadUtils {
@@ -63,8 +64,8 @@ public final class DownloadUtils {
                             HttpURLConnection httpURLConnection3 = (HttpURLConnection) this.url.openConnection();
                             try {
                                 httpURLConnection3.setRequestMethod(HttpRequest.METHOD_HEAD);
-                                httpURLConnection3.setConnectTimeout(10000);
-                                httpURLConnection3.setReadTimeout(10000);
+                                httpURLConnection3.setConnectTimeout(AbstractSpiCall.DEFAULT_TIMEOUT);
+                                httpURLConnection3.setReadTimeout(AbstractSpiCall.DEFAULT_TIMEOUT);
                                 HttpUtils.drainQuietly(httpURLConnection3);
                                 if (httpURLConnection3.getResponseCode() != 200) {
                                     Log.w(Constants.TAG, String.format("%s: %d %s", new Object[]{this.url, Integer.valueOf(httpURLConnection3.getResponseCode()), httpURLConnection3.getResponseMessage()}));
@@ -115,8 +116,8 @@ public final class DownloadUtils {
                     HttpURLConnection httpURLConnection4 = (HttpURLConnection) this.url.openConnection();
                     try {
                         httpURLConnection4.setRequestMethod(HttpRequest.METHOD_GET);
-                        httpURLConnection4.setConnectTimeout(10000);
-                        httpURLConnection4.setReadTimeout(10000);
+                        httpURLConnection4.setConnectTimeout(AbstractSpiCall.DEFAULT_TIMEOUT);
+                        httpURLConnection4.setReadTimeout(AbstractSpiCall.DEFAULT_TIMEOUT);
                         if (httpURLConnection4.getResponseCode() != 200) {
                             Log.w(Constants.TAG, String.format("%s: %d %s", new Object[]{this.url, Integer.valueOf(httpURLConnection4.getResponseCode()), httpURLConnection4.getResponseMessage()}));
                             HttpUtils.drainQuietly(httpURLConnection4);

@@ -7,13 +7,13 @@ import android.content.DialogInterface.OnClickListener;
 final class C1630o implements OnClickListener {
 
     /* renamed from: a */
-    final /* synthetic */ C1400m f1293a;
+    final /* synthetic */ C1400m f1281a;
 
     C1630o(C1400m mVar) {
-        this.f1293a = mVar;
+        this.f1281a = mVar;
     }
 
     public final void onClick(DialogInterface dialogInterface, int i) {
-        this.f1293a.f1115b.f1021F.setSelection(this.f1293a.f1115b.f1031P);
+        this.f1281a.f1109b.f1015F.setSelection(this.f1281a.f1109b.f1025P);
     }
 }

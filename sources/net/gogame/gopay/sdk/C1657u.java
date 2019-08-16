@@ -21,30 +21,30 @@ import org.onepf.oms.appstore.googleUtils.SkuDetails;
 public final class C1657u extends BaseAdapter {
 
     /* renamed from: a */
-    C1363h f1321a;
+    C1363h f1309a;
     /* access modifiers changed from: private */
 
     /* renamed from: b */
-    public final Activity f1322b;
+    public final Activity f1310b;
     /* access modifiers changed from: private */
 
     /* renamed from: c */
-    public final C1407m f1323c;
+    public final C1407m f1311c;
 
     public C1657u(Activity activity, C1407m mVar) {
-        this.f1322b = activity;
-        this.f1323c = mVar;
+        this.f1310b = activity;
+        this.f1311c = mVar;
     }
 
     public final int getCount() {
-        if (this.f1321a == null) {
+        if (this.f1309a == null) {
             return 0;
         }
-        return this.f1321a.f1010b.size();
+        return this.f1309a.f1004b.size();
     }
 
     public final Object getItem(int i) {
-        return this.f1321a.f1010b.get(i);
+        return this.f1309a.f1004b.get(i);
     }
 
     public final long getItemId(int i) {

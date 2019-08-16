@@ -7,13 +7,13 @@ import android.view.View.OnClickListener;
 final class C1390bo implements OnClickListener {
 
     /* renamed from: a */
-    final /* synthetic */ PurchaseActivity f1096a;
+    final /* synthetic */ PurchaseActivity f1090a;
 
     C1390bo(PurchaseActivity purchaseActivity) {
-        this.f1096a = purchaseActivity;
+        this.f1090a = purchaseActivity;
     }
 
     public final void onClick(View view) {
-        PurchaseActivity.m829m(this.f1096a);
+        PurchaseActivity.m829m(this.f1090a);
     }
 }

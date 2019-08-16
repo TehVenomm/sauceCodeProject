@@ -7,20 +7,20 @@ import android.content.DialogInterface.OnClickListener;
 final class C1604aa implements OnClickListener {
 
     /* renamed from: a */
-    final /* synthetic */ int f1236a;
+    final /* synthetic */ int f1224a;
 
     /* renamed from: b */
-    final /* synthetic */ C1635z f1237b;
+    final /* synthetic */ C1635z f1225b;
 
     C1604aa(C1635z zVar, int i) {
-        this.f1237b = zVar;
-        this.f1236a = i;
+        this.f1225b = zVar;
+        this.f1224a = i;
     }
 
     public final void onClick(DialogInterface dialogInterface, int i) {
-        this.f1237b.f1299a.f1120a.f1026K = false;
-        this.f1237b.f1299a.f1120a.f1027L = false;
-        PurchaseActivity.m816c(this.f1237b.f1299a.f1120a, this.f1236a);
-        this.f1237b.f1299a.f1120a.f1058z.setEnabled(true);
+        this.f1225b.f1287a.f1114a.f1020K = false;
+        this.f1225b.f1287a.f1114a.f1021L = false;
+        PurchaseActivity.m816c(this.f1225b.f1287a.f1114a, this.f1224a);
+        this.f1225b.f1287a.f1114a.f1052z.setEnabled(true);
     }
 }

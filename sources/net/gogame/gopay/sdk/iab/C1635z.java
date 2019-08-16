@@ -8,19 +8,19 @@ import android.content.DialogInterface.OnClickListener;
 final class C1635z implements OnClickListener {
 
     /* renamed from: a */
-    final /* synthetic */ C1405y f1299a;
+    final /* synthetic */ C1405y f1287a;
 
     C1635z(C1405y yVar) {
-        this.f1299a = yVar;
+        this.f1287a = yVar;
     }
 
     public final void onClick(DialogInterface dialogInterface, int i) {
-        if (!this.f1299a.f1120a.f1026K || this.f1299a.f1120a.f1025J || !this.f1299a.f1120a.f1027L) {
-            this.f1299a.f1120a.f1025J = false;
-            PurchaseActivity.m816c(this.f1299a.f1120a, i);
-            this.f1299a.f1120a.f1058z.setEnabled(true);
+        if (!this.f1287a.f1114a.f1020K || this.f1287a.f1114a.f1019J || !this.f1287a.f1114a.f1021L) {
+            this.f1287a.f1114a.f1019J = false;
+            PurchaseActivity.m816c(this.f1287a.f1114a, i);
+            this.f1287a.f1114a.f1052z.setEnabled(true);
             return;
         }
-        new Builder(this.f1299a.f1120a).setTitle(this.f1299a.f1120a.f1047o).setMessage(this.f1299a.f1120a.f1046n).setPositiveButton(this.f1299a.f1120a.f1044l, new C1604aa(this, i)).setNegativeButton(this.f1299a.f1120a.f1045m, new C1605ab(this)).setCancelable(false).show();
+        new Builder(this.f1287a.f1114a).setTitle(this.f1287a.f1114a.f1041o).setMessage(this.f1287a.f1114a.f1040n).setPositiveButton(this.f1287a.f1114a.f1038l, new C1604aa(this, i)).setNegativeButton(this.f1287a.f1114a.f1039m, new C1605ab(this)).setCancelable(false).show();
     }
 }

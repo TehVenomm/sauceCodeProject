@@ -4,13 +4,13 @@ package net.gogame.gopay.sdk;
 public final class C1407m {
 
     /* renamed from: a */
-    final String f1129a;
+    final String f1123a;
 
     /* renamed from: b */
-    final String f1130b;
+    final String f1124b;
 
     public C1407m(String str, String str2) {
-        this.f1129a = str;
-        this.f1130b = str2;
+        this.f1123a = str;
+        this.f1124b = str2;
     }
 }

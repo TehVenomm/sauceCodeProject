@@ -115,8 +115,8 @@ public class GoPaySupport extends AbstractIntegrationSupport implements CanSetGu
                 VipClient.INSTANCE.setExtraData(((String) entry.getKey()) + "_uid", (String) entry.getValue());
             }
         }
-        VipClient.INSTANCE.setExtraData("gowrap_version", "2.6.4");
-        VipClient.INSTANCE.setExtraHeader("X-goWrap-Version", "2.6.4");
+        VipClient.INSTANCE.setExtraData("gowrap_version", "2.6.6");
+        VipClient.INSTANCE.setExtraHeader("X-goWrap-Version", "2.6.6");
     }
 
     public void checkVipStatus(String str, boolean z) {

@@ -12,10 +12,6 @@
         <item>繁體中文</item>
         <item>ภาษาไทย</item>
     </string-array>
-    <array name="net_gogame_gowrap_dpro_search_edittext_drawables">
-        <item>@drawable/net_gogame_gowrap_dpro_icon_search</item>
-        <item>@drawable/net_gogame_gowrap_dpro_icon_close</item>
-    </array>
     <array name="net_gogame_gowrap_search_edittext_drawables">
         <item>@drawable/net_gogame_gowrap_icon_search</item>
         <item>@drawable/net_gogame_gowrap_icon_close_new</item>

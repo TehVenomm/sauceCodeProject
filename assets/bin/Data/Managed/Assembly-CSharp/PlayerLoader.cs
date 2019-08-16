@@ -714,6 +714,10 @@ public class PlayerLoader : ModelLoaderBase
 					}
 					string anim_format_name = (m != 0) ? skillParam.tableData.actStateName : skillParam.tableData.castStateName;
 					string ctrlNameFromAnimFormatName = Character.GetCtrlNameFromAnimFormatName(anim_format_name);
+					if (m != 0)
+					{
+						Debug.LogError((object)("Load player " + skillParam.tableData.actStateName));
+					}
 					if (!string.IsNullOrEmpty(ctrlNameFromAnimFormatName) && list.IndexOf(ctrlNameFromAnimFormatName) < 0)
 					{
 						list.Add(ctrlNameFromAnimFormatName);

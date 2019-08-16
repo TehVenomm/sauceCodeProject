@@ -9,19 +9,19 @@ import net.gogame.gopay.sdk.C1636k;
 final class C1391bp implements OnTouchListener {
 
     /* renamed from: a */
-    final /* synthetic */ PurchaseActivity f1097a;
+    final /* synthetic */ PurchaseActivity f1091a;
 
     C1391bp(PurchaseActivity purchaseActivity) {
-        this.f1097a = purchaseActivity;
+        this.f1091a = purchaseActivity;
     }
 
     public final boolean onTouch(View view, MotionEvent motionEvent) {
-        this.f1097a.f1024I = false;
-        if (!this.f1097a.f1036d) {
+        this.f1091a.f1018I = false;
+        if (!this.f1091a.f1030d) {
             return false;
         }
-        PurchaseActivity.m813b(this.f1097a, false);
-        PurchaseActivity.m798a(this.f1097a, this.f1097a.m790a("paymentMethod"), ((C1636k) this.f1097a.f1017B.getItem(this.f1097a.f1022G.getSelectedItemPosition())).f1300a);
+        PurchaseActivity.m813b(this.f1091a, false);
+        PurchaseActivity.m798a(this.f1091a, this.f1091a.m790a("paymentMethod"), ((C1636k) this.f1091a.f1011B.getItem(this.f1091a.f1016G.getSelectedItemPosition())).f1288a);
         return true;
     }
 }

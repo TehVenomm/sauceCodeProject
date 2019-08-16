@@ -4,19 +4,19 @@ package net.gogame.gopay.sdk.iab;
 final class C1612ao implements Runnable {
 
     /* renamed from: a */
-    final /* synthetic */ C1371an f1250a;
+    final /* synthetic */ C1371an f1238a;
 
     C1612ao(C1371an anVar) {
-        this.f1250a = anVar;
+        this.f1238a = anVar;
     }
 
     public final void run() {
-        if (!this.f1250a.f1067a.f1023H.canRetry() || this.f1250a.f1067a.f1057y == null) {
-            this.f1250a.f1067a.f1035c = true;
-            this.f1250a.f1067a.f1041i = null;
-            this.f1250a.f1067a.onBackPressed();
+        if (!this.f1238a.f1061a.f1017H.canRetry() || this.f1238a.f1061a.f1051y == null) {
+            this.f1238a.f1061a.f1029c = true;
+            this.f1238a.f1061a.f1035i = null;
+            this.f1238a.f1061a.onBackPressed();
             return;
         }
-        this.f1250a.f1067a.f1057y.loadUrl(this.f1250a.f1067a.f1023H.getFailedUrl());
+        this.f1238a.f1061a.f1051y.loadUrl(this.f1238a.f1061a.f1017H.getFailedUrl());
     }
 }

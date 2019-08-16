@@ -15,14 +15,14 @@ public abstract class AbstractIntegrationSupport implements IntegrationSupport {
     public static final int DEFAULT_REWARD_QUANTITY = -1;
 
     /* renamed from: id */
-    private final String f1189id;
+    private final String f1181id;
     private boolean initialized = false;
 
     /* access modifiers changed from: protected */
     public abstract void doInit(Activity activity, Config config, IntegrationContext integrationContext);
 
     public AbstractIntegrationSupport(String str) {
-        this.f1189id = str;
+        this.f1181id = str;
     }
 
     public void init(Activity activity, Config config, IntegrationContext integrationContext) {
@@ -30,7 +30,7 @@ public abstract class AbstractIntegrationSupport implements IntegrationSupport {
             try {
                 doInit(activity, config, integrationContext);
             } catch (Exception e) {
-                Log.e(Constants.TAG, "Error initializing " + this.f1189id, e);
+                Log.e(Constants.TAG, "Error initializing " + this.f1181id, e);
             } finally {
                 this.initialized = true;
             }
@@ -38,7 +38,7 @@ public abstract class AbstractIntegrationSupport implements IntegrationSupport {
     }
 
     public String getId() {
-        return this.f1189id;
+        return this.f1181id;
     }
 
     public void onActivityCreated(Activity activity) {

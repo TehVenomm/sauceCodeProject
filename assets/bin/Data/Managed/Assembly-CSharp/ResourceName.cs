@@ -76,6 +76,11 @@ public static class ResourceName
 				text += "_bundle";
 			}
 			text = text + ResourceDefine.suffix[(int)category] + GoGameResourceManager.GetDefaultAssetBundleExtension();
+			if (text.Contains("areamap_ui"))
+			{
+				int num = 1;
+				num++;
+			}
 		}
 		else
 		{

@@ -6,13 +6,13 @@ public abstract class AbstractTaskQueue<T> implements Runnable, TaskQueue<T> {
     public static final long DEFAULT_DELAY = 60000;
 
     /* renamed from: a */
-    private final Listener<T> f1326a;
+    private final Listener<T> f1314a;
 
     /* renamed from: b */
-    private long f1327b = 60000;
+    private long f1315b = 60000;
 
     /* renamed from: c */
-    private Thread f1328c = null;
+    private Thread f1316c = null;
 
     /* access modifiers changed from: protected */
     public abstract T peek();
@@ -24,21 +24,21 @@ public abstract class AbstractTaskQueue<T> implements Runnable, TaskQueue<T> {
     public abstract boolean shouldProcess();
 
     public AbstractTaskQueue(Listener<T> listener) {
-        this.f1326a = listener;
+        this.f1314a = listener;
     }
 
     public long getDelay() {
-        return this.f1327b;
+        return this.f1315b;
     }
 
     public void setDelay(long j) {
-        this.f1327b = j;
+        this.f1315b = j;
     }
 
     public void start() {
-        if (this.f1328c == null || !this.f1328c.isAlive()) {
-            this.f1328c = new Thread(this);
-            this.f1328c.start();
+        if (this.f1316c == null || !this.f1316c.isAlive()) {
+            this.f1316c = new Thread(this);
+            this.f1316c.start();
             return;
         }
         throw new IllegalStateException();
@@ -65,16 +65,16 @@ public abstract class AbstractTaskQueue<T> implements Runnable, TaskQueue<T> {
             java.lang.Object r0 = r3.peek()     // Catch:{ InterruptedException -> 0x0012, Exception -> 0x002d }
             if (r0 != 0) goto L_0x0014
         L_0x000c:
-            long r0 = r3.f1327b     // Catch:{ InterruptedException -> 0x0012, Exception -> 0x002d }
+            long r0 = r3.f1315b     // Catch:{ InterruptedException -> 0x0012, Exception -> 0x002d }
             java.lang.Thread.sleep(r0)     // Catch:{ InterruptedException -> 0x0012, Exception -> 0x002d }
             goto L_0x0000
         L_0x0012:
             r0 = move-exception
             return
         L_0x0014:
-            net.gogame.gopay.vip.TaskQueue$Listener<T> r1 = r3.f1326a     // Catch:{ Exception -> 0x0024, InterruptedException -> 0x0012 }
+            net.gogame.gopay.vip.TaskQueue$Listener<T> r1 = r3.f1314a     // Catch:{ Exception -> 0x0024, InterruptedException -> 0x0012 }
             if (r1 == 0) goto L_0x0036
-            net.gogame.gopay.vip.TaskQueue$Listener<T> r1 = r3.f1326a     // Catch:{ Exception -> 0x0024, InterruptedException -> 0x0012 }
+            net.gogame.gopay.vip.TaskQueue$Listener<T> r1 = r3.f1314a     // Catch:{ Exception -> 0x0024, InterruptedException -> 0x0012 }
             boolean r0 = r1.onTask(r0)     // Catch:{ Exception -> 0x0024, InterruptedException -> 0x0012 }
             if (r0 == 0) goto L_0x000c
             r3.remove()     // Catch:{ Exception -> 0x0024, InterruptedException -> 0x0012 }

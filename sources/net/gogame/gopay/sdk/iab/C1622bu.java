@@ -4,17 +4,17 @@ package net.gogame.gopay.sdk.iab;
 public final class C1622bu {
 
     /* renamed from: a */
-    final float f1269a;
+    final float f1257a;
 
     /* renamed from: b */
-    final String f1270b;
+    final String f1258b;
 
     /* renamed from: c */
-    final boolean f1271c;
+    final boolean f1259c;
 
     public C1622bu(float f, String str, boolean z) {
-        this.f1269a = f;
-        this.f1270b = str;
-        this.f1271c = z;
+        this.f1257a = f;
+        this.f1258b = str;
+        this.f1259c = z;
     }
 }

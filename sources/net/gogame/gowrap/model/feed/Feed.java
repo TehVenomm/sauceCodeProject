@@ -29,7 +29,7 @@ public class Feed implements Serializable {
         private Long createdTime;
 
         /* renamed from: id */
-        private String f1407id;
+        private String f1397id;
         private String link;
         private Integer mediaHeight;
         private String mediaPreview;
@@ -48,7 +48,7 @@ public class Feed implements Serializable {
                 while (jsonReader.hasNext()) {
                     String nextName = jsonReader.nextName();
                     if (StringUtils.isEquals(nextName, "id")) {
-                        this.f1407id = JSONUtils.optString(jsonReader);
+                        this.f1397id = JSONUtils.optString(jsonReader);
                     } else if (StringUtils.isEquals(nextName, KEY_CREATED_TIME)) {
                         this.createdTime = JSONUtils.optLong(jsonReader);
                     } else if (StringUtils.isEquals(nextName, KEY_UPDATED_TIME)) {
@@ -80,11 +80,11 @@ public class Feed implements Serializable {
         }
 
         public String getId() {
-            return this.f1407id;
+            return this.f1397id;
         }
 
         public void setId(String str) {
-            this.f1407id = str;
+            this.f1397id = str;
         }
 
         public Long getCreatedTime() {

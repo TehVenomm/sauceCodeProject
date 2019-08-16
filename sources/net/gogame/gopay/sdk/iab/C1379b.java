@@ -26,12 +26,12 @@ public final class C1379b extends C1359a {
     /* renamed from: a */
     private View m846a(int i, View view) {
         if (view == 0) {
-            r13 = new LinearLayout(this.f993a);
+            r13 = new LinearLayout(this.f987a);
             r13.setWeightSum(1.0f);
             r13.setBackgroundColor(0);
             r13.setOrientation(0);
             r13.setGravity(GravityCompat.START);
-            ImageView imageView = new ImageView(this.f993a);
+            ImageView imageView = new ImageView(this.f987a);
             imageView.setImageResource(17301514);
             imageView.setScaleType(ScaleType.FIT_CENTER);
             imageView.setPadding(mo21497a(0), mo21497a(0), mo21497a(0), mo21497a(0));
@@ -41,7 +41,7 @@ public final class C1379b extends C1359a {
             layoutParams.gravity = 16;
             layoutParams.setMargins(mo21497a(1), 0, mo21497a(2), 0);
             r13.addView(imageView, layoutParams);
-            TextView textView = new TextView(this.f993a);
+            TextView textView = new TextView(this.f987a);
             textView.setBackgroundColor(0);
             textView.setTextColor(Color.parseColor("#000000"));
             textView.setTextSize(2, 14.0f);
@@ -53,7 +53,7 @@ public final class C1379b extends C1359a {
             layoutParams2.gravity = 16;
             layoutParams2.setMargins(mo21497a(1), mo21497a(0), mo21497a(1), mo21497a(0));
             r13.addView(textView, layoutParams2);
-            ImageView imageView2 = new ImageView(this.f993a);
+            ImageView imageView2 = new ImageView(this.f987a);
             Bitmap e = C1415m.m931e();
             if (e != null) {
                 imageView2.setImageBitmap(e);
@@ -62,7 +62,7 @@ public final class C1379b extends C1359a {
             imageView2.setPadding(mo21497a(1), mo21497a(1), mo21497a(1), mo21497a(1));
             imageView2.setVisibility(4);
             imageView2.setTag(Integer.valueOf(3));
-            LayoutParams layoutParams3 = new LayoutParams(DisplayUtils.pxFromDp(this.f993a, 14.0f), DisplayUtils.pxFromDp(this.f993a, 8.0f), 0.0f);
+            LayoutParams layoutParams3 = new LayoutParams(DisplayUtils.pxFromDp(this.f987a, 14.0f), DisplayUtils.pxFromDp(this.f987a, 8.0f), 0.0f);
             layoutParams3.gravity = 16;
             layoutParams3.setMargins(mo21497a(2), 0, mo21497a(10), 0);
             r13.addView(imageView2, layoutParams3);
@@ -74,10 +74,10 @@ public final class C1379b extends C1359a {
             findViewWithTag.setVisibility(4);
         }
         C1623bv bvVar = (C1623bv) view.getTag();
-        bvVar.f1274c = i;
-        bvVar.f1272a.setVisibility(4);
-        bvVar.f1273b.setText(((C1636k) getItem(bvVar.f1274c)).getDisplayName());
-        C1415m.m929c(mo21498a(), ((C1636k) getItem(bvVar.f1274c)).getDisplayIcon(), new C1624c(this, bvVar, i));
+        bvVar.f1262c = i;
+        bvVar.f1260a.setVisibility(4);
+        bvVar.f1261b.setText(((C1636k) getItem(bvVar.f1262c)).getDisplayName());
+        C1415m.m929c(mo21498a(), ((C1636k) getItem(bvVar.f1262c)).getDisplayIcon(), new C1624c(this, bvVar, i));
         return view;
     }
 

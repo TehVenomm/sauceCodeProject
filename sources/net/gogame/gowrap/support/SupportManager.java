@@ -135,26 +135,26 @@ public final class SupportManager {
 
     public static String getExtraData(Context context, String str, SupportCategory supportCategory) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Date/time: " + new Date() + StringUtils.f1199LF);
+        sb.append("Date/time: " + new Date() + StringUtils.f1189LF);
         if (str != null) {
-            sb.append("Name: " + str + StringUtils.f1199LF);
+            sb.append("Name: " + str + StringUtils.f1189LF);
         }
-        sb.append("Game: " + AppInfo.getAppLabel(context) + StringUtils.f1199LF);
-        sb.append("Version: " + AppInfo.getAppVersion(context) + StringUtils.f1199LF);
+        sb.append("Game: " + AppInfo.getAppLabel(context) + StringUtils.f1189LF);
+        sb.append("Version: " + AppInfo.getAppVersion(context) + StringUtils.f1189LF);
         if (GoWrapImpl.INSTANCE.getGuid() != null) {
-            sb.append("Game user ID: " + GoWrapImpl.INSTANCE.getGuid() + StringUtils.f1199LF);
+            sb.append("Game user ID: " + GoWrapImpl.INSTANCE.getGuid() + StringUtils.f1189LF);
         }
         if (supportCategory != null) {
-            sb.append("Category: " + supportCategory.getId() + StringUtils.f1199LF);
+            sb.append("Category: " + supportCategory.getId() + StringUtils.f1189LF);
         }
         if (Wrapper.INSTANCE.getCurrentLocale(context) != null) {
-            sb.append("Locale: " + Wrapper.INSTANCE.getCurrentLocale(context) + StringUtils.f1199LF);
+            sb.append("Locale: " + Wrapper.INSTANCE.getCurrentLocale(context) + StringUtils.f1189LF);
         }
-        sb.append("Device ID: " + getDeviceId(context) + StringUtils.f1199LF);
-        sb.append("Mem: " + getMemoryInfo(context) + StringUtils.f1199LF);
-        sb.append("Device Type: " + getDeviceInfo() + StringUtils.f1199LF);
-        sb.append("OS Version: " + getOsVersion() + StringUtils.f1199LF);
-        sb.append("Resolution: " + getScreenResolution(context) + StringUtils.f1199LF);
+        sb.append("Device ID: " + getDeviceId(context) + StringUtils.f1189LF);
+        sb.append("Mem: " + getMemoryInfo(context) + StringUtils.f1189LF);
+        sb.append("Device Type: " + getDeviceInfo() + StringUtils.f1189LF);
+        sb.append("OS Version: " + getOsVersion() + StringUtils.f1189LF);
+        sb.append("Resolution: " + getScreenResolution(context) + StringUtils.f1189LF);
         return sb.toString();
     }
 

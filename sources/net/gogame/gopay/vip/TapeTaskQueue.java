@@ -10,16 +10,16 @@ import net.gogame.gopay.vip.tape2.ObjectQueue.Converter;
 public abstract class TapeTaskQueue<T> extends AbstractTaskQueue<T> {
 
     /* renamed from: a */
-    private final ObjectQueue<T> f1352a;
+    private final ObjectQueue<T> f1338a;
 
     public TapeTaskQueue(File file, Converter<T> converter, Listener listener) throws IOException {
         super(listener);
-        this.f1352a = ObjectQueue.create(file, converter);
+        this.f1338a = ObjectQueue.create(file, converter);
     }
 
     public synchronized void add(T t) {
         try {
-            this.f1352a.add(t);
+            this.f1338a.add(t);
         } catch (Exception e) {
             Log.e("goPay", "Exception", e);
         }
@@ -29,7 +29,7 @@ public abstract class TapeTaskQueue<T> extends AbstractTaskQueue<T> {
     public synchronized T peek() {
         T t;
         try {
-            t = this.f1352a.peek();
+            t = this.f1338a.peek();
         } catch (Exception e) {
             Log.e("goPay", "Exception", e);
             t = null;
@@ -39,7 +39,7 @@ public abstract class TapeTaskQueue<T> extends AbstractTaskQueue<T> {
 
     public synchronized void remove() {
         try {
-            this.f1352a.remove();
+            this.f1338a.remove();
         } catch (Exception e) {
             Log.e("goPay", "Exception", e);
         }

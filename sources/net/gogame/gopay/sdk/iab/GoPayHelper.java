@@ -8,99 +8,99 @@ import org.onepf.oms.appstore.GooglePlay;
 public final class GoPayHelper {
 
     /* renamed from: a */
-    private static GoGameStore f1223a;
+    private static GoGameStore f1211a;
 
     /* renamed from: b */
-    private static boolean f1224b = false;
+    private static boolean f1212b = false;
 
     /* renamed from: c */
-    private static String f1225c;
+    private static String f1213c;
 
     /* renamed from: d */
-    private static String f1226d;
+    private static String f1214d;
 
     /* renamed from: e */
-    private static String f1227e;
+    private static String f1215e;
 
     /* renamed from: f */
-    private static String f1228f;
+    private static String f1216f;
 
     /* renamed from: g */
-    private static String f1229g;
+    private static String f1217g;
 
     /* renamed from: h */
-    private static String f1230h;
+    private static String f1218h;
 
     private GoPayHelper() {
     }
 
     public static String getEmail() {
-        return f1228f;
+        return f1216f;
     }
 
     public static String getGameLanguage() {
-        return f1229g;
+        return f1217g;
     }
 
     public static String getGoPayAppId() {
-        return f1225c;
+        return f1213c;
     }
 
     public static String getGoPayAppSecret() {
-        return f1226d;
+        return f1214d;
     }
 
     public static String getGooglePlayPublicKey() {
-        return f1230h;
+        return f1218h;
     }
 
     public static String getGuid() {
-        return f1227e;
+        return f1215e;
     }
 
     public static GoGameStore getStoreInstance() {
-        return f1223a;
+        return f1211a;
     }
 
     public static boolean isDisable3rdParty() {
-        return f1224b;
+        return f1212b;
     }
 
     public static OpenIabHelper newOpenIabHelper(Context context) {
-        if (f1224b) {
-            return new OpenIabHelper(context, new Builder().addAvailableStoreNames(OpenIabHelper.NAME_GOOGLE).addAvailableStores(new GooglePlay(context, f1230h)).setStoreSearchStrategy(1).build());
+        if (f1212b) {
+            return new OpenIabHelper(context, new Builder().addAvailableStoreNames(OpenIabHelper.NAME_GOOGLE).addAvailableStores(new GooglePlay(context, f1218h)).setStoreSearchStrategy(1).build());
         }
         Builder addAvailableStoreNames = new Builder().addAvailableStoreNames("GoGameStore");
-        GoGameStore goGameStore = new GoGameStore(context, f1225c, f1227e, f1226d, f1228f, f1229g);
-        f1223a = goGameStore;
+        GoGameStore goGameStore = new GoGameStore(context, f1213c, f1215e, f1214d, f1216f, f1217g);
+        f1211a = goGameStore;
         return new OpenIabHelper(context, addAvailableStoreNames.addAvailableStores(goGameStore).setCheckInventory(false).setStoreSearchStrategy(1).build());
     }
 
     public static void setDisable3rdParty(boolean z) {
-        f1224b = z;
+        f1212b = z;
     }
 
     public static void setEmail(String str) {
-        f1228f = str;
+        f1216f = str;
     }
 
     public static void setGameLanguage(String str) {
-        f1229g = str;
+        f1217g = str;
     }
 
     public static void setGoPayAppId(String str) {
-        f1225c = str;
+        f1213c = str;
     }
 
     public static void setGoPayAppSecret(String str) {
-        f1226d = str;
+        f1214d = str;
     }
 
     public static void setGooglePlayPublicKey(String str) {
-        f1230h = str;
+        f1218h = str;
     }
 
     public static void setGuid(String str) {
-        f1227e = str;
+        f1215e = str;
     }
 }

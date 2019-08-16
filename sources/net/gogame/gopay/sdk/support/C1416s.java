@@ -8,7 +8,7 @@ import java.util.Map;
 public final class C1416s {
 
     /* renamed from: a */
-    private static final Map f1180a = new HashMap();
+    private static final Map f1174a = new HashMap();
 
     static {
         m944a("store_title", "Store");
@@ -35,17 +35,17 @@ public final class C1416s {
 
     /* renamed from: a */
     private static void m944a(String str, String str2) {
-        Map map = (Map) f1180a.get(str);
+        Map map = (Map) f1174a.get(str);
         if (map == null) {
             map = new HashMap();
-            f1180a.put(str, map);
+            f1174a.put(str, map);
         }
         map.put(null, str2);
     }
 
     /* renamed from: b */
     private static String m945b(String str, String str2) {
-        Map map = (Map) f1180a.get(str2);
+        Map map = (Map) f1174a.get(str2);
         if (map == null) {
             return null;
         }

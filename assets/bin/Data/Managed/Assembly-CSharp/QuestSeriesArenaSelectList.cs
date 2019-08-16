@@ -22,6 +22,8 @@ public class QuestSeriesArenaSelectList : QuestSeriesArenaEventList
 		LBL_LOCATION_NAME,
 		LBL_LOCATION_NAME_EFFECT,
 		WGT_LOCATION_NAME_LIMIT,
+		SPR_MISSION_CROWN_ON,
+		SPR_MISSION_CROWN_OFF,
 		SCR_DELIVERY_QUEST,
 		OBJ_IMAGE,
 		BTN_EVENT,
@@ -163,6 +165,25 @@ public class QuestSeriesArenaSelectList : QuestSeriesArenaEventList
 			SetActive(t, UI.OBJ_REQUEST_COMPLETED, is_visible: true);
 		}
 		SetSprite(t, UI.SPR_FRAME, "RequestPlate_hero");
+		bool flag = true;
+		QuestInfoData.Mission[] array = null;
+		array = QuestInfoData.CreateMissionData(showDeliveryData.data.GetQuestData());
+		if (array == null)
+		{
+			SetActive(t, UI.SPR_MISSION_CROWN_ON, is_visible: false);
+			SetActive(t, UI.SPR_MISSION_CROWN_OFF, is_visible: true);
+			return;
+		}
+		for (int i = 0; i < array.Length; i++)
+		{
+			if (array[i].state < CLEAR_STATUS.CLEAR)
+			{
+				flag = false;
+				break;
+			}
+		}
+		SetActive(t, UI.SPR_MISSION_CROWN_ON, flag);
+		SetActive(t, UI.SPR_MISSION_CROWN_OFF, !flag);
 	}
 
 	private void SetUpSeriesArenaListItem(Transform t, DeliveryTable.DeliveryData info)

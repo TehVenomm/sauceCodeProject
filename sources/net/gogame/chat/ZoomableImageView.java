@@ -31,7 +31,7 @@ public class ZoomableImageView extends ImageView {
     /* access modifiers changed from: private */
 
     /* renamed from: m */
-    public float[] f1205m;
+    public float[] f1195m;
     /* access modifiers changed from: private */
     public ScaleGestureDetector mScaleDetector;
     /* access modifiers changed from: private */
@@ -84,9 +84,9 @@ public class ZoomableImageView extends ImageView {
             if (ZoomableImageView.this.origWidth * ZoomableImageView.this.saveScale <= ZoomableImageView.this.width || ZoomableImageView.this.origHeight * ZoomableImageView.this.saveScale <= ZoomableImageView.this.height) {
                 ZoomableImageView.this.matrix.postScale(scaleFactor, scaleFactor, ZoomableImageView.this.width / 2.0f, ZoomableImageView.this.height / 2.0f);
                 if (scaleFactor < 1.0f) {
-                    ZoomableImageView.this.matrix.getValues(ZoomableImageView.this.f1205m);
-                    float f = ZoomableImageView.this.f1205m[2];
-                    float f2 = ZoomableImageView.this.f1205m[5];
+                    ZoomableImageView.this.matrix.getValues(ZoomableImageView.this.f1195m);
+                    float f = ZoomableImageView.this.f1195m[2];
+                    float f2 = ZoomableImageView.this.f1195m[5];
                     if (scaleFactor < 1.0f) {
                         if (((float) Math.round(ZoomableImageView.this.origWidth * ZoomableImageView.this.saveScale)) < ZoomableImageView.this.width) {
                             if (f2 < (-ZoomableImageView.this.bottom)) {
@@ -103,9 +103,9 @@ public class ZoomableImageView extends ImageView {
                 }
             } else {
                 ZoomableImageView.this.matrix.postScale(scaleFactor, scaleFactor, scaleGestureDetector.getFocusX(), scaleGestureDetector.getFocusY());
-                ZoomableImageView.this.matrix.getValues(ZoomableImageView.this.f1205m);
-                float f3 = ZoomableImageView.this.f1205m[2];
-                float f4 = ZoomableImageView.this.f1205m[5];
+                ZoomableImageView.this.matrix.getValues(ZoomableImageView.this.f1195m);
+                float f3 = ZoomableImageView.this.f1195m[2];
+                float f4 = ZoomableImageView.this.f1195m[5];
                 if (scaleFactor < 1.0f) {
                     if (f3 < (-ZoomableImageView.this.right)) {
                         ZoomableImageView.this.matrix.postTranslate(-(f3 + ZoomableImageView.this.right), 0.0f);
@@ -129,15 +129,15 @@ public class ZoomableImageView extends ImageView {
         this.context = context2;
         this.mScaleDetector = new ScaleGestureDetector(context2, new ScaleListener());
         this.matrix.setTranslate(1.0f, 1.0f);
-        this.f1205m = new float[9];
+        this.f1195m = new float[9];
         setImageMatrix(this.matrix);
         setScaleType(ScaleType.MATRIX);
         setOnTouchListener(new OnTouchListener() {
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 ZoomableImageView.this.mScaleDetector.onTouchEvent(motionEvent);
-                ZoomableImageView.this.matrix.getValues(ZoomableImageView.this.f1205m);
-                float f = ZoomableImageView.this.f1205m[2];
-                float f2 = ZoomableImageView.this.f1205m[5];
+                ZoomableImageView.this.matrix.getValues(ZoomableImageView.this.f1195m);
+                float f = ZoomableImageView.this.f1195m[2];
+                float f2 = ZoomableImageView.this.f1195m[5];
                 PointF pointF = new PointF(motionEvent.getX(), motionEvent.getY());
                 switch (motionEvent.getAction()) {
                     case 0:

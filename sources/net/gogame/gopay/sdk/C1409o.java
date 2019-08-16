@@ -8,15 +8,15 @@ import android.widget.AdapterView.OnItemSelectedListener;
 final class C1409o implements OnItemSelectedListener {
 
     /* renamed from: a */
-    final /* synthetic */ StoreActivity f1134a;
+    final /* synthetic */ StoreActivity f1128a;
 
     C1409o(StoreActivity storeActivity) {
-        this.f1134a = storeActivity;
+        this.f1128a = storeActivity;
     }
 
     public final void onItemSelected(AdapterView adapterView, View view, int i, long j) {
-        C1406j.m868a(((Country) this.f1134a.f991d.getItem(i)).getCode());
-        this.f1134a.m762a();
+        C1406j.m868a(((Country) this.f1128a.f985d.getItem(i)).getCode());
+        this.f1128a.m762a();
     }
 
     public final void onNothingSelected(AdapterView adapterView) {

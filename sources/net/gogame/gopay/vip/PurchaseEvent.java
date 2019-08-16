@@ -10,31 +10,31 @@ public class PurchaseEvent implements BaseEvent {
     public static final String EVENT_TYPE = "PurchaseEvent";
 
     /* renamed from: a */
-    private String f1335a;
+    private String f1323a;
 
     /* renamed from: b */
-    private String f1336b;
+    private String f1324b;
 
     /* renamed from: c */
-    private String f1337c;
+    private String f1325c;
 
     /* renamed from: d */
-    private String f1338d;
+    private String f1326d;
 
     /* renamed from: e */
-    private double f1339e;
+    private double f1327e;
 
     /* renamed from: f */
-    private long f1340f;
+    private long f1328f;
 
     /* renamed from: g */
-    private String f1341g;
+    private String f1329g;
 
     /* renamed from: h */
-    private VerificationStatus f1342h;
+    private VerificationStatus f1330h;
 
     /* renamed from: i */
-    private boolean f1343i;
+    private boolean f1331i;
 
     public enum VerificationStatus {
         NOT_VERIFIED(0),
@@ -43,14 +43,14 @@ public class PurchaseEvent implements BaseEvent {
         
 
         /* renamed from: a */
-        private final int f1345a;
+        private final int f1333a;
 
         private VerificationStatus(int i) {
-            this.f1345a = i;
+            this.f1333a = i;
         }
 
         public int getValue() {
-            return this.f1345a;
+            return this.f1333a;
         }
 
         public static VerificationStatus fromValue(int i) {
@@ -65,103 +65,103 @@ public class PurchaseEvent implements BaseEvent {
     }
 
     public String getReferenceId() {
-        return this.f1335a;
+        return this.f1323a;
     }
 
     public void setReferenceId(String str) {
-        this.f1335a = str;
+        this.f1323a = str;
     }
 
     public String getGuid() {
-        return this.f1336b;
+        return this.f1324b;
     }
 
     public void setGuid(String str) {
-        this.f1336b = str;
+        this.f1324b = str;
     }
 
     public String getProductId() {
-        return this.f1337c;
+        return this.f1325c;
     }
 
     public void setProductId(String str) {
-        this.f1337c = str;
+        this.f1325c = str;
     }
 
     public String getCurrencyCode() {
-        return this.f1338d;
+        return this.f1326d;
     }
 
     public void setCurrencyCode(String str) {
-        this.f1338d = str;
+        this.f1326d = str;
     }
 
     public double getPrice() {
-        return this.f1339e;
+        return this.f1327e;
     }
 
     public void setPrice(double d) {
-        this.f1339e = d;
+        this.f1327e = d;
     }
 
     public long getTimestamp() {
-        return this.f1340f;
+        return this.f1328f;
     }
 
     public void setTimestamp(long j) {
-        this.f1340f = j;
+        this.f1328f = j;
     }
 
     public String getOrderId() {
-        return this.f1341g;
+        return this.f1329g;
     }
 
     public void setOrderId(String str) {
-        this.f1341g = str;
+        this.f1329g = str;
     }
 
     public VerificationStatus getVerificationStatus() {
-        return this.f1342h;
+        return this.f1330h;
     }
 
     public void setVerificationStatus(VerificationStatus verificationStatus) {
-        this.f1342h = verificationStatus;
+        this.f1330h = verificationStatus;
     }
 
     public boolean isSandbox() {
-        return this.f1343i;
+        return this.f1331i;
     }
 
     public void setSandbox(boolean z) {
-        this.f1343i = z;
+        this.f1331i = z;
     }
 
     public JSONObject marshal() throws JSONException {
         JSONObject jSONObject = new JSONObject();
         jSONObject.put("@eventType", EVENT_TYPE);
-        jSONObject.put("referenceId", this.f1335a);
-        jSONObject.put("guid", this.f1336b);
-        jSONObject.put(AmazonAppstoreBillingService.JSON_KEY_PRODUCT_ID, this.f1337c);
-        jSONObject.put(AppsFlyerProperties.CURRENCY_CODE, this.f1338d);
-        jSONObject.put(Param.PRICE, this.f1339e);
-        jSONObject.put("timestamp", this.f1340f);
-        jSONObject.put(AmazonAppstoreBillingService.JSON_KEY_ORDER_ID, this.f1341g);
-        if (this.f1342h != null) {
-            jSONObject.put("verificationStatus", this.f1342h.getValue());
+        jSONObject.put("referenceId", this.f1323a);
+        jSONObject.put("guid", this.f1324b);
+        jSONObject.put(AmazonAppstoreBillingService.JSON_KEY_PRODUCT_ID, this.f1325c);
+        jSONObject.put(AppsFlyerProperties.CURRENCY_CODE, this.f1326d);
+        jSONObject.put(Param.PRICE, this.f1327e);
+        jSONObject.put("timestamp", this.f1328f);
+        jSONObject.put(AmazonAppstoreBillingService.JSON_KEY_ORDER_ID, this.f1329g);
+        if (this.f1330h != null) {
+            jSONObject.put("verificationStatus", this.f1330h.getValue());
         }
-        jSONObject.put("sandbox", this.f1343i);
+        jSONObject.put("sandbox", this.f1331i);
         return jSONObject;
     }
 
     public void unmarshal(JSONObject jSONObject) throws JSONException {
-        this.f1335a = jSONObject.optString("referenceId", null);
-        this.f1336b = jSONObject.optString("guid", null);
-        this.f1337c = jSONObject.optString(AmazonAppstoreBillingService.JSON_KEY_PRODUCT_ID, null);
-        this.f1338d = jSONObject.optString(AppsFlyerProperties.CURRENCY_CODE, null);
-        this.f1339e = jSONObject.optDouble(Param.PRICE);
-        this.f1340f = jSONObject.optLong("timestamp");
-        this.f1341g = jSONObject.optString(AmazonAppstoreBillingService.JSON_KEY_ORDER_ID, null);
-        this.f1342h = VerificationStatus.fromValue(jSONObject.optInt("verificationStatus", VerificationStatus.NOT_VERIFIED.getValue()));
-        this.f1343i = jSONObject.optBoolean("sandbox");
+        this.f1323a = jSONObject.optString("referenceId", null);
+        this.f1324b = jSONObject.optString("guid", null);
+        this.f1325c = jSONObject.optString(AmazonAppstoreBillingService.JSON_KEY_PRODUCT_ID, null);
+        this.f1326d = jSONObject.optString(AppsFlyerProperties.CURRENCY_CODE, null);
+        this.f1327e = jSONObject.optDouble(Param.PRICE);
+        this.f1328f = jSONObject.optLong("timestamp");
+        this.f1329g = jSONObject.optString(AmazonAppstoreBillingService.JSON_KEY_ORDER_ID, null);
+        this.f1330h = VerificationStatus.fromValue(jSONObject.optInt("verificationStatus", VerificationStatus.NOT_VERIFIED.getValue()));
+        this.f1331i = jSONObject.optBoolean("sandbox");
     }
 }

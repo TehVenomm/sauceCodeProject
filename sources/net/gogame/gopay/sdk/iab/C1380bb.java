@@ -8,17 +8,17 @@ import net.gogame.gopay.sdk.C1361f;
 final class C1380bb implements OnCancelListener {
 
     /* renamed from: a */
-    final /* synthetic */ C1361f f1078a;
+    final /* synthetic */ C1361f f1072a;
 
     /* renamed from: b */
-    final /* synthetic */ PurchaseActivity f1079b;
+    final /* synthetic */ PurchaseActivity f1073b;
 
     C1380bb(PurchaseActivity purchaseActivity, C1361f fVar) {
-        this.f1079b = purchaseActivity;
-        this.f1078a = fVar;
+        this.f1073b = purchaseActivity;
+        this.f1072a = fVar;
     }
 
     public final void onCancel(DialogInterface dialogInterface) {
-        PurchaseActivity.m811b(this.f1079b, this.f1078a.f997a, this.f1078a.f999c);
+        PurchaseActivity.m811b(this.f1073b, this.f1072a.f991a, this.f1072a.f993c);
     }
 }

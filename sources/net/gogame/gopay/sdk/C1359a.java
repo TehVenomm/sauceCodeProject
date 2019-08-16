@@ -9,44 +9,44 @@ import net.gogame.gopay.sdk.support.DisplayUtils;
 public abstract class C1359a extends BaseAdapter {
 
     /* renamed from: a */
-    public final Context f993a;
+    public final Context f987a;
 
     /* renamed from: b */
-    protected String f994b;
+    protected String f988b;
 
     /* renamed from: c */
-    public List f995c;
+    public List f989c;
 
     public C1359a(Context context) {
-        this.f993a = context;
+        this.f987a = context;
     }
 
     /* renamed from: a */
     public final int mo21497a(int i) {
-        return DisplayUtils.pxFromDp(this.f993a, (float) i);
+        return DisplayUtils.pxFromDp(this.f987a, (float) i);
     }
 
     /* renamed from: a */
     public final String mo21498a() {
-        return this.f994b;
+        return this.f988b;
     }
 
     /* renamed from: a */
     public final void mo21499a(String str, List list) {
-        this.f994b = str;
-        this.f995c = list;
+        this.f988b = str;
+        this.f989c = list;
         notifyDataSetChanged();
     }
 
     public int getCount() {
-        if (this.f995c == null) {
+        if (this.f989c == null) {
             return 0;
         }
-        return this.f995c.size();
+        return this.f989c.size();
     }
 
     public Object getItem(int i) {
-        return this.f995c.get(i);
+        return this.f989c.get(i);
     }
 
     public long getItemId(int i) {

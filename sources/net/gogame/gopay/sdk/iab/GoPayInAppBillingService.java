@@ -33,25 +33,25 @@ public class GoPayInAppBillingService implements GoPayInAppBillingServiceExt, Ap
     /* access modifiers changed from: private */
 
     /* renamed from: a */
-    public final String f1231a;
+    public final String f1219a;
     /* access modifiers changed from: private */
 
     /* renamed from: b */
-    public String f1232b;
+    public String f1220b;
 
     /* renamed from: c */
-    private final String f1233c;
+    private final String f1221c;
 
     /* renamed from: d */
-    private final Map f1234d = new HashMap();
+    private final Map f1222d = new HashMap();
 
     /* renamed from: e */
-    private final boolean f1235e = false;
+    private final boolean f1223e = false;
 
     public GoPayInAppBillingService(@NotNull Context context, @NotNull String str, @NotNull String str2, @NotNull String str3, @NotNull String str4) {
-        this.f1231a = str;
-        this.f1232b = str2;
-        this.f1233c = null;
+        this.f1219a = str;
+        this.f1220b = str2;
+        this.f1221c = null;
         C1406j.m873b(str4);
         C1406j.m876c(str3);
         C1406j.m880e(context.getPackageName());
@@ -66,16 +66,16 @@ public class GoPayInAppBillingService implements GoPayInAppBillingServiceExt, Ap
 
     @Deprecated
     public GoPayInAppBillingService(@NotNull String str, @NotNull String str2) {
-        this.f1231a = str;
-        this.f1232b = str2;
-        this.f1233c = null;
+        this.f1219a = str;
+        this.f1220b = str2;
+        this.f1221c = null;
     }
 
     @Deprecated
     public GoPayInAppBillingService(@NotNull String str, @NotNull String str2, @NotNull String str3) {
-        this.f1231a = str;
-        this.f1232b = str2;
-        this.f1233c = str3;
+        this.f1219a = str;
+        this.f1220b = str2;
+        this.f1221c = str3;
     }
 
     /* renamed from: a */
@@ -92,7 +92,7 @@ public class GoPayInAppBillingService implements GoPayInAppBillingServiceExt, Ap
 
     public GetCountryDetailsResponse getCountries() {
         try {
-            return C1406j.m870b(this.f1231a, this.f1232b, null);
+            return C1406j.m870b(this.f1219a, this.f1220b, null);
         } catch (Exception e) {
             throw new IabException(-1008, e.getLocalizedMessage());
         }
@@ -100,7 +100,7 @@ public class GoPayInAppBillingService implements GoPayInAppBillingServiceExt, Ap
 
     public GetCountryDetailsResponse getCountries(String str) {
         try {
-            return C1406j.m870b(this.f1231a, this.f1232b, str);
+            return C1406j.m870b(this.f1219a, this.f1220b, str);
         } catch (Exception e) {
             throw new IabException(-1008, e.getLocalizedMessage());
         }
@@ -112,8 +112,8 @@ public class GoPayInAppBillingService implements GoPayInAppBillingServiceExt, Ap
 
     public Intent getPurchaseFlowIntent(Activity activity, String str, String str2, String str3) {
         Intent intent = new Intent(activity, PurchaseActivity.class);
-        intent.putExtra("gid", this.f1231a);
-        intent.putExtra("guid", this.f1232b);
+        intent.putExtra("gid", this.f1219a);
+        intent.putExtra("guid", this.f1220b);
         intent.putExtra(MessengerShareContentUtility.ATTACHMENT_PAYLOAD, str3);
         intent.putExtra("sku", str);
         intent.putExtra(AmazonAppstoreBillingService.JSON_KEY_RECEIPT_ITEM_TYPE, str2);
@@ -123,16 +123,16 @@ public class GoPayInAppBillingService implements GoPayInAppBillingServiceExt, Ap
 
     public boolean handleActivityResult(int i, int i2, Intent intent) {
         Purchase purchase;
-        C1626e eVar = (C1626e) this.f1234d.get(Integer.valueOf(i));
+        C1626e eVar = (C1626e) this.f1222d.get(Integer.valueOf(i));
         if (eVar == null) {
             return false;
         }
-        OnIabPurchaseFinishedListener onIabPurchaseFinishedListener = eVar.f1281b;
+        OnIabPurchaseFinishedListener onIabPurchaseFinishedListener = eVar.f1269b;
         if (intent == null) {
             if (onIabPurchaseFinishedListener != null) {
                 onIabPurchaseFinishedListener.onIabPurchaseFinished(new IabResult(-1002, "Bad response!"), null);
             }
-            this.f1234d.remove(Integer.valueOf(i));
+            this.f1222d.remove(Integer.valueOf(i));
             return true;
         }
         int i3 = intent.getExtras().getInt("RESPONSE_CODE");
@@ -146,7 +146,7 @@ public class GoPayInAppBillingService implements GoPayInAppBillingServiceExt, Ap
                 }
             } else {
                 try {
-                    purchase = new Purchase(eVar.f1280a, stringExtra, stringExtra2, "GoGameStore");
+                    purchase = new Purchase(eVar.f1268a, stringExtra, stringExtra2, "GoGameStore");
                 } catch (JSONException e) {
                     e.printStackTrace();
                     if (onIabPurchaseFinishedListener != null) {
@@ -169,7 +169,7 @@ public class GoPayInAppBillingService implements GoPayInAppBillingServiceExt, Ap
                 onIabPurchaseFinishedListener.onIabPurchaseFinished(new IabResult(-1006, "Unknown purchase response."), null);
             }
         }
-        this.f1234d.remove(Integer.valueOf(i));
+        this.f1222d.remove(Integer.valueOf(i));
         return true;
     }
 
@@ -180,7 +180,7 @@ public class GoPayInAppBillingService implements GoPayInAppBillingServiceExt, Ap
     public void launchPurchaseFlow(Activity activity, String str, String str2, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str3) {
         try {
             Intent purchaseFlowIntent = getPurchaseFlowIntent(activity, str, str2, str3);
-            this.f1234d.put(Integer.valueOf(i), new C1626e(str, str2, onIabPurchaseFinishedListener));
+            this.f1222d.put(Integer.valueOf(i), new C1626e(str, str2, onIabPurchaseFinishedListener));
             activity.startActivityForResult(purchaseFlowIntent, i);
         } catch (Exception e) {
             if (onIabPurchaseFinishedListener != null) {
@@ -191,13 +191,13 @@ public class GoPayInAppBillingService implements GoPayInAppBillingServiceExt, Ap
 
     @Nullable
     public Inventory queryInventory(boolean z, List list, List list2) {
-        C1363h a = C1406j.m865a(this.f1231a, this.f1232b, null);
+        C1363h a = C1406j.m865a(this.f1219a, this.f1220b, null);
         Inventory inventory = new Inventory();
-        if (a.f1010b != null) {
-            for (SkuDetails addSkuDetails : a.f1010b) {
+        if (a.f1004b != null) {
+            for (SkuDetails addSkuDetails : a.f1004b) {
                 inventory.addSkuDetails(addSkuDetails);
             }
-            setCurrentCountry(a.f1009a);
+            setCurrentCountry(a.f1003a);
         }
         return inventory;
     }
@@ -216,8 +216,8 @@ public class GoPayInAppBillingService implements GoPayInAppBillingServiceExt, Ap
     }
 
     public void setGameUserId(String str) {
-        if (!this.f1232b.equals(str)) {
-            this.f1232b = str;
+        if (!this.f1220b.equals(str)) {
+            this.f1220b = str;
         }
     }
 
